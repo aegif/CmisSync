@@ -1,13 +1,7 @@
 Points of contact:
 
 	Maintainer:
-	Hylke Bons <hylkebons@gmail.com>
-
-	Marketing:
-	Alexandre Saiz Verdaguer <alex@sparkleshare.net>
-
-	Translations:
-	Łukasz Jernaś <deejay1@srem.org>
+	Nicolas Raoul <nicolas.raoul@aegif.jp>
 
 
 Code:

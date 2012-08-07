@@ -14,8 +14,8 @@ CmisSync is Open Source software and licensed under the `GNU General Public Lice
 
 ### Development
 
-CmisSync based on [SparkleShare](http://sparkleshare.org), an excellent Git sync tool. Due to this fact, the build instructions of SparkleShare apply:
+CmisSync re-uses a lot of source code from [SparkleShare](http://sparkleshare.org), an excellent Git sync tool. You might find references to SparkleShare in the source code. Please note that CmisSync is not SparkleShare and does not represent it. The build instructions of SparkleShare apply, though:
 
-[...on Linux distributions](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Linux/README.md)  
-[...on Mac](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Mac/README.md)  
-[...on Windows](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Windows/README.md)  
+[Linux](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Linux/README.md)  
+[Mac](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Mac/README.md)  
+[Windows](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Windows/README.md)  
