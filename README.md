@@ -1,32 +1,21 @@
-## SparkleShare
+## CmisSync
 
-SparkleShare is an Open Source collaboration and sharing tool that is designed to keep things simple and to stay out of your way. It allows you to instantly sync with [Git](http://www.git-scm.org/) repositories and is available for Linux distributions, Mac and Windows.
+CmisSync allows you to keep in sync with your CMIS repository. It is like Dropbox for Enterprise Content Management!  
+It is available for Linux, Mac, Windows.
 
+CmisSync is mostly developed by [Aegif](http://aegif.jp), but all contributions are welcome!
 
-### Resources
-
-|                    |                                                   |
-|-------------------:|:--------------------------------------------------|
-|       **Website**: | http://www.sparkleshare.org/                      |
-|       **Twitter**: | https://www.twitter.com/SparkleShare              |
-|     **Downloads**: | https://github.com/hbons/SparkleShare/downloads   |
-|   **Development**: | https://github.com/hbons/SparkleShare             |
-|   **IRC channel**: | #sparkleshare on irc.gnome.org                    |
-
+The first release of CmisSync will happen before the end of the year.
 
 ### License
 
-SparkleShare is Open Source software and licensed under the `GNU General Public License version 3 or later`. You are welcome to change and redistribute it under certain conditions.For more information see the `legal/LICENSE` file.
+CmisSync is Open Source software and licensed under the `GNU General Public License version 3 or later`. You are welcome to change and redistribute it under certain conditions. For more information see the `legal/LICENSE` file.
 
 
-### Building...
+### Development
+
+CmisSync based on [SparkleShare](http://sparkleshare.org), an excellent Git sync tool. Due to this fact, the build instructions of SparkleShare apply:
 
 [...on Linux distributions](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Linux/README.md)  
 [...on Mac](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Mac/README.md)  
 [...on Windows](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Windows/README.md)  
-
-
-### Finally...
-
-Have fun, make awesome. :)
-
