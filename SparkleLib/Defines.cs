@@ -8,7 +8,7 @@
 //
 //   This program is distributed in the hope that it will be useful,
 //   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
@@ -16,22 +16,16 @@
 
 
 using System;
+using System.Reflection;
 
-namespace SparkleShare {
-    
-    public class SparkleBubbles {
+[assembly:AssemblyTitle ("SparkleLib")]
+[assembly:AssemblyVersion ("0.9.1")]
+[assembly:AssemblyCopyright ("Copyright (c) 2010 Hylke Bons and others")]
+[assembly:AssemblyTrademark ("SparkleShare is a trademark of SparkleShare Ltd.")]
 
-        public SparkleBubblesController Controller = new SparkleBubblesController ();
+namespace SparkleLib {
 
-
-        public SparkleBubbles ()
-        {
-            Controller.ShowBubbleEvent += delegate (string title,
-                string subtext, string image_path) {
-
-                Program.UI.StatusIcon.ShowBalloon (title, subtext, image_path);
-            };
-        }
+    public class Defines {
+        public const string INSTALL_DIR = "/usr/share/sparkleshare";
     }
 }
-

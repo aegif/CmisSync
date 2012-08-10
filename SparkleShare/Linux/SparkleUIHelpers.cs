@@ -14,37 +14,20 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-using Gtk;
-using SparkleLib;
 using System;
 using System.IO;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
+
+using Gtk;
 
 namespace SparkleShare {
 
     public static class SparkleUIHelpers {
 
-        // Creates an MD5 hash of input
-        public static string GetMD5 (string s)
-        {
-            MD5 md5 = new MD5CryptoServiceProvider ();
-            Byte[] bytes = ASCIIEncoding.Default.GetBytes (s);
-            Byte[] encodedBytes = md5.ComputeHash (bytes);
-            return BitConverter.ToString (encodedBytes).ToLower ().Replace ("-", "");
-        }
-
-
         // Looks up an icon from the system's theme
         public static Gdk.Pixbuf GetIcon (string name, int size)
         {
             IconTheme icon_theme = new IconTheme ();
-
-            icon_theme.AppendSearchPath (Path.Combine (SparkleUI.AssetsPath, "icons"));
-
-            icon_theme.AppendSearchPath (
-                Path.Combine (Path.GetDirectoryName (SparkleConfig.DefaultConfig.FullPath), "icons"));
+            icon_theme.AppendSearchPath (Path.Combine (Program.UI.AssetsPath, "icons"));
 
             try {
                 return icon_theme.LoadIcon (name, size, IconLookupFlags.GenericFallback);
@@ -62,7 +45,7 @@ namespace SparkleShare {
 
         public static Image GetImage (string name)
         {
-            string image_path = SparkleHelpers.CombineMore (Defines.INSTALL_DIR, "pixmaps", name);
+            string image_path = new string [] { Program.UI.AssetsPath, "pixmaps", name }.Combine ();
             return new Image (image_path);
         }
 

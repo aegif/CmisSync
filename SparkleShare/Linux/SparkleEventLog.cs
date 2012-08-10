@@ -239,15 +239,15 @@ namespace SparkleShare {
 
         public void UpdateContent (string html)
         {
-            Thread thread = new Thread (new ThreadStart (delegate {
+            Thread thread = new Thread (() => {
                 if (html == null)
                     html = Controller.HTML;
 
                 if (html == null)
                     return;
                 
-                string pixmaps_path = IO.Path.Combine (SparkleUI.AssetsPath, "pixmaps");
-                string icons_path  = new string [] {SparkleUI.AssetsPath, "icons",
+                string pixmaps_path = IO.Path.Combine (Program.UI.AssetsPath, "pixmaps");
+                string icons_path  = new string [] {Program.UI.AssetsPath, "icons",
                     "hicolor", "12x12", "status"}.Combine ();
 
                 html = html.Replace ("<!-- $body-font-size -->", (double) (Style.FontDescription.Size / 1024 + 3) + "px");
@@ -278,14 +278,16 @@ namespace SparkleShare {
                 
                 Application.Invoke (delegate {
                     this.spinner.Stop ();
-                                this.web_view.NavigationRequested -= WebViewNavigationRequested;
+
+                    this.web_view.NavigationRequested -= WebViewNavigationRequested;
                     this.web_view.LoadHtmlString (html, "file://");
-                                this.web_view.NavigationRequested += WebViewNavigationRequested;
+                    this.web_view.NavigationRequested += WebViewNavigationRequested;
+
                     this.content_wrapper.Remove (this.content_wrapper.Child);
                     this.content_wrapper.Add (this.scrolled_window);
                     this.content_wrapper.ShowAll ();
                 });
-            }));
+            });
 
             thread.Start ();
         }

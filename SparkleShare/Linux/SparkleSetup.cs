@@ -69,12 +69,12 @@ namespace SparkleShare {
                                 Xalign    = 1
                             };
 
-                            Entry name_entry = new Entry (Controller.GuessedUserName) {
+                            Entry name_entry = new Entry (UnixUserInfo.GetRealUser ().RealName) {
                                 Xalign = 0,
                                 ActivatesDefault = true
                             };
 
-                            Entry email_entry = new Entry (Controller.GuessedUserEmail) {
+                            Entry email_entry = new Entry () {
                                 Xalign = 0,
                                 ActivatesDefault = true
                             };
@@ -687,9 +687,9 @@ namespace SparkleShare {
 
                         if (!HasToplevelFocus) {
                             string title   = "Your shared project is ready!";
-                            string subtext = "You can find the files in your SparkleShare folder.");
+                            string subtext = "You can find the files in your SparkleShare folder.";
 
-                            SparkleUI.Bubbles.Controller.ShowBubble (title, subtext, null);
+                            Program.UI.Bubbles.Controller.ShowBubble (title, subtext, null);
                         }
 
                         Header      = "Your shared project is ready!";
