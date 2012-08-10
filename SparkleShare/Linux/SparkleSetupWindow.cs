@@ -45,7 +45,7 @@ namespace SparkleShare {
 
         public SparkleSetupWindow () : base ("")
         {
-            Title          = Catalog.GetString ("SparkleShare Setup");
+            Title          = Catalog.GetString ("CmisSync Setup");
             BorderWidth    = 0;
             IconName       = "folder-sparkleshare";
             Resizable      = false;

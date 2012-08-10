@@ -53,6 +53,7 @@ namespace SparkleLib {
         public SparkleConfig (string config_path, string config_file_name)
         {
             FullPath    = Path.Combine (config_path, config_file_name);
+			Console.WriteLine("FullPath:" + FullPath);
             LogFilePath = Path.Combine (config_path, "debug_log.txt");
 
             if (File.Exists (LogFilePath)) {
@@ -221,7 +222,7 @@ namespace SparkleLib {
 
         public string GetBackendForFolder (string name)
         {
-            return GetFolderValue (name, "backend");
+            return "Cmis"; // TODO GetFolderValue (name, "backend");
         }
 
 
