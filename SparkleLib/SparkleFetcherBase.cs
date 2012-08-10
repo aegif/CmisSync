@@ -234,7 +234,7 @@ namespace SparkleLib {
                 return new string (letters);
 
             } else {
-                return "Git";
+                return "Cmis";
             }
         }
 

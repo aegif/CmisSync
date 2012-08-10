@@ -36,6 +36,7 @@ namespace SparkleShare {
         #endif
         public static void Main (string [] args)
         {
+			Console.WriteLine("start");
             if (args.Length != 0 && !args [0].Equals ("start") &&
                 SparkleBackend.Platform != PlatformID.MacOSX) {
 
@@ -71,6 +72,7 @@ namespace SparkleShare {
                 UI.Run ();
             
             } catch (Exception e) {
+				Console.WriteLine("exception");
                 SparkleLogger.WriteCrashReport (e);
                 Environment.Exit (-1);
             }
