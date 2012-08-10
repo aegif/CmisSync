@@ -135,7 +135,7 @@ namespace SparkleShare {
 
                     case PageType.Add: {
 
-                        Header = "Where's your project hosted?";
+                        Header = "Where's your CMIS folder?";
 
                         VBox layout_vertical = new VBox (false, 12);
                         HBox layout_fields   = new HBox (true, 12);
@@ -325,16 +325,6 @@ namespace SparkleShare {
                             });
                         };
                         
-
-                        CheckButton check_button = new CheckButton ("Fetch prior history") {
-                            Active = false
-                        };
-
-                        check_button.Toggled += delegate {
-                            Controller.HistoryItemChanged (check_button.Active);
-                        };
-
-                        AddOption (check_button);
                         AddButton (cancel_button);
                         AddButton (add_button);
                         

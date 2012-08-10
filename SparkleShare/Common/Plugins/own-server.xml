@@ -2,7 +2,7 @@
 <sparkleshare>
   <plugin>
     <info>
-        <name>On my own server</name>
+        <name>Generic CMIS server</name>
         <name xml:lang="de">Auf meinem eigenen Server</name>
         <name xml:lang="el">Στον δικό μου server</name>
         <name xml:lang="es">En mi propio servidor</name>
@@ -15,7 +15,7 @@
         <name xml:lang="ru">Мой личный сервер</name>
         <name xml:lang="sv">På min egen server</name>
         <name xml:lang="zh_CN">拥有你自己的服务器</name>
-        <description>Everything under my control</description>
+        <description>Using any CMIS-compliant ECM system</description>
         <description xml:lang="de">Alles unter meiner Kontrolle</description>
         <description xml:lang="el">Όλα κάτω απ' τον δικό μου έλεγχο</description>
         <description xml:lang="es">Todo bajo mi control</description>
@@ -29,15 +29,15 @@
         <description xml:lang="sv">Allting under min kontroll</description>
         <description xml:lang="zh_CN">一切尽在你的掌控</description>
         <icon>own-server.png</icon>
-        <backend>Git</backend>
+        <backend>Cmis</backend>
     </info>
     <address>
       <value/>
-      <example>[user@]hostname[:port]</example>
+      <example>user:password@hostname:port/prefix</example>
     </address>
     <path>
       <value/>
-      <example>/path/to/project</example>
+      <example>/repo/path/to/folder</example>
       <example xml:lang="de">/Pfad/zum/Projekt</example>
       <example xml:lang="el">/path/to/project</example>
       <example xml:lang="es">/ruta/al/proyecto</example>
