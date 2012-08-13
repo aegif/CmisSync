@@ -246,8 +246,8 @@ namespace SparkleShare {
                 if (html == null)
                     return;
                 
-                string pixmaps_path = IO.Path.Combine ("/usr/share/sparkleshare", "pixmaps");
-                string icons_path  = new string [] {"/usr/share/sparkleshare", "icons",
+                string pixmaps_path = IO.Path.Combine (SparkleUI.AssetsPath, "pixmaps");
+                string icons_path  = new string [] {SparkleUI.AssetsPath, "icons",
                     "hicolor", "12x12", "status"}.Combine ();
 
                 html = html.Replace ("<!-- $body-font-size -->", (double) (Style.FontDescription.Size / 1024 + 3) + "px");
