@@ -35,6 +35,7 @@ namespace SparkleLib.Cmis {
             string target_folder, bool fetch_prior_history) : base (server, required_fingerprint,
                 remote_path, target_folder, fetch_prior_history)
         {
+			Console.WriteLine("Cmis SparkleFetcher constructor");
             TargetFolder = target_folder;
             RemoteUrl    = new Uri ("http://localhost:8080/alfresco/service/cmis"); // TODO
         }
@@ -42,12 +43,14 @@ namespace SparkleLib.Cmis {
 
         public override bool Fetch ()
         {
+			Console.WriteLine("Cmis SparkleFetcher Fetch");
             return true; // TODO
 		}
 
 
         public override bool IsFetchedRepoEmpty {
             get {
+				Console.WriteLine("Cmis SparkleFetcher IsFetchedRepoEmpty");
                 return false; // TODO
             }
         }
@@ -55,29 +58,34 @@ namespace SparkleLib.Cmis {
 
         public override void EnableFetchedRepoCrypto (string password)
         {
+			Console.WriteLine("Cmis SparkleFetcher EnableFetchedRepoCrypto");
 			// TODO
         }
 
 
         public override bool IsFetchedRepoPasswordCorrect (string password)
         {
+			Console.WriteLine("Cmis SparkleFetcher IsFetchedRepoPasswordCorrect");
 			return true; // TODO
         }
 
 
         public override void Stop ()
         {
+			Console.WriteLine("Cmis SparkleFetcher Stop");
         }
 
 
         public override void Complete ()
         {
+			Console.WriteLine("Cmis SparkleFetcher Complete");
             base.Complete ();
         }
 
 
         private void InstallConfiguration ()
         {
+			Console.WriteLine("Cmis SparkleFetcher InstallConfiguration");
         }
     }
 }

@@ -36,6 +36,7 @@ namespace SparkleLib.Cmis {
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
+			Console.WriteLine("Cmis SparkleRepo constructor");
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
 			parameters[SessionParameter.BindingType] = BindingType.AtomPub;
@@ -52,6 +53,7 @@ namespace SparkleLib.Cmis {
 
         public override List<string> ExcludePaths {
             get {
+				Console.WriteLine("Cmis SparkleRepo ExcludePaths get");
                 List<string> rules = new List<string> ();
                 rules.Add (".CmisSync"); // Contains the configuration for this checkout
                 return rules;
@@ -61,6 +63,7 @@ namespace SparkleLib.Cmis {
 
         public override double Size {
             get {
+				Console.WriteLine("Cmis SparkleRepo Size get");
                 return 1234567; // TODO
             }
         }
@@ -68,6 +71,7 @@ namespace SparkleLib.Cmis {
 
         public override double HistorySize {
             get {
+				Console.WriteLine("Cmis SparkleRepo HistorySize get");
                 return 1234567; // TODO
             }
         }
@@ -75,12 +79,14 @@ namespace SparkleLib.Cmis {
 
         private void UpdateSizes ()
         {
+			Console.WriteLine("Cmis SparkleRepo UpdateSizes");
 			// TODO
         }
         
 
         public override string [] UnsyncedFilePaths {
             get {
+				Console.WriteLine("Cmis SparkleRepo UnsyncedFilePaths get");
                 List<string> file_paths = new List<string> ();
                 //file_paths.Add (path); TODO
                 return file_paths.ToArray ();
@@ -90,6 +96,7 @@ namespace SparkleLib.Cmis {
 
         public override string CurrentRevision {
             get {
+				Console.WriteLine("Cmis SparkleRepo CurrentRevision get");
                 return null; // TODO
             }
         }
@@ -97,25 +104,29 @@ namespace SparkleLib.Cmis {
 
         public override bool HasRemoteChanges {
             get {
-                    return false; // TODO
+				Console.WriteLine("Cmis SparkleRepo HasRemoteChanges get");
+                return false; // TODO
             }
         }
 
 
         public override bool SyncUp ()
         {
+			Console.WriteLine("Cmis SparkleRepo SyncUp");
 			return true; // TODO
         }
 
 
         public override bool SyncDown ()
         {
+			Console.WriteLine("Cmis SparkleRepo SyncDown");
 			return true; // TODO
         }
 
 
         public override bool HasLocalChanges {
             get {
+				Console.WriteLine("Cmis SparkleRepo HasLocalChanges get");
 				return false; // TODO
             }
         }
@@ -123,10 +134,12 @@ namespace SparkleLib.Cmis {
 
         public override bool HasUnsyncedChanges {
             get {
+				Console.WriteLine("Cmis SparkleRepo HasUnsyncedChanges get");
 				return false; // TODO
             }
 
             set {
+				Console.WriteLine("Cmis SparkleRepo HasUnsyncedChanges set");
 				// TODO
             }
         }
@@ -135,6 +148,7 @@ namespace SparkleLib.Cmis {
         // Stages the made changes
         private void Add ()
         {
+			Console.WriteLine("Cmis SparkleRepo Add");
 			// TODO
         }
 
@@ -142,6 +156,7 @@ namespace SparkleLib.Cmis {
         // Commits the made changes
         private void Commit (string message)
 		{
+			Console.WriteLine("Cmis SparkleRepo Commit");
 			// TODO
         }
 
@@ -149,30 +164,35 @@ namespace SparkleLib.Cmis {
         // Merges the fetched changes
         private void Rebase ()
         {
+			Console.WriteLine("Cmis SparkleRepo Rebase");
 			// TODO
         }
 
 
         private void ResolveConflict ()
         {
+			Console.WriteLine("Cmis SparkleRepo ResolveConflict");
 			// TODO
         }
 
 
         public override void RevertFile (string path, string revision)
         {
+			Console.WriteLine("Cmis SparkleRepo RevertFile");
 			// TODO
         }
 
 
         public override List<SparkleChangeSet> GetChangeSets (string path, int count)
         {
+			Console.WriteLine("Cmis SparkleRepo GetChangeSets");
             return new List <SparkleChangeSet> (); // TODO
         }   
 
 
         public override List<SparkleChangeSet> GetChangeSets (int count)
         {
+			Console.WriteLine("Cmis SparkleRepo GetChangeSets");
             return new List <SparkleChangeSet> (); // TODO
         }
     }
