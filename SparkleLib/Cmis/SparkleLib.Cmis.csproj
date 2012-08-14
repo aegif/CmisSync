@@ -38,6 +38,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
+    <Reference Include="DotCMIS">
+      <HintPath>DotCMIS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -55,5 +58,8 @@
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>SparkleLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DotCMIS.dll" />
   </ItemGroup>
 </Project>

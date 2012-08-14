@@ -21,20 +21,32 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using DotCMIS;
+using DotCMIS.Client.Impl;
+using DotCMIS.Client;
+using DotCMIS.Data.Impl;
+using DotCMIS.Data.Extensions;
+
 using SparkleLib;
 
 namespace SparkleLib.Cmis {
 
     public class SparkleRepo : SparkleRepoBase {
 
-		private bool user_is_set;
-        private bool remote_url_is_set;
-        private bool use_git_bin;
-
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
-            // TODO
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+			parameters[SessionParameter.BindingType] = BindingType.AtomPub;
+			parameters[SessionParameter.AtomPubUrl] = "http://localhost:8080/alfresco/service/cmis";
+			parameters[SessionParameter.User] = "admin";
+			parameters[SessionParameter.Password] = "admin";
+
+			SessionFactory factory = SessionFactory.NewInstance();
+			ISession session = factory.GetRepositories(parameters)[0].CreateSession();
+			
+			Console.WriteLine("Created CMIS session");
         }
 
 
