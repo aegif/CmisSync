@@ -168,7 +168,7 @@ namespace SparkleShare {
         public SparkleControllerBase ()
         {
             string app_data_path = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
-            string config_path   = Path.Combine (app_data_path, "sparkleshare");
+            string config_path   = Path.Combine (app_data_path, "cmissync");
             
             this.config                 = new SparkleConfig (config_path, "config.xml");
             SparkleConfig.DefaultConfig = this.config;
@@ -261,7 +261,7 @@ namespace SparkleShare {
 
             } catch (Exception e) {
                 SparkleLogger.LogInfo ("Controller",
-                    "Failed to load '" + backend + "' backend for '" + folder_name + "': " + e.Message);
+                    "Failed to load '" + backend + "' backend for '" + folder_name + "': " + e.ToString());
 
                 return;
             }
