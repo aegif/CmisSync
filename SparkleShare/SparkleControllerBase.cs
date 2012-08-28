@@ -189,6 +189,7 @@ namespace SparkleShare {
                 this.config.SetConfigOption ("notifications", bool.TrueString);
 
             } else {
+                /*
                 string keys_path = Path.GetDirectoryName (this.config.FullPath);
                 string key_file_path = "";
 
@@ -214,6 +215,7 @@ namespace SparkleShare {
                 }
 
                 SparkleKeys.ListPrivateKeys ();
+                */
             }
 
             // Watch the SparkleShare folder

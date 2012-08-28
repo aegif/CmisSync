@@ -236,6 +236,7 @@ namespace SparkleShare {
         {
             Program.Controller.CurrentUser = new SparkleUser (full_name, email);
 
+            /*
             new Thread (() => {
                 string keys_path     = Path.GetDirectoryName (SparkleConfig.DefaultConfig.FullPath);
                 string key_file_name = DateTime.Now.ToString ("yyyy-MM-dd HH\\hmm");
@@ -251,6 +252,7 @@ namespace SparkleShare {
                 File.Copy (key_pair [1], link_code_file_path, true);
 
             }).Start ();
+            */
 
             TutorialPageNumber = 1;
             ChangePageEvent (PageType.Tutorial, null);
