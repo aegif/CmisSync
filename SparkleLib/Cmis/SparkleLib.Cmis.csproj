@@ -59,7 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SparkleFetcherCmis.cs" />
-    <Compile Include="SparkleCmis.cs" />
+    <Compile Include="SparkleCmis.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="SparkleRepoCmis.cs" />
     <None Include="DotCMIS.dll" />
   </ItemGroup>
