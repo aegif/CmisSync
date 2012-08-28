@@ -208,50 +208,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Common\Plugins\github.png">
-      <Link>Plugins\github.png</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\gitorious.png">
-      <Link>Plugins\gitorious.png</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\gnome.png">
-      <Link>Plugins\gnome.png</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="..\Common\Plugins\own-server.png">
       <Link>Plugins\own-server.png</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\Common\Plugins\bitbucket.png">
-      <Link>Plugins\bitbucket.png</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\ssnet.png">
-      <Link>Plugins\ssnet.png</Link>
-    </None>
-    <None Include="..\Common\Plugins\ssnet.xml">
-      <Link>Plugins\ssnet.xml</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Common\Plugins\bitbucket.xml">
-      <Link>Plugins\bitbucket.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\github.xml">
-      <Link>Plugins\github.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\gitorious.xml">
-      <Link>Plugins\gitorious.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\gnome.xml">
-      <Link>Plugins\gnome.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="..\Common\Plugins\own-server.xml">
       <Link>Plugins\own-server.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
