@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 
 using SparkleLib;
+using SparkleLib.Cmis;
 
 namespace SparkleShare {
 
@@ -486,8 +487,9 @@ namespace SparkleShare {
             string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
             try {
+                SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
                 this.fetcher = (SparkleFetcherBase) Activator.CreateInstance (
-                    Type.GetType ("SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend),
+                    Type.GetType("SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend),
                         address, required_fingerprint, remote_path, tmp_folder, fetch_prior_history
                 );
 
