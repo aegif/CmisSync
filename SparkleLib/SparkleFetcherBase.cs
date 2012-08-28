@@ -184,6 +184,7 @@ namespace SparkleLib {
                 Identifier = File.ReadAllText (identifier_path).Trim ();
 
             } else {
+                Directory.CreateDirectory(TargetFolder);
                 Identifier = CreateIdentifier ();
                 File.WriteAllText (identifier_path, Identifier);
             }
@@ -255,6 +256,7 @@ namespace SparkleLib {
 
         private string GetHostKey ()
         {
+            /*
             string host = RemoteUrl.Host;
             SparkleLogger.LogInfo ("Auth", "Fetching host key for " + host);
 
@@ -280,6 +282,8 @@ namespace SparkleLib {
                 return host_key;
             else
                 return null;
+            */
+            return "dummy";
         }
 
 
