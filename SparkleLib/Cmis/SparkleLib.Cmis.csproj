@@ -24,18 +24,6 @@
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SparkleFetcherCmis.cs">
-      <Link>SparkleFetcherCmis.cs</Link>
-    </Compile>
-    <Compile Include="SparkleCmis.cs">
-      <SubType>Component</SubType>
-      <Link>SparkleCmis.cs</Link>
-    </Compile>
-    <Compile Include="SparkleRepoCmis.cs">
-      <Link>SparkleRepoCmis.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="DotCMIS">
@@ -60,6 +48,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SparkleFetcherCmis.cs" />
+    <Compile Include="SparkleCmis.cs" />
+    <Compile Include="SparkleRepoCmis.cs" />
     <None Include="DotCMIS.dll" />
   </ItemGroup>
 </Project>
