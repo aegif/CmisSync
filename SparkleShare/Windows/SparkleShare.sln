@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleShareInviteOpener", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleLib", "..\..\SparkleLib\SparkleLib.csproj", "{2C914413-B31C-4362-93C7-1AE34F09112A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleLib.Git", "..\..\SparkleLib\Git\SparkleLib.Git.csproj", "{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleLib.Cmis", "..\..\SparkleLib\Cmis\SparkleLib.Cmis.csproj", "{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
