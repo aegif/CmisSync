@@ -32,22 +32,41 @@ using SparkleLib;
 namespace SparkleLib.Cmis {
 
     public class SparkleRepo : SparkleRepoBase {
-
+		
+		ISession session;
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
 			Console.WriteLine("Cmis SparkleRepo constructor");
+			
+			// Connect to repository
             Dictionary<string, string> parameters = new Dictionary<string, string>();
-
 			parameters[SessionParameter.BindingType] = BindingType.AtomPub;
 			parameters[SessionParameter.AtomPubUrl] = "http://localhost:8080/alfresco/service/cmis";
 			parameters[SessionParameter.User] = "admin";
 			parameters[SessionParameter.Password] = "admin";
-
 			SessionFactory factory = SessionFactory.NewInstance();
-			ISession session = factory.GetRepositories(parameters)[0].CreateSession();
+			session = factory.GetRepositories(parameters)[0].CreateSession(); // TODO there might be several repositories, let user select one, see https://github.com/nicolas-raoul/CmisSync/issues/15
+			Console.WriteLine("Created CMIS session: " + session.ToString());
 			
-			Console.WriteLine("Created CMIS session");
+			// Get the root folder
+			IFolder rootFolder = session.GetRootFolder();
+			
+			// List all children
+			foreach (ICmisObject cmisObject in rootFolder.GetChildren())
+			{
+			    Console.WriteLine(cmisObject.Name);
+			}
+			
+			// Get a page
+			Console.WriteLine("Page:");
+			IItemEnumerable<ICmisObject> children = rootFolder.GetChildren();
+			IItemEnumerable<ICmisObject> page = children.SkipTo(20).GetPage(10); // children 20 to 30
+			
+			foreach (ICmisObject cmisObject in page)
+			{
+			    Console.WriteLine(cmisObject.Name);
+			}
         }
 
 
