@@ -256,18 +256,19 @@ namespace SparkleShare {
             string folder_name   = Path.GetFileName (folder_path);
             string backend       = this.config.GetBackendForFolder (folder_name);
 
-            try {
-                repo = (SparkleRepoBase) Activator.CreateInstance (
-                    Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend),
-                        new object [] { folder_path, this.config }
-                );
+            //try {
+                //repo = (SparkleRepoBase) Activator.CreateInstance (
+                //    Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend),
+                //        new object [] { folder_path, this.config }
+                //);
+                repo = new SparkleLib.Cmis.SparkleRepo(folder_path, this.config);
 
-            } catch (Exception e) {
-                SparkleLogger.LogInfo ("Controller",
-                    "Failed to load '" + backend + "' backend for '" + folder_name + "': " + e.ToString());
-
-                return;
-            }
+            //} catch (Exception e) {
+            //    SparkleLogger.LogInfo ("Controller",
+            //        "Failed to load '" + backend + "' backend for '" + folder_name + "': " + e.ToString());
+            //
+            //      return;
+            //}
 
             repo.ChangesDetected += delegate {
                 UpdateState ();
