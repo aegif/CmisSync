@@ -42,7 +42,7 @@ namespace SparkleShare {
 
         public SparkleSetupWindow ()
         {
-            Title      = "SparkleShare Setup";
+            Title      = "CmisSync Setup";
             Width      = 640;
             Height     = 440;
             ResizeMode = ResizeMode.NoResize;
@@ -50,7 +50,7 @@ namespace SparkleShare {
             Icon       = SparkleUIHelpers.GetImageSource("sparkleshare-app", "ico");
 			
 			TaskbarItemInfo = new TaskbarItemInfo () {
-				Description = "SparkleShare"
+				Description = "CmisSync"
 			};
             
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
