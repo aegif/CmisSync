@@ -312,6 +312,12 @@ namespace SparkleShare {
                             IsEnabled = true
                         };
                         
+                        TextBlock repository_help_label = new TextBlock () {
+                            Text       = "myrepo", // Controller.SelectedPlugin.AddressExample, // TODO
+                            FontSize   = 11,
+                            Foreground = new SolidColorBrush (Color.FromRgb (128, 128, 128))
+                        };
+                        
                         TextBlock path_label = new TextBlock () {
                             Text       = "Remote Path:",
                             FontWeight = FontWeights.Bold,
@@ -339,24 +345,25 @@ namespace SparkleShare {
                             Content = "Add"
                         };
 
-                        CheckBox history_check_box = new CheckBox ()
-                        {
-                            Content   = "Fetch prior revisions",
-                            IsChecked = Controller.FetchPriorHistory
-                        };
-						
-						history_check_box.Click += delegate {
-							Controller.HistoryItemChanged (history_check_box.IsChecked.Value);
-						};
-						
-                        ContentCanvas.Children.Add (history_check_box);
-                        Canvas.SetLeft (history_check_box, 185);
-                        Canvas.SetBottom (history_check_box, 12);
+                        //CheckBox history_check_box = new CheckBox ()
+                        //{
+                        //    Content   = "Fetch prior revisions",
+                        //    IsChecked = Controller.FetchPriorHistory
+                        //};
+						//
+						//history_check_box.Click += delegate {
+						//	Controller.HistoryItemChanged (history_check_box.IsChecked.Value);
+						//};
+						//
+                        //ContentCanvas.Children.Add (history_check_box);
+                        //Canvas.SetLeft (history_check_box, 185);
+                        //Canvas.SetBottom (history_check_box, 12);
                         
                         ContentCanvas.Children.Add (list_view);
                         Canvas.SetTop (list_view, 70);
                         Canvas.SetLeft (list_view, 185);
-                        
+
+						// Address
                         ContentCanvas.Children.Add (address_label);
                         Canvas.SetTop (address_label, 285);
                         Canvas.SetLeft (address_label, 185);
@@ -369,16 +376,30 @@ namespace SparkleShare {
                         Canvas.SetTop (address_help_label, 330);
                         Canvas.SetLeft (address_help_label, 185);
                         
+						// Repository
+                        ContentCanvas.Children.Add (repository_label);
+                        Canvas.SetTop (repository_label, 335);
+                        Canvas.SetLeft (repository_label, 185);
+                        
+                        ContentCanvas.Children.Add (repository_box);
+                        Canvas.SetTop (repository_box, 365);
+                        Canvas.SetLeft (repository_box, 185);
+                        
+                        ContentCanvas.Children.Add (repository_help_label);
+                        Canvas.SetTop (repository_help_label, 390);
+                        Canvas.SetLeft (repository_help_label, 185);
+                        
+						// Path
                         ContentCanvas.Children.Add (path_label);
-                        Canvas.SetTop (path_label, 285);
+                        Canvas.SetTop (path_label, 335);
                         Canvas.SetRight (path_label, 30);
                         
                         ContentCanvas.Children.Add (path_box);
-                        Canvas.SetTop (path_box, 305);
+                        Canvas.SetTop (path_box, 365);
                         Canvas.SetRight (path_box, 30);
                         
                         ContentCanvas.Children.Add (path_help_label);
-                        Canvas.SetTop (path_help_label, 330);
+                        Canvas.SetTop (path_help_label, 390);
                         Canvas.SetRight (path_help_label, 30);
                         
 						TaskbarItemInfo.ProgressValue = 0.0;
