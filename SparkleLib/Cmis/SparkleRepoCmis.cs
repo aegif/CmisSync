@@ -32,42 +32,90 @@ using SparkleLib;
 namespace SparkleLib.Cmis {
 
     public class SparkleRepo : SparkleRepoBase {
-		
-		ISession session;
+
+        IFolder remoteRootFolder;
+        string localRootFolder = @"C:\localRoot";
+
+        bool syncing = false; // State. true if syncing is being performed right now.
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
-			Console.WriteLine("Cmis SparkleRepo constructor");
-			
-			// Connect to repository
+            Console.WriteLine("Cmis SparkleRepo constructor");
+
+            // Connect to repository
             Dictionary<string, string> parameters = new Dictionary<string, string>();
-			parameters[SessionParameter.BindingType] = BindingType.AtomPub;
-			parameters[SessionParameter.AtomPubUrl] = "http://localhost:8080/alfresco/service/cmis";
-			parameters[SessionParameter.User] = "admin";
-			parameters[SessionParameter.Password] = "admin";
-			SessionFactory factory = SessionFactory.NewInstance();
-			session = factory.GetRepositories(parameters)[0].CreateSession(); // TODO there might be several repositories, let user select one, see https://github.com/nicolas-raoul/CmisSync/issues/15
-			Console.WriteLine("Created CMIS session: " + session.ToString());
-			
-			// Get the root folder
-			IFolder rootFolder = session.GetRootFolder();
-			
-			// List all children
-			foreach (ICmisObject cmisObject in rootFolder.GetChildren())
-			{
-			    Console.WriteLine(cmisObject.Name);
-			}
-			
-			// Get a page
-			Console.WriteLine("Page:");
-			IItemEnumerable<ICmisObject> children = rootFolder.GetChildren();
-			IItemEnumerable<ICmisObject> page = children.SkipTo(20).GetPage(10); // children 20 to 30
-			
-			foreach (ICmisObject cmisObject in page)
-			{
-			    Console.WriteLine(cmisObject.Name);
-			}
+            parameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            parameters[SessionParameter.AtomPubUrl] = "http://localhost:8080/alfresco/service/cmis";
+            parameters[SessionParameter.User] = "admin";
+            parameters[SessionParameter.Password] = "admin";
+            SessionFactory factory = SessionFactory.NewInstance();
+            ISession session = factory.GetRepositories(parameters)[0].CreateSession(); // TODO there might be several repositories, let user select one, see https://github.com/nicolas-raoul/CmisSync/issues/15
+            Console.WriteLine("Created CMIS session: " + session.ToString());
+
+            // Get the root folder
+            remoteRootFolder = session.GetRootFolder();
+
+            Sync();
         }
+
+        private void Sync()
+        {
+            if (syncing)
+                return;
+            syncing = true;
+
+            // TODO if localRootFolder contains zero file
+			RecursiveFolderCopy(remoteRootFolder, localRootFolder);
+
+            syncing = false;
+        }
+
+        private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
+		{
+		    Console.WriteLine("Copying " + remoteFolder + " to " + localFolder);
+            // List all children
+			foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
+			{
+                // Console.WriteLine(cmisObject.Name);
+                if (cmisObject is DotCMIS.Client.Impl.Folder)
+                {
+                    IFolder remoteSubFolder = (IFolder)cmisObject;
+                    string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
+                    
+                    // Create local folder
+                    Directory.CreateDirectory(localSubFolder);
+
+                    // Recurse into folder
+                    RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                }
+                else
+                {
+                    // It is a file, just download it.
+                    IDocument remoteDocument = (IDocument)cmisObject;
+                    DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream();
+
+                    // If this file does not have a content stream, ignore it.
+                    // Even 0 bytes files have a contentStream.
+                    // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                    if (contentStream == null)
+                    {
+                        continue;
+                    }
+
+                    string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
+                    Console.WriteLine("Downloading " + contentStream.FileName);
+                    Stream file = File.OpenWrite(filePath);
+                    byte[] buffer = new byte[8 * 1024];
+                    int len;
+                    while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        file.Write(buffer, 0, len);
+                    }
+                    file.Close();
+                    contentStream.Stream.Close();
+                }
+            }
+		}
 
 
         public override List<string> ExcludePaths {
