@@ -228,7 +228,7 @@ namespace SparkleShare {
                     }
                         
                     case PageType.Add: {
-                        Header = "Where's your project hosted?";
+                        Header = "Where is the folder your want to sync?";
                         
 
                         ListView list_view = new ListView () {
@@ -298,6 +298,18 @@ namespace SparkleShare {
                             Text       = Controller.SelectedPlugin.AddressExample,
                             FontSize   = 11,
                             Foreground = new SolidColorBrush (Color.FromRgb (128, 128, 128))
+                        };
+                        
+                        TextBlock repository_label = new TextBlock () {
+                            Text       = "Repository:",
+                            FontWeight = FontWeights.Bold,
+                            Width      = 200
+                        };
+                                                    
+                        TextBox repository_box = new TextBox () {
+                            Width = 200,
+                            Text  = Controller.PreviousPath,
+                            IsEnabled = true
                         };
                         
                         TextBlock path_label = new TextBlock () {
