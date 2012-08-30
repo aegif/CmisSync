@@ -52,7 +52,7 @@ namespace SparkleShare {
 			CreateAnimationFrames ();
 
 			this.notify_icon.Icon = animation_frames [0];
-            this.notify_icon.HeaderText = "SparkleShare";
+            this.notify_icon.HeaderText = "CmisSync";
 
             CreateMenu ();
          
@@ -70,7 +70,7 @@ namespace SparkleShare {
 				Dispatcher.BeginInvoke ((Action) delegate {
 					this.state_item.Header = state_text;
 					this.state_item.UpdateLayout ();
-					this.notify_icon.HeaderText = "SparkleShare\n" + state_text;
+					this.notify_icon.HeaderText = "CmisSync\n" + state_text;
 				});
 			};
 			
@@ -105,7 +105,7 @@ namespace SparkleShare {
                 IsEnabled = false
             };
 			
-			this.notify_icon.HeaderText = "SparkleShare\n" + Controller.StateText;
+			this.notify_icon.HeaderText = "CmisSync\n" + Controller.StateText;
             
             Image folder_image = new Image () {
             	Source = SparkleUIHelpers.GetImageSource ("sparkleshare-folder"),
@@ -114,7 +114,7 @@ namespace SparkleShare {
 			};
             
             SparkleMenuItem folder_item = new SparkleMenuItem () {
-                Header = "SparkleShare",
+                Header = "CmisSync",
                 Icon   = folder_image
             };
         
@@ -123,7 +123,7 @@ namespace SparkleShare {
                 };
             
             SparkleMenuItem add_item = new SparkleMenuItem () {
-                Header = "Add hosted project…"
+                Header = "Add a CMIS folder…"
             };
             
                 add_item.Click += delegate {
@@ -162,7 +162,7 @@ namespace SparkleShare {
                 };
             
             SparkleMenuItem about_item = new SparkleMenuItem () {
-                Header = "About SparkleShare"
+                Header = "About CmisSync"
             };
             
                 about_item.Click += delegate {
