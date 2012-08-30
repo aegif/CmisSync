@@ -248,7 +248,7 @@ namespace SparkleShare {
 							"  xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\">" +
 						    "  <Grid>" +
 						    "    <StackPanel Orientation=\"Horizontal\">" +
-						    "      <Image Margin=\"5,0,0,0\" Source=\"{Binding Image}\" Height=\"24\" Width=\"24\"/>" +
+						    "      <Image Margin=\"5,0,0,0\" Source=\"{Binding Image}\" Height=\"29\" Width=\"29\"/>" +
 						    "      <StackPanel>" +
 							"        <TextBlock Padding=\"10,4,0,0\" FontWeight=\"Bold\" Text=\"{Binding Name}\">" +
 							"        </TextBlock>" +
