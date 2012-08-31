@@ -44,6 +44,10 @@ namespace SparkleLib {
         public abstract void EnableFetchedRepoCrypto (string password);
 
         public Uri RemoteUrl { get; protected set; }
+        public string Repository { get; protected set; }
+        public string ThePath { get; protected set; }
+        public string User { get; protected set; }
+        public string Password { get; protected set; }
         public string RequiredFingerprint { get; protected set; }
         public readonly bool FetchPriorHistory = false;
         public string TargetFolder { get; protected set; }
@@ -91,7 +95,8 @@ namespace SparkleLib {
 
 
         public SparkleFetcherBase (string server, string required_fingerprint,
-            string remote_path, string target_folder, bool fetch_prior_history)
+            string remote_path, string target_folder, bool fetch_prior_history,
+            string repository, string path, string user, string password)
         {
             RequiredFingerprint = required_fingerprint;
             FetchPriorHistory   = fetch_prior_history;
@@ -108,6 +113,10 @@ namespace SparkleLib {
 
             TargetFolder = target_folder;
             RemoteUrl    = new Uri (server + remote_path);
+            Repository = repository;
+            ThePath = path;
+            User = user;
+            Password = password;
             IsActive     = false;
         }
 

@@ -233,7 +233,7 @@ namespace SparkleShare {
 
                         ListView list_view = new ListView () {
                             Width  = 419,
-                            Height = 195,
+                            Height = 80,
                             SelectionMode = SelectionMode.Single
                         };
                         
@@ -248,7 +248,7 @@ namespace SparkleShare {
 							"  xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\">" +
 						    "  <Grid>" +
 						    "    <StackPanel Orientation=\"Horizontal\">" +
-						    "      <Image Margin=\"5,0,0,0\" Source=\"{Binding Image}\" Height=\"29\" Width=\"29\"/>" +
+						    "      <Image Margin=\"5,0,0,0\" Source=\"{Binding Image}\" Height=\"40\" Width=\"29\"/>" +
 						    "      <StackPanel>" +
 							"        <TextBlock Padding=\"10,4,0,0\" FontWeight=\"Bold\" Text=\"{Binding Name}\">" +
 							"        </TextBlock>" +
@@ -283,6 +283,7 @@ namespace SparkleShare {
                         list_view.View          = grid_view;
                         list_view.SelectedIndex = Controller.SelectedPluginIndex;
                         
+                        // Address
                         TextBlock address_label = new TextBlock () {
                             Text       = "Address:",
                             FontWeight = FontWeights.Bold
@@ -300,6 +301,7 @@ namespace SparkleShare {
                             Foreground = new SolidColorBrush (Color.FromRgb (128, 128, 128))
                         };
                         
+                        // Repository
                         TextBlock repository_label = new TextBlock () {
                             Text       = "Repository:",
                             FontWeight = FontWeights.Bold,
@@ -313,13 +315,14 @@ namespace SparkleShare {
                         };
                         
                         TextBlock repository_help_label = new TextBlock () {
-                            Text       = "myrepo", // Controller.SelectedPlugin.AddressExample, // TODO
+                            Text       = Controller.SelectedPlugin.RepositoryExample,
                             FontSize   = 11,
                             Foreground = new SolidColorBrush (Color.FromRgb (128, 128, 128))
                         };
                         
+                        // Path
                         TextBlock path_label = new TextBlock () {
-                            Text       = "Remote Path:",
+                            Text       = "Remote Folder:",
                             FontWeight = FontWeights.Bold,
                             Width      = 200
                         };
@@ -336,7 +339,53 @@ namespace SparkleShare {
                             Width      = 200,
                             Foreground = new SolidColorBrush (Color.FromRgb (128, 128, 128))
                         };
-						
+
+                        // User
+                        TextBlock user_label = new TextBlock()
+                        {
+                            Text = "User:",
+                            FontWeight = FontWeights.Bold,
+                            Width = 200
+                        };
+
+                        TextBox user_box = new TextBox()
+                        {
+                            Width = 200,
+                            Text = Controller.PreviousPath,
+                            IsEnabled = (Controller.SelectedPlugin.Path == null)
+                        };
+
+                        TextBlock user_help_label = new TextBlock()
+                        {
+                            Text = Controller.SelectedPlugin.UserExample,
+                            FontSize = 11,
+                            Width = 200,
+                            Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
+                        };
+
+                        // Password
+                        TextBlock password_label = new TextBlock()
+                        {
+                            Text = "Password:",
+                            FontWeight = FontWeights.Bold,
+                            Width = 200
+                        };
+
+                        TextBox password_box = new TextBox()
+                        {
+                            Width = 200,
+                            Text = Controller.PreviousPath,
+                            IsEnabled = (Controller.SelectedPlugin.Path == null)
+                        };
+
+                        TextBlock password_help_label = new TextBlock()
+                        {
+                            Text = Controller.SelectedPlugin.PasswordExample,
+                            FontSize = 11,
+                            Width = 200,
+                            Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
+                        };
+                        
                         Button cancel_button = new Button () {
                             Content = "Cancel"
                         };
@@ -365,44 +414,70 @@ namespace SparkleShare {
 
 						// Address
                         ContentCanvas.Children.Add (address_label);
-                        Canvas.SetTop (address_label, 285);
+                        Canvas.SetTop (address_label, 160);
                         Canvas.SetLeft (address_label, 185);
                         
                         ContentCanvas.Children.Add (address_box);
-                        Canvas.SetTop (address_box, 305);
+                        Canvas.SetTop (address_box, 180);
                         Canvas.SetLeft (address_box, 185);
                         
                         ContentCanvas.Children.Add (address_help_label);
-                        Canvas.SetTop (address_help_label, 330);
+                        Canvas.SetTop (address_help_label, 205);
                         Canvas.SetLeft (address_help_label, 185);
                         
 						// Repository
                         ContentCanvas.Children.Add (repository_label);
-                        Canvas.SetTop (repository_label, 335);
+                        Canvas.SetTop (repository_label, 225);
                         Canvas.SetLeft (repository_label, 185);
                         
                         ContentCanvas.Children.Add (repository_box);
-                        Canvas.SetTop (repository_box, 365);
+                        Canvas.SetTop (repository_box, 255);
                         Canvas.SetLeft (repository_box, 185);
                         
                         ContentCanvas.Children.Add (repository_help_label);
-                        Canvas.SetTop (repository_help_label, 390);
+                        Canvas.SetTop (repository_help_label, 280);
                         Canvas.SetLeft (repository_help_label, 185);
                         
 						// Path
                         ContentCanvas.Children.Add (path_label);
-                        Canvas.SetTop (path_label, 335);
+                        Canvas.SetTop (path_label, 225);
                         Canvas.SetRight (path_label, 30);
                         
                         ContentCanvas.Children.Add (path_box);
-                        Canvas.SetTop (path_box, 365);
+                        Canvas.SetTop (path_box, 255);
                         Canvas.SetRight (path_box, 30);
                         
                         ContentCanvas.Children.Add (path_help_label);
-                        Canvas.SetTop (path_help_label, 390);
+                        Canvas.SetTop (path_help_label, 280);
                         Canvas.SetRight (path_help_label, 30);
-                        
-						TaskbarItemInfo.ProgressValue = 0.0;
+
+                        // User
+                        ContentCanvas.Children.Add(user_label);
+                        Canvas.SetTop(user_label, 300);
+                        Canvas.SetLeft(user_label, 185);
+
+                        ContentCanvas.Children.Add(user_box);
+                        Canvas.SetTop(user_box, 330);
+                        Canvas.SetLeft(user_box, 185);
+
+                        ContentCanvas.Children.Add(user_help_label);
+                        Canvas.SetTop(user_help_label, 355);
+                        Canvas.SetLeft(user_help_label, 185);
+
+                        // Password
+                        ContentCanvas.Children.Add(password_label);
+                        Canvas.SetTop(password_label, 300);
+                        Canvas.SetRight(password_label, 30);
+
+                        ContentCanvas.Children.Add(password_box);
+                        Canvas.SetTop(password_box, 330);
+                        Canvas.SetRight(password_box, 30);
+
+                        ContentCanvas.Children.Add(password_help_label);
+                        Canvas.SetTop(password_help_label, 355);
+                        Canvas.SetRight(password_help_label, 30);
+
+                        TaskbarItemInfo.ProgressValue = 0.0;
 						TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 						
                         Buttons.Add (add_button);
@@ -414,7 +489,6 @@ namespace SparkleShare {
 
 						Controller.ChangeAddressFieldEvent += delegate (string text,
                             string example_text, FieldState state) {
-
                             Dispatcher.BeginInvoke ((Action) delegate {
                                 address_box.Text        = text;
                                 address_box.IsEnabled   = (state == FieldState.Enabled);
@@ -422,17 +496,47 @@ namespace SparkleShare {
                             });
                         };
 
-                        Controller.ChangePathFieldEvent += delegate (string text,
+                        Controller.ChangeRepositoryFieldEvent += delegate(string text,
                             string example_text, FieldState state) {
+                            Dispatcher.BeginInvoke((Action)delegate
+                            {
+                                repository_box.Text = text;
+                                repository_box.IsEnabled = (state == FieldState.Enabled);
+                                repository_help_label.Text = example_text;
+                            });
+                        };
 
+                        Controller.ChangePathFieldEvent += delegate(string text,
+                            string example_text, FieldState state) {
                             Dispatcher.BeginInvoke ((Action) delegate {
                                 path_box.Text        = text;
                                 path_box.IsEnabled   = (state == FieldState.Enabled);
                                 path_help_label.Text = example_text;
                             });
                         };
-                        
-                        Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
+
+                        Controller.ChangeUserFieldEvent += delegate(string text,
+                            string example_text, FieldState state) {
+                            Dispatcher.BeginInvoke((Action)delegate
+                            {
+                                user_box.Text = text;
+                                user_box.IsEnabled = (state == FieldState.Enabled);
+                                user_help_label.Text = example_text;
+                            });
+                        };
+
+                        Controller.ChangePasswordFieldEvent += delegate(string text,
+                            string example_text, FieldState state) {
+                            Dispatcher.BeginInvoke((Action)delegate
+                            {
+                                password_box.Text = text;
+                                password_box.IsEnabled = (state == FieldState.Enabled);
+                                password_help_label.Text = example_text;
+                            });
+                        };
+
+                        Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
+                        {
                             Dispatcher.BeginInvoke ((Action) delegate {
                                 add_button.IsEnabled = button_enabled;
                             });
@@ -461,7 +565,8 @@ namespace SparkleShare {
                         };
 
                         add_button.Click += delegate {
-                            Controller.AddPageCompleted (address_box.Text, path_box.Text);
+                            Controller.AddPageCompleted(address_box.Text, repository_box.Text, path_box.Text,
+                                user_box.Text, password_box.Text);
                         };
                                           
                         break;

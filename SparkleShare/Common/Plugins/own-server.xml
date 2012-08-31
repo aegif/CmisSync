@@ -33,11 +33,15 @@
     </info>
     <address>
       <value/>
-      <example>user:password@hostname:port/prefix</example>
+      <example>http://hostname:port/cmis-atom-prefix</example>
     </address>
+    <repository>
+      <value/>
+      <example>repositoryId</example>
+    </repository>
     <path>
       <value/>
-      <example>/repo/path/to/folder</example>
+      <example>/sub/folder</example>
       <example xml:lang="de">/Pfad/zum/Projekt</example>
       <example xml:lang="el">/path/to/project</example>
       <example xml:lang="es">/ruta/al/proyecto</example>
@@ -50,5 +54,13 @@
       <example xml:lang="sv">/sökväg/till/projekt</example>
       <example xml:lang="zh_CN">/path/to/project</example>
     </path>
+    <address>
+      <value/>
+      <example>user</example>
+    </address>
+    <address>
+      <value/>
+      <example>password</example>
+    </address>
   </plugin>
 </sparkleshare>

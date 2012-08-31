@@ -70,10 +70,19 @@ namespace SparkleShare {
         public event ChangeAddressFieldEventHandler ChangeAddressFieldEvent = delegate { };
         public delegate void ChangeAddressFieldEventHandler (string text, string example_text, FieldState state);
 
+        public event ChangeRepositoryFieldEventHandler ChangeRepositoryFieldEvent = delegate { };
+        public delegate void ChangeRepositoryFieldEventHandler(string text, string example_text, FieldState state);
+
         public event ChangePathFieldEventHandler ChangePathFieldEvent = delegate { };
         public delegate void ChangePathFieldEventHandler (string text, string example_text, FieldState state);
 
-        public readonly List<SparklePlugin> Plugins = new List<SparklePlugin> ();
+        public event ChangeUserFieldEventHandler ChangeUserFieldEvent = delegate { };
+        public delegate void ChangeUserFieldEventHandler(string text, string example_text, FieldState state);
+
+        public event ChangePasswordFieldEventHandler ChangePasswordFieldEvent = delegate { };
+        public delegate void ChangePasswordFieldEventHandler(string text, string example_text, FieldState state);
+
+        public readonly List<SparklePlugin> Plugins = new List<SparklePlugin>();
         public SparklePlugin SelectedPlugin;
 
         public bool WindowIsOpen { get; private set; }
@@ -340,7 +349,7 @@ namespace SparkleShare {
         }
 
 
-        public void AddPageCompleted (string address, string remote_path)
+        public void AddPageCompleted (string address, string repository, string remote_path, string user, string password)
         {
             SyncingFolder         = Path.GetFileNameWithoutExtension (remote_path);
             ProgressBarPercentage = 1.0;
@@ -348,13 +357,17 @@ namespace SparkleShare {
             ChangePageEvent (PageType.Syncing, null);
 
             address     = address.Trim ();
+            repository  = repository.Trim();
             remote_path = remote_path.Trim ();
-            remote_path = remote_path.TrimEnd ("/".ToCharArray ());
+            //remote_path = remote_path.TrimEnd ("/".ToCharArray ());
+            user        = user.Trim();
+            password    = password.Trim();
 
             if (SelectedPlugin.PathUsesLowerCase)
                 remote_path = remote_path.ToLower ();
 
             PreviousAddress = address;
+            // TODO PreviousRepository = repository;
             PreviousPath    = remote_path;
 
             Program.Controller.FolderFetched    += AddPageFetchedDelegate;
@@ -363,7 +376,8 @@ namespace SparkleShare {
 
             new Thread (() => {
                 Program.Controller.StartFetcher (address, SelectedPlugin.Fingerprint, remote_path,
-                    SelectedPlugin.AnnouncementsUrl, this.fetch_prior_history);
+                    SelectedPlugin.AnnouncementsUrl, this.fetch_prior_history,
+                    repository, remote_path, user, password);
 
             }).Start ();
         }
@@ -383,8 +397,8 @@ namespace SparkleShare {
 
                 try {
                     string address = remote_url.Replace (uri.AbsolutePath, "");
-    
-                    new_plugin = SparklePlugin.Create (uri.Host, address, address, "", "", "/path/to/project");
+
+                    new_plugin = SparklePlugin.Create(uri.Host, address, address, "", "", "", "", "/path/to/project", "", "", "", "");
     
                     if (new_plugin != null) {
                         Plugins.Insert (1, new_plugin);
@@ -424,7 +438,7 @@ namespace SparkleShare {
 
         public void InvitePageCompleted ()
         {
-            SyncingFolder   = Path.GetFileNameWithoutExtension (PendingInvite.RemotePath);
+            /*SyncingFolder   = Path.GetFileNameWithoutExtension (PendingInvite.RemotePath);
             PreviousAddress = PendingInvite.Address;
             PreviousPath    = PendingInvite.RemotePath;
 
@@ -444,9 +458,10 @@ namespace SparkleShare {
                 Program.Controller.FolderFetching   += SyncingPageFetchingDelegate;
 
                 Program.Controller.StartFetcher (PendingInvite.Address, PendingInvite.Fingerprint,
-                    PendingInvite.RemotePath, PendingInvite.AnnouncementsUrl, false); // TODO: checkbox on invite page
+                    PendingInvite.RemotePath, PendingInvite.AnnouncementsUrl, false,
+                    repository, remote_path, user, password); // TODO: checkbox on invite page
 
-            }).Start ();
+            }).Start ();*/
         }
 
         // The following private methods are

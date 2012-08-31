@@ -36,8 +36,14 @@ namespace SparkleShare {
         public string AnnouncementsUrl { get { return GetValue ("info", "announcements_url"); } }
         public string Address { get { return GetValue ("address", "value"); } }
         public string AddressExample { get { return GetValue ("address", "example"); } }
-        public string Path { get { return GetValue ("path", "value"); } }
+        public string Repository { get { return GetValue("repository", "value"); } }
+        public string RepositoryExample { get { return GetValue("repository", "example"); } }
+        public string Path { get { return GetValue("path", "value"); } }
         public string PathExample { get { return GetValue ("path", "example"); } }
+        public string User { get { return GetValue("user", "value"); } }
+        public string UserExample { get { return GetValue("user", "example"); } }
+        public string Password { get { return GetValue("password", "value"); } }
+        public string PasswordExample { get { return GetValue("password", "example"); } }
 
         public string ImagePath {
             get {
@@ -74,7 +80,9 @@ namespace SparkleShare {
 
 
         public static SparklePlugin Create (string name, string description, string address_value,
-            string address_example, string path_value, string path_example)
+            string address_example, string repository_value, string repository_example,
+            string path_value, string path_example, string user_value, string user_example,
+            string password_value, string password_example)
         {
             string plugin_path = System.IO.Path.Combine (LocalPluginsPath, name + ".xml");
 
@@ -93,10 +101,22 @@ namespace SparkleShare {
                 "      <value>" + address_value + "</value>" +
                 "      <example>" + address_example + "</example>" +
                 "    </address>" +
+                "    <repository>" +
+                "      <value>" + repository_value + "</value>" +
+                "      <example>" + repository_example + "</example>" +
+                "    </repository>" +
                 "    <path>" +
                 "      <value>" + path_value + "</value>" +
                 "      <example>" + path_example + "</example>" +
                 "    </path>" +
+                "    <user>" +
+                "      <value>" + user_value + "</value>" +
+                "      <example>" + user_example + "</example>" +
+                "    </user>" +
+                "    <password>" +
+                "      <value>" + password_value + "</value>" +
+                "      <example>" + password_example + "</example>" +
+                "    </password>" +
                 "  </plugin>" +
                 "</sparkleshare>";
 

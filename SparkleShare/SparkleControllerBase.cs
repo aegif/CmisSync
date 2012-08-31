@@ -471,7 +471,8 @@ namespace SparkleShare {
 
 
         public void StartFetcher (string address, string required_fingerprint,
-            string remote_path, string announcements_url, bool fetch_prior_history)
+            string remote_path, string announcements_url, bool fetch_prior_history,
+            string repository, string path, string user, string password)
         {
             if (announcements_url != null)
                 announcements_url = announcements_url.Trim ();
@@ -487,22 +488,24 @@ namespace SparkleShare {
             string tmp_folder     = Path.Combine (tmp_path, canonical_name);
             string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
-            try {
-                SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
-                this.fetcher = (SparkleFetcherBase) Activator.CreateInstance (
-                    Type.GetType("SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend),
-                        address, required_fingerprint, remote_path, tmp_folder, fetch_prior_history
-                );
-
-            } catch (Exception e) {
-                SparkleLogger.LogInfo ("Controller",
-                    "Failed to load '" + backend + "' backend for '" + canonical_name + "' " + e.Message);
-
-                FolderFetchError (Path.Combine (address, remote_path).Replace (@"\", "/"),
-                    new string [] {"Failed to load \"" + backend + "\" backend for \"" + canonical_name + "\""});
-
-                return;
-            }
+            fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, tmp_folder,
+                fetch_prior_history, repository, path, user, password);
+            //try {
+            //    SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
+            //    this.fetcher = (SparkleFetcherBase) Activator.CreateInstance (
+            //        Type.GetType("SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend),
+            //            address, required_fingerprint, remote_path, tmp_folder, fetch_prior_history
+            //    );
+            //
+            //} catch (Exception e) {
+            //    SparkleLogger.LogInfo ("Controller",
+            //        "Failed to load '" + backend + "' backend for '" + canonical_name + "' " + e.Message);
+            //
+            //    FolderFetchError (Path.Combine (address, remote_path).Replace (@"\", "/"),
+            //        new string [] {"Failed to load \"" + backend + "\" backend for \"" + canonical_name + "\""});
+            //
+            //    return;
+            //}
 
 
             this.fetcher.Finished += delegate (bool repo_is_encrypted, bool repo_is_empty, string [] warnings) {
@@ -596,7 +599,8 @@ namespace SparkleShare {
             string backend = SparkleFetcherBase.GetBackend (this.fetcher.RemoteUrl.AbsolutePath);
 
             this.config.AddFolder (target_folder_name, this.fetcher.Identifier,
-                this.fetcher.RemoteUrl.ToString (), backend);
+                this.fetcher.RemoteUrl.ToString (), backend,
+                this.fetcher.Repository, this.fetcher.ThePath, this.fetcher.User, this.fetcher.Password);
 
             FolderFetched (this.fetcher.RemoteUrl.ToString (), this.fetcher.Warnings.ToArray ());
 
