@@ -1,5 +1,5 @@
-//   SparkleShare, a collaboration and sharing tool.
-//   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
+//   CmisSync, a CMIS synchronization tool.
+//   Copyright (C) 2012  Nicolas Raoul <nicolas.raoul@aegif.jp>
 //
 //   This program is free software: you can redistribute it and/or modify
 //   it under the terms of the GNU General Public License as published by
@@ -33,29 +33,26 @@ namespace SparkleLib.Cmis {
 
     public class SparkleRepo : SparkleRepoBase {
 
-        IFolder remoteRootFolder;
+        ISession session;
         string localRootFolder = @"C:\localRoot";
 
-        bool syncing = false; // State. true if syncing is being performed right now.
+        bool syncing = true; // State. true if syncing is being performed right now. // TODO use is_syncing variable in parent
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
-            Console.WriteLine("Cmis SparkleRepo constructor");
-
-            // Connect to repository
+            // Connect to repository.
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             parameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            parameters[SessionParameter.AtomPubUrl] = "http://localhost:8080/alfresco/service/cmis";
-            parameters[SessionParameter.User] = "admin";
-            parameters[SessionParameter.Password] = "admin";
+            parameters[SessionParameter.AtomPubUrl] = config.GetUrlForFolder(Path.GetFileName(path));
+            parameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "user");
+            parameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "password");
+            parameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "repository");
             SessionFactory factory = SessionFactory.NewInstance();
-            ISession session = factory.GetRepositories(parameters)[0].CreateSession(); // TODO there might be several repositories, let user select one, see https://github.com/nicolas-raoul/CmisSync/issues/15
+            IList<IRepository> repositories = factory.GetRepositories(parameters);
+            Console.WriteLine("Matching repositories: " + repositories.Count);
+            session = factory.GetRepositories(parameters)[0].CreateSession();
             Console.WriteLine("Created CMIS session: " + session.ToString());
-
-            // Get the root folder
-            remoteRootFolder = session.GetRootFolder();
-
-            Sync();
+            syncing = false;
         }
 
         private void Sync()
@@ -64,28 +61,45 @@ namespace SparkleLib.Cmis {
                 return;
             syncing = true;
 
-            // TODO if localRootFolder contains zero file
-			RecursiveFolderCopy(remoteRootFolder, localRootFolder);
+            Console.WriteLine("Syncing " + RemoteUrl + " " + local_config.GetFolderOptionalAttribute("repository", LocalPath));
+
+            // Get the root folder.
+            IFolder remoteRootFolder = session.GetRootFolder();
+
+            // Get last change log token from server.
+            // TODO
+            if (true /* TODO if no locally saved CMIS change log token */)
+            {
+                RecursiveFolderCopy(remoteRootFolder, localRootFolder);
+            }
+            else
+            {
+                // Check which files/folders have changed.
+                // TODO session.GetContentChanges(changeLogToken, includeProperties, maxNumItems);
+
+                // Download/delete files/folders accordingly.
+                // TODO
+            }
+            // Save change log token locally.
+            // TODO
 
             syncing = false;
         }
 
         private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
 		{
-		    Console.WriteLine("Copying " + remoteFolder + " to " + localFolder);
-            // List all children
+            // List all children.
 			foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
 			{
-                // Console.WriteLine(cmisObject.Name);
                 if (cmisObject is DotCMIS.Client.Impl.Folder)
                 {
                     IFolder remoteSubFolder = (IFolder)cmisObject;
                     string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
                     
-                    // Create local folder
+                    // Create local folder.
                     Directory.CreateDirectory(localSubFolder);
 
-                    // Recurse into folder
+                    // Recurse into folder.
                     RecursiveFolderCopy(remoteSubFolder, localSubFolder);
                 }
                 else
@@ -102,8 +116,9 @@ namespace SparkleLib.Cmis {
                         continue;
                     }
 
+                    // Download.
                     string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
-                    Console.WriteLine("Downloading " + contentStream.FileName);
+                    Console.Write("Downloading " + filePath);
                     Stream file = File.OpenWrite(filePath);
                     byte[] buffer = new byte[8 * 1024];
                     int len;
@@ -113,6 +128,7 @@ namespace SparkleLib.Cmis {
                     }
                     file.Close();
                     contentStream.Stream.Close();
+                    Console.WriteLine(" OK");
                 }
             }
 		}
@@ -122,7 +138,7 @@ namespace SparkleLib.Cmis {
             get {
 				Console.WriteLine("Cmis SparkleRepo ExcludePaths get");
                 List<string> rules = new List<string> ();
-                rules.Add (".CmisSync"); // Contains the configuration for this checkout
+                rules.Add (".CmisSync"); // Contains the configuration for this checkout.
                 return rules;
             }
         }
@@ -202,6 +218,7 @@ namespace SparkleLib.Cmis {
         public override bool HasUnsyncedChanges {
             get {
 				Console.WriteLine("Cmis SparkleRepo HasUnsyncedChanges get");
+                Sync();
 				return false; // TODO
             }
 
