@@ -28,6 +28,7 @@ using DotCMIS.Data.Impl;
 using DotCMIS.Data.Extensions;
 
 using SparkleLib;
+using System.ComponentModel;
 
 namespace SparkleLib.Cmis {
 
@@ -60,9 +61,29 @@ namespace SparkleLib.Cmis {
             if (syncing)
                 return;
             syncing = true;
+            // TODO this.watcher.Disable ();
 
             Console.WriteLine("Syncing " + RemoteUrl + " " + local_config.GetFolderOptionalAttribute("repository", LocalPath));
 
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
+                {
+                    Console.WriteLine("Launching sync in background, so that the UI stays available.");
+                    SyncInBackground();
+                }
+            );
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                delegate(object o, RunWorkerCompletedEventArgs args)
+                {
+                    syncing = false;
+                }
+            );
+            bw.RunWorkerAsync();
+        }
+
+        private void SyncInBackground()
+        {
             // Get the root folder.
             IFolder remoteRootFolder = session.GetRootFolder();
 
@@ -82,8 +103,6 @@ namespace SparkleLib.Cmis {
             }
             // Save change log token locally.
             // TODO
-
-            syncing = false;
         }
 
         private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
