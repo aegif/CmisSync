@@ -229,10 +229,26 @@
       <Link>Plugins\own-server.png</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\Common\Plugins\alfresco.png">
+      <Link>Plugins\alfresco.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Plugins\filenet.png">
+      <Link>Plugins\filenet.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Common\Plugins\own-server.xml">
       <Link>Plugins\own-server.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Plugins\alfresco.xml">
+      <Link>Plugins\alfresco.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Plugins\filenet.xml">
+      <Link>Plugins\filenet.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
