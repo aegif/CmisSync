@@ -35,12 +35,17 @@ namespace SparkleLib.Cmis {
     public class SparkleRepo : SparkleRepoBase {
 
         ISession session;
-        string localRootFolder = @"C:\localRoot";
+        string localRootFolder;
 
         bool syncing = true; // State. true if syncing is being performed right now. // TODO use is_syncing variable in parent
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
+            // Set local root folder.
+            localRootFolder = @"C:\localRoot" // TODO make this configurable, or create in user home.
+                 + Path.DirectorySeparatorChar
+                 + config.GetFolderOptionalAttribute(Path.GetFileName(path), "name");
+
             // Connect to repository.
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             parameters[SessionParameter.BindingType] = BindingType.AtomPub;
