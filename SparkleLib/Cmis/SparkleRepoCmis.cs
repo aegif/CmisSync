@@ -29,12 +29,21 @@ using DotCMIS.Data.Extensions;
 
 using SparkleLib;
 using System.ComponentModel;
+using DotCMIS.Enums;
 
 namespace SparkleLib.Cmis {
 
     public class SparkleRepo : SparkleRepoBase {
 
+        // At which degree the repository supports Change Logs.
+        // See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
+        // Possible values: none, objectidsonly, properties, all
+        bool ChangeLogCapability;
+
+        // Session to the CMIS repository.
         ISession session;
+
+        // Local folder where the changes are synchronized to.
         string localRootFolder;
 
         bool syncing = true; // State. true if syncing is being performed right now. // TODO use is_syncing variable in parent
@@ -56,7 +65,10 @@ namespace SparkleLib.Cmis {
             SessionFactory factory = SessionFactory.NewInstance();
             IList<IRepository> repositories = factory.GetRepositories(parameters);
             Console.WriteLine("Matching repositories: " + repositories.Count);
-            session = factory.GetRepositories(parameters)[0].CreateSession();
+            IRepository repository = factory.GetRepositories(parameters)[0];
+            ChangeLogCapability = repository.Capabilities.ChangesCapability.GetCmisValue().Equals("all")
+                || repository.Capabilities.ChangesCapability.GetCmisValue().Equals("objectidsonly");
+            session = repository.CreateSession();
             Console.WriteLine("Created CMIS session: " + session.ToString());
             syncing = false;
         }
@@ -92,26 +104,35 @@ namespace SparkleLib.Cmis {
             // Get the root folder.
             IFolder remoteRootFolder = session.GetRootFolder();
 
-            // Get last change log token from server.
-            // TODO
-            if (true /* TODO if no locally saved CMIS change log token */)
+            if (ChangeLogCapability)
             {
-                RecursiveFolderCopy(remoteRootFolder, localRootFolder);
+                // Get last change log token from server.
+                // TODO
+                if (true /* TODO if no locally saved CMIS change log token */)
+                {
+                    RecursiveFolderCopy(remoteRootFolder, localRootFolder);
+                }
+                else
+                {
+                    // Check which files/folders have changed.
+                    // TODO session.GetContentChanges(changeLogToken, includeProperties, maxNumItems);
+
+                    // Download/delete files/folders accordingly.
+                    // TODO
+                }
+                // Save change log token locally.
+                // TODO
             }
             else
             {
-                // Check which files/folders have changed.
-                // TODO session.GetContentChanges(changeLogToken, includeProperties, maxNumItems);
-
-                // Download/delete files/folders accordingly.
-                // TODO
+                // No ChangeLog capability, so we have to crawl remote and local folders.
+                CrawlSync(remoteRootFolder, localRootFolder);
             }
-            // Save change log token locally.
-            // TODO
         }
 
         private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
 		{
+            String id = new Random().Next(0, 1000000).ToString();
             // List all children.
 			foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
 			{
@@ -129,33 +150,100 @@ namespace SparkleLib.Cmis {
                 else
                 {
                     // It is a file, just download it.
+                    DownloadFile((IDocument)cmisObject, localFolder);
+                }
+            }
+		}
+
+
+        private void CrawlSync(IFolder remoteFolder, string localFolder)
+        {
+            //String id = new Random().Next(0, 1000000).ToString();
+
+            // Sync down.
+
+            // List all children.
+            foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
+            {
+                if (cmisObject is DotCMIS.Client.Impl.Folder)
+                {
+                    IFolder remoteSubFolder = (IFolder)cmisObject;
+                    string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
+
+                    // Check whether local folder
+                    if (Directory.Exists(localSubFolder))
+                    {
+                        // Recurse into folder.
+                        CrawlSync(remoteSubFolder, localSubFolder);
+                    }
+                    else
+                    {
+                        // Create local folder.
+                        Directory.CreateDirectory(localSubFolder);
+
+                        // Recursive copy of the whole folder.
+                        RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                    }
+                }
+                else
+                {
+                    // It is a file, check whether it exists and has the same modifica download it.
                     IDocument remoteDocument = (IDocument)cmisObject;
-                    DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream();
+                    DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream(); // TODO protect from TimeOutException
 
                     // If this file does not have a content stream, ignore it.
                     // Even 0 bytes files have a contentStream.
                     // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
                     if (contentStream == null)
                     {
-                        continue;
+                        return;
                     }
 
-                    // Download.
                     string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
-                    Console.Write("Downloading " + filePath);
-                    Stream file = File.OpenWrite(filePath);
-                    byte[] buffer = new byte[8 * 1024];
-                    int len;
-                    while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                    if (File.Exists(filePath))
                     {
-                        file.Write(buffer, 0, len);
+                        // Download if modification date if different
+                        // TODO check modification date stored in SQLite
                     }
-                    file.Close();
-                    contentStream.Stream.Close();
-                    Console.WriteLine(" OK");
+                    else
+                    {
+                        DownloadFile(remoteDocument, localFolder);
+                    }
                 }
             }
-		}
+
+            // Sync up.
+            // TODO
+            // for all local folders/files check SQLite
+        }
+
+
+        private void DownloadFile(IDocument remoteDocument, string localFolder)
+        {
+            DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream();
+
+            // If this file does not have a content stream, ignore it.
+            // Even 0 bytes files have a contentStream.
+            // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+            if (contentStream == null)
+            {
+                return;
+            }
+
+            // Download.
+            string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
+            Console.Write(/*id +*/ "Downloading " + filePath);
+            Stream file = File.OpenWrite(filePath);
+            byte[] buffer = new byte[8 * 1024];
+            int len;
+            while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                file.Write(buffer, 0, len);
+            }
+            file.Close();
+            contentStream.Stream.Close();
+            Console.WriteLine(" OK");
+        }
 
 
         public override List<string> ExcludePaths {
