@@ -28,18 +28,24 @@ using DotCMIS.Data.Impl;
 using DotCMIS.Data.Extensions;
 
 using SparkleLib;
+using System.ComponentModel;
 
 namespace SparkleLib.Cmis {
 
     public class SparkleRepo : SparkleRepoBase {
 
         ISession session;
-        string localRootFolder = @"C:\localRoot";
+        string localRootFolder;
 
         bool syncing = true; // State. true if syncing is being performed right now. // TODO use is_syncing variable in parent
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
+            // Set local root folder.
+            localRootFolder = @"C:\localRoot" // TODO make this configurable, or create in user home.
+                 + Path.DirectorySeparatorChar
+                 + config.GetFolderOptionalAttribute(Path.GetFileName(path), "name");
+
             // Connect to repository.
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             parameters[SessionParameter.BindingType] = BindingType.AtomPub;
@@ -60,9 +66,29 @@ namespace SparkleLib.Cmis {
             if (syncing)
                 return;
             syncing = true;
+            // TODO this.watcher.Disable ();
 
             Console.WriteLine("Syncing " + RemoteUrl + " " + local_config.GetFolderOptionalAttribute("repository", LocalPath));
 
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
+                {
+                    Console.WriteLine("Launching sync in background, so that the UI stays available.");
+                    SyncInBackground();
+                }
+            );
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                delegate(object o, RunWorkerCompletedEventArgs args)
+                {
+                    syncing = false;
+                }
+            );
+            bw.RunWorkerAsync();
+        }
+
+        private void SyncInBackground()
+        {
             // Get the root folder.
             IFolder remoteRootFolder = session.GetRootFolder();
 
@@ -82,8 +108,6 @@ namespace SparkleLib.Cmis {
             }
             // Save change log token locally.
             // TODO
-
-            syncing = false;
         }
 
         private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
