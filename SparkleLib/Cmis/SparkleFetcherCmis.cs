@@ -38,7 +38,7 @@ namespace SparkleLib.Cmis {
         {
 			Console.WriteLine("Cmis SparkleFetcher constructor");
             TargetFolder = target_folder;
-            RemoteUrl    = new Uri ("http://localhost:8080/alfresco/service/cmis"); // TODO
+            RemoteUrl    = new Uri (server);
         }
 
 

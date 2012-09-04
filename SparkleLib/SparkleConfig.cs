@@ -173,23 +173,23 @@ namespace SparkleLib {
 
 
         public void AddFolder (string name, string identifier, string url, string backend,
-            string repository, string path, string user, string password)
+            string repository, string remoteFolder, string user, string password)
         {
-            XmlNode node_name       = CreateElement ("name");
-            XmlNode node_identifier = CreateElement ("identifier");
-            XmlNode node_url        = CreateElement ("url");
-            XmlNode node_backend    = CreateElement ("backend");
-            XmlNode node_repository = CreateElement("repository");
-            XmlNode node_path       = CreateElement("path");
-            XmlNode node_user       = CreateElement("user");
-            XmlNode node_password   = CreateElement("password");
+            XmlNode node_name         = CreateElement ("name");
+            XmlNode node_identifier   = CreateElement ("identifier");
+            XmlNode node_url          = CreateElement ("url");
+            XmlNode node_backend      = CreateElement ("backend");
+            XmlNode node_repository   = CreateElement("repository");
+            XmlNode node_remoteFolder = CreateElement("remoteFolder");
+            XmlNode node_user         = CreateElement("user");
+            XmlNode node_password     = CreateElement("password");
 
             node_name.InnerText       = name;
             node_identifier.InnerText = identifier;
             node_url.InnerText        = url;
             node_backend.InnerText    = backend;
             node_repository.InnerText = repository;
-            node_path.InnerText = path;
+            node_remoteFolder.InnerText = remoteFolder;
             node_user.InnerText = user;
             node_password.InnerText = password;
 
@@ -200,7 +200,7 @@ namespace SparkleLib {
             node_folder.AppendChild (node_url);
             node_folder.AppendChild (node_backend);
             node_folder.AppendChild(node_repository);
-            node_folder.AppendChild(node_path);
+            node_folder.AppendChild(node_remoteFolder);
             node_folder.AppendChild(node_user);
             node_folder.AppendChild(node_password);
 
