@@ -189,21 +189,12 @@ namespace SparkleLib.Cmis {
                 {
                     // It is a file, check whether it exists and has the same modifica download it.
                     IDocument remoteDocument = (IDocument)cmisObject;
-                    DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream(); // TODO protect from TimeOutException
 
-                    // If this file does not have a content stream, ignore it.
-                    // Even 0 bytes files have a contentStream.
-                    // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-                    if (contentStream == null)
-                    {
-                        return;
-                    }
-
-                    string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
+                    string filePath = localFolder + Path.DirectorySeparatorChar + remoteDocument.ContentStreamFileName;
                     if (File.Exists(filePath))
                     {
-                        // Download if modification date if different
-                        // TODO check modification date stored in SQLite
+                        // Check modification date stored in SQLite and download if remote modification date if different.
+                        // TODO
                     }
                     else
                     {
