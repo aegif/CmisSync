@@ -600,7 +600,7 @@ namespace SparkleShare {
 
             this.config.AddFolder (target_folder_name, this.fetcher.Identifier,
                 this.fetcher.RemoteUrl.ToString (), backend,
-                this.fetcher.Repository, this.fetcher.ThePath, this.fetcher.User, this.fetcher.Password);
+                this.fetcher.Repository, this.fetcher.RemoteFolder, this.fetcher.User, this.fetcher.Password);
 
             FolderFetched (this.fetcher.RemoteUrl.ToString (), this.fetcher.Warnings.ToArray ());
 

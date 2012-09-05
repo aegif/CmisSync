@@ -46,14 +46,19 @@ namespace SparkleLib.Cmis {
         // Local folder where the changes are synchronized to.
         string localRootFolder;
 
+        // Path of the root in the remote repository.
+        string remoteFolderPath;
+
         bool syncing = true; // State. true if syncing is being performed right now. // TODO use is_syncing variable in parent
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
             // Set local root folder.
-            localRootFolder = @"C:\localRoot" // TODO make this configurable, or create in user home.
-                 + Path.DirectorySeparatorChar
-                 + config.GetFolderOptionalAttribute(Path.GetFileName(path), "name");
+            localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER,
+                 config.GetFolderOptionalAttribute(Path.GetFileName(path), "name"));
+
+            // Get path on remote repository.
+            remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "path");
 
             // Connect to repository.
             Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -66,8 +71,8 @@ namespace SparkleLib.Cmis {
             IList<IRepository> repositories = factory.GetRepositories(parameters);
             Console.WriteLine("Matching repositories: " + repositories.Count);
             IRepository repository = factory.GetRepositories(parameters)[0];
-            ChangeLogCapability = repository.Capabilities.ChangesCapability.GetCmisValue().Equals("all")
-                || repository.Capabilities.ChangesCapability.GetCmisValue().Equals("objectidsonly");
+            ChangeLogCapability = repository.Capabilities.ChangesCapability == CapabilityChanges.All
+                || repository.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
             session = repository.CreateSession();
             Console.WriteLine("Created CMIS session: " + session.ToString());
             syncing = false;
@@ -102,7 +107,8 @@ namespace SparkleLib.Cmis {
         private void SyncInBackground()
         {
             // Get the root folder.
-            IFolder remoteRootFolder = session.GetRootFolder();
+            //IFolder remoteRootFolder = session.GetRootFolder();
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath("/" + remoteFolderPath);
 
             if (ChangeLogCapability)
             {
@@ -110,7 +116,7 @@ namespace SparkleLib.Cmis {
                 // TODO
                 if (true /* TODO if no locally saved CMIS change log token */)
                 {
-                    RecursiveFolderCopy(remoteRootFolder, localRootFolder);
+                    RecursiveFolderCopy(remoteFolder, localRootFolder);
                 }
                 else
                 {
@@ -126,7 +132,7 @@ namespace SparkleLib.Cmis {
             else
             {
                 // No ChangeLog capability, so we have to crawl remote and local folders.
-                CrawlSync(remoteRootFolder, localRootFolder);
+                CrawlSync(remoteFolder, localRootFolder);
             }
         }
 
@@ -189,24 +195,27 @@ namespace SparkleLib.Cmis {
                 {
                     // It is a file, check whether it exists and has the same modifica download it.
                     IDocument remoteDocument = (IDocument)cmisObject;
-                    DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream(); // TODO protect from TimeOutException
 
-                    // If this file does not have a content stream, ignore it.
-                    // Even 0 bytes files have a contentStream.
-                    // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-                    if (contentStream == null)
+                    string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
+                    // If this file does not have a filename, ignore it.
+                    // It sometimes happen on IBM P8 CMIS server, not sure why.
+                    if (remoteDocumentFileName == null)
                     {
-                        return;
+                        Console.WriteLine("Skipping download of file with null content stream in " + localFolder);
+                        continue;
                     }
 
-                    string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
+                    string filePath = localFolder + Path.DirectorySeparatorChar + remoteDocumentFileName;
+
+
                     if (File.Exists(filePath))
                     {
-                        // Download if modification date if different
-                        // TODO check modification date stored in SQLite
+                        // Check modification date stored in SQLite and download if remote modification date if different.
+                        // TODO
                     }
                     else
                     {
+                        Console.WriteLine("Downloading " + remoteDocumentFileName);
                         DownloadFile(remoteDocument, localFolder);
                     }
                 }
@@ -227,6 +236,7 @@ namespace SparkleLib.Cmis {
             // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
             if (contentStream == null)
             {
+                Console.WriteLine("Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
                 return;
             }
 
@@ -238,7 +248,7 @@ namespace SparkleLib.Cmis {
             int len;
             while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                file.Write(buffer, 0, len);
+                file.Write(buffer, 0, len); // crash+
             }
             file.Close();
             contentStream.Stream.Close();

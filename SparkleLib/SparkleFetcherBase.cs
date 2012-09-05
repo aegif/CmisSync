@@ -45,7 +45,7 @@ namespace SparkleLib {
 
         public Uri RemoteUrl { get; protected set; }
         public string Repository { get; protected set; }
-        public string ThePath { get; protected set; }
+        public string RemoteFolder { get; protected set; }
         public string User { get; protected set; }
         public string Password { get; protected set; }
         public string RequiredFingerprint { get; protected set; }
@@ -114,7 +114,7 @@ namespace SparkleLib {
             TargetFolder = target_folder;
             RemoteUrl    = new Uri (server + remote_path);
             Repository = repository;
-            ThePath = path;
+            RemoteFolder = remote_path;
             User = user;
             Password = password;
             IsActive     = false;
