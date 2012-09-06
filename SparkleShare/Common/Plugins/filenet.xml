@@ -3,7 +3,7 @@
   <plugin>
     <info>
         <name>IBM FileNet</name>
-        <description>IBM FileNet Content Manager P8 CMIS server 5.0+</description>
+        <description>IBM FileNet Content Manager 5.x+</description>
         <icon>filenet.png</icon>
         <backend>Cmis</backend>
     </info>
