@@ -247,6 +247,10 @@
       <Link>Plugins\filenet.png</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\Common\Plugins\nemakiware.png">
+      <Link>Plugins\nemakiware.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Common\Plugins\own-server.xml">
@@ -259,6 +263,10 @@
     </None>
     <None Include="..\Common\Plugins\filenet.xml">
       <Link>Plugins\filenet.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Plugins\nemakiware.xml">
+      <Link>Plugins\nemakiware.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

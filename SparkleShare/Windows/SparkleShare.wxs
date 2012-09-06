@@ -25,8 +25,6 @@
               <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\SparkleLib\Cmis\DotCMIS.dll' DiskId='1' />
               <File Id='sparkleshare_app.ico' Name='sparkleshare.ico' Source='!(wix.root)\SparkleShare\Windows\Pixmaps\sparkleshare-app.ico' DiskId='1' />
             </Component>
-            <Directory Id='MSYSGIT_DIR' Name='msysgit'>
-            </Directory>
             <Directory Id='PLUGINS_DIR' Name='plugins'>
             </Directory>
         </Directory>
