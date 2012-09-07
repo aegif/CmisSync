@@ -63,7 +63,7 @@ namespace SparkleShare {
                     
                     switch (type) {
                     case PageType.Setup: {
-                        Header      = "Welcome to SparkleShare!";
+                        Header      = "Welcome to CmisSync!";
                         Description  = "First off, what's your name and email?\nThis information is only visible to team members.";
                         
                         TextBlock name_label = new TextBlock () {
@@ -574,8 +574,8 @@ namespace SparkleShare {
                         
                         
                     case PageType.Syncing: {
-                        Header      = "Adding project ‘" + Controller.SyncingFolder + "’…";
-                        Description = "This may either take a short or a long time depending on the project's size.";
+                        Header      = "Adding folder ‘" + Controller.SyncingFolder + "’…";
+                        Description = "This may either take a short or a long time depending on the folder's size.";
 
                         Button finish_button = new Button () {
                             Content   = "Finish",
@@ -681,8 +681,8 @@ namespace SparkleShare {
                     }    
                         
                     case PageType.Finished: {
-                        Header      = "Your shared project is ready!";
-                        Description = "You can find the files in your SparkleShare folder.";
+                        Header      = "Your documents are ready!";
+                        Description = "You can find them in your CmisSync folder.";
                         
                         
                         Button finish_button = new Button () {
@@ -740,7 +740,7 @@ namespace SparkleShare {
                         switch (Controller.TutorialPageNumber) {
                             case 1: {
                                 Header      = "What's happening next?";
-                                Description = "SparkleShare creates a special folder on your computer " +
+                                Description = "CmisSync creates a special folder on your computer " +
                                     "that will keep track of your projects.";
     
                             
@@ -781,8 +781,8 @@ namespace SparkleShare {
                         
                             case 2: {
                                 Header      = "Sharing files with others";
-                                Description = "All files added to your project folders are synced automatically with " +
-                                    "the host and your team members.";
+                                Description = "All files added to the server are automatically synced to your " +
+                                    "local folder.";
     
                             
                                 Button continue_button = new Button () {
@@ -814,7 +814,7 @@ namespace SparkleShare {
                             case 3: {
                                 Header      = "The status icon is here to help";
                                 Description = "It shows the syncing progress, provides easy access to " +
-                                    "your projects and lets you view recent changes.";
+                                    "your folders and lets you view recent changes.";
     
                             
                                 Button continue_button = new Button () {
@@ -844,9 +844,9 @@ namespace SparkleShare {
                             }
                             
                             case 4: {
-                                Header      = "Adding projects to SparkleShare";
-                                Description = "You can do this through the status icon menu, or by clicking " +
-                                    "magic buttons on webpages that look like this:";
+                                Header      = "Adding repository folders to CmisSync";
+                                Description = "           " +
+                                    "           ";
                             
                             
                                 Button finish_button = new Button () {
@@ -861,7 +861,7 @@ namespace SparkleShare {
                                 slide_image.Source = SparkleUIHelpers.GetImageSource ("tutorial-slide-4");
     
                                 CheckBox check_box = new CheckBox () {
-                                    Content   = "Add SparkleShare to startup items",
+                                    Content   = "Add CmisSync to startup items",
                                     IsChecked = true
                                 };
                             
