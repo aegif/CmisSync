@@ -78,7 +78,7 @@ namespace SparkleLib.Cmis {
             syncing = false;
         }
 
-        private void Sync()
+        private void SyncInBackground()
         {
             if (syncing)
                 return;
@@ -92,7 +92,14 @@ namespace SparkleLib.Cmis {
                 delegate(Object o, DoWorkEventArgs args)
                 {
                     Console.WriteLine("Launching sync in background, so that the UI stays available.");
-                    SyncInBackground();
+                    try
+                    {
+                        Sync();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception while syncing:" + e.Message);
+                    }
                 }
             );
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -104,7 +111,7 @@ namespace SparkleLib.Cmis {
             bw.RunWorkerAsync();
         }
 
-        private void SyncInBackground()
+        private void Sync()
         {
             // Get the root folder.
             //IFolder remoteRootFolder = session.GetRootFolder();
@@ -242,13 +249,21 @@ namespace SparkleLib.Cmis {
 
             // Download.
             string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
+
+            // If there was previously a directory with this name, delete it.
+            // TODO warn if local changes inside the folder.
+            if (Directory.Exists(filePath))
+            {
+                Directory.Delete(filePath);
+            }
+
             Console.Write(/*id +*/ "Downloading " + filePath);
             Stream file = File.OpenWrite(filePath);
             byte[] buffer = new byte[8 * 1024];
             int len;
             while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                file.Write(buffer, 0, len); // crash+
+                file.Write(buffer, 0, len);
             }
             file.Close();
             contentStream.Stream.Close();
@@ -340,7 +355,7 @@ namespace SparkleLib.Cmis {
         public override bool HasUnsyncedChanges {
             get {
 				Console.WriteLine("Cmis SparkleRepo HasUnsyncedChanges get");
-                Sync();
+                SyncInBackground();
 				return false; // TODO
             }
 
