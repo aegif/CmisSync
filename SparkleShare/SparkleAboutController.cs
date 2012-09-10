@@ -33,9 +33,9 @@ namespace SparkleShare {
         public event NewVersionEventDelegate NewVersionEvent = delegate { };
         public delegate void NewVersionEventDelegate (string new_version_string);
 
-        public readonly string WebsiteLinkAddress       = "http://www.sparkleshare.org/";
-        public readonly string CreditsLinkAddress       = "http://www.github.com/hbons/SparkleShare/tree/master/legal/AUTHORS";
-        public readonly string ReportProblemLinkAddress = "http://www.github.com/hbons/SparkleShare/issues";
+        public readonly string WebsiteLinkAddress       = "http://CmisSync.github.com";
+        public readonly string CreditsLinkAddress       = "http://www.github.com/nicolas-raoul/CmisSync/tree/master/legal/AUTHORS";
+        public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
 
         public string RunningVersion {
             get {
