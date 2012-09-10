@@ -73,7 +73,7 @@ namespace SparkleShare {
                 UI.Run ();
             
             } catch (Exception e) {
-				Console.WriteLine("exception");
+				Console.WriteLine("Exception in Program.Main");
                 SparkleLogger.WriteCrashReport (e);
                 Environment.Exit (-1);
             }
