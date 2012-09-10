@@ -282,8 +282,15 @@ namespace SparkleShare {
 
                 Dispatcher.BeginInvoke ((Action) delegate {
                     this.spinner.Stop ();
-                    
-                    this.web_browser.NavigateToString (html);
+
+                    if (html.Length > 0)
+                    {
+                        this.web_browser.NavigateToString(html);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Empty HML for EventLog");
+                    }
                     
                     if (!this.canvas.Children.Contains (this.web_browser)) {
                         this.canvas.Children.Add (this.web_browser);
