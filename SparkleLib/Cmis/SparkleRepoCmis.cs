@@ -74,7 +74,7 @@ namespace SparkleLib.Cmis {
             cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "repository");
         }
 
-        public void connect()
+        public void Connect()
         {
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
@@ -82,16 +82,19 @@ namespace SparkleLib.Cmis {
             {
                 // Get the list of repositories. There should be only one, because we specified RepositoryId.
                 IList<IRepository> repositories = factory.GetRepositories(cmisParameters);
-                Console.WriteLine("Matching repositories: " + repositories.Count);
+                if(repositories.Count != 1)
+                    SparkleLogger.LogInfo("Sync", "Unexpected number of matching repositories: " + repositories.Count);
+                // Get the repository.
                 IRepository repository = factory.GetRepositories(cmisParameters)[0];
+                // Detect whether the repository has the ChangeLog capability.
                 ChangeLogCapability = repository.Capabilities.ChangesCapability == CapabilityChanges.All
                     || repository.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
                 session = repository.CreateSession();
-                Console.WriteLine("Created CMIS session: " + session.ToString());
+                SparkleLogger.LogInfo("Sync", "Created CMIS session: " + session.ToString());
             }
             catch (CmisRuntimeException e)
             {
-                Console.WriteLine("Exception: " + e.Message + ", error content: " + e.ErrorContent);
+                SparkleLogger.LogInfo("Sync", "Exception: " + e.Message + ", error content: " + e.ErrorContent);
             }
         }
 
@@ -101,20 +104,20 @@ namespace SparkleLib.Cmis {
                 return;
             syncing = true;
 
-            Console.WriteLine("Syncing " + RemoteUrl + " " + local_config.GetFolderOptionalAttribute("repository", LocalPath));
+            SparkleLogger.LogInfo("Sync", "Syncing " + RemoteUrl + " " + local_config.GetFolderOptionalAttribute("repository", LocalPath));
 
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += new DoWorkEventHandler(
                 delegate(Object o, DoWorkEventArgs args)
                 {
-                    Console.WriteLine("Launching sync in background, so that the UI stays available.");
+                    SparkleLogger.LogInfo("Sync", "Launching sync in background, so that the UI stays available.");
                     try
                     {
                         Sync();
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Exception while syncing:" + e.Message);
+                        SparkleLogger.LogInfo("Sync", "Exception while syncing:" + e.Message);
                     }
                 }
             );
@@ -131,7 +134,7 @@ namespace SparkleLib.Cmis {
         {
             // If not connected, connect.
             if (session == null)
-                connect();
+                Connect();
 
             // Get the root folder.
             //IFolder remoteRootFolder = session.GetRootFolder();
@@ -228,7 +231,7 @@ namespace SparkleLib.Cmis {
                     // It sometimes happen on IBM P8 CMIS server, not sure why.
                     if (remoteDocumentFileName == null)
                     {
-                        Console.WriteLine("Skipping download of file with null content stream in " + localFolder);
+                        SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream in " + localFolder);
                         continue;
                     }
 
@@ -242,7 +245,7 @@ namespace SparkleLib.Cmis {
                     }
                     else
                     {
-                        Console.WriteLine("Downloading " + remoteDocumentFileName);
+                        SparkleLogger.LogInfo("Sync", "Downloading " + remoteDocumentFileName);
                         DownloadFile(remoteDocument, localFolder);
                     }
                 }
@@ -263,7 +266,7 @@ namespace SparkleLib.Cmis {
             // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
             if (contentStream == null)
             {
-                Console.WriteLine("Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
                 return;
             }
 
@@ -277,7 +280,7 @@ namespace SparkleLib.Cmis {
                 Directory.Delete(filePath);
             }
 
-            Console.Write(/*id +*/ "Downloading " + filePath);
+            SparkleLogger.LogInfo("Sync", /*id +*/ "Downloading " + filePath);
             Stream file = File.OpenWrite(filePath);
             byte[] buffer = new byte[8 * 1024];
             int len;
@@ -287,13 +290,13 @@ namespace SparkleLib.Cmis {
             }
             file.Close();
             contentStream.Stream.Close();
-            Console.WriteLine(" OK");
+            SparkleLogger.LogInfo("Sync", "Downloaded");
         }
 
 
         public override List<string> ExcludePaths {
             get {
-				Console.WriteLine("Cmis SparkleRepo ExcludePaths get");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo ExcludePaths get");
                 List<string> rules = new List<string> ();
                 rules.Add (".CmisSync"); // Contains the configuration for this checkout.
                 return rules;
@@ -303,7 +306,7 @@ namespace SparkleLib.Cmis {
 
         public override double Size {
             get {
-				Console.WriteLine("Cmis SparkleRepo Size get");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo Size get");
                 return 1234567; // TODO
             }
         }
@@ -311,7 +314,7 @@ namespace SparkleLib.Cmis {
 
         public override double HistorySize {
             get {
-				Console.WriteLine("Cmis SparkleRepo HistorySize get");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo HistorySize get");
                 return 1234567; // TODO
             }
         }
@@ -319,14 +322,14 @@ namespace SparkleLib.Cmis {
 
         private void UpdateSizes ()
         {
-			Console.WriteLine("Cmis SparkleRepo UpdateSizes");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo UpdateSizes");
 			// TODO
         }
         
 
         public override string [] UnsyncedFilePaths {
             get {
-				Console.WriteLine("Cmis SparkleRepo UnsyncedFilePaths get");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo UnsyncedFilePaths get");
                 List<string> file_paths = new List<string> ();
                 //file_paths.Add (path); TODO
                 return file_paths.ToArray ();
@@ -336,7 +339,7 @@ namespace SparkleLib.Cmis {
 
         public override string CurrentRevision {
             get {
-				Console.WriteLine("Cmis SparkleRepo CurrentRevision get");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo CurrentRevision get");
                 return null; // TODO
             }
         }
@@ -344,7 +347,7 @@ namespace SparkleLib.Cmis {
 
         public override bool HasRemoteChanges {
             get {
-				Console.WriteLine("Cmis SparkleRepo HasRemoteChanges get");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo HasRemoteChanges get");
                 return false; // TODO
             }
         }
@@ -352,21 +355,21 @@ namespace SparkleLib.Cmis {
 
         public override bool SyncUp ()
         {
-			Console.WriteLine("Cmis SparkleRepo SyncUp");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo SyncUp");
 			return true; // TODO
         }
 
 
         public override bool SyncDown ()
         {
-			Console.WriteLine("Cmis SparkleRepo SyncDown");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo SyncDown");
 			return true; // TODO
         }
 
 
         public override bool HasLocalChanges {
             get {
-				Console.WriteLine("Cmis SparkleRepo HasLocalChanges get");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo HasLocalChanges get");
 				return false; // TODO
             }
         }
@@ -374,13 +377,13 @@ namespace SparkleLib.Cmis {
 
         public override bool HasUnsyncedChanges {
             get {
-				Console.WriteLine("Cmis SparkleRepo HasUnsyncedChanges get");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo HasUnsyncedChanges get");
                 SyncInBackground();
 				return false; // TODO
             }
 
             set {
-				Console.WriteLine("Cmis SparkleRepo HasUnsyncedChanges set");
+                SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo HasUnsyncedChanges set");
 				// TODO
             }
         }
@@ -389,7 +392,7 @@ namespace SparkleLib.Cmis {
         // Stages the made changes
         private void Add ()
         {
-			Console.WriteLine("Cmis SparkleRepo Add");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo Add");
 			// TODO
         }
 
@@ -397,7 +400,7 @@ namespace SparkleLib.Cmis {
         // Commits the made changes
         private void Commit (string message)
 		{
-			Console.WriteLine("Cmis SparkleRepo Commit");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo Commit");
 			// TODO
         }
 
@@ -405,35 +408,35 @@ namespace SparkleLib.Cmis {
         // Merges the fetched changes
         private void Rebase ()
         {
-			Console.WriteLine("Cmis SparkleRepo Rebase");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo Rebase");
 			// TODO
         }
 
 
         private void ResolveConflict ()
         {
-			Console.WriteLine("Cmis SparkleRepo ResolveConflict");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo ResolveConflict");
 			// TODO
         }
 
 
         public override void RevertFile (string path, string revision)
         {
-			Console.WriteLine("Cmis SparkleRepo RevertFile");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo RevertFile");
 			// TODO
         }
 
 
         public override List<SparkleChangeSet> GetChangeSets (string path, int count)
         {
-			Console.WriteLine("Cmis SparkleRepo GetChangeSets");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo GetChangeSets");
             return new List <SparkleChangeSet> (); // TODO
         }   
 
 
         public override List<SparkleChangeSet> GetChangeSets (int count)
         {
-			Console.WriteLine("Cmis SparkleRepo GetChangeSets");
+            SparkleLogger.LogInfo("Sync", "Cmis SparkleRepo GetChangeSets");
             return new List <SparkleChangeSet> (); // TODO
         }
     }
