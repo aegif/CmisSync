@@ -58,7 +58,7 @@ namespace SparkleLib.Cmis {
                  config.GetFolderOptionalAttribute(Path.GetFileName(path), "name"));
 
             // Get path on remote repository.
-            remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "path");
+            remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "remoteFolder");
 
             // Connect to repository.
             Dictionary<string, string> parameters = new Dictionary<string, string>();
