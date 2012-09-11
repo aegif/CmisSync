@@ -30,6 +30,7 @@ using DotCMIS.Data.Extensions;
 using SparkleLib;
 using System.ComponentModel;
 using DotCMIS.Enums;
+using DotCMIS.Exceptions;
 
 namespace SparkleLib.Cmis {
 
@@ -49,7 +50,12 @@ namespace SparkleLib.Cmis {
         // Path of the root in the remote repository.
         string remoteFolderPath;
 
-        bool syncing = true; // State. true if syncing is being performed right now. // TODO use is_syncing variable in parent
+        // State. true if syncing is being performed right now.
+        // TODO use is_syncing variable in parent
+        bool syncing = false;
+
+        // Parameters for CMIS requests.
+        Dictionary<string, string> cmisParameters;
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
@@ -60,22 +66,33 @@ namespace SparkleLib.Cmis {
             // Get path on remote repository.
             remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "remoteFolder");
 
-            // Connect to repository.
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            parameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            parameters[SessionParameter.AtomPubUrl] = config.GetUrlForFolder(Path.GetFileName(path));
-            parameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "user");
-            parameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "password");
-            parameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "repository");
+            cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = config.GetUrlForFolder(Path.GetFileName(path));
+            cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "user");
+            cmisParameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "password");
+            cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "repository");
+        }
+
+        public void connect()
+        {
+            // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
-            IList<IRepository> repositories = factory.GetRepositories(parameters);
-            Console.WriteLine("Matching repositories: " + repositories.Count);
-            IRepository repository = factory.GetRepositories(parameters)[0];
-            ChangeLogCapability = repository.Capabilities.ChangesCapability == CapabilityChanges.All
-                || repository.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-            session = repository.CreateSession();
-            Console.WriteLine("Created CMIS session: " + session.ToString());
-            syncing = false;
+            try
+            {
+                // Get the list of repositories. There should be only one, because we specified RepositoryId.
+                IList<IRepository> repositories = factory.GetRepositories(cmisParameters);
+                Console.WriteLine("Matching repositories: " + repositories.Count);
+                IRepository repository = factory.GetRepositories(cmisParameters)[0];
+                ChangeLogCapability = repository.Capabilities.ChangesCapability == CapabilityChanges.All
+                    || repository.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
+                session = repository.CreateSession();
+                Console.WriteLine("Created CMIS session: " + session.ToString());
+            }
+            catch (CmisRuntimeException e)
+            {
+                Console.WriteLine("Exception: " + e.Message + ", error content: " + e.ErrorContent);
+            }
         }
 
         private void SyncInBackground()
@@ -83,7 +100,6 @@ namespace SparkleLib.Cmis {
             if (syncing)
                 return;
             syncing = true;
-            // TODO this.watcher.Disable ();
 
             Console.WriteLine("Syncing " + RemoteUrl + " " + local_config.GetFolderOptionalAttribute("repository", LocalPath));
 
@@ -113,6 +129,10 @@ namespace SparkleLib.Cmis {
 
         private void Sync()
         {
+            // If not connected, connect.
+            if (session == null)
+                connect();
+
             // Get the root folder.
             //IFolder remoteRootFolder = session.GetRootFolder();
             IFolder remoteFolder = (IFolder)session.GetObjectByPath("/" + remoteFolderPath);
