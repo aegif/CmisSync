@@ -56,7 +56,7 @@ namespace SparkleShare {
                     switch (type) {
                     case PageType.Setup: {
 
-                        Header      = "Welcome to SparkleShare!";
+                        Header      = "Welcome to CmisSync!";
                         Description = "First off, what's your name and email?\nThis information is only visible to team members.";
 
                         Table table = new Table (2, 3, true) {
@@ -137,11 +137,13 @@ namespace SparkleShare {
 
                         Header = "Where's your CMIS folder?";
 
-                        VBox layout_vertical = new VBox (false, 12);
-                        HBox layout_fields   = new HBox (true, 12);
-                        VBox layout_address  = new VBox (true, 0);
-                        VBox layout_path     = new VBox (true, 0);
-
+                        VBox layout_vertical   = new VBox (false, 12);
+                        HBox layout_fields     = new HBox (true, 12);
+                        VBox layout_address    = new VBox (true, 0);
+                        VBox layout_repository = new VBox (true, 0);
+                        VBox layout_path       = new VBox (true, 0);
+                        VBox layout_user       = new VBox (true, 0);
+                        VBox layout_password   = new VBox (true, 0);
 
                         ListStore store = new ListStore (typeof (Gdk.Pixbuf),
                             typeof (string), typeof (SparklePlugin));
@@ -171,16 +173,11 @@ namespace SparkleShare {
                         }
 
                         tree.AppendColumn (service_column);
-
+						
+						// Address
                         Entry address_entry = new Entry () {
                             Text = Controller.PreviousAddress,
                             Sensitive = (Controller.SelectedPlugin.Address == null),
-                            ActivatesDefault = true
-                        };
-                        
-                        Entry path_entry = new Entry () {
-                            Text = Controller.PreviousPath,
-                            Sensitive = (Controller.SelectedPlugin.Path == null),
                             ActivatesDefault = true
                         };
                         
@@ -191,11 +188,60 @@ namespace SparkleShare {
                                 SecondaryTextColor + "\">" + Controller.SelectedPlugin.AddressExample + "</span>"
                         };
 
+						// Repository
+                        Entry repository_entry = new Entry () {
+                            Text = Controller.PreviousAddress,
+                            Sensitive = (Controller.SelectedPlugin.Repository == null),
+                            ActivatesDefault = true
+                        };
+                        
+                        Label repository_example = new Label () {
+                            Xalign = 0,
+                            UseMarkup = true,
+                            Markup = "<span size=\"small\" fgcolor=\"" +
+                                SecondaryTextColor + "\">" + Controller.SelectedPlugin.RepositoryExample + "</span>"
+                        };
+
+						// Path
+                        Entry path_entry = new Entry () {
+                            Text = Controller.PreviousPath,
+                            Sensitive = (Controller.SelectedPlugin.Path == null),
+                            ActivatesDefault = true
+                        };
+                        
                         Label path_example = new Label () {
                             Xalign = 0,
                             UseMarkup = true,
                             Markup = "<span size=\"small\" fgcolor=\"" +
                                 SecondaryTextColor + "\">" + Controller.SelectedPlugin.PathExample + "</span>"
+                        };
+
+						// User
+                        Entry user_entry = new Entry () {
+                            Text = Controller.PreviousPath,
+                            Sensitive = (Controller.SelectedPlugin.User == null),
+                            ActivatesDefault = true
+                        };
+                        
+                        Label user_example = new Label () {
+                            Xalign = 0,
+                            UseMarkup = true,
+                            Markup = "<span size=\"small\" fgcolor=\"" +
+                                SecondaryTextColor + "\">" + Controller.SelectedPlugin.UserExample + "</span>"
+                        };
+
+						// Password
+                        Entry password_entry = new Entry () {
+                            Text = Controller.PreviousPath,
+                            Sensitive = (Controller.SelectedPlugin.Password == null),
+                            ActivatesDefault = true
+                        };
+                        
+                        Label password_example = new Label () {
+                            Xalign = 0,
+                            UseMarkup = true,
+                            Markup = "<span size=\"small\" fgcolor=\"" +
+                                SecondaryTextColor + "\">" + Controller.SelectedPlugin.PasswordExample + "</span>"
                         };
 
 
@@ -216,6 +262,17 @@ namespace SparkleShare {
                             });
                         };
 
+                        Controller.ChangeRepositoryFieldEvent += delegate (string text,
+                            string example_text, FieldState state) {
+
+                            Application.Invoke (delegate {
+                                repository_entry.Text      = text;
+                                repository_entry.Sensitive = (state == FieldState.Enabled);
+                                repository_example.Markup  =  "<span size=\"small\" fgcolor=\"" +
+                                    SecondaryTextColor + "\">" + example_text + "</span>";
+                            });
+                        };
+
                         Controller.ChangePathFieldEvent += delegate (string text,
                             string example_text, FieldState state) {
 
@@ -223,6 +280,28 @@ namespace SparkleShare {
                                 path_entry.Text      = text;
                                 path_entry.Sensitive = (state == FieldState.Enabled);
                                 path_example.Markup  =  "<span size=\"small\" fgcolor=\""
+                                    + SecondaryTextColor + "\">" + example_text + "</span>";
+                            });
+                        };
+
+                        Controller.ChangeUserFieldEvent += delegate (string text,
+                            string example_text, FieldState state) {
+
+                            Application.Invoke (delegate {
+                                user_entry.Text      = text;
+                                user_entry.Sensitive = (state == FieldState.Enabled);
+                                user_example.Markup  =  "<span size=\"small\" fgcolor=\""
+                                    + SecondaryTextColor + "\">" + example_text + "</span>";
+                            });
+                        };
+
+                        Controller.ChangePasswordFieldEvent += delegate (string text,
+                            string example_text, FieldState state) {
+
+                            Application.Invoke (delegate {
+                                password_entry.Text      = text;
+                                password_entry.Sensitive = (state == FieldState.Enabled);
+                                password_example.Markup  =  "<span size=\"small\" fgcolor=\""
                                     + SecondaryTextColor + "\">" + example_text + "</span>";
                             });
                         };
@@ -272,28 +351,55 @@ namespace SparkleShare {
                             Controller.CheckAddPage (address_entry.Text, path_entry.Text, tree.SelectedRow);
                         };
 
-                                layout_address.PackStart (new Label () {
-                                        Markup = "<b>" + "Address:" + "</b>",
-                                        Xalign = 0
-                                    }, true, true, 0);
+						// Address
+                        layout_address.PackStart (new Label () {
+                                Markup = "<b>" + "Address:" + "</b>",
+                                Xalign = 0
+                            }, true, true, 0);
 
-                                layout_address.PackStart (address_entry, false, false, 0);
-                                layout_address.PackStart (address_example, false, false, 0);
+                        layout_address.PackStart (address_entry, false, false, 0);
+                        layout_address.PackStart (address_example, false, false, 0);
+                        path_entry.Changed += delegate {
+                            Controller.CheckAddPage (address_entry.Text, path_entry.Text, tree.SelectedRow);
+                        };
 
-                                    path_entry.Changed += delegate {
-                                        Controller.CheckAddPage (address_entry.Text, path_entry.Text, tree.SelectedRow);
-                                    };
+						// Repository
+						layout_repository.PackStart (new Label () {
+                                Markup = "<b>" + "Repository:" + "</b>",
+                                Xalign = 0
+                            }, true, true, 0);
+                        layout_repository.PackStart (repository_entry, false, false, 0);
+                        layout_repository.PackStart (repository_example, false, false, 0);
 
-                                layout_path.PackStart (new Label () {
-                                        Markup = "<b>" + "Remote Path:" + "</b>",
-                                        Xalign = 0
-                                    }, true, true, 0);
-                                
-                                layout_path.PackStart (path_entry, false, false, 0);
-                                layout_path.PackStart (path_example, false, false, 0);
+						// Path
+						layout_path.PackStart (new Label () {
+                                Markup = "<b>" + "Remote Path:" + "</b>",
+                                Xalign = 0
+                            }, true, true, 0);
+                        layout_path.PackStart (path_entry, false, false, 0);
+                        layout_path.PackStart (path_example, false, false, 0);
 
-                            layout_fields.PackStart (layout_address);
-                            layout_fields.PackStart (layout_path);
+						// User
+						layout_user.PackStart (new Label () {
+                                Markup = "<b>" + "User:" + "</b>",
+                                Xalign = 0
+                            }, true, true, 0);
+                        layout_user.PackStart (user_entry, false, false, 0);
+                        layout_user.PackStart (user_example, false, false, 0);
+
+						// Path
+						layout_password.PackStart (new Label () {
+                                Markup = "<b>" + "password:" + "</b>",
+                                Xalign = 0
+                            }, true, true, 0);
+                        layout_password.PackStart (password_entry, false, false, 0);
+                        layout_password.PackStart (password_example, false, false, 0);
+
+                        layout_fields.PackStart (layout_address);
+                        layout_fields.PackStart (layout_repository);
+                        layout_fields.PackStart (layout_path);
+                        layout_fields.PackStart (layout_user);
+                        layout_fields.PackStart (layout_password);
 
                         layout_vertical.PackStart (new Label (""), false, false, 0);
                         layout_vertical.PackStart (scrolled_window, true, true, 0);
@@ -313,10 +419,8 @@ namespace SparkleShare {
                             };
 
                             add_button.Clicked += delegate {
-                                string server         = address_entry.Text;
-                                string folder_name    = path_entry.Text;
-
-                                Controller.AddPageCompleted (server, folder_name);
+                                Controller.AddPageCompleted(address_entry.Text, repository_entry.Text, path_entry.Text,
+                                	user_entry.Text, password_entry.Text);
                             };
 
                         Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
@@ -676,14 +780,14 @@ namespace SparkleShare {
                         UrgencyHint = true;
 
                         if (!HasToplevelFocus) {
-                            string title   = "Your shared project is ready!";
-                            string subtext = "You can find the files in your SparkleShare folder.";
+                            string title   = "Your documents are ready!";
+                            string subtext = "You can find them in your CmisSync folder.";
 
                             Program.UI.Bubbles.Controller.ShowBubble (title, subtext, null);
                         }
 
-                        Header      = "Your shared project is ready!";
-                        Description = "You can find it in your SparkleShare folder";
+                        Header      = "Your documents are ready!";
+                        Description = "You can find them in your CmisSync folder.";
 
                         // A button that opens the synced folder
                         Button open_folder_button = new Button (string.Format ("Open {0}",
@@ -736,8 +840,8 @@ namespace SparkleShare {
                         switch (Controller.TutorialPageNumber) {
                         case 1: {
                             Header      = "What's happening next?";
-                            Description = "SparkleShare creates a special folder on your computer " +
-                                "that will keep track of your projects.";
+                            Description = "CmisSync creates a special folder on your computer " +
+                                "that will keep track of your folders.";
 
                             Button skip_tutorial_button = new Button ("Skip Tutorial");
                             skip_tutorial_button.Clicked += delegate {
@@ -761,8 +865,8 @@ namespace SparkleShare {
 
                         case 2: {
                             Header      = "Sharing files with others";
-                            Description = "All files added to your project folders are synced automatically with " +
-                                "the host and your team members.";
+                            Description = "All files added to the server are automatically synced to your " +
+                                "local folder.";
 
                             Button continue_button = new Button ("Continue");
                             continue_button.Clicked += delegate {
@@ -780,7 +884,7 @@ namespace SparkleShare {
                         case 3: {
                             Header      = "The status icon is here to help";
                             Description = "It shows the syncing progress, provides easy access to " +
-                                "your projects and let's you view recent changes.";
+                                "your folders and let's you view recent changes.";
 
                             Button continue_button = new Button ("Continue");
                             continue_button.Clicked += delegate {
@@ -796,9 +900,9 @@ namespace SparkleShare {
                         }
 
                         case 4: {
-                            Header      = "Adding projects to SparkleShare";
-                            Description = "You can do this through the status icon menu, or by clicking " +
-                                "magic buttons on webpages that look like this:";
+                            Header      = "Adding repository folders to CmisSync";
+                            Description = "           " +
+                                "           ";
 
                             Image slide = SparkleUIHelpers.GetImage ("tutorial-slide-4.png");
 
@@ -808,7 +912,7 @@ namespace SparkleShare {
                             };
 
 
-                            CheckButton check_button = new CheckButton ("Add SparkleShare to startup items") {
+                            CheckButton check_button = new CheckButton ("Add CmisSync to startup items") {
                                 Active = true
                             };
 
