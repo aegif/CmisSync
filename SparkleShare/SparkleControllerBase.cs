@@ -253,8 +253,8 @@ namespace SparkleShare {
         private void AddRepository (string folder_path)
         {
             SparkleRepoBase repo = null;
-            string folder_name   = Path.GetFileName (folder_path);
-            string backend       = this.config.GetBackendForFolder (folder_name);
+            //string folder_name   = Path.GetFileName (folder_path);
+            //string backend       = this.config.GetBackendForFolder (folder_name);
 
             //try {
                 //repo = (SparkleRepoBase) Activator.CreateInstance (
@@ -486,7 +486,7 @@ namespace SparkleShare {
 
             string canonical_name = Path.GetFileNameWithoutExtension (remote_path);
             string tmp_folder     = Path.Combine (tmp_path, canonical_name);
-            string backend        = SparkleFetcherBase.GetBackend (remote_path);
+            //string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
             fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, tmp_folder,
                 fetch_prior_history, repository, path, user, password);
