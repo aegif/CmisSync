@@ -32,7 +32,7 @@ namespace SparkleShare {
 
         public override string PluginsPath {
             get {
-                return new string [] { Defines.INSTALL_DIR, "plugins" }.Combine ();
+                return new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "plugins" }.Combine ();
             }
         }
 
@@ -157,8 +157,8 @@ namespace SparkleShare {
 
         public override string EventLogHTML {
             get {
-                string html_path = new string [] { Defines.INSTALL_DIR, "html", "event-log.html" }.Combine ();
-                string jquery_file_path = new string [] { Defines.INSTALL_DIR, "html", "jquery.js" }.Combine ();
+                string html_path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "html", "event-log.html" }.Combine ();
+                string jquery_file_path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "html", "jquery.js" }.Combine ();
 
                 string html   = File.ReadAllText (html_path);
                 string jquery = File.ReadAllText (jquery_file_path);
@@ -170,7 +170,7 @@ namespace SparkleShare {
         
         public override string DayEntryHTML {
             get {
-                string path = new string [] { Defines.INSTALL_DIR, "html", "day-entry.html" }.Combine ();
+                string path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "html", "day-entry.html" }.Combine ();
                 return File.ReadAllText (path);
             }
         }
@@ -178,7 +178,7 @@ namespace SparkleShare {
         
         public override string EventEntryHTML {
             get {
-                string path = new string [] { Defines.INSTALL_DIR, "html", "event-entry.html" }.Combine ();
+                string path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "html", "event-entry.html" }.Combine ();
                 return File.ReadAllText (path);
             }
         }
