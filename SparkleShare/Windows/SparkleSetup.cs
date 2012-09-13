@@ -741,7 +741,7 @@ namespace SparkleShare {
                             case 1: {
                                 Header      = "What's happening next?";
                                 Description = "CmisSync creates a special folder on your computer " +
-                                    "that will keep track of your projects.";
+                                    "that will keep track of your folders.";
     
                             
                                 WPF.Image slide_image = new WPF.Image () {
