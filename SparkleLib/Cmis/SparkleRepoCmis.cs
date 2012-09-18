@@ -115,6 +115,11 @@ namespace SparkleLib.Cmis {
                     {
                         Sync();
                     }
+                    catch (CmisBaseException e)
+                    {
+                        SparkleLogger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
+                        SparkleLogger.LogInfo("Sync", e.ErrorContent);
+                    }
                     catch (Exception e)
                     {
                         SparkleLogger.LogInfo("Sync", "Exception while syncing:" + e.Message);
@@ -138,7 +143,7 @@ namespace SparkleLib.Cmis {
 
             // Get the root folder.
             //IFolder remoteRootFolder = session.GetRootFolder();
-            IFolder remoteFolder = (IFolder)session.GetObjectByPath("/" + remoteFolderPath);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
 
             if (ChangeLogCapability)
             {
