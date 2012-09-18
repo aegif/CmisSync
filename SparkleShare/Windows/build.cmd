@@ -14,12 +14,12 @@ copy Pixmaps\sparkleshare-app.ico ..\..\bin\
 
 if "%1"=="installer" (
 	if exist "%wixBinDir%" (
-	  if exist "%~dp0\SparkleShare.msi" del "%~dp0\SparkleShare.msi"
+	  if exist "%~dp0\CmisSync.msi" del "%~dp0\CmisSync.msi"
 		"%wixBinDir%\heat.exe" dir "%~dp0\..\..\bin\plugins" -cg pluginsComponentGroup -gg -scom -sreg -sfrag -srd -dr PLUGINS_DIR -var wix.pluginsdir -o plugins.wxs
 		"%wixBinDir%\candle" "%~dp0\SparkleShare.wxs" -ext WixUIExtension -ext WixUtilExtension
 		"%wixBinDir%\candle" "%~dp0\plugins.wxs" -ext WixUIExtension -ext WixUtilExtension
-		"%wixBinDir%\light" -ext WixUIExtension -ext WixUtilExtension Sparkleshare.wixobj plugins.wixobj -droot="%~dp0\..\.." -dpluginsdir="%~dp0\..\..\bin\plugins"  -o SparkleShare.msi 
-		if exist "%~dp0\SparkleShare.msi" echo SparkleShare.msi created.
+		"%wixBinDir%\light" -ext WixUIExtension -ext WixUtilExtension Sparkleshare.wixobj plugins.wixobj -droot="%~dp0\..\.." -dpluginsdir="%~dp0\..\..\bin\plugins"  -o CmisSync.msi 
+		if exist "%~dp0\CmisSync.msi" echo CmisSync.msi created.
 	) else (
 		echo Not building installer ^(could not find wix, Windows Installer XML toolset^)
 	  echo wix is available at http://wix.sourceforge.net/
