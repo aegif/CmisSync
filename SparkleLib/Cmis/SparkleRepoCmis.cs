@@ -75,11 +75,11 @@ namespace SparkleLib.Cmis {
 	            sqliteConnection.Open();
                 if (initializeDatabase)
                 {
-                    SQLiteCommand initializationCommand = new SQLiteCommand(sqliteConnection);
-                    initializationCommand.CommandText =
+                    SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                    command.CommandText =
                         "CREATE TABLE files (path TEXT PRIMARY KEY,"
                         + "serverSideModificationDate DATE);";
-                    SQLiteDataReader reader = initializationCommand.ExecuteReader();
+                    SQLiteDataReader reader = command.ExecuteReader();
                     reader.Close();
                     // sqliteConnection.Close(); TODO call when exiting CmisSync
                 }
@@ -150,10 +150,10 @@ namespace SparkleLib.Cmis {
                         SparkleLogger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
                         SparkleLogger.LogInfo("Sync", e.ErrorContent);
                     }
-                    catch (Exception e)
-                    {
-                        SparkleLogger.LogInfo("Sync", "Exception while syncing:" + e.Message);
-                    }
+                    //catch (Exception e)
+                    //{
+                    //    SparkleLogger.LogInfo("Sync", "Exception while syncing:" + e.Message);
+                    //}
                 }
             );
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -249,6 +249,13 @@ namespace SparkleLib.Cmis {
                     }
                     else
                     {
+                        // If there was previously a file with this name, delete it.
+                        // TODO warn if local changes in the file.
+                        if (File.Exists(localSubFolder))
+                        {
+                            File.Delete(localSubFolder);
+                        }
+
                         // Create local folder.
                         Directory.CreateDirectory(localSubFolder);
 
@@ -275,12 +282,39 @@ namespace SparkleLib.Cmis {
 
                     if (File.Exists(filePath))
                     {
-                        // Check modification date stored in SQLite and download if remote modification date if different.
-                        // TODO
+                        // Check modification date stored in database and download if remote modification date if different.
+                        DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
+                        try
+                        {
+                            SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                            command.CommandText =
+                                "SELECT serverSideModificationDate FROM files WHERE path=@filePath";
+                            command.Parameters.AddWithValue("filePath", filePath);
+                            object obj = command.ExecuteScalar();
+                            DateTime clientSideModificationDate = (DateTime)obj;
+                            if (clientSideModificationDate == null)
+                            {
+                                SparkleLogger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
+                                DownloadFile(remoteDocument, localFolder);
+                            }
+                            else
+                            {
+                                // If the file has been modified since last time we downloaded it, then download again.
+                                if (serverSideModificationDate > clientSideModificationDate)
+                                {
+                                    SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
+                                    DownloadFile(remoteDocument, localFolder);
+                                }
+                            }
+                        }
+                        catch (SQLiteException e)
+                        {
+                            SparkleLogger.LogInfo("Sync", e.Message);
+                        }
                     }
                     else
                     {
-                        SparkleLogger.LogInfo("Sync", "Downloading " + remoteDocumentFileName);
+                        SparkleLogger.LogInfo("Sync", "Downloading new file: " + remoteDocumentFileName);
                         DownloadFile(remoteDocument, localFolder);
                     }
                 }
@@ -328,14 +362,16 @@ namespace SparkleLib.Cmis {
             SparkleLogger.LogInfo("Sync", "Downloaded");
 
             // Create database entry for this file.
-            string serverSideModificationDate = remoteDocument.LastModificationDate.ToString();
+            DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
             try
             {
-                SQLiteCommand initializationCommand = new SQLiteCommand(sqliteConnection);
-                initializationCommand.CommandText =
-                    "INSERT INTO files (path, serverSideModificationDate) VALUES (\""
-                    + filePath + "\",\"" + serverSideModificationDate + "\");";
-                initializationCommand.ExecuteReader();
+                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                command.CommandText =
+                    "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
+                    + " VALUES (@filePath, @serverSideModificationDate)";
+                command.Parameters.AddWithValue("filePath", filePath);
+                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                command.ExecuteReader();
 	        }
 	        catch (SQLiteException e)
 	        {
