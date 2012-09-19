@@ -32,6 +32,9 @@ using System.ComponentModel;
 using DotCMIS.Enums;
 using DotCMIS.Exceptions;
 
+using System.Data;
+using System.Data.SQLite;
+
 namespace SparkleLib.Cmis {
 
     public class SparkleRepo : SparkleRepoBase {
@@ -59,6 +62,22 @@ namespace SparkleLib.Cmis {
 
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
+            try
+	        {
+            SQLiteConnection cnn = new SQLiteConnection("Data Source=" + SparkleFolder.ROOT_FOLDER + Path.DirectorySeparatorChar + "recipes.s3db");
+	            cnn.Open();
+	            SQLiteCommand mycommand = new SQLiteCommand(cnn);
+	            mycommand.CommandText = "SELECT 1";
+	            SQLiteDataReader reader = mycommand.ExecuteReader();
+                //reader.
+	            reader.Close();
+	            cnn.Close();
+	        }
+	        catch (Exception e)
+	        {
+	            throw new Exception(e.Message);
+	        }
+
             // Set local root folder.
             localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER,
                  config.GetFolderOptionalAttribute(Path.GetFileName(path), "name"));
