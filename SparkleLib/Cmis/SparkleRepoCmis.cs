@@ -60,27 +60,38 @@ namespace SparkleLib.Cmis {
         // Parameters for CMIS requests.
         Dictionary<string, string> cmisParameters;
 
+        // SQLite connection to store modification dates.
+        SQLiteConnection sqliteConnection;
+
         public SparkleRepo (string path, SparkleConfig config) : base (path, config)
         {
+            string databaseFilename = path + ".s3db";
+            bool initializeDatabase = ! File.Exists(databaseFilename);
+
             try
 	        {
-            SQLiteConnection cnn = new SQLiteConnection("Data Source=" + SparkleFolder.ROOT_FOLDER + Path.DirectorySeparatorChar + "recipes.s3db");
-	            cnn.Open();
-	            SQLiteCommand mycommand = new SQLiteCommand(cnn);
-	            mycommand.CommandText = "SELECT 1";
-	            SQLiteDataReader reader = mycommand.ExecuteReader();
-                //reader.
-	            reader.Close();
-	            cnn.Close();
+                // Establish connection with database, create tables if it did not exist yet.
+                sqliteConnection = new SQLiteConnection("Data Source=" + databaseFilename);
+	            sqliteConnection.Open();
+                if (initializeDatabase)
+                {
+                    SQLiteCommand initializationCommand = new SQLiteCommand(sqliteConnection);
+                    initializationCommand.CommandText =
+                        "CREATE TABLE files (path TEXT PRIMARY KEY,"
+                        + "serverSideModificationDate DATE);";
+                    SQLiteDataReader reader = initializationCommand.ExecuteReader();
+                    reader.Close();
+                    // sqliteConnection.Close(); TODO call when exiting CmisSync
+                }
 	        }
-	        catch (Exception e)
+	        catch (SQLiteException e)
 	        {
-	            throw new Exception(e.Message);
+	            SparkleLogger.LogInfo("Sync", e.Message);
 	        }
 
             // Set local root folder.
-            localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER,
-                 config.GetFolderOptionalAttribute(Path.GetFileName(path), "name"));
+            //string localPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "name");
+            localRootFolder = path; //Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
 
             // Get path on remote repository.
             remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "remoteFolder");
@@ -230,7 +241,7 @@ namespace SparkleLib.Cmis {
                     IFolder remoteSubFolder = (IFolder)cmisObject;
                     string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
 
-                    // Check whether local folder
+                    // Check whether local folder exists.
                     if (Directory.Exists(localSubFolder))
                     {
                         // Recurse into folder.
@@ -315,6 +326,21 @@ namespace SparkleLib.Cmis {
             file.Close();
             contentStream.Stream.Close();
             SparkleLogger.LogInfo("Sync", "Downloaded");
+
+            // Create database entry for this file.
+            string serverSideModificationDate = remoteDocument.LastModificationDate.ToString();
+            try
+            {
+                SQLiteCommand initializationCommand = new SQLiteCommand(sqliteConnection);
+                initializationCommand.CommandText =
+                    "INSERT INTO files (path, serverSideModificationDate) VALUES (\""
+                    + filePath + "\",\"" + serverSideModificationDate + "\");";
+                initializationCommand.ExecuteReader();
+	        }
+	        catch (SQLiteException e)
+	        {
+	            SparkleLogger.LogInfo("Sync", e.Message);
+	        }
         }
 
 
