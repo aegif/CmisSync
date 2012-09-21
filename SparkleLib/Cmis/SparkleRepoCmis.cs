@@ -34,6 +34,7 @@ using DotCMIS.Exceptions;
 
 using System.Data;
 using System.Data.SQLite;
+using System.Collections;
 
 namespace SparkleLib.Cmis {
 
@@ -233,13 +234,18 @@ namespace SparkleLib.Cmis {
 
             // Sync down.
 
+            // Lists of files/folders, to delete those that have been removed on the server.
+            IList remoteFiles = new ArrayList();
+            IList remoteFolders = new ArrayList();
+
             // List all children.
             foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
             {
                 if (cmisObject is DotCMIS.Client.Impl.Folder)
                 {
                     IFolder remoteSubFolder = (IFolder)cmisObject;
-                    string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
+                    remoteFolders.Add(remoteSubFolder.Name);
+                    string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
 
                     // Check whether local folder exists.
                     if (Directory.Exists(localSubFolder))
@@ -267,6 +273,7 @@ namespace SparkleLib.Cmis {
                 {
                     // It is a file, check whether it exists and has the same modifica download it.
                     IDocument remoteDocument = (IDocument)cmisObject;
+                    remoteFiles.Add(remoteDocument.Name);
 
                     string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
                     // If this file does not have a filename, ignore it.
@@ -319,6 +326,63 @@ namespace SparkleLib.Cmis {
                     }
                 }
             }
+
+            // Delete folders that have been removed on the server.
+            //foreach (string dirPath in Directory.GetDirectories(localFolder, "*", SearchOption.AllDirectories))
+            //    Directory.CreateDirectory(dirPath.Replace(SourcePath, DestinationPath));
+
+            // Delete files that have been removed on the server.
+            foreach (string filePath in Directory.GetFiles(localFolder, "*.*"))
+            {
+                string fileName = Path.GetFileName(filePath);
+                if (!remoteFiles.Contains(fileName))
+                {
+                    // This local file is not on the CMIS server now, so
+                    // check whether it used to exist on server or not.
+                    SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                    command.CommandText =
+                        "SELECT serverSideModificationDate FROM files WHERE path=@filePath";
+                    command.Parameters.AddWithValue("filePath", filePath);
+                    object obj = command.ExecuteScalar();
+                    if (obj == null)
+                    {
+                        // New file, sync up.
+                        // TODO
+                    }
+                    else
+                    {
+                        // File has been deleted on server, delete it locally too.
+                        SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
+                        File.Delete(filePath);
+                    }
+                }
+            }
+            // Delete folders that have been removed on the server.
+            /*foreach (string folderPath in Directory.GetDirectories(localFolder, "*.*"))
+            {
+                string folderName = Path.GetFileName(folderPath);
+                if (!remoteFiles.Contains(folderName))
+                {
+                    // This local folder is not on the CMIS server now, so
+                    // check whether it used to exist on server or not.
+                    SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                    command.CommandText =
+                        "SELECT serverSideModificationDate FROM files WHERE path=@filePath";
+                    command.Parameters.AddWithValue("filePath", folderPath);
+                    object obj = command.ExecuteScalar();
+                    if (obj == null)
+                    {
+                        // New file, sync up.
+                        // TODO
+                    }
+                    else
+                    {
+                        // File has been deleted on server, delete it locally too.
+                        SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + folderPath);
+                        // File.Delete(filePath);
+                    }
+                }
+            }*/
 
             // Sync up.
             // TODO
