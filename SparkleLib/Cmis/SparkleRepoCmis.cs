@@ -56,7 +56,7 @@ namespace SparkleLib.Cmis {
 
         // State. true if syncing is being performed right now.
         // TODO use is_syncing variable in parent
-        bool syncing = false;
+        bool syncing = true;
 
         // Parameters for CMIS requests.
         Dictionary<string, string> cmisParameters;
@@ -103,6 +103,8 @@ namespace SparkleLib.Cmis {
             cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "user");
             cmisParameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "password");
             cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "repository");
+
+            syncing = false;
         }
 
         public void Connect()
