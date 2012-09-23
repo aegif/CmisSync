@@ -28,9 +28,6 @@ namespace SparkleLib.Cmis {
     // Sets up a fetcher that can get remote folders
     public class SparkleFetcher : SparkleFetcherBase {
 
-        private string crypto_salt = "e0d592768d7cf99a"; // TODO: Make unique per repo
-
-
         public SparkleFetcher (string server, string required_fingerprint, string remote_path,
             string target_folder, bool fetch_prior_history, string repository, string path,
             string user, string password) : base (server, required_fingerprint,

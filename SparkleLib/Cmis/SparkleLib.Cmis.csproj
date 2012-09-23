@@ -66,6 +66,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cmis.cs" />
     <Compile Include="SparkleFetcherCmis.cs" />
     <Compile Include="SparkleCmis.cs">
       <SubType>Component</SubType>
