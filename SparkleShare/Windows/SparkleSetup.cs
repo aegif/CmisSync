@@ -371,11 +371,10 @@ namespace SparkleShare {
                             Width = 200
                         };
 
-                        TextBox password_box = new TextBox()
+                        PasswordBox password_box = new PasswordBox()
                         {
                             Width = 200,
-                            Text = Controller.PreviousPath,
-                            IsEnabled = (Controller.SelectedPlugin.Path == null)
+                            IsEnabled = (Controller.SelectedPlugin.Path == null),
                         };
 
                         TextBlock password_help_label = new TextBlock()
@@ -529,7 +528,7 @@ namespace SparkleShare {
                             string example_text, FieldState state) {
                             Dispatcher.BeginInvoke((Action)delegate
                             {
-                                password_box.Text = text;
+                                password_box.Password = text;
                                 password_box.IsEnabled = (state == FieldState.Enabled);
                                 password_help_label.Text = example_text;
                             });
@@ -566,7 +565,7 @@ namespace SparkleShare {
 
                         add_button.Click += delegate {
                             Controller.AddPageCompleted(address_box.Text, repository_box.Text, path_box.Text,
-                                user_box.Text, password_box.Text);
+                                user_box.Text, password_box.Password);
                         };
                                           
                         break;
