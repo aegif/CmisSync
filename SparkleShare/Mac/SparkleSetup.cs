@@ -99,7 +99,7 @@ namespace SparkleShare {
         public void ShowPage (PageType type, string [] warnings)
         {
             if (type == PageType.Setup) {
-                Header      = "Welcome to SparkleShare!";
+                Header      = "Welcome to CmisSync!";
                 Description = "First off, what's your name and email?\n(visible only to team members)";
 
 

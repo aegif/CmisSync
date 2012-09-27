@@ -52,7 +52,7 @@ namespace SparkleShare {
         public delegate void UpdateOpenRecentEventsItemEventHandler (bool open_recent_events_item_enabled);
 
         public IconState CurrentState = IconState.Idle;
-        public string StateText = "Welcome to SparkleShare!";
+        public string StateText = "Welcome to CmisSync!";
 
 
         public readonly int MenuOverflowThreshold   = 9;
@@ -133,7 +133,7 @@ namespace SparkleShare {
                     CurrentState = IconState.Idle;
 
                     if (Program.Controller.Folders.Count == 0)
-                        StateText = "Welcome to SparkleShare!";
+                        StateText = "Welcome to CmisSync!";
                     else
                         StateText = "Files up to date " + FolderSize;
                 }
@@ -148,7 +148,7 @@ namespace SparkleShare {
                     CurrentState = IconState.Idle;
 
                     if (Program.Controller.Folders.Count == 0)
-                        StateText = "Welcome to SparkleShare!";
+                        StateText = "Welcome to CmisSync!";
                     else
                         StateText = "Files up to date " + FolderSize;
                 }

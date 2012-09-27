@@ -64,34 +64,7 @@ namespace SparkleShare {
                     switch (type) {
                     case PageType.Setup: {
                         Header      = "Welcome to CmisSync!";
-                        Description  = "First off, what's your name and email?\nThis information is only visible to team members.";
-                        
-                        TextBlock name_label = new TextBlock () {
-                            Text = "Full Name:",
-                            Width = 150,
-                            TextAlignment = TextAlignment.Right,
-                            FontWeight = FontWeights.Bold
-                        };
-                        
-						string name = System.Security.Principal.WindowsIdentity.GetCurrent ().Name;
-						name = name.Split ("\\".ToCharArray ()) [1];
-
-                        TextBox name_box = new TextBox () {
-                            Text  = name,
-                            Width = 175
-                        };
-                        
-                        TextBlock email_label = new TextBlock () {
-                            Text    = "Email:",
-                            Width = 150,
-                            TextAlignment = TextAlignment.Right,
-                            FontWeight = FontWeights.Bold
-                        };
-                        
-                        TextBox email_box = new TextBox () {
-                            Width = 175
-                        };
-                                        
+                        Description = "CmisSync allows you to keep in sync with any CMIS-compatible repository, and use your documents even when offline.\nIt is like Dropbox for Enterprise Content Management!\nAvailable for Linux, Mac, Windows.";
                         
                         Button cancel_button = new Button () {
                             Content = "Cancel"
@@ -102,41 +75,15 @@ namespace SparkleShare {
                             IsEnabled = false
                         };
                         
-                        
-                        ContentCanvas.Children.Add (name_label);
-                        Canvas.SetLeft (name_label, 180);
-                        Canvas.SetTop (name_label, 200 + 3);
-                        
-                        ContentCanvas.Children.Add (name_box);
-                        Canvas.SetLeft (name_box, 340);
-                        Canvas.SetTop (name_box, 200);
-                        
-                        ContentCanvas.Children.Add (email_label);
-                        Canvas.SetLeft (email_label, 180);
-                        Canvas.SetTop (email_label, 230 + 3);
-                        
-                        ContentCanvas.Children.Add (email_box);
-                        Canvas.SetLeft (email_box, 340);
-                        Canvas.SetTop (email_box, 230);
-                        
                         Buttons.Add (continue_button);
                         Buttons.Add (cancel_button);
-                        
-						name_box.Focus ();
-						name_box.Select (name_box.Text.Length, 0);
+
+                        continue_button.Focus();
                         
                         Controller.UpdateSetupContinueButtonEvent += delegate (bool enabled) {
                         	Dispatcher.BeginInvoke ((Action) delegate {
                                 continue_button.IsEnabled = enabled;
                             });
-                        };
-                        
-                        name_box.TextChanged += delegate {
-                            Controller.CheckSetupPage (name_box.Text, email_box.Text);
-                        };
-                        
-                        email_box.TextChanged += delegate {
-                            Controller.CheckSetupPage (name_box.Text, email_box.Text);
                         };
                         
                         cancel_button.Click += delegate {
@@ -147,10 +94,10 @@ namespace SparkleShare {
                         };
                         
                         continue_button.Click += delegate {
-                            Controller.SetupPageCompleted (name_box.Text, email_box.Text);
+                            Controller.SetupPageCompleted ();
                         };
                         
-                        Controller.CheckSetupPage (name_box.Text, email_box.Text);
+                        Controller.CheckSetupPage ();
                         
                         break;
                     }
@@ -844,8 +791,8 @@ namespace SparkleShare {
                             
                             case 4: {
                                 Header      = "Adding repository folders to CmisSync";
-                                Description = "           " +
-                                    "           ";
+                                Description = "You can easily add a new CMIS folder " +
+                                    "at any time.";
                             
                             
                                 Button finish_button = new Button () {
@@ -854,7 +801,7 @@ namespace SparkleShare {
                                 
                                 WPF.Image slide_image = new WPF.Image () {
                                     Width  = 350,
-                                    Height = 64
+                                    Height = 200
                                 };
                                 
                                 slide_image.Source = SparkleUIHelpers.GetImageSource ("tutorial-slide-4");

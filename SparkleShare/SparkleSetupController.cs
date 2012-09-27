@@ -225,13 +225,9 @@ namespace SparkleShare {
         }
 
 
-        public void CheckSetupPage (string full_name, string email)
+        public void CheckSetupPage ()
         {
-            full_name = full_name.Trim ();
-            email     = email.Trim ();
-
-            bool fields_valid = (!string.IsNullOrEmpty (full_name) && IsValidEmail (email));
-            UpdateSetupContinueButtonEvent (fields_valid);
+            UpdateSetupContinueButtonEvent (true);
         }
 
         
@@ -241,9 +237,9 @@ namespace SparkleShare {
         }
         
         
-        public void SetupPageCompleted (string full_name, string email)
+        public void SetupPageCompleted ()
         {
-            Program.Controller.CurrentUser = new SparkleUser (full_name, email);
+            Program.Controller.CurrentUser = new SparkleUser ("Dummy", "dummy@example.org");
 
             /*
             new Thread (() => {
