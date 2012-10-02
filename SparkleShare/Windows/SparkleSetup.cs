@@ -425,14 +425,21 @@ namespace SparkleShare {
                             
                             // Get path of selected folder
                             object cursor = item;
-                            Controller.saved_remote_path = "";
+                            Controller.saved_remote_path = null;
                             while (cursor is TreeViewItem)
                             {
                                 TreeViewItem treeViewItem = (TreeViewItem)cursor;
                                 cursor = treeViewItem.Parent;
                                 if (cursor is TreeViewItem)
                                 {
-                                    Controller.saved_remote_path = treeViewItem.Header + "/" + Controller.saved_remote_path;
+                                    if (Controller.saved_remote_path == null)
+                                    {
+                                        Controller.saved_remote_path = (string)treeViewItem.Header;
+                                    }
+                                    else
+                                    {
+                                        Controller.saved_remote_path = treeViewItem.Header + "/" + Controller.saved_remote_path;
+                                    }
                                 }
                                 else
                                 {

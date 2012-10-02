@@ -42,27 +42,46 @@ namespace SparkleLib.Cmis
         // SQLite connection to store modification dates.
         SQLiteConnection sqliteConnection;
 
-        public Cmis(string path, SparkleConfig config)
+        public Cmis(string localRootFolder, SparkleConfig config)
         {
-            databaseFilename = path + ".s3db";
-
+            databaseFilename = localRootFolder + ".s3db";
 
             // Set local root folder.
             //string localPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "name");
-            localRootFolder = path; //Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
+            this.localRootFolder = localRootFolder; //Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
 
             // Get path on remote repository.
-            remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "remoteFolder");
+            remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "remoteFolder");
 
             cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = config.GetUrlForFolder(Path.GetFileName(path));
-            cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "user");
-            cmisParameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "password");
-            cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(path), "repository");
+            cmisParameters[SessionParameter.AtomPubUrl] = config.GetUrlForFolder(Path.GetFileName(localRootFolder));
+            cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "user");
+            cmisParameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "password");
+            cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "repository");
 
             syncing = false;
+        }
 
+        public Cmis(string localRootFolder, string remoteFolderPath, string url, string user, string password, string repositoryId)
+        {
+            databaseFilename = localRootFolder + ".s3db";
+
+            // Set local root folder.
+            //string localPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "name");
+            this.localRootFolder = localRootFolder; //Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
+
+            // Get path on remote repository.
+            this.remoteFolderPath = remoteFolderPath;
+
+            cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = url;
+            cmisParameters[SessionParameter.User] = user;
+            cmisParameters[SessionParameter.Password] = password;
+            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+
+            syncing = false;
         }
 
         public void Connect()

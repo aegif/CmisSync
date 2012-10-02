@@ -36,6 +36,9 @@ namespace SparkleLib.Cmis {
 			Console.WriteLine("Cmis SparkleFetcher constructor");
             TargetFolder = target_folder;
             RemoteUrl    = new Uri (server);
+
+            Cmis cmis = new Cmis(path, remote_path, server, user, password, repository);
+            cmis.SyncInBackground();
         }
 
 
