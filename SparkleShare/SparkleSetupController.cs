@@ -28,7 +28,8 @@ namespace SparkleShare {
     public enum PageType {
         None,
         Setup,
-        Add,
+        Add1,
+        Add2,
         Invite,
         Syncing,
         Error,
@@ -92,7 +93,7 @@ namespace SparkleShare {
         public string PreviousAddress { get; private set; }
         public string PreviousPath { get; private set; }
         public string SyncingFolder { get; private set; }
-        public double ProgressBarPercentage  { get; private set; }
+        public double ProgressBarPercentage { get; private set; }
 
 
         public int SelectedPluginIndex {
@@ -108,8 +109,12 @@ namespace SparkleShare {
         }
 
         private PageType current_page;
-        private string saved_address     = "";
-        private string saved_remote_path = "";
+        public string saved_address     = "";
+        public string saved_remote_path = "";
+        public string saved_user = "";
+        public string saved_password = "";
+        public string saved_repository = "";
+        public string[] repositories;
         private bool create_startup_item = true;
         private bool fetch_prior_history = false;
 
@@ -183,20 +188,20 @@ namespace SparkleShare {
                     return;
                 }
 
-                if (page_type == PageType.Add) {
+                if (page_type == PageType.Add1) {
                     if (WindowIsOpen) {
                         if (this.current_page == PageType.Error ||
                             this.current_page == PageType.Finished ||
                             this.current_page == PageType.None) {
 
-                            ChangePageEvent (PageType.Add, null);
+                            ChangePageEvent (PageType.Add1, null);
                         }
 
                         ShowWindowEvent ();
 
                     } else if (!Program.Controller.FirstRun && TutorialPageNumber == 0) {
                         WindowIsOpen = true;
-                        ChangePageEvent (PageType.Add, null);
+                        ChangePageEvent (PageType.Add1, null);
                         ShowWindowEvent ();
                     }
 
@@ -328,13 +333,12 @@ namespace SparkleShare {
         }
 
 
-        public void CheckAddPage (string address, string remote_path, int selected_plugin)
+        public void CheckAddPage (string address, string remote_path)
         {
             address     = address.Trim ();
             remote_path = remote_path.Trim ();
 
-            if (selected_plugin == 0)
-                this.saved_address = address;
+            this.saved_address = address;
 
             this.saved_remote_path = remote_path;
 
@@ -344,38 +348,47 @@ namespace SparkleShare {
             UpdateAddProjectButtonEvent (fields_valid);
         }
 
-
-        public void AddPageCompleted (string address, string repository, string remote_path, string user, string password)
+        public void Add1PageCompleted(string address, string user, string password)
         {
-            SyncingFolder         = Path.GetFileNameWithoutExtension (remote_path);
+            saved_address = address;
+            saved_user = user;
+            saved_password = password;
+
+            ChangePageEvent(PageType.Add2, null);
+        }
+
+        public void Add2PageCompleted(string repository, string remote_path)
+        {
+            SyncingFolder = Path.GetFileNameWithoutExtension(remote_path);
             ProgressBarPercentage = 1.0;
 
-            ChangePageEvent (PageType.Syncing, null);
+            ChangePageEvent(PageType.Syncing, null);
 
-            address     = address.Trim ();
-            repository  = repository.Trim();
-            remote_path = remote_path.Trim ();
+            String address = saved_address.Trim();
+            repository = repository.Trim();
+            remote_path = remote_path.Trim();
             //remote_path = remote_path.TrimEnd ("/".ToCharArray ());
-            user        = user.Trim();
-            password    = password.Trim();
+            String user = saved_user.Trim();
+            String password = saved_password.Trim();
 
             if (SelectedPlugin.PathUsesLowerCase)
-                remote_path = remote_path.ToLower ();
+                remote_path = remote_path.ToLower();
 
             PreviousAddress = address;
             // TODO PreviousRepository = repository;
-            PreviousPath    = remote_path;
+            PreviousPath = remote_path;
 
-            Program.Controller.FolderFetched    += AddPageFetchedDelegate;
+            Program.Controller.FolderFetched += AddPageFetchedDelegate;
             Program.Controller.FolderFetchError += AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching   += SyncingPageFetchingDelegate;
+            Program.Controller.FolderFetching += SyncingPageFetchingDelegate;
 
-            new Thread (() => {
-                Program.Controller.StartFetcher (address, SelectedPlugin.Fingerprint, remote_path,
+            new Thread(() =>
+            {
+                Program.Controller.StartFetcher(address, SelectedPlugin.Fingerprint, remote_path,
                     SelectedPlugin.AnnouncementsUrl, this.fetch_prior_history,
                     repository, remote_path, user, password);
 
-            }).Start ();
+            }).Start();
         }
 
         // The following private methods are
@@ -495,7 +508,7 @@ namespace SparkleShare {
             if (PendingInvite != null)
                 ChangePageEvent (PageType.Invite, null);
             else
-                ChangePageEvent (PageType.Add, null);
+                ChangePageEvent (PageType.Add1, null);
         }
 
 
@@ -504,7 +517,7 @@ namespace SparkleShare {
             if (PendingInvite != null)
                 ChangePageEvent (PageType.Invite, null);
             else
-                ChangePageEvent (PageType.Add, null);
+                ChangePageEvent (PageType.Add1, null);
         }
 
 

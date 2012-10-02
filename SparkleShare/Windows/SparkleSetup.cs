@@ -34,12 +34,15 @@ using Drawing = System.Drawing;
 using Imaging = System.Windows.Interop.Imaging;
 using WPF = System.Windows.Controls;
 
+using SparkleLib.Cmis;
+using SparkleLib;
+//using System.Windows.Forms;
+
 namespace SparkleShare {
 
     public class SparkleSetup : SparkleSetupWindow {
     
         public SparkleSetupController Controller = new SparkleSetupController ();
-        
         
         public SparkleSetup ()
         {
@@ -174,65 +177,12 @@ namespace SparkleShare {
                         break;
                     }
                         
-                    case PageType.Add: {
-                        Header = "Where is the folder your want to sync?";
-                        
-
-                        ListView list_view = new ListView () {
-                            Width  = 419,
-                            Height = 80,
-                            SelectionMode = SelectionMode.Single
-                        };
-                        
-                        GridView grid_view = new GridView () {
-							AllowsColumnReorder = false
-						};
-						
-						grid_view.Columns.Add (new GridViewColumn ());
-					
-						string xaml =	
-							"<DataTemplate xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"" +
-							"  xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\">" +
-						    "  <Grid>" +
-						    "    <StackPanel Orientation=\"Horizontal\">" +
-						    "      <Image Margin=\"5,0,0,0\" Source=\"{Binding Image}\" Height=\"40\" Width=\"29\"/>" +
-						    "      <StackPanel>" +
-							"        <TextBlock Padding=\"10,4,0,0\" FontWeight=\"Bold\" Text=\"{Binding Name}\">" +
-							"        </TextBlock>" +
-							"        <TextBlock Padding=\"10,0,0,4\" Opacity=\"0.5\" Text=\"{Binding Description}\">" +
-							"        </TextBlock>" +
-							"      </StackPanel>" +
-							"    </StackPanel>" +
-							"  </Grid>" +
-							"</DataTemplate>";
-
-    					grid_view.Columns [0].CellTemplate = (DataTemplate) XamlReader.Parse (xaml);
-
-						Style header_style = new Style(typeof (GridViewColumnHeader));
-						header_style.Setters.Add (new Setter (GridViewColumnHeader.VisibilityProperty, Visibility.Collapsed));
-					    grid_view.ColumnHeaderContainerStyle = header_style;
-					    
-                        foreach (SparklePlugin plugin in Controller.Plugins) {
-                            // FIXME: images are blurry
-                            BitmapFrame image = BitmapFrame.Create (
-								new Uri (plugin.ImagePath)
-							);
-							
-                            list_view.Items.Add (
-                                new {
-                                    Name        = plugin.Name,
-									Description = plugin.Description,
-									Image       = image
-								}
-                            );
-                        }        
-                        
-                        list_view.View          = grid_view;
-                        list_view.SelectedIndex = Controller.SelectedPluginIndex;
+                    case PageType.Add1: {
+                        Header = "What is your server?";
                         
                         // Address
                         TextBlock address_label = new TextBlock () {
-                            Text       = "Address:",
+                            Text       = "Address of the CMIS server:",
                             FontWeight = FontWeights.Bold
                         };
                                                     
@@ -241,51 +191,29 @@ namespace SparkleShare {
                             Text  = Controller.PreviousAddress,
                             IsEnabled = (Controller.SelectedPlugin.Address == null)
                         };
-                        
-                        TextBlock address_help_label = new TextBlock () {
-                            Text       = Controller.SelectedPlugin.AddressExample,
-                            FontSize   = 11,
-                            Foreground = new SolidColorBrush (Color.FromRgb (128, 128, 128))
+
+                        TextBlock address_help_label = new TextBlock()
+                        {
+                            Text = Controller.SelectedPlugin.AddressExample,
+                            FontSize = 11,
+                            Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
+                        };
+
+                        TextBlock address_error_label = new TextBlock()
+                        {
+                            FontSize = 11,
+                            Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
+                            Visibility = Visibility.Hidden
+                        };
+
+                        TextBlock address_wait_label = new TextBlock()
+                        {
+                            Text = "Detecting CMIS server...",
+                            FontSize = 11,
+                            Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128)),
+                            Visibility = Visibility.Hidden
                         };
                         
-                        // Repository
-                        TextBlock repository_label = new TextBlock () {
-                            Text       = "Repository:",
-                            FontWeight = FontWeights.Bold,
-                            Width      = 200
-                        };
-                                                    
-                        TextBox repository_box = new TextBox () {
-                            Width = 200,
-                            Text  = Controller.PreviousPath,
-                            IsEnabled = true
-                        };
-                        
-                        TextBlock repository_help_label = new TextBlock () {
-                            Text       = Controller.SelectedPlugin.RepositoryExample,
-                            FontSize   = 11,
-                            Foreground = new SolidColorBrush (Color.FromRgb (128, 128, 128))
-                        };
-                        
-                        // Path
-                        TextBlock path_label = new TextBlock () {
-                            Text       = "Remote Folder:",
-                            FontWeight = FontWeights.Bold,
-                            Width      = 200
-                        };
-                                                    
-                        TextBox path_box = new TextBox () {
-                            Width = 200,
-                            Text  = Controller.PreviousPath,
-                            IsEnabled = (Controller.SelectedPlugin.Path == null)
-                        };
-                        
-                        TextBlock path_help_label = new TextBlock () {
-                            Text       = Controller.SelectedPlugin.PathExample,
-                            FontSize   = 11,
-                            Width      = 200,
-                            Foreground = new SolidColorBrush (Color.FromRgb (128, 128, 128))
-                        };
 
                         // User
                         TextBlock user_label = new TextBlock()
@@ -336,27 +264,9 @@ namespace SparkleShare {
                             Content = "Cancel"
                         };
                         
-                        Button add_button = new Button () {
-                            Content = "Add"
+                        Button continue_button = new Button () {
+                            Content = "Continue"
                         };
-
-                        //CheckBox history_check_box = new CheckBox ()
-                        //{
-                        //    Content   = "Fetch prior revisions",
-                        //    IsChecked = Controller.FetchPriorHistory
-                        //};
-						//
-						//history_check_box.Click += delegate {
-						//	Controller.HistoryItemChanged (history_check_box.IsChecked.Value);
-						//};
-						//
-                        //ContentCanvas.Children.Add (history_check_box);
-                        //Canvas.SetLeft (history_check_box, 185);
-                        //Canvas.SetBottom (history_check_box, 12);
-                        
-                        ContentCanvas.Children.Add (list_view);
-                        Canvas.SetTop (list_view, 70);
-                        Canvas.SetLeft (list_view, 185);
 
 						// Address
                         ContentCanvas.Children.Add (address_label);
@@ -366,36 +276,18 @@ namespace SparkleShare {
                         ContentCanvas.Children.Add (address_box);
                         Canvas.SetTop (address_box, 180);
                         Canvas.SetLeft (address_box, 185);
-                        
-                        ContentCanvas.Children.Add (address_help_label);
-                        Canvas.SetTop (address_help_label, 205);
-                        Canvas.SetLeft (address_help_label, 185);
-                        
-						// Repository
-                        ContentCanvas.Children.Add (repository_label);
-                        Canvas.SetTop (repository_label, 225);
-                        Canvas.SetLeft (repository_label, 185);
-                        
-                        ContentCanvas.Children.Add (repository_box);
-                        Canvas.SetTop (repository_box, 255);
-                        Canvas.SetLeft (repository_box, 185);
-                        
-                        ContentCanvas.Children.Add (repository_help_label);
-                        Canvas.SetTop (repository_help_label, 280);
-                        Canvas.SetLeft (repository_help_label, 185);
-                        
-						// Path
-                        ContentCanvas.Children.Add (path_label);
-                        Canvas.SetTop (path_label, 225);
-                        Canvas.SetRight (path_label, 30);
-                        
-                        ContentCanvas.Children.Add (path_box);
-                        Canvas.SetTop (path_box, 255);
-                        Canvas.SetRight (path_box, 30);
-                        
-                        ContentCanvas.Children.Add (path_help_label);
-                        Canvas.SetTop (path_help_label, 280);
-                        Canvas.SetRight (path_help_label, 30);
+
+                        ContentCanvas.Children.Add(address_help_label);
+                        Canvas.SetTop(address_help_label, 205);
+                        Canvas.SetLeft(address_help_label, 185);
+
+                        ContentCanvas.Children.Add(address_error_label);
+                        Canvas.SetTop(address_error_label, 235);
+                        Canvas.SetLeft(address_error_label, 185);
+
+                        ContentCanvas.Children.Add(address_wait_label);
+                        Canvas.SetTop(address_error_label, 235);
+                        Canvas.SetLeft(address_error_label, 185);
 
                         // User
                         ContentCanvas.Children.Add(user_label);
@@ -426,7 +318,7 @@ namespace SparkleShare {
                         TaskbarItemInfo.ProgressValue = 0.0;
 						TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 						
-                        Buttons.Add (add_button);
+                        Buttons.Add (continue_button);
                         Buttons.Add (cancel_button);
                         
 						address_box.Focus ();
@@ -439,25 +331,6 @@ namespace SparkleShare {
                                 address_box.Text        = text;
                                 address_box.IsEnabled   = (state == FieldState.Enabled);
                                 address_help_label.Text = example_text;
-                            });
-                        };
-
-                        Controller.ChangeRepositoryFieldEvent += delegate(string text,
-                            string example_text, FieldState state) {
-                            Dispatcher.BeginInvoke((Action)delegate
-                            {
-                                repository_box.Text = text;
-                                repository_box.IsEnabled = (state == FieldState.Enabled);
-                                repository_help_label.Text = example_text;
-                            });
-                        };
-
-                        Controller.ChangePathFieldEvent += delegate(string text,
-                            string example_text, FieldState state) {
-                            Dispatcher.BeginInvoke ((Action) delegate {
-                                path_box.Text        = text;
-                                path_box.IsEnabled   = (state == FieldState.Enabled);
-                                path_help_label.Text = example_text;
                             });
                         };
 
@@ -484,40 +357,130 @@ namespace SparkleShare {
                         Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
                         {
                             Dispatcher.BeginInvoke ((Action) delegate {
-                                add_button.IsEnabled = button_enabled;
+                                continue_button.IsEnabled = button_enabled;
                             });
                         };
                         
-                        list_view.SelectionChanged += delegate {
-                            Controller.SelectedPluginChanged (list_view.SelectedIndex);
-                        };
-                        
-                        list_view.KeyDown += delegate {
-                            Controller.SelectedPluginChanged (list_view.SelectedIndex);
-                        };
-
-                        Controller.CheckAddPage (address_box.Text, path_box.Text, list_view.SelectedIndex);
+                        Controller.CheckAddPage (address_box.Text, "path_box.Text");
                         
                         address_box.TextChanged += delegate {
-                            Controller.CheckAddPage (address_box.Text, path_box.Text, list_view.SelectedIndex);
-                        };
-                        
-                        path_box.TextChanged += delegate {
-                            Controller.CheckAddPage (address_box.Text, path_box.Text, list_view.SelectedIndex);
+                            Controller.CheckAddPage (address_box.Text, "path_box.Text");
                         };
                         
                         cancel_button.Click += delegate {
                             Controller.PageCancelled ();
                         };
 
-                        add_button.Click += delegate {
-                            Controller.AddPageCompleted(address_box.Text, repository_box.Text, path_box.Text,
-                                user_box.Text, password_box.Password);
+                        continue_button.Click += delegate {
+                            // Show wait message
+                            address_wait_label.Visibility = Visibility.Visible;
+
+                            // Try to connect to the CMIS server
+                            try
+                            {
+                                Controller.repositories = CmisUtils.GetRepositories(
+                                    address_box.Text, user_box.Text, password_box.Password);
+                            }
+                            catch(CmisServerNotFoundException e)
+                            {
+                                Controller.repositories = null; // Might have subsisted from cancelled 
+                                // Show warning
+                                address_error_label.Text = e.Message;
+                                address_error_label.Visibility = Visibility.Visible;
+                            }
+                            finally
+                            {
+                                // Hide wait message
+                                address_wait_label.Visibility = Visibility.Hidden;
+                            }
+
+                            if (Controller.repositories != null)
+                            {
+                                // Continue
+                                Controller.Add1PageCompleted(
+                                    address_box.Text, user_box.Text, password_box.Password);
+                            }
                         };
                                           
                         break;
                     }
-                        
+
+                    case PageType.Add2: {
+                        Header = "Which remote folder do you want to sync?";
+
+                        System.Windows.Controls.TreeView treeView = new System.Windows.Controls.TreeView();
+                        foreach (string repository in Controller.repositories)
+                        {
+                            System.Windows.Controls.TreeViewItem item = new System.Windows.Controls.TreeViewItem();
+                            item.Header = repository;
+                            treeView.Items.Add(item);
+                        }
+                        ContentCanvas.Children.Add(treeView);
+                        Canvas.SetTop(treeView, 70);
+                        Canvas.SetLeft(treeView, 185);
+
+                        treeView.SelectedItemChanged += delegate
+                        {
+                            TreeViewItem item = (TreeViewItem)treeView.SelectedItem;
+                            
+                            // Get path of selected folder
+                            object cursor = item;
+                            Controller.saved_remote_path = "";
+                            while (cursor is TreeViewItem)
+                            {
+                                TreeViewItem treeViewItem = (TreeViewItem)cursor;
+                                cursor = treeViewItem.Parent;
+                                if (cursor is TreeViewItem)
+                                {
+                                    Controller.saved_remote_path = treeViewItem.Header + "/" + Controller.saved_remote_path;
+                                }
+                                else
+                                {
+                                    Controller.saved_repository = (string)treeViewItem.Header;
+                                }
+                            }
+
+                            // Get list of subfolders
+                            string[] subfolders = CmisUtils.getSubfolders(Controller.saved_repository, Controller.saved_remote_path,
+                                Controller.saved_address, Controller.saved_user, Controller.saved_password);
+
+                            // Create a sub-item for each subfolder
+                            foreach (string subfolder in subfolders)
+                            {
+                                System.Windows.Controls.TreeViewItem subItem =
+                                    new System.Windows.Controls.TreeViewItem();
+                                subItem.Header = subfolder;
+                                item.Items.Add(subItem);
+                            }
+                        };
+
+                        Button cancel_button = new Button()
+                        {
+                            Content = "Cancel"
+                        };
+
+                        Button add_button = new Button()
+                        {
+                            Content = "Add"
+                        };
+
+                        Buttons.Add(add_button);
+                        Buttons.Add(cancel_button);
+
+                        cancel_button.Click += delegate
+                        {
+                            Controller.PageCancelled();
+                        };
+
+                        add_button.Click += delegate
+                        {
+                            Controller.Add2PageCompleted(
+                                Controller.saved_repository, Controller.saved_remote_path);
+                        };
+
+                        break;
+                    }
+
                         
                     case PageType.Syncing: {
                         Header      = "Adding folder ‘" + Controller.SyncingFolder + "’…";
