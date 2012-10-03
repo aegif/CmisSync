@@ -29,7 +29,7 @@ namespace SparkleLib.Cmis {
     public class SparkleFetcher : SparkleFetcherBase {
 
         public SparkleFetcher (string server, string required_fingerprint, string remote_path,
-            string target_folder, bool fetch_prior_history, string repository, string path,
+            string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
             string user, string password) : base (server, required_fingerprint,
                 remote_path, target_folder, fetch_prior_history, repository, path, user, password)
         {
@@ -37,8 +37,10 @@ namespace SparkleLib.Cmis {
             TargetFolder = target_folder;
             RemoteUrl    = new Uri (server);
 
-            Cmis cmis = new Cmis(path, remote_path, server, user, password, repository);
-            cmis.SyncInBackground();
+            Directory.CreateDirectory(Path.Combine(SparkleFolder.ROOT_FOLDER, path));
+
+            Cmis cmis = new Cmis(canonical_name, "/"+path, remote_path, server, user, password, repository);
+            cmis.Sync();
         }
 
 

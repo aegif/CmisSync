@@ -24,6 +24,10 @@ namespace SparkleLib.Cmis
         // Session to the CMIS repository.
         ISession session;
 
+        // Canonical name for this checkout.
+        // config.xml: name
+        string canonical_name;
+
         // Local folder where the changes are synchronized to.
         string localRootFolder;
 
@@ -42,13 +46,38 @@ namespace SparkleLib.Cmis
         // SQLite connection to store modification dates.
         SQLiteConnection sqliteConnection;
 
-        public Cmis(string localRootFolder, SparkleConfig config)
+        /**
+         * Called by SparkleFetcher (when a new CMIS folder is first added)
+         */
+        public Cmis(string canonical_name, string localPath, string remoteFolderPath, string url, string user, string password, string repositoryId)
         {
-            databaseFilename = localRootFolder + ".s3db";
-
             // Set local root folder.
-            //string localPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "name");
-            this.localRootFolder = localRootFolder; //Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
+            this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
+
+            databaseFilename = canonical_name + ".s3db";
+
+            // Get path on remote repository.
+            this.remoteFolderPath = "/" + remoteFolderPath;
+
+            cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = url;
+            cmisParameters[SessionParameter.User] = user;
+            cmisParameters[SessionParameter.Password] = password;
+            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+
+            syncing = false;
+        }
+
+        /**
+         * Called by SparkleRepo (at every launch of CmisSync)
+         */
+        public Cmis(string localPath, SparkleConfig config)
+        {
+            // Set local root folder.
+            this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
+
+            databaseFilename = localRootFolder + ".s3db";
 
             // Get path on remote repository.
             remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "remoteFolder");
@@ -59,27 +88,6 @@ namespace SparkleLib.Cmis
             cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "user");
             cmisParameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "password");
             cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "repository");
-
-            syncing = false;
-        }
-
-        public Cmis(string localRootFolder, string remoteFolderPath, string url, string user, string password, string repositoryId)
-        {
-            databaseFilename = localRootFolder + ".s3db";
-
-            // Set local root folder.
-            //string localPath = config.GetFolderOptionalAttribute(Path.GetFileName(path), "name");
-            this.localRootFolder = localRootFolder; //Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
-
-            // Get path on remote repository.
-            this.remoteFolderPath = remoteFolderPath;
-
-            cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = url;
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password;
-            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
             syncing = false;
         }
@@ -160,6 +168,7 @@ namespace SparkleLib.Cmis
                     catch (CmisBaseException e)
                     {
                         SparkleLogger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
+                        SparkleLogger.LogInfo("Sync", e.StackTrace);
                         SparkleLogger.LogInfo("Sync", e.ErrorContent);
                     }
                     //catch (Exception e)
@@ -177,11 +186,10 @@ namespace SparkleLib.Cmis
             bw.RunWorkerAsync();
         }
 
-        private void Sync()
+        public void Sync()
         {
             RecreateDatabaseIfNeeded();
-            if (sqliteConnection == null)
-                sqliteConnection.Open();
+            ConnectToSqliteIfNeeded();
 
             // If not connected, connect.
             if (session == null)
@@ -189,7 +197,8 @@ namespace SparkleLib.Cmis
 
             // Get the root folder.
             //IFolder remoteRootFolder = session.GetRootFolder();
-            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+            
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath/*.Substring(1,remoteFolderPath.Length - 1)*/);
 
             if (ChangeLogCapability)
             {
@@ -313,14 +322,14 @@ namespace SparkleLib.Cmis
                                 "SELECT serverSideModificationDate FROM files WHERE path=@filePath";
                             command.Parameters.AddWithValue("filePath", filePath);
                             object obj = command.ExecuteScalar();
-                            DateTime clientSideModificationDate = (DateTime)obj;
-                            if (clientSideModificationDate == null)
+                            if (obj == null)
                             {
                                 SparkleLogger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
                                 DownloadFile(remoteDocument, localFolder);
                             }
                             else
                             {
+                                DateTime clientSideModificationDate = (DateTime)obj;
                                 // If the file has been modified since last time we downloaded it, then download again.
                                 if (serverSideModificationDate > clientSideModificationDate)
                                 {

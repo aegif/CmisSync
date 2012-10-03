@@ -41,7 +41,7 @@ namespace SparkleLib.Cmis
 
             for (int i = 0; i < repositories.Count; i++)
             {
-                result[i] = repositories.ElementAt(i).Name;
+                result[i] = repositories.ElementAt(i).Id; // TODO displaying Name would be more user-friendly than Id
             }
             
             return result;

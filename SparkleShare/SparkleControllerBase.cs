@@ -489,7 +489,7 @@ namespace SparkleShare {
             //string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
             fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, tmp_folder,
-                fetch_prior_history, repository, path, user, password);
+                fetch_prior_history, canonical_name, repository, path, user, password);
             //try {
             //    SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
             //    this.fetcher = (SparkleFetcherBase) Activator.CreateInstance (
@@ -566,7 +566,7 @@ namespace SparkleShare {
         public void FinishFetcher ()
         {
             this.fetcher.Complete ();
-            string canonical_name = Path.GetFileNameWithoutExtension (this.fetcher.RemoteUrl.AbsolutePath);
+            string canonical_name = Path.GetFileNameWithoutExtension (this.fetcher.RemoteFolder);
 
             bool target_folder_exists = Directory.Exists (
                 Path.Combine (this.config.FoldersPath, canonical_name));
