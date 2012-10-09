@@ -36,7 +36,6 @@ using WPF = System.Windows.Controls;
 
 using SparkleLib.Cmis;
 using SparkleLib;
-//using System.Windows.Forms;
 
 namespace SparkleShare {
 
@@ -214,15 +213,6 @@ namespace SparkleShare {
                             Visibility = Visibility.Hidden
                         };
 
-                        TextBlock address_wait_label = new TextBlock()
-                        {
-                            Text = "Detecting CMIS server...",
-                            FontSize = 11,
-                            Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128)),
-                            Visibility = Visibility.Hidden
-                        };
-                        
-
                         // User
                         TextBlock user_label = new TextBlock()
                         {
@@ -290,10 +280,6 @@ namespace SparkleShare {
                         Canvas.SetLeft(address_help_label, 185);
 
                         ContentCanvas.Children.Add(address_error_label);
-                        Canvas.SetTop(address_error_label, 235);
-                        Canvas.SetLeft(address_error_label, 185);
-
-                        ContentCanvas.Children.Add(address_wait_label);
                         Canvas.SetTop(address_error_label, 235);
                         Canvas.SetLeft(address_error_label, 185);
 
@@ -380,8 +366,8 @@ namespace SparkleShare {
                         };
 
                         continue_button.Click += delegate {
-                            // Show wait message
-                            address_wait_label.Visibility = Visibility.Visible;
+                            // Show wait cursor
+                            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
                             // Try to connect to the CMIS server
                             try
@@ -400,8 +386,8 @@ namespace SparkleShare {
                             }
                             finally
                             {
-                                // Hide wait message
-                                address_wait_label.Visibility = Visibility.Hidden;
+                                // Hide wait cursor
+                                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
                             }
 
                             if (Controller.repositories != null)
@@ -411,7 +397,7 @@ namespace SparkleShare {
                                     address_box.Text, user_box.Text, password_box.Password);
                             }
                         };
-                                          
+                        
                         break;
                     }
 
@@ -458,18 +444,28 @@ namespace SparkleShare {
                                     Controller.saved_repository = (string)treeViewItem.Header;
                                 }
                             }
-
-                            // Get list of subfolders
-                            string[] subfolders = CmisUtils.getSubfolders(Controller.saved_repository, Controller.saved_remote_path,
-                                Controller.saved_address, Controller.saved_user, Controller.saved_password);
-
-                            // Create a sub-item for each subfolder
-                            foreach (string subfolder in subfolders)
+                            
+                            // Load sub-folders if it has not been done already.
+                            // We use each item's Tag to store metadata: whether this item's subfolders have been loaded or not.
+                            if ( ! ("loaded".Equals(item.Tag)))
                             {
-                                System.Windows.Controls.TreeViewItem subItem =
-                                    new System.Windows.Controls.TreeViewItem();
-                                subItem.Header = subfolder;
-                                item.Items.Add(subItem);
+                                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+
+                                // Get list of subfolders
+                                string[] subfolders = CmisUtils.getSubfolders(Controller.saved_repository, Controller.saved_remote_path,
+                                    Controller.saved_address, Controller.saved_user, Controller.saved_password);
+
+                                // Create a sub-item for each subfolder
+                                foreach (string subfolder in subfolders)
+                                {
+                                    System.Windows.Controls.TreeViewItem subItem =
+                                        new System.Windows.Controls.TreeViewItem();
+                                    subItem.Header = subfolder;
+                                    item.Items.Add(subItem);
+                                }
+                                item.Tag = "loaded";
+
+                                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
                             }
                         };
 
