@@ -37,7 +37,7 @@ namespace SparkleLib.Cmis {
             TargetFolder = target_folder;
             RemoteUrl    = new Uri (server);
 
-            Directory.CreateDirectory(Path.Combine(SparkleFolder.ROOT_FOLDER, path));
+            Directory.CreateDirectory(Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name));
 
             Cmis cmis = new Cmis(canonical_name, "/"+path, remote_path, server, user, password, repository);
             cmis.Sync();
