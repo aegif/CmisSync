@@ -9,10 +9,65 @@ using DotCMIS.Exceptions;
 
 namespace SparkleLib.Cmis
 {
+    public class CmisServer
+    {
+        public string url;
+        public string[] repositories;
+        public CmisServer(string url, string[] repositories)
+        {
+            this.url = url;
+            this.repositories = repositories;
+        }
+    }
+
     public class CmisUtils
     {
+        /**
+         * Try to find the CMIS server associated to any URL.
+         * Users can provide the URL of the web interface, and we have to return the CMIS URL
+         * Returns the list of repositories as well.
+         */
+        static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
+        {
+            // Try the given URL
+            string[] repositories = GetRepositories(url, user, password);
+            if (repositories != null)
+            {
+                return new CmisServer(url, repositories);
+            }
+
+            // Extract protocol and server name or IP address
+            string prefix = new Uri(url).GetLeftPart(UriPartial.Authority);
+
+            // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
+            string[] suffixes = {
+                "/alfresco/cmisatom",
+                "/cmis/resources/",
+                "/emc-cmis-ea/resources/",
+                "/files/basic/cmis/my/servicedoc",
+                "/p8cmis/resources/Service",
+                "/_vti_bin/ListData.svc",
+                "/Nemaki/atom"
+            };
+
+            // Try all suffixes
+            for (int i=0; i < suffixes.Length; i++)
+            {
+                string fuzzyUrl = prefix + suffixes[i];
+                repositories = GetRepositories(fuzzyUrl, user, password);
+                if (repositories != null)
+                    return new CmisServer(fuzzyUrl, repositories);
+            }
+            return new CmisServer(url, repositories);
+        }
+
+        /**
+         * Get the list of repositories of a CMIS server
+         */
         static public string[] GetRepositories(string url, string user, string password)
         {
+
+
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
 
@@ -33,8 +88,13 @@ namespace SparkleLib.Cmis
             }
             catch (CmisRuntimeException e)
             {
-                // TODO try harder by extracting the hostname and changing the URL to well-known patterns
-                throw new CmisServerNotFoundException("Sorry, CmisSync can not find a CMIS server at this address.\nPlease check again.\nIf you are sure about the address, open it in a browser and post\nthe resulting XML to the CmisSync forum.");
+                // No CMIS server at this address, or no connection.
+                return null;
+            }
+            catch (CmisObjectNotFoundException e)
+            {
+                // No CMIS server at this address, or no connection.
+                return null;
             }
 
             string[] result = new string[repositories.Count];

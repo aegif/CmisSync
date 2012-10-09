@@ -386,8 +386,10 @@ namespace SparkleShare {
                             // Try to connect to the CMIS server
                             try
                             {
-                                Controller.repositories = CmisUtils.GetRepositories(
+                                CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
                                     address_box.Text, user_box.Text, password_box.Password);
+                                Controller.repositories = cmisServer.repositories;
+                                address_box.Text = cmisServer.url;
                             }
                             catch(CmisServerNotFoundException e)
                             {
