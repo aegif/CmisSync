@@ -93,8 +93,8 @@ namespace SparkleLib {
                     else
                         this.identifier = SparkleFetcherBase.CreateIdentifier ();
 
-                    File.WriteAllText (id_path, this.identifier);
-                    File.SetAttributes (id_path, FileAttributes.Hidden);
+                    // File.WriteAllText (id_path, this.identifier);
+                    // File.SetAttributes (id_path, FileAttributes.Hidden);
 
                     SparkleLogger.LogInfo ("Local", Name + " | Assigned identifier: " + this.identifier);
 

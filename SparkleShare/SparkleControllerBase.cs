@@ -610,7 +610,9 @@ namespace SparkleShare {
                     target_folder_name, "announcements_url", announcements_url);
             */
 
-            AddRepository (target_folder_path);
+            //AddRepository (target_folder_path);
+            AddRepository(Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name));
+
             FolderListChanged ();
 
             this.fetcher.Dispose ();
