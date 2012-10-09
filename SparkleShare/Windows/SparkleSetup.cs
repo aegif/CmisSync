@@ -178,26 +178,34 @@ namespace SparkleShare {
                     }
                         
                     case PageType.Add1: {
-                        Header = "What is your server?";
+                        Header = "Where is your organization's server?";
                         
                         // Address
                         TextBlock address_label = new TextBlock () {
-                            Text       = "Address of the CMIS server:",
+                            Text       = "Enter a Web address where the documents can be seen:",
                             FontWeight = FontWeights.Bold
                         };
-                                                    
+                        
                         TextBox address_box = new TextBox () {
-                            Width = 200,
+                            Width = 420,
                             Text  = Controller.PreviousAddress,
                             IsEnabled = (Controller.SelectedPlugin.Address == null)
                         };
 
                         TextBlock address_help_label = new TextBlock()
                         {
-                            Text = Controller.SelectedPlugin.AddressExample,
+                            Text = "Help: ",
                             FontSize = 11,
                             Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
                         };
+                        Run run = new Run("Where to find this address");
+                        Hyperlink link = new Hyperlink(run);
+                        link.NavigateUri = new Uri("https://github.com/nicolas-raoul/CmisSync/wiki/What-address");
+                        address_help_label.Inlines.Add(link);
+                        link.RequestNavigate += (sender, e) =>
+                            {
+                                System.Diagnostics.Process.Start(e.Uri.ToString());
+                            };
 
                         TextBlock address_error_label = new TextBlock()
                         {
@@ -409,6 +417,8 @@ namespace SparkleShare {
                         Header = "Which remote folder do you want to sync?";
 
                         System.Windows.Controls.TreeView treeView = new System.Windows.Controls.TreeView();
+                        treeView.Width = 410;
+                        treeView.Height = 267;
                         foreach (string repository in Controller.repositories)
                         {
                             System.Windows.Controls.TreeViewItem item = new System.Windows.Controls.TreeViewItem();
