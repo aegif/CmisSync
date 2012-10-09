@@ -77,7 +77,7 @@ namespace SparkleLib.Cmis
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
 
-            databaseFilename = localRootFolder + ".s3db";
+            databaseFilename = localRootFolder + ".cmissync";
 
             // Get path on remote repository.
             remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "remoteFolder");
