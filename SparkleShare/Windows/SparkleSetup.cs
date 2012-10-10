@@ -369,30 +369,24 @@ namespace SparkleShare {
                             // Show wait cursor
                             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
-                            // Try to connect to the CMIS server
-                            try
+                            // Try to find the CMIS server
+                            CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
+                                address_box.Text, user_box.Text, password_box.Password);
+                            Controller.repositories = cmisServer.repositories;
+                            address_box.Text = cmisServer.url;
+
+                            // Hide wait cursor
+                            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+
+                            if (Controller.repositories == null)
                             {
-                                CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
-                                    address_box.Text, user_box.Text, password_box.Password);
-                                Controller.repositories = cmisServer.repositories;
-                                address_box.Text = cmisServer.url;
-                            }
-                            catch(CmisServerNotFoundException e)
-                            {
-                                Controller.repositories = null; // Might have subsisted from cancelled 
                                 // Show warning
-                                address_error_label.Text = e.Message;
+                                address_error_label.Text = "Sorry, CmisSync can not find a CMIS server at this address.\nPlease check again.\nIf you are sure about the address, open it in a browser and post\nthe resulting XML to the CmisSync forum.";
                                 address_error_label.Visibility = Visibility.Visible;
                             }
-                            finally
+                            else
                             {
-                                // Hide wait cursor
-                                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
-                            }
-
-                            if (Controller.repositories != null)
-                            {
-                                // Continue
+                                // Continue to folder selection
                                 Controller.Add1PageCompleted(
                                     address_box.Text, user_box.Text, password_box.Password);
                             }

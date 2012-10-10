@@ -96,6 +96,11 @@ namespace SparkleLib.Cmis
                 // No CMIS server at this address, or no connection.
                 return null;
             }
+            catch (CmisConnectionException e)
+            {
+                // No CMIS server at this address, or no connection.
+                return null;
+            }
 
             string[] result = new string[repositories.Count];
 
