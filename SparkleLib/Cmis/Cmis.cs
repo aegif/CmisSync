@@ -286,6 +286,8 @@ namespace SparkleLib.Cmis
          *     if exists locally:
          *       if remote is more recent than local:
          *         download
+         *       else
+         *         upload                         // if BIDIRECTIONAL
          *     else:
          *       download
          * for all local files:
@@ -297,7 +299,7 @@ namespace SparkleLib.Cmis
          * for all local folders:
          *   if not present remotely:
          *     if in database:
-         *       delete recursively from server   // if BIDIRECTIONAL
+         *       delete recursively from local
          *     else:
          *       upload recursively               // if BIDIRECTIONAL
          */
@@ -451,7 +453,7 @@ namespace SparkleLib.Cmis
             }
 
             // Delete folders that have been removed on the server.
-            /*foreach (string folderPath in Directory.GetDirectories(localFolder, "*.*"))
+            foreach (string folderPath in Directory.GetDirectories(localFolder, "*.*"))
             {
                 string folderName = Path.GetFileName(folderPath);
                 if (!remoteFolders.Contains(folderName))
@@ -460,8 +462,8 @@ namespace SparkleLib.Cmis
                     // check whether it used to exist on server or not.
                     SQLiteCommand command = new SQLiteCommand(sqliteConnection);
                     command.CommandText =
-                        "SELECT serverSideModificationDate FROM files WHERE path=@filePath";
-                    command.Parameters.AddWithValue("filePath", folderPath);
+                        "SELECT serverSideModificationDate FROM folders WHERE path=@folderPath";
+                    command.Parameters.AddWithValue("folderPath", folderPath);
                     object obj = command.ExecuteScalar();
                     if (obj == null)
                     {
@@ -471,11 +473,11 @@ namespace SparkleLib.Cmis
                     else
                     {
                         // File has been deleted on server, delete it locally too.
-                        SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + folderPath);
-                        // File.Delete(filePath);
+                        SparkleLogger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
+                        Directory.Delete(folderPath, true);
                     }
                 }
-            }*/
+            }
         }
 
 
