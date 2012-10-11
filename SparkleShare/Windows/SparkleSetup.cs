@@ -39,6 +39,19 @@ using SparkleLib;
 
 namespace SparkleShare {
 
+    /**
+     * Stores the metadata of an item in the folder selection dialog.
+     */
+    public class SelectionTreeItem
+    {
+        public bool childrenLoaded = false;
+        public string fullPath;
+        public SelectionTreeItem(string fullPath)
+        {
+            this.fullPath = fullPath;
+        }
+    }
+
     public class SparkleSetup : SparkleSetupWindow {
     
         public SparkleSetupController Controller = new SparkleSetupController ();
@@ -404,6 +417,7 @@ namespace SparkleShare {
                         foreach (string repository in Controller.repositories)
                         {
                             System.Windows.Controls.TreeViewItem item = new System.Windows.Controls.TreeViewItem();
+                            item.Tag = new SelectionTreeItem("/");
                             item.Header = repository;
                             treeView.Items.Add(item);
                         }
@@ -413,27 +427,17 @@ namespace SparkleShare {
 
                         treeView.SelectedItemChanged += delegate
                         {
+                            // Identify the selected remote path.
                             TreeViewItem item = (TreeViewItem)treeView.SelectedItem;
-                            
-                            // Get path of selected folder
+                            Controller.saved_remote_path = ((SelectionTreeItem)item.Tag).fullPath;
+
+                            // Identify the selected repository.
                             object cursor = item;
-                            Controller.saved_remote_path = null;
                             while (cursor is TreeViewItem)
                             {
                                 TreeViewItem treeViewItem = (TreeViewItem)cursor;
                                 cursor = treeViewItem.Parent;
-                                if (cursor is TreeViewItem)
-                                {
-                                    if (Controller.saved_remote_path == null)
-                                    {
-                                        Controller.saved_remote_path = (string)treeViewItem.Header;
-                                    }
-                                    else
-                                    {
-                                        Controller.saved_remote_path = treeViewItem.Header + "/" + Controller.saved_remote_path;
-                                    }
-                                }
-                                else
+                                if ( ! (cursor is TreeViewItem))
                                 {
                                     Controller.saved_repository = (string)treeViewItem.Header;
                                 }
@@ -441,7 +445,7 @@ namespace SparkleShare {
                             
                             // Load sub-folders if it has not been done already.
                             // We use each item's Tag to store metadata: whether this item's subfolders have been loaded or not.
-                            if ( ! ("loaded".Equals(item.Tag)))
+                            if ( ((SelectionTreeItem)item.Tag).childrenLoaded == false)
                             {
                                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
@@ -454,11 +458,12 @@ namespace SparkleShare {
                                 {
                                     System.Windows.Controls.TreeViewItem subItem =
                                         new System.Windows.Controls.TreeViewItem();
-                                    subItem.Header = subfolder;
+                                    subItem.Tag = new SelectionTreeItem(subfolder);
+                                    subItem.Header = Path.GetFileName(subfolder);
                                     item.Items.Add(subItem);
                                 }
-                                item.Tag = "loaded";
-
+                                ((SelectionTreeItem)item.Tag).childrenLoaded = true;
+                                item.ExpandSubtree();
                                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
                             }
                         };

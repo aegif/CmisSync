@@ -54,6 +54,7 @@ namespace SparkleLib.Cmis
             for (int i=0; i < suffixes.Length; i++)
             {
                 string fuzzyUrl = prefix + suffixes[i];
+                SparkleLogger.LogInfo("Sync", "Trying with " + fuzzyUrl);
                 repositories = GetRepositories(fuzzyUrl, user, password);
                 if (repositories != null)
                     return new CmisServer(fuzzyUrl, repositories);
@@ -128,14 +129,18 @@ namespace SparkleLib.Cmis
             ISession session = factory.CreateSession(cmisParameters);
 
             IFolder folder = (IFolder)session.GetObjectByPath("/" + path);
-            foreach (ICmisObject obj in folder.GetChildren())
+            //IFolder folder = (IFolder)session.GetObjectByPath("/files");
+            SparkleLogger.LogInfo("Sync", "folder.Properties.Count:" + folder.Properties.Count);
+            IItemEnumerable<ICmisObject> children = folder.GetChildren();
+            foreach (ICmisObject obj in children)
             {
                 if (obj is IFolder)
-                    result.Add(obj.Name);
+                {
+                    IFolder subfolder = (IFolder)obj;
+                    result.Add(subfolder.Path);
+                }
             }
-
-
-            return result.ToArray();//new string[] { "bob", "nick" };
+            return result.ToArray();
         }
     }
 }
