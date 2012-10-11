@@ -16,6 +16,8 @@ namespace SparkleLib.Cmis
 {
     class Cmis
     {
+        private bool BIDIRECTIONAL = false;
+
         // At which degree the repository supports Change Logs.
         // See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
         // Possible values: none, objectidsonly, properties, all
@@ -57,7 +59,7 @@ namespace SparkleLib.Cmis
             databaseFilename = canonical_name + ".s3db";
 
             // Get path on remote repository.
-            this.remoteFolderPath = "/" + remoteFolderPath;
+            this.remoteFolderPath = /*"/" +*/ remoteFolderPath;
 
             cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
@@ -132,8 +134,12 @@ namespace SparkleLib.Cmis
             ConnectToSqliteIfNeeded();
             SQLiteCommand command = new SQLiteCommand(sqliteConnection);
             command.CommandText =
-                "CREATE TABLE files (path TEXT PRIMARY KEY,"
-                + "serverSideModificationDate DATE);";
+                  "CREATE TABLE files ("
+                + "    path TEXT PRIMARY KEY,"
+                + "    serverSideModificationDate DATE);"
+                + "CREATE TABLE folders ("
+                + "    path TEXT PRIMARY KEY,"
+                + "    serverSideModificationDate DATE);";
             SQLiteDataReader reader = command.ExecuteReader();
             reader.Close();
         }
@@ -198,7 +204,8 @@ namespace SparkleLib.Cmis
             // Get the root folder.
             //IFolder remoteRootFolder = session.GetRootFolder();
             
-            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath/*.Substring(1,remoteFolderPath.Length - 1)*/);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath/*.Substring(1,remoteFolderPath.Length - 1)*/); // Works with FileNet
+            // IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath.Substring(1,remoteFolderPath.Length - 1)); // Remove extra slash // Works with Alfresco
 
             if (ChangeLogCapability)
             {
@@ -228,7 +235,6 @@ namespace SparkleLib.Cmis
 
         private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
         {
-            String id = new Random().Next(0, 1000000).ToString();
             // List all children.
             foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
             {
@@ -239,6 +245,23 @@ namespace SparkleLib.Cmis
 
                     // Create local folder.
                     Directory.CreateDirectory(localSubFolder);
+
+                    // Create database entry for this folder.
+                    DateTime? serverSideModificationDate = remoteFolder.LastModificationDate;
+                    try
+                    {
+                        SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                        command.CommandText =
+                            "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
+                            + " VALUES (@path, @serverSideModificationDate)";
+                        command.Parameters.AddWithValue("path", localSubFolder);
+                        command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                        command.ExecuteReader();
+                    }
+                    catch (SQLiteException e)
+                    {
+                        SparkleLogger.LogInfo("Sync", "Error writing folder to database. " + e.Message);
+                    }
 
                     // Recurse into folder.
                     RecursiveFolderCopy(remoteSubFolder, localSubFolder);
@@ -251,7 +274,33 @@ namespace SparkleLib.Cmis
             }
         }
 
-
+        /**
+         * Synchronize by checking all folders/files one-by-one.
+         * 
+         * for all remote folders:
+         *     if exists locally:
+         *       recurse
+         *     else
+         *       create local folder
+         * for all remote files:
+         *     if exists locally:
+         *       if remote is more recent than local:
+         *         download
+         *     else:
+         *       download
+         * for all local files:
+         *   if not present remotely:
+         *     if in database:
+         *       delete
+         *     else:
+         *       upload                           // if BIDIRECTIONAL
+         * for all local folders:
+         *   if not present remotely:
+         *     if in database:
+         *       delete recursively from server   // if BIDIRECTIONAL
+         *     else:
+         *       upload recursively               // if BIDIRECTIONAL
+         */
         private void CrawlSync(IFolder remoteFolder, string localFolder)
         {
             //String id = new Random().Next(0, 1000000).ToString();
@@ -288,6 +337,23 @@ namespace SparkleLib.Cmis
 
                         // Create local folder.
                         Directory.CreateDirectory(localSubFolder);
+
+                        // Create database entry for this folder.
+                        DateTime? serverSideModificationDate = remoteFolder.LastModificationDate;
+                        try
+                        {
+                            SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                            command.CommandText =
+                                "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
+                                + " VALUES (@path, @serverSideModificationDate)";
+                            command.Parameters.AddWithValue("path", localSubFolder);
+                            command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                            command.ExecuteReader();
+                        }
+                        catch (SQLiteException e)
+                        {
+                            SparkleLogger.LogInfo("Sync", "Error writing folder to database. " + e.Message);
+                        }
 
                         // Recursive copy of the whole folder.
                         RecursiveFolderCopy(remoteSubFolder, localSubFolder);
@@ -351,10 +417,6 @@ namespace SparkleLib.Cmis
                 }
             }
 
-            // Delete folders that have been removed on the server.
-            //foreach (string dirPath in Directory.GetDirectories(localFolder, "*", SearchOption.AllDirectories))
-            //    Directory.CreateDirectory(dirPath.Replace(SourcePath, DestinationPath));
-
             // Delete files that have been removed on the server.
             foreach (string filePath in Directory.GetFiles(localFolder, "*.*"))
             {
@@ -370,22 +432,29 @@ namespace SparkleLib.Cmis
                     object obj = command.ExecuteScalar();
                     if (obj == null)
                     {
-                        // New file, sync up.
-                        // TODO
+                        if (BIDIRECTIONAL)
+                        {
+                            // New file, sync up.
+                            // TODO
+                        }
                     }
                     else
                     {
-                        // File has been deleted on server, delete it locally too.
+                        // File has been deleted on server, so delete it locally.
                         SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
                         File.Delete(filePath);
+
+                        // Remove from database.
+                        // TODO
                     }
                 }
             }
+
             // Delete folders that have been removed on the server.
             /*foreach (string folderPath in Directory.GetDirectories(localFolder, "*.*"))
             {
                 string folderName = Path.GetFileName(folderPath);
-                if (!remoteFiles.Contains(folderName))
+                if (!remoteFolders.Contains(folderName))
                 {
                     // This local folder is not on the CMIS server now, so
                     // check whether it used to exist on server or not.
@@ -396,7 +465,7 @@ namespace SparkleLib.Cmis
                     object obj = command.ExecuteScalar();
                     if (obj == null)
                     {
-                        // New file, sync up.
+                        // New folder, sync up.
                         // TODO
                     }
                     else
@@ -407,10 +476,6 @@ namespace SparkleLib.Cmis
                     }
                 }
             }*/
-
-            // Sync up.
-            // TODO
-            // for all local folders/files check SQLite
         }
 
 
@@ -463,7 +528,7 @@ namespace SparkleLib.Cmis
             }
             catch (SQLiteException e)
             {
-                SparkleLogger.LogInfo("Sync", e.Message);
+                SparkleLogger.LogInfo("Sync", "Error writing file to database. " + e.Message);
             }
         }
     }

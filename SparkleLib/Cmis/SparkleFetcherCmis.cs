@@ -39,7 +39,7 @@ namespace SparkleLib.Cmis {
 
             Directory.CreateDirectory(Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name));
 
-            Cmis cmis = new Cmis(canonical_name, "/"+path, remote_path, server, user, password, repository);
+            Cmis cmis = new Cmis(canonical_name, path, remote_path, server, user, password, repository);
             cmis.Sync();
         }
 
