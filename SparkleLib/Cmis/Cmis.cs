@@ -318,6 +318,7 @@ namespace SparkleLib.Cmis
             {
                 if (cmisObject is DotCMIS.Client.Impl.Folder)
                 {
+                    // It is a CMIS folder.
                     IFolder remoteSubFolder = (IFolder)cmisObject;
                     remoteFolders.Add(remoteSubFolder.Name);
                     string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
@@ -363,7 +364,7 @@ namespace SparkleLib.Cmis
                 }
                 else
                 {
-                    // It is a file, check whether it exists and has the same modifica download it.
+                    // It is a CMIS document.
                     IDocument remoteDocument = (IDocument)cmisObject;
                     remoteFiles.Add(remoteDocument.Name);
 
@@ -403,6 +404,23 @@ namespace SparkleLib.Cmis
                                 {
                                     SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
                                     DownloadFile(remoteDocument, localFolder);
+                                }
+
+                                // Change modification date in database
+                                try
+                                {
+                                    command = new SQLiteCommand(sqliteConnection);
+                                    command.CommandText =
+                                        "UPDATE files"
+                                        + " SET serverSideModificationDate=@serverSideModificationDate"
+                                        + " WHERE path=@filePath";
+                                    command.Parameters.AddWithValue("filePath", filePath);
+                                    command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                                    command.ExecuteReader();
+                                }
+                                catch (SQLiteException e)
+                                {
+                                    SparkleLogger.LogInfo("Sync", "Error writing folder to database. " + e.Message);
                                 }
                             }
                         }
@@ -446,8 +464,19 @@ namespace SparkleLib.Cmis
                         SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
                         File.Delete(filePath);
 
-                        // Remove from database.
-                        // TODO
+                        // Delete file from database.
+                        try
+                        {
+                            command = new SQLiteCommand(sqliteConnection);
+                            command.CommandText =
+                                "DELETE FROM files WHERE path=@filePath";
+                            command.Parameters.AddWithValue("filePath", filePath);
+                            command.ExecuteReader();
+                        }
+                        catch (SQLiteException e)
+                        {
+                            SparkleLogger.LogInfo("Sync", "Error deleting file from database. " + e.Message);
+                        }
                     }
                 }
             }
@@ -475,6 +504,32 @@ namespace SparkleLib.Cmis
                         // File has been deleted on server, delete it locally too.
                         SparkleLogger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
                         Directory.Delete(folderPath, true);
+
+                        // Delete folder from database.
+                        try
+                        {
+                            command = new SQLiteCommand(sqliteConnection);
+                            command.CommandText =
+                                "DELETE FROM folders WHERE path LIKE '" + folderPath + "%'";
+                            command.ExecuteReader();
+                        }
+                        catch (SQLiteException e)
+                        {
+                            SparkleLogger.LogInfo("Sync", "Error deleting folder from database. " + e.Message);
+                        }
+
+                        // Delete all files under this folder from database.
+                        try
+                        {
+                            command = new SQLiteCommand(sqliteConnection);
+                            command.CommandText =
+                                "DELETE FROM files WHERE path LIKE '" + folderPath + "%'";
+                            command.ExecuteReader();
+                        }
+                        catch (SQLiteException e)
+                        {
+                            SparkleLogger.LogInfo("Sync", "Error deleting files from database. " + e.Message);
+                        }
                     }
                 }
             }
