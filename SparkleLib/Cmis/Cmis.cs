@@ -44,10 +44,8 @@ namespace SparkleLib.Cmis
         // Parameters for CMIS requests.
         Dictionary<string, string> cmisParameters;
 
-        private string databaseFilename;
-
-        // SQLite connection to store modification dates.
-        SQLiteConnection sqliteConnection;
+        // Database to cache remote information from the CMIS server
+        CmisDatabase database;
 
         /**
          * Called by SparkleFetcher (when a new CMIS folder is first added)
@@ -58,10 +56,10 @@ namespace SparkleLib.Cmis
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
 
-            databaseFilename = canonical_name + ".s3db";
+            database = new CmisDatabase(canonical_name + ".s3db"); // who still uses ".s3db" ?
 
             // Get path on remote repository.
-            this.remoteFolderPath = /*"/" +*/ remoteFolderPath;
+            this.remoteFolderPath = remoteFolderPath;
 
             cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
@@ -81,7 +79,7 @@ namespace SparkleLib.Cmis
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
 
-            databaseFilename = localRootFolder + ".cmissync";
+            database = new CmisDatabase(localRootFolder + ".cmissync");
 
             // Get path on remote repository.
             remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "remoteFolder");
@@ -121,41 +119,6 @@ namespace SparkleLib.Cmis
         }
 
 
-        public void RecreateDatabaseIfNeeded()
-        {
-            if (!File.Exists(databaseFilename))
-                CreateDatabase();
-        }
-
-
-        /**
-         * Create database and tables, if it does not exist yet.
-         */
-        public void CreateDatabase()
-        {
-            ConnectToSqliteIfNeeded();
-            SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-            command.CommandText =
-                  "CREATE TABLE files ("
-                + "    path TEXT PRIMARY KEY,"
-                + "    serverSideModificationDate DATE,"
-                + "    checksum TEXT);" // Checksum of both data and metadata
-                + "CREATE TABLE folders ("
-                + "    path TEXT PRIMARY KEY,"
-                + "    serverSideModificationDate DATE);";
-            SQLiteDataReader reader = command.ExecuteReader();
-            reader.Close();
-        }
-
-        public void ConnectToSqliteIfNeeded()
-        {
-            if (sqliteConnection == null)
-            {
-                sqliteConnection = new SQLiteConnection("Data Source=" + databaseFilename);
-                sqliteConnection.Open();
-            }
-        }
-
         public void SyncInBackground()
         {
             if (syncing)
@@ -190,8 +153,8 @@ namespace SparkleLib.Cmis
 
         public void Sync()
         {
-            RecreateDatabaseIfNeeded();
-            ConnectToSqliteIfNeeded();
+            database.RecreateDatabaseIfNeeded();
+            database.ConnectToSqliteIfNeeded();
 
             // If not connected, connect.
             if (session == null)
@@ -239,21 +202,7 @@ namespace SparkleLib.Cmis
                     Directory.CreateDirectory(localSubFolder);
 
                     // Create database entry for this folder.
-                    DateTime? serverSideModificationDate = remoteFolder.LastModificationDate;
-                    try
-                    {
-                        SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                        command.CommandText =
-                            "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
-                            + " VALUES (@path, @serverSideModificationDate)";
-                        command.Parameters.AddWithValue("path", localSubFolder);
-                        command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                        command.ExecuteReader();
-                    }
-                    catch (SQLiteException e)
-                    {
-                        SparkleLogger.LogInfo("Sync", "Error writing folder to database. " + e.Message);
-                    }
+                    database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                     // Recurse into folder.
                     RecursiveFolderCopy(remoteSubFolder, localSubFolder);
@@ -330,21 +279,7 @@ namespace SparkleLib.Cmis
                         Directory.CreateDirectory(localSubFolder);
 
                         // Create database entry for this folder.
-                        DateTime? serverSideModificationDate = remoteFolder.LastModificationDate;
-                        try
-                        {
-                            SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                            command.CommandText =
-                                "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
-                                + " VALUES (@path, @serverSideModificationDate)";
-                            command.Parameters.AddWithValue("path", localSubFolder);
-                            command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                            command.ExecuteReader();
-                        }
-                        catch (SQLiteException e)
-                        {
-                            SparkleLogger.LogInfo("Sync", "Error writing folder to database. " + e.Message);
-                        }
+                        database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                         // Recursive copy of the whole folder.
                         RecursiveFolderCopy(remoteSubFolder, localSubFolder);
@@ -372,49 +307,23 @@ namespace SparkleLib.Cmis
                     {
                         // Check modification date stored in database and download if remote modification date if different.
                         DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
-                        try
+                        DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
+                        if (lastDatabaseUpdate == null)
                         {
-                            SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                            command.CommandText =
-                                "SELECT serverSideModificationDate FROM files WHERE path=@filePath";
-                            command.Parameters.AddWithValue("filePath", filePath);
-                            object obj = command.ExecuteScalar();
-                            if (obj == null)
+                            SparkleLogger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
+                            DownloadFile(remoteDocument, localFolder);
+                        }
+                        else
+                        {
+                            // If the file has been modified since last time we downloaded it, then download again.
+                            if (serverSideModificationDate > lastDatabaseUpdate)
                             {
-                                SparkleLogger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
+                                SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
                                 DownloadFile(remoteDocument, localFolder);
                             }
-                            else
-                            {
-                                DateTime clientSideModificationDate = (DateTime)obj;
-                                // If the file has been modified since last time we downloaded it, then download again.
-                                if (serverSideModificationDate > clientSideModificationDate)
-                                {
-                                    SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
-                                    DownloadFile(remoteDocument, localFolder);
-                                }
 
-                                // Change modification date in database
-                                try
-                                {
-                                    command = new SQLiteCommand(sqliteConnection);
-                                    command.CommandText =
-                                        "UPDATE files"
-                                        + " SET serverSideModificationDate=@serverSideModificationDate"
-                                        + " WHERE path=@filePath";
-                                    command.Parameters.AddWithValue("filePath", filePath);
-                                    command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                                    command.ExecuteReader();
-                                }
-                                catch (SQLiteException e)
-                                {
-                                    SparkleLogger.LogInfo("Sync", "Error writing folder to database. " + e.Message);
-                                }
-                            }
-                        }
-                        catch (SQLiteException e)
-                        {
-                            SparkleLogger.LogInfo("Sync", e.Message);
+                            // Change modification date in database
+                            database.SetFileServerSideModificationDate(filePath, serverSideModificationDate);
                         }
                     }
                     else
@@ -433,37 +342,21 @@ namespace SparkleLib.Cmis
                 {
                     // This local file is not on the CMIS server now, so
                     // check whether it used to exist on server or not.
-                    SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                    command.CommandText =
-                        "SELECT serverSideModificationDate FROM files WHERE path=@filePath";
-                    command.Parameters.AddWithValue("filePath", filePath);
-                    object obj = command.ExecuteScalar();
-                    if (obj == null)
-                    {
-                        if (BIDIRECTIONAL)
-                        {
-                            // New file, sync up.
-                            UploadFile(filePath, remoteFolder);
-                        }
-                    }
-                    else
+                    if(database.ContainsFile(filePath))
                     {
                         // File has been deleted on server, so delete it locally.
                         SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
                         File.Delete(filePath);
 
                         // Delete file from database.
-                        try
+                        database.RemoveFile(filePath);
+                    }
+                    else
+                    {
+                        if (BIDIRECTIONAL)
                         {
-                            command = new SQLiteCommand(sqliteConnection);
-                            command.CommandText =
-                                "DELETE FROM files WHERE path=@filePath";
-                            command.Parameters.AddWithValue("filePath", filePath);
-                            command.ExecuteReader();
-                        }
-                        catch (SQLiteException e)
-                        {
-                            SparkleLogger.LogInfo("Sync", "Error deleting file from database. " + e.Message);
+                            // New file, sync up.
+                            UploadFile(filePath, remoteFolder);
                         }
                     }
                 }
@@ -477,12 +370,16 @@ namespace SparkleLib.Cmis
                 {
                     // This local folder is not on the CMIS server now, so
                     // check whether it used to exist on server or not.
-                    SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                    command.CommandText =
-                        "SELECT serverSideModificationDate FROM folders WHERE path=@folderPath";
-                    command.Parameters.AddWithValue("folderPath", folderPath);
-                    object obj = command.ExecuteScalar();
-                    if (obj == null)
+                    if(database.ContainsFolder(folderPath))
+                    {
+                        // File has been deleted on server, delete it locally too.
+                        SparkleLogger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
+                        Directory.Delete(folderPath, true);
+
+                        // Delete folder from database.
+                        database.RemoveFolder(folderPath);
+                    }
+                    else
                     {
                         if (BIDIRECTIONAL)
                         {
@@ -493,67 +390,7 @@ namespace SparkleLib.Cmis
                             IFolder folder = remoteFolder.CreateFolder(properties);
 
                             // Create database entry for this folder.
-                            DateTime? serverSideModificationDate = folder.LastModificationDate;
-                            try
-                            {
-                                command = new SQLiteCommand(sqliteConnection);
-                                command.CommandText =
-                                    "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
-                                    + " VALUES (@path, @serverSideModificationDate)";
-                                command.Parameters.AddWithValue("path", folderPath);
-                                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                                command.ExecuteReader();
-                            }
-                            catch (SQLiteException e)
-                            {
-                                SparkleLogger.LogInfo("Sync", "Error writing folder to database. " + e.Message);
-                            }
-
-                        }
-                    }
-                    else
-                    {
-                        // File has been deleted on server, delete it locally too.
-                        SparkleLogger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
-                        Directory.Delete(folderPath, true);
-
-                        // Delete folder from database.
-                        try
-                        {
-                            command = new SQLiteCommand(sqliteConnection);
-                            command.CommandText =
-                                "DELETE FROM folders WHERE path='" + folderPath + "'";
-                            command.ExecuteReader();
-                        }
-                        catch (SQLiteException e)
-                        {
-                            SparkleLogger.LogInfo("Sync", "Error deleting folder from database. " + e.Message);
-                        }
-
-                        // Delete all folders under this folder from database.
-                        try
-                        {
-                            command = new SQLiteCommand(sqliteConnection);
-                            command.CommandText =
-                                "DELETE FROM folders WHERE path LIKE '" + folderPath + "/%'";
-                            command.ExecuteReader();
-                        }
-                        catch (SQLiteException e)
-                        {
-                            SparkleLogger.LogInfo("Sync", "Error deleting folders from database. " + e.Message);
-                        }
-
-                        // Delete all files under this folder from database.
-                        try
-                        {
-                            command = new SQLiteCommand(sqliteConnection);
-                            command.CommandText =
-                                "DELETE FROM files WHERE path LIKE '" + folderPath + "/%'";
-                            command.ExecuteReader();
-                        }
-                        catch (SQLiteException e)
-                        {
-                            SparkleLogger.LogInfo("Sync", "Error deleting files from database. " + e.Message);
+                            database.AddFolder(folderPath, folder.LastModificationDate);
                         }
                     }
                 }
@@ -597,21 +434,7 @@ namespace SparkleLib.Cmis
             SparkleLogger.LogInfo("Sync", "Downloaded");
 
             // Create database entry for this file.
-            DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
-            try
-            {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
-                    + " VALUES (@filePath, @serverSideModificationDate)";
-                command.Parameters.AddWithValue("filePath", filePath);
-                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("Sync", "Error writing file to database. " + e.Message);
-            }
+            database.AddFile(filePath, remoteDocument.LastModificationDate);
         }
 
         private void UploadFile(string filePath, IFolder remoteFolder)
@@ -632,21 +455,7 @@ namespace SparkleLib.Cmis
             IDocument remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
 
             // Create database entry for this file.
-            DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
-            try
-            {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
-                    + " VALUES (@filePath, @serverSideModificationDate)";
-                command.Parameters.AddWithValue("filePath", filePath);
-                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("Sync", "Error writing file to database. " + e.Message);
-            }
+            database.AddFile(filePath, remoteDocument.LastModificationDate);
         }
     }
 }
