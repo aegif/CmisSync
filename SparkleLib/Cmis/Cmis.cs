@@ -11,12 +11,13 @@ using DotCMIS.Exceptions;
 using DotCMIS.Enums;
 using System.ComponentModel;
 using System.Collections;
+using DotCMIS.Data.Impl;
 
 namespace SparkleLib.Cmis
 {
     public class Cmis
     {
-        private bool BIDIRECTIONAL = false;
+        private bool BIDIRECTIONAL = true; // TODO make it a CMIS folder - specific setting
 
         // At which degree the repository supports Change Logs.
         // See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
@@ -137,14 +138,14 @@ namespace SparkleLib.Cmis
             command.CommandText =
                   "CREATE TABLE files ("
                 + "    path TEXT PRIMARY KEY,"
-                + "    serverSideModificationDate DATE);"
+                + "    serverSideModificationDate DATE,"
+                + "    checksum TEXT);" // Checksum of both data and metadata
                 + "CREATE TABLE folders ("
                 + "    path TEXT PRIMARY KEY,"
                 + "    serverSideModificationDate DATE);";
             SQLiteDataReader reader = command.ExecuteReader();
             reader.Close();
         }
-
 
         public void ConnectToSqliteIfNeeded()
         {
@@ -161,8 +162,6 @@ namespace SparkleLib.Cmis
                 return;
             syncing = true;
 
-            //SparkleLogger.LogInfo("Sync", "Syncing " + RemoteUrl + " " + local_config.GetFolderOptionalAttribute("repository", LocalPath));
-
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += new DoWorkEventHandler(
                 delegate(Object o, DoWorkEventArgs args)
@@ -178,10 +177,6 @@ namespace SparkleLib.Cmis
                         SparkleLogger.LogInfo("Sync", e.StackTrace);
                         SparkleLogger.LogInfo("Sync", e.ErrorContent);
                     }
-                    //catch (Exception e)
-                    //{
-                    //    SparkleLogger.LogInfo("Sync", "Exception while syncing:" + e.Message);
-                    //}
                 }
             );
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -202,11 +197,7 @@ namespace SparkleLib.Cmis
             if (session == null)
                 Connect();
 
-            // Get the root folder.
-            //IFolder remoteRootFolder = session.GetRootFolder();
-            
-            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath/*.Substring(1,remoteFolderPath.Length - 1)*/); // Works with FileNet
-            // IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath.Substring(1,remoteFolderPath.Length - 1)); // Remove extra slash // Works with Alfresco
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
 
             if (ChangeLogCapability)
             {
@@ -306,15 +297,11 @@ namespace SparkleLib.Cmis
          */
         private void CrawlSync(IFolder remoteFolder, string localFolder)
         {
-            //String id = new Random().Next(0, 1000000).ToString();
-
-            // Sync down.
-
             // Lists of files/folders, to delete those that have been removed on the server.
             IList remoteFiles = new ArrayList();
             IList remoteFolders = new ArrayList();
 
-            // List all children.
+            // Crawl remote children.
             foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
             {
                 if (cmisObject is DotCMIS.Client.Impl.Folder)
@@ -438,7 +425,7 @@ namespace SparkleLib.Cmis
                 }
             }
 
-            // Delete files that have been removed on the server.
+            // Crawl local files.
             foreach (string filePath in Directory.GetFiles(localFolder, "*.*"))
             {
                 string fileName = Path.GetFileName(filePath);
@@ -456,7 +443,7 @@ namespace SparkleLib.Cmis
                         if (BIDIRECTIONAL)
                         {
                             // New file, sync up.
-                            // TODO
+                            UploadFile(filePath, remoteFolder);
                         }
                     }
                     else
@@ -482,7 +469,7 @@ namespace SparkleLib.Cmis
                 }
             }
 
-            // Delete folders that have been removed on the server.
+            // Crawl local folders.
             foreach (string folderPath in Directory.GetDirectories(localFolder, "*.*"))
             {
                 string folderName = Path.GetFileName(folderPath);
@@ -497,8 +484,32 @@ namespace SparkleLib.Cmis
                     object obj = command.ExecuteScalar();
                     if (obj == null)
                     {
-                        // New folder, sync up.
-                        // TODO
+                        if (BIDIRECTIONAL)
+                        {
+                            // New folder, sync up.
+                            Dictionary<string, object> properties = new Dictionary<string, object>();
+                            properties.Add(PropertyIds.Name, folderName);
+                            properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
+                            IFolder folder = remoteFolder.CreateFolder(properties);
+
+                            // Create database entry for this folder.
+                            DateTime? serverSideModificationDate = folder.LastModificationDate;
+                            try
+                            {
+                                command = new SQLiteCommand(sqliteConnection);
+                                command.CommandText =
+                                    "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
+                                    + " VALUES (@path, @serverSideModificationDate)";
+                                command.Parameters.AddWithValue("path", folderPath);
+                                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                                command.ExecuteReader();
+                            }
+                            catch (SQLiteException e)
+                            {
+                                SparkleLogger.LogInfo("Sync", "Error writing folder to database. " + e.Message);
+                            }
+
+                        }
                     }
                     else
                     {
@@ -511,7 +522,7 @@ namespace SparkleLib.Cmis
                         {
                             command = new SQLiteCommand(sqliteConnection);
                             command.CommandText =
-                                "DELETE FROM folders WHERE path LIKE '" + folderPath + "%'";
+                                "DELETE FROM folders WHERE path='" + folderPath + "'";
                             command.ExecuteReader();
                         }
                         catch (SQLiteException e)
@@ -519,12 +530,25 @@ namespace SparkleLib.Cmis
                             SparkleLogger.LogInfo("Sync", "Error deleting folder from database. " + e.Message);
                         }
 
+                        // Delete all folders under this folder from database.
+                        try
+                        {
+                            command = new SQLiteCommand(sqliteConnection);
+                            command.CommandText =
+                                "DELETE FROM folders WHERE path LIKE '" + folderPath + "/%'";
+                            command.ExecuteReader();
+                        }
+                        catch (SQLiteException e)
+                        {
+                            SparkleLogger.LogInfo("Sync", "Error deleting folders from database. " + e.Message);
+                        }
+
                         // Delete all files under this folder from database.
                         try
                         {
                             command = new SQLiteCommand(sqliteConnection);
                             command.CommandText =
-                                "DELETE FROM files WHERE path LIKE '" + folderPath + "%'";
+                                "DELETE FROM files WHERE path LIKE '" + folderPath + "/%'";
                             command.ExecuteReader();
                         }
                         catch (SQLiteException e)
@@ -560,7 +584,7 @@ namespace SparkleLib.Cmis
                 Directory.Delete(filePath);
             }
 
-            SparkleLogger.LogInfo("Sync", /*id +*/ "Downloading " + filePath);
+            SparkleLogger.LogInfo("Sync", "Downloading " + filePath);
             Stream file = File.OpenWrite(filePath);
             byte[] buffer = new byte[8 * 1024];
             int len;
@@ -571,6 +595,41 @@ namespace SparkleLib.Cmis
             file.Close();
             contentStream.Stream.Close();
             SparkleLogger.LogInfo("Sync", "Downloaded");
+
+            // Create database entry for this file.
+            DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
+            try
+            {
+                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                command.CommandText =
+                    "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
+                    + " VALUES (@filePath, @serverSideModificationDate)";
+                command.Parameters.AddWithValue("filePath", filePath);
+                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                command.ExecuteReader();
+            }
+            catch (SQLiteException e)
+            {
+                SparkleLogger.LogInfo("Sync", "Error writing file to database. " + e.Message);
+            }
+        }
+
+        private void UploadFile(string filePath, IFolder remoteFolder)
+        {
+            // Prepare properties
+            string fileName = Path.GetFileName(filePath);
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties.Add(PropertyIds.Name, fileName);
+            properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
+
+            // Prepare content stream
+            ContentStream contentStream = new ContentStream();
+            contentStream.FileName = fileName;
+            contentStream.MimeType = "application/octet-stream"; // Should CmisSync try to guess?
+            contentStream.Stream = File.OpenRead(filePath);
+
+            // Upload
+            IDocument remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
 
             // Create database entry for this file.
             DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;

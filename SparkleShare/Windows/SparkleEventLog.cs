@@ -289,7 +289,7 @@ namespace SparkleShare {
                     }
                     else
                     {
-                        Console.WriteLine("Empty HML for EventLog");
+                        Console.WriteLine("Empty HTML for EventLog");
                     }
                     
                     if (!this.canvas.Children.Contains (this.web_browser)) {
