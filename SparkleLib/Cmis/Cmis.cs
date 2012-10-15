@@ -14,7 +14,7 @@ using System.Collections;
 
 namespace SparkleLib.Cmis
 {
-    class Cmis
+    public class Cmis
     {
         private bool BIDIRECTIONAL = false;
 
@@ -51,7 +51,8 @@ namespace SparkleLib.Cmis
         /**
          * Called by SparkleFetcher (when a new CMIS folder is first added)
          */
-        public Cmis(string canonical_name, string localPath, string remoteFolderPath, string url, string user, string password, string repositoryId)
+        public Cmis(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
         {
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);

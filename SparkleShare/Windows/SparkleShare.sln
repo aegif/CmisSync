@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleLib", "..\..\Sparkle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleLib.Cmis", "..\..\SparkleLib\Cmis\SparkleLib.Cmis.csproj", "{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLibrary", "..\TestLibrary\TestLibrary.csproj", "{295D2B18-B6EB-4EF4-9862-4E3C0C383888}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{295D2B18-B6EB-4EF4-9862-4E3C0C383888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{295D2B18-B6EB-4EF4-9862-4E3C0C383888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{295D2B18-B6EB-4EF4-9862-4E3C0C383888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{295D2B18-B6EB-4EF4-9862-4E3C0C383888}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
