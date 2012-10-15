@@ -65,18 +65,18 @@ namespace SparkleShare {
 				Environment.Exit (-1);
 			}
 
-            //try {
+            try {
                 Controller = new SparkleController ();
                 Controller.Initialize ();
 
                 UI = new SparkleUI ();
                 UI.Run ();
             
-            /*} catch (Exception e) {
+            } catch (Exception e) {
 				Console.WriteLine("Exception in Program.Main");
                 SparkleLogger.WriteCrashReport (e);
                 Environment.Exit (-1);
-            }*/
+            }
          
             #if !__MonoCS__
             // Suppress assertion messages in debug mode
