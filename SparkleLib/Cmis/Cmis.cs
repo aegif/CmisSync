@@ -27,10 +27,6 @@ namespace SparkleLib.Cmis
         // Session to the CMIS repository.
         ISession session;
 
-        // Canonical name for this checkout.
-        // config.xml: name
-        string canonical_name;
-
         // Local folder where the changes are synchronized to.
         string localRootFolder;
 
@@ -56,7 +52,7 @@ namespace SparkleLib.Cmis
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
 
-            database = new CmisDatabase(canonical_name + ".s3db"); // who still uses ".s3db" ?
+            database = new CmisDatabase(canonical_name);
 
             // Get path on remote repository.
             this.remoteFolderPath = remoteFolderPath;
@@ -79,7 +75,7 @@ namespace SparkleLib.Cmis
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
 
-            database = new CmisDatabase(localRootFolder + ".cmissync");
+            database = new CmisDatabase(localRootFolder);
 
             // Get path on remote repository.
             remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "remoteFolder");
