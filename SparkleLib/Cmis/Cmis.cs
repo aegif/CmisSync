@@ -15,36 +15,61 @@ using DotCMIS.Data.Impl;
 
 namespace SparkleLib.Cmis
 {
+    /**
+     * Synchronization with a particular CMIS folder.
+     */
     public class Cmis
     {
-        private bool BIDIRECTIONAL = true; // TODO make it a CMIS folder - specific setting
-
-        // At which degree the repository supports Change Logs.
-        // See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
-        // Possible values: none, objectidsonly, properties, all
-        bool ChangeLogCapability;
-
-        // Session to the CMIS repository.
-        ISession session;
-
-        // Local folder where the changes are synchronized to.
-        string localRootFolder;
-
-        // Path of the root in the remote repository.
-        string remoteFolderPath;
-
-        // State. true if syncing is being performed right now.
-        // TODO use is_syncing variable in parent
-        bool syncing = true;
-
-        // Parameters for CMIS requests.
-        Dictionary<string, string> cmisParameters;
-
-        // Database to cache remote information from the CMIS server
-        CmisDatabase database;
+        /**
+         * Whether sync is bidirectional or only from server to client.
+         * TODO make it a CMIS folder - specific setting
+         */
+        private bool BIDIRECTIONAL = true;
 
         /**
-         * Called by SparkleFetcher (when a new CMIS folder is first added)
+         * At which degree the repository supports Change Logs.
+         * See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
+         * Possible values: none, objectidsonly, properties, all
+         */
+        bool ChangeLogCapability;
+
+        /**
+         * Session to the CMIS repository.
+         */
+        ISession session;
+
+        /**
+         * Local folder where the changes are synchronized to.
+         * Example: "C:\CmisSync"
+         */
+        string localRootFolder;
+
+        /**
+         * Path of the root in the remote repository.
+         * Example: "/User Homes/nicolas.raoul/demos"
+         */
+        string remoteFolderPath;
+
+        /**
+         * Syncing lock.
+         * true if syncing is being performed right now.
+         * TODO use is_syncing variable in parent
+         */
+        bool syncing = true;
+
+        /**
+         * Parameters to use for all CMIS requests.
+         */
+        Dictionary<string, string> cmisParameters;
+
+        /**
+         * Database to cache remote information from the CMIS server.
+         */
+        CmisDatabase database;
+
+
+        /**
+         * Constructor for SparkleFetcher (when a new CMIS folder is first added)
          */
         public Cmis(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -67,8 +92,9 @@ namespace SparkleLib.Cmis
             syncing = false;
         }
 
+
         /**
-         * Called by SparkleRepo (at every launch of CmisSync)
+         * Constructor for SparkleRepo (at every launch of CmisSync)
          */
         public Cmis(string localPath, SparkleConfig config)
         {
@@ -90,6 +116,10 @@ namespace SparkleLib.Cmis
             syncing = false;
         }
 
+
+        /**
+         * Connect to the CMIS repository.
+         */
         public void Connect()
         {
             // Create session factory.
@@ -115,6 +145,9 @@ namespace SparkleLib.Cmis
         }
 
 
+        /**
+         * Sync in the background.
+         */
         public void SyncInBackground()
         {
             if (syncing)
@@ -147,6 +180,10 @@ namespace SparkleLib.Cmis
             bw.RunWorkerAsync();
         }
 
+
+        /**
+         * Synchronize between CMIS folder and local folder.
+         */
         public void Sync()
         {
             database.RecreateDatabaseIfNeeded();
@@ -184,6 +221,10 @@ namespace SparkleLib.Cmis
             }
         }
 
+
+        /**
+         * Download all content from a CMIS folder.
+         */
         private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
         {
             // List all children.
@@ -211,8 +252,10 @@ namespace SparkleLib.Cmis
             }
         }
 
+
         /**
          * Synchronize by checking all folders/files one-by-one.
+         * This strategy is used if the CMIS server does not support the ChangeLog feature.
          * 
          * for all remote folders:
          *     if exists locally:
@@ -394,6 +437,9 @@ namespace SparkleLib.Cmis
         }
 
 
+        /**
+         * Download a single file from the CMIS server.
+         */
         private void DownloadFile(IDocument remoteDocument, string localFolder)
         {
             DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream();
@@ -433,6 +479,10 @@ namespace SparkleLib.Cmis
             database.AddFile(filePath, remoteDocument.LastModificationDate);
         }
 
+
+        /**
+         * Upload a single file to the CMIS server.
+         */
         private void UploadFile(string filePath, IFolder remoteFolder)
         {
             // Prepare properties

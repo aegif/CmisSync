@@ -7,26 +7,47 @@ using System.IO;
 
 namespace SparkleLib.Cmis
 {
+    /**
+     * Database to cache remote information from the CMIS server.
+     * Implemented with SQLite.
+     */
     public class CmisDatabase
     {
+        /**
+         * Name of the SQLite database file.
+         */
         private string databaseFileName;
 
-        // SQLite connection to the underlying database.
+        /**
+         * SQLite connection to the underlying database.
+         */
         private SQLiteConnection sqliteConnection;
 
+        /**
+         * Length of the prefix to remove before storing paths.
+         */
         private int pathPrefixSize;
 
+
+        /**
+         * Constructor.
+         */
         public CmisDatabase(string dataPath)
         {
             this.databaseFileName = dataPath + ".cmissync";
             pathPrefixSize = dataPath.Length + 1; // +1 for the slash
         }
 
+
+        /**
+         * Create the database if it does not exist already.
+         */
         public void RecreateDatabaseIfNeeded()
         {
             if (!File.Exists(databaseFileName))
                 CreateDatabase();
         }
+
 
         /**
          * Create database and tables, if it does not exist yet.
@@ -47,6 +68,10 @@ namespace SparkleLib.Cmis
             reader.Close();
         }
 
+
+        /**
+         * Connect to SQLite if needed.
+         */
         public void ConnectToSqliteIfNeeded()
         {
             if (sqliteConnection == null)
@@ -55,6 +80,54 @@ namespace SparkleLib.Cmis
                 sqliteConnection.Open();
             }
         }
+
+
+        /**
+         * Normalize a path.
+         * All paths stored in database must be normalized.
+         * Goals:
+         * - Make data smaller in database
+         * - Reduce OS-specific differences
+         */
+        public string Normalize(string path)
+        {
+            // Remove path prefix
+            path = path.Substring(pathPrefixSize, path.Length - pathPrefixSize);
+            // Normalize all slashes to forward slash
+            path = path.Replace(@"\", "/");
+            return path;
+        }
+
+
+        /*
+         *
+         * 
+         *
+         * Database operations
+         * 
+         * 
+         * 
+         */
+
+        public void AddFile(string path, DateTime? serverSideModificationDate)
+        {
+            path = Normalize(path);
+            try
+            {
+                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
+                command.CommandText =
+                    "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
+                    + " VALUES (@filePath, @serverSideModificationDate)";
+                command.Parameters.AddWithValue("filePath", path);
+                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                command.ExecuteReader();
+            }
+            catch (SQLiteException e)
+            {
+                SparkleLogger.LogInfo("CmisDatabase", e.Message);
+            }
+        }
+
 
         public void AddFolder(string path, DateTime? serverSideModificationDate)
         {
@@ -75,6 +148,7 @@ namespace SparkleLib.Cmis
             }
         }
 
+
         public void RemoveFile(string path)
         {
             path = Normalize(path);
@@ -91,6 +165,7 @@ namespace SparkleLib.Cmis
                 SparkleLogger.LogInfo("CmisDatabase", e.Message);
             }
         }
+
 
         public void RemoveFolder(string path)
         {
@@ -135,24 +210,6 @@ namespace SparkleLib.Cmis
             }
         }
 
-        public void AddFile(string path, DateTime? serverSideModificationDate)
-        {
-            path = Normalize(path);
-            try
-            {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
-                    + " VALUES (@filePath, @serverSideModificationDate)";
-                command.Parameters.AddWithValue("filePath", path);
-                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
-            }
-        }
 
         public DateTime? GetServerSideModificationDate(string path)
         {
@@ -172,6 +229,7 @@ namespace SparkleLib.Cmis
                 return null;
             }
         }
+
 
         public void SetFileServerSideModificationDate(string path, DateTime? serverSideModificationDate)
         {
@@ -193,6 +251,7 @@ namespace SparkleLib.Cmis
             }
         }
 
+
         public bool ContainsFile(string path)
         {
             path = Normalize(path);
@@ -204,6 +263,7 @@ namespace SparkleLib.Cmis
             return obj != null;
         }
 
+
         public bool ContainsFolder(string path)
         {
             path = Normalize(path);
@@ -213,15 +273,6 @@ namespace SparkleLib.Cmis
             command.Parameters.AddWithValue("path", path);
             object obj = command.ExecuteScalar();
             return obj != null;
-        }
-
-        public string Normalize(string path)
-        {
-            // Remove path prefix
-            path = path.Substring(pathPrefixSize, path.Length - pathPrefixSize);
-            // Normalize all slashes to forward slash
-            path = path.Replace(@"\", "/");
-            return path;
         }
     }
 }
