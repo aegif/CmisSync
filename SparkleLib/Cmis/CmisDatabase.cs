@@ -156,7 +156,7 @@ namespace SparkleLib.Cmis
                     "SELECT serverSideModificationDate FROM files WHERE path=@path";
                 command.Parameters.AddWithValue("path", path);
                 object obj = command.ExecuteScalar();
-                return (DateTime)obj;
+                return (DateTime?)obj;
             }
             catch (SQLiteException e)
             {
