@@ -55,7 +55,7 @@ namespace SparkleLib {
 
     public class SparkleFolder {
 
-        public static string ROOT_FOLDER = @"C:\localRoot"; // TODO make this configurable
+        public static string ROOT_FOLDER = @"C:\CmisSync"; // TODO make this configurable
 
         public string Name;
         public Uri RemoteAddress;
