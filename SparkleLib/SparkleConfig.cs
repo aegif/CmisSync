@@ -89,8 +89,8 @@ namespace SparkleLib {
 
             } finally {
                 Load (FullPath);
-                TmpPath = Path.Combine (FoldersPath, ".tmp");
-                Directory.CreateDirectory (TmpPath);
+                //TmpPath = Path.Combine (FoldersPath, ".tmp");
+                //Directory.CreateDirectory (TmpPath);
             }
         }
 

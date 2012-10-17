@@ -479,16 +479,16 @@ namespace SparkleShare {
 
             string tmp_path = this.config.TmpPath;
 
-			if (!Directory.Exists (tmp_path)) {
-                Directory.CreateDirectory (tmp_path);
-                File.SetAttributes (tmp_path, File.GetAttributes (tmp_path) | FileAttributes.Hidden);
-            }
+			//if (!Directory.Exists (tmp_path)) {
+            //    Directory.CreateDirectory (tmp_path);
+            //    File.SetAttributes (tmp_path, File.GetAttributes (tmp_path) | FileAttributes.Hidden);
+            //}
 
             string canonical_name = Path.GetFileNameWithoutExtension (remote_path);
-            string tmp_folder     = Path.Combine (tmp_path, canonical_name);
+            //string tmp_folder     = Path.Combine (tmp_path, canonical_name);
             //string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
-            fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, tmp_folder,
+            fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
                 fetch_prior_history, canonical_name, repository, path, user, password);
             //try {
             //    SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
@@ -587,14 +587,14 @@ namespace SparkleShare {
 
             string target_folder_path = Path.Combine (this.config.FoldersPath, target_folder_name);
 
-            try {
-                ClearFolderAttributes (this.fetcher.TargetFolder);
-                Directory.Move (this.fetcher.TargetFolder, target_folder_path);
-
-            } catch (Exception e) {
-                SparkleLogger.LogInfo ("Controller", "Error moving directory: " + e.Message);
-                return;
-            }
+            //try {
+            //    ClearFolderAttributes (this.fetcher.TargetFolder);
+            //    Directory.Move (this.fetcher.TargetFolder, target_folder_path);
+            //
+            //} catch (Exception e) {
+            //    SparkleLogger.LogInfo ("Controller", "Error moving directory: " + e.Message);
+            //    return;
+            //}
 
             string backend = SparkleFetcherBase.GetBackend (this.fetcher.RemoteUrl.AbsolutePath);
 

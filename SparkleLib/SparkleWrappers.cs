@@ -55,7 +55,13 @@ namespace SparkleLib {
 
     public class SparkleFolder {
 
-        public static string ROOT_FOLDER = @"C:\CmisSync"; // TODO make this configurable
+        public static string ROOT_FOLDER =
+            (Environment.OSVersion.Platform == PlatformID.Unix || 
+            Environment.OSVersion.Platform == PlatformID.MacOSX) ?
+                   Environment.GetEnvironmentVariable("HOME") :
+                   Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%")
+            + Path.DirectorySeparatorChar
+            + "CmisSync";
 
         public string Name;
         public Uri RemoteAddress;

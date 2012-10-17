@@ -59,7 +59,7 @@ namespace SparkleShare {
             Left = x;
             Top = y;
 
-            WriteOutImages ();
+            //WriteOutImages ();
                         
             Label size_label = new Label () {
                 Content    = "Size:",
@@ -179,7 +179,7 @@ namespace SparkleShare {
 
             Controller.UpdateContentEvent += delegate (string html) {
                 Dispatcher.BeginInvoke ((Action) delegate {
-                    UpdateContent (html);
+                    // UpdateContent (html);
                 });
             };
 

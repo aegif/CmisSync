@@ -187,16 +187,16 @@ namespace SparkleLib {
 
         public virtual void Complete ()
         {
-            string identifier_path = Path.Combine (TargetFolder, ".sparkleshare");
-
-            if (File.Exists (identifier_path)) {
-                Identifier = File.ReadAllText (identifier_path).Trim ();
-
-            } else {
-                Directory.CreateDirectory(TargetFolder);
-                Identifier = CreateIdentifier ();
-                File.WriteAllText (identifier_path, Identifier);
-            }
+            //string identifier_path = Path.Combine (TargetFolder, ".sparkleshare");
+            //
+            //if (File.Exists (identifier_path)) {
+            //    Identifier = File.ReadAllText (identifier_path).Trim ();
+            //
+            //} else {
+            //    Directory.CreateDirectory(TargetFolder);
+            //    Identifier = CreateIdentifier ();
+            //    File.WriteAllText (identifier_path, Identifier);
+            //}
 
             if (IsFetchedRepoEmpty)
                 CreateInitialChangeSet ();

@@ -367,7 +367,6 @@ namespace SparkleShare {
             String address = saved_address.Trim();
             repository = repository.Trim();
             remote_path = remote_path.Trim();
-            //remote_path = remote_path.TrimEnd ("/".ToCharArray ());
             String user = saved_user.Trim();
             String password = saved_password.Trim();
 
