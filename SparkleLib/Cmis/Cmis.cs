@@ -494,7 +494,7 @@ namespace SparkleLib.Cmis
             // Prepare content stream
             ContentStream contentStream = new ContentStream();
             contentStream.FileName = fileName;
-            contentStream.MimeType = "application/octet-stream"; // Should CmisSync try to guess?
+            contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
             contentStream.Stream = File.OpenRead(filePath);
 
             // Upload
