@@ -450,7 +450,7 @@ namespace SparkleShare {
                                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
                                 // Get list of subfolders
-                                string[] subfolders = CmisUtils.getSubfolders(Controller.saved_repository, Controller.saved_remote_path,
+                                string[] subfolders = CmisUtils.GetSubfolders(Controller.saved_repository, Controller.saved_remote_path,
                                     Controller.saved_address, Controller.saved_user, Controller.saved_password);
 
                                 // Create a sub-item for each subfolder

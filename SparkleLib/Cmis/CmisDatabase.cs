@@ -70,13 +70,13 @@ namespace SparkleLib.Cmis
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
-                      "CREATE TABLE files ("
-                    + "    path TEXT PRIMARY KEY,"
-                    + "    serverSideModificationDate DATE,"
-                    + "    checksum TEXT);" // Checksum of both data and metadata
-                    + "CREATE TABLE folders ("
-                    + "    path TEXT PRIMARY KEY,"
-                    + "    serverSideModificationDate DATE);";
+                    @"CREATE TABLE files (
+                        path TEXT PRIMARY KEY,
+                        serverSideModificationDate DATE,
+                        checksum TEXT);   /* Checksum of both data and metadata */
+                    CREATE TABLE folders (
+                        path TEXT PRIMARY KEY,
+                        serverSideModificationDate DATE);";
                 command.ExecuteNonQuery();
             }
         }
@@ -117,8 +117,8 @@ namespace SparkleLib.Cmis
                 try
                 {
                     command.CommandText =
-                        "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
-                        + " VALUES (@filePath, @serverSideModificationDate)";
+                        @"INSERT OR REPLACE INTO files (path, serverSideModificationDate)
+                            VALUES (@filePath, @serverSideModificationDate)";
                     command.Parameters.AddWithValue("filePath", path);
                     command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
                     command.ExecuteNonQuery();
@@ -139,8 +139,8 @@ namespace SparkleLib.Cmis
                 try
                 {
                     command.CommandText =
-                        "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
-                        + " VALUES (@path, @serverSideModificationDate)";
+                        @"INSERT OR REPLACE INTO folders (path, serverSideModificationDate)
+                            VALUES (@path, @serverSideModificationDate)";
                     command.Parameters.AddWithValue("path", path);
                     command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
                     command.ExecuteNonQuery();
@@ -254,9 +254,9 @@ namespace SparkleLib.Cmis
                 try
                 {
                     command.CommandText =
-                        "UPDATE files"
-                        + " SET serverSideModificationDate=@serverSideModificationDate"
-                        + " WHERE path=@path";
+                        @"UPDATE files
+                            SET serverSideModificationDate=@serverSideModificationDate
+                            WHERE path=@path";
                     command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
                     command.Parameters.AddWithValue("path", path);
                     command.ExecuteNonQuery();

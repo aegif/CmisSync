@@ -113,7 +113,7 @@ namespace SparkleLib.Cmis
             return result;
         }
 
-        static public string[] getSubfolders(string repositoryId, string path,
+        static public string[] GetSubfolders(string repositoryId, string path,
             string address, string user, string password)
         {
             List<string> result = new List<string>();
