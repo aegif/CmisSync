@@ -55,17 +55,18 @@ namespace SparkleLib.Cmis
         public void CreateDatabase()
         {
             ConnectToSqliteIfNeeded();
-            SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-            command.CommandText =
-                  "CREATE TABLE files ("
-                + "    path TEXT PRIMARY KEY,"
-                + "    serverSideModificationDate DATE,"
-                + "    checksum TEXT);" // Checksum of both data and metadata
-                + "CREATE TABLE folders ("
-                + "    path TEXT PRIMARY KEY,"
-                + "    serverSideModificationDate DATE);";
-            SQLiteDataReader reader = command.ExecuteReader();
-            reader.Close();
+            using (var command = new SQLiteCommand(sqliteConnection))
+            {
+                command.CommandText =
+                      "CREATE TABLE files ("
+                    + "    path TEXT PRIMARY KEY,"
+                    + "    serverSideModificationDate DATE,"
+                    + "    checksum TEXT);" // Checksum of both data and metadata
+                    + "CREATE TABLE folders ("
+                    + "    path TEXT PRIMARY KEY,"
+                    + "    serverSideModificationDate DATE);";
+                command.ExecuteNonQuery();
+            }
         }
 
 
@@ -112,19 +113,21 @@ namespace SparkleLib.Cmis
         public void AddFile(string path, DateTime? serverSideModificationDate)
         {
             path = Normalize(path);
-            try
+            using (var command = new SQLiteCommand(sqliteConnection))
             {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
-                    + " VALUES (@filePath, @serverSideModificationDate)";
-                command.Parameters.AddWithValue("filePath", path);
-                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                try
+                {
+                    command.CommandText =
+                        "INSERT OR REPLACE INTO files (path, serverSideModificationDate)"
+                        + " VALUES (@filePath, @serverSideModificationDate)";
+                    command.Parameters.AddWithValue("filePath", path);
+                    command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                }
             }
         }
 
@@ -132,19 +135,21 @@ namespace SparkleLib.Cmis
         public void AddFolder(string path, DateTime? serverSideModificationDate)
         {
             path = Normalize(path);
-            try
+            using (var command = new SQLiteCommand(sqliteConnection))
             {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
-                    + " VALUES (@path, @serverSideModificationDate)";
-                command.Parameters.AddWithValue("path", path);
-                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                try
+                {
+                    command.CommandText =
+                        "INSERT OR REPLACE INTO folders (path, serverSideModificationDate)"
+                        + " VALUES (@path, @serverSideModificationDate)";
+                    command.Parameters.AddWithValue("path", path);
+                    command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                }
             }
         }
 
@@ -152,17 +157,19 @@ namespace SparkleLib.Cmis
         public void RemoveFile(string path)
         {
             path = Normalize(path);
-            try
+            using (var command = new SQLiteCommand(sqliteConnection))
             {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "DELETE FROM files WHERE path=@filePath";
-                command.Parameters.AddWithValue("filePath", path);
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                try
+                {
+                    command.CommandText =
+                        "DELETE FROM files WHERE path=@filePath";
+                    command.Parameters.AddWithValue("filePath", path);
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                }
             }
         }
 
@@ -170,43 +177,50 @@ namespace SparkleLib.Cmis
         public void RemoveFolder(string path)
         {
             path = Normalize(path);
+
             // Remove folder itself
-            try
+            using (var command = new SQLiteCommand(sqliteConnection))
             {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "DELETE FROM folders WHERE path='" + path + "'";
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                try
+                {
+                    command.CommandText =
+                        "DELETE FROM folders WHERE path='" + path + "'";
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                }
             }
 
             // Remove all folders under this folder
-            try
+            using (var command = new SQLiteCommand(sqliteConnection))
             {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "DELETE FROM folders WHERE path LIKE '" + path + "/%'";
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                try
+                {
+                    command.CommandText =
+                        "DELETE FROM folders WHERE path LIKE '" + path + "/%'";
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                }
             }
 
             // Remove all files under this folder
-            try
+            using (var command = new SQLiteCommand(sqliteConnection))
             {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "DELETE FROM files WHERE path LIKE '" + path + "/%'";
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                try
+                {
+                    command.CommandText =
+                        "DELETE FROM files WHERE path LIKE '" + path + "/%'";
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                }
             }
         }
 
@@ -214,19 +228,21 @@ namespace SparkleLib.Cmis
         public DateTime? GetServerSideModificationDate(string path)
         {
             path = Normalize(path);
-            try
+            using (var command = new SQLiteCommand(sqliteConnection))
             {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "SELECT serverSideModificationDate FROM files WHERE path=@path";
-                command.Parameters.AddWithValue("path", path);
-                object obj = command.ExecuteScalar();
-                return (DateTime?)obj;
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
-                return null;
+                try
+                {
+                    command.CommandText =
+                        "SELECT serverSideModificationDate FROM files WHERE path=@path";
+                    command.Parameters.AddWithValue("path", path);
+                    object obj = command.ExecuteScalar();
+                    return (DateTime?)obj;
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    return null;
+                }
             }
         }
 
@@ -234,20 +250,22 @@ namespace SparkleLib.Cmis
         public void SetFileServerSideModificationDate(string path, DateTime? serverSideModificationDate)
         {
             path = Normalize(path);
-            try
+            using (var command = new SQLiteCommand(sqliteConnection))
             {
-                SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-                command.CommandText =
-                    "UPDATE files"
-                    + " SET serverSideModificationDate=@serverSideModificationDate"
-                    + " WHERE path=@path";
-                command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                command.Parameters.AddWithValue("path", path);
-                command.ExecuteReader();
-            }
-            catch (SQLiteException e)
-            {
-                SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                try
+                {
+                    command.CommandText =
+                        "UPDATE files"
+                        + " SET serverSideModificationDate=@serverSideModificationDate"
+                        + " WHERE path=@path";
+                    command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                    command.Parameters.AddWithValue("path", path);
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                }
             }
         }
 
@@ -255,24 +273,28 @@ namespace SparkleLib.Cmis
         public bool ContainsFile(string path)
         {
             path = Normalize(path);
-            SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-            command.CommandText =
-                "SELECT serverSideModificationDate FROM files WHERE path=@path";
-            command.Parameters.AddWithValue("path", path);
-            object obj = command.ExecuteScalar();
-            return obj != null;
+            using (var command = new SQLiteCommand(sqliteConnection))
+            {
+                command.CommandText =
+                    "SELECT serverSideModificationDate FROM files WHERE path=@path";
+                command.Parameters.AddWithValue("path", path);
+                object obj = command.ExecuteScalar();
+                return obj != null;
+            }
         }
 
 
         public bool ContainsFolder(string path)
         {
             path = Normalize(path);
-            SQLiteCommand command = new SQLiteCommand(sqliteConnection);
-            command.CommandText =
-                "SELECT serverSideModificationDate FROM folders WHERE path=@path";
-            command.Parameters.AddWithValue("path", path);
-            object obj = command.ExecuteScalar();
-            return obj != null;
+            using (var command = new SQLiteCommand(sqliteConnection))
+            {
+                command.CommandText =
+                    "SELECT serverSideModificationDate FROM folders WHERE path=@path";
+                command.Parameters.AddWithValue("path", path);
+                object obj = command.ExecuteScalar();
+                return obj != null;
+            }
         }
     }
 }
