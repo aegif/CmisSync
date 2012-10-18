@@ -284,9 +284,25 @@ namespace SparkleLib.Cmis
         {
             // Lists of files/folders, to delete those that have been removed on the server.
             IList remoteFiles = new ArrayList();
-            IList remoteFolders = new ArrayList();
+            IList remoteSubfolders = new ArrayList();
 
             // Crawl remote children.
+            crawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
+
+            // Crawl local files.
+            crawlLocalFiles(localFolder, remoteFolder, remoteFiles);
+
+            // Crawl local folders.
+            crawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
+        }
+
+
+        /** 
+         * Crawl remote content, syncing down if needed.
+         * Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in crawlLocalFiles/crawlLocalFolders
+         */
+        private void crawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
+        {
             foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
             {
                 if (cmisObject is DotCMIS.Client.Impl.Folder)
@@ -369,8 +385,14 @@ namespace SparkleLib.Cmis
                     }
                 }
             }
-
-            // Crawl local files.
+        }
+        
+        
+        /**
+         * Crawl local files in a given directory (not recursive).
+         */
+        private void crawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
+        {
             foreach (string filePath in Directory.GetFiles(localFolder, "*.*"))
             {
                 string fileName = Path.GetFileName(filePath);
@@ -378,7 +400,7 @@ namespace SparkleLib.Cmis
                 {
                     // This local file is not on the CMIS server now, so
                     // check whether it used to exist on server or not.
-                    if(database.ContainsFile(filePath))
+                    if (database.ContainsFile(filePath))
                     {
                         // File has been deleted on server, so delete it locally.
                         SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
@@ -397,8 +419,13 @@ namespace SparkleLib.Cmis
                     }
                 }
             }
+        }
 
-            // Crawl local folders.
+        /**
+         * Crawl local folders in a given directory (not recursive).
+         */
+        private void crawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
+        {
             foreach (string folderPath in Directory.GetDirectories(localFolder, "*.*"))
             {
                 string folderName = Path.GetFileName(folderPath);
