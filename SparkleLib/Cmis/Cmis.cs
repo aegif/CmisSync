@@ -186,9 +186,6 @@ namespace SparkleLib.Cmis
          */
         public void Sync()
         {
-            database.RecreateDatabaseIfNeeded();
-            database.ConnectToSqliteIfNeeded();
-
             // If not connected, connect.
             if (session == null)
                 Connect();

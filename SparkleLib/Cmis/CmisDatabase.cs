@@ -40,12 +40,25 @@ namespace SparkleLib.Cmis
 
 
         /**
-         * Create the database if it does not exist already.
+         * Connection to the database.
+         * The sqliteConnection must not be used directly, used this method instead.
          */
-        public void RecreateDatabaseIfNeeded()
+        public SQLiteConnection GetSQLiteConnection()
         {
-            if (!File.Exists(databaseFileName))
-                CreateDatabase();
+            if (sqliteConnection == null)
+            {
+                if (!File.Exists(databaseFileName))
+                {
+                    CreateDatabase();
+                }
+                sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
+                sqliteConnection.Open();
+                return sqliteConnection;
+            }
+            else
+            {
+                return sqliteConnection;
+            }
         }
 
 
@@ -54,8 +67,7 @@ namespace SparkleLib.Cmis
          */
         public void CreateDatabase()
         {
-            ConnectToSqliteIfNeeded();
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
                       "CREATE TABLE files ("
@@ -66,19 +78,6 @@ namespace SparkleLib.Cmis
                     + "    path TEXT PRIMARY KEY,"
                     + "    serverSideModificationDate DATE);";
                 command.ExecuteNonQuery();
-            }
-        }
-
-
-        /**
-         * Connect to SQLite if needed.
-         */
-        public void ConnectToSqliteIfNeeded()
-        {
-            if (sqliteConnection == null)
-            {
-                sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
-                sqliteConnection.Open();
             }
         }
 
@@ -113,7 +112,7 @@ namespace SparkleLib.Cmis
         public void AddFile(string path, DateTime? serverSideModificationDate)
         {
             path = Normalize(path);
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -135,7 +134,7 @@ namespace SparkleLib.Cmis
         public void AddFolder(string path, DateTime? serverSideModificationDate)
         {
             path = Normalize(path);
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -157,7 +156,7 @@ namespace SparkleLib.Cmis
         public void RemoveFile(string path)
         {
             path = Normalize(path);
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -179,7 +178,7 @@ namespace SparkleLib.Cmis
             path = Normalize(path);
 
             // Remove folder itself
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -194,7 +193,7 @@ namespace SparkleLib.Cmis
             }
 
             // Remove all folders under this folder
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -209,7 +208,7 @@ namespace SparkleLib.Cmis
             }
 
             // Remove all files under this folder
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -228,7 +227,7 @@ namespace SparkleLib.Cmis
         public DateTime? GetServerSideModificationDate(string path)
         {
             path = Normalize(path);
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -250,7 +249,7 @@ namespace SparkleLib.Cmis
         public void SetFileServerSideModificationDate(string path, DateTime? serverSideModificationDate)
         {
             path = Normalize(path);
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -273,7 +272,7 @@ namespace SparkleLib.Cmis
         public bool ContainsFile(string path)
         {
             path = Normalize(path);
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
                     "SELECT serverSideModificationDate FROM files WHERE path=@path";
@@ -287,7 +286,7 @@ namespace SparkleLib.Cmis
         public bool ContainsFolder(string path)
         {
             path = Normalize(path);
-            using (var command = new SQLiteCommand(sqliteConnection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
                     "SELECT serverSideModificationDate FROM folders WHERE path=@path";

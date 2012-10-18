@@ -70,6 +70,7 @@
     <Compile Include="CmisServerNotFoundException.cs" />
     <Compile Include="CmisUtils.cs" />
     <Compile Include="Cmis.cs" />
+    <Compile Include="MimeType.cs" />
     <Compile Include="SparkleFetcherCmis.cs" />
     <Compile Include="SparkleCmis.cs">
       <SubType>Component</SubType>
