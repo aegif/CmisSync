@@ -128,18 +128,13 @@ namespace SparkleLib.Cmis
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.CreateSession(cmisParameters);
 
-            //IFolder folder = (IFolder)session.GetObjectByPath("/" + path); // Works with FileNet
-            IFolder folder = (IFolder)session.GetObjectByPath(path); // Works with Alfresco
+            IFolder folder = (IFolder)session.GetObjectByPath(path);
             
             SparkleLogger.LogInfo("Sync", "folder.Properties.Count:" + folder.Properties.Count);
             IItemEnumerable<ICmisObject> children = folder.GetChildren();
-            foreach (ICmisObject obj in children)
+            foreach (var subfolder in children.OfType<IFolder>())
             {
-                if (obj is IFolder)
-                {
-                    IFolder subfolder = (IFolder)obj;
-                    result.Add(subfolder.Path);
-                }
+                result.Add(subfolder.Path);
             }
             return result.ToArray();
         }
