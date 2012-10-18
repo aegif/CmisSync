@@ -22,6 +22,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 
 using SparkleLib;
+using SparkleLib.Cmis;
 
 namespace SparkleShare {
 
@@ -95,6 +96,17 @@ namespace SparkleShare {
         public string SyncingFolder { get; private set; }
         public double ProgressBarPercentage { get; private set; }
 
+
+        static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
+        {
+            return CmisUtils.GetRepositoriesFuzzy(url, user, password);
+        }
+
+        static public string[] GetSubfolders(string repositoryId, string path,
+            string address, string user, string password)
+        {
+            return CmisUtils.GetSubfolders(repositoryId, path, address, user, password);
+        }
 
         public int SelectedPluginIndex {
             get {
