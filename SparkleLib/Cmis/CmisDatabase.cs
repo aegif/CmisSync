@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data.SQLite;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace SparkleLib.Cmis
 {
@@ -99,6 +100,29 @@ namespace SparkleLib.Cmis
         }
 
 
+        /**
+         * Calculate the SHA1 checksum of a file.
+         * Code from http://stackoverflow.com/a/1993919/226958
+         */
+        private string Checksum(string filePath)
+        {
+            using (var fs = new FileStream(filePath, FileMode.Open))
+            using (var bs = new BufferedStream(fs))
+            {
+                using (var sha1 = new SHA1Managed())
+                {
+                    byte[] hash = sha1.ComputeHash(bs);
+                    StringBuilder formatted = new StringBuilder(2 * hash.Length);
+                    foreach (byte b in hash)
+                    {
+                        formatted.AppendFormat("{0:X2}", b);
+                    }
+                    return formatted.ToString();
+                }
+            }
+        }
+
+
         /*
          *
          * 
@@ -118,9 +142,10 @@ namespace SparkleLib.Cmis
                 {
                     command.CommandText =
                         @"INSERT OR REPLACE INTO files (path, serverSideModificationDate)
-                            VALUES (@filePath, @serverSideModificationDate)";
-                    command.Parameters.AddWithValue("filePath", path);
+                            VALUES (@path, @serverSideModificationDate, @checksum)";
+                    command.Parameters.AddWithValue("path", path);
                     command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                    command.Parameters.AddWithValue("checksum", Checksum(path));
                     command.ExecuteNonQuery();
                 }
                 catch (SQLiteException e)
