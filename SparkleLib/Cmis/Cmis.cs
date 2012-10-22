@@ -77,7 +77,7 @@ namespace SparkleLib.Cmis
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
 
-            database = new CmisDatabase(canonical_name);
+            database = new CmisDatabase(localRootFolder);
 
             // Get path on remote repository.
             this.remoteFolderPath = remoteFolderPath;
