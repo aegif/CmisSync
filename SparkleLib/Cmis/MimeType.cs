@@ -211,7 +211,8 @@ namespace SparkleLib.Cmis
 
         public static string GetMIMEType(string fileName)
         {
-            if (MIMETypesDictionary.ContainsKey(Path.GetExtension(fileName).Remove(0, 1)))
+            if (Path.GetExtension(fileName).Length > 1 && /* File with an extension */
+                MIMETypesDictionary.ContainsKey(Path.GetExtension(fileName).Remove(0, 1)))
             {
                 return MIMETypesDictionary[Path.GetExtension(fileName).Remove(0, 1)];
             }
