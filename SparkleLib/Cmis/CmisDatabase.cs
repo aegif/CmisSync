@@ -48,38 +48,26 @@ namespace SparkleLib.Cmis
         {
             if (sqliteConnection == null)
             {
-                if (!File.Exists(databaseFileName))
-                {
-                    CreateDatabase();
-                }
+                bool createDatabase = ! File.Exists(databaseFileName);
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
-                return sqliteConnection;
+                if (createDatabase)
+                {
+                    using (var command = new SQLiteCommand(sqliteConnection))
+                    {
+                        command.CommandText =
+                            @"CREATE TABLE files (
+                                path TEXT PRIMARY KEY,
+                                serverSideModificationDate DATE,
+                                checksum TEXT);   /* Checksum of both data and metadata */
+                            CREATE TABLE folders (
+                                path TEXT PRIMARY KEY,
+                                serverSideModificationDate DATE);";
+                        command.ExecuteNonQuery();
+                    }
+                }
             }
-            else
-            {
-                return sqliteConnection;
-            }
-        }
-
-
-        /**
-         * Create database and tables, if it does not exist yet.
-         */
-        public void CreateDatabase()
-        {
-            using (var command = new SQLiteCommand(GetSQLiteConnection()))
-            {
-                command.CommandText =
-                    @"CREATE TABLE files (
-                        path TEXT PRIMARY KEY,
-                        serverSideModificationDate DATE,
-                        checksum TEXT);   /* Checksum of both data and metadata */
-                    CREATE TABLE folders (
-                        path TEXT PRIMARY KEY,
-                        serverSideModificationDate DATE);";
-                command.ExecuteNonQuery();
-            }
+            return sqliteConnection;
         }
 
 
@@ -135,15 +123,15 @@ namespace SparkleLib.Cmis
 
         public void AddFile(string path, DateTime? serverSideModificationDate)
         {
-            path = Normalize(path);
+            string normalizedPath = Normalize(path);
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
                     command.CommandText =
-                        @"INSERT OR REPLACE INTO files (path, serverSideModificationDate)
+                        @"INSERT OR REPLACE INTO files (path, serverSideModificationDate, checksum)
                             VALUES (@path, @serverSideModificationDate, @checksum)";
-                    command.Parameters.AddWithValue("path", path);
+                    command.Parameters.AddWithValue("path", normalizedPath);
                     command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
                     command.Parameters.AddWithValue("checksum", Checksum(path));
                     command.ExecuteNonQuery();
@@ -319,6 +307,30 @@ namespace SparkleLib.Cmis
                 object obj = command.ExecuteScalar();
                 return obj != null;
             }
+        }
+
+        /**
+         * Check whether a file's content has changed since it was last synchronized.
+         */
+        public bool LocalFileHasChanged(string path)
+        {
+            string normalizedPath = Normalize(path);
+
+            // Calculate current checksum.
+            string currentChecksum = Checksum(path);
+
+            // Read previous checksum from database.
+            string previousChecksum = null;
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
+            {
+                command.CommandText =
+                    "SELECT checksum FROM files WHERE path=@path";
+                command.Parameters.AddWithValue("path", normalizedPath);
+                object obj = command.ExecuteScalar();
+                previousChecksum = (string)obj;
+            }
+
+            return ! currentChecksum.Equals(previousChecksum);
         }
     }
 }

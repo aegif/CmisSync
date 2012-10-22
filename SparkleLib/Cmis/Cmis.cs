@@ -159,16 +159,16 @@ namespace SparkleLib.Cmis
                 delegate(Object o, DoWorkEventArgs args)
                 {
                     SparkleLogger.LogInfo("Sync", "Launching sync in background, so that the UI stays available.");
-                    try
-                    {
+                    //try
+                    //{
                         Sync();
-                    }
+                    /*}
                     catch (CmisBaseException e)
                     {
                         SparkleLogger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
                         SparkleLogger.LogInfo("Sync", e.StackTrace);
                         SparkleLogger.LogInfo("Sync", e.ErrorContent);
-                    }
+                    }*/
                 }
             );
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -272,6 +272,9 @@ namespace SparkleLib.Cmis
          *     if in database:
          *       delete
          *     else:
+         *       upload                           // if BIDIRECTIONAL
+         *   else:
+         *     if has changed locally:
          *       upload                           // if BIDIRECTIONAL
          * for all local folders:
          *   if not present remotely:
@@ -418,6 +421,18 @@ namespace SparkleLib.Cmis
                         }
                     }
                 }
+                else
+                {
+                    // The file exists both on server and locally.
+                    if(database.LocalFileHasChanged(filePath))
+                    {
+                        if (BIDIRECTIONAL)
+                        {
+                            // Upload new version of file content.
+                            UpdateFile(filePath, remoteFolder);
+                        }
+                    }
+                }
             }
         }
 
@@ -526,6 +541,50 @@ namespace SparkleLib.Cmis
 
             // Create database entry for this file.
             database.AddFile(filePath, remoteDocument.LastModificationDate);
+        }
+
+        /**
+         * Upload new version of file content.
+         */
+        private void UpdateFile(string filePath, IFolder remoteFolder)
+        {
+            string fileName = Path.GetFileName(filePath);
+
+            // Prepare content stream
+            ContentStream contentStream = new ContentStream();
+            contentStream.FileName = fileName;
+            contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
+            contentStream.Stream = File.OpenRead(filePath);
+
+            IDocument document = null;
+            bool found = false;
+            foreach(ICmisObject obj in remoteFolder.GetChildren())
+            {
+                if (obj is IDocument)
+                {
+                    document = (IDocument)obj;
+                    if (document.Name == fileName)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            // If not found, it means the document has been deleted, will be processed at the next sync cycle.
+            if (!found)
+            {
+                return;
+            }
+
+            // Send content stream.
+            IObjectId id = document.SetContentStream(contentStream, true, true);
+
+            // Read new last modification date.
+            // TODO document = (IDocument)id; // null. See DotCMIS 0.4 bug: CMIS-594
+            //
+            // Update timestamp in database.
+            //database.SetFileServerSideModificationDate(filePath, document.LastModificationDate);
         }
     }
 }
