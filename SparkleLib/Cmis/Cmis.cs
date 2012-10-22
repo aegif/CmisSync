@@ -258,7 +258,10 @@ namespace SparkleLib.Cmis
          *     if exists locally:
          *       recurse
          *     else
-         *       create local folder
+         *       if in database                   // if BIDIRECTIONAL
+         *         delete recursively
+         *       else
+         *         download recursively
          * for all remote files:
          *     if exists locally:
          *       if remote is more recent than local:
@@ -330,14 +333,30 @@ namespace SparkleLib.Cmis
                             File.Delete(localSubFolder);
                         }
 
-                        // Create local folder.
-                        Directory.CreateDirectory(localSubFolder);
+                        if (database.ContainsFolder(localSubFolder))
+                        {
+                            // If there was previously a folder with this name, it means that
+                            // the user has deleted it voluntarily, so delete it from server too.
+                            
+                            // Delete the folder from the remote server.
+                            remoteSubFolder.DeleteTree(true, null, true);
 
-                        // Create database entry for this folder.
-                        database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+                            // Delete the folder from database.
+                            database.RemoveFolder(localFolder);
+                        }
+                        else
+                        {
+                            // The folder has been recently created on server, so download it.
 
-                        // Recursive copy of the whole folder.
-                        RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                            // Create local folder.
+                            Directory.CreateDirectory(localSubFolder);
+
+                            // Create database entry for this folder.
+                            database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+
+                            // Recursive copy of the whole folder.
+                            RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                        }
                     }
                 }
                 else
