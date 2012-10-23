@@ -122,35 +122,16 @@ namespace SparkleLib.Cmis
          */
         public void Connect()
         {
-            // Create session factory.
-            SessionFactory factory = SessionFactory.NewInstance();
             try
             {
-                // Get the list of repositories. There should be only one, because we specified RepositoryId.
-                IList<IRepository> repositories = factory.GetRepositories(cmisParameters);
-                IRepository repository = null;
-                // Get the repository.
-                if (repositories.Count != 1)
-                {
-                    SparkleLogger.LogInfo("Sync", "Unexpected number of matching repositories: " + repositories.Count);
-                    // Workaround for bug in FileNet, see http://stackoverflow.com/q/1302785
-                    string repositoryId = cmisParameters[SessionParameter.RepositoryId];
-                    foreach (IRepository potentialRepository in repositories)
-                    {
-                        if(potentialRepository.Id.Equals(repositoryId))
-                        {
-                            repository = potentialRepository;
-                        }
-                    }
-                }
-                else
-                {
-                    repository = factory.GetRepositories(cmisParameters)[0];
-                }
+                // Create session factory.
+                SessionFactory factory = SessionFactory.NewInstance();
+                session = factory.CreateSession(cmisParameters);
+
                 // Detect whether the repository has the ChangeLog capability.
-                ChangeLogCapability = repository.Capabilities.ChangesCapability == CapabilityChanges.All
-                    || repository.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-                session = repository.CreateSession();
+                ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
+                        || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
+                
                 SparkleLogger.LogInfo("Sync", "Created CMIS session: " + session.ToString());
             }
             catch (CmisRuntimeException e)
