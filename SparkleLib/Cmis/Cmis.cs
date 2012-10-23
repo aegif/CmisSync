@@ -366,14 +366,18 @@ namespace SparkleLib.Cmis
                 {
                     // It is a CMIS document.
                     IDocument remoteDocument = (IDocument)cmisObject;
-                    remoteFiles.Add(remoteDocument.Name);
 
+                    // We use the filename of the document's content stream.
+                    // This can be different from the name of the document.
+                    // For instance in FileNet it is not usual to have a document where
+                    // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
                     string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
+                    remoteFiles.Add(remoteDocumentFileName);
                     // If this file does not have a filename, ignore it.
                     // It sometimes happen on IBM P8 CMIS server, not sure why.
                     if (remoteDocumentFileName == null)
                     {
-                        SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream in " + localFolder);
+                        SparkleLogger.LogInfo("Sync", "Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
                         continue;
                     }
 
@@ -558,23 +562,38 @@ namespace SparkleLib.Cmis
          */
         private void UploadFile(string filePath, IFolder remoteFolder)
         {
-            // Prepare properties
-            string fileName = Path.GetFileName(filePath);
-            Dictionary<string, object> properties = new Dictionary<string, object>();
-            properties.Add(PropertyIds.Name, fileName);
-            properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
+            IDocument remoteDocument = null;
+            try
+            {
+                // Prepare properties
+                string fileName = Path.GetFileName(filePath);
+                Dictionary<string, object> properties = new Dictionary<string, object>();
+                properties.Add(PropertyIds.Name, fileName);
+                properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
 
-            // Prepare content stream
-            ContentStream contentStream = new ContentStream();
-            contentStream.FileName = fileName;
-            contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
-            contentStream.Stream = File.OpenRead(filePath);
+                // Prepare content stream
+                ContentStream contentStream = new ContentStream();
+                contentStream.FileName = fileName;
+                contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
+                contentStream.Stream = File.OpenRead(filePath);
 
-            // Upload
-            IDocument remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                // Upload
+                remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
 
-            // Create database entry for this file.
-            database.AddFile(filePath, remoteDocument.LastModificationDate);
+                // Create database entry for this file.
+                database.AddFile(filePath, remoteDocument.LastModificationDate);
+            }
+            catch (FileNotFoundException e)
+            {
+                SparkleLogger.LogInfo("Sync", "File deleted while trying to upload it, reverting.");
+                // File has been deleted while we were trying to upload/checksum/add.
+                // This can typically happen in Windows when creating a new text file and giving it a name.
+                // Revert the upload.
+                if (remoteDocument != null)
+                {
+                    remoteDocument.DeleteAllVersions();
+                }
+            }
         }
 
         /**
