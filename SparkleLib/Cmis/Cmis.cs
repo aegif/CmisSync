@@ -258,8 +258,8 @@ namespace SparkleLib.Cmis
          *     if exists locally:
          *       recurse
          *     else
-         *       if in database                   // if BIDIRECTIONAL
-         *         delete recursively
+         *       if in database:
+         *         delete recursively from server // if BIDIRECTIONAL
          *       else
          *         download recursively
          * for all remote files:
@@ -269,7 +269,10 @@ namespace SparkleLib.Cmis
          *       else
          *         upload                         // if BIDIRECTIONAL
          *     else:
-         *       download
+         *       if in database:
+         *         delete from server             // if BIDIRECTIONAL
+         *       else
+         *         download
          * for all local files:
          *   if not present remotely:
          *     if in database:
@@ -303,7 +306,7 @@ namespace SparkleLib.Cmis
         }
 
 
-        /** 
+        /**
          * Crawl remote content, syncing down if needed.
          * Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in crawlLocalFiles/crawlLocalFolders
          */
@@ -402,8 +405,20 @@ namespace SparkleLib.Cmis
                     }
                     else
                     {
-                        SparkleLogger.LogInfo("Sync", "Downloading new file: " + remoteDocumentFileName);
-                        DownloadFile(remoteDocument, localFolder);
+                        if (database.ContainsFile(filePath))
+                        {
+                            // File has been recently removed locally, so remove it from server too.
+                            remoteDocument.DeleteAllVersions();
+
+                            // Remove it from database.
+                            database.RemoveFile(filePath);
+                        }
+                        else
+                        {
+                            // New remote file, download it.
+                            SparkleLogger.LogInfo("Sync", "Downloading new file: " + remoteDocumentFileName);
+                            DownloadFile(remoteDocument, localFolder);
+                        }
                     }
                 }
             }
@@ -415,7 +430,7 @@ namespace SparkleLib.Cmis
          */
         private void crawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
         {
-            foreach (string filePath in Directory.GetFiles(localFolder, "*.*"))
+            foreach (string filePath in Directory.GetFiles(localFolder))
             {
                 string fileName = Path.GetFileName(filePath);
                 if (!remoteFiles.Contains(fileName))
@@ -460,7 +475,7 @@ namespace SparkleLib.Cmis
          */
         private void crawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
         {
-            foreach (string folderPath in Directory.GetDirectories(localFolder, "*.*"))
+            foreach (string folderPath in Directory.GetDirectories(localFolder))
             {
                 string folderName = Path.GetFileName(folderPath);
                 if (!remoteFolders.Contains(folderName))
