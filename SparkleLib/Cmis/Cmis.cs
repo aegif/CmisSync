@@ -155,16 +155,20 @@ namespace SparkleLib.Cmis
                 delegate(Object o, DoWorkEventArgs args)
                 {
                     SparkleLogger.LogInfo("Sync", "Launching sync in background, so that the UI stays available.");
-                    //try
-                    //{
+#if !DEBUG
+                    try
+                    {
+#endif
                         Sync();
-                    /*}
+#if !DEBUG
+                    }
                     catch (CmisBaseException e)
                     {
                         SparkleLogger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
                         SparkleLogger.LogInfo("Sync", e.StackTrace);
                         SparkleLogger.LogInfo("Sync", e.ErrorContent);
-                    }*/
+                    }
+#endif
                 }
             );
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
