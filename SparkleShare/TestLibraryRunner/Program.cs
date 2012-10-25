@@ -10,7 +10,7 @@ namespace TestLibraryRunner
     {
         static void Main(string[] args)
         {
-            new ConnectionTests().DotCmisToIBMConnections();
+            new ConnectionTests().ClientSideChanges();
 
 #if DEBUG
             Console.WriteLine("Press any key to close...");
