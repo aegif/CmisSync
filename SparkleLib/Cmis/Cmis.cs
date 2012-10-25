@@ -122,22 +122,31 @@ namespace SparkleLib.Cmis
          */
         public void Connect()
         {
-            try
+            do
             {
-                // Create session factory.
-                SessionFactory factory = SessionFactory.NewInstance();
-                session = factory.CreateSession(cmisParameters);
+                try
+                {
+                    // Create session factory.
+                    SessionFactory factory = SessionFactory.NewInstance();
+                    session = factory.CreateSession(cmisParameters);
 
-                // Detect whether the repository has the ChangeLog capability.
-                ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
-                        || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-                
-                SparkleLogger.LogInfo("Sync", "Created CMIS session: " + session.ToString());
+                    // Detect whether the repository has the ChangeLog capability.
+                    ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
+                            || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
+
+                    SparkleLogger.LogInfo("Sync", "Created CMIS session: " + session.ToString());
+                }
+                catch (CmisRuntimeException e)
+                {
+                    SparkleLogger.LogInfo("Sync", "Exception: " + e.Message + ", error content: " + e.ErrorContent);
+                }
+                if (session == null)
+                {
+                    SparkleLogger.LogInfo("Sync", "Connection failed, waiting 10 seconds...");
+                    System.Threading.Thread.Sleep(10 * 1000);
+                }
             }
-            catch (CmisRuntimeException e)
-            {
-                SparkleLogger.LogInfo("Sync", "Exception: " + e.Message + ", error content: " + e.ErrorContent);
-            }
+            while (session == null);
         }
 
 
@@ -345,7 +354,7 @@ namespace SparkleLib.Cmis
                             remoteSubFolder.DeleteTree(true, null, true);
 
                             // Delete the folder from database.
-                            database.RemoveFolder(localFolder);
+                            database.RemoveFolder(localSubFolder);
                         }
                         else
                         {
