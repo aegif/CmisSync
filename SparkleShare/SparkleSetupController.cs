@@ -371,7 +371,7 @@ namespace SparkleShare {
 
         public void Add2PageCompleted(string repository, string remote_path)
         {
-            SyncingFolder = Path.GetFileNameWithoutExtension(remote_path);
+            SyncingFolder = Path.GetFileName(remote_path);
             ProgressBarPercentage = 1.0;
 
             ChangePageEvent(PageType.Syncing, null);
