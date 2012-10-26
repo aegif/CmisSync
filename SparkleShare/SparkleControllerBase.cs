@@ -433,7 +433,7 @@ namespace SparkleShare {
                 if (Directory.Exists (args.FullPath) && args.ChangeType == WatcherChangeTypes.Created)
                     return;
 
-                CheckRepositories ();
+                // CheckRepositories (); // NR Disabled because was creating tons of Cmis objects
             }
         }
 
@@ -484,7 +484,7 @@ namespace SparkleShare {
             //    File.SetAttributes (tmp_path, File.GetAttributes (tmp_path) | FileAttributes.Hidden);
             //}
 
-            string canonical_name = Path.GetFileNameWithoutExtension (remote_path);
+            string canonical_name = Path.GetFileName(remote_path);
             //string tmp_folder     = Path.Combine (tmp_path, canonical_name);
             //string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
@@ -566,24 +566,24 @@ namespace SparkleShare {
         public void FinishFetcher ()
         {
             this.fetcher.Complete ();
-            string canonical_name = Path.GetFileNameWithoutExtension (this.fetcher.RemoteFolder);
+            string canonical_name = Path.GetFileName (this.fetcher.RemoteFolder);
 
             bool target_folder_exists = Directory.Exists (
                 Path.Combine (this.config.FoldersPath, canonical_name));
 
             // Add a numbered suffix to the name if a folder with the same name
             // already exists. Example: "Folder (2)"
-            int suffix = 1;
+            /*int suffix = 1;
             while (target_folder_exists) {
                 suffix++;
                 target_folder_exists = Directory.Exists (
                     Path.Combine (this.config.FoldersPath, canonical_name + " (" + suffix + ")"));
-            }
+            }*/
 
             string target_folder_name = canonical_name;
 
-            if (suffix > 1)
-                target_folder_name += " (" + suffix + ")";
+            /*if (suffix > 1)   TODO make this work by first creating checkout in temp directory (also paragraph just above)
+                target_folder_name += " (" + suffix + ")";*/
 
             string target_folder_path = Path.Combine (this.config.FoldersPath, target_folder_name);
 

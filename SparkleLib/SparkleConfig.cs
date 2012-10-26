@@ -44,7 +44,7 @@ namespace SparkleLib {
 
         public string FoldersPath {
             get {
-                return Path.Combine (HomePath, "SparkleShare");
+                return Path.Combine (HomePath, "CmisSync");
             }
         }
 

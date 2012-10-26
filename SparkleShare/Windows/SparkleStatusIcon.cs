@@ -39,7 +39,6 @@ namespace SparkleShare {
         private ContextMenu context_menu;
 
 
-        private SparkleMenuItem log_item;
         private SparkleMenuItem state_item;
         private SparkleMenuItem exit_item;
         
@@ -86,13 +85,6 @@ namespace SparkleShare {
                     this.exit_item.UpdateLayout ();
                 });
             };
-
-            Controller.UpdateOpenRecentEventsItemEvent += delegate (bool item_enabled) {
-                  Dispatcher.BeginInvoke ((Action) delegate {
-                    this.log_item.IsEnabled = item_enabled;
-                    this.log_item.UpdateLayout ();
-                });
-            };
         }
 
 
@@ -128,15 +120,6 @@ namespace SparkleShare {
             
                 add_item.Click += delegate {
                     Controller.AddHostedProjectClicked ();
-                };
-            
-            this.log_item = new SparkleMenuItem () {
-                Header    = "Recent changes…",
-                IsEnabled = Controller.OpenRecentEventsItemEnabled
-            };
-            
-                this.log_item.Click += delegate {
-                    Controller.OpenRecentEventsClicked ();
                 };
             
             SparkleMenuItem notify_item = new SparkleMenuItem () {
@@ -180,8 +163,8 @@ namespace SparkleShare {
             
             
             this.context_menu.Items.Add (this.state_item);
-            this.context_menu.Items.Add (new Separator ());
-			this.context_menu.Items.Add (folder_item);
+            //this.context_menu.Items.Add (new Separator ());
+			//this.context_menu.Items.Add (folder_item);
 
             if (Controller.Folders.Length > 0) {
                 foreach (string folder_name in Controller.Folders) {     
@@ -255,12 +238,11 @@ namespace SparkleShare {
             
             this.context_menu.Items.Add (new Separator ());
             this.context_menu.Items.Add (add_item);
-            this.context_menu.Items.Add (this.log_item);
 			this.context_menu.Items.Add (new Separator ());
-			this.context_menu.Items.Add (notify_item);
-            this.context_menu.Items.Add (new Separator ());
-            this.context_menu.Items.Add (about_item);
-            this.context_menu.Items.Add (new Separator ());
+			//this.context_menu.Items.Add (notify_item);
+            //this.context_menu.Items.Add (new Separator ());
+            //this.context_menu.Items.Add (about_item);
+            //this.context_menu.Items.Add (new Separator ());
             this.context_menu.Items.Add (this.exit_item);
 			
 			this.notify_icon.ContextMenu = this.context_menu;
