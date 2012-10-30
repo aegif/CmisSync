@@ -13,6 +13,9 @@ using System.ComponentModel;
 using System.Collections;
 using DotCMIS.Data.Impl;
 
+// TODO refactor to UI layer
+using System.Windows.Forms;
+
 namespace SparkleLib.Cmis
 {
     /**
@@ -392,7 +395,6 @@ namespace SparkleLib.Cmis
 
                     string filePath = localFolder + Path.DirectorySeparatorChar + remoteDocumentFileName;
 
-
                     if (File.Exists(filePath))
                     {
                         // Check modification date stored in database and download if remote modification date if different.
@@ -408,8 +410,24 @@ namespace SparkleLib.Cmis
                             // If the file has been modified since last time we downloaded it, then download again.
                             if (serverSideModificationDate > lastDatabaseUpdate)
                             {
-                                SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
-                                DownloadFile(remoteDocument, localFolder);
+                                if (database.LocalFileHasChanged(filePath))
+                                {
+                                    SparkleLogger.LogInfo("Sync", "Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
+                                    // Rename locally modified file.
+                                    File.Move(filePath, SuffixIfExists(filePath + "_your-version"));
+
+                                    // Download server version
+                                    DownloadFile(remoteDocument, localFolder);
+                                    
+                                    System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
+                                        + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
+                                    // TODO show CMIS property lastModifiedBy
+                                }
+                                else
+                                {
+                                    SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
+                                    DownloadFile(remoteDocument, localFolder);
+                                }
                             }
 
                             // Change modification date in database
@@ -452,6 +470,9 @@ namespace SparkleLib.Cmis
                     // check whether it used to exist on server or not.
                     if (database.ContainsFile(filePath))
                     {
+                        // If file has changed locally, move to 'your_version' and warn about conflict
+                        // TODO
+
                         // File has been deleted on server, so delete it locally.
                         SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
                         File.Delete(filePath);
@@ -497,7 +518,7 @@ namespace SparkleLib.Cmis
                     // check whether it used to exist on server or not.
                     if(database.ContainsFolder(folderPath))
                     {
-                        // File has been deleted on server, delete it locally too.
+                        // Folder has been deleted on server, delete it locally too.
                         SparkleLogger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
                         Directory.Delete(folderPath, true);
 
@@ -647,6 +668,36 @@ namespace SparkleLib.Cmis
             //
             // Update timestamp in database.
             //database.SetFileServerSideModificationDate(filePath, document.LastModificationDate);
+        }
+
+        /**
+         * Find an available name (potentially suffixed) for this file.
+         * For instance:
+         * - if /dir/file does not exist, return the same path
+         * - if /dir/file exists, return /dir/file (1)
+         * - if /dir/file (1) also exists, return /dir/file (2)
+         * - etc
+         */
+        public static string SuffixIfExists(String path)
+        {
+            if ( ! File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                int index = 1;
+                do
+                {
+                    string ret = path + " (" + index + ")";
+                    if( ! File.Exists(ret))
+                    {
+                        return ret;
+                    }
+                    index++;
+                }
+                while(true);
+            }
         }
     }
 }
