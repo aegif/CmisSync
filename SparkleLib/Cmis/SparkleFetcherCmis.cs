@@ -30,7 +30,8 @@ namespace SparkleLib.Cmis {
 
         public SparkleFetcher (string server, string required_fingerprint, string remote_path,
             string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
-            string user, string password) : base (server, required_fingerprint,
+            string user, string password, ActivityListener activityListener)
+            : base(server, required_fingerprint,
                 remote_path, target_folder, fetch_prior_history, repository, path, user, password)
         {
 			Console.WriteLine("Cmis SparkleFetcher constructor");
@@ -39,7 +40,7 @@ namespace SparkleLib.Cmis {
 
             Directory.CreateDirectory(Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name));
 
-            Cmis cmis = new Cmis(canonical_name, path, remote_path, server, user, password, repository);
+            Cmis cmis = new Cmis(canonical_name, path, remote_path, server, user, password, repository, activityListener);
             cmis.Sync();
         }
 

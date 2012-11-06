@@ -28,7 +28,7 @@ using SparkleLib.Cmis;
 
 namespace SparkleShare {
 
-    public abstract class SparkleControllerBase {
+    public abstract class SparkleControllerBase : ActivityListener {
 
         public SparkleRepoBase [] Repositories {
             get {
@@ -261,7 +261,7 @@ namespace SparkleShare {
                 //    Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend),
                 //        new object [] { folder_path, this.config }
                 //);
-                repo = new SparkleLib.Cmis.SparkleRepo(folder_path, this.config);
+                repo = new SparkleLib.Cmis.SparkleRepo(folder_path, this.config, this);
 
             //} catch (Exception e) {
             //    SparkleLogger.LogInfo ("Controller",
@@ -489,7 +489,7 @@ namespace SparkleShare {
             //string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
             fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
-                fetch_prior_history, canonical_name, repository, path, user, password);
+                fetch_prior_history, canonical_name, repository, path, user, password, this);
             //try {
             //    SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
             //    this.fetcher = (SparkleFetcherBase) Activator.CreateInstance (
@@ -748,6 +748,16 @@ namespace SparkleShare {
                 repo.Dispose ();
 
             Environment.Exit (0);
+        }
+
+        public void activityStarted()
+        {
+            OnSyncing();
+        }
+
+        public void activityStopped()
+        {
+            OnIdle();
         }
     }
 }

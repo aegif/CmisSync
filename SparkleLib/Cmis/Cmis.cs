@@ -34,56 +34,62 @@ namespace SparkleLib.Cmis
          * See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
          * Possible values: none, objectidsonly, properties, all
          */
-        bool ChangeLogCapability;
+        private bool ChangeLogCapability;
 
         /**
          * Session to the CMIS repository.
          */
-        ISession session;
+        private ISession session;
 
         /**
          * Local folder where the changes are synchronized to.
          * Example: "C:\CmisSync"
          */
-        string localRootFolder;
+        private string localRootFolder;
 
         /**
          * Path of the root in the remote repository.
          * Example: "/User Homes/nicolas.raoul/demos"
          */
-        string remoteFolderPath;
+        private string remoteFolderPath;
 
         /**
          * Syncing lock.
          * true if syncing is being performed right now.
          * TODO use is_syncing variable in parent
          */
-        bool syncing = true;
+        private bool syncing = true;
 
         /**
          * Parameters to use for all CMIS requests.
          */
-        Dictionary<string, string> cmisParameters;
+        private Dictionary<string, string> cmisParameters;
 
         /**
          * Database to cache remote information from the CMIS server.
          */
-        CmisDatabase database;
+        private CmisDatabase database;
+
+        /**
+         * Listener we inform about activity (used by spinner)
+         */
+        private ActivityListener activityListener;
 
 
         /**
          * Constructor for SparkleFetcher (when a new CMIS folder is first added)
          */
         public Cmis(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId)
+            string url, string user, string password, string repositoryId,
+            ActivityListener activityListener)
         {
+            this.activityListener = activityListener;
+            this.remoteFolderPath = remoteFolderPath;
+
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
 
             database = new CmisDatabase(localRootFolder);
-
-            // Get path on remote repository.
-            this.remoteFolderPath = remoteFolderPath;
 
             cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
@@ -99,8 +105,11 @@ namespace SparkleLib.Cmis
         /**
          * Constructor for SparkleRepo (at every launch of CmisSync)
          */
-        public Cmis(string localPath, SparkleConfig config)
+        public Cmis(string localPath, SparkleConfig config,
+            ActivityListener activityListener)
         {
+            this.activityListener = activityListener;
+
             // Set local root folder.
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
 
@@ -198,6 +207,8 @@ namespace SparkleLib.Cmis
          */
         public void Sync()
         {
+            activityListener.activityStarted();
+
             // If not connected, connect.
             if (session == null)
                 Connect();
@@ -228,6 +239,8 @@ namespace SparkleLib.Cmis
                 // No ChangeLog capability, so we have to crawl remote and local folders.
                 CrawlSync(remoteFolder, localRootFolder);
             }
+
+            activityListener.activityStopped();
         }
 
 
@@ -581,6 +594,11 @@ namespace SparkleLib.Cmis
             file.Close();
             contentStream.Stream.Close();
             SparkleLogger.LogInfo("Sync", "Downloaded");
+
+            // Get metadata.
+            string lastModifiedBy = remoteDocument.LastModifiedBy;
+            // Write metadata.
+            // TODO
 
             // Create database entry for this file.
             database.AddFile(filePath, remoteDocument.LastModificationDate);
