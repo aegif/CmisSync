@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivityListener.cs" />
+    <Compile Include="ActivityListenerAggregator.cs" />
     <Compile Include="SparkleRepoBase.cs" />
     <Compile Include="SparkleFetcherBase.cs" />
     <Compile Include="SparkleWrappers.cs" />

@@ -45,7 +45,6 @@ namespace SparkleShare {
         public double ProgressPercentage = 0.0;
         public string ProgressSpeed      = "";
 
-
         public event ShowSetupWindowEventHandler ShowSetupWindowEvent = delegate { };
         public delegate void ShowSetupWindowEventHandler (PageType page_type);
 
@@ -159,6 +158,7 @@ namespace SparkleShare {
         public abstract void OpenFile (string path);
 
 
+        private ActivityListener activityListenerAggregator;
         private SparkleConfig config;
         private SparkleFetcherBase fetcher;
         private FileSystemWatcher watcher;
@@ -168,6 +168,8 @@ namespace SparkleShare {
 
         public SparkleControllerBase ()
         {
+            activityListenerAggregator = new ActivityListenerAggregator(this);
+
             string app_data_path = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
             string config_path   = Path.Combine (app_data_path, "cmissync");
             
@@ -261,7 +263,7 @@ namespace SparkleShare {
                 //    Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend),
                 //        new object [] { folder_path, this.config }
                 //);
-                repo = new SparkleLib.Cmis.SparkleRepo(folder_path, this.config, this);
+            repo = new SparkleLib.Cmis.SparkleRepo(folder_path, this.config, activityListenerAggregator);
 
             //} catch (Exception e) {
             //    SparkleLogger.LogInfo ("Controller",
@@ -489,7 +491,7 @@ namespace SparkleShare {
             //string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
             fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
-                fetch_prior_history, canonical_name, repository, path, user, password, this);
+                fetch_prior_history, canonical_name, repository, path, user, password, activityListenerAggregator);
             //try {
             //    SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
             //    this.fetcher = (SparkleFetcherBase) Activator.CreateInstance (
@@ -750,12 +752,12 @@ namespace SparkleShare {
             Environment.Exit (0);
         }
 
-        public void activityStarted()
+        public void ActivityStarted()
         {
             OnSyncing();
         }
 
-        public void activityStopped()
+        public void ActivityStopped()
         {
             OnIdle();
         }

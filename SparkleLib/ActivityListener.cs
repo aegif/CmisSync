@@ -13,7 +13,7 @@ namespace SparkleLib
      */
     public interface ActivityListener
     {
-        void activityStarted();
-        void activityStopped();
+        void ActivityStarted();
+        void ActivityStopped();
     }
 }

@@ -207,7 +207,7 @@ namespace SparkleLib.Cmis
          */
         public void Sync()
         {
-            activityListener.activityStarted();
+            activityListener.ActivityStarted();
 
             // If not connected, connect.
             if (session == null)
@@ -240,7 +240,7 @@ namespace SparkleLib.Cmis
                 CrawlSync(remoteFolder, localRootFolder);
             }
 
-            activityListener.activityStopped();
+            activityListener.ActivityStopped();
         }
 
 
