@@ -207,8 +207,6 @@ namespace SparkleLib.Cmis
          */
         public void Sync()
         {
-            activityListener.ActivityStarted();
-
             // If not connected, connect.
             if (session == null)
                 Connect();
@@ -239,8 +237,6 @@ namespace SparkleLib.Cmis
                 // No ChangeLog capability, so we have to crawl remote and local folders.
                 CrawlSync(remoteFolder, localRootFolder);
             }
-
-            activityListener.ActivityStopped();
         }
 
 
@@ -249,6 +245,7 @@ namespace SparkleLib.Cmis
          */
         private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
         {
+            activityListener.ActivityStarted();
             // List all children.
             foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
             {
@@ -272,6 +269,7 @@ namespace SparkleLib.Cmis
                     DownloadFile((IDocument)cmisObject, localFolder);
                 }
             }
+            activityListener.ActivityStopped();
         }
 
 
@@ -562,6 +560,7 @@ namespace SparkleLib.Cmis
          */
         private void DownloadFile(IDocument remoteDocument, string localFolder)
         {
+            activityListener.ActivityStarted();
             DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream();
 
             // If this file does not have a content stream, ignore it.
@@ -602,6 +601,7 @@ namespace SparkleLib.Cmis
 
             // Create database entry for this file.
             database.AddFile(filePath, remoteDocument.LastModificationDate);
+            activityListener.ActivityStopped();
         }
 
 
@@ -610,6 +610,7 @@ namespace SparkleLib.Cmis
          */
         private void UploadFile(string filePath, IFolder remoteFolder)
         {
+            activityListener.ActivityStarted();
             IDocument remoteDocument = null;
             try
             {
@@ -642,6 +643,7 @@ namespace SparkleLib.Cmis
                     remoteDocument.DeleteAllVersions();
                 }
             }
+            activityListener.ActivityStopped();
         }
 
         /**
@@ -649,6 +651,7 @@ namespace SparkleLib.Cmis
          */
         private void UpdateFile(string filePath, IFolder remoteFolder)
         {
+            activityListener.ActivityStarted();
             string fileName = Path.GetFileName(filePath);
 
             // Prepare content stream
@@ -686,6 +689,7 @@ namespace SparkleLib.Cmis
             //
             // Update timestamp in database.
             //database.SetFileServerSideModificationDate(filePath, document.LastModificationDate);
+            activityListener.ActivityStopped();
         }
 
         /**
