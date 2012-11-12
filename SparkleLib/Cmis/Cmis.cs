@@ -15,6 +15,7 @@ using DotCMIS.Data.Impl;
 
 // TODO refactor to UI layer
 using System.Windows.Forms;
+using System.Net;
 
 namespace SparkleLib.Cmis
 {
@@ -154,7 +155,7 @@ namespace SparkleLib.Cmis
                 }
                 if (session == null)
                 {
-                    SparkleLogger.LogInfo("Sync", "Connection failed, waiting 10 seconds...");
+                    SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds...");
                     System.Threading.Thread.Sleep(10 * 1000);
                 }
             }
@@ -582,17 +583,22 @@ namespace SparkleLib.Cmis
                 Directory.Delete(filePath);
             }
 
-            SparkleLogger.LogInfo("Sync", "Downloading " + filePath);
-            Stream file = File.OpenWrite(filePath);
-            byte[] buffer = new byte[8 * 1024];
-            int len;
-            while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+            bool success = false;
+            do
             {
-                file.Write(buffer, 0, len);
+                try
+                {
+                    DownloadFile(contentStream, filePath);
+                    success = true;
+                }
+                catch (WebException e)
+                {
+                    SparkleLogger.LogInfo("Sync", e.Message);
+                    SparkleLogger.LogInfo("Sync", "Problem during download, waiting for 10 seconds...");
+                    System.Threading.Thread.Sleep(10 * 1000);
+                }
             }
-            file.Close();
-            contentStream.Stream.Close();
-            SparkleLogger.LogInfo("Sync", "Downloaded");
+            while (!success);
 
             // Get metadata.
             string lastModifiedBy = remoteDocument.LastModifiedBy;
@@ -602,6 +608,24 @@ namespace SparkleLib.Cmis
             // Create database entry for this file.
             database.AddFile(filePath, remoteDocument.LastModificationDate);
             activityListener.ActivityStopped();
+        }
+
+        /**
+         * Download a file, without retrying
+         */
+        private void DownloadFile(DotCMIS.Data.IContentStream contentStream, string filePath)
+        {
+            SparkleLogger.LogInfo("Sync", "Downloading " + filePath);
+            Stream file = File.OpenWrite(filePath);
+            byte[] buffer = new byte[8 * 1024];
+            int len;
+            while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0) // TODO catch WebException here and retry
+            {
+                file.Write(buffer, 0, len);
+            }
+            file.Close();
+            contentStream.Stream.Close();
+            SparkleLogger.LogInfo("Sync", "Downloaded");
         }
 
 

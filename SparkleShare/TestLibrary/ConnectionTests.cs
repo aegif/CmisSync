@@ -9,10 +9,12 @@ using SparkleLib;
 using DotCMIS;
 using DotCMIS.Client.Impl;
 using DotCMIS.Client;
+using System.IO;
+using Moq;
 
 namespace TestLibrary
 {
-    public class ConnectionTests
+    public class ConnectionTests : IDisposable
     {
         List<TestServer> testServers;
 
@@ -22,6 +24,24 @@ namespace TestLibrary
             testServers = new List<TestServer>();
             // Add your CMIS test server(s) below
             // testServers.Add(new TestServer("unittest0", "/localPath", "/remotePath", "http://servername:port/path", "username", "password", "repository"));
+            testServers.Add(new TestServer("unittest1", "/mftArchive", "/mftArchive", "http://ibmcmis.dyndns.org:8080/p8cmis/resources/Service", "CEMPAdmin", "CEMPAdmin", "DaphneA"));
+            testServers.Add(new TestServer("unittest2", "/Test1", "/Test1", "http://ibmcmis.dyndns.org:8080/p8cmis/resources/Service", "CEMPAdmin", "CEMPAdmin", "DaphneB"));
+            testServers.Add(new TestServer("unittest3", "/User Homes", "/User Homes", "http://avenue.aegif.jp/alfresco/cmisatom", "nicolas.raoul", "eR31g6HG", "676bbe8a-b507-419e-99c7-8612a9fead59"));
+        }
+
+        public void Dispose()
+        {
+            DeleteDirectoryIfExists(@"C:\Users\nico\CmisSync\unittest1");
+            DeleteDirectoryIfExists(@"C:\Users\nico\CmisSync\unittest2");
+            DeleteDirectoryIfExists(@"C:\Users\nico\CmisSync\unittest3");
+        }
+
+        private void DeleteDirectoryIfExists(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
         }
 
         [Fact]
@@ -52,6 +72,7 @@ namespace TestLibrary
         {
             testServers.ForEach(delegate(TestServer testServer)
             {
+                ActivityListener activityListener = new Mock<ActivityListener>().Object;
                 Cmis cmis = new Cmis(
                     testServer.canonical_name,
                     testServer.localPath,
@@ -59,10 +80,54 @@ namespace TestLibrary
                     testServer.url,
                     testServer.user,
                     testServer.password,
-                    testServer.repositoryId
+                    testServer.repositoryId,
+                    activityListener
                 );
                 cmis.Sync();
             });
+        }
+
+        [Fact]
+        public void ClientSideChanges()
+        {
+            testServers.ForEach(delegate(TestServer testServer)
+            {
+                ActivityListener activityListener = new Mock<ActivityListener>().Object;
+                // Create checkout.
+                Cmis cmis = new Cmis(
+                    testServer.canonical_name,
+                    testServer.localPath,
+                    testServer.remoteFolderPath,
+                    testServer.url,
+                    testServer.user,
+                    testServer.password,
+                    testServer.repositoryId,
+                    activityListener
+                );
+                cmis.Sync();
+
+                // Generate local filesystem activity
+                string path = Path.Combine(@"C:\Users\nico\CmisSync", testServer.canonical_name);
+                LocalFilesystemActivityGenerator.GenerateActivity(path);
+            });
+        }
+
+        [Fact]
+        public void DotCmisToFileNet()
+        {
+            var cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = "http://ibmcmis.dyndns.org:8080/p8cmis/resources/Service";
+            cmisParameters[SessionParameter.User] = "CEMPAdmin";
+            cmisParameters[SessionParameter.Password] = "CEMPAdmin";
+            cmisParameters[SessionParameter.RepositoryId] = "DaphneB";
+
+            SessionFactory factory = SessionFactory.NewInstance();
+            IList<IRepository> repositories = factory.GetRepositories(cmisParameters);
+            foreach (var repository in repositories)
+            {
+                Console.WriteLine(repository.Id);
+            }
         }
 
         [Fact]
@@ -71,8 +136,8 @@ namespace TestLibrary
             var cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = "https://greenhouse.lotus.com/files/basic/cmis/my/servicedoc";
-            cmisParameters[SessionParameter.User] = "get one at greenhouse.lotus.com";
-            cmisParameters[SessionParameter.Password] = "get one at greenhouse.lotus.com";
+            cmisParameters[SessionParameter.User] = "nicolas.raoul@aegif.jp";
+            cmisParameters[SessionParameter.Password] = "notanota";
 
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.GetRepositories(cmisParameters)[0].CreateSession();
