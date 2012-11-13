@@ -601,12 +601,19 @@ namespace SparkleLib.Cmis
             while (!success);
 
             // Get metadata.
-            string lastModifiedBy = remoteDocument.LastModifiedBy;
-            // Write metadata.
-            // TODO
+            Dictionary<string, string> metadata = new Dictionary<string, string>();
+            metadata.Add("Id", remoteDocument.Id);
+            metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
+            metadata.Add("VersionLabel", remoteDocument.VersionLabel);
+            metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
+            metadata.Add("CreatedBy", remoteDocument.CreatedBy);
+            metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
+            metadata.Add("CheckinComment", remoteDocument.CheckinComment);
+            metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
+            metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
 
             // Create database entry for this file.
-            database.AddFile(filePath, remoteDocument.LastModificationDate);
+            database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
             activityListener.ActivityStopped();
         }
 
@@ -654,7 +661,7 @@ namespace SparkleLib.Cmis
                 remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
 
                 // Create database entry for this file.
-                database.AddFile(filePath, remoteDocument.LastModificationDate);
+                database.AddFile(filePath, remoteDocument.LastModificationDate, null);
             }
             catch (FileNotFoundException e)
             {

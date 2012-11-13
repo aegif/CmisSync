@@ -5,6 +5,7 @@ using System.Text;
 using System.Data.SQLite;
 using System.IO;
 using System.Security.Cryptography;
+using Newtonsoft.Json;
 
 namespace SparkleLib.Cmis
 {
@@ -59,10 +60,13 @@ namespace SparkleLib.Cmis
                             @"CREATE TABLE files (
                                 path TEXT PRIMARY KEY,
                                 serverSideModificationDate DATE,
+                                metadata TEXT,
                                 checksum TEXT);   /* Checksum of both data and metadata */
                             CREATE TABLE folders (
                                 path TEXT PRIMARY KEY,
-                                serverSideModificationDate DATE);";
+                                serverSideModificationDate DATE,
+                                metadata TEXT,
+                                checksum TEXT);";   /* Checksum of metadata */
                         command.ExecuteNonQuery();
                     }
                 }
@@ -110,6 +114,28 @@ namespace SparkleLib.Cmis
             }
         }
 
+        /**
+         * Put all the values of a dictionary into a JSON string.
+         */
+        private string Json(Dictionary<string, string> dictionary)
+        {
+            return JsonConvert.SerializeObject(dictionary);
+            /*StringBuilder json = new StringBuilder();
+            json.Append("{\n");
+            foreach (var entry in dictionary)
+            {
+                json.Append("\"");
+                json.Append(entry.Key);
+                json.Append("\" : \"");
+                json.Append(entry.Value);
+                json.Append("\"\n");
+                json.Append(",");
+                json.Append("\n");
+            }
+            json.Append("}");
+            return json.ToString();*/
+        }
+
 
         /*
          *
@@ -121,18 +147,21 @@ namespace SparkleLib.Cmis
          * 
          */
 
-        public void AddFile(string path, DateTime? serverSideModificationDate)
+        public void AddFile(string path, DateTime? serverSideModificationDate,
+            Dictionary<string, string> metadata)
         {
             string normalizedPath = Normalize(path);
+
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
                     command.CommandText =
-                        @"INSERT OR REPLACE INTO files (path, serverSideModificationDate, checksum)
-                            VALUES (@path, @serverSideModificationDate, @checksum)";
+                        @"INSERT OR REPLACE INTO files (path, serverSideModificationDate, metadata, checksum)
+                            VALUES (@path, @serverSideModificationDate, @metadata, @checksum)";
                     command.Parameters.AddWithValue("path", normalizedPath);
                     command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
+                    command.Parameters.AddWithValue("metadata", Json(metadata));
                     command.Parameters.AddWithValue("checksum", Checksum(path));
                     command.ExecuteNonQuery();
                 }
