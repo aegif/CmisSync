@@ -65,22 +65,22 @@ namespace SparkleShare {
 				Environment.Exit (-1);
 			}
 
-#if !DEBUG
+//#if !DEBUG
             try {
-#endif
+//#endif
                 Controller = new SparkleController ();
                 Controller.Initialize ();
 
                 UI = new SparkleUI ();
                 UI.Run ();
             
-#if !DEBUG
+//#if !DEBUG
             } catch (Exception e) {
 				Console.WriteLine("Exception in Program.Main");
                 SparkleLogger.WriteCrashReport (e);
                 Environment.Exit (-1);
             }
-#endif
+//#endif
 
             #if !__MonoCS__
             // Suppress assertion messages in debug mode
