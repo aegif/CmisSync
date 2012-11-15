@@ -47,4 +47,4 @@ _ReSharper.*
 *.wixpdb
 *.wxs
 *.dotCover
-
+SparkleShare/TestLibrary/test-servers.json
