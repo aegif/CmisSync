@@ -39,6 +39,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Moq.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SparkleLib\Cmis\lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,12 +50,16 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="xunit">
-      <HintPath>..\..\..\..\..\..\p\xunit\xunit.dll</HintPath>
+    <Reference Include="xunit, Version=1.9.1.1600, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\xunit.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.extensions">
+      <HintPath>lib\xunit.extensions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConnectionTests.cs" />
+    <Compile Include="CmisSyncTests.cs" />
     <Compile Include="LocalFilesystemActivityGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,6 +72,9 @@
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>SparkleLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test-servers.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
