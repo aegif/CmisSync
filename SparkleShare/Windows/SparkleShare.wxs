@@ -22,8 +22,9 @@
             <Component Id='Libraries' Guid='0DA692D5-4DBE-4251-9F62-E7C1A76F10E1'>
               <File Id='SparkleLib.Cmis.dll' Name='SparkleLib.Cmis.dll' Source='!(wix.root)\bin\SparkleLib.Cmis.dll' DiskId='1' />
               <File Id='SparkleLib.dll' Name='SparkleLib.dll' Source='!(wix.root)\bin\SparkleLib.dll' DiskId='1' />
-              <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\SparkleLib\Cmis\DotCMIS.dll' DiskId='1' />
-              <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\SparkleLib\Cmis\System.Data.SQLite.dll' DiskId='1' />
+              <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\SparkleLib\Cmis\lib\DotCMIS.dll' DiskId='1' />
+              <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\SparkleLib\Cmis\lib\System.Data.SQLite.dll' DiskId='1' />
+              <File Id='Newtonsoft.Json.dll' Name='Newtonsoft.Json.dll' Source='!(wix.root)\SparkleLib\Cmis\lib\Newtonsoft.Json.dll' DiskId='1' />
               <File Id='sparkleshare_app.ico' Name='sparkleshare.ico' Source='!(wix.root)\SparkleShare\Windows\Pixmaps\sparkleshare-app.ico' DiskId='1' />
             </Component>
             <Directory Id='PLUGINS_DIR' Name='plugins'>
