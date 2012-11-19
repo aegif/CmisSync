@@ -31,9 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotCMIS, Version=0.4.0.0, Culture=neutral, PublicKeyToken=0377a82433ccbb00, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SparkleLib\Cmis\DotCMIS.dll</HintPath>
+    <Reference Include="DotCMIS">
+      <HintPath>..\..\SparkleLib\Cmis\lib\DotCMIS.dll</HintPath>
     </Reference>
     <Reference Include="Moq, Version=4.0.10827.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
