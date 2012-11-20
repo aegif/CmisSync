@@ -1,11 +1,9 @@
 ## CmisSync
 
 [CmisSync](http://cmissync.github.com) allows you to keep in sync with your CMIS repository. It is like Dropbox for Enterprise Content Management!  
-It is available for Linux, Mac, Windows.
+See: http://cmissync.github.com
 
 CmisSync is mostly developed by [Aegif](http://aegif.jp), but all contributions are welcome!
-
-The first release of CmisSync will happen before the end of the year.
 
 ### License
 
