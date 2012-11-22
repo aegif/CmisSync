@@ -41,7 +41,7 @@ namespace SparkleShare {
             BorderWidth    = 0;
             IconName       = "folder-sparkleshare";
             WindowPosition = WindowPosition.Center;
-            Title          = "About SparkleShare";
+            Title          = "About CmisSync";
             AppPaintable   = true;
 
             string image_path = new string [] { SparkleUI.AssetsPath, "pixmaps", "about.png" }.Combine ();
@@ -124,7 +124,7 @@ namespace SparkleShare {
                 LineWrap     = true,
                 LineWrapMode = Pango.WrapMode.Word,
                 Markup       = "<span font_size='small' fgcolor='white'>" +
-                               "SparkleShare Open Source software. You are free to use, modify, " +
+                               "CmisSync Open Source software. You are free to use, modify, " +
                                "and redistribute it under the GNU General Public License version 3 or later." +
                                "</span>",
                 WidthRequest = 330,
