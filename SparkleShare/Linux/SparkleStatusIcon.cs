@@ -134,7 +134,7 @@ namespace SparkleShare {
             this.menu.Add (this.state_item);
             this.menu.Add (new SeparatorMenuItem ());
 
-                ImageMenuItem folder_item = new SparkleMenuItem ("SparkleShare"){
+                ImageMenuItem folder_item = new SparkleMenuItem ("CmisSync"){
                     Image = new Image (SparkleUIHelpers.GetIcon ("folder-sparkleshare", 16))
                 };
 
@@ -242,7 +242,7 @@ namespace SparkleShare {
             this.menu.Add (new SeparatorMenuItem ());
 
 
-                MenuItem about_item = new MenuItem ("About SparkleShare");
+                MenuItem about_item = new MenuItem ("About CmisSync");
 
                 about_item.Activated += delegate {
                     Controller.AboutClicked ();
