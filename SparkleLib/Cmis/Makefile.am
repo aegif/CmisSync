@@ -3,7 +3,7 @@ TARGET = library
 
 ASSEMBLY_INFO_SOURCE = ../Defines.cs
 
-LINK = -r:$(DIR_BIN)/SparkleLib.dll -r:DotCMIS.dll
+LINK = -r:$(DIR_BIN)/SparkleLib.dll -r:lib/DotCMIS.dll -r:lib/Newtonsoft.Json.dll -r:lib/System.Data.SQLite.dll
 
 SOURCES =  \
 	SparkleCmis.cs \
