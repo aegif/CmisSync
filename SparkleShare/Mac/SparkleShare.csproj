@@ -219,12 +219,6 @@
     <Content Include="..\Common\Pixmaps\avatar-k.png">
       <Link>Pixmaps\avatar-k.png</Link>
     </Content>
-    <Content Include="..\Common\Plugins\ssnet.png">
-      <Link>Plugins\ssnet.png</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\ssnet.xml">
-      <Link>Plugins\ssnet.xml</Link>
-    </Content>
     <Content Include="Growl.plist" />
   </ItemGroup>
   <ItemGroup>
