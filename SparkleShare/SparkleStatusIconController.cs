@@ -47,7 +47,10 @@ namespace SparkleShare {
 
         public event UpdateQuitItemEventHandler UpdateQuitItemEvent = delegate { };
         public delegate void UpdateQuitItemEventHandler (bool quit_item_enabled);
-
+		
+		public event UpdateOpenRecentEventsItemEventHandler UpdateOpenRecentEventsItemEvent = delegate { };
+        public delegate void UpdateOpenRecentEventsItemEventHandler (bool open_recent_events_item_enabled);
+		
         public IconState CurrentState = IconState.Idle;
         public string StateText = "Welcome to CmisSync!";
 
