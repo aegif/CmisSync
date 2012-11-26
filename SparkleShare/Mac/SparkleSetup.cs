@@ -145,18 +145,18 @@ namespace SparkleShare {
 
 
                 (FullNameTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-                    Controller.CheckSetupPage (FullNameTextField.StringValue, EmailTextField.StringValue);
+                    Controller.CheckSetupPage ();
                 };
 
                 (EmailTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-                    Controller.CheckSetupPage (FullNameTextField.StringValue, EmailTextField.StringValue);
+                    Controller.CheckSetupPage ();
                 };
 
                 ContinueButton.Activated += delegate {
                     string full_name = FullNameTextField.StringValue.Trim ();
                     string email     = EmailTextField.StringValue.Trim ();
 
-                    Controller.SetupPageCompleted (full_name, email);
+                    Controller.SetupPageCompleted ();
                 };
 
                 CancelButton.Activated += delegate {
@@ -178,7 +178,7 @@ namespace SparkleShare {
                 Buttons.Add (ContinueButton);
                 Buttons.Add (CancelButton);
 
-                Controller.CheckSetupPage (FullNameTextField.StringValue, EmailTextField.StringValue);
+                Controller.CheckSetupPage ();
             }
 
             if (type == PageType.Invite) {
@@ -253,203 +253,399 @@ namespace SparkleShare {
                 Buttons.Add (CancelButton);
             }
 
-            if (type == PageType.Add) {
-                Header      = "Where's your project hosted?";
-                Description = "";
-
-
-                AddressLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (190, Frame.Height - 308, 160, 17),
-                    StringValue     = "Address:",
-                    Font            = SparkleUI.BoldFont
-                };
-
-                AddressTextField = new NSTextField () {
-                    Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
-                    Font        = SparkleUI.Font,
-                    Enabled     = (Controller.SelectedPlugin.Address == null),
-                    Delegate    = new SparkleTextFieldDelegate (),
-                    StringValue = "" + Controller.PreviousAddress
-                };
-
-                AddressTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
-
-                PathLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 308, 160, 17),
-                    StringValue     = "Remote Path:",
-                    Font            = SparkleUI.BoldFont
-                };
-
-                PathTextField = new NSTextField () {
-                    Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
-                    Enabled     = (Controller.SelectedPlugin.Path == null),
-                    Delegate    = new SparkleTextFieldDelegate (),
-                    StringValue = "" + Controller.PreviousPath
-                };
-
-                PathTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
-
-                PathHelpLabel = new NSTextField () {
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    TextColor       = NSColor.DisabledControlText,
-                    Editable        = false,
-                    Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 355, 204, 17),
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
-                        NSFontTraitMask.Condensed, 0, 11),
-                    StringValue = "" + Controller.SelectedPlugin.PathExample
-                };
-
-                AddressHelpLabel = new NSTextField () {
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    TextColor       = NSColor.DisabledControlText,
-                    Editable        = false,
-                    Frame           = new RectangleF (190, Frame.Height - 355, 204, 17),
-                    Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
-                        NSFontTraitMask.Condensed, 0, 11),
-                    StringValue = "" + Controller.SelectedPlugin.AddressExample
-                };
-
-                TableView = new NSTableView () {
-                    Frame            = new RectangleF (0, 0, 0, 0),
-                    RowHeight        = 34,
-                    IntercellSpacing = new SizeF (8, 12),
-                    HeaderView       = null,
-                    Delegate         = new SparkleTableViewDelegate ()
-                };
-
-                ScrollView = new NSScrollView () {
-                    Frame               = new RectangleF (190, Frame.Height - 280, 408, 185),
-                    DocumentView        = TableView,
-                    HasVerticalScroller = true,
-                    BorderType          = NSBorderType.BezelBorder
-                };
-
-                IconColumn = new NSTableColumn (new NSImage ()) {
-                    Width = 36,
-                    HeaderToolTip = "Icon",
-                    DataCell = new NSImageCell () {
-                        ImageAlignment = NSImageAlignment.Right
-                    }
-                };
-
-                DescriptionColumn = new NSTableColumn () {
-                    Width         = 350,
-                    HeaderToolTip = "Description",
-                    Editable      = false
-                };
-
-                DescriptionColumn.DataCell.Font = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
-                    NSFontTraitMask.Condensed, 0, 11);
-
-                TableView.AddColumn (IconColumn);
-                TableView.AddColumn (DescriptionColumn);
-
-                DataSource = new SparkleDataSource (Controller.Plugins);
-
-                TableView.DataSource = DataSource;
-                TableView.ReloadData ();
-
-                HistoryCheckButton = new NSButton () {
-                    Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
-                    Title = "Fetch prior revisions"
-                };
-
-                if (Controller.FetchPriorHistory)
-                    HistoryCheckButton.State = NSCellStateValue.On;
-
-                HistoryCheckButton.SetButtonType (NSButtonType.Switch);
-
-                AddButton = new NSButton () {
-                    Title = "Add",
-                    Enabled = false
-                };
-
-                CancelButton = new NSButton () {
-                    Title = "Cancel"
-                };
-
-
-                Controller.ChangeAddressFieldEvent += delegate (string text,
-                    string example_text, FieldState state) {
-
-                    InvokeOnMainThread (delegate {
-                        AddressTextField.StringValue = text;
-                        AddressTextField.Enabled     = (state == FieldState.Enabled);
-                        AddressHelpLabel.StringValue = example_text;
-                    });
-                };
-
-                Controller.ChangePathFieldEvent += delegate (string text,
-                    string example_text, FieldState state) {
-
-                    InvokeOnMainThread (delegate {
-                        PathTextField.StringValue = text;
-                        PathTextField.Enabled     = (state == FieldState.Enabled);
-                        PathHelpLabel.StringValue = example_text;
-                    });
-                };
-
-                TableView.SelectRow (Controller.SelectedPluginIndex, false);
-                TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
-
-                (AddressTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-                    Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue, TableView.SelectedRow);
-                };
-
-                 (PathTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-                    Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue, TableView.SelectedRow);
-                };
-
-                (TableView.Delegate as SparkleTableViewDelegate).SelectionChanged += delegate {
-                    Controller.SelectedPluginChanged (TableView.SelectedRow);
-                    Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue, TableView.SelectedRow);
-                };
-
-                HistoryCheckButton.Activated += delegate {
-                    Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
-                };
-
-                AddButton.Activated += delegate {
-                    Controller.AddPageCompleted (AddressTextField.StringValue, PathTextField.StringValue);
-                };
-
-                CancelButton.Activated += delegate {
-                    Controller.PageCancelled ();
-                };
-
-                Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
-                    InvokeOnMainThread (delegate {
-                        AddButton.Enabled = button_enabled;
-                    });
-                };
-
-
-                ContentView.AddSubview (ScrollView);
-                ContentView.AddSubview (AddressLabel);
-                ContentView.AddSubview (AddressTextField);
-                ContentView.AddSubview (AddressHelpLabel);
-                ContentView.AddSubview (PathLabel);
-                ContentView.AddSubview (PathTextField);
-                ContentView.AddSubview (PathHelpLabel);
-                ContentView.AddSubview (HistoryCheckButton);
-
-                Buttons.Add (AddButton);
-                Buttons.Add (CancelButton);
-
-                Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue, TableView.SelectedRow);
-            }
-
-            if (type == PageType.Syncing) {
+			if (type == PageType.Add1) {
+				Header      = "Where's your project hosted?";
+				Description = "";
+				
+				
+				AddressLabel = new NSTextField () {
+					Alignment       = NSTextAlignment.Left,
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					Editable        = false,
+					Frame           = new RectangleF (190, Frame.Height - 308, 160, 17),
+					StringValue     = "Address:",
+					Font            = SparkleUI.BoldFont
+				};
+				
+				AddressTextField = new NSTextField () {
+					Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
+					Font        = SparkleUI.Font,
+					Enabled     = (Controller.SelectedPlugin.Address == null),
+					Delegate    = new SparkleTextFieldDelegate (),
+					StringValue = "" + Controller.PreviousAddress
+				};
+				
+				AddressTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
+				
+				PathLabel = new NSTextField () {
+					Alignment       = NSTextAlignment.Left,
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					Editable        = false,
+					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 308, 160, 17),
+					StringValue     = "Remote Path:",
+					Font            = SparkleUI.BoldFont
+				};
+				
+				PathTextField = new NSTextField () {
+					Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
+					Enabled     = (Controller.SelectedPlugin.Path == null),
+					Delegate    = new SparkleTextFieldDelegate (),
+					StringValue = "" + Controller.PreviousPath
+				};
+				
+				PathTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
+				
+				PathHelpLabel = new NSTextField () {
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					TextColor       = NSColor.DisabledControlText,
+					Editable        = false,
+					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 355, 204, 17),
+					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
+					                                                                  NSFontTraitMask.Condensed, 0, 11),
+					StringValue = "" + Controller.SelectedPlugin.PathExample
+				};
+				
+				AddressHelpLabel = new NSTextField () {
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					TextColor       = NSColor.DisabledControlText,
+					Editable        = false,
+					Frame           = new RectangleF (190, Frame.Height - 355, 204, 17),
+					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
+					                                                                  NSFontTraitMask.Condensed, 0, 11),
+					StringValue = "" + Controller.SelectedPlugin.AddressExample
+				};
+				
+				TableView = new NSTableView () {
+					Frame            = new RectangleF (0, 0, 0, 0),
+					RowHeight        = 34,
+					IntercellSpacing = new SizeF (8, 12),
+					HeaderView       = null,
+					Delegate         = new SparkleTableViewDelegate ()
+				};
+				
+				ScrollView = new NSScrollView () {
+					Frame               = new RectangleF (190, Frame.Height - 280, 408, 185),
+					DocumentView        = TableView,
+					HasVerticalScroller = true,
+					BorderType          = NSBorderType.BezelBorder
+				};
+				
+				IconColumn = new NSTableColumn (new NSImage ()) {
+					Width = 36,
+					HeaderToolTip = "Icon",
+					DataCell = new NSImageCell () {
+						ImageAlignment = NSImageAlignment.Right
+					}
+				};
+				
+				DescriptionColumn = new NSTableColumn () {
+					Width         = 350,
+					HeaderToolTip = "Description",
+					Editable      = false
+				};
+				
+				DescriptionColumn.DataCell.Font = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
+				                                                                                  NSFontTraitMask.Condensed, 0, 11);
+				
+				TableView.AddColumn (IconColumn);
+				TableView.AddColumn (DescriptionColumn);
+				
+				DataSource = new SparkleDataSource (Controller.Plugins);
+				
+				TableView.DataSource = DataSource;
+				TableView.ReloadData ();
+				
+				HistoryCheckButton = new NSButton () {
+					Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
+					Title = "Fetch prior revisions"
+				};
+				
+				if (Controller.FetchPriorHistory)
+					HistoryCheckButton.State = NSCellStateValue.On;
+				
+				HistoryCheckButton.SetButtonType (NSButtonType.Switch);
+				
+				AddButton = new NSButton () {
+					Title = "Add",
+					Enabled = false
+				};
+				
+				CancelButton = new NSButton () {
+					Title = "Cancel"
+				};
+				
+				
+				Controller.ChangeAddressFieldEvent += delegate (string text,
+				                                                string example_text, FieldState state) {
+					
+					InvokeOnMainThread (delegate {
+						AddressTextField.StringValue = text;
+						AddressTextField.Enabled     = (state == FieldState.Enabled);
+						AddressHelpLabel.StringValue = example_text;
+					});
+				};
+				
+				Controller.ChangePathFieldEvent += delegate (string text,
+				                                             string example_text, FieldState state) {
+					
+					InvokeOnMainThread (delegate {
+						PathTextField.StringValue = text;
+						PathTextField.Enabled     = (state == FieldState.Enabled);
+						PathHelpLabel.StringValue = example_text;
+					});
+				};
+				
+				TableView.SelectRow (Controller.SelectedPluginIndex, false);
+				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
+				
+				(AddressTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+				};
+				
+				(PathTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+				};
+				
+				(TableView.Delegate as SparkleTableViewDelegate).SelectionChanged += delegate {
+					Controller.SelectedPluginChanged (TableView.SelectedRow);
+					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+				};
+				
+				HistoryCheckButton.Activated += delegate {
+					Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
+				};
+				
+				AddButton.Activated += delegate {
+					Controller.Add1PageCompleted (AddressTextField.StringValue, "user", "password");
+				};
+				
+				CancelButton.Activated += delegate {
+					Controller.PageCancelled ();
+				};
+				
+				Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
+					InvokeOnMainThread (delegate {
+						AddButton.Enabled = button_enabled;
+					});
+				};
+				
+				
+				ContentView.AddSubview (ScrollView);
+				ContentView.AddSubview (AddressLabel);
+				ContentView.AddSubview (AddressTextField);
+				ContentView.AddSubview (AddressHelpLabel);
+				ContentView.AddSubview (PathLabel);
+				ContentView.AddSubview (PathTextField);
+				ContentView.AddSubview (PathHelpLabel);
+				ContentView.AddSubview (HistoryCheckButton);
+				
+				Buttons.Add (AddButton);
+				Buttons.Add (CancelButton);
+				
+				Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+			}
+			
+			if (type == PageType.Add2) {
+				Header      = "Where's your project hosted?";
+				Description = "";
+				
+				
+				AddressLabel = new NSTextField () {
+					Alignment       = NSTextAlignment.Left,
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					Editable        = false,
+					Frame           = new RectangleF (190, Frame.Height - 308, 160, 17),
+					StringValue     = "Address:",
+					Font            = SparkleUI.BoldFont
+				};
+				
+				AddressTextField = new NSTextField () {
+					Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
+					Font        = SparkleUI.Font,
+					Enabled     = (Controller.SelectedPlugin.Address == null),
+					Delegate    = new SparkleTextFieldDelegate (),
+					StringValue = "" + Controller.PreviousAddress
+				};
+				
+				AddressTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
+				
+				PathLabel = new NSTextField () {
+					Alignment       = NSTextAlignment.Left,
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					Editable        = false,
+					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 308, 160, 17),
+					StringValue     = "Remote Path:",
+					Font            = SparkleUI.BoldFont
+				};
+				
+				PathTextField = new NSTextField () {
+					Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
+					Enabled     = (Controller.SelectedPlugin.Path == null),
+					Delegate    = new SparkleTextFieldDelegate (),
+					StringValue = "" + Controller.PreviousPath
+				};
+				
+				PathTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
+				
+				PathHelpLabel = new NSTextField () {
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					TextColor       = NSColor.DisabledControlText,
+					Editable        = false,
+					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 355, 204, 17),
+					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
+					                                                                  NSFontTraitMask.Condensed, 0, 11),
+					StringValue = "" + Controller.SelectedPlugin.PathExample
+				};
+				
+				AddressHelpLabel = new NSTextField () {
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					TextColor       = NSColor.DisabledControlText,
+					Editable        = false,
+					Frame           = new RectangleF (190, Frame.Height - 355, 204, 17),
+					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
+					                                                                  NSFontTraitMask.Condensed, 0, 11),
+					StringValue = "" + Controller.SelectedPlugin.AddressExample
+				};
+				
+				TableView = new NSTableView () {
+					Frame            = new RectangleF (0, 0, 0, 0),
+					RowHeight        = 34,
+					IntercellSpacing = new SizeF (8, 12),
+					HeaderView       = null,
+					Delegate         = new SparkleTableViewDelegate ()
+				};
+				
+				ScrollView = new NSScrollView () {
+					Frame               = new RectangleF (190, Frame.Height - 280, 408, 185),
+					DocumentView        = TableView,
+					HasVerticalScroller = true,
+					BorderType          = NSBorderType.BezelBorder
+				};
+				
+				IconColumn = new NSTableColumn (new NSImage ()) {
+					Width = 36,
+					HeaderToolTip = "Icon",
+					DataCell = new NSImageCell () {
+						ImageAlignment = NSImageAlignment.Right
+					}
+				};
+				
+				DescriptionColumn = new NSTableColumn () {
+					Width         = 350,
+					HeaderToolTip = "Description",
+					Editable      = false
+				};
+				
+				DescriptionColumn.DataCell.Font = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
+				                                                                                  NSFontTraitMask.Condensed, 0, 11);
+				
+				TableView.AddColumn (IconColumn);
+				TableView.AddColumn (DescriptionColumn);
+				
+				DataSource = new SparkleDataSource (Controller.Plugins);
+				
+				TableView.DataSource = DataSource;
+				TableView.ReloadData ();
+				
+				HistoryCheckButton = new NSButton () {
+					Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
+					Title = "Fetch prior revisions"
+				};
+				
+				if (Controller.FetchPriorHistory)
+					HistoryCheckButton.State = NSCellStateValue.On;
+				
+				HistoryCheckButton.SetButtonType (NSButtonType.Switch);
+				
+				AddButton = new NSButton () {
+					Title = "Add",
+					Enabled = false
+				};
+				
+				CancelButton = new NSButton () {
+					Title = "Cancel"
+				};
+				
+				
+				Controller.ChangeAddressFieldEvent += delegate (string text,
+				                                                string example_text, FieldState state) {
+					
+					InvokeOnMainThread (delegate {
+						AddressTextField.StringValue = text;
+						AddressTextField.Enabled     = (state == FieldState.Enabled);
+						AddressHelpLabel.StringValue = example_text;
+					});
+				};
+				
+				Controller.ChangePathFieldEvent += delegate (string text,
+				                                             string example_text, FieldState state) {
+					
+					InvokeOnMainThread (delegate {
+						PathTextField.StringValue = text;
+						PathTextField.Enabled     = (state == FieldState.Enabled);
+						PathHelpLabel.StringValue = example_text;
+					});
+				};
+				
+				TableView.SelectRow (Controller.SelectedPluginIndex, false);
+				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
+				
+				(AddressTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+				};
+				
+				(PathTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+				};
+				
+				(TableView.Delegate as SparkleTableViewDelegate).SelectionChanged += delegate {
+					Controller.SelectedPluginChanged (TableView.SelectedRow);
+					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+				};
+				
+				HistoryCheckButton.Activated += delegate {
+					Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
+				};
+				
+				AddButton.Activated += delegate {
+					Controller.Add2PageCompleted (AddressTextField.StringValue, PathTextField.StringValue);
+				};
+				
+				CancelButton.Activated += delegate {
+					Controller.PageCancelled ();
+				};
+				
+				Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
+					InvokeOnMainThread (delegate {
+						AddButton.Enabled = button_enabled;
+					});
+				};
+				
+				
+				ContentView.AddSubview (ScrollView);
+				ContentView.AddSubview (AddressLabel);
+				ContentView.AddSubview (AddressTextField);
+				ContentView.AddSubview (AddressHelpLabel);
+				ContentView.AddSubview (PathLabel);
+				ContentView.AddSubview (PathTextField);
+				ContentView.AddSubview (PathHelpLabel);
+				ContentView.AddSubview (HistoryCheckButton);
+				
+				Buttons.Add (AddButton);
+				Buttons.Add (CancelButton);
+				
+				Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+			}
+			
+			if (type == PageType.Syncing) {
                 Header      = "Adding project ‘" + Controller.SyncingFolder + "’…";
                 Description = "This may take a while on big projects.\nIsn't it coffee-o'clock?";
 
