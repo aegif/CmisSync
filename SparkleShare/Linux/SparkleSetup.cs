@@ -722,7 +722,7 @@ namespace SparkleShare {
                             };
 
                             add_button.Clicked += delegate {
-                                Controller.Add1PageCompleted(address_entry.Text, user_entry.Text, password_entry.Text);
+                                Controller.Add2PageCompleted("repository", "remote path"); // FIXME
                             };
 
                         Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
