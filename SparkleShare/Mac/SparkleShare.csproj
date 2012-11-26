@@ -186,36 +186,6 @@
     <Content Include="..\Common\Pixmaps\tutorial-slide-4.png">
       <Link>Pixmaps\tutorial-slide-4.png</Link>
     </Content>
-    <Content Include="..\Common\Plugins\bitbucket.xml">
-      <Link>Plugins\bitbucket.xml</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\github.xml">
-      <Link>Plugins\github.xml</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\gitorious.xml">
-      <Link>Plugins\gitorious.xml</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\gnome.xml">
-      <Link>Plugins\gnome.xml</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\own-server.xml">
-      <Link>Plugins\own-server.xml</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\bitbucket.png">
-      <Link>Plugins\bitbucket.png</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\github.png">
-      <Link>Plugins\github.png</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\gitorious.png">
-      <Link>Plugins\gitorious.png</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\gnome.png">
-      <Link>Plugins\gnome.png</Link>
-    </Content>
-    <Content Include="..\Common\Plugins\own-server.png">
-      <Link>Plugins\own-server.png</Link>
-    </Content>
     <Content Include="..\Common\Pixmaps\avatar-a.png">
       <Link>Pixmaps\avatar-a.png</Link>
     </Content>
