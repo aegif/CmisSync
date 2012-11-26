@@ -53,15 +53,7 @@ namespace SparkleShare {
                 Dlfcn.dlopen (growl_path, 0);
                 NSApplication.Init ();
             }
-
-
-            // Let's use the bundled git first
-            SparkleLib.Git.SparkleGit.GitPath =
-                Path.Combine (NSBundle.MainBundle.ResourcePath, "git", "libexec", "git-core", "git");
-
-            SparkleLib.Git.SparkleGit.ExecPath =
-                Path.Combine (NSBundle.MainBundle.ResourcePath, "git", "libexec", "git-core");
-        }
+		}
 
 
         public override void Initialize ()
