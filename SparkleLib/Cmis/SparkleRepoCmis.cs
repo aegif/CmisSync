@@ -36,16 +36,18 @@ using System.Data;
 using System.Data.SQLite;
 using System.Collections;
 
+using SparkleLib.Cmis;
+
 namespace SparkleLib.Cmis {
 
     public class SparkleRepo : SparkleRepoBase {
 
-        private Cmis cmis;
+        private SparkleLib.Cmis.CmisDirectory cmis;
 
         public SparkleRepo(string path, SparkleConfig config, ActivityListener activityListener)
             : base(path, config)
         {
-            cmis = new Cmis(path, config, activityListener);
+            cmis = new CmisDirectory(path, config, activityListener);
             SparkleLogger.LogInfo("Sync", "Cmis:" + cmis);
         }
 

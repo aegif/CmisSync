@@ -345,17 +345,13 @@ namespace SparkleShare {
         }
 
 
-        public void CheckAddPage (string address, string remote_path)
+        public void CheckAddPage (string address)
         {
             address     = address.Trim ();
-            remote_path = remote_path.Trim ();
 
             this.saved_address = address;
 
-            this.saved_remote_path = remote_path;
-
-            bool fields_valid = (!string.IsNullOrEmpty (address) &&
-                !string.IsNullOrEmpty (remote_path) && !remote_path.Contains ("\""));
+            bool fields_valid = (!string.IsNullOrEmpty (address));
 
             UpdateAddProjectButtonEvent (fields_valid);
         }

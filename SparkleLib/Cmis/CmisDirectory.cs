@@ -13,8 +13,6 @@ using System.ComponentModel;
 using System.Collections;
 using DotCMIS.Data.Impl;
 
-// TODO refactor to UI layer
-using System.Windows.Forms;
 using System.Net;
 
 namespace SparkleLib.Cmis
@@ -22,7 +20,7 @@ namespace SparkleLib.Cmis
     /**
      * Synchronization with a particular CMIS folder.
      */
-    public class Cmis
+    public class CmisDirectory
     {
         /**
          * Whether sync is bidirectional or only from server to client.
@@ -80,7 +78,7 @@ namespace SparkleLib.Cmis
         /**
          * Constructor for SparkleFetcher (when a new CMIS folder is first added)
          */
-        public Cmis(string canonical_name, string localPath, string remoteFolderPath,
+        public CmisDirectory(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId,
             ActivityListener activityListener)
         {
@@ -106,7 +104,7 @@ namespace SparkleLib.Cmis
         /**
          * Constructor for SparkleRepo (at every launch of CmisSync)
          */
-        public Cmis(string localPath, SparkleConfig config,
+        public CmisDirectory(string localPath, SparkleConfig config,
             ActivityListener activityListener)
         {
             this.activityListener = activityListener;
@@ -431,8 +429,9 @@ namespace SparkleLib.Cmis
                                     // Download server version
                                     DownloadFile(remoteDocument, localFolder);
                                     
-                                    System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                        + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
+									// TODO move to OS-dependant layer
+                                    //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
+                                    //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
                                     // TODO show CMIS property lastModifiedBy
                                 }
                                 else

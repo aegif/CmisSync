@@ -25,6 +25,9 @@ using System.Collections.Generic;
 using Gtk;
 using Mono.Unix;
 
+using SparkleLib;
+using SparkleLib.Cmis;
+
 namespace SparkleShare {
 
     public class SparkleSetup : SparkleSetupWindow {
@@ -135,44 +138,14 @@ namespace SparkleShare {
 
                     case PageType.Add1: {
 
-                        Header = "Where's your CMIS folder?";
+                        Header = "Where is your organization's server?";
 
                         VBox layout_vertical   = new VBox (false, 12);
                         HBox layout_fields     = new HBox (true, 12);
                         VBox layout_address    = new VBox (true, 0);
-                        VBox layout_repository = new VBox (true, 0);
-                        VBox layout_path       = new VBox (true, 0);
                         VBox layout_user       = new VBox (true, 0);
                         VBox layout_password   = new VBox (true, 0);
 
-                        ListStore store = new ListStore (typeof (Gdk.Pixbuf),
-                            typeof (string), typeof (SparklePlugin));
-
-                        SparkleTreeView tree = new SparkleTreeView (store) { HeadersVisible = false };
-                        ScrolledWindow scrolled_window = new ScrolledWindow ();
-                        scrolled_window.AddWithViewport (tree);
-
-                        // Icon column
-                        tree.AppendColumn ("Icon", new Gtk.CellRendererPixbuf (), "pixbuf", 0);
-                        tree.Columns [0].Cells [0].Xpad = 6;
-
-                        // Service column
-                        TreeViewColumn service_column = new TreeViewColumn () { Title = "Service" };
-                        CellRendererText service_cell = new CellRendererText () { Ypad = 4 };
-                        service_column.PackStart (service_cell, true);
-                        service_column.SetCellDataFunc (service_cell, new TreeCellDataFunc (RenderServiceColumn));
-
-                        foreach (SparklePlugin plugin in Controller.Plugins) {
-                            store.AppendValues (
-                                new Gdk.Pixbuf (plugin.ImagePath),
-                                "<span size=\"small\"><b>" + plugin.Name + "</b>\n" +
-                                  "<span fgcolor=\"" + SecondaryTextColorSelected + "\">" +
-                                  plugin.Description + "</span>" +
-                                "</span>",
-                                plugin);
-                        }
-
-                        tree.AppendColumn (service_column);
 						
 						// Address
                         Entry address_entry = new Entry () {
@@ -188,34 +161,28 @@ namespace SparkleShare {
                                 SecondaryTextColor + "\">" + Controller.SelectedPlugin.AddressExample + "</span>"
                         };
 
-						// Repository
-                        Entry repository_entry = new Entry () {
-                            Text = Controller.PreviousAddress,
-                            Sensitive = (Controller.SelectedPlugin.Repository == null),
-                            ActivatesDefault = true
+						Label address_help_label = new Label()
+                        {
+                            Text = "Help: ",
+                            // TODO FontSize = 11,
+                            // TODO Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
                         };
-                        
-                        Label repository_example = new Label () {
-                            Xalign = 0,
-                            UseMarkup = true,
-                            Markup = "<span size=\"small\" fgcolor=\"" +
-                                SecondaryTextColor + "\">" + Controller.SelectedPlugin.RepositoryExample + "</span>"
-                        };
+                        /* TODO Run run = new Run("Where to find this address");
+                        Hyperlink link = new Hyperlink(run);
+                        link.NavigateUri = new Uri("https://github.com/nicolas-raoul/CmisSync/wiki/What-address");
+                        address_help_label.Inlines.Add(link);
+                        link.RequestNavigate += (sender, e) =>
+                            {
+                                System.Diagnostics.Process.Start(e.Uri.ToString());
+                            };*/
 
-						// Path
-                        Entry path_entry = new Entry () {
-                            Text = Controller.PreviousPath,
-                            Sensitive = (Controller.SelectedPlugin.Path == null),
-                            ActivatesDefault = true
+                        Label address_error_label = new Label()
+                        {
+                            // TODO FontSize = 11,
+                            // TODO Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
+                            // TODO Visibility = Visibility.Hidden
                         };
-                        
-                        Label path_example = new Label () {
-                            Xalign = 0,
-                            UseMarkup = true,
-                            Markup = "<span size=\"small\" fgcolor=\"" +
-                                SecondaryTextColor + "\">" + Controller.SelectedPlugin.PathExample + "</span>"
-                        };
-
+						
 						// User
                         Entry user_entry = new Entry () {
                             Text = Controller.PreviousPath,
@@ -245,12 +212,6 @@ namespace SparkleShare {
                         };
 
 
-                        // Select the first plugin by default
-                        TreeSelection default_selection = tree.Selection;
-                        TreePath default_path = new TreePath ("0");
-                        default_selection.SelectPath (default_path);
-                        Controller.SelectedPluginChanged (0);
-
                         Controller.ChangeAddressFieldEvent += delegate (string text,
                             string example_text, FieldState state) {
 
@@ -259,28 +220,6 @@ namespace SparkleShare {
                                 address_entry.Sensitive = (state == FieldState.Enabled);
                                 address_example.Markup  =  "<span size=\"small\" fgcolor=\"" +
                                     SecondaryTextColor + "\">" + example_text + "</span>";
-                            });
-                        };
-
-                        Controller.ChangeRepositoryFieldEvent += delegate (string text,
-                            string example_text, FieldState state) {
-
-                            Application.Invoke (delegate {
-                                repository_entry.Text      = text;
-                                repository_entry.Sensitive = (state == FieldState.Enabled);
-                                repository_example.Markup  =  "<span size=\"small\" fgcolor=\"" +
-                                    SecondaryTextColor + "\">" + example_text + "</span>";
-                            });
-                        };
-
-                        Controller.ChangePathFieldEvent += delegate (string text,
-                            string example_text, FieldState state) {
-
-                            Application.Invoke (delegate {
-                                path_entry.Text      = text;
-                                path_entry.Sensitive = (state == FieldState.Enabled);
-                                path_example.Markup  =  "<span size=\"small\" fgcolor=\""
-                                    + SecondaryTextColor + "\">" + example_text + "</span>";
                             });
                         };
 
@@ -306,49 +245,10 @@ namespace SparkleShare {
                             });
                         };
 
-                        Controller.CheckAddPage (address_entry.Text, path_entry.Text);
+                        Controller.CheckAddPage (address_entry.Text);
                         
-                        // Update the address field text when the selection changes
-                        tree.CursorChanged += delegate (object sender, EventArgs e) {
-                            Controller.SelectedPluginChanged (tree.SelectedRow);
-                            // TODO: Scroll to selected row when using arrow keys
-                        };
-
-                        tree.Model.Foreach (new TreeModelForeachFunc (delegate (TreeModel model,
-                            TreePath path, TreeIter iter) {
-
-                            string address;
-
-                            try {
-                                address = (model.GetValue (iter, 2) as SparklePlugin).Address;
-
-                            } catch (NullReferenceException) {
-                                address = "";
-                            }
-
-                            if (!string.IsNullOrEmpty (address) &&
-                                address.Equals (Controller.PreviousAddress)) {
-
-                                tree.SetCursor (path, service_column, false);
-                                SparklePlugin plugin = (SparklePlugin) model.GetValue (iter, 2);
-
-                                if (plugin.Address != null) {
-                                    address_entry.Sensitive = false;}
-
-                                if (plugin.Path != null)
-                                    path_entry.Sensitive = false;
-
-                                // TODO: Scroll to the selection
-
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        }));
-
-
                         address_entry.Changed += delegate {
-                            Controller.CheckAddPage (address_entry.Text, path_entry.Text);
+                            Controller.CheckAddPage (address_entry.Text);
                         };
 
 						// Address
@@ -359,25 +259,6 @@ namespace SparkleShare {
 
                         layout_address.PackStart (address_entry, false, false, 0);
                         layout_address.PackStart (address_example, false, false, 0);
-                        path_entry.Changed += delegate {
-                            Controller.CheckAddPage (address_entry.Text, path_entry.Text);
-                        };
-
-						// Repository
-						layout_repository.PackStart (new Label () {
-                                Markup = "<b>" + "Repository:" + "</b>",
-                                Xalign = 0
-                            }, true, true, 0);
-                        layout_repository.PackStart (repository_entry, false, false, 0);
-                        layout_repository.PackStart (repository_example, false, false, 0);
-
-						// Path
-						layout_path.PackStart (new Label () {
-                                Markup = "<b>" + "Remote Path:" + "</b>",
-                                Xalign = 0
-                            }, true, true, 0);
-                        layout_path.PackStart (path_entry, false, false, 0);
-                        layout_path.PackStart (path_example, false, false, 0);
 
 						// User
 						layout_user.PackStart (new Label () {
@@ -387,7 +268,7 @@ namespace SparkleShare {
                         layout_user.PackStart (user_entry, false, false, 0);
                         layout_user.PackStart (user_example, false, false, 0);
 
-						// Path
+						// Password
 						layout_password.PackStart (new Label () {
                                 Markup = "<b>" + "password:" + "</b>",
                                 Xalign = 0
@@ -396,13 +277,10 @@ namespace SparkleShare {
                         layout_password.PackStart (password_example, false, false, 0);
 
                         layout_fields.PackStart (layout_address);
-                        layout_fields.PackStart (layout_repository);
-                        layout_fields.PackStart (layout_path);
                         layout_fields.PackStart (layout_user);
                         layout_fields.PackStart (layout_password);
 
                         layout_vertical.PackStart (new Label (""), false, false, 0);
-                        layout_vertical.PackStart (scrolled_window, true, true, 0);
                         layout_vertical.PackStart (layout_fields, false, false, 0);
 
                         Add (layout_vertical);
@@ -413,87 +291,69 @@ namespace SparkleShare {
                             cancel_button.Clicked += delegate {
                                 Controller.PageCancelled ();
                             };
-
-                            Button add_button = new Button ("Add") {
+							
+							// Continue button
+                            Button continue_button = new Button ("Continue") {
                                 Sensitive = false
                             };
 
-                            add_button.Clicked += delegate {
-                                Controller.Add1PageCompleted(address_entry.Text, user_entry.Text, password_entry.Text);
-                            };
+                            continue_button.Clicked += delegate {
+	                            // Show wait cursor
+	                            // TODO System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+	
+								SparkleLogger.LogInfo("SparkleSetup", "address:" + address_entry.Text + " user:" + user_entry.Text + " password:" + password_entry.Text);
+							
+	                            // Try to find the CMIS server
+	                            CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
+	                                address_entry.Text, user_entry.Text, password_entry.Text);
+	                            Controller.repositories = cmisServer.repositories;
+	                            address_entry.Text = cmisServer.url;
+	
+	                            // Hide wait cursor
+	                            // TODO System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+	
+	                            if (Controller.repositories == null)
+	                            {
+	                                // Show warning
+	                                address_error_label.Text = "Sorry, CmisSync can not find a CMIS server at this address.\nPlease check again.\nIf you are sure about the address, open it in a browser and post\nthe resulting XML to the CmisSync forum.";
+	                                // TODO address_error_label.Visibility = Visibility.Visible;
+	                            }
+	                            else
+	                            {
+									SparkleLogger.LogInfo("SparkleSetup", "repositories[0]:" + Controller.repositories[0]);
+	                                // Continue to folder selection
+	                                Controller.Add1PageCompleted(
+	                                    address_entry.Text, user_entry.Text, password_entry.Text);
+	                            }
+	                        };
+
 
                         Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
                             Application.Invoke (delegate {
-                                add_button.Sensitive = button_enabled;                            
+                                continue_button.Sensitive = button_enabled;                            
                             });
                         };
                         
                         AddButton (cancel_button);
-                        AddButton (add_button);
+                        AddButton (continue_button);
                         
-                        Controller.CheckAddPage (address_entry.Text, path_entry.Text);
+                        Controller.CheckAddPage (address_entry.Text);
 
                         break;
                     }
 
                     case PageType.Add2: {
 
-                        Header = "Where's your CMIS folder?";
+                        Header = "Which remote folder do you want to sync?";
 
                         VBox layout_vertical   = new VBox (false, 12);
                         HBox layout_fields     = new HBox (true, 12);
-                        VBox layout_address    = new VBox (true, 0);
                         VBox layout_repository = new VBox (true, 0);
                         VBox layout_path       = new VBox (true, 0);
-                        VBox layout_user       = new VBox (true, 0);
-                        VBox layout_password   = new VBox (true, 0);
-
-                        ListStore store = new ListStore (typeof (Gdk.Pixbuf),
-                            typeof (string), typeof (SparklePlugin));
-
-                        SparkleTreeView tree = new SparkleTreeView (store) { HeadersVisible = false };
-                        ScrolledWindow scrolled_window = new ScrolledWindow ();
-                        scrolled_window.AddWithViewport (tree);
-
-                        // Icon column
-                        tree.AppendColumn ("Icon", new Gtk.CellRendererPixbuf (), "pixbuf", 0);
-                        tree.Columns [0].Cells [0].Xpad = 6;
-
-                        // Service column
-                        TreeViewColumn service_column = new TreeViewColumn () { Title = "Service" };
-                        CellRendererText service_cell = new CellRendererText () { Ypad = 4 };
-                        service_column.PackStart (service_cell, true);
-                        service_column.SetCellDataFunc (service_cell, new TreeCellDataFunc (RenderServiceColumn));
-
-                        foreach (SparklePlugin plugin in Controller.Plugins) {
-                            store.AppendValues (
-                                new Gdk.Pixbuf (plugin.ImagePath),
-                                "<span size=\"small\"><b>" + plugin.Name + "</b>\n" +
-                                  "<span fgcolor=\"" + SecondaryTextColorSelected + "\">" +
-                                  plugin.Description + "</span>" +
-                                "</span>",
-                                plugin);
-                        }
-
-                        tree.AppendColumn (service_column);
-						
-						// Address
-                        Entry address_entry = new Entry () {
-                            Text = Controller.PreviousAddress,
-                            Sensitive = (Controller.SelectedPlugin.Address == null),
-                            ActivatesDefault = true
-                        };
-                        
-                        Label address_example = new Label () {
-                            Xalign = 0,
-                            UseMarkup = true,
-                            Markup = "<span size=\"small\" fgcolor=\"" +
-                                SecondaryTextColor + "\">" + Controller.SelectedPlugin.AddressExample + "</span>"
-                        };
 
 						// Repository
                         Entry repository_entry = new Entry () {
-                            Text = Controller.PreviousAddress,
+                            Text = Controller.repositories[0], // TODO put all elements in a tree
                             Sensitive = (Controller.SelectedPlugin.Repository == null),
                             ActivatesDefault = true
                         };
@@ -507,7 +367,7 @@ namespace SparkleShare {
 
 						// Path
                         Entry path_entry = new Entry () {
-                            Text = Controller.PreviousPath,
+                            Text = "/",
                             Sensitive = (Controller.SelectedPlugin.Path == null),
                             ActivatesDefault = true
                         };
@@ -517,52 +377,6 @@ namespace SparkleShare {
                             UseMarkup = true,
                             Markup = "<span size=\"small\" fgcolor=\"" +
                                 SecondaryTextColor + "\">" + Controller.SelectedPlugin.PathExample + "</span>"
-                        };
-
-						// User
-                        Entry user_entry = new Entry () {
-                            Text = Controller.PreviousPath,
-                            Sensitive = (Controller.SelectedPlugin.User == null),
-                            ActivatesDefault = true
-                        };
-                        
-                        Label user_example = new Label () {
-                            Xalign = 0,
-                            UseMarkup = true,
-                            Markup = "<span size=\"small\" fgcolor=\"" +
-                                SecondaryTextColor + "\">" + Controller.SelectedPlugin.UserExample + "</span>"
-                        };
-
-						// Password
-                        Entry password_entry = new Entry () {
-                            Text = Controller.PreviousPath,
-                            Sensitive = (Controller.SelectedPlugin.Password == null),
-                            ActivatesDefault = true
-                        };
-                        
-                        Label password_example = new Label () {
-                            Xalign = 0,
-                            UseMarkup = true,
-                            Markup = "<span size=\"small\" fgcolor=\"" +
-                                SecondaryTextColor + "\">" + Controller.SelectedPlugin.PasswordExample + "</span>"
-                        };
-
-
-                        // Select the first plugin by default
-                        TreeSelection default_selection = tree.Selection;
-                        TreePath default_path = new TreePath ("0");
-                        default_selection.SelectPath (default_path);
-                        Controller.SelectedPluginChanged (0);
-
-                        Controller.ChangeAddressFieldEvent += delegate (string text,
-                            string example_text, FieldState state) {
-
-                            Application.Invoke (delegate {
-                                address_entry.Text      = text;
-                                address_entry.Sensitive = (state == FieldState.Enabled);
-                                address_example.Markup  =  "<span size=\"small\" fgcolor=\"" +
-                                    SecondaryTextColor + "\">" + example_text + "</span>";
-                            });
                         };
 
                         Controller.ChangeRepositoryFieldEvent += delegate (string text,
@@ -587,85 +401,8 @@ namespace SparkleShare {
                             });
                         };
 
-                        Controller.ChangeUserFieldEvent += delegate (string text,
-                            string example_text, FieldState state) {
-
-                            Application.Invoke (delegate {
-                                user_entry.Text      = text;
-                                user_entry.Sensitive = (state == FieldState.Enabled);
-                                user_example.Markup  =  "<span size=\"small\" fgcolor=\""
-                                    + SecondaryTextColor + "\">" + example_text + "</span>";
-                            });
-                        };
-
-                        Controller.ChangePasswordFieldEvent += delegate (string text,
-                            string example_text, FieldState state) {
-
-                            Application.Invoke (delegate {
-                                password_entry.Text      = text;
-                                password_entry.Sensitive = (state == FieldState.Enabled);
-                                password_example.Markup  =  "<span size=\"small\" fgcolor=\""
-                                    + SecondaryTextColor + "\">" + example_text + "</span>";
-                            });
-                        };
-
-                        Controller.CheckAddPage (address_entry.Text, path_entry.Text);
+                        //Controller.CheckAddPage (address_entry.Text);
                         
-                        // Update the address field text when the selection changes
-                        tree.CursorChanged += delegate (object sender, EventArgs e) {
-                            Controller.SelectedPluginChanged (tree.SelectedRow);
-                            // TODO: Scroll to selected row when using arrow keys
-                        };
-
-                        tree.Model.Foreach (new TreeModelForeachFunc (delegate (TreeModel model,
-                            TreePath path, TreeIter iter) {
-
-                            string address;
-
-                            try {
-                                address = (model.GetValue (iter, 2) as SparklePlugin).Address;
-
-                            } catch (NullReferenceException) {
-                                address = "";
-                            }
-
-                            if (!string.IsNullOrEmpty (address) &&
-                                address.Equals (Controller.PreviousAddress)) {
-
-                                tree.SetCursor (path, service_column, false);
-                                SparklePlugin plugin = (SparklePlugin) model.GetValue (iter, 2);
-
-                                if (plugin.Address != null) {
-                                    address_entry.Sensitive = false;}
-
-                                if (plugin.Path != null)
-                                    path_entry.Sensitive = false;
-
-                                // TODO: Scroll to the selection
-
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        }));
-
-
-                        address_entry.Changed += delegate {
-                            Controller.CheckAddPage (address_entry.Text, path_entry.Text);
-                        };
-
-						// Address
-                        layout_address.PackStart (new Label () {
-                                Markup = "<b>" + "Address:" + "</b>",
-                                Xalign = 0
-                            }, true, true, 0);
-
-                        layout_address.PackStart (address_entry, false, false, 0);
-                        layout_address.PackStart (address_example, false, false, 0);
-                        path_entry.Changed += delegate {
-                            Controller.CheckAddPage (address_entry.Text, path_entry.Text);
-                        };
-
 						// Repository
 						layout_repository.PackStart (new Label () {
                                 Markup = "<b>" + "Repository:" + "</b>",
@@ -682,48 +419,28 @@ namespace SparkleShare {
                         layout_path.PackStart (path_entry, false, false, 0);
                         layout_path.PackStart (path_example, false, false, 0);
 
-						// User
-						layout_user.PackStart (new Label () {
-                                Markup = "<b>" + "User:" + "</b>",
-                                Xalign = 0
-                            }, true, true, 0);
-                        layout_user.PackStart (user_entry, false, false, 0);
-                        layout_user.PackStart (user_example, false, false, 0);
-
-						// Path
-						layout_password.PackStart (new Label () {
-                                Markup = "<b>" + "password:" + "</b>",
-                                Xalign = 0
-                            }, true, true, 0);
-                        layout_password.PackStart (password_entry, false, false, 0);
-                        layout_password.PackStart (password_example, false, false, 0);
-
-                        layout_fields.PackStart (layout_address);
                         layout_fields.PackStart (layout_repository);
                         layout_fields.PackStart (layout_path);
-                        layout_fields.PackStart (layout_user);
-                        layout_fields.PackStart (layout_password);
 
                         layout_vertical.PackStart (new Label (""), false, false, 0);
-                        layout_vertical.PackStart (scrolled_window, true, true, 0);
                         layout_vertical.PackStart (layout_fields, false, false, 0);
 
                         Add (layout_vertical);
 
-                            // Cancel button
-                            Button cancel_button = new Button ("Cancel");
+                        // Cancel button
+                        Button cancel_button = new Button ("Cancel");
 
-                            cancel_button.Clicked += delegate {
-                                Controller.PageCancelled ();
-                            };
+                        cancel_button.Clicked += delegate {
+                            Controller.PageCancelled ();
+                        };
 
-                            Button add_button = new Button ("Add") {
-                                Sensitive = false
-                            };
+                        Button add_button = new Button ("Add") {
+                            //Sensitive = false
+                        };
 
-                            add_button.Clicked += delegate {
-                                Controller.Add2PageCompleted("repository", "remote path"); // FIXME
-                            };
+                        add_button.Clicked += delegate {
+                            Controller.Add2PageCompleted(repository_entry.Text, path_entry.Text);
+                        };
 
                         Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
                             Application.Invoke (delegate {
@@ -734,7 +451,7 @@ namespace SparkleShare {
                         AddButton (cancel_button);
                         AddButton (add_button);
                         
-                        Controller.CheckAddPage (address_entry.Text, path_entry.Text);
+                        //Controller.CheckAddPage (address_entry.Text);
 
                         break;
                     }
