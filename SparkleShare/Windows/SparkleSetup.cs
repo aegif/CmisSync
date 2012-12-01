@@ -368,10 +368,10 @@ namespace SparkleShare {
                             });
                         };
                         
-                        Controller.CheckAddPage (address_box.Text, "path_box.Text");
+                        Controller.CheckAddPage (address_box.Text);
                         
                         address_box.TextChanged += delegate {
-                            Controller.CheckAddPage (address_box.Text, "path_box.Text");
+                            Controller.CheckAddPage (address_box.Text);
                         };
                         
                         cancel_button.Click += delegate {

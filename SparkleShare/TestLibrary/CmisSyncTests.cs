@@ -104,7 +104,7 @@ namespace TestLibrary
             string url, string user, string password, string repositoryId)
         {
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            Cmis cmis = new Cmis(
+            CmisDirectory cmisDirectory = new CmisDirectory(
                 canonical_name,
                 localPath,
                 remoteFolderPath,
@@ -114,7 +114,7 @@ namespace TestLibrary
                 repositoryId,
                 activityListener
             );
-            cmis.Sync();
+            cmisDirectory.Sync();
         }
 
         [Theory, PropertyData("TestServers")]
@@ -123,7 +123,7 @@ namespace TestLibrary
         {
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Create checkout.
-            Cmis cmis = new Cmis(
+            CmisDirectory cmisDirectory = new CmisDirectory(
                 canonical_name,
                 localPath,
                 remoteFolderPath,
@@ -133,7 +133,7 @@ namespace TestLibrary
                 repositoryId,
                 activityListener
             );
-            cmis.Sync();
+            cmisDirectory.Sync();
 
             // Generate local filesystem activity
             string path = Path.Combine(@"C:\Users\nico\CmisSync", canonical_name);
