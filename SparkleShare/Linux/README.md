@@ -70,6 +70,7 @@ You can build and install SparkleShare like this:
 $ ./configure --prefix=/usr (or ./autogen.sh if you build from the repository)
 $ make
 $ sudo make install
+$ sudo cp SparkleLib/Cmis/lib/* /usr/lib/sparkleshare/
 ```
 
 **Note:** The Nautilus extension will only be enabled if you build with `--prefix=/usr`.
