@@ -3,12 +3,9 @@
 [CmisSync](http://CmisSync.com) allows you to keep in sync with your CMIS repository. It is like Dropbox for Enterprise Content Management!  
 See: http://CmisSync.com
 
-CmisSync is mostly developed by [Aegif](http://aegif.jp), but all contributions are welcome!
-
 ### License
 
 CmisSync is Open Source software and licensed under the `GNU General Public License version 3 or later`. You are welcome to change and redistribute it under certain conditions. For more information see the `legal/LICENSE` file.
-
 
 ### Development
 
