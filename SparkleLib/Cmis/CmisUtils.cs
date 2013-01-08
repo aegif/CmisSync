@@ -44,10 +44,12 @@ namespace SparkleLib.Cmis
                 "/alfresco/cmisatom",
                 "/cmis/resources/",
                 "/emc-cmis-ea/resources/",
+                "/xcmis/rest/cmisatom",
                 "/files/basic/cmis/my/servicedoc",
                 "/p8cmis/resources/Service",
                 "/_vti_bin/ListData.svc",
-                "/Nemaki/atom"
+                "/Nemaki/atom",
+                "/nuxeo/atom/cmis"
             };
 
             // Try all suffixes
