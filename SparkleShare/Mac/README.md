@@ -5,8 +5,7 @@ You can choose to build SparkleShare from source or to download the SparkleShare
 
 ### Installing build requirements
 
-Install [Xcode](https://developer.apple.com/xcode/), the [Mono Framework](http://www.mono-project.com/) 
-and [MonoDevelop](http://monodevelop.com/).
+Install [Xcode](https://developer.apple.com/xcode/), the [Mono Framework](http://www.mono-project.com/) (both MRE and MDK) and [MonoDevelop](http://monodevelop.com/).
 
 Start MonoDevelop and install the MonoMac add-in (it's in the menus: <tt>MonoDevelop</tt> > <tt>Add-in Manager</tt>).
 

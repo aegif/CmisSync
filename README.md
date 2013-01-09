@@ -1,19 +1,13 @@
 ## CmisSync
 
-[CmisSync](http://cmissync.github.com) allows you to keep in sync with your CMIS repository. It is like Dropbox for Enterprise Content Management!  
-See: http://cmissync.github.com
-
-CmisSync is mostly developed by [Aegif](http://aegif.jp), but all contributions are welcome!
+[CmisSync](http://CmisSync.com) allows you to keep in sync with your CMIS repository. It is like Dropbox for Enterprise Content Management!  
+See: http://CmisSync.com
 
 ### License
 
 CmisSync is Open Source software and licensed under the `GNU General Public License version 3 or later`. You are welcome to change and redistribute it under certain conditions. For more information see the `legal/LICENSE` file.
 
-
 ### Development
 
-CmisSync re-uses a lot of source code from [SparkleShare](http://sparkleshare.org), an excellent Git sync tool. You might find references to SparkleShare in the source code. Please note that CmisSync is not SparkleShare and does not represent it. The build instructions of SparkleShare apply, though:
-
-[Linux](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Linux/README.md)  
-[Mac](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Mac/README.md)  
-[Windows](https://github.com/hbons/SparkleShare/blob/master/SparkleShare/Windows/README.md)  
+We are looking for volunteers!  
+See [how to get started developing CmisSync](https://github.com/nicolas-raoul/CmisSync/wiki/Getting-started-with-CmisSync-development)

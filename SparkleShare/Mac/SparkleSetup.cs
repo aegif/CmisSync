@@ -403,16 +403,16 @@ namespace SparkleShare {
 				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
 				
 				(AddressTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
 				(PathTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
 				(TableView.Delegate as SparkleTableViewDelegate).SelectionChanged += delegate {
 					Controller.SelectedPluginChanged (TableView.SelectedRow);
-					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
 				HistoryCheckButton.Activated += delegate {
@@ -446,7 +446,7 @@ namespace SparkleShare {
 				Buttons.Add (AddButton);
 				Buttons.Add (CancelButton);
 				
-				Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+				Controller.CheckAddPage (AddressTextField.StringValue);
 			}
 			
 			if (type == PageType.Add2) {
@@ -599,16 +599,16 @@ namespace SparkleShare {
 				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
 				
 				(AddressTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
 				(PathTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
 				(TableView.Delegate as SparkleTableViewDelegate).SelectionChanged += delegate {
 					Controller.SelectedPluginChanged (TableView.SelectedRow);
-					Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
 				HistoryCheckButton.Activated += delegate {
@@ -642,7 +642,7 @@ namespace SparkleShare {
 				Buttons.Add (AddButton);
 				Buttons.Add (CancelButton);
 				
-				Controller.CheckAddPage (AddressTextField.StringValue, PathTextField.StringValue);
+				Controller.CheckAddPage (AddressTextField.StringValue);
 			}
 			
 			if (type == PageType.Syncing) {
