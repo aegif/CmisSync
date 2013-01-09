@@ -66,7 +66,10 @@ namespace SparkleLib.Cmis
                                 path TEXT PRIMARY KEY,
                                 serverSideModificationDate DATE,
                                 metadata TEXT,
-                                checksum TEXT);";   /* Checksum of metadata */
+                                checksum TEXT);   /* Checksum of metadata */
+                            CREATE TABLE general (
+                                key TEXT PRIMARY KEY,
+                                value TEXT);";    /* Other data such as ChangeLog token */
                         command.ExecuteNonQuery();
                     }
                 }
@@ -360,6 +363,28 @@ namespace SparkleLib.Cmis
             }
 
             return ! currentChecksum.Equals(previousChecksum);
+        }
+
+        public string GetChangeLogToken()
+        {
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
+            {
+                command.CommandText =
+                    "SELECT value FROM general WHERE key=\"ChangeLogToken\"";
+                object obj = command.ExecuteScalar();
+                return (string)obj;
+            }
+        }
+
+        public void SetChangeLogToken(string token)
+        {
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
+            {
+                command.CommandText =
+                    "UPDATE general SET value=@token WHERE key=\"ChangeLogToken\"";
+                command.Parameters.AddWithValue("token", token);
+                command.ExecuteNonQuery();
+            }
         }
     }
 }

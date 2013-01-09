@@ -214,22 +214,33 @@ namespace SparkleLib.Cmis
 
             if (ChangeLogCapability)
             {
-                // Get last change log token from server.
-                // TODO
-                if (true /* TODO if no locally saved CMIS change log token */)
+                // Get last change log token on server side.
+                string lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
+
+                // Get last change token that had been saved on client side.
+                string lastTokenOnClient = database.GetChangeLogToken();
+
+                if (lastTokenOnClient == null)
                 {
+                    // Token is null, which means no sync has ever happened yet, so just copy everything.
                     RecursiveFolderCopy(remoteFolder, localRootFolder);
                 }
                 else
                 {
                     // Check which files/folders have changed.
-                    // TODO session.GetContentChanges(changeLogToken, includeProperties, maxNumItems);
+                    int maxNumItems = 1000;
+                    IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
 
                     // Download/delete files/folders accordingly.
-                    // TODO
+                    foreach (IChangeEvent change in changes.ChangeEventList)
+                    {
+                        SparkleLogger.LogInfo("Sync", "Change " + change.ChangeType);
+                    }
                 }
+
                 // Save change log token locally.
-                // TODO
+                // TODO only if successful
+                database.SetChangeLogToken(lastTokenOnServer);
             }
             else
             {
