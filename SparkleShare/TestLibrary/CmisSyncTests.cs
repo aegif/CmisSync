@@ -18,7 +18,7 @@ using Newtonsoft.Json;
  * Unit Tests for CmisSync.
  * 
  * To use them, first create a JSON file containing the credentials/parameters to your CMIS server(s)
- * Call it test-servers.json and use this format:
+ * Put it in TestLibrary/test-servers.json and use this format:
 [
     [
 		"unittest1",
@@ -46,7 +46,7 @@ namespace TestLibrary
     {
         public CmisSyncTests()
         {
-            SparkleConfig.DefaultConfig = new SparkleConfig(@"C:\Users\nico\AppData\Roaming\cmissync", "config.xml");
+            SparkleConfig.DefaultConfig = new SparkleConfig(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml");
         }
 
         public static IEnumerable<object[]> TestServers
