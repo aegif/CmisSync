@@ -155,6 +155,15 @@ namespace SparkleLib.Cmis
         {
             string normalizedPath = Normalize(path);
 
+            try
+            {
+                string checksum = Checksum(path);
+            }
+            catch (IOException e) {
+                SparkleLogger.LogInfo("CmisDatabase", "IOException while reading file checksum during addition: " + path);
+                return;
+            }
+
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
@@ -349,7 +358,14 @@ namespace SparkleLib.Cmis
             string normalizedPath = Normalize(path);
 
             // Calculate current checksum.
-            string currentChecksum = Checksum(path);
+            string currentChecksum = null;
+            try {
+                currentChecksum = Checksum(path);
+            }
+            catch(IOException e) {
+                SparkleLogger.LogInfo("CmisDatabase", "IOException while reading file checksum: " + path);
+                return true;
+            }
 
             // Read previous checksum from database.
             string previousChecksum = null;
