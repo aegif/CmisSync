@@ -144,7 +144,7 @@ namespace SparkleLib.Cmis
                     // Detect whether the repository has the ChangeLog capability.
                     ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-
+                    SparkleLogger.LogInfo("Sync", "ChangeLog capability: " + ChangeLogCapability);
                     SparkleLogger.LogInfo("Sync", "Created CMIS session: " + session.ToString());
                 }
                 catch (CmisRuntimeException e)
@@ -240,6 +240,7 @@ namespace SparkleLib.Cmis
 
                 // Save change log token locally.
                 // TODO only if successful
+                SparkleLogger.LogInfo("Sync", "SetChangeLogToken " + lastTokenOnServer);
                 database.SetChangeLogToken(lastTokenOnServer);
             }
             else
