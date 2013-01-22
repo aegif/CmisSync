@@ -397,7 +397,7 @@ namespace SparkleLib.Cmis
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
-                    "UPDATE general SET value=@token WHERE key=\"ChangeLogToken\"";
+                    "INSERT OR REPLACE INTO general (key, value) VALUES (\"ChangeLogToken\", @token)";
                 command.Parameters.AddWithValue("token", token);
                 command.ExecuteNonQuery();
             }
