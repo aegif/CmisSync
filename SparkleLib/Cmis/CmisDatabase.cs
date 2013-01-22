@@ -47,7 +47,7 @@ namespace SparkleLib.Cmis
          */
         public SQLiteConnection GetSQLiteConnection()
         {
-            if (sqliteConnection == null && sqliteConnection.State == System.Data.ConnectionState.Broken)
+            if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
                 bool createDatabase = ! File.Exists(databaseFileName);
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
@@ -285,8 +285,7 @@ namespace SparkleLib.Cmis
         public DateTime? GetServerSideModificationDate(string path)
         {
             path = Normalize(path);
-            using (
-            var connection = GetSQLiteConnection())
+            var connection = GetSQLiteConnection();
             using (var command = new SQLiteCommand(connection))
             {
                 try
