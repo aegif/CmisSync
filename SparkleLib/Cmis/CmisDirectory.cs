@@ -227,26 +227,73 @@ namespace SparkleLib.Cmis
                 }
                 else
                 {
+                    if (lastTokenOnServer.Equals(lastTokenOnClient))
+                    {
+                        SparkleLogger.LogInfo("Sync", "No changes, ChangeLog token: " + lastTokenOnServer);
+                        return; // No new changes, nothing to do.
+                    }
+
                     // Check which files/folders have changed.
                     int maxNumItems = 1000;
                     IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
 
-                    // Download/delete files/folders accordingly.
+                    // Replicate each change to the local side.
                     foreach (IChangeEvent change in changes.ChangeEventList)
                     {
-                        SparkleLogger.LogInfo("Sync", "Change " + change.ChangeType);
+                        applyRemoteChange(change);
                     }
                 }
 
                 // Save change log token locally.
                 // TODO only if successful
-                SparkleLogger.LogInfo("Sync", "SetChangeLogToken " + lastTokenOnServer);
+                SparkleLogger.LogInfo("Sync", "Updating ChangeLog token: " + lastTokenOnServer);
                 database.SetChangeLogToken(lastTokenOnServer);
             }
             else
             {
                 // No ChangeLog capability, so we have to crawl remote and local folders.
                 CrawlSync(remoteFolder, localRootFolder);
+            }
+        }
+
+
+        /**
+         * Apply a remote change.
+         */
+        private void applyRemoteChange(IChangeEvent change)
+        {
+            SparkleLogger.LogInfo("Sync", "Change type:" + change.ChangeType + " id:" + change.ObjectId + " properties:" + change.Properties);
+            switch (change.ChangeType)
+            {
+                case ChangeType.Created:
+                    ICmisObject cmisObject = session.GetObject(change.ObjectId);
+                    if (cmisObject is DotCMIS.Client.Impl.Folder) {
+                        IFolder remoteFolder = (IFolder)cmisObject;
+                        string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
+                        RecursiveFolderCopy(remoteFolder, localFolder);
+                    }
+                    else if (cmisObject is DotCMIS.Client.Impl.Document)
+                    {
+                        IDocument remoteDocument = (IDocument)cmisObject;
+                        string remoteDocumentPath = remoteDocument.Paths.First();
+                        if (!remoteDocumentPath.StartsWith(remoteFolderPath))
+                        {
+                            SparkleLogger.LogInfo("Sync", "Change in unrelated document: " + remoteDocumentPath);
+                            break; // The change is not under the folder we care about.
+                        }
+                        string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
+                        string relativeFolderPath = Path.GetDirectoryName(relativePath);
+                        relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
+                        string localFolderPath = Path.Combine(localRootFolder, relativeFolderPath);
+                        DownloadFile(remoteDocument, localFolderPath);
+                    }
+                    break;
+                case ChangeType.Updated:
+                    break;
+                case ChangeType.Deleted:
+                    break;
+                case ChangeType.Security:
+                    break;
             }
         }
 
