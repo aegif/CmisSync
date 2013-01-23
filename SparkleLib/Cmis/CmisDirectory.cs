@@ -212,15 +212,15 @@ namespace SparkleLib.Cmis
 
             IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
 
-            if (ChangeLogCapability)
-            {
-                ChangeLogSync(remoteFolder);
-            }
-            else
-            {
+//            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
+//            {
+//                ChangeLogSync(remoteFolder);
+//            }
+//            else
+//            {
                 // No ChangeLog capability, so we have to crawl remote and local folders.
                 CrawlSync(remoteFolder, localRootFolder);
-            }
+//            }
         }
 
 
@@ -240,7 +240,11 @@ namespace SparkleLib.Cmis
             else
             {
                 // If there are remote changes, apply them.
-                if (!lastTokenOnServer.Equals(lastTokenOnClient))
+                if (lastTokenOnServer.Equals(lastTokenOnClient))
+                {
+                    SparkleLogger.LogInfo("Sync", "No changes on server, ChangeLog token: " + lastTokenOnServer);
+                }
+                else
                 {
                     // Check which files/folders have changed.
                     int maxNumItems = 1000;
@@ -317,7 +321,7 @@ namespace SparkleLib.Cmis
                         string relativeFolderPath = Path.GetDirectoryName(relativePath);
                         relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
                         string localFolderPath = Path.Combine(localRootFolder, relativeFolderPath);
-                        DownloadFile(remoteDocument, localFolderPath);
+                        // TODO DeleteFile(localFolderPath); // Delete on filesystem and in database
                     }
                     break;
                 case ChangeType.Security:
