@@ -214,40 +214,7 @@ namespace SparkleLib.Cmis
 
             if (ChangeLogCapability)
             {
-                // Get last change log token on server side.
-                string lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
-
-                // Get last change token that had been saved on client side.
-                string lastTokenOnClient = database.GetChangeLogToken();
-
-                if (lastTokenOnClient == null)
-                {
-                    // Token is null, which means no sync has ever happened yet, so just copy everything.
-                    RecursiveFolderCopy(remoteFolder, localRootFolder);
-                }
-                else
-                {
-                    if (lastTokenOnServer.Equals(lastTokenOnClient))
-                    {
-                        SparkleLogger.LogInfo("Sync", "No changes, ChangeLog token: " + lastTokenOnServer);
-                        return; // No new changes, nothing to do.
-                    }
-
-                    // Check which files/folders have changed.
-                    int maxNumItems = 1000;
-                    IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
-
-                    // Replicate each change to the local side.
-                    foreach (IChangeEvent change in changes.ChangeEventList)
-                    {
-                        applyRemoteChange(change);
-                    }
-                }
-
-                // Save change log token locally.
-                // TODO only if successful
-                SparkleLogger.LogInfo("Sync", "Updating ChangeLog token: " + lastTokenOnServer);
-                database.SetChangeLogToken(lastTokenOnServer);
+                ChangeLogSync(remoteFolder);
             }
             else
             {
@@ -257,17 +224,59 @@ namespace SparkleLib.Cmis
         }
 
 
+        private void ChangeLogSync(IFolder remoteFolder)
+        {
+            // Get last change log token on server side.
+            string lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
+
+            // Get last change token that had been saved on client side.
+            string lastTokenOnClient = database.GetChangeLogToken();
+
+            if (lastTokenOnClient == null)
+            {
+                // Token is null, which means no sync has ever happened yet, so just copy everything.
+                RecursiveFolderCopy(remoteFolder, localRootFolder);
+            }
+            else
+            {
+                // If there are remote changes, apply them.
+                if (!lastTokenOnServer.Equals(lastTokenOnClient))
+                {
+                    // Check which files/folders have changed.
+                    int maxNumItems = 1000;
+                    IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
+
+                    // Replicate each change to the local side.
+                    foreach (IChangeEvent change in changes.ChangeEventList)
+                    {
+                        ApplyRemoteChange(change);
+                    }
+
+                    // Save change log token locally.
+                    // TODO only if successful
+                    SparkleLogger.LogInfo("Sync", "Updating ChangeLog token: " + lastTokenOnServer);
+                    database.SetChangeLogToken(lastTokenOnServer);
+                }
+
+                // Upload local changes by comparing with database.
+                // TODO
+            }
+        }
+
+
         /**
          * Apply a remote change.
          */
-        private void applyRemoteChange(IChangeEvent change)
+        private void ApplyRemoteChange(IChangeEvent change)
         {
             SparkleLogger.LogInfo("Sync", "Change type:" + change.ChangeType + " id:" + change.ObjectId + " properties:" + change.Properties);
             switch (change.ChangeType)
             {
                 case ChangeType.Created:
+                case ChangeType.Updated:
                     ICmisObject cmisObject = session.GetObject(change.ObjectId);
-                    if (cmisObject is DotCMIS.Client.Impl.Folder) {
+                    if (cmisObject is DotCMIS.Client.Impl.Folder)
+                    {
                         IFolder remoteFolder = (IFolder)cmisObject;
                         string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
                         RecursiveFolderCopy(remoteFolder, localFolder);
@@ -288,9 +297,28 @@ namespace SparkleLib.Cmis
                         DownloadFile(remoteDocument, localFolderPath);
                     }
                     break;
-                case ChangeType.Updated:
-                    break;
                 case ChangeType.Deleted:
+                    cmisObject = session.GetObject(change.ObjectId);
+                    if (cmisObject is DotCMIS.Client.Impl.Folder) {
+                        IFolder remoteFolder = (IFolder)cmisObject;
+                        string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
+                        RemoveFolderLocally(localFolder); // Remove from filesystem and database.
+                    }
+                    else if (cmisObject is DotCMIS.Client.Impl.Document)
+                    {
+                        IDocument remoteDocument = (IDocument)cmisObject;
+                        string remoteDocumentPath = remoteDocument.Paths.First();
+                        if (!remoteDocumentPath.StartsWith(remoteFolderPath))
+                        {
+                            SparkleLogger.LogInfo("Sync", "Change in unrelated document: " + remoteDocumentPath);
+                            break; // The change is not under the folder we care about.
+                        }
+                        string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
+                        string relativeFolderPath = Path.GetDirectoryName(relativePath);
+                        relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
+                        string localFolderPath = Path.Combine(localRootFolder, relativeFolderPath);
+                        DownloadFile(remoteDocument, localFolderPath);
+                    }
                     break;
                 case ChangeType.Security:
                     break;
@@ -588,12 +616,7 @@ namespace SparkleLib.Cmis
                     // check whether it used to exist on server or not.
                     if(database.ContainsFolder(folderPath))
                     {
-                        // Folder has been deleted on server, delete it locally too.
-                        SparkleLogger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
-                        Directory.Delete(folderPath, true);
-
-                        // Delete folder from database.
-                        database.RemoveFolder(folderPath);
+                        RemoveFolderLocally(folderPath);
                     }
                     else
                     {
@@ -779,6 +802,19 @@ namespace SparkleLib.Cmis
             // Update timestamp in database.
             //database.SetFileServerSideModificationDate(filePath, document.LastModificationDate);
             activityListener.ActivityStopped();
+        }
+
+        /**
+         * Remove folder from local filesystem and database.
+         */
+        private void RemoveFolderLocally(string folderPath)
+        {
+            // Folder has been deleted on server, delete it locally too.
+            SparkleLogger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
+            Directory.Delete(folderPath, true);
+
+            // Delete folder from database.
+            database.RemoveFolder(folderPath);
         }
 
         /**
