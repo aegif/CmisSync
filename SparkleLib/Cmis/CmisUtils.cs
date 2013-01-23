@@ -48,6 +48,7 @@ namespace SparkleLib.Cmis
                 "/files/basic/cmis/my/servicedoc",
                 "/p8cmis/resources/Service",
                 "/_vti_bin/ListData.svc",
+                "/cmis/rest/",
                 "/Nemaki/atom",
                 "/nuxeo/atom/cmis"
             };
