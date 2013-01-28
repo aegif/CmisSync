@@ -44,6 +44,8 @@ namespace TestLibrary
 {
     public class CmisSyncTests : IDisposable
     {
+        private string CMISSYNCDIR = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "CmisSync");
+
         public CmisSyncTests()
         {
             SparkleConfig.DefaultConfig = new SparkleConfig(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml");
@@ -71,6 +73,12 @@ namespace TestLibrary
             {
                 Directory.Delete(path, true);
             }
+        }
+
+        private void CleanDirectory(string path)
+        {
+            DeleteDirectoryIfExists(path);
+            Directory.CreateDirectory(path);
         }
 
 
@@ -103,7 +111,11 @@ namespace TestLibrary
         public void Sync(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
+            // Clean.
+            CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+            // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            // Sync.
             CmisDirectory cmisDirectory = new CmisDirectory(
                 canonical_name,
                 localPath,
@@ -118,11 +130,15 @@ namespace TestLibrary
         }
 
         [Theory, PropertyData("TestServers")]
-        public void ClientSideChanges(string canonical_name, string localPath, string remoteFolderPath,
+        public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
+            // Clean local.
+            Directory.CreateDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+            // TODO: Clean remote
+            // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Create checkout.
+            // Sync.
             CmisDirectory cmisDirectory = new CmisDirectory(
                 canonical_name,
                 localPath,
@@ -135,9 +151,12 @@ namespace TestLibrary
             );
             cmisDirectory.Sync();
 
-            // Generate local filesystem activity
-            string path = Path.Combine(@"C:\Users\nico\CmisSync", canonical_name);
-            LocalFilesystemActivityGenerator.GenerateActivity(path);
+            // Create random small file.
+            string path = Path.Combine(CMISSYNCDIR, canonical_name);
+            LocalFilesystemActivityGenerator.CreateRandomFile(path, 3);
+
+            // Sync again.
+            cmisDirectory.Sync();
         }
 
         [Fact]
