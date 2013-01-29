@@ -13,6 +13,7 @@ using System.IO;
 using Moq;
 using Xunit.Extensions;
 using Newtonsoft.Json;
+using DotCMIS.Data.Impl;
 
 /**
  * Unit Tests for CmisSync.
@@ -165,6 +166,7 @@ namespace TestLibrary
         public void WriteThenRead(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
+            string fileName = "test.txt";
             var cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url;
@@ -175,7 +177,24 @@ namespace TestLibrary
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.GetRepositories(cmisParameters)[0].CreateSession();
 
-            // TODO
+            IFolder root = session.GetRootFolder();
+            
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties.Add(PropertyIds.Name, fileName);
+            properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
+
+            ContentStream contentStream = new ContentStream();
+            contentStream.FileName = fileName;
+            contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
+            contentStream.Stream = File.OpenRead("../../CmisSyncTests.cs");
+            
+            session.CreateDocument(properties, root, contentStream, null);
+
+            IItemEnumerable<ICmisObject> children = root.GetChildren();
+            foreach(ICmisObject child in children)
+            {
+                Console.WriteLine("Child:" + child.GetPropertyValue(PropertyIds.Name));
+            }
         }
 
         [Theory, PropertyData("TestServers")]
