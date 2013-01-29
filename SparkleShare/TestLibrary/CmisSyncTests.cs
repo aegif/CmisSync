@@ -159,12 +159,35 @@ namespace TestLibrary
             cmisDirectory.Sync();
         }
 
-        [Fact]
-        public void DotCmisToIBMConnections()
+        // Write a file and immediately check whether it has been created.
+        // Should help see whether CMIS servers are synchronous or not.
+        [Theory, PropertyData("TestServers")]
+        public void WriteThenRead(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
         {
             var cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            // TODO Insert here your own credentials to an IBM Connections server
+            cmisParameters[SessionParameter.AtomPubUrl] = url;
+            cmisParameters[SessionParameter.User] = user;
+            cmisParameters[SessionParameter.Password] = password;
+            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+
+            SessionFactory factory = SessionFactory.NewInstance();
+            ISession session = factory.GetRepositories(cmisParameters)[0].CreateSession();
+
+            // TODO
+        }
+
+        [Theory, PropertyData("TestServers")]
+        public void DotCmisToIBMConnections(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            var cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = url;
+            cmisParameters[SessionParameter.User] = user;
+            cmisParameters[SessionParameter.Password] = password;
+            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.GetRepositories(cmisParameters)[0].CreateSession();
