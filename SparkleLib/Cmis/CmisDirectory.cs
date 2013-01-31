@@ -611,29 +611,23 @@ namespace SparkleLib.Cmis
          */
         private void crawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
         {
-            foreach (string folderPath in Directory.GetDirectories(localFolder))
+            foreach (string localSubFolder in Directory.GetDirectories(localFolder))
             {
-                string folderName = Path.GetFileName(folderPath);
+                string folderName = Path.GetFileName(localSubFolder);
                 if (!remoteFolders.Contains(folderName))
                 {
                     // This local folder is not on the CMIS server now, so
                     // check whether it used to exist on server or not.
-                    if(database.ContainsFolder(folderPath))
+                    if(database.ContainsFolder(localSubFolder))
                     {
-                        RemoveFolderLocally(folderPath);
+                        RemoveFolderLocally(localSubFolder);
                     }
                     else
                     {
                         if (BIDIRECTIONAL)
                         {
-                            // New folder, sync up.
-                            Dictionary<string, object> properties = new Dictionary<string, object>();
-                            properties.Add(PropertyIds.Name, folderName);
-                            properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
-                            IFolder folder = remoteFolder.CreateFolder(properties);
-
-                            // Create database entry for this folder.
-                            database.AddFolder(folderPath, folder.LastModificationDate);
+                            // New local folder, upload recursively.
+                            UploadFolderRecursively(remoteFolder, localSubFolder);
                         }
                     }
                 }
@@ -720,7 +714,6 @@ namespace SparkleLib.Cmis
             SparkleLogger.LogInfo("Sync", "Downloaded");
         }
 
-
         /**
          * Upload a single file to the CMIS server.
          */
@@ -760,6 +753,34 @@ namespace SparkleLib.Cmis
                 }
             }
             activityListener.ActivityStopped();
+        }
+
+        /**
+         * Upload folder recursively.
+         * After execution, the hierarchy on server will be: .../remoteBaseFolder/localFolder/...
+         */
+        private void UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
+        {
+            // Create remote folder.
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties.Add(PropertyIds.Name, Path.GetFileName(localFolder));
+            properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
+            IFolder folder = remoteBaseFolder.CreateFolder(properties);
+
+            // Create database entry for this folder.
+            database.AddFolder(localFolder, folder.LastModificationDate);
+
+            // Upload each file in this folder.
+            foreach (string file in Directory.GetFiles(localFolder))
+            {
+                UploadFile(file, folder);
+            }
+
+            // Recurse for each subfolder in this folder.
+            foreach (string subfolder in Directory.GetDirectories(localFolder))
+            {
+                UploadFolderRecursively(folder, subfolder);
+            }
         }
 
         /**
