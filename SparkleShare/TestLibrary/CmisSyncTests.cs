@@ -134,9 +134,8 @@ namespace TestLibrary
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Clean local.
-            Directory.CreateDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
-            // TODO: Clean remote
+            // Create checkout directory.
+            DirectoryInfo localDirectory = Directory.CreateDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
@@ -151,6 +150,7 @@ namespace TestLibrary
                 activityListener
             );
             cmisDirectory.Sync();
+            Console.WriteLine("First sync done.");
 
             // Create random small file.
             string path = Path.Combine(CMISSYNCDIR, canonical_name);
@@ -158,6 +158,64 @@ namespace TestLibrary
 
             // Sync again.
             cmisDirectory.Sync();
+            Console.WriteLine("Second sync done.");
+
+            // Check that file is present server-side.
+            // TODO
+
+            // Clean.
+            Clean(localDirectory, cmisDirectory);
+        }
+
+        [Theory, PropertyData("TestServers")]
+        public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Create checkout directory.
+            DirectoryInfo localDirectory = Directory.CreateDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+            // Mock.
+            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            // Sync.
+            CmisDirectory cmisDirectory = new CmisDirectory(
+                canonical_name,
+                localPath,
+                remoteFolderPath,
+                url,
+                user,
+                password,
+                repositoryId,
+                activityListener
+            );
+            cmisDirectory.Sync();
+            Console.WriteLine("First sync done.");
+
+            // Create directory and small files.
+            string path = Path.Combine(CMISSYNCDIR, canonical_name);
+            LocalFilesystemActivityGenerator.CreateDirectoryAndRandomFiles(path);
+
+            // Sync again.
+            cmisDirectory.Sync();
+            Console.WriteLine("Second sync done.");
+
+            // Clean.
+            Clean(localDirectory, cmisDirectory);
+        }
+
+        private void Clean(DirectoryInfo localDirectory, CmisDirectory cmisDirectory)
+        {
+            // Delete all local files/folders.
+            foreach (FileInfo file in localDirectory.GetFiles())
+            {
+                file.Delete();
+            }
+            foreach (DirectoryInfo dir in localDirectory.GetDirectories())
+            {
+                dir.Delete(true);
+            }
+            // Sync deletions to server.
+            cmisDirectory.Sync();
+            // Remove checkout folder.
+            localDirectory.Delete(false); // Not recursive, should not contain anything at this point.
         }
 
         // Write a file and immediately check whether it has been created.
@@ -177,8 +235,9 @@ namespace TestLibrary
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.GetRepositories(cmisParameters)[0].CreateSession();
 
-            IFolder root = session.GetRootFolder();
-            
+            // IFolder root = session.GetRootFolder();
+            IFolder root = (IFolder)session.GetObjectByPath(remoteFolderPath);
+
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, fileName);
             properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
@@ -186,15 +245,28 @@ namespace TestLibrary
             ContentStream contentStream = new ContentStream();
             contentStream.FileName = fileName;
             contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
-            contentStream.Stream = File.OpenRead("../../CmisSyncTests.cs");
+            contentStream.Stream = File.OpenRead("../../../TestLibraryRunner/Program.cs");
             
+            // Create file.
             session.CreateDocument(properties, root, contentStream, null);
 
+            // Check whether file is present.
             IItemEnumerable<ICmisObject> children = root.GetChildren();
+            bool found = false;
             foreach(ICmisObject child in children)
             {
-                Console.WriteLine("Child:" + child.GetPropertyValue(PropertyIds.Name));
+                string childFileName = (string)child.GetPropertyValue(PropertyIds.Name);
+                Console.WriteLine(childFileName);
+                if (childFileName.Equals(fileName))
+                {
+                    found = true;
+                }
             }
+            Assert.True(found);
+
+            // Clean.
+            IDocument doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + fileName);
+            doc.DeleteAllVersions();
         }
 
         [Theory, PropertyData("TestServers")]

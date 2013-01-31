@@ -10,22 +10,21 @@ namespace TestLibrary
     {
         private static int id = 0;
 
-        /*public static void GenerateActivity(string path)
+        public static void CreateDirectoryAndRandomFiles(string path)
         {
-            CreateRandomFile(path);
-            CreateRandomFile(path);
-            CreateRandomFile(path);
-            CreateRandomFile(path);
-            CreateRandomFile(path);
+            CreateRandomFile(path, 3);
+            CreateRandomFile(path, 3);
+            CreateRandomFile(path, 3);
+            CreateRandomFile(path, 3);
+            CreateRandomFile(path, 3);
             string path1 = Path.Combine(path, "dir1");
             Directory.CreateDirectory(path1);
-            CreateRandomFile(path1);
-            CreateRandomFile(path1);
-            CreateRandomFile(path1);
-            CreateRandomFile(path1);
-            CreateRandomFile(path1);
-            // TODO destroy directory while upload is going on
-        }*/
+            CreateRandomFile(path1, 3);
+            CreateRandomFile(path1, 3);
+            CreateRandomFile(path1, 3);
+            CreateRandomFile(path1, 3);
+            CreateRandomFile(path1, 3);
+        }
 
         public static void CreateRandomFile(string path, int maxSizeInKb)
         {

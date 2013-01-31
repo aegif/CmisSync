@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
 
-  <Product Name='CmisSync' Id='184950D5-67F6-4D06-9717-7E2F1607A7B0' UpgradeCode='D3DF1D99-87F5-47A7-A349-863DD6E4B73A'
-    Language='1033' Codepage='1252' Version='0.8.1' Manufacturer='SparkleShare'>
+  <Product Name='CmisSync' Id='184950D5-67F6-4D06-9717-630B4389409E' UpgradeCode='D3DF1D99-87F5-47A7-A349-863DD6E4B78B'
+    Language='1033' Codepage='1252' Version='0.3.5.1' Manufacturer='CmisSync'>
 
     <Package Id='*' Keywords='Installer' Description="CmisSync Setup" Manufacturer='CmisSync'
       InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
