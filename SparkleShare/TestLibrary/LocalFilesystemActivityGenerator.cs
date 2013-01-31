@@ -29,7 +29,7 @@ namespace TestLibrary
         public static void CreateRandomFile(string path, int maxSizeInKb)
         {
             Random rng = new Random();
-            int sizeInKb = rng.Next(maxSizeInKb);
+            int sizeInKb = 1 + rng.Next(maxSizeInKb);
             string filename = "file_" + id++ + ".bin";
             byte[] data = new byte[1024];
 
