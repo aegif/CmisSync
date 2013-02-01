@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
 
-  <Product Name='CmisSync' Id='184950D5-67F6-4D06-9717-630B4389409E' UpgradeCode='D3DF1D99-87F5-47A7-A349-863DD6E4B78B'
+  <Product Name='CmisSync' Id='879793ad-13fd-43df-9f3c-ae14fbce7e11' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
     Language='1033' Codepage='1252' Version='0.3.5.1' Manufacturer='CmisSync'>
 
     <Package Id='*' Keywords='Installer' Description="CmisSync Setup" Manufacturer='CmisSync'
@@ -13,13 +13,13 @@
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
           <Directory Id='INSTALLDIR' Name='CmisSync'>
-            <Component Id='SparkleShare.exe' Guid='0DA582D5-4ABE-4251-9F62-E7DEA76F10E1'>
+            <Component Id='SparkleShare.exe' Guid='bab5a922-b5c4-4958-ab79-5e303b767a61'>
               <File Id='SparkleShare.exe' Name='SparkleShare.exe' Source='!(wix.root)\bin\SparkleShare.exe' KeyPath='yes' DiskId='1' />
             </Component>
-            <Component Id='SparkleShareInviteOpener.exe' Guid='0DA582D5-4ABE-4251-9F62-E7DEA76F28E1'>
+            <Component Id='SparkleShareInviteOpener.exe' Guid='f2db20a2-94b9-48d1-8cb9-c88097c2c8ff'>
               <File Id='SparkleShareInviteOpener.exe' Name='SparkleShareInviteOpener.exe' Source='!(wix.root)\bin\SparkleShareInviteOpener.exe' DiskId='1' />
             </Component>
-            <Component Id='Libraries' Guid='0DA692D5-4DBE-4251-9F62-E7C1A76F10E1'>
+            <Component Id='Libraries' Guid='f982a0bb-824d-4835-921d-e51b47b8598b'>
               <File Id='SparkleLib.Cmis.dll' Name='SparkleLib.Cmis.dll' Source='!(wix.root)\bin\SparkleLib.Cmis.dll' DiskId='1' />
               <File Id='SparkleLib.dll' Name='SparkleLib.dll' Source='!(wix.root)\bin\SparkleLib.dll' DiskId='1' />
               <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\SparkleLib\Cmis\lib\DotCMIS.dll' DiskId='1' />
@@ -33,7 +33,7 @@
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
-          <Component Id="ApplicationShortcut" Guid="468550D5-67F6-4D06-97A2-7E2F1607A7B0">
+          <Component Id="ApplicationShortcut" Guid="15cef5f2-2f02-4b60-868a-78cfc35823db">
             <Shortcut Id="ApplicationStartMenuShortcut"
                       Name="CmisSync"
                       Target="[INSTALLDIR]SparkleShare.exe"
