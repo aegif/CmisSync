@@ -14,6 +14,7 @@ using Moq;
 using Xunit.Extensions;
 using Newtonsoft.Json;
 using DotCMIS.Data.Impl;
+using System.ComponentModel;
 
 /**
  * Unit Tests for CmisSync.
@@ -187,15 +188,84 @@ namespace TestLibrary
                 activityListener
             );
             cmisDirectory.Sync();
-            Console.WriteLine("First sync done.");
+            Console.WriteLine("Pre sync done.");
 
             // Create directory and small files.
             string path = Path.Combine(CMISSYNCDIR, canonical_name);
-            LocalFilesystemActivityGenerator.CreateDirectoryAndRandomFiles(path);
+            LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(path);
 
             // Sync again.
             cmisDirectory.Sync();
-            Console.WriteLine("Second sync done.");
+            Console.WriteLine("Post sync done.");
+
+            // Clean.
+            Clean(localDirectory, cmisDirectory);
+        }
+
+        /**
+         * Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
+         */
+        [Theory, PropertyData("TestServers")]
+        public void SyncWhileModifyingFile(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Create checkout directory.
+            DirectoryInfo localDirectory = Directory.CreateDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+            // Mock.
+            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            // Sync.
+            CmisDirectory cmisDirectory = new CmisDirectory(
+                canonical_name,
+                localPath,
+                remoteFolderPath,
+                url,
+                user,
+                password,
+                repositoryId,
+                activityListener
+            );
+            cmisDirectory.Sync();
+            Console.WriteLine("Pre sync done.");
+
+            // Sync a few times in a different thread.
+            bool syncing = true;
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Console.WriteLine("Sync.");
+                        cmisDirectory.Sync();
+                    }
+                }
+            );
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                delegate(object o, RunWorkerCompletedEventArgs args)
+                {
+                    syncing = false;
+                }
+            );
+            bw.RunWorkerAsync();
+
+            // Keep creating/removing a file as long as sync is going on.
+            string path = Path.Combine(CMISSYNCDIR, canonical_name);
+            while (syncing)
+            {
+                Console.WriteLine("Create/remove.");
+                LocalFilesystemActivityGenerator.CreateRandomFile(path, 3);
+                foreach (FileInfo file in localDirectory.GetFiles())
+                {
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine("Exception on testing side, ignoring");
+                    }
+                }
+            }
 
             // Clean.
             Clean(localDirectory, cmisDirectory);
