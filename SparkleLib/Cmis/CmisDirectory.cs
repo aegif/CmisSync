@@ -741,15 +741,23 @@ namespace SparkleLib.Cmis
                 // Create database entry for this file.
                 database.AddFile(filePath, remoteDocument.LastModificationDate, null);
             }
-            catch (FileNotFoundException e)
+            catch (Exception e)
             {
-                SparkleLogger.LogInfo("Sync", "File deleted while trying to upload it, reverting.");
-                // File has been deleted while we were trying to upload/checksum/add.
-                // This can typically happen in Windows when creating a new text file and giving it a name.
-                // Revert the upload.
-                if (remoteDocument != null)
+                if (e is FileNotFoundException ||
+                    e is IOException)
                 {
-                    remoteDocument.DeleteAllVersions();
+                    SparkleLogger.LogInfo("Sync", "File deleted while trying to upload it, reverting.");
+                    // File has been deleted while we were trying to upload/checksum/add.
+                    // This can typically happen in Windows when creating a new text file and giving it a name.
+                    // Revert the upload.
+                    if (remoteDocument != null)
+                    {
+                        remoteDocument.DeleteAllVersions();
+                    }
+                }
+                else
+                {
+                    throw;
                 }
             }
             activityListener.ActivityStopped();
