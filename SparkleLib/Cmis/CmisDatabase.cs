@@ -161,6 +161,7 @@ namespace SparkleLib.Cmis
             }
             catch (IOException e) {
                 SparkleLogger.LogInfo("CmisDatabase", "IOException while reading file checksum during addition: " + path);
+                // The file was removed while reading. Just skip it, as it does not need to be added anymore.
                 return;
             }
 

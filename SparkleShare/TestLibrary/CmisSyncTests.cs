@@ -50,7 +50,7 @@ namespace TestLibrary
 
         public CmisSyncTests()
         {
-            SparkleConfig.DefaultConfig = new SparkleConfig(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml");
+            SparkleConfig.DefaultConfig = new SparkleConfig(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
         }
 
         public static IEnumerable<object[]> TestServers
@@ -64,9 +64,24 @@ namespace TestLibrary
 
         public void Dispose()
         {
-            DeleteDirectoryIfExists(@"C:\Users\nico\CmisSync\unittest1");
-            DeleteDirectoryIfExists(@"C:\Users\nico\CmisSync\unittest2");
-            DeleteDirectoryIfExists(@"C:\Users\nico\CmisSync\unittest3");
+        }
+
+        private void Clean(string localDirectory, CmisDirectory cmisDirectory)
+        {
+            DirectoryInfo directory = new DirectoryInfo(localDirectory);
+            // Delete all local files/folders.
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                file.Delete();
+            }
+            foreach (DirectoryInfo dir in directory.GetDirectories())
+            {
+                dir.Delete(true);
+            }
+            // Sync deletions to server.
+            cmisDirectory.Sync();
+            // Remove checkout folder.
+            directory.Delete(false); // Not recursive, should not contain anything at this point.
         }
 
         private void DeleteDirectoryIfExists(string path)
@@ -79,7 +94,18 @@ namespace TestLibrary
 
         private void CleanDirectory(string path)
         {
+            // Delete recursively.
             DeleteDirectoryIfExists(path);
+            
+            // Delete database.
+            string database = path + ".cmissync";
+            File.Delete(database);
+            if (File.Exists(database))
+            {
+                File.Delete(database);
+            }
+
+            // Prepare empty directory.
             Directory.CreateDirectory(path);
         }
 
@@ -135,8 +161,9 @@ namespace TestLibrary
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Create checkout directory.
-            DirectoryInfo localDirectory = Directory.CreateDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
@@ -151,11 +178,47 @@ namespace TestLibrary
                 activityListener
             );
             cmisDirectory.Sync();
-            Console.WriteLine("First sync done.");
+            Console.WriteLine("Synced to clean state.");
 
             // Create random small file.
-            string path = Path.Combine(CMISSYNCDIR, canonical_name);
-            LocalFilesystemActivityGenerator.CreateRandomFile(path, 3);
+            LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
+
+            // Sync again.
+            cmisDirectory.Sync();
+            Console.WriteLine("Second sync done.");
+
+            // Check that file is present server-side.
+            // TODO
+
+            // Clean.
+            Clean(localDirectory, cmisDirectory);
+        }
+
+        [Theory, PropertyData("TestServers")]
+        public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
+            // Mock.
+            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            // Sync.
+            CmisDirectory cmisDirectory = new CmisDirectory(
+                canonical_name,
+                localPath,
+                remoteFolderPath,
+                url,
+                user,
+                password,
+                repositoryId,
+                activityListener
+            );
+            cmisDirectory.Sync();
+            Console.WriteLine("Synced to clean state.");
+
+            // Create random small file.
+            LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000);
 
             // Sync again.
             cmisDirectory.Sync();
@@ -172,8 +235,9 @@ namespace TestLibrary
         public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Create checkout directory.
-            DirectoryInfo localDirectory = Directory.CreateDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
@@ -188,11 +252,10 @@ namespace TestLibrary
                 activityListener
             );
             cmisDirectory.Sync();
-            Console.WriteLine("Pre sync done.");
+            Console.WriteLine("Synced to clean state.");
 
             // Create directory and small files.
-            string path = Path.Combine(CMISSYNCDIR, canonical_name);
-            LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(path);
+            LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
 
             // Sync again.
             cmisDirectory.Sync();
@@ -209,8 +272,9 @@ namespace TestLibrary
         public void SyncWhileModifyingFile(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Create checkout directory.
-            DirectoryInfo localDirectory = Directory.CreateDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
@@ -225,7 +289,7 @@ namespace TestLibrary
                 activityListener
             );
             cmisDirectory.Sync();
-            Console.WriteLine("Pre sync done.");
+            Console.WriteLine("Synced to clean state.");
 
             // Sync a few times in a different thread.
             bool syncing = true;
@@ -249,12 +313,12 @@ namespace TestLibrary
             bw.RunWorkerAsync();
 
             // Keep creating/removing a file as long as sync is going on.
-            string path = Path.Combine(CMISSYNCDIR, canonical_name);
             while (syncing)
             {
                 Console.WriteLine("Create/remove.");
-                LocalFilesystemActivityGenerator.CreateRandomFile(path, 3);
-                foreach (FileInfo file in localDirectory.GetFiles())
+                LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
+                DirectoryInfo localDirectoryInfo = new DirectoryInfo(localDirectory);
+                foreach (FileInfo file in localDirectoryInfo.GetFiles())
                 {
                     try
                     {
@@ -271,21 +335,85 @@ namespace TestLibrary
             Clean(localDirectory, cmisDirectory);
         }
 
-        private void Clean(DirectoryInfo localDirectory, CmisDirectory cmisDirectory)
+        /**
+         * Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
+         */
+        [Theory, PropertyData("TestServers")]
+        public void SyncWhileModifyingFolders(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
         {
-            // Delete all local files/folders.
-            foreach (FileInfo file in localDirectory.GetFiles())
-            {
-                file.Delete();
-            }
-            foreach (DirectoryInfo dir in localDirectory.GetDirectories())
-            {
-                dir.Delete(true);
-            }
-            // Sync deletions to server.
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
+            // Mock.
+            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            // Sync.
+            CmisDirectory cmisDirectory = new CmisDirectory(
+                canonical_name,
+                localPath,
+                remoteFolderPath,
+                url,
+                user,
+                password,
+                repositoryId,
+                activityListener
+            );
             cmisDirectory.Sync();
-            // Remove checkout folder.
-            localDirectory.Delete(false); // Not recursive, should not contain anything at this point.
+            Console.WriteLine("Synced to clean state.");
+
+            // Sync a few times in a different thread.
+            bool syncing = true;
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Console.WriteLine("Sync.");
+                        cmisDirectory.Sync();
+                    }
+                }
+            );
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                delegate(object o, RunWorkerCompletedEventArgs args)
+                {
+                    syncing = false;
+                }
+            );
+            bw.RunWorkerAsync();
+
+            // Keep creating/removing a file as long as sync is going on.
+            while (syncing)
+            {
+                Console.WriteLine("Create/remove.");
+                LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
+                DirectoryInfo localDirectoryInfo = new DirectoryInfo(localDirectory);
+                foreach (FileInfo file in localDirectoryInfo.GetFiles())
+                {
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine("Exception on testing side, ignoring");
+                    }
+                }
+                foreach (DirectoryInfo directory in localDirectoryInfo.GetDirectories())
+                {
+                    try
+                    {
+                        directory.Delete();
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine("Exception on testing side, ignoring");
+                    }
+                }
+            }
+
+            // Clean.
+            Clean(localDirectory, cmisDirectory);
         }
 
         // Write a file and immediately check whether it has been created.

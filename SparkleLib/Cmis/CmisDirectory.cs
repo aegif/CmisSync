@@ -153,7 +153,7 @@ namespace SparkleLib.Cmis
                 }
                 if (session == null)
                 {
-                    SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds...");
+                    SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + cmisParameters[SessionParameter.AtomPubUrl]);
                     System.Threading.Thread.Sleep(10 * 1000);
                 }
             }

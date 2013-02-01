@@ -33,6 +33,12 @@ namespace TestLibrary
         {
             Random rng = new Random();
             int sizeInKb = 1 + rng.Next(maxSizeInKb);
+            CreateFile(path, sizeInKb);
+        }
+
+        public static void CreateFile(string path, int sizeInKb)
+        {
+            Random rng = new Random();
             string filename = "file_" + id++ + ".bin";
             byte[] data = new byte[1024];
 
