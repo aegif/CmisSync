@@ -94,6 +94,11 @@
       <Link>SparkleStatusIconController.cs</Link>
     </Compile>
     <Compile Include="..\SparkleSetupController.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SparkleShortcut.cs" />
     <Compile Include="SparkleUI.cs" />
     <Compile Include="..\SparkleAboutController.cs" />
@@ -233,6 +238,11 @@
     </EmbeddedResource>
     <EmbeddedResource Include="..\Linux\Pixmaps\icons\process-working-22.png">
       <Link>Pixmaps\process-working-22.png</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

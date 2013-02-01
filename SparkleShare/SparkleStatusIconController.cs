@@ -22,6 +22,9 @@ using System.Timers;
 using Threading = System.Threading;
 
 using SparkleLib;
+using System.Globalization;
+
+using SparkleShare.Properties;
 
 namespace SparkleShare {
 
@@ -52,7 +55,7 @@ namespace SparkleShare {
         public delegate void UpdateOpenRecentEventsItemEventHandler (bool open_recent_events_item_enabled);
 		
         public IconState CurrentState = IconState.Idle;
-        public string StateText = "Welcome to CmisSync!";
+        public string StateText = Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
 
 
         public readonly int MenuOverflowThreshold   = 9;
@@ -119,7 +122,6 @@ namespace SparkleShare {
             }
         }
 
-
         private Timer animation;
         private int animation_frame_number;
 
@@ -133,9 +135,9 @@ namespace SparkleShare {
                     CurrentState = IconState.Idle;
 
                     if (Program.Controller.Folders.Count == 0)
-                        StateText = "Welcome to CmisSync!";
+                        StateText = Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
                     else
-                        StateText = "Files up to date " + FolderSize;
+                        StateText = Resources.ResourceManager.GetString("FilesUpToDate", CultureInfo.CurrentCulture) + " " + FolderSize;
                 }
 
                 UpdateStatusItemEvent (StateText);
@@ -147,9 +149,9 @@ namespace SparkleShare {
                     CurrentState = IconState.Idle;
 
                     if (Program.Controller.Folders.Count == 0)
-                        StateText = "Welcome to CmisSync!";
+                        StateText = Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
                     else
-                        StateText = "Files up to date " + FolderSize;
+                        StateText = Resources.ResourceManager.GetString("FilesUpToDate", CultureInfo.CurrentCulture) + " " + FolderSize;
                 }
 
                 UpdateQuitItemEvent (QuitItemEnabled);
@@ -177,15 +179,15 @@ namespace SparkleShare {
 				    repos_syncing_down > 0) {
 					
 					CurrentState = IconState.Syncing;
-                    StateText    = "Syncing changes…";
+                    StateText = Resources.ResourceManager.GetString("SyncingChanges", CultureInfo.CurrentCulture);
 				
 				} else if (repos_syncing_down == 0) {
 					CurrentState = IconState.SyncingUp;
-                    StateText    = "Sending changes…";
+                    StateText = Resources.ResourceManager.GetString("SendingChanges", CultureInfo.CurrentCulture);
 					
 				} else {
 					CurrentState = IconState.SyncingDown;
-                    StateText    = "Receiving changes…";
+                    StateText = Resources.ResourceManager.GetString("ReceivingChanges", CultureInfo.CurrentCulture);
 				}
 
                 StateText += " " + ProgressPercentage + "%  " + ProgressSpeed;
@@ -198,7 +200,7 @@ namespace SparkleShare {
 
             Program.Controller.OnError += delegate {
                 CurrentState = IconState.Error;
-                StateText    = "Failed to send some changes";
+                StateText = Resources.ResourceManager.GetString("FailedToSendSomeChanges", CultureInfo.CurrentCulture);
 
                 UpdateQuitItemEvent (QuitItemEnabled);
                 UpdateStatusItemEvent (StateText);

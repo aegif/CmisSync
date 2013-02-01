@@ -26,6 +26,7 @@ using System.Windows.Controls.Primitives;
 
 using Drawing = System.Drawing;
 using Forms = System.Windows.Forms;
+using System.Globalization;
 
 namespace SparkleShare {
 
@@ -115,7 +116,7 @@ namespace SparkleShare {
                 };
             
             SparkleMenuItem add_item = new SparkleMenuItem () {
-                Header = "Add a CMIS folder…"
+                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture)
             };
             
                 add_item.Click += delegate {
@@ -153,7 +154,7 @@ namespace SparkleShare {
                 };
             
             this.exit_item = new SparkleMenuItem () {
-                Header = "Exit"
+                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)
             };
             
                 this.exit_item.Click += delegate {
