@@ -133,13 +133,13 @@
     <value>Cancel</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync creates a special folder on your computer where the server's documents are synchronized.</value>
+    <value>CmisSync creates a special folder on your computer where the documents are synchronized.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Continue</value>
   </data>
   <data name="DocumentsAre" xml:space="preserve">
-    <value>Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server.</value>
+    <value>Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server automatically too.</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
     <value>Enter a Web address where the documents can be seen:</value>
@@ -160,10 +160,18 @@
     <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync allows you to keep in sync with any CMIS-compatible repository, and use your documents even when offline.\nIt is like Dropbox for Enterprise Content Management!\nAvailable for Linux, Mac, Windows.</value>
+    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+
+It is like Dropbox for Enterprise Content Management!</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
     <value>This may either take a short or a long time depending on the folder's size.</value>
+  </data>
+  <data name="OpenFolder" xml:space="preserve">
+    <value>Open the synchronized folder</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Your documents are ready!</value>
@@ -178,7 +186,10 @@
     <value>Skip Tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.\nPlease check again.\nIf you are sure about the address, open it in a browser and post\nthe resulting XML to the CmisSync forum.</value>
+    <value>Sorry, CmisSync can not find a CMIS server at this address.
+Please check again.
+If you are sure about the address, open it in a browser and post
+the resulting XML to the CmisSync forum.</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Add CmisSync to startup items</value>
@@ -187,13 +198,16 @@
     <value>The status icon is here to help</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>It shows the syncing progress, and provides easy access to your folders.</value>
+    <value>CmisSync's status icon shows the syncing progress, and provides easy access to your folders.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronization</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
     <value>Syncing changes…</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to CmisSync!</value>

@@ -106,7 +106,7 @@ namespace SparkleShare.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CmisSync creates a special folder on your computer where the server&apos;s documents are synchronized..
+        ///   Looks up a localized string similar to CmisSync creates a special folder on your computer where the documents are synchronized..
         /// </summary>
         internal static string CmisSyncCreates {
             get {
@@ -124,7 +124,7 @@ namespace SparkleShare.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server..
+        ///   Looks up a localized string similar to Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server automatically too..
         /// </summary>
         internal static string DocumentsAre {
             get {
@@ -187,7 +187,9 @@ namespace SparkleShare.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CmisSync allows you to keep in sync with any CMIS-compatible repository, and use your documents even when offline.\nIt is like Dropbox for Enterprise Content Management!\nAvailable for Linux, Mac, Windows..
+        ///   Looks up a localized string similar to CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+        ///
+        ///It is like Dropbox for Enterprise Content Management!.
         /// </summary>
         internal static string Intro {
             get {
@@ -201,6 +203,24 @@ namespace SparkleShare.Properties {
         internal static string MayTakeTime {
             get {
                 return ResourceManager.GetString("MayTakeTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open the synchronized folder.
+        /// </summary>
+        internal static string OpenFolder {
+            get {
+                return ResourceManager.GetString("OpenFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        internal static string Password {
+            get {
+                return ResourceManager.GetString("Password", resourceCulture);
             }
         }
         
@@ -241,7 +261,10 @@ namespace SparkleShare.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorry, CmisSync can not find a CMIS server at this address.\nPlease check again.\nIf you are sure about the address, open it in a browser and post\nthe resulting XML to the CmisSync forum..
+        ///   Looks up a localized string similar to Sorry, CmisSync can not find a CMIS server at this address.
+        ///Please check again.
+        ///If you are sure about the address, open it in a browser and post
+        ///the resulting XML to the CmisSync forum..
         /// </summary>
         internal static string Sorry {
             get {
@@ -268,7 +291,7 @@ namespace SparkleShare.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to It shows the syncing progress, and provides easy access to your folders..
+        ///   Looks up a localized string similar to CmisSync&apos;s status icon shows the syncing progress, and provides easy access to your folders..
         /// </summary>
         internal static string StatusIconShows {
             get {
@@ -291,6 +314,15 @@ namespace SparkleShare.Properties {
         internal static string SyncingChanges {
             get {
                 return ResourceManager.GetString("SyncingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User.
+        /// </summary>
+        internal static string User {
+            get {
+                return ResourceManager.GetString("User", resourceCulture);
             }
         }
         

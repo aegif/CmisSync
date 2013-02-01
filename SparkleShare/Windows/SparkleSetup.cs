@@ -608,13 +608,12 @@ namespace SparkleShare {
                         Header      = SparkleShare.Properties.Resources.ResourceManager.GetString("Ready", CultureInfo.CurrentCulture);
                         Description = SparkleShare.Properties.Resources.ResourceManager.GetString("YouCanFind", CultureInfo.CurrentCulture);
                         
-                        
                         Button finish_button = new Button () {
                             Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture)
                         };
     
                         Button open_folder_button = new Button () {
-                            Content = string.Format ("Open {0}", Path.GetFileName (Controller.PreviousPath))
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("OpenFolder", CultureInfo.CurrentCulture)
                         };
 
                         if (warnings.Length > 0) {
@@ -781,7 +780,7 @@ namespace SparkleShare {
                                 slide_image.Source = SparkleUIHelpers.GetImageSource ("tutorial-slide-4");
     
                                 CheckBox check_box = new CheckBox () {
-                                    Content   = SparkleShare.Properties.Resources.ResourceManager.GetString("Startup", CultureInfo.CurrentCulture)
+                                    Content   = SparkleShare.Properties.Resources.ResourceManager.GetString("Startup", CultureInfo.CurrentCulture),
                                     IsChecked = true
                                 };
                             
