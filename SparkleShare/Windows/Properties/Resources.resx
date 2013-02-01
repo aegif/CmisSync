@@ -117,8 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
   <data name="AddARemoteFolder" xml:space="preserve">
     <value>Add a remote folder…</value>
+  </data>
+  <data name="AddFolders" xml:space="preserve">
+    <value>Adding synchronized folders to CmisSync</value>
+  </data>
+  <data name="AddingFolder" xml:space="preserve">
+    <value>Adding Folder</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CmisSyncCreates" xml:space="preserve">
+    <value>CmisSync creates a special folder on your computer where the server's documents are synchronized.</value>
+  </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="DocumentsAre" xml:space="preserve">
+    <value>Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server.</value>
+  </data>
+  <data name="EnterWebAddress" xml:space="preserve">
+    <value>Enter a Web address where the documents can be seen:</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
@@ -129,16 +153,67 @@
   <data name="FilesUpToDate" xml:space="preserve">
     <value>Files up to date</value>
   </data>
+  <data name="Finish" xml:space="preserve">
+    <value>Finish</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Intro" xml:space="preserve">
+    <value>CmisSync allows you to keep in sync with any CMIS-compatible repository, and use your documents even when offline.\nIt is like Dropbox for Enterprise Content Management!\nAvailable for Linux, Mac, Windows.</value>
+  </data>
+  <data name="MayTakeTime" xml:space="preserve">
+    <value>This may either take a short or a long time depending on the folder's size.</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Your documents are ready!</value>
+  </data>
   <data name="ReceivingChanges" xml:space="preserve">
     <value>Receiving changes…</value>
   </data>
   <data name="SendingChanges" xml:space="preserve">
     <value>Sending changes…</value>
   </data>
+  <data name="SkipTutorial" xml:space="preserve">
+    <value>Skip Tutorial</value>
+  </data>
+  <data name="Sorry" xml:space="preserve">
+    <value>Sorry, CmisSync can not find a CMIS server at this address.\nPlease check again.\nIf you are sure about the address, open it in a browser and post\nthe resulting XML to the CmisSync forum.</value>
+  </data>
+  <data name="Startup" xml:space="preserve">
+    <value>Add CmisSync to startup items</value>
+  </data>
+  <data name="StatusIcon" xml:space="preserve">
+    <value>The status icon is here to help</value>
+  </data>
+  <data name="StatusIconShows" xml:space="preserve">
+    <value>It shows the syncing progress, and provides easy access to your folders.</value>
+  </data>
+  <data name="Synchronization" xml:space="preserve">
+    <value>Synchronization</value>
+  </data>
   <data name="SyncingChanges" xml:space="preserve">
     <value>Syncing changes…</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to CmisSync!</value>
+  </data>
+  <data name="WhatsNext" xml:space="preserve">
+    <value>What's happening next?</value>
+  </data>
+  <data name="Where" xml:space="preserve">
+    <value>Where is your organization's server?</value>
+  </data>
+  <data name="WhereToFind" xml:space="preserve">
+    <value>Where to find this address</value>
+  </data>
+  <data name="Which" xml:space="preserve">
+    <value>Which remote folder do you want to sync?</value>
+  </data>
+  <data name="YouCan" xml:space="preserve">
+    <value>You can easily add a new CMIS folder at any time.</value>
+  </data>
+  <data name="YouCanFind" xml:space="preserve">
+    <value>You can find them in your CmisSync folder.</value>
   </data>
 </root>

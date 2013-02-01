@@ -36,6 +36,7 @@ using WPF = System.Windows.Controls;
 
 using SparkleLib.Cmis;
 using SparkleLib;
+using System.Globalization;
 
 namespace SparkleShare {
 
@@ -78,15 +79,15 @@ namespace SparkleShare {
                     
                     switch (type) {
                     case PageType.Setup: {
-                        Header      = "Welcome to CmisSync!";
-                        Description = "CmisSync allows you to keep in sync with any CMIS-compatible repository, and use your documents even when offline.\nIt is like Dropbox for Enterprise Content Management!\nAvailable for Linux, Mac, Windows.";
+                        Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
+                        Description = SparkleShare.Properties.Resources.ResourceManager.GetString("Intro", CultureInfo.CurrentCulture);
                         
                         Button cancel_button = new Button () {
-                            Content = "Cancel"
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                         };
                         
                         Button continue_button = new Button () {
-                            Content = "Continue",
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture),
                             IsEnabled = false
                         };
                         
@@ -190,11 +191,11 @@ namespace SparkleShare {
                     }
                         
                     case PageType.Add1: {
-                        Header = "Where is your organization's server?";
+                        Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Where", CultureInfo.CurrentCulture);
                         
                         // Address
                         TextBlock address_label = new TextBlock () {
-                            Text       = "Enter a Web address where the documents can be seen:",
+                            Text       = SparkleShare.Properties.Resources.ResourceManager.GetString("EnterWebAddress", CultureInfo.CurrentCulture),
                             FontWeight = FontWeights.Bold
                         };
                         
@@ -206,11 +207,11 @@ namespace SparkleShare {
 
                         TextBlock address_help_label = new TextBlock()
                         {
-                            Text = "Help: ",
+                            Text = SparkleShare.Properties.Resources.ResourceManager.GetString("Help", CultureInfo.CurrentCulture) + ": ",
                             FontSize = 11,
                             Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
                         };
-                        Run run = new Run("Where to find this address");
+                        Run run = new Run(SparkleShare.Properties.Resources.ResourceManager.GetString("WhereToFind", CultureInfo.CurrentCulture));
                         Hyperlink link = new Hyperlink(run);
                         link.NavigateUri = new Uri("https://github.com/nicolas-raoul/CmisSync/wiki/What-address");
                         address_help_label.Inlines.Add(link);
@@ -229,7 +230,7 @@ namespace SparkleShare {
                         // User
                         TextBlock user_label = new TextBlock()
                         {
-                            Text = "User:",
+                            Text = SparkleShare.Properties.Resources.ResourceManager.GetString("User", CultureInfo.CurrentCulture) + ":",
                             FontWeight = FontWeights.Bold,
                             Width = 200
                         };
@@ -252,7 +253,7 @@ namespace SparkleShare {
                         // Password
                         TextBlock password_label = new TextBlock()
                         {
-                            Text = "Password:",
+                            Text = SparkleShare.Properties.Resources.ResourceManager.GetString("Password", CultureInfo.CurrentCulture) + ":",
                             FontWeight = FontWeights.Bold,
                             Width = 200
                         };
@@ -272,11 +273,11 @@ namespace SparkleShare {
                         };
                         
                         Button cancel_button = new Button () {
-                            Content = "Cancel"
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                         };
                         
                         Button continue_button = new Button () {
-                            Content = "Continue"
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                         };
 
 						// Address
@@ -394,7 +395,7 @@ namespace SparkleShare {
                             if (Controller.repositories == null)
                             {
                                 // Show warning
-                                address_error_label.Text = "Sorry, CmisSync can not find a CMIS server at this address.\nPlease check again.\nIf you are sure about the address, open it in a browser and post\nthe resulting XML to the CmisSync forum.";
+                                address_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture);
                                 address_error_label.Visibility = Visibility.Visible;
                             }
                             else
@@ -409,7 +410,7 @@ namespace SparkleShare {
                     }
 
                     case PageType.Add2: {
-                        Header = "Which remote folder do you want to sync?";
+                        Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Which", CultureInfo.CurrentCulture);
 
                         System.Windows.Controls.TreeView treeView = new System.Windows.Controls.TreeView();
                         treeView.Width = 410;
@@ -470,12 +471,12 @@ namespace SparkleShare {
 
                         Button cancel_button = new Button()
                         {
-                            Content = "Cancel"
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                         };
 
                         Button add_button = new Button()
                         {
-                            Content = "Add"
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
                         };
 
                         Buttons.Add(add_button);
@@ -497,16 +498,16 @@ namespace SparkleShare {
 
                         
                     case PageType.Syncing: {
-                        Header      = "Adding folder ‘" + Controller.SyncingFolder + "’…";
-                        Description = "This may either take a short or a long time depending on the folder's size.";
+                        Header      = SparkleShare.Properties.Resources.ResourceManager.GetString("AddingFolder", CultureInfo.CurrentCulture) + " ‘" + Controller.SyncingFolder + "’…";
+                        Description = SparkleShare.Properties.Resources.ResourceManager.GetString("MayTakeTime", CultureInfo.CurrentCulture);
 
                         Button finish_button = new Button () {
-                            Content   = "Finish",
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture),
                             IsEnabled = false
                         };
 
                         Button cancel_button = new Button () {
-                            Content = "Cancel"
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                         };
 
                         ProgressBar progress_bar = new ProgressBar () {
@@ -604,12 +605,12 @@ namespace SparkleShare {
                     }    
                         
                     case PageType.Finished: {
-                        Header      = "Your documents are ready!";
-                        Description = "You can find them in your CmisSync folder.";
+                        Header      = SparkleShare.Properties.Resources.ResourceManager.GetString("Ready", CultureInfo.CurrentCulture);
+                        Description = SparkleShare.Properties.Resources.ResourceManager.GetString("YouCanFind", CultureInfo.CurrentCulture);
                         
                         
                         Button finish_button = new Button () {
-                            Content = "Finish"
+                            Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture)
                         };
     
                         Button open_folder_button = new Button () {
@@ -662,9 +663,8 @@ namespace SparkleShare {
                         
                         switch (Controller.TutorialPageNumber) {
                             case 1: {
-                                Header      = "What's happening next?";
-                                Description = "CmisSync creates a special folder on your computer " +
-                                    "that will keep track of your folders.";
+                                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("WhatsNext", CultureInfo.CurrentCulture);
+                                Description = SparkleShare.Properties.Resources.ResourceManager.GetString("CmisSyncCreates", CultureInfo.CurrentCulture);
     
                             
                                 WPF.Image slide_image = new WPF.Image () {
@@ -675,11 +675,11 @@ namespace SparkleShare {
                                 slide_image.Source = SparkleUIHelpers.GetImageSource ("tutorial-slide-1");
                             
 								Button skip_tutorial_button = new Button () {
-									Content = "Skip tutorial"
+                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("SkipTutorial", CultureInfo.CurrentCulture)
 								};
 								
 								Button continue_button = new Button () {
-									Content = "Continue"
+									Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
 								};
 							
                             
@@ -703,13 +703,12 @@ namespace SparkleShare {
                             }
                         
                             case 2: {
-                                Header      = "Sharing files with others";
-                                Description = "All files added to the server are automatically synced to your " +
-                                    "local folder.";
+                                Header      = SparkleShare.Properties.Resources.ResourceManager.GetString("Synchronization", CultureInfo.CurrentCulture);
+                                Description = SparkleShare.Properties.Resources.ResourceManager.GetString("DocumentsAre", CultureInfo.CurrentCulture);
     
                             
                                 Button continue_button = new Button () {
-                                    Content = "Continue"
+                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                                 };
                                 
                                 WPF.Image slide_image = new WPF.Image () {
@@ -735,13 +734,12 @@ namespace SparkleShare {
                             }
                             
                             case 3: {
-                                Header      = "The status icon is here to help";
-                                Description = "It shows the syncing progress, provides easy access to " +
-                                    "your folders and lets you view recent changes.";
+                                Header      = SparkleShare.Properties.Resources.ResourceManager.GetString("StatusIcon", CultureInfo.CurrentCulture);
+                                Description = SparkleShare.Properties.Resources.ResourceManager.GetString("StatusIconShows", CultureInfo.CurrentCulture);
     
                             
                                 Button continue_button = new Button () {
-                                    Content = "Continue"
+                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                                 };
                                 
                                 WPF.Image slide_image = new WPF.Image () {
@@ -767,13 +765,12 @@ namespace SparkleShare {
                             }
                             
                             case 4: {
-                                Header      = "Adding repository folders to CmisSync";
-                                Description = "You can easily add a new CMIS folder " +
-                                    "at any time.";
+                                Header      = SparkleShare.Properties.Resources.ResourceManager.GetString("AddFolders", CultureInfo.CurrentCulture);
+                                Description = SparkleShare.Properties.Resources.ResourceManager.GetString("YouCan", CultureInfo.CurrentCulture);
                             
                             
                                 Button finish_button = new Button () {
-                                    Content = "Finish"
+                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture)
                                 };
                                 
                                 WPF.Image slide_image = new WPF.Image () {
@@ -784,7 +781,7 @@ namespace SparkleShare {
                                 slide_image.Source = SparkleUIHelpers.GetImageSource ("tutorial-slide-4");
     
                                 CheckBox check_box = new CheckBox () {
-                                    Content   = "Add CmisSync to startup items",
+                                    Content   = SparkleShare.Properties.Resources.ResourceManager.GetString("Startup", CultureInfo.CurrentCulture)
                                     IsChecked = true
                                 };
                             
