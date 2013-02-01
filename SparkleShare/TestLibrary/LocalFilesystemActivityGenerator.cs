@@ -8,9 +8,9 @@ namespace TestLibrary
 {
     class LocalFilesystemActivityGenerator
     {
-        private static int id = 0;
+        private static int id = 1;
 
-        public static void CreateDirectoryAndRandomFiles(string path)
+        public static void CreateDirectoriesAndFiles(string path)
         {
             CreateRandomFile(path, 3);
             CreateRandomFile(path, 3);
@@ -24,6 +24,9 @@ namespace TestLibrary
             CreateRandomFile(path1, 3);
             CreateRandomFile(path1, 3);
             CreateRandomFile(path1, 3);
+            string path2 = Path.Combine(path1, "dir2");
+            Directory.CreateDirectory(path2);
+            CreateRandomFile(path2, 3);
         }
 
         public static void CreateRandomFile(string path, int maxSizeInKb)
