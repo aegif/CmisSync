@@ -18,7 +18,7 @@ namespace TestLibraryRunner
             IEnumerable<object[]> servers = JsonConvert.DeserializeObject<List<object[]>>(
                     File.ReadAllText("../../../TestLibrary/test-servers.json"));
             object[] server = servers.ElementAt(serverId);
-            new CmisSyncTests().ClientSideDirectoryAndSmallFilesAddition((string)server[0], (string)server[1],
+            new CmisSyncTests().SyncWhileModifyingFile((string)server[0], (string)server[1],
                 (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
 
 // Let the console open.
