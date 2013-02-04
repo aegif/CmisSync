@@ -616,7 +616,7 @@ namespace SparkleShare {
                             Content = SparkleShare.Properties.Resources.ResourceManager.GetString("OpenFolder", CultureInfo.CurrentCulture)
                         };
 
-                        if (warnings.Length > 0) {
+                        /*if (warnings.Length > 0) {
 							Image warning_image = new Image () {
 								Source = Imaging.CreateBitmapSourceFromHIcon (Drawing.SystemIcons.Information.Handle,
                                 	Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions ())
@@ -635,7 +635,7 @@ namespace SparkleShare {
 					        ContentCanvas.Children.Add (warning_block);
 	                        Canvas.SetLeft (warning_block, 240);
 	                        Canvas.SetTop (warning_block, 100);
-						}
+						}*/
 						
 						TaskbarItemInfo.ProgressValue = 0.0;
 						TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
