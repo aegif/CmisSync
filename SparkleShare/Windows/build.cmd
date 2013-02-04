@@ -18,7 +18,7 @@ if "%1"=="installer" (
 		"%wixBinDir%\heat.exe" dir "%~dp0\..\..\bin\plugins" -cg pluginsComponentGroup -gg -scom -sreg -sfrag -srd -dr PLUGINS_DIR -var wix.pluginsdir -o plugins.wxs
 		"%wixBinDir%\candle" "%~dp0\SparkleShare.wxs" -ext WixUIExtension -ext WixUtilExtension
 		"%wixBinDir%\candle" "%~dp0\plugins.wxs" -ext WixUIExtension -ext WixUtilExtension
-		"%wixBinDir%\light" -ext WixUIExtension -ext WixUtilExtension Sparkleshare.wixobj plugins.wixobj -droot="%~dp0\..\.." -dpluginsdir="%~dp0\..\..\bin\plugins"  -o CmisSync.msi 
+		"%wixBinDir%\light" -ext WixUIExtension -ext WixUtilExtension -cultures:en-us;fr-fr;ja-ja;uk-ua;da-dk Sparkleshare.wixobj plugins.wixobj -droot="%~dp0\..\.." -dpluginsdir="%~dp0\..\..\bin\plugins"  -o CmisSync.msi 
 		if exist "%~dp0\CmisSync.msi" echo CmisSync.msi created.
 	) else (
 		echo Not building installer ^(could not find wix, Windows Installer XML toolset^)
