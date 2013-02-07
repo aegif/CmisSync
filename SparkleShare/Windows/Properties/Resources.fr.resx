@@ -186,7 +186,7 @@ C'est comme Dropbox pour les serveurs de gestion de contenu d'Entreprise (ECM) !
     <value>Passer le Tutoriel</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Désolé, CmisSync n'a pas trouver de serveur CMIS à cette adresse.
+    <value>Désolé, CmisSync n'a pas trouvé de serveur CMIS à cette adresse.
 Vérifiez à nouveau l'adresse que vous avez saisie.
 Si vous êtes sûr de l'adresse, ouvrez-la dans votre navigateur et ajouter les données XML obtenues dans le forum de CmisSync.</value>
   </data>
