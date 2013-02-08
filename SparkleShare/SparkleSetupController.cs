@@ -347,7 +347,8 @@ namespace SparkleShare {
 
         public void CheckAddPage (string address)
         {
-            // Check URL validity. http://regexlib.com/RETester.aspx?regexp_id=1057
+            // Check URL validity.
+            // We ignore everything after the servername so no need to check that.
             Regex regx = new Regex(@"(http|https)://[a-zA-Z0-9].*");
 
             this.saved_address = address;
