@@ -719,7 +719,14 @@ namespace SparkleLib.Cmis
          */
         private void UploadFile(string filePath, IFolder remoteFolder)
         {
+            // Ignore "your-version" files, they are generated locally in case of conflict.
+            if (filePath.Contains("your-version"))
+            {
+                return;
+            }
+
             activityListener.ActivityStarted();
+
             IDocument remoteDocument = null;
             try
             {
