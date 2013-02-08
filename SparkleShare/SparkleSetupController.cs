@@ -347,11 +347,12 @@ namespace SparkleShare {
 
         public void CheckAddPage (string address)
         {
-            address     = address.Trim ();
+            // Check URL validity. http://regexlib.com/RETester.aspx?regexp_id=1057
+            Regex regx = new Regex(@"(http|https)://[a-zA-Z0-9].*");
 
             this.saved_address = address;
 
-            bool fields_valid = (!string.IsNullOrEmpty (address));
+            bool fields_valid = ((!string.IsNullOrEmpty(address)) && (regx.IsMatch(address)));
 
             UpdateAddProjectButtonEvent (fields_valid);
         }
