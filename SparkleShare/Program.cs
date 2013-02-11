@@ -29,7 +29,6 @@ namespace SparkleShare {
         public static SparkleUI UI;
 
         private static Mutex program_mutex = new Mutex (false, "CmisSync");
-        
      
         #if !__MonoCS__
         [STAThread]

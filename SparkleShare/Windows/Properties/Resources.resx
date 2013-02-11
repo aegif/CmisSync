@@ -129,6 +129,12 @@
   <data name="AddingFolder" xml:space="preserve">
     <value>Adding Folder</value>
   </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="BadURL" xml:space="preserve">
+    <value>Bad URL !</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -138,8 +144,17 @@
   <data name="Continue" xml:space="preserve">
     <value>Continue</value>
   </data>
+  <data name="Customize" xml:space="preserve">
+    <value>Customize the local folder name</value>
+  </data>
   <data name="DocumentsAre" xml:space="preserve">
     <value>Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server automatically too.</value>
+  </data>
+  <data name="EmptyURLNotAllow" xml:space="preserve">
+    <value>Empty url not allow !</value>
+  </data>
+  <data name="EnterLocalFolderName" xml:space="preserve">
+    <value>Enter a name for the local folder where the documents are synchronised</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
     <value>Enter a Web address where the documents can be seen:</value>
@@ -156,6 +171,9 @@
   <data name="Finish" xml:space="preserve">
     <value>Finish</value>
   </data>
+  <data name="FolderAlreadyExist" xml:space="preserve">
+    <value>A folder already in the CmisSync root folder</value>
+  </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
   </data>
@@ -163,6 +181,9 @@
     <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
 
 It is like Dropbox for Enterprise Content Management!</value>
+  </data>
+  <data name="InvalidFolderName" xml:space="preserve">
+    <value>The folder name is invalid. Special car are not allow.</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
     <value>This may either take a short or a long time depending on the folder's size.</value>
@@ -172,6 +193,9 @@ It is like Dropbox for Enterprise Content Management!</value>
   </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
+  </data>
+  <data name="PermissionDenied" xml:space="preserve">
+    <value>CMIS server found, but permission denied. Please check username/password !</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Your documents are ready!</value>

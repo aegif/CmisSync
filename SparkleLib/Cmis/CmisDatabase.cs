@@ -52,6 +52,10 @@ namespace SparkleLib.Cmis
                 bool createDatabase = ! File.Exists(databaseFileName);
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
+                
+                // Hidden database file
+                File.SetAttributes(databaseFileName, FileAttributes.Hidden);
+
                 if (createDatabase)
                 {
                     using (var command = new SQLiteCommand(sqliteConnection))

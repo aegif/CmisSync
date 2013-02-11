@@ -86,9 +86,10 @@ namespace SparkleLib.Cmis
             {
                 repositories = factory.GetRepositories(cmisParameters);
             }
-            catch (CmisPermissionDeniedException e)
+            catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
-                throw new CmisServerNotFoundException("CMIS server found, but permission denied. Please check username/password");
+                //throw new CmisServerNotFoundException("CMIS server found, but permission denied. Please check username/password");
+                throw new SparkleLib.Cmis.CmisPermissionDeniedException("PermissionDenied");
             }
             catch (CmisRuntimeException e)
             {

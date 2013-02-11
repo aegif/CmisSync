@@ -112,7 +112,8 @@ namespace SparkleShare {
 
         public bool QuitItemEnabled {
             get {
-                return (CurrentState == IconState.Idle || CurrentState == IconState.Error);
+                // return (CurrentState == IconState.Idle || CurrentState == IconState.Error);
+                return true;
             }
         }
 

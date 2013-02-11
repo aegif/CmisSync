@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string"/>
-              <xsd:attribute name="type" type="xsd:string"/>
-              <xsd:attribute name="mimetype" type="xsd:string"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string"/>
-              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -129,8 +129,17 @@
   <data name="AddingFolder" xml:space="preserve">
     <value>Ajouter un dossier</value>
   </data>
+  <data name="Back" xml:space="preserve">
+    <value>Retour</value>
+  </data>
+  <data name="BadURL" xml:space="preserve">
+    <value>L'adresse saisie n'est pas une adresse valide !</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Annuler</value>
+  </data>
+  <data name="CheckURL" xml:space="preserve">
+    <value>Vérifier l'URL</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
     <value>CmisSync crée un dossier spécial sur votre ordinateur où les documents sont synchronisés.</value>
@@ -138,8 +147,17 @@
   <data name="Continue" xml:space="preserve">
     <value>Continuer</value>
   </data>
+  <data name="Customize" xml:space="preserve">
+    <value>Personnaliser le nom du dossier local</value>
+  </data>
   <data name="DocumentsAre" xml:space="preserve">
     <value>Les documents sont automatiquement mis à jour pour refléter les derniers changements de vos collègues et vos modifications sont aussi envoyées au serveur automatiquement.</value>
+  </data>
+  <data name="EmptyURLNotAllow" xml:space="preserve">
+    <value>Le champ adresse ne peut pas être vide !</value>
+  </data>
+  <data name="EnterLocalFolderName" xml:space="preserve">
+    <value>Entrez un nom pour le dossier local où les documents seront synchronisés:</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
     <value>Entrez l'adresse web où vos documents sont accessibles:</value>
@@ -156,6 +174,9 @@
   <data name="Finish" xml:space="preserve">
     <value>Terminer</value>
   </data>
+  <data name="FolderAlreadyExist" xml:space="preserve">
+    <value>Un dossier porte déjà ce nom dans le dossier racine de CmisSync</value>
+  </data>
   <data name="Help" xml:space="preserve">
     <value>Aide</value>
   </data>
@@ -163,6 +184,9 @@
     <value>CmisSync permet de rester synchronisé avec n'importe quel serveur d'entreprise conforme CMIS et d'utiliser vos documents même en mode hors connexion.
 
 C'est comme Dropbox pour les serveurs de gestion de contenu d'Entreprise (ECM) !</value>
+  </data>
+  <data name="InvalidFolderName" xml:space="preserve">
+    <value>Le nom du dossier n'est pas valide. Les caractères spéciaux ne sont pas autorisés</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
     <value>Cela peut prendre un certain temps en fonction de la taille du dossier.</value>
@@ -172,6 +196,10 @@ C'est comme Dropbox pour les serveurs de gestion de contenu d'Entreprise (ECM) !
   </data>
   <data name="Password" xml:space="preserve">
     <value>Mot de passe</value>
+  </data>
+  <data name="PermissionDenied" xml:space="preserve">
+    <value>Le serveur CMIS a été trouvé mais l'accès a été refusé.
+Vérifiez votre nom d'utilisateur et votre mot de passe !</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Vos documents sont prêts!</value>
@@ -186,9 +214,10 @@ C'est comme Dropbox pour les serveurs de gestion de contenu d'Entreprise (ECM) !
     <value>Passer le Tutoriel</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Désolé, CmisSync n'a pas trouvé de serveur CMIS à cette adresse.
+    <value>Désolé, CmisSync n'a pas trouver de serveur CMIS à cette adresse.
 Vérifiez à nouveau l'adresse que vous avez saisie.
-Si vous êtes sûr de l'adresse, ouvrez-la dans votre navigateur et ajouter les données XML obtenues dans le forum de CmisSync.</value>
+Si vous êtes sûr de l'adresse, ouvrez-la dans votre navigateur et ajouter 
+les données XML obtenues dans le forum de CmisSync.</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Ajouter CmisSync dans le menu démarrer</value>

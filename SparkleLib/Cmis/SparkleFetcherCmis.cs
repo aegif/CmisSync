@@ -23,20 +23,26 @@ using System.Threading;
 
 using SparkleLib;
 
-namespace SparkleLib.Cmis {
+namespace SparkleLib.Cmis
+{
 
     // Sets up a fetcher that can get remote folders
-    public class SparkleFetcher : SparkleFetcherBase {
+    public class SparkleFetcher : SparkleFetcherBase
+    {
 
-        public SparkleFetcher (string server, string required_fingerprint, string remote_path,
+        private string _canonical_name;
+        public string CanonicalName { get { return _canonical_name; } protected set { _canonical_name = value; } }
+
+        public SparkleFetcher(string server, string required_fingerprint, string remote_path,
             string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
             string user, string password, ActivityListener activityListener)
             : base(server, required_fingerprint,
                 remote_path, target_folder, fetch_prior_history, repository, path, user, password)
         {
-			Console.WriteLine("Cmis SparkleFetcher constructor");
+            Console.WriteLine("Cmis SparkleFetcher constructor");
             TargetFolder = target_folder;
-            RemoteUrl    = new Uri (server);
+            RemoteUrl = new Uri(server);
+            CanonicalName = canonical_name;
 
             Directory.CreateDirectory(Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name));
 
@@ -45,51 +51,53 @@ namespace SparkleLib.Cmis {
         }
 
 
-        public override bool Fetch ()
+        public override bool Fetch()
         {
-			Console.WriteLine("Cmis SparkleFetcher Fetch");
+            Console.WriteLine("Cmis SparkleFetcher Fetch");
             return true; // TODO
-		}
+        }
 
 
-        public override bool IsFetchedRepoEmpty {
-            get {
-				Console.WriteLine("Cmis SparkleFetcher IsFetchedRepoEmpty");
+        public override bool IsFetchedRepoEmpty
+        {
+            get
+            {
+                Console.WriteLine("Cmis SparkleFetcher IsFetchedRepoEmpty");
                 return false; // TODO
             }
         }
 
 
-        public override void EnableFetchedRepoCrypto (string password)
+        public override void EnableFetchedRepoCrypto(string password)
         {
-			Console.WriteLine("Cmis SparkleFetcher EnableFetchedRepoCrypto");
-			// TODO
+            Console.WriteLine("Cmis SparkleFetcher EnableFetchedRepoCrypto");
+            // TODO
         }
 
 
-        public override bool IsFetchedRepoPasswordCorrect (string password)
+        public override bool IsFetchedRepoPasswordCorrect(string password)
         {
-			Console.WriteLine("Cmis SparkleFetcher IsFetchedRepoPasswordCorrect");
-			return true; // TODO
+            Console.WriteLine("Cmis SparkleFetcher IsFetchedRepoPasswordCorrect");
+            return true; // TODO
         }
 
 
-        public override void Stop ()
+        public override void Stop()
         {
-			Console.WriteLine("Cmis SparkleFetcher Stop");
+            Console.WriteLine("Cmis SparkleFetcher Stop");
         }
 
 
-        public override void Complete ()
+        public override void Complete()
         {
-			Console.WriteLine("Cmis SparkleFetcher Complete");
-            base.Complete ();
+            Console.WriteLine("Cmis SparkleFetcher Complete");
+            base.Complete();
         }
 
 
-        private void InstallConfiguration ()
+        private void InstallConfiguration()
         {
-			Console.WriteLine("Cmis SparkleFetcher InstallConfiguration");
+            Console.WriteLine("Cmis SparkleFetcher InstallConfiguration");
         }
     }
 }

@@ -123,6 +123,7 @@ namespace SparkleLib.Cmis
             cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "user");
             cmisParameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "password");
             cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "repository");
+            // cmisParameters[SessionParameter.ConnectTimeout] = "-1";
 
             syncing = false;
         }
@@ -153,7 +154,7 @@ namespace SparkleLib.Cmis
                 }
                 if (session == null)
                 {
-                    SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + cmisParameters[SessionParameter.AtomPubUrl]);
+                    SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + this.localRootFolder + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
                     System.Threading.Thread.Sleep(10 * 1000);
                 }
             }
@@ -174,7 +175,7 @@ namespace SparkleLib.Cmis
             bw.DoWork += new DoWorkEventHandler(
                 delegate(Object o, DoWorkEventArgs args)
                 {
-                    SparkleLogger.LogInfo("Sync", "Launching sync in background, so that the UI stays available.");
+                    SparkleLogger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", this.localRootFolder));
 #if !DEBUG
                     try
                     {
@@ -212,15 +213,15 @@ namespace SparkleLib.Cmis
 
             IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
 
-//            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
-//            {
-//                ChangeLogSync(remoteFolder);
-//            }
-//            else
-//            {
-                // No ChangeLog capability, so we have to crawl remote and local folders.
-                CrawlSync(remoteFolder, localRootFolder);
-//            }
+            //            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
+            //            {
+            //                ChangeLogSync(remoteFolder);
+            //            }
+            //            else
+            //            {
+            // No ChangeLog capability, so we have to crawl remote and local folders.
+            CrawlSync(remoteFolder, localRootFolder);
+            //            }
         }
 
 
@@ -303,7 +304,8 @@ namespace SparkleLib.Cmis
                     break;
                 case ChangeType.Deleted:
                     cmisObject = session.GetObject(change.ObjectId);
-                    if (cmisObject is DotCMIS.Client.Impl.Folder) {
+                    if (cmisObject is DotCMIS.Client.Impl.Folder)
+                    {
                         IFolder remoteFolder = (IFolder)cmisObject;
                         string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
                         RemoveFolderLocally(localFolder); // Remove from filesystem and database.
@@ -453,7 +455,7 @@ namespace SparkleLib.Cmis
                         {
                             // If there was previously a folder with this name, it means that
                             // the user has deleted it voluntarily, so delete it from server too.
-                            
+
                             // Delete the folder from the remote server.
                             remoteSubFolder.DeleteTree(true, null, true);
 
@@ -519,8 +521,8 @@ namespace SparkleLib.Cmis
 
                                     // Download server version
                                     DownloadFile(remoteDocument, localFolder);
-                                    
-									// TODO move to OS-dependant layer
+
+                                    // TODO move to OS-dependant layer
                                     //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
                                     //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
                                     // TODO show CMIS property lastModifiedBy
@@ -556,8 +558,8 @@ namespace SparkleLib.Cmis
                 }
             }
         }
-        
-        
+
+
         /**
          * Crawl local files in a given directory (not recursive).
          */
@@ -594,7 +596,7 @@ namespace SparkleLib.Cmis
                 else
                 {
                     // The file exists both on server and locally.
-                    if(database.LocalFileHasChanged(filePath))
+                    if (database.LocalFileHasChanged(filePath))
                     {
                         if (BIDIRECTIONAL)
                         {
@@ -618,7 +620,7 @@ namespace SparkleLib.Cmis
                 {
                     // This local folder is not on the CMIS server now, so
                     // check whether it used to exist on server or not.
-                    if(database.ContainsFolder(localSubFolder))
+                    if (database.ContainsFolder(localSubFolder))
                     {
                         RemoveFolderLocally(localSubFolder);
                     }
@@ -719,14 +721,7 @@ namespace SparkleLib.Cmis
          */
         private void UploadFile(string filePath, IFolder remoteFolder)
         {
-            // Ignore "your-version" files, they are generated locally in case of conflict.
-            if (filePath.Contains("your-version"))
-            {
-                return;
-            }
-
             activityListener.ActivityStarted();
-
             IDocument remoteDocument = null;
             try
             {
@@ -740,7 +735,12 @@ namespace SparkleLib.Cmis
                 ContentStream contentStream = new ContentStream();
                 contentStream.FileName = fileName;
                 contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
-                contentStream.Stream = File.OpenRead(filePath);
+
+                Stream file = File.OpenRead(filePath);
+                contentStream.Length = file.Length;
+                contentStream.Stream = file;
+
+                // contentStream.Stream = File.OpenRead(filePath);
 
                 // Upload
                 remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
@@ -814,7 +814,7 @@ namespace SparkleLib.Cmis
 
             IDocument document = null;
             bool found = false;
-            foreach(ICmisObject obj in remoteFolder.GetChildren())
+            foreach (ICmisObject obj in remoteFolder.GetChildren())
             {
                 if (obj is IDocument)
                 {
@@ -867,7 +867,7 @@ namespace SparkleLib.Cmis
          */
         public static string SuffixIfExists(String path)
         {
-            if ( ! File.Exists(path))
+            if (!File.Exists(path))
             {
                 return path;
             }
@@ -877,13 +877,13 @@ namespace SparkleLib.Cmis
                 do
                 {
                     string ret = path + " (" + index + ")";
-                    if( ! File.Exists(ret))
+                    if (!File.Exists(ret))
                     {
                         return ret;
                     }
                     index++;
                 }
-                while(true);
+                while (true);
             }
         }
     }

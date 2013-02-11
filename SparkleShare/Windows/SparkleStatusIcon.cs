@@ -173,8 +173,16 @@ namespace SparkleShare {
                         Header = folder_name
                     };
                     
-                    subfolder_item.Click += OpenFolderDelegate (folder_name);
-                    
+                    // subfolder_item.Click += OpenFolderDelegate (folder_name);
+
+                    // Open Subfolder
+                    SparkleMenuItem open_subfolder = new SparkleMenuItem() {
+                        Header = "Open " + folder_name
+                    };
+                    open_subfolder.Click += OpenFolderDelegate(folder_name);
+
+                    // Open remotefolder
+
 					Image subfolder_image = new Image () {
 		            	Source = SparkleUIHelpers.GetImageSource ("folder"),
 		                Width  = 16,
@@ -193,7 +201,8 @@ namespace SparkleShare {
 					} else {
                     	subfolder_item.Icon = subfolder_image;
 					}
-					
+
+                    subfolder_item.Items.Add(open_subfolder);
 					this.context_menu.Items.Add (subfolder_item);
 				}
 				
