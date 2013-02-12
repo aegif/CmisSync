@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotCMIS">
-      <HintPath>..\..\SparkleLib\Cmis\lib\DotCMIS.dll</HintPath>
-    </Reference>
     <Reference Include="Moq, Version=4.0.10827.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Moq.dll</HintPath>
@@ -63,6 +60,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\SparkleLib\Cmis\chemistry-dotcmis-0.5-src\src\DotCMIS.csproj">
+      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+      <Name>DotCMIS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\SparkleLib\Cmis\SparkleLib.Cmis.csproj">
       <Project>{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}</Project>
       <Name>SparkleLib.Cmis</Name>

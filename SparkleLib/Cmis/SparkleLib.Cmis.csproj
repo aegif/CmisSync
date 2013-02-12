@@ -98,6 +98,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>Copy $(ProjectDir)lib\SQLite.Interop.dll $(ProjectDir)$(OutDir)SQLite.Interop.dll
+Copy $(ProjectDir)lib\SQLite.Interop.dll $(ProjectDir)..\..\SparkleShare\Windows\bin\Debug\SQLite.Interop.dll
 Copy $(ProjectDir)lib\SQLite.Interop.dll $(ProjectDir)..\..\SparkleShare\TestLibrary\bin\Debug\SQLite.Interop.dll
 Copy $(ProjectDir)lib\SQLite.Interop.dll $(ProjectDir)..\..\SparkleShare\TestLibraryRunner\bin\Debug\SQLite.Interop.dll</PostBuildEvent>
   </PropertyGroup>
