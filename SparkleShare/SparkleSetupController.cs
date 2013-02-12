@@ -392,9 +392,8 @@ namespace SparkleShare
         {
             address = address.Trim();
 
-            // Contrôle de l'url : http://regexlib.com/RETester.aspx?regexp_id=1057
-            // (((http|https)://)|(www\.))+(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(/[a-zA-Z0-9\&amp;%_\./-~-]*)?
-            Regex regx = new Regex(@"(((http|https)://)|(www\.))+(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(/[a-zA-Z0-9\&amp;%_\./-~-]*)?");
+            // Check that the first part of the URL (protocol and server name) are valid.
+            Regex regx = new Regex(@"(http|https)://[a-zA-Z0-9].*");
 
             this.saved_address = address;
 
