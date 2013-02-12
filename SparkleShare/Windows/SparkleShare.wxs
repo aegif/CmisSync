@@ -22,7 +22,7 @@
             <Component Id='Libraries' Guid='f982a0bb-824d-4835-921d-e51b47b8598b'>
               <File Id='SparkleLib.Cmis.dll' Name='SparkleLib.Cmis.dll' Source='!(wix.root)\bin\SparkleLib.Cmis.dll' DiskId='1' />
               <File Id='SparkleLib.dll' Name='SparkleLib.dll' Source='!(wix.root)\bin\SparkleLib.dll' DiskId='1' />
-              <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\SparkleLib\Cmis\lib\DotCMIS.dll' DiskId='1' />
+              <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\SparkleLib\Cmis\chemistry-dotcmis-0.5-src\src\bin\Release\DotCMIS.dll' DiskId='1' />
               <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\SparkleLib\Cmis\lib\System.Data.SQLite.dll' DiskId='1' />
               <File Id='SQLite.Interop.dll' Name='SQLite.Interop.dll' Source='!(wix.root)\SparkleLib\Cmis\lib\SQLite.Interop.dll' DiskId='1' />
               <File Id='Newtonsoft.Json.dll' Name='Newtonsoft.Json.dll' Source='!(wix.root)\SparkleLib\Cmis\lib\Newtonsoft.Json.dll' DiskId='1' />
