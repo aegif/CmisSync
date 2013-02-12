@@ -42,6 +42,7 @@ namespace SparkleLib.Cmis
             // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
             string[] suffixes = {
                 "/alfresco/cmisatom",
+                "/alfresco/service/cmis",
                 "/cmis/resources/",
                 "/emc-cmis-ea/resources/",
                 "/xcmis/rest/cmisatom",
