@@ -131,7 +131,8 @@ namespace SparkleLib.Cmis
             cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "user");
             cmisParameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "password");
             cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "repository");
-            // cmisParameters[SessionParameter.ConnectTimeout] = "-1";
+
+            cmisParameters[SessionParameter.ConnectTimeout] = "-1";
 
             syncing = false;
         }
@@ -644,7 +645,6 @@ namespace SparkleLib.Cmis
             }
         }
 
-
         /**
          * Download a single file from the CMIS server.
          */
@@ -712,15 +712,19 @@ namespace SparkleLib.Cmis
         private void DownloadFile(DotCMIS.Data.IContentStream contentStream, string filePath)
         {
             SparkleLogger.LogInfo("Sync", "Downloading " + filePath);
-            Stream file = File.OpenWrite(filePath);
-            byte[] buffer = new byte[8 * 1024];
-            int len;
-            while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0) // TODO catch WebException here and retry
-            {
-                file.Write(buffer, 0, len);
-            }
+            // Append .sync at the end of the filename
+            String tmpfile = filePath + ".sync";
+            Stream file = File.OpenWrite(tmpfile);
+            CopyStream(contentStream.Stream, file);
+            //byte[] buffer = new byte[8 * 1024];
+            //int len;
+            //while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0) // TODO catch WebException here and retry
+            //{
+            //    file.Write(buffer, 0, len);
+            //}
             file.Close();
             contentStream.Stream.Close();
+            File.Move(tmpfile, filePath);
             SparkleLogger.LogInfo("Sync", "Downloaded");
         }
 
@@ -776,6 +780,20 @@ namespace SparkleLib.Cmis
                 }
             }
             activityListener.ActivityStopped();
+        }
+
+        private void CopyStream(Stream src, Stream dst)
+        {
+            int size = (src.CanSeek) ? Math.Min((int)(src.Length - src.Position), 0x2000) : 0x2000;
+            byte[] buffer = new byte[size];
+            long TempPos = (src.CanSeek) ? src.Position : 0;
+            while (true)
+            {
+                int read = src.Read(buffer, 0, buffer.Length);
+                if (read <= 0)
+                    return;
+                dst.Write(buffer, 0, read);
+            }
         }
 
         /**
