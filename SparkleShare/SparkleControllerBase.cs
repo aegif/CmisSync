@@ -180,7 +180,7 @@ namespace SparkleShare
         private ActivityListener activityListenerAggregator;
         private SparkleConfig config;
         // private SparkleFetcherBase fetcher;
-        private SparkleFetcher fetcher;
+        private CmisFetcher fetcher;
         private FileSystemWatcher watcher;
         private Object repo_lock = new Object();
         private Object check_repos_lock = new Object();
@@ -291,7 +291,7 @@ namespace SparkleShare
             //    Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend),
             //        new object [] { folder_path, this.config }
             //);
-            repo = new SparkleLib.Cmis.SparkleRepo(folder_path, this.config, activityListenerAggregator);
+            repo = new SparkleLib.Cmis.CmisRepo(folder_path, this.config, activityListenerAggregator);
 
             //} catch (Exception e) {
             //    SparkleLogger.LogInfo ("Controller",
@@ -344,21 +344,34 @@ namespace SparkleShare
 
         private void RemoveRepository(string folder_path)
         {
-            for (int i = 0; i < this.repositories.Count; i++)
+            if (this.repositories.Count > 0)
             {
-                SparkleRepoBase repo = this.repositories[i];
-
-                if (repo.LocalPath.Equals(folder_path))
+                for (int i = 0; i <= this.repositories.Count; i++)
                 {
-                    repo.Dispose();
-                    this.repositories.Remove(repo);
-                    repo = null;
+                    SparkleRepoBase repo = this.repositories[i];
 
-                    return;
+                    if (repo.LocalPath.Equals(folder_path))
+                    {
+                        // Remove Cmis Database File
+                        RemoveCmisDatabase(folder_path);
+
+                        repo.Dispose();
+                        this.repositories.Remove(repo);
+                        repo = null;
+
+                        return;
+                    }
                 }
             }
+
+            RemoveCmisDatabase(folder_path);
         }
 
+        private void RemoveCmisDatabase(string folder_path)
+        {
+            string databasefile = Path.Combine(this.config.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
+            if (File.Exists(databasefile)) File.Delete(databasefile);
+        }
 
         private void CheckRepositories()
         {
@@ -402,8 +415,8 @@ namespace SparkleShare
 
                     if (!Directory.Exists(folder_path))
                     {
-                        this.config.RemoveFolder(folder_name);
                         RemoveRepository(folder_path);
+                        this.config.RemoveFolder(folder_name);
 
                         SparkleLogger.LogInfo("Controller",
                             "Removed folder '" + folder_name + "' from config");
@@ -550,8 +563,8 @@ namespace SparkleShare
             //fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
             //    fetch_prior_history, canonical_name, repository, path, user, password, activityListenerAggregator);
 
-            fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
-                 fetch_prior_history, local_path, repository, path, user, password, activityListenerAggregator);
+            fetcher = new SparkleLib.Cmis.CmisFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
+                 fetch_prior_history, local_path, repository, path, user, password, this.config, activityListenerAggregator);
 
             //try {
             //    SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
@@ -671,11 +684,11 @@ namespace SparkleShare
             //    return;
             //}
 
-            string backend = SparkleFetcherBase.GetBackend(this.fetcher.RemoteUrl.AbsolutePath);
+            //string backend = SparkleFetcherBase.GetBackend(this.fetcher.RemoteUrl.AbsolutePath);
 
-            this.config.AddFolder(fetcher.CanonicalName, this.fetcher.Identifier,
-                this.fetcher.RemoteUrl.ToString(), backend,
-                this.fetcher.Repository, this.fetcher.RemoteFolder, this.fetcher.User, this.fetcher.Password);
+            //this.config.AddFolder(fetcher.CanonicalName, this.fetcher.Identifier,
+            //    this.fetcher.RemoteUrl.ToString(), backend,
+            //    this.fetcher.Repository, this.fetcher.RemoteFolder, this.fetcher.User, this.fetcher.Password);
 
             FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.Warnings.ToArray());
 

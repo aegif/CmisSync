@@ -118,6 +118,7 @@ namespace SparkleLib {
             User = user;
             Password = password;
             IsActive     = false;
+
         }
 
 

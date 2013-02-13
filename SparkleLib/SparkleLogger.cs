@@ -45,7 +45,9 @@ namespace SparkleLib {
             if (SparkleBackend.Platform == PlatformID.Win32NT)
                 home_path = Environment.GetFolderPath (Environment.SpecialFolder.UserProfile);
 
-            string crash_report_file_path = new string [] { home_path, "SparkleShare", "crash_report.txt" }.Combine ();
+            // Invalid for CmisSync
+            // string crash_report_file_path = new string [] { home_path, "SparkleShare", "crash_report.txt" }.Combine ();
+            string crash_report_file_path = Path.Combine(SparkleConfig.DefaultConfig.ConfigPath, "crash_report.txt");
 
             string n = Environment.NewLine;
             string crash_report = "Oops! SparkleShare has crashed... :(" + n + n +

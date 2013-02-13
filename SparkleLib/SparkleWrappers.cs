@@ -63,6 +63,9 @@ namespace SparkleLib {
             + Path.DirectorySeparatorChar
             + "CmisSync";
 
+        // public static string APPDATA_FOLDER =
+
+
         public string Name;
         public Uri RemoteAddress;
 

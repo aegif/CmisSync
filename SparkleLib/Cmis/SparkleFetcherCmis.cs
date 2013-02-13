@@ -27,15 +27,15 @@ namespace SparkleLib.Cmis
 {
 
     // Sets up a fetcher that can get remote folders
-    public class SparkleFetcher : SparkleFetcherBase
+    public class CmisFetcher : SparkleFetcherBase
     {
 
         private string _canonical_name;
         public string CanonicalName { get { return _canonical_name; } protected set { _canonical_name = value; } }
 
-        public SparkleFetcher(string server, string required_fingerprint, string remote_path,
+        public CmisFetcher(string server, string required_fingerprint, string remote_path,
             string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
-            string user, string password, ActivityListener activityListener)
+            string user, string password, SparkleConfig config, ActivityListener activityListener)
             : base(server, required_fingerprint,
                 remote_path, target_folder, fetch_prior_history, repository, path, user, password)
         {
@@ -44,10 +44,17 @@ namespace SparkleLib.Cmis
             RemoteUrl = new Uri(server);
             CanonicalName = canonical_name;
 
-            Directory.CreateDirectory(Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name));
+            string backend = SparkleFetcherBase.GetBackend(RemoteUrl.AbsolutePath);
 
-            CmisDirectory cmis = new CmisDirectory(canonical_name, path, remote_path, server, user, password, repository, activityListener);
+            config.AddFolder(CanonicalName, Identifier, RemoteUrl.ToString(), backend, Repository, RemoteFolder, User, Password);
+
+            String localPath = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
+            Directory.CreateDirectory(localPath);
+            CmisDirectory cmis = new CmisDirectory(localPath, SparkleConfig.DefaultConfig, activityListener);
             cmis.Sync();
+
+            // CmisDirectory cmis = new CmisDirectory(canonical_name, path, remote_path, server, user, password, repository, activityListener);
+            // cmis.Sync();
         }
 
 

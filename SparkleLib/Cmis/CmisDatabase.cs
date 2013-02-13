@@ -36,8 +36,9 @@ namespace SparkleLib.Cmis
          */
         public CmisDatabase(string dataPath)
         {
-            this.databaseFileName = dataPath + ".cmissync";
-            pathPrefixSize = dataPath.Length + 1; // +1 for the slash
+            this.databaseFileName = dataPath;
+            // pathPrefixSize = dataPath.Length + 1; // +1 for the slash
+            pathPrefixSize = SparkleFolder.ROOT_FOLDER.Length + 1;
         }
 
 

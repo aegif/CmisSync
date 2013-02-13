@@ -74,31 +74,35 @@ namespace SparkleLib.Cmis
          */
         private ActivityListener activityListener;
 
-
+        // Why use a special constructor, add folder in config before syncing and use standard constructor instead
         /**
          * Constructor for SparkleFetcher (when a new CMIS folder is first added)
+         * 
          */
-        public CmisDirectory(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId,
-            ActivityListener activityListener)
-        {
-            this.activityListener = activityListener;
-            this.remoteFolderPath = remoteFolderPath;
+        //public CmisDirectory(string canonical_name, string localPath, string remoteFolderPath,
+        //    string url, string user, string password, string repositoryId,
+        //    ActivityListener activityListener)
+        //{
+        //    this.activityListener = activityListener;
+        //    this.remoteFolderPath = remoteFolderPath;
 
-            // Set local root folder.
-            this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
+        //    // Set local root folder.
+        //    this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
 
-            database = new CmisDatabase(localRootFolder);
+        //    // Database is place in appdata of the users instead of sync folder (more secure)
+        //    // database = new CmisDatabase(localRootFolder);
+        //    string cmis_path = Path.Combine(config.ConfigPath, canonical_name + ".cmissync");
+        //    database = new CmisDatabase(cmis_path);
 
-            cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = url;
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password;
-            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+        //    cmisParameters = new Dictionary<string, string>();
+        //    cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+        //    cmisParameters[SessionParameter.AtomPubUrl] = url;
+        //    cmisParameters[SessionParameter.User] = user;
+        //    cmisParameters[SessionParameter.Password] = password;
+        //    cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
-            syncing = false;
-        }
+        //    syncing = false;
+        //}
 
 
         /**
@@ -109,13 +113,17 @@ namespace SparkleLib.Cmis
         {
             this.activityListener = activityListener;
 
-            // Set local root folder.
-            this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, localPath);
+            // Set local root folder
+            String FolderName = Path.GetFileName(localPath);
+            this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, FolderName);
 
-            database = new CmisDatabase(localRootFolder);
+            // Database is place in appdata of the users instead of sync folder (more secure)
+            // database = new CmisDatabase(localRootFolder);
+            string cmis_path = Path.Combine(config.ConfigPath, FolderName + ".cmissync");
+            database = new CmisDatabase(cmis_path);
 
             // Get path on remote repository.
-            remoteFolderPath = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "remoteFolder");
+            remoteFolderPath = config.GetFolderOptionalAttribute(FolderName, "remoteFolder");
 
             cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
