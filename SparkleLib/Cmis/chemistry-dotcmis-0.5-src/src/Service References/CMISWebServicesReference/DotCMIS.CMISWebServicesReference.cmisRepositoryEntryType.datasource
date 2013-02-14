@@ -6,5 +6,5 @@
     cause the file to be unrecognizable by the program.
 -->
 <GenericObjectDataSource DisplayName="cmisRepositoryEntryType" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
-   <TypeInfo>DotCMIS.CMISWebServicesReference.cmisRepositoryEntryType, DotCMIS, Version=0.3.0.0, Culture=neutral, PublicKeyToken=0377a82433ccbb00</TypeInfo>
+   <TypeInfo>DotCMIS.CMISWebServicesReference.cmisRepositoryEntryType, Service References.CMISWebServicesReference.Reference.cs, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
 </GenericObjectDataSource>
