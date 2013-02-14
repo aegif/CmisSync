@@ -61,6 +61,27 @@ namespace SparkleLib.Cmis
                 SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] ExcludePaths get", this.Name));
                 List<string> rules = new List<string>();
                 rules.Add(".CmisSync"); // Contains the configuration for this checkout.
+                rules.Add(".sync"); // File currently syncing
+            //    protected string [] ExcludeRules = new string [] {
+            //"*.autosave", // Various autosaving apps
+            //"*~", // gedit and emacs
+            //".~lock.*", // LibreOffice
+            //"*.part", "*.crdownload", // Firefox and Chromium temporary download files
+            //".*.sw[a-z]", "*.un~", "*.swp", "*.swo", // vi(m)
+            //".directory", // KDE
+            //".DS_Store", "Icon\r\r", "._*", ".Spotlight-V100", ".Trashes", // Mac OS X
+            //"*(Autosaved).graffle", // Omnigraffle
+            //"Thumbs.db", "Desktop.ini", // Windows
+            //"~*.tmp", "~*.TMP", "*~*.tmp", "*~*.TMP", // MS Office
+            //"~*.ppt", "~*.PPT", "~*.pptx", "~*.PPTX",
+            //"~*.xls", "~*.XLS", "~*.xlsx", "~*.XLSX",
+            //"~*.doc", "~*.DOC", "~*.docx", "~*.DOCX",
+            //"*/CVS/*", ".cvsignore", "*/.cvsignore", // CVS
+            //"/.svn/*", "*/.svn/*", // Subversion
+            //"/.hg/*", "*/.hg/*", "*/.hgignore", // Mercurial
+            //"/.bzr/*", "*/.bzr/*", "*/.bzrignore" // Bazaar
+            //};
+
                 return rules;
             }
         }

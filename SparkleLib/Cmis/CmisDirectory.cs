@@ -651,43 +651,48 @@ namespace SparkleLib.Cmis
         private void DownloadFile(IDocument remoteDocument, string localFolder)
         {
             activityListener.ActivityStarted();
-            DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream();
 
-            // If this file does not have a content stream, ignore it.
-            // Even 0 bytes files have a contentStream.
-            // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-            if (contentStream == null)
+            string filepath = Path.Combine(localFolder, remoteDocument.ContentStreamFileName);
+
+            // If a file exist, file is deleted.
+            if (File.Exists(filepath))
+                File.Delete(filepath);
+
+
+            string tmpfilepath = filepath + ".sync";
+
+            // If tmp file exist, file is open in append mode else it's a new file.
+            bool appendmode = File.Exists(tmpfilepath);
+            Stream localfile = File.OpenWrite(tmpfilepath);
+            DotCMIS.Data.IContentStream contentStream = null;
+            // Download file, starting at the last download point
+
+            // Get the last position in the localfile.
+            Boolean success = false;
+            try
             {
-                SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
-                return;
-            }
-
-            // Download.
-            string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
-
-            // If there was previously a directory with this name, delete it.
-            // TODO warn if local changes inside the folder.
-            if (Directory.Exists(filePath))
-            {
-                Directory.Delete(filePath);
-            }
-
-            bool success = false;
-            do
-            {
-                try
+                Int64 Offset = localfile.Length;
+                contentStream = remoteDocument.GetContentStream(remoteDocument.Id, Offset, remoteDocument.ContentStreamLength);
+                if (contentStream == null)
                 {
-                    DownloadFile(contentStream, filePath);
-                    success = true;
+                    SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                    throw new IOException();
                 }
-                catch (WebException e)
-                {
-                    SparkleLogger.LogInfo("Sync", e.Message);
-                    SparkleLogger.LogInfo("Sync", "Problem during download, waiting for 10 seconds...");
-                    System.Threading.Thread.Sleep(10 * 1000);
-                }
+                CopyStream(contentStream.Stream, localfile);
+                localfile.Close();
+                contentStream.Stream.Close();
+                success = true;
             }
-            while (!success);
+            catch
+            {
+                success = false;
+                localfile.Flush();
+                localfile.Close();
+                if (contentStream != null) contentStream.Stream.Close();
+            }
+            // Rename file
+            if (success)
+                File.Move(tmpfilepath, filepath);
 
             // Get metadata.
             Dictionary<string, string> metadata = new Dictionary<string, string>();
@@ -702,31 +707,107 @@ namespace SparkleLib.Cmis
             metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
 
             // Create database entry for this file.
-            database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+            database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
             activityListener.ActivityStopped();
         }
 
-        /**
-         * Download a file, without retrying
-         */
-        private void DownloadFile(DotCMIS.Data.IContentStream contentStream, string filePath)
+        private void CopyStream(Stream src, Stream dst)
         {
-            SparkleLogger.LogInfo("Sync", "Downloading " + filePath);
-            // Append .sync at the end of the filename
-            String tmpfile = filePath + ".sync";
-            Stream file = File.OpenWrite(tmpfile);
-            CopyStream(contentStream.Stream, file);
-            //byte[] buffer = new byte[8 * 1024];
-            //int len;
-            //while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0) // TODO catch WebException here and retry
-            //{
-            //    file.Write(buffer, 0, len);
-            //}
-            file.Close();
-            contentStream.Stream.Close();
-            File.Move(tmpfile, filePath);
-            SparkleLogger.LogInfo("Sync", "Downloaded");
+            byte[] buffer = new byte[8 * 1024];
+            while (true)
+            {
+                int read = src.Read(buffer, 0, buffer.Length);
+                if (read <= 0)
+                    return;
+                dst.Write(buffer, 0, read);
+            }
         }
+
+        ///**
+        // * Download a single file from the CMIS server.
+        // */
+        //private void DownloadFile(IDocument remoteDocument, string localFolder)
+        //{
+        //    activityListener.ActivityStarted();
+
+        //    //TODO - Yannick - CanSeek is not supported on contentStream.Stream but we can do the trick with HttpWebRequest.AddRange that is implemented behind GetContentStream(String id, Int64? offset, Int64? length)
+        //    //The download code must be rewrite from scratch.
+        //    DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream();
+
+        //    // If this file does not have a content stream, ignore it.
+        //    // Even 0 bytes files have a contentStream.
+        //    // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+        //    if (contentStream == null)
+        //    {
+        //        SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+        //        return;
+        //    }
+
+        //    // Download.
+        //    string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
+
+        //    // If there was previously a directory with this name, delete it.
+        //    // TODO warn if local changes inside the folder.
+        //    if (Directory.Exists(filePath))
+        //    {
+        //        Directory.Delete(filePath);
+        //    }
+
+        //    bool success = false;
+        //    do
+        //    {
+        //        try
+        //        {
+        //            DownloadFile(contentStream, filePath);
+        //            success = true;
+        //        }
+        //        catch (WebException e)
+        //        {
+        //            SparkleLogger.LogInfo("Sync", e.Message);
+        //            SparkleLogger.LogInfo("Sync", "Problem during download, waiting for 10 seconds...");
+        //            System.Threading.Thread.Sleep(10 * 1000);
+        //        }
+        //    }
+        //    while (!success);
+
+        //    // Get metadata.
+        //    Dictionary<string, string> metadata = new Dictionary<string, string>();
+        //    metadata.Add("Id", remoteDocument.Id);
+        //    metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
+        //    metadata.Add("VersionLabel", remoteDocument.VersionLabel);
+        //    metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
+        //    metadata.Add("CreatedBy", remoteDocument.CreatedBy);
+        //    metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
+        //    metadata.Add("CheckinComment", remoteDocument.CheckinComment);
+        //    metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
+        //    metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
+
+        //    // Create database entry for this file.
+        //    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+        //    activityListener.ActivityStopped();
+        //}
+
+        ///**
+        // * Download a file, without retrying
+        // */
+        //private void DownloadFile(DotCMIS.Data.IContentStream contentStream, string filePath)
+        //{
+        //    SparkleLogger.LogInfo("Sync", "Downloading " + filePath);
+        //    // Append .sync at the end of the filename
+        //    String tmpfile = filePath + ".sync";
+        //    Stream file = File.OpenWrite(tmpfile);
+        //    CopyStream(contentStream.Stream, file);
+        //    //byte[] buffer = new byte[8 * 1024];
+        //    //int len;
+        //    //while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0) // TODO catch WebException here and retry
+        //    //{
+        //    //    file.Write(buffer, 0, len);
+        //    //}
+        //    file.Close();
+        //    contentStream.Stream.Close();
+        //    File.Move(tmpfile, filePath);
+        //    SparkleLogger.LogInfo("Sync", "Downloaded");
+        //}
 
         /**
          * Upload a single file to the CMIS server.
@@ -782,19 +863,19 @@ namespace SparkleLib.Cmis
             activityListener.ActivityStopped();
         }
 
-        private void CopyStream(Stream src, Stream dst)
-        {
-            int size = (src.CanSeek) ? Math.Min((int)(src.Length - src.Position), 0x2000) : 0x2000;
-            byte[] buffer = new byte[size];
-            long TempPos = (src.CanSeek) ? src.Position : 0;
-            while (true)
-            {
-                int read = src.Read(buffer, 0, buffer.Length);
-                if (read <= 0)
-                    return;
-                dst.Write(buffer, 0, read);
-            }
-        }
+        //private void CopyStream(Stream src, Stream dst)
+        //{
+        //    int size = (src.CanSeek) ? Math.Min((int)(src.Length - src.Position), 0x2000) : 0x2000;
+        //    byte[] buffer = new byte[size];
+        //    long TempPos = (src.CanSeek) ? src.Position : 0;
+        //    while (true)
+        //    {
+        //        int read = src.Read(buffer, 0, buffer.Length);
+        //        if (read <= 0)
+        //            return;
+        //        dst.Write(buffer, 0, read);
+        //    }
+        //}
 
         /**
          * Upload folder recursively.

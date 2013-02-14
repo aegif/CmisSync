@@ -1776,6 +1776,7 @@ namespace DotCMIS.Binding.AtomPub
             {
                 throw new CmisInvalidArgumentException("Length >" + Int32.MaxValue);
             }
+
             HttpUtils.Response resp = HttpUtils.InvokeGET(url, Session, (int?)offset, (int?)length);
 
             // check response code
