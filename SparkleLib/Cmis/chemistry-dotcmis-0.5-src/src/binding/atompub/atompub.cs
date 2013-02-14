@@ -1768,16 +1768,17 @@ namespace DotCMIS.Binding.AtomPub
             url.AddParameter(AtomPubConstants.ParamStreamId, streamId);
 
             // get the content
-            if (offset != null && offset > Int32.MaxValue)
+            // Modifiy to support Int64
+            if (offset != null && offset > Int64.MaxValue)
             {
-                throw new CmisInvalidArgumentException("Offset >" + Int32.MaxValue);
+                throw new CmisInvalidArgumentException("Offset >" + Int64.MaxValue);
             }
-            if (length != null && length > Int32.MaxValue)
+            if (length != null && length > Int64.MaxValue)
             {
-                throw new CmisInvalidArgumentException("Length >" + Int32.MaxValue);
+                throw new CmisInvalidArgumentException("Length >" + Int64.MaxValue);
             }
 
-            HttpUtils.Response resp = HttpUtils.InvokeGET(url, Session, (int?)offset, (int?)length);
+            HttpUtils.Response resp = HttpUtils.InvokeGET(url, Session, offset, length);
 
             // check response code
             if (resp.StatusCode != HttpStatusCode.OK && resp.StatusCode != HttpStatusCode.PartialContent)

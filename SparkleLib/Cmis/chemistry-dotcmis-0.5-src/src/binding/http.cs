@@ -24,6 +24,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
+using System.Reflection;
 using DotCMIS.Enums;
 using DotCMIS.Exceptions;
 using DotCMIS.Util;
@@ -39,7 +40,7 @@ namespace DotCMIS.Binding.Impl
             return Invoke(url, "GET", null, null, session, null, null, null);
         }
 
-        public static Response InvokeGET(UrlBuilder url, BindingSession session, int? offset, int? length)
+        public static Response InvokeGET(UrlBuilder url, BindingSession session, long? offset, long? length)
         {
             return Invoke(url, "GET", null, null, session, offset, length, null);
         }
@@ -61,7 +62,7 @@ namespace DotCMIS.Binding.Impl
 
         //TODO - Yannick - Change to support long offset : http://forums.codeguru.com/showthread.php?467570-WebRequest.AddRange-what-about-files-gt-2gb&p=1794639#post1794639
         private static Response Invoke(UrlBuilder url, String method, String contentType, Output writer, BindingSession session,
-                int? offset, int? length, IDictionary<string, string> headers)
+                long? offset, long? length, IDictionary<string, string> headers)
         {
             try
             {
@@ -71,7 +72,7 @@ namespace DotCMIS.Binding.Impl
                     Trace.WriteLine(method + " " + url);
                 }
 
-                // create connection           
+                // create connection 
                 HttpWebRequest conn = (HttpWebRequest)WebRequest.Create(url.Url);
                 conn.Method = method;
                 conn.UserAgent = "Apache Chemistry DotCMIS";
@@ -160,6 +161,107 @@ namespace DotCMIS.Binding.Impl
                 throw new CmisConnectionException("Cannot access " + url + ": " + e.Message, e);
             }
         }
+        // Original fonction
+        //private static Response Invoke(UrlBuilder url, String method, String contentType, Output writer, BindingSession session,
+        //        int? offset, int? length, IDictionary<string, string> headers)
+        //{
+        //    try
+        //    {
+        //        // log before connect
+        //        if (DotCMISDebug.DotCMISSwitch.TraceInfo)
+        //        {
+        //            Trace.WriteLine(method + " " + url);
+        //        }
+
+        //        // create connection           
+        //        HttpWebRequest conn = (HttpWebRequest)WebRequest.Create(url.Url);
+        //        conn.Method = method;
+        //        conn.UserAgent = "Apache Chemistry DotCMIS";
+
+        //        // timeouts
+        //        int connectTimeout = session.GetValue(SessionParameter.ConnectTimeout, -2);
+        //        if (connectTimeout >= -1)
+        //        {
+        //            conn.Timeout = connectTimeout;
+        //        }
+
+        //        int readTimeout = session.GetValue(SessionParameter.ReadTimeout, -2);
+        //        if (readTimeout >= -1)
+        //        {
+        //            conn.ReadWriteTimeout = readTimeout;
+        //        }
+
+        //        // set content type
+        //        if (contentType != null)
+        //        {
+        //            conn.ContentType = contentType;
+        //        }
+
+        //        // set additional headers
+        //        if (headers != null)
+        //        {
+        //            foreach (KeyValuePair<string, string> header in headers)
+        //            {
+        //                conn.Headers.Add(header.Key, header.Value);
+        //            }
+        //        }
+
+        //        // authenticate
+        //        IAuthenticationProvider authProvider = session.GetAuthenticationProvider();
+        //        if (authProvider != null)
+        //        {
+        //            conn.PreAuthenticate = true;
+        //            authProvider.Authenticate(conn);
+        //        }
+
+        //        // range
+        //        if (offset != null && length != null)
+        //        {
+        //            conn.AddRange(offset ?? 0, offset + length - 1 ?? 0);
+        //        }
+        //        else if (offset != null)
+        //        {
+        //            conn.AddRange(offset ?? 0);
+        //        }
+
+        //        // compression
+        //        string compressionFlag = session.GetValue(SessionParameter.Compression) as string;
+        //        if (compressionFlag != null && compressionFlag.ToLower().Equals("true"))
+        //        {
+        //            conn.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+        //        }
+
+        //        // send data
+        //        if (writer != null)
+        //        {
+        //            conn.SendChunked = true;
+        //            Stream requestStream = conn.GetRequestStream();
+        //            writer(requestStream);
+        //            requestStream.Close();
+        //        }
+
+        //        // connect
+        //        try
+        //        {
+        //            HttpWebResponse response = (HttpWebResponse)conn.GetResponse();
+
+        //            if (authProvider != null)
+        //            {
+        //                authProvider.HandleResponse(response);
+        //            }
+
+        //            return new Response(response);
+        //        }
+        //        catch (WebException we)
+        //        {
+        //            return new Response(we);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new CmisConnectionException("Cannot access " + url + ": " + e.Message, e);
+        //    }
+        //}
 
         internal class Response
         {
