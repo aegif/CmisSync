@@ -60,7 +60,6 @@ namespace DotCMIS.Binding.Impl
             return Invoke(url, "DELETE", null, null, session, null, null, null);
         }
 
-        //TODO - Yannick - Change to support long offset : http://forums.codeguru.com/showthread.php?467570-WebRequest.AddRange-what-about-files-gt-2gb&p=1794639#post1794639
         private static Response Invoke(UrlBuilder url, String method, String contentType, Output writer, BindingSession session,
                 long? offset, long? length, IDictionary<string, string> headers)
         {
