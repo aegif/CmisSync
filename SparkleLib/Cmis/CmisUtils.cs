@@ -12,8 +12,8 @@ namespace SparkleLib.Cmis
     public class CmisServer
     {
         public string url;
-        public string[] repositories;
-        public CmisServer(string url, string[] repositories)
+        public Dictionary<string, string> repositories;
+        public CmisServer(string url, Dictionary<string, string> repositories)
         {
             this.url = url;
             this.repositories = repositories;
@@ -30,7 +30,7 @@ namespace SparkleLib.Cmis
         static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
         {
             // Try the given URL
-            string[] repositories = GetRepositories(url, user, password);
+            Dictionary<string, string> repositories = GetRepositories(url, user, password);
             if (repositories != null)
             {
                 return new CmisServer(url, repositories);
@@ -67,8 +67,9 @@ namespace SparkleLib.Cmis
 
         /**
          * Get the list of repositories of a CMIS server
+         * Each item contains id + 
          */
-        static public string[] GetRepositories(string url, string user, string password)
+        static public Dictionary<string,string> GetRepositories(string url, string user, string password)
         {
 
 
@@ -107,11 +108,11 @@ namespace SparkleLib.Cmis
                 return null;
             }
 
-            string[] result = new string[repositories.Count];
+            Dictionary<string,string> result = new Dictionary<string,string>();
 
             for (int i = 0; i < repositories.Count; i++)
             {
-                result[i] = repositories.ElementAt(i).Id; // TODO displaying Name would be more user-friendly than Id
+                result.Add(repositories.ElementAt(i).Id, repositories.ElementAt(i).Name);
             }
             
             return result;
