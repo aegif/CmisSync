@@ -879,7 +879,12 @@ namespace SparkleLib.Cmis
                     // Until we can not append the remote file, if exist must delete it to avoid conflict
                     string remotepath = remoteFolder.Path + '/' + tmpfileName;
                     ICmisObject obj = session.GetObjectByPath(remotepath);
-                    if (obj != null) obj.Delete(true);
+                    if (obj != null)
+                    {
+                        SparkleLogger.LogInfo("Sync", "Temp file exist on remote server, but CMIS 1.0 don't support Append Mode");
+                        SparkleLogger.LogInfo("Sync", String.Format("We delete temp file and create a new empty file on the CMIS Server for {0} and launch a simple update", filePath));
+                        obj.Delete(true);
+                    }
 
                     // Create an empty file on remote server and get ContentStream
                     SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
