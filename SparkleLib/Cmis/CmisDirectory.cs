@@ -17,6 +17,7 @@ using System.Net;
 
 namespace SparkleLib.Cmis
 {
+    public enum RulesType { Folder, File };
     /**
      * Synchronization with a particular CMIS folder.
      */
@@ -74,7 +75,11 @@ namespace SparkleLib.Cmis
          */
         private ActivityListener activityListener;
 
-             
+        /**
+         * Config 
+         * */
+        private SparkleConfig sconfig;
+
         // Why use a special constructor, add folder in config before syncing and use standard constructor instead
         /**
          * Constructor for SparkleFetcher (when a new CMIS folder is first added)
@@ -105,7 +110,7 @@ namespace SparkleLib.Cmis
         //    syncing = false;
         //}
 
-        
+
         /**
          * Constructor for SparkleRepo (at every launch of CmisSync)
          */
@@ -113,7 +118,7 @@ namespace SparkleLib.Cmis
             ActivityListener activityListener)
         {
             this.activityListener = activityListener;
-
+            this.sconfig = config;
             // Set local root folder
             String FolderName = Path.GetFileName(localPath);
             this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, FolderName);
@@ -450,47 +455,50 @@ namespace SparkleLib.Cmis
                 {
                     // It is a CMIS folder.
                     IFolder remoteSubFolder = (IFolder)cmisObject;
-                    remoteFolders.Add(remoteSubFolder.Name);
-                    string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
-
-                    // Check whether local folder exists.
-                    if (Directory.Exists(localSubFolder))
+                    if (CheckRules(remoteSubFolder.Name, RulesType.Folder))
                     {
-                        // Recurse into folder.
-                        CrawlSync(remoteSubFolder, localSubFolder);
-                    }
-                    else
-                    {
-                        // If there was previously a file with this name, delete it.
-                        // TODO warn if local changes in the file.
-                        if (File.Exists(localSubFolder))
+                        remoteFolders.Add(remoteSubFolder.Name);
+                        string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
+
+                        // Check whether local folder exists.
+                        if (Directory.Exists(localSubFolder))
                         {
-                            File.Delete(localSubFolder);
-                        }
-
-                        if (database.ContainsFolder(localSubFolder))
-                        {
-                            // If there was previously a folder with this name, it means that
-                            // the user has deleted it voluntarily, so delete it from server too.
-
-                            // Delete the folder from the remote server.
-                            remoteSubFolder.DeleteTree(true, null, true);
-
-                            // Delete the folder from database.
-                            database.RemoveFolder(localSubFolder);
+                            // Recurse into folder.
+                            CrawlSync(remoteSubFolder, localSubFolder);
                         }
                         else
                         {
-                            // The folder has been recently created on server, so download it.
+                            // If there was previously a file with this name, delete it.
+                            // TODO warn if local changes in the file.
+                            if (File.Exists(localSubFolder))
+                            {
+                                File.Delete(localSubFolder);
+                            }
 
-                            // Create local folder.
-                            Directory.CreateDirectory(localSubFolder);
+                            if (database.ContainsFolder(localSubFolder))
+                            {
+                                // If there was previously a folder with this name, it means that
+                                // the user has deleted it voluntarily, so delete it from server too.
 
-                            // Create database entry for this folder.
-                            database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+                                // Delete the folder from the remote server.
+                                remoteSubFolder.DeleteTree(true, null, true);
 
-                            // Recursive copy of the whole folder.
-                            RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                // Delete the folder from database.
+                                database.RemoveFolder(localSubFolder);
+                            }
+                            else
+                            {
+                                // The folder has been recently created on server, so download it.
+
+                                // Create local folder.
+                                Directory.CreateDirectory(localSubFolder);
+
+                                // Create database entry for this folder.
+                                database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+
+                                // Recursive copy of the whole folder.
+                                RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                            }
                         }
                     }
                 }
@@ -499,80 +507,83 @@ namespace SparkleLib.Cmis
                     // It is a CMIS document.
                     IDocument remoteDocument = (IDocument)cmisObject;
 
-                    // We use the filename of the document's content stream.
-                    // This can be different from the name of the document.
-                    // For instance in FileNet it is not usual to have a document where
-                    // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
-                    string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
-
-                    // Check if file extension is allowed
-
-                    remoteFiles.Add(remoteDocumentFileName);
-                    // If this file does not have a filename, ignore it.
-                    // It sometimes happen on IBM P8 CMIS server, not sure why.
-                    if (remoteDocumentFileName == null)
+                    if (CheckRules(remoteDocument.Name, RulesType.File))
                     {
-                        SparkleLogger.LogInfo("Sync", "Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
-                        continue;
-                    }
+                        // We use the filename of the document's content stream.
+                        // This can be different from the name of the document.
+                        // For instance in FileNet it is not usual to have a document where
+                        // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
+                        string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
 
-                    string filePath = localFolder + Path.DirectorySeparatorChar + remoteDocumentFileName;
+                        // Check if file extension is allowed
 
-                    if (File.Exists(filePath))
-                    {
-                        // Check modification date stored in database and download if remote modification date if different.
-                        DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
-                        DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
-                        if (lastDatabaseUpdate == null)
+                        remoteFiles.Add(remoteDocumentFileName);
+                        // If this file does not have a filename, ignore it.
+                        // It sometimes happen on IBM P8 CMIS server, not sure why.
+                        if (remoteDocumentFileName == null)
                         {
-                            SparkleLogger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
-                            DownloadFile(remoteDocument, localFolder);
+                            SparkleLogger.LogInfo("Sync", "Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
+                            continue;
                         }
-                        else
+
+                        string filePath = localFolder + Path.DirectorySeparatorChar + remoteDocumentFileName;
+
+                        if (File.Exists(filePath))
                         {
-                            // If the file has been modified since last time we downloaded it, then download again.
-                            if (serverSideModificationDate > lastDatabaseUpdate)
+                            // Check modification date stored in database and download if remote modification date if different.
+                            DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
+                            DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
+                            if (lastDatabaseUpdate == null)
                             {
-                                if (database.LocalFileHasChanged(filePath))
-                                {
-                                    SparkleLogger.LogInfo("Sync", "Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
-                                    // Rename locally modified file.
-                                    File.Move(filePath, SuffixIfExists(filePath + "_your-version"));
-
-                                    // Download server version
-                                    DownloadFile(remoteDocument, localFolder);
-
-                                    // TODO move to OS-dependant layer
-                                    //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                    //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
-                                    // TODO show CMIS property lastModifiedBy
-                                }
-                                else
-                                {
-                                    SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
-                                    DownloadFile(remoteDocument, localFolder);
-                                }
+                                SparkleLogger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
+                                DownloadFile(remoteDocument, localFolder);
                             }
+                            else
+                            {
+                                // If the file has been modified since last time we downloaded it, then download again.
+                                if (serverSideModificationDate > lastDatabaseUpdate)
+                                {
+                                    if (database.LocalFileHasChanged(filePath))
+                                    {
+                                        SparkleLogger.LogInfo("Sync", "Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
+                                        // Rename locally modified file.
+                                        File.Move(filePath, SuffixIfExists(filePath + "_your-version"));
 
-                            // Change modification date in database
-                            database.SetFileServerSideModificationDate(filePath, serverSideModificationDate);
-                        }
-                    }
-                    else
-                    {
-                        if (database.ContainsFile(filePath))
-                        {
-                            // File has been recently removed locally, so remove it from server too.
-                            remoteDocument.DeleteAllVersions();
+                                        // Download server version
+                                        DownloadFile(remoteDocument, localFolder);
 
-                            // Remove it from database.
-                            database.RemoveFile(filePath);
+                                        // TODO move to OS-dependant layer
+                                        //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
+                                        //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
+                                        // TODO show CMIS property lastModifiedBy
+                                    }
+                                    else
+                                    {
+                                        SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
+                                        DownloadFile(remoteDocument, localFolder);
+                                    }
+                                }
+
+                                // Change modification date in database
+                                database.SetFileServerSideModificationDate(filePath, serverSideModificationDate);
+                            }
                         }
                         else
                         {
-                            // New remote file, download it.
-                            SparkleLogger.LogInfo("Sync", "Downloading new file: " + remoteDocumentFileName);
-                            DownloadFile(remoteDocument, localFolder);
+                            if (database.ContainsFile(filePath))
+                            {
+                                // File has been recently removed locally, so remove it from server too.
+                                remoteDocument.DeleteAllVersions();
+
+                                // Remove it from database.
+                                database.RemoveFile(filePath);
+                            }
+                            else
+                            {
+                                // New remote file, download it.
+                                SparkleLogger.LogInfo("Sync", "Downloading new file: " + remoteDocumentFileName);
+                                DownloadFile(remoteDocument, localFolder);
+                            }
                         }
                     }
                 }
@@ -588,6 +599,9 @@ namespace SparkleLib.Cmis
             foreach (string filePath in Directory.GetFiles(localFolder))
             {
                 string fileName = Path.GetFileName(filePath);
+
+                if (!CheckRules(filePath, RulesType.File)) return;
+
                 if (!remoteFiles.Contains(fileName))
                 {
                     // This local file is not on the CMIS server now, so
@@ -637,21 +651,24 @@ namespace SparkleLib.Cmis
         {
             foreach (string localSubFolder in Directory.GetDirectories(localFolder))
             {
-                string folderName = Path.GetFileName(localSubFolder);
-                if (!remoteFolders.Contains(folderName))
+                if (CheckRules(localSubFolder, RulesType.Folder))
                 {
-                    // This local folder is not on the CMIS server now, so
-                    // check whether it used to exist on server or not.
-                    if (database.ContainsFolder(localSubFolder))
+                    string folderName = Path.GetFileName(localSubFolder);
+                    if (!remoteFolders.Contains(folderName))
                     {
-                        RemoveFolderLocally(localSubFolder);
-                    }
-                    else
-                    {
-                        if (BIDIRECTIONAL)
+                        // This local folder is not on the CMIS server now, so
+                        // check whether it used to exist on server or not.
+                        if (database.ContainsFolder(localSubFolder))
                         {
-                            // New local folder, upload recursively.
-                            UploadFolderRecursively(remoteFolder, localSubFolder);
+                            RemoveFolderLocally(localSubFolder);
+                        }
+                        else
+                        {
+                            if (BIDIRECTIONAL)
+                            {
+                                // New local folder, upload recursively.
+                                UploadFolderRecursively(remoteFolder, localSubFolder);
+                            }
                         }
                     }
                 }
@@ -850,8 +867,6 @@ namespace SparkleLib.Cmis
 
                 Boolean success = false;
 
-                StreamWriter remoteFile = null;
-
                 // Prepare content stream
                 ContentStream contentStream = new ContentStream();
                 contentStream.FileName = fileName;
@@ -873,8 +888,6 @@ namespace SparkleLib.Cmis
                 {
                     SparkleLogger.LogInfo("Sync", String.Format("Upload of file {0} abort: {1}", filePath, ex));
                     success = false;
-                    remoteFile.BaseStream.Flush();
-                    remoteFile.BaseStream.Close();
                     if (contentStream != null) contentStream.Stream.Close();
                 }
 
@@ -939,6 +952,7 @@ namespace SparkleLib.Cmis
         }
 
 
+
         private void UpdateFile(string filePath, IDocument remoteFile)
         {
             Stream localfile = File.OpenRead(filePath);
@@ -955,6 +969,8 @@ namespace SparkleLib.Cmis
             remoteStream.Stream = localfile;
 
             // CMIS do not have a Method to upload block by block. So upload file must be full.
+            // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
+            // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
             remoteFile.SetContentStream(remoteStream, true, true);
         }
 
@@ -1039,5 +1055,66 @@ namespace SparkleLib.Cmis
                 while (true);
             }
         }
+
+        /**
+         * Check if the filename provide is compliance
+         * Return true if path is ok, or false is path contains one or more rule
+         * */
+        public Boolean CheckRules(string path, RulesType ruletype)
+        {
+            string[] contents = new string[] {
+                "~",             // gedit and emacs
+                "Thumbs.db", "Desktop.ini", // Windows
+                "$~"
+            };
+
+            string[] extensions = new string[] {
+            ".autosave", // Various autosaving apps
+            ".~lock", // LibreOffice
+            ".part", ".crdownload", // Firefox and Chromium temporary download files
+            ".sw[a-z]", ".un~", ".swp", ".swo", // vi(m)
+            ".directory", // KDE
+            ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes", // Mac OS X
+            ".(Autosaved).graffle", // Omnigraffle
+            ".tmp", ".TMP", // MS Office
+            ".~ppt", ".~PPT", ".~pptx", ".~PPTX",
+            ".~xls", ".~XLS", ".~xlsx", ".~XLSX",
+            ".~doc", ".~DOC", ".~docx", ".~DOCX",
+            ".cvsignore", ".~cvsignore", // CVS
+            ".sync", // CmisSync File Downloading/Uploading
+            ".cmissync" // CmisSync Database 
+            };
+
+            string[] directories = new string[] {
+                "CVS",".svn",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
+            };
+
+            SparkleLogger.LogInfo("Sync", "Check rule on " + path);
+            Boolean found = false;
+            foreach (string content in contents)
+            {
+                if (path.Contains(content)) found = true;
+            }
+
+            if (ruletype == RulesType.Folder)
+            {
+                foreach (string dir in directories)
+                {
+                    if (path.Contains(dir)) found = true;
+                }
+            }
+            else
+            {
+                foreach (string ext in extensions)
+                {
+                    string filext = Path.GetExtension(path);
+                    if (filext == ext) found = true;
+                }
+            }
+
+            return !found;
+
+        }
     }
+
 }

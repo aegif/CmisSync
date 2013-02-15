@@ -36,30 +36,6 @@ namespace SparkleLib
 
         public string ConfigPath { get { return configpath; } }
 
-        private string[] rules = new string[] {
-            "*.autosave", // Various autosaving apps
-            "*~", // gedit and emacs
-            ".~lock.*", // LibreOffice
-            "*.part", "*.crdownload", // Firefox and Chromium temporary download files
-            ".*.sw[a-z]", "*.un~", "*.swp", "*.swo", // vi(m)
-            ".directory", // KDE
-            ".DS_Store", "Icon\r\r", "._*", ".Spotlight-V100", ".Trashes", // Mac OS X
-            "*(Autosaved).graffle", // Omnigraffle
-            "Thumbs.db", "Desktop.ini", // Windows
-            "~*.tmp", "~*.TMP", "*~*.tmp", "*~*.TMP", // MS Office
-            "~*.ppt", "~*.PPT", "~*.pptx", "~*.PPTX",
-            "~*.xls", "~*.XLS", "~*.xlsx", "~*.XLSX",
-            "~*.doc", "~*.DOC", "~*.docx", "~*.DOCX",
-            "*/CVS/*", ".cvsignore", "*/.cvsignore", // CVS
-            "/.svn/*", "*/.svn/*", // Subversion
-            "/.hg/*", "*/.hg/*", "*/.hgignore", // Mercurial
-            "/.bzr/*", "*/.bzr/*", "*/.bzrignore", // Bazaar
-            "*.sync", // CmisSync File Downloading/Uploading
-            "*.cmissync" // CmisSync Database 
-        };
-
-        public string[] ExcludeRules { get { return rules; } }
-
         public string HomePath
         {
             get
