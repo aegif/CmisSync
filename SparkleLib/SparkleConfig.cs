@@ -54,7 +54,8 @@ namespace SparkleLib
             "/.svn/*", "*/.svn/*", // Subversion
             "/.hg/*", "*/.hg/*", "*/.hgignore", // Mercurial
             "/.bzr/*", "*/.bzr/*", "*/.bzrignore", // Bazaar
-            "*.sync","*.cmissync" // CmisSync specific
+            "*.sync", // CmisSync File Downloading/Uploading
+            "*.cmissync" // CmisSync Database 
         };
 
         public string[] ExcludeRules { get { return rules; } }
