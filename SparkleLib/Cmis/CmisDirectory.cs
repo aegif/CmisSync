@@ -679,6 +679,7 @@ namespace SparkleLib.Cmis
                     throw new IOException();
                 }
                 CopyStream(contentStream.Stream, localfile);
+                localfile.Flush();
                 localfile.Close();
                 contentStream.Stream.Close();
                 success = true;
@@ -691,7 +692,8 @@ namespace SparkleLib.Cmis
                 if (contentStream != null) contentStream.Stream.Close();
             }
             // Rename file
-            if (success)
+            // TODO - Yannick - Control file integrity by using hash compare
+            if (success) 
                 File.Move(tmpfilepath, filepath);
 
             // Get metadata.
