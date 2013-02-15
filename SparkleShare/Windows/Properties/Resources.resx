@@ -132,9 +132,6 @@
   <data name="Back" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="BadURL" xml:space="preserve">
-    <value>Bad URL !</value>
-  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -150,11 +147,11 @@
   <data name="DocumentsAre" xml:space="preserve">
     <value>Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server automatically too.</value>
   </data>
-  <data name="EmptyURLNotAllow" xml:space="preserve">
-    <value>Empty url not allow !</value>
+  <data name="EmptyURLNotAllowed" xml:space="preserve">
+    <value>Empty URL</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Enter a name for the local folder where the documents are synchronised</value>
+    <value>Enter a name for the local folder where the documents are synchronized</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
     <value>Enter a Web address where the documents can be seen:</value>
@@ -184,6 +181,9 @@ It is like Dropbox for Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
     <value>The folder name is invalid. Special car are not allow.</value>
+  </data>
+  <data name="InvalidURL" xml:space="preserve">
+    <value>Invalid URL</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
     <value>This may either take a short or a long time depending on the folder's size.</value>

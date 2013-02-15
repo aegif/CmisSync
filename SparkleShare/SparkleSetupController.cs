@@ -401,8 +401,8 @@ namespace SparkleShare
 
             UpdateAddProjectButtonEvent(fields_valid);
 
-            if (String.IsNullOrEmpty(address)) return "EmptyURLNotAllow";
-            if (!regx.IsMatch(address)) return "BadURL";
+            if (String.IsNullOrEmpty(address)) return "EmptyURLNotAllowed";
+            if (!regx.IsMatch(address)) return "InvalidURL";
             return String.Empty;
         }
 
