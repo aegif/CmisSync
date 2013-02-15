@@ -291,7 +291,7 @@ namespace SparkleShare
             //    Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend),
             //        new object [] { folder_path, this.config }
             //);
-            repo = new SparkleLib.Cmis.CmisRepo(folder_path, this.config, activityListenerAggregator);
+            repo = new SparkleLib.Cmis.SparkleRepo(folder_path, this.config, activityListenerAggregator);
 
             //} catch (Exception e) {
             //    SparkleLogger.LogInfo ("Controller",
