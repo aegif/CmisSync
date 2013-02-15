@@ -47,9 +47,11 @@ namespace SparkleShare
     public class SelectionTreeItem
     {
         public bool childrenLoaded = false;
+        public string repository; // Only necessary for repository root nodes.
         public string fullPath;
-        public SelectionTreeItem(string fullPath)
+        public SelectionTreeItem(string repository, string fullPath)
         {
+            this.repository = repository;
             this.fullPath = fullPath;
         }
     }
@@ -492,11 +494,11 @@ namespace SparkleShare
                                 System.Windows.Controls.TreeView treeView = new System.Windows.Controls.TreeView();
                                 treeView.Width = 410;
                                 treeView.Height = 267;
-                                foreach (string repository in Controller.repositories)
+                                foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
                                     System.Windows.Controls.TreeViewItem item = new System.Windows.Controls.TreeViewItem();
-                                    item.Tag = new SelectionTreeItem("/");
-                                    item.Header = repository;
+                                    item.Tag = new SelectionTreeItem(repository.Key, "/");
+                                    item.Header = repository.Value + " [" + repository.Key + "]";
                                     treeView.Items.Add(item);
                                 }
 
@@ -518,7 +520,7 @@ namespace SparkleShare
                                         cursor = treeViewItem.Parent;
                                         if (!(cursor is TreeViewItem))
                                         {
-                                            Controller.saved_repository = (string)treeViewItem.Header;
+                                            Controller.saved_repository = ((SelectionTreeItem)treeViewItem.Tag).repository;
                                         }
                                     }
 
@@ -537,7 +539,7 @@ namespace SparkleShare
                                         {
                                             System.Windows.Controls.TreeViewItem subItem =
                                                 new System.Windows.Controls.TreeViewItem();
-                                            subItem.Tag = new SelectionTreeItem(subfolder);
+                                            subItem.Tag = new SelectionTreeItem(null, subfolder);
                                             subItem.Header = Path.GetFileName(subfolder);
                                             item.Items.Add(subItem);
                                         }

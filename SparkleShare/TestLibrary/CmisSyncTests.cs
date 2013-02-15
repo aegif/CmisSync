@@ -131,7 +131,7 @@ namespace TestLibrary
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            string[] repos = CmisUtils.GetRepositories(url, user, password);
+            Dictionary<string, string> repos = CmisUtils.GetRepositories(url, user, password);
             Assert.NotNull(repos);
         }
 
