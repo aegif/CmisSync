@@ -180,7 +180,7 @@ namespace SparkleShare
         private ActivityListener activityListenerAggregator;
         private SparkleConfig config;
         // private SparkleFetcherBase fetcher;
-        private CmisFetcher fetcher;
+        private SparkleFetcher fetcher;
         private FileSystemWatcher watcher;
         private Object repo_lock = new Object();
         private Object check_repos_lock = new Object();
@@ -563,7 +563,7 @@ namespace SparkleShare
             //fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
             //    fetch_prior_history, canonical_name, repository, path, user, password, activityListenerAggregator);
 
-            fetcher = new SparkleLib.Cmis.CmisFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
+            fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
                  fetch_prior_history, local_path, repository, path, user, password, this.config, activityListenerAggregator);
 
             //try {
