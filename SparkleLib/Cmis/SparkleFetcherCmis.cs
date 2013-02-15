@@ -27,13 +27,13 @@ namespace SparkleLib.Cmis
 {
 
     // Sets up a fetcher that can get remote folders
-    public class CmisFetcher : SparkleFetcherBase
+    public class SparkleFetcher : SparkleFetcherBase
     {
 
         private string _canonical_name;
         public string CanonicalName { get { return _canonical_name; } protected set { _canonical_name = value; } }
 
-        public CmisFetcher(string server, string required_fingerprint, string remote_path,
+        public SparkleFetcher(string server, string required_fingerprint, string remote_path,
             string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
             string user, string password, SparkleConfig config, ActivityListener activityListener)
             : base(server, required_fingerprint,

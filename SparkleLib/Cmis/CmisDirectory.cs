@@ -177,7 +177,10 @@ namespace SparkleLib.Cmis
         public void SyncInBackground()
         {
             if (syncing)
+            {
+                SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", this.localRootFolder));
                 return;
+            }
             syncing = true;
 
             BackgroundWorker bw = new BackgroundWorker();
@@ -420,12 +423,15 @@ namespace SparkleLib.Cmis
             IList remoteSubfolders = new ArrayList();
 
             // Crawl remote children.
+            SparkleLogger.LogInfo("sync", String.Format("Parse remote folder {0}", this.remoteFolderPath));
             crawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
 
             // Crawl local files.
-            crawlLocalFiles(localFolder, remoteFolder, remoteFiles);
+            SparkleLogger.LogInfo("sync", String.Format("Parse local files in the local folder {0}", localFolder));
+            // crawlLocalFiles(localFolder, remoteFolder, remoteFiles);
 
             // Crawl local folders.
+            SparkleLogger.LogInfo("sync", String.Format("Parse local folder {0}", localFolder));
             crawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
         }
 
@@ -658,34 +664,39 @@ namespace SparkleLib.Cmis
             if (File.Exists(filepath))
                 File.Delete(filepath);
 
-
             string tmpfilepath = filepath + ".sync";
 
-            // If tmp file exist, file is open in append mode else it's a new file.
-            bool appendmode = File.Exists(tmpfilepath);
-            Stream localfile = File.OpenWrite(tmpfilepath);
+            // Create Stream with the local file in append mode, if file is empty it's like write.
+            StreamWriter localfile = new StreamWriter(tmpfilepath, true);
+            localfile.AutoFlush = true;
             DotCMIS.Data.IContentStream contentStream = null;
+
             // Download file, starting at the last download point
 
             // Get the last position in the localfile.
             Boolean success = false;
             try
             {
-                Int64 Offset = localfile.Length;
+                Int64 Offset = localfile.BaseStream.Position;
+
                 contentStream = remoteDocument.GetContentStream(remoteDocument.Id, Offset, remoteDocument.ContentStreamLength);
                 if (contentStream == null)
                 {
                     SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
                     throw new IOException();
                 }
-                CopyStream(contentStream.Stream, localfile);
+
+                SparkleLogger.LogInfo("Sync", String.Format("Start download of file with offset {0}", Offset));
+
+                CopyStream(contentStream.Stream, localfile.BaseStream);
                 localfile.Flush();
                 localfile.Close();
                 contentStream.Stream.Close();
                 success = true;
             }
-            catch
+            catch (Exception ex)
             {
+                SparkleLogger.LogInfo("Sync", String.Format("Download of file {0} abort: {1}", remoteDocument.ContentStreamFileName, ex));
                 success = false;
                 localfile.Flush();
                 localfile.Close();
@@ -693,23 +704,25 @@ namespace SparkleLib.Cmis
             }
             // Rename file
             // TODO - Yannick - Control file integrity by using hash compare
-            if (success) 
+            if (success)
+            {
                 File.Move(tmpfilepath, filepath);
 
-            // Get metadata.
-            Dictionary<string, string> metadata = new Dictionary<string, string>();
-            metadata.Add("Id", remoteDocument.Id);
-            metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
-            metadata.Add("VersionLabel", remoteDocument.VersionLabel);
-            metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
-            metadata.Add("CreatedBy", remoteDocument.CreatedBy);
-            metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
-            metadata.Add("CheckinComment", remoteDocument.CheckinComment);
-            metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
-            metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
+                // Get metadata.
+                Dictionary<string, string> metadata = new Dictionary<string, string>();
+                metadata.Add("Id", remoteDocument.Id);
+                metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
+                metadata.Add("VersionLabel", remoteDocument.VersionLabel);
+                metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
+                metadata.Add("CreatedBy", remoteDocument.CreatedBy);
+                metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
+                metadata.Add("CheckinComment", remoteDocument.CheckinComment);
+                metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
+                metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
 
-            // Create database entry for this file.
-            database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+                // Create database entry for this file.
+                database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+            }
             activityListener.ActivityStopped();
         }
 
@@ -823,25 +836,65 @@ namespace SparkleLib.Cmis
                 // Prepare properties
                 string fileName = Path.GetFileName(filePath);
                 Dictionary<string, object> properties = new Dictionary<string, object>();
-                properties.Add(PropertyIds.Name, fileName);
+                properties.Add(PropertyIds.Name, fileName + ".sync");
                 properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
 
-                // Prepare content stream
-                ContentStream contentStream = new ContentStream();
-                contentStream.FileName = fileName;
-                contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
+                Boolean success = false;
 
-                Stream file = File.OpenRead(filePath);
-                contentStream.Length = file.Length;
-                contentStream.Stream = file;
+                Stream localfile = File.OpenRead(filePath);
+                if (localfile == null)
+                {
+                    SparkleLogger.LogInfo("Sync", "Skipping upload of file with null content stream: " + filePath);
+                    throw new IOException();
+                }
+
+                // contentStream.Length = file.Length;
+                // contentStream.Stream = file;
 
                 // contentStream.Stream = File.OpenRead(filePath);
+                StreamWriter remoteFile = null;
+                // Prepare content stream
+                DotCMIS.Data.IContentStream contentStream = new ContentStream();
 
                 // Upload
-                remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                try
+                {
+                    // Create an empty file on remote server and get ContentStream
+                    SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and return stream ", filePath));
+                    remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                    contentStream = remoteDocument.GetContentStream();
+                    remoteFile = new StreamWriter(contentStream.Stream);
+                    Int64 Offset = remoteFile.BaseStream.Position;
+                    remoteFile.AutoFlush = true;
 
-                // Create database entry for this file.
-                database.AddFile(filePath, remoteDocument.LastModificationDate, null);
+                    CopyStream(localfile, remoteFile.BaseStream);
+
+                    remoteFile.BaseStream.Flush();
+                    remoteFile.BaseStream.Close();
+                    localfile.Close();
+
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+                    SparkleLogger.LogInfo("Sync", String.Format("Upload of file {0} abort: {1}", filePath, ex));
+                    success = false;
+                    localfile.Close();
+                    remoteFile.BaseStream.Flush();
+                    remoteFile.BaseStream.Close();
+                    if (contentStream != null) contentStream.Stream.Close();
+                }
+                // remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+
+                if (success)
+                {
+                    if (contentStream != null) contentStream.Stream.Close();
+                    properties[PropertyIds.Name] = fileName;
+                    remoteDocument.UpdateProperties(properties, true);
+
+                    // Create database entry for this file.
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, null);
+                }
             }
             catch (Exception e)
             {
@@ -864,20 +917,6 @@ namespace SparkleLib.Cmis
             }
             activityListener.ActivityStopped();
         }
-
-        //private void CopyStream(Stream src, Stream dst)
-        //{
-        //    int size = (src.CanSeek) ? Math.Min((int)(src.Length - src.Position), 0x2000) : 0x2000;
-        //    byte[] buffer = new byte[size];
-        //    long TempPos = (src.CanSeek) ? src.Position : 0;
-        //    while (true)
-        //    {
-        //        int read = src.Read(buffer, 0, buffer.Length);
-        //        if (read <= 0)
-        //            return;
-        //        dst.Write(buffer, 0, read);
-        //    }
-        //}
 
         /**
          * Upload folder recursively.
