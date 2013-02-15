@@ -198,7 +198,6 @@ namespace SparkleShare
             process.Start();
         }
 
-
         public override void Quit()
         {
             StopSSH();
