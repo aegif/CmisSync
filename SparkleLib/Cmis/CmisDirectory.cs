@@ -862,7 +862,7 @@ namespace SparkleLib.Cmis
                 string fileName = Path.GetFileName(filePath);
                 string tmpfileName = fileName + ".sync";
                 Dictionary<string, object> properties = new Dictionary<string, object>();
-                properties.Add(PropertyIds.Name, fileName + ".sync");
+                properties.Add(PropertyIds.Name, tmpfileName);
                 properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
 
                 Boolean success = false;
@@ -876,6 +876,11 @@ namespace SparkleLib.Cmis
                 // Upload
                 try
                 {
+                    // Until we can not append the remote file, if exist must delete it to avoid conflict
+                    string remotepath = remoteFolder.Path + '/' + tmpfileName;
+                    ICmisObject obj = session.GetObjectByPath(remotepath);
+                    if (obj != null) obj.Delete(true);
+
                     // Create an empty file on remote server and get ContentStream
                     SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
                     remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
@@ -972,6 +977,8 @@ namespace SparkleLib.Cmis
             // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
             // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
             remoteFile.SetContentStream(remoteStream, true, true);
+
+            SparkleLogger.LogInfo("Sync", "Upload/Update finished:" + filePath);
         }
 
         /**
@@ -979,6 +986,7 @@ namespace SparkleLib.Cmis
          */
         private void UpdateFile(string filePath, IFolder remoteFolder)
         {
+            SparkleLogger.LogInfo("Sync", "Updated " + filePath);
             activityListener.ActivityStarted();
             string fileName = Path.GetFileName(filePath);
 
@@ -1000,6 +1008,7 @@ namespace SparkleLib.Cmis
             // If not found, it means the document has been deleted, will be processed at the next sync cycle.
             if (!found)
             {
+                SparkleLogger.LogInfo("Sync", filePath + " not found on server, must be uploaded instead of updated");
                 return;
             }
 
@@ -1064,7 +1073,7 @@ namespace SparkleLib.Cmis
         {
             string[] contents = new string[] {
                 "~",             // gedit and emacs
-                "Thumbs.db", "Desktop.ini", // Windows
+                "Thumbs.db", "Desktop.ini","desktop.ini","thumbs.db", // Windows
                 "$~"
             };
 
@@ -1089,7 +1098,7 @@ namespace SparkleLib.Cmis
                 "CVS",".svn",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
             };
 
-            SparkleLogger.LogInfo("Sync", "Check rule on " + path);
+            SparkleLogger.LogInfo("Sync", "Check rules for " + path);
             Boolean found = false;
             foreach (string content in contents)
             {

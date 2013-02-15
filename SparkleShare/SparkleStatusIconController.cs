@@ -245,7 +245,7 @@ namespace SparkleShare {
 		
         public void QuitClicked ()
         {
-            Program.Controller.Quit ();
+                Program.Controller.Quit ();
         }
 
 

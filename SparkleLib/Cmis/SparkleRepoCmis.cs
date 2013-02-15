@@ -43,13 +43,11 @@ namespace SparkleLib.Cmis
 
     public class SparkleRepo : SparkleRepoBase
     {
-        private SparkleConfig sconfig;
         private SparkleLib.Cmis.CmisDirectory cmis;
 
         public SparkleRepo(string path, SparkleConfig config, ActivityListener activityListener)
             : base(path, config)
         {
-            this.sconfig = config;
             cmis = new CmisDirectory(path, config, activityListener);
             SparkleLogger.LogInfo("Sync", "Cmis:" + cmis);
         }
@@ -216,5 +214,6 @@ namespace SparkleLib.Cmis
             SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] GetChangeSets", this.Name));
             return new List<SparkleChangeSet>(); // TODO
         }
+
     }
 }
