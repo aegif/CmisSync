@@ -868,30 +868,38 @@ namespace SparkleLib.Cmis
                 Boolean success = false;
 
                 // Prepare content stream
+                Stream file = File.OpenRead(filePath);
                 ContentStream contentStream = new ContentStream();
                 contentStream.FileName = fileName;
                 contentStream.Stream = new MemoryStream();
                 contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
+                contentStream.Length = file.Length;
+                contentStream.Stream = file;
 
                 // Upload
                 try
                 {
                     // Until we can not append the remote file, if exist must delete it to avoid conflict
-                    string remotepath = remoteFolder.Path + '/' + tmpfileName;
-                    ICmisObject obj = session.GetObjectByPath(remotepath);
-                    if (obj != null)
+                    try
                     {
-                        SparkleLogger.LogInfo("Sync", "Temp file exist on remote server, but CMIS 1.0 don't support Append Mode");
-                        SparkleLogger.LogInfo("Sync", String.Format("We delete temp file and create a new empty file on the CMIS Server for {0} and launch a simple update", filePath));
-                        obj.Delete(true);
+                        string remotepath = remoteFolder.Path + '/' + tmpfileName;
+                        ICmisObject obj = session.GetObjectByPath(remotepath);
+                        if (obj != null)
+                        {
+                            SparkleLogger.LogInfo("Sync", "Temp file exist on remote server, but CMIS 1.0 don't support Append Mode");
+                            SparkleLogger.LogInfo("Sync", String.Format("We delete temp file and create a new empty file on the CMIS Server for {0} and launch a simple update", filePath));
+                            obj.Delete(true);
+                        }
+                    }
+                    catch (DotCMIS.Exceptions.CmisObjectNotFoundException)
+                    {
+                        // Create an empty file on remote server and get ContentStream
+                        SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
                     }
 
-                    // Create an empty file on remote server and get ContentStream
-                    SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
+                    // remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                    // UpdateFile(filePath, remoteDocument);
                     remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-
-                    UpdateFile(filePath, remoteDocument);
-
                     success = true;
                 }
                 catch (Exception ex)
@@ -903,6 +911,7 @@ namespace SparkleLib.Cmis
 
                 if (success)
                 {
+                    SparkleLogger.LogInfo("Sync", String.Format("Upload of file {0} finish", filePath));
                     if (contentStream != null) contentStream.Stream.Close();
                     properties[PropertyIds.Name] = fileName;
                     remoteDocument.UpdateProperties(properties, true);
@@ -977,13 +986,14 @@ namespace SparkleLib.Cmis
 
             ContentStream remoteStream = (ContentStream)remoteFile.GetContentStream();
             remoteStream.Stream = localfile;
+            remoteStream.Length = localfile.Length;
 
             // CMIS do not have a Method to upload block by block. So upload file must be full.
             // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
             // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
             remoteFile.SetContentStream(remoteStream, true, true);
 
-            SparkleLogger.LogInfo("Sync", "Upload/Update finished:" + filePath);
+            SparkleLogger.LogInfo("Sync", "Update finished:" + filePath);
         }
 
         /**
@@ -1020,8 +1030,6 @@ namespace SparkleLib.Cmis
             UpdateFile(filePath, document);
 
             // Read new last modification date.
-            // TODO document = (IDocument)id; // null. See DotCMIS 0.4 bug: CMIS-594
-            //
             // Update timestamp in database.
             database.SetFileServerSideModificationDate(filePath, document.LastModificationDate);
             activityListener.ActivityStopped();
