@@ -136,7 +136,7 @@ namespace SparkleShare
         public string saved_user = "";
         public string saved_password = "";
         public string saved_repository = "";
-        public string[] repositories;
+        public Dictionary<string, string> repositories;
         private bool create_startup_item = true;
         private bool fetch_prior_history = false;
 
