@@ -134,140 +134,138 @@ namespace TestLibrary
             Dictionary<string, string> repos = CmisUtils.GetRepositories(url, user, password);
             Assert.NotNull(repos);
         }
+        /*
+                [Theory, PropertyData("TestServers")]
+                public void Sync(string canonical_name, string localPath, string remoteFolderPath,
+                    string url, string user, string password, string repositoryId)
+                {
+                    // Clean.
+                    CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+                    // Mock.
+                    ActivityListener activityListener = new Mock<ActivityListener>().Object;
+                    // Sync.
+                    CmisDirectory cmisDirectory = new CmisDirectory(
+                        canonical_name,
+                        localPath,
+                        remoteFolderPath,
+                        url,
+                        user,
+                        password,
+                        repositoryId,
+                        activityListener
+                    );
+                    cmisDirectory.Sync();
+                }
 
-        [Theory, PropertyData("TestServers")]
-        public void Sync(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId)
-        {
-            // Clean.
-            CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
-            CmisDirectory cmisDirectory = new CmisDirectory(
-                canonical_name,
-                localPath,
-                remoteFolderPath,
-                url,
-                user,
-                password,
-                repositoryId,
-                activityListener
-            );
-            cmisDirectory.Sync();
-        }
+                [Theory, PropertyData("TestServers")]
+                public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
+                    string url, string user, string password, string repositoryId)
+                {
+                    // Prepare checkout directory.
+                    string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+                    CleanDirectory(localDirectory);
+                    // Mock.
+                    ActivityListener activityListener = new Mock<ActivityListener>().Object;
+                    // Sync.
+                    CmisDirectory cmisDirectory = new CmisDirectory(
+                        canonical_name,
+                        localPath,
+                        remoteFolderPath,
+                        url,
+                        user,
+                        password,
+                        repositoryId,
+                        activityListener
+                    );
+                    cmisDirectory.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-        [Theory, PropertyData("TestServers")]
-        public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId)
-        {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
-            CmisDirectory cmisDirectory = new CmisDirectory(
-                canonical_name,
-                localPath,
-                remoteFolderPath,
-                url,
-                user,
-                password,
-                repositoryId,
-                activityListener
-            );
-            cmisDirectory.Sync();
-            Console.WriteLine("Synced to clean state.");
+                    // Create random small file.
+                    LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
 
-            // Create random small file.
-            LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
+                    // Sync again.
+                    cmisDirectory.Sync();
+                    Console.WriteLine("Second sync done.");
 
-            // Sync again.
-            cmisDirectory.Sync();
-            Console.WriteLine("Second sync done.");
+                    // Check that file is present server-side.
+                    // TODO
 
-            // Check that file is present server-side.
-            // TODO
+                    // Clean.
+                    Clean(localDirectory, cmisDirectory);
+                }
 
-            // Clean.
-            Clean(localDirectory, cmisDirectory);
-        }
+                [Theory, PropertyData("TestServers")]
+                public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
+                    string url, string user, string password, string repositoryId)
+                {
+                    // Prepare checkout directory.
+                    string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+                    CleanDirectory(localDirectory);
+                    // Mock.
+                    ActivityListener activityListener = new Mock<ActivityListener>().Object;
+                    // Sync.
+                    CmisDirectory cmisDirectory = new CmisDirectory(
+                        canonical_name,
+                        localPath,
+                        remoteFolderPath,
+                        url,
+                        user,
+                        password,
+                        repositoryId,
+                        activityListener
+                    );
+                    cmisDirectory.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-        [Theory, PropertyData("TestServers")]
-        public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId)
-        {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
-            CmisDirectory cmisDirectory = new CmisDirectory(
-                canonical_name,
-                localPath,
-                remoteFolderPath,
-                url,
-                user,
-                password,
-                repositoryId,
-                activityListener
-            );
-            cmisDirectory.Sync();
-            Console.WriteLine("Synced to clean state.");
+                    // Create random small file.
+                    LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000);
 
-            // Create random small file.
-            LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000);
+                    // Sync again.
+                    cmisDirectory.Sync();
+                    Console.WriteLine("Second sync done.");
 
-            // Sync again.
-            cmisDirectory.Sync();
-            Console.WriteLine("Second sync done.");
+                    // Check that file is present server-side.
+                    // TODO
 
-            // Check that file is present server-side.
-            // TODO
+                    // Clean.
+                    Clean(localDirectory, cmisDirectory);
+                }
 
-            // Clean.
-            Clean(localDirectory, cmisDirectory);
-        }
+                [Theory, PropertyData("TestServers")]
+                public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
+                    string url, string user, string password, string repositoryId)
+                {
+                    // Prepare checkout directory.
+                    string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+                    CleanDirectory(localDirectory);
+                    // Mock.
+                    ActivityListener activityListener = new Mock<ActivityListener>().Object;
+                    // Sync.
+                    CmisDirectory cmisDirectory = new CmisDirectory(
+                        canonical_name,
+                        localPath,
+                        remoteFolderPath,
+                        url,
+                        user,
+                        password,
+                        repositoryId,
+                        activityListener
+                    );
+                    cmisDirectory.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-        [Theory, PropertyData("TestServers")]
-        public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId)
-        {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
-            CmisDirectory cmisDirectory = new CmisDirectory(
-                canonical_name,
-                localPath,
-                remoteFolderPath,
-                url,
-                user,
-                password,
-                repositoryId,
-                activityListener
-            );
-            cmisDirectory.Sync();
-            Console.WriteLine("Synced to clean state.");
+                    // Create directory and small files.
+                    LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
 
-            // Create directory and small files.
-            LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
+                    // Sync again.
+                    cmisDirectory.Sync();
+                    Console.WriteLine("Post sync done.");
 
-            // Sync again.
-            cmisDirectory.Sync();
-            Console.WriteLine("Post sync done.");
+                    // Clean.
+                    Clean(localDirectory, cmisDirectory);
+                }
 
-            // Clean.
-            Clean(localDirectory, cmisDirectory);
-        }
-
-        /**
-         * Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
-         */
+                 // Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
         [Theory, PropertyData("TestServers")]
         public void SyncWhileModifyingFile(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -335,9 +333,7 @@ namespace TestLibrary
             Clean(localDirectory, cmisDirectory);
         }
 
-        /**
-         * Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
-         */
+        // Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
         [Theory, PropertyData("TestServers")]
         public void SyncWhileModifyingFolders(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -415,6 +411,7 @@ namespace TestLibrary
             // Clean.
             Clean(localDirectory, cmisDirectory);
         }
+*/
 
         // Write a file and immediately check whether it has been created.
         // Should help see whether CMIS servers are synchronous or not.
