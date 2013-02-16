@@ -20,7 +20,7 @@ namespace SparkleLib.Cmis
     public partial class SparkleRepoCmis : SparkleRepoBase
     {
         private enum RulesType { Folder, File };
-        
+
         /**
          * Synchronization with a particular CMIS folder.
          */
@@ -138,7 +138,8 @@ namespace SparkleLib.Cmis
                 cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
                 cmisParameters[SessionParameter.AtomPubUrl] = config.GetUrlForFolder(Path.GetFileName(localRootFolder));
                 cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "user");
-                cmisParameters[SessionParameter.Password] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "password");
+                // TODO - Yannick - Uncrypt password
+                cmisParameters[SessionParameter.Password] = CmisCrypto.Unprotect(config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "password"));
                 cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "repository");
 
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";

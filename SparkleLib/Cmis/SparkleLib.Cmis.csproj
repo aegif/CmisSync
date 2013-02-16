@@ -44,6 +44,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>libs-from-sqliteorg-2012\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -59,6 +60,7 @@
   </Target>
   -->
   <ItemGroup>
+    <Compile Include="CmisCrypto.cs" />
     <Compile Include="CmisDatabase.cs" />
     <Compile Include="CmisPermissionDeniedException.cs" />
     <Compile Include="CmisServerNotFoundException.cs" />

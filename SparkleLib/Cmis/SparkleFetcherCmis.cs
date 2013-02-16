@@ -46,7 +46,9 @@ namespace SparkleLib.Cmis
 
             string backend = SparkleFetcherBase.GetBackend(RemoteUrl.AbsolutePath);
 
-            config.AddFolder(CanonicalName, Identifier, RemoteUrl.ToString(), backend, Repository, RemoteFolder, User, Password);
+            // TODO - Yannick - Crypt Password
+            string cryptPwd = CmisCrypto.Protect(Password);
+            config.AddFolder(CanonicalName, Identifier, RemoteUrl.ToString(), backend, Repository, RemoteFolder, User, cryptPwd);
 
             String localPath = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
             Directory.CreateDirectory(localPath);
