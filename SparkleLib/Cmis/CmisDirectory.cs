@@ -918,8 +918,20 @@ namespace SparkleLib.Cmis
                     DotCMIS.Client.IObjectId objID = remoteDocument.UpdateProperties(properties, true);
                     remoteDocument = (IDocument)session.GetObject(objID);
 
+                    // Get metadata.
+                    Dictionary<string, string> metadata = new Dictionary<string, string>();
+                    metadata.Add("Id", remoteDocument.Id);
+                    metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
+                    metadata.Add("VersionLabel", remoteDocument.VersionLabel);
+                    metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
+                    metadata.Add("CreatedBy", remoteDocument.CreatedBy);
+                    metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
+                    metadata.Add("CheckinComment", remoteDocument.CheckinComment);
+                    metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
+                    metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
+
                     // Create database entry for this file.
-                    database.AddFile(filePath, remoteDocument.LastModificationDate, null);
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
                 }
             }
             catch (Exception e)
