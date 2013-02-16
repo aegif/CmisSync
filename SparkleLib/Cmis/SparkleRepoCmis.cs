@@ -41,11 +41,11 @@ using SparkleLib.Cmis;
 namespace SparkleLib.Cmis
 {
 
-    public class SparkleRepo : SparkleRepoBase
+    public partial class SparkleRepoCmis : SparkleRepoBase
     {
-        private SparkleLib.Cmis.CmisDirectory cmis;
+        private CmisDirectory cmis;
 
-        public SparkleRepo(string path, SparkleConfig config, ActivityListener activityListener)
+        public SparkleRepoCmis(string path, SparkleConfig config, ActivityListener activityListener)
             : base(path, config)
         {
             cmis = new CmisDirectory(path, config, activityListener);

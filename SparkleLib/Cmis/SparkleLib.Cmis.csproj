@@ -63,6 +63,7 @@
     <Compile Include="CmisPermissionDeniedException.cs" />
     <Compile Include="CmisServerNotFoundException.cs" />
     <Compile Include="CmisUtils.cs" />
+    <Compile Include="CmisDirectoryCrawlMethod.cs" />
     <Compile Include="MimeType.cs" />
     <Compile Include="SparkleFetcherCmis.cs" />
     <Compile Include="SparkleCmis.cs">
