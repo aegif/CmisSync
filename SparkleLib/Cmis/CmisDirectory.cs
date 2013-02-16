@@ -659,11 +659,19 @@ namespace SparkleLib.Cmis
                         // This local folder is not on the CMIS server now, so
                         // check whether it used to exist on server or not.
                         if (database.ContainsFolder(localSubFolder))
+<<<<<<< HEAD
                         {
                             RemoveFolderLocally(localSubFolder);
                         }
                         else
                         {
+=======
+                        {
+                            RemoveFolderLocally(localSubFolder);
+                        }
+                        else
+                        {
+>>>>>>> origin/LARGE-UPLOAD
                             if (BIDIRECTIONAL)
                             {
                                 // New local folder, upload recursively.
@@ -896,6 +904,7 @@ namespace SparkleLib.Cmis
                         SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
                     }
                     if (remoteDocument == null) return;
+<<<<<<< HEAD
 
                     // This two method have same effect at this time, but first could be helpful when AppendMethod will be available (CMIS1.1)
                     UpdateFile(filePath, remoteDocument);
@@ -914,12 +923,49 @@ namespace SparkleLib.Cmis
                     if (contentStream != null) contentStream.Stream.Close();
                     properties[PropertyIds.Name] = fileName;
 
+=======
+
+                    // This two method have same effect at this time, but first could be helpful when AppendMethod will be available (CMIS1.1)
+                    UpdateFile(filePath, remoteDocument);
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+                    SparkleLogger.LogInfo("Sync", String.Format("Upload of file {0} abort: {1}", filePath, ex));
+                    success = false;
+                    if (contentStream != null) contentStream.Stream.Close();
+                }
+
+                if (success)
+                {
+                    SparkleLogger.LogInfo("Sync", String.Format("Upload of file {0} finished", filePath));
+                    if (contentStream != null) contentStream.Stream.Close();
+                    properties[PropertyIds.Name] = fileName;
+
+>>>>>>> origin/LARGE-UPLOAD
                     // Object update change ID
                     DotCMIS.Client.IObjectId objID = remoteDocument.UpdateProperties(properties, true);
                     remoteDocument = (IDocument)session.GetObject(objID);
 
+<<<<<<< HEAD
                     // Create database entry for this file.
                     database.AddFile(filePath, remoteDocument.LastModificationDate, null);
+=======
+                    // Get metadata.
+                    Dictionary<string, string> metadata = new Dictionary<string, string>();
+                    metadata.Add("Id", remoteDocument.Id);
+                    metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
+                    metadata.Add("VersionLabel", remoteDocument.VersionLabel);
+                    metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
+                    metadata.Add("CreatedBy", remoteDocument.CreatedBy);
+                    metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
+                    metadata.Add("CheckinComment", remoteDocument.CheckinComment);
+                    metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
+                    metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
+
+                    // Create database entry for this file.
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+>>>>>>> origin/LARGE-UPLOAD
                 }
             }
             catch (Exception e)
@@ -996,6 +1042,10 @@ namespace SparkleLib.Cmis
             // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
             DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
 
+<<<<<<< HEAD
+=======
+            localfile.Close();
+>>>>>>> origin/LARGE-UPLOAD
             SparkleLogger.LogInfo("Sync", "Update finished:" + filePath);
             
         }

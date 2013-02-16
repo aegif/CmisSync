@@ -159,14 +159,20 @@ namespace SparkleLib.Cmis
             Dictionary<string, string> metadata)
         {
             string normalizedPath = Normalize(path);
-
+            string checksum = String.Empty;
             try
             {
-                string checksum = Checksum(path);
+                checksum = Checksum(path);
             }
             catch (IOException e) {
                 SparkleLogger.LogInfo("CmisDatabase", "IOException while reading file checksum during addition: " + path);
                 // The file was removed while reading. Just skip it, as it does not need to be added anymore.
+                return;
+            }
+
+            if (String.IsNullOrEmpty(checksum))
+            {
+                SparkleLogger.LogInfo("CmisDatabase", "Bad checksum for " + path);
                 return;
             }
 
@@ -181,7 +187,9 @@ namespace SparkleLib.Cmis
                     command.Parameters.AddWithValue("path", normalizedPath);
                     command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
                     command.Parameters.AddWithValue("metadata", Json(metadata));
-                    command.Parameters.AddWithValue("checksum", Checksum(path));
+                    // Why re-checksum file ?
+                    // command.Parameters.AddWithValue("checksum", Checksum(path));
+                    command.Parameters.AddWithValue("checksum", checksum);
                     command.ExecuteNonQuery();
                 }
                 catch (SQLiteException e)
