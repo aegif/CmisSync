@@ -19,11 +19,12 @@ namespace SparkleLib.Cmis
 {
     public partial class SparkleRepoCmis : SparkleRepoBase
     {
-        public enum RulesType { Folder, File };
+        private enum RulesType { Folder, File };
+        
         /**
          * Synchronization with a particular CMIS folder.
          */
-        public partial class CmisDirectory
+        private partial class CmisDirectory
         {
             /**
              * Whether sync is bidirectional or only from server to client.
@@ -177,72 +178,6 @@ namespace SparkleLib.Cmis
                     }
                 }
                 while (session == null);
-            }
-
-
-            /**
-             * Sync in the background.
-             */
-            public void SyncInBackground()
-            {
-                if (syncing)
-                {
-                    SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", this.localRootFolder));
-                    return;
-                }
-                syncing = true;
-
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.DoWork += new DoWorkEventHandler(
-                    delegate(Object o, DoWorkEventArgs args)
-                    {
-                        SparkleLogger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", this.localRootFolder));
-#if !DEBUG
-                        try
-                        {
-#endif
-                            Sync();
-#if !DEBUG
-                        }
-                        catch (CmisBaseException e)
-                        {
-                            SparkleLogger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
-                            SparkleLogger.LogInfo("Sync", e.StackTrace);
-                            SparkleLogger.LogInfo("Sync", e.ErrorContent);
-                        }
-#endif
-                    }
-                );
-                bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                    delegate(object o, RunWorkerCompletedEventArgs args)
-                    {
-                        syncing = false;
-                    }
-                );
-                bw.RunWorkerAsync();
-            }
-
-
-            /**
-             * Synchronize between CMIS folder and local folder.
-             */
-            public void Sync()
-            {
-                // If not connected, connect.
-                if (session == null)
-                    Connect();
-
-                IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
-
-                //            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
-                //            {
-                //                ChangeLogSync(remoteFolder);
-                //            }
-                //            else
-                //            {
-                // No ChangeLog capability, so we have to crawl remote and local folders.
-                CrawlSync(remoteFolder, localRootFolder);
-                //            }
             }
 
 

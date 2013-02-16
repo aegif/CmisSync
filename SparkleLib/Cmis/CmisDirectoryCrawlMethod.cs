@@ -22,7 +22,7 @@ namespace SparkleLib.Cmis
         /**
          * Synchronization with a particular CMIS folder.
          */
-        public partial class CmisDirectory
+        private partial class CmisDirectory
         {
             /**
              * Synchronize by checking all folders/files one-by-one.
@@ -81,7 +81,6 @@ namespace SparkleLib.Cmis
                 SparkleLogger.LogInfo("Sync", String.Format("Parse local folder {0}", localFolder));
                 crawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
             }
-
 
             /**
              * Crawl remote content, syncing down if needed.
@@ -229,7 +228,6 @@ namespace SparkleLib.Cmis
                     }
                 }
             }
-
 
             /**
              * Crawl local files in a given directory (not recursive).

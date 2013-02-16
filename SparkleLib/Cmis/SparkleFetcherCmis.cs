@@ -52,7 +52,7 @@ namespace SparkleLib.Cmis
             Directory.CreateDirectory(localPath);
 
             SparkleRepoCmis CmisRepo = new SparkleRepoCmis(localPath, SparkleConfig.DefaultConfig, activityListener);
-            bool Sync = CmisRepo.HasUnsyncedChanges;
+            bool Sync = CmisRepo.SyncDown();
             // CmisDirectory cmis = new CmisDirectory(canonical_name, path, remote_path, server, user, password, repository, activityListener);
             // cmis.Sync();
         }

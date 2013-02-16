@@ -125,6 +125,8 @@ namespace SparkleLib.Cmis
         public override bool SyncUp()
         {
             SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] SyncUp", this.Name));
+            if (cmis != null)
+                cmis.SyncInBackground();
             return true; // TODO
         }
 
@@ -132,7 +134,9 @@ namespace SparkleLib.Cmis
         public override bool SyncDown()
         {
             SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] SyncDown", this.Name));
-            return true; // TODO
+            if (cmis != null)
+                cmis.SyncInBackground();
+            return true;
         }
 
 
