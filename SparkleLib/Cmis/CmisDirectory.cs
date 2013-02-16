@@ -868,13 +868,10 @@ namespace SparkleLib.Cmis
                 Boolean success = false;
 
                 // Prepare content stream
-                Stream file = File.OpenRead(filePath);
                 ContentStream contentStream = new ContentStream();
                 contentStream.FileName = fileName;
                 contentStream.Stream = new MemoryStream();
                 contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
-                //contentStream.Length = file.Length;
-                //contentStream.Stream = file;
 
                 // Upload
                 try
@@ -1008,6 +1005,7 @@ namespace SparkleLib.Cmis
             // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
             DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
 
+            localfile.Close();
             SparkleLogger.LogInfo("Sync", "Update finished:" + filePath);
             
         }
