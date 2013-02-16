@@ -706,32 +706,6 @@ namespace SparkleShare
 
                                 add_button.Click += delegate
                                 {
-                                    // TODO: Check if folder already exist
-                                    //// Show wait cursor
-                                    //System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-
-                                    //// Try to find the CMIS server
-                                    //CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
-                                    //    localfolder_bx.Text, user_box.Text, password_box.Password);
-                                    //Controller.repositories = cmisServer.repositories;
-                                    //address_box.Text = cmisServer.url;
-
-                                    //// Hide wait cursor
-                                    //System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
-
-                                    //if (Controller.repositories == null)
-                                    //{
-                                    //    // Show warning
-                                    //    address_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture);
-                                    //    address_error_label.Visibility = Visibility.Visible;
-                                    //}
-                                    //else
-                                    //{
-                                    //    // Continue to folder selection
-                                    //    Controller.Add1PageCompleted(
-                                    //        address_box.Text, user_box.Text, password_box.Password);
-                                    //}
-
                                     Controller.CustomizePageCompleted(localfolder_box.Text);
                                 };
                                 break;

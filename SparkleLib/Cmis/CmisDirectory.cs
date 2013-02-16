@@ -138,7 +138,7 @@ namespace SparkleLib.Cmis
                 cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
                 cmisParameters[SessionParameter.AtomPubUrl] = config.GetUrlForFolder(Path.GetFileName(localRootFolder));
                 cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "user");
-                // TODO - Yannick - Uncrypt password
+                // Uncrypt password
                 cmisParameters[SessionParameter.Password] = CmisCrypto.Unprotect(config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "password"));
                 cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "repository");
 

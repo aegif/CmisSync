@@ -46,7 +46,7 @@ namespace SparkleLib.Cmis
 
             string backend = SparkleFetcherBase.GetBackend(RemoteUrl.AbsolutePath);
 
-            // TODO - Yannick - Crypt Password
+            // Crypt Password
             string cryptPwd = CmisCrypto.Protect(Password);
             config.AddFolder(CanonicalName, Identifier, RemoteUrl.ToString(), backend, Repository, RemoteFolder, User, cryptPwd);
 
