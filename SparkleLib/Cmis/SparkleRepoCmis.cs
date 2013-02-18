@@ -45,10 +45,10 @@ namespace SparkleLib.Cmis
     {
         private CmisDirectory cmis;
 
-        public SparkleRepoCmis(string path, SparkleConfig config, ActivityListener activityListener)
-            : base(path, config)
+        public SparkleRepoCmis(string path, SparkleRepoInfo repoInfo, ActivityListener activityListener)
+            : base(path, repoInfo)
         {
-            cmis = new CmisDirectory(path, config, activityListener);
+            cmis = new CmisDirectory(path, repoInfo, activityListener);
             SparkleLogger.LogInfo("Sync", "Cmis:" + cmis);
         }
 
@@ -139,6 +139,12 @@ namespace SparkleLib.Cmis
             return true;
         }
 
+        public void DoFirstSync()
+        {
+            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] First sync", this.Name));
+            if (cmis != null)
+                cmis.Sync();
+        }
 
         public override bool HasLocalChanges
         {
