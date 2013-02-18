@@ -15,7 +15,8 @@ namespace SparkleLib.Cmis
 
         public static byte[] GetCryptoKey()
         {
-            return System.Text.Encoding.UTF8.GetBytes("CmisSync Is tHe BeSt cMiscLieNt, So uSe it");
+            return System.Text.Encoding.UTF8.GetBytes(
+                "Thou art so farth away, I miss you my dear files❥, with CmisSync be forever by my side!");
         }
 
         public static string Protect(string value)
