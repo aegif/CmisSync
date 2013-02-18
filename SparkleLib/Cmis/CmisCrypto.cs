@@ -51,6 +51,12 @@ namespace SparkleLib.Cmis
                 Console.WriteLine(e.ToString());
                 return null;
             }
+            catch (FormatException e)
+            {
+                Console.WriteLine("Your password is not obfuscated yet.");
+                Console.WriteLine("Using unobfuscated value directly might be deprecated soon, so please delete your local directories and recreate them. Thank you for your understanding.");
+                return value;
+            }
         }
     }
 }
