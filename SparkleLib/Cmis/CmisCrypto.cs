@@ -15,7 +15,8 @@ namespace SparkleLib.Cmis
 
         public static byte[] GetCryptoKey()
         {
-            return System.Text.Encoding.UTF8.GetBytes("CmisSync Is tHe BeSt cMiscLieNt, So uSe it");
+            return System.Text.Encoding.UTF8.GetBytes(
+                "Thou art so farth away, I miss you my dear files❥, with CmisSync be forever by my side!");
         }
 
         public static string Protect(string value)
@@ -50,6 +51,12 @@ namespace SparkleLib.Cmis
                 Console.WriteLine("Data was not decrypted. An error occurred.");
                 Console.WriteLine(e.ToString());
                 return null;
+            }
+            catch (FormatException e)
+            {
+                Console.WriteLine("Your password is not obfuscated yet.");
+                Console.WriteLine("Using unobfuscated value directly might be deprecated soon, so please delete your local directories and recreate them. Thank you for your understanding.");
+                return value;
             }
         }
     }

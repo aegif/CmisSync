@@ -348,7 +348,7 @@ namespace SparkleShare
         {
             if (this.repositories.Count > 0)
             {
-                for (int i = 0; i <= this.repositories.Count; i++)
+                for (int i = 0; i < this.repositories.Count; i++)
                 {
                     SparkleRepoBase repo = this.repositories[i];
 
