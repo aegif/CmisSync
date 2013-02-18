@@ -81,7 +81,7 @@ namespace SparkleLib.Cmis
             /**
              * Config 
              * */
-            private SparkleConfig sconfig;
+            private SparkleRepoInfo repoinfo;
 
             // Why use a special constructor, add folder in config before syncing and use standard constructor instead
             /**
@@ -117,30 +117,29 @@ namespace SparkleLib.Cmis
             /**
              * Constructor for SparkleRepo (at every launch of CmisSync)
              */
-            public CmisDirectory(string localPath, SparkleConfig config,
+            public CmisDirectory(string localPath, SparkleRepoInfo repoInfo,
                 ActivityListener activityListener)
             {
                 this.activityListener = activityListener;
-                this.sconfig = config;
+                this.repoinfo = repoInfo;
                 // Set local root folder
                 String FolderName = Path.GetFileName(localPath);
                 this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, FolderName);
 
                 // Database is place in appdata of the users instead of sync folder (more secure)
                 // database = new CmisDatabase(localRootFolder);
-                string cmis_path = Path.Combine(config.ConfigPath, FolderName + ".cmissync");
-                database = new CmisDatabase(cmis_path);
+                database = new CmisDatabase(repoinfo.CmisDatabase);
 
                 // Get path on remote repository.
-                remoteFolderPath = config.GetFolderOptionalAttribute(FolderName, "remoteFolder");
+                remoteFolderPath = repoInfo.RemotePath;
 
                 cmisParameters = new Dictionary<string, string>();
                 cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-                cmisParameters[SessionParameter.AtomPubUrl] = config.GetUrlForFolder(Path.GetFileName(localRootFolder));
-                cmisParameters[SessionParameter.User] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "user");
+                cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
+                cmisParameters[SessionParameter.User] = repoInfo.User;
                 // Uncrypt password
-                cmisParameters[SessionParameter.Password] = CmisCrypto.Unprotect(config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "password"));
-                cmisParameters[SessionParameter.RepositoryId] = config.GetFolderOptionalAttribute(Path.GetFileName(localRootFolder), "repository");
+                cmisParameters[SessionParameter.Password] = CmisCrypto.Unprotect(repoInfo.Password);
+                cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
 
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
 
@@ -505,6 +504,8 @@ namespace SparkleLib.Cmis
                 IDocument remoteDocument = null;
                 try
                 {
+                    SparkleLogger.LogInfo("Sync", String.Format("Start upload of file {0}", filePath));
+
                     // Prepare properties
                     string fileName = Path.GetFileName(filePath);
                     string tmpfileName = fileName + ".sync";
