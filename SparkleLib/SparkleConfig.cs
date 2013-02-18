@@ -204,6 +204,10 @@ namespace SparkleLib
             }
         }
 
+        public void AddFolder(SparkleRepoInfo repoInfo)
+        {
+            this.AddFolder(repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password);
+        }
 
         public void AddFolder(string name, string identifier, string url, string backend,
             string repository, string remoteFolder, string user, string password)
@@ -344,6 +348,18 @@ namespace SparkleLib
             }
         }
 
+        public SparkleRepoInfo GetRepoInfo(string FolderName)
+        {
+            SparkleRepoInfo repoInfo = new SparkleRepoInfo(FolderName, ConfigPath);
+
+            repoInfo.User = GetFolderOptionalAttribute(FolderName, "user");
+            repoInfo.Password = GetFolderOptionalAttribute(FolderName, "password");
+            repoInfo.Address = new Uri(GetUrlForFolder(FolderName));
+            repoInfo.RepoID = GetFolderOptionalAttribute(FolderName, "repository");
+            repoInfo.RemotePath = GetFolderOptionalAttribute(FolderName, "remoteFolder");
+
+            return repoInfo;
+        }
 
         private XmlNode GetFolder(string name)
         {
