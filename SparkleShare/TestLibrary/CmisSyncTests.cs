@@ -65,7 +65,7 @@ namespace TestLibrary
         public void Dispose()
         {
         }
-
+        /*
         private void Clean(string localDirectory, CmisDirectory cmisDirectory)
         {
             DirectoryInfo directory = new DirectoryInfo(localDirectory);
