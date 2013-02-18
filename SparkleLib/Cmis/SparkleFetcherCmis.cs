@@ -20,7 +20,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
-
 using SparkleLib;
 
 namespace SparkleLib.Cmis
@@ -29,37 +28,29 @@ namespace SparkleLib.Cmis
     // Sets up a fetcher that can get remote folders
     public class SparkleFetcher : SparkleFetcherBase
     {
-
-        private string _canonical_name;
-        public string CanonicalName { get { return _canonical_name; } protected set { _canonical_name = value; } }
-
-        public SparkleFetcher(string server, string required_fingerprint, string remote_path,
-            string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
-            string user, string password, SparkleConfig config, ActivityListener activityListener)
-            : base(server, required_fingerprint,
-                remote_path, target_folder, fetch_prior_history, repository, path, user, password)
+        //public SparkleFetcher(string server, string required_fingerprint, string remote_path,
+        //    string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
+        //    string user, string password, SparkleConfig config, ActivityListener activityListener)
+        //    : base(server, required_fingerprint,
+        //        remote_path, target_folder, fetch_prior_history, repository, path, user, password)
+        public SparkleFetcher(SparkleRepoInfo repoInfo, ActivityListener activityListener)
+            : base(repoInfo)
         {
             Console.WriteLine("Cmis SparkleFetcher constructor");
-            TargetFolder = target_folder;
-            RemoteUrl = new Uri(server);
-            CanonicalName = canonical_name;
-
-            string backend = SparkleFetcherBase.GetBackend(RemoteUrl.AbsolutePath);
-
-            // Crypt Password
-            string cryptPwd = CmisCrypto.Protect(Password);
-            config.AddFolder(CanonicalName, Identifier, RemoteUrl.ToString(), backend, Repository, RemoteFolder, User, cryptPwd);
-
-            String localPath = Path.Combine(SparkleFolder.ROOT_FOLDER, canonical_name);
+            TargetFolder = repoInfo.TargetDirectory;
+            RemoteUrl = repoInfo.Address;
+            
+            String localPath = Path.Combine(SparkleFolder.ROOT_FOLDER, repoInfo.TargetDirectory);
             Directory.CreateDirectory(localPath);
 
-            SparkleRepoCmis CmisRepo = new SparkleRepoCmis(localPath, SparkleConfig.DefaultConfig, activityListener);
-            bool Sync = CmisRepo.SyncDown();
+            SparkleRepoCmis CmisRepo = new SparkleRepoCmis(localPath, repoInfo, activityListener);
+            CmisRepo.DoFirstSync();
+
             // CmisDirectory cmis = new CmisDirectory(canonical_name, path, remote_path, server, user, password, repository, activityListener);
             // cmis.Sync();
         }
 
-
+        
         public override bool Fetch()
         {
             Console.WriteLine("Cmis SparkleFetcher Fetch");
@@ -100,7 +91,7 @@ namespace SparkleLib.Cmis
         public override void Complete()
         {
             Console.WriteLine("Cmis SparkleFetcher Complete");
-            base.Complete();
+            // base.Complete();
         }
 
 
