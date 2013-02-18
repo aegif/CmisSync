@@ -50,10 +50,10 @@ namespace SparkleLib.Cmis
         {
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
-                bool createDatabase = ! File.Exists(databaseFileName);
+                bool createDatabase = !File.Exists(databaseFileName);
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
-                
+
                 // Hidden database file
                 File.SetAttributes(databaseFileName, FileAttributes.Hidden);
 
@@ -158,13 +158,15 @@ namespace SparkleLib.Cmis
         public void AddFile(string path, DateTime? serverSideModificationDate,
             Dictionary<string, string> metadata)
         {
+            SparkleLogger.LogInfo("CmisDatabase", "Start adding data in db for: " + path);
             string normalizedPath = Normalize(path);
             string checksum = String.Empty;
             try
             {
                 checksum = Checksum(path);
             }
-            catch (IOException e) {
+            catch (IOException e)
+            {
                 SparkleLogger.LogInfo("CmisDatabase", "IOException while reading file checksum during addition: " + path);
                 // The file was removed while reading. Just skip it, as it does not need to be added anymore.
                 return;
@@ -197,6 +199,7 @@ namespace SparkleLib.Cmis
                     SparkleLogger.LogInfo("CmisDatabase", e.Message);
                 }
             }
+            SparkleLogger.LogInfo("CmisDatabase", "Adding data in db for: " + path + " finished");
         }
 
 
@@ -381,10 +384,12 @@ namespace SparkleLib.Cmis
 
             // Calculate current checksum.
             string currentChecksum = null;
-            try {
+            try
+            {
                 currentChecksum = Checksum(path);
             }
-            catch(IOException e) {
+            catch (IOException e)
+            {
                 SparkleLogger.LogInfo("CmisDatabase", "IOException while reading file checksum: " + path);
                 return true;
             }
@@ -401,7 +406,7 @@ namespace SparkleLib.Cmis
                 previousChecksum = (string)obj;
             }
 
-            return ! currentChecksum.Equals(previousChecksum);
+            return !currentChecksum.Equals(previousChecksum);
         }
 
         public string GetChangeLogToken()

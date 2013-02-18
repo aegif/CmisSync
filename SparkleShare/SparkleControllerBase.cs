@@ -31,6 +31,7 @@ namespace SparkleShare
 
     public abstract class SparkleControllerBase : ActivityListener
     {
+        private SparkleRepoInfo repoInfo;
 
         public SparkleRepoBase[] Repositories
         {
@@ -283,7 +284,7 @@ namespace SparkleShare
         private void AddRepository(string folder_path)
         {
             SparkleRepoBase repo = null;
-            //string folder_name   = Path.GetFileName (folder_path);
+            string folder_name = Path.GetFileName(folder_path);
             //string backend       = this.config.GetBackendForFolder (folder_name);
 
             //try {
@@ -291,7 +292,8 @@ namespace SparkleShare
             //    Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend),
             //        new object [] { folder_path, this.config }
             //);
-            repo = new SparkleLib.Cmis.SparkleRepoCmis(folder_path, this.config, activityListenerAggregator);
+
+            repo = new SparkleLib.Cmis.SparkleRepoCmis(folder_path, config.GetRepoInfo(folder_name), activityListenerAggregator);
 
             //} catch (Exception e) {
             //    SparkleLogger.LogInfo ("Controller",
@@ -563,8 +565,16 @@ namespace SparkleShare
             //fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
             //    fetch_prior_history, canonical_name, repository, path, user, password, activityListenerAggregator);
 
-            fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
-                 fetch_prior_history, local_path, repository, path, user, password, this.config, activityListenerAggregator);
+            repoInfo = new SparkleRepoInfo(local_path, this.config.ConfigPath);
+            repoInfo.Address = new Uri(address);
+            repoInfo.Fingerprint = required_fingerprint;
+            repoInfo.RemotePath = remote_path;
+            repoInfo.FetchPriorHistory = fetch_prior_history;
+            repoInfo.RepoID = repository;
+            repoInfo.User = user;
+            repoInfo.Password = CmisCrypto.Protect(password);
+
+            fetcher = new SparkleLib.Cmis.SparkleFetcher(repoInfo, activityListenerAggregator);
 
             //try {
             //    SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
@@ -656,7 +666,8 @@ namespace SparkleShare
             this.fetcher.Complete();
             // string canonical_name = Path.GetFileName (this.fetcher.RemoteFolder);
 
-            string target_folder_path = Path.Combine(this.config.FoldersPath, fetcher.CanonicalName);
+            // string target_folder_path = Path.Combine(this.config.FoldersPath, fetcher.CanonicalName);
+            string target_folder_path = Path.Combine(this.config.FoldersPath, repoInfo.TargetDirectory);
             bool target_folder_exists = Directory.Exists(target_folder_path);
 
             // Add a numbered suffix to the name if a folder with the same name
@@ -689,6 +700,7 @@ namespace SparkleShare
             //this.config.AddFolder(fetcher.CanonicalName, this.fetcher.Identifier,
             //    this.fetcher.RemoteUrl.ToString(), backend,
             //    this.fetcher.Repository, this.fetcher.RemoteFolder, this.fetcher.User, this.fetcher.Password);
+            this.config.AddFolder(repoInfo);
 
             FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.Warnings.ToArray());
 
@@ -699,7 +711,8 @@ namespace SparkleShare
             */
 
             //AddRepository (target_folder_path);
-            AddRepository(Path.Combine(SparkleFolder.ROOT_FOLDER, fetcher.CanonicalName));
+            // AddRepository(Path.Combine(SparkleFolder.ROOT_FOLDER, fetcher.CanonicalName));
+            AddRepository(Path.Combine(SparkleFolder.ROOT_FOLDER, repoInfo.TargetDirectory));
 
             FolderListChanged();
 
