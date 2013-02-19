@@ -328,6 +328,8 @@ namespace SparkleLib.Cmis
             private void DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 activityListener.ActivityStarted();
+                StreamWriter localfile = null;
+                DotCMIS.Data.IContentStream contentStream = null;
 
                 string filepath = Path.Combine(localFolder, remoteDocument.ContentStreamFileName);
 
@@ -337,17 +339,17 @@ namespace SparkleLib.Cmis
 
                 string tmpfilepath = filepath + ".sync";
 
-                // Create Stream with the local file in append mode, if file is empty it's like a full download.
-                StreamWriter localfile = new StreamWriter(tmpfilepath, true);
-                localfile.AutoFlush = true;
-                DotCMIS.Data.IContentStream contentStream = null;
-
                 // Download file, starting at the last download point
 
-                // Get the last position in the localfile.
                 Boolean success = false;
                 try
                 {
+                    // Create Stream with the local file in append mode, if file is empty it's like a full download.
+                    localfile = new StreamWriter(tmpfilepath, true);
+                    localfile.AutoFlush = true;
+                    
+
+                    // Get the last position in the localfile.
                     Int64 Offset = localfile.BaseStream.Position;
 
                     contentStream = remoteDocument.GetContentStream(remoteDocument.Id, Offset, remoteDocument.ContentStreamLength);
@@ -369,8 +371,11 @@ namespace SparkleLib.Cmis
                 {
                     SparkleLogger.LogInfo("CmisDirectory", String.Format("Download of file {0} abort: {1}", remoteDocument.ContentStreamFileName, ex));
                     success = false;
-                    localfile.Flush();
-                    localfile.Close();
+                    if (localfile != null)
+                    {
+                        localfile.Flush();
+                        localfile.Close();
+                    }
                     if (contentStream != null) contentStream.Stream.Close();
                 }
                 // Rename file
