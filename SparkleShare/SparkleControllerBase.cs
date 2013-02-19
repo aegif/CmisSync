@@ -593,7 +593,6 @@ namespace SparkleShare
             //    return;
             //}
 
-
             this.fetcher.Finished += delegate(bool repo_is_encrypted, bool repo_is_empty, string[] warnings)
             {
                 if (repo_is_encrypted && repo_is_empty)

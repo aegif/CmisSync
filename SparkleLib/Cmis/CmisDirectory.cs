@@ -353,11 +353,11 @@ namespace SparkleLib.Cmis
                     contentStream = remoteDocument.GetContentStream(remoteDocument.Id, Offset, remoteDocument.ContentStreamLength);
                     if (contentStream == null)
                     {
-                        SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                        SparkleLogger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
                         throw new IOException();
                     }
 
-                    SparkleLogger.LogInfo("Sync", String.Format("Start download of file with offset {0}", Offset));
+                    SparkleLogger.LogInfo("CmisDirectory", String.Format("Start download of file with offset {0}", Offset));
 
                     CopyStream(contentStream.Stream, localfile.BaseStream);
                     localfile.Flush();
@@ -367,7 +367,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (Exception ex)
                 {
-                    SparkleLogger.LogInfo("Sync", String.Format("Download of file {0} abort: {1}", remoteDocument.ContentStreamFileName, ex));
+                    SparkleLogger.LogInfo("CmisDirectory", String.Format("Download of file {0} abort: {1}", remoteDocument.ContentStreamFileName, ex));
                     success = false;
                     localfile.Flush();
                     localfile.Close();
