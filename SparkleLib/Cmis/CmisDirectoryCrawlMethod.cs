@@ -90,6 +90,7 @@ namespace SparkleLib.Cmis
             {
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
+                    #region Cmis Folder
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
                         // It is a CMIS folder.
@@ -141,6 +142,9 @@ namespace SparkleLib.Cmis
                             }
                         }
                     }
+                    #endregion
+
+                    #region Cmis Document
                     else
                     {
                         // It is a CMIS document.
@@ -172,6 +176,7 @@ namespace SparkleLib.Cmis
                                 // Check modification date stored in database and download if remote modification date if different.
                                 DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
                                 DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
+
                                 if (lastDatabaseUpdate == null)
                                 {
                                     SparkleLogger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
@@ -226,6 +231,7 @@ namespace SparkleLib.Cmis
                             }
                         }
                     }
+                    #endregion
                 }
             }
 

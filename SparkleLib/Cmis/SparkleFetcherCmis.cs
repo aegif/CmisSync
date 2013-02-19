@@ -55,6 +55,11 @@ namespace SparkleLib.Cmis
         public override bool Fetch()
         {
             SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher Fetch");
+            //double percentage = 1.0;
+            //Regex progress_regex = new Regex(@"([0-9]+)%", RegexOptions.Compiled);
+            //DateTime last_change = DateTime.Now;
+            //TimeSpan change_interval = new TimeSpan(0, 0, 0, 1);
+
             CmisRepo.DoFirstSync();
             return true; // TODO
         }
