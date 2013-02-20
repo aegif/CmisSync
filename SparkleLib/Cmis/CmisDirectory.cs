@@ -301,20 +301,24 @@ namespace SparkleLib.Cmis
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
                         string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
+                        if (CheckRules(localSubFolder, RulesType.Folder))
+                        {
 
-                        // Create local folder.
-                        Directory.CreateDirectory(localSubFolder);
+                            // Create local folder.
+                            Directory.CreateDirectory(localSubFolder);
 
-                        // Create database entry for this folder.
-                        database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+                            // Create database entry for this folder.
+                            database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
-                        // Recurse into folder.
-                        RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                            // Recurse into folder.
+                            RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                        }
                     }
                     else
                     {
-                        // It is a file, just download it.
-                        DownloadFile((IDocument)cmisObject, localFolder);
+                        if (CheckRules(cmisObject.Name, RulesType.File))
+                            // It is a file, just download it.
+                            DownloadFile((IDocument)cmisObject, localFolder);
                     }
                 }
                 activityListener.ActivityStopped();
@@ -340,19 +344,25 @@ namespace SparkleLib.Cmis
                 string tmpfilepath = filepath + ".sync";
 
                 // Download file, starting at the last download point
-
                 Boolean success = false;
                 try
                 {
                     // Create Stream with the local file in append mode, if file is empty it's like a full download.
                     localfile = new StreamWriter(tmpfilepath, true);
                     localfile.AutoFlush = true;
-                    
 
                     // Get the last position in the localfile.
                     Int64 Offset = localfile.BaseStream.Position;
 
-                    contentStream = remoteDocument.GetContentStream(remoteDocument.Id, Offset, remoteDocument.ContentStreamLength);
+                    // Nuxeo don't support partial getContentStream
+                    if (session.RepositoryInfo.VendorName.ToLower().Contains("nuxeo"))
+                    {
+                        if (File.Exists(tmpfilepath)) File.Delete(tmpfilepath);
+                        contentStream = remoteDocument.GetContentStream();
+                    }
+                    else
+                        contentStream = remoteDocument.GetContentStream(remoteDocument.Id, Offset, remoteDocument.ContentStreamLength);
+
                     if (contentStream == null)
                     {
                         SparkleLogger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
@@ -772,9 +782,9 @@ namespace SparkleLib.Cmis
             ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes", // Mac OS X
             ".(Autosaved).graffle", // Omnigraffle
             ".tmp", ".TMP", // MS Office
-            ".~ppt", ".~PPT", ".~pptx", ".~PPTX",
-            ".~xls", ".~XLS", ".~xlsx", ".~XLSX",
-            ".~doc", ".~DOC", ".~docx", ".~DOCX",
+            ".~ppt", ".~pptx",
+            ".~xls", ".~xlsx",
+            ".~doc", ".~docx",
             ".cvsignore", ".~cvsignore", // CVS
             ".sync", // CmisSync File Downloading/Uploading
             ".cmissync" // CmisSync Database 
@@ -784,7 +794,7 @@ namespace SparkleLib.Cmis
                 "CVS",".svn",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
             };
 
-                SparkleLogger.LogInfo("Sync", "Check rules for " + path);
+                SparkleLogger.LogInfo("SyncRules", "Check rules for " + path);
                 Boolean found = false;
                 foreach (string content in contents)
                 {
@@ -803,10 +813,14 @@ namespace SparkleLib.Cmis
                     foreach (string ext in extensions)
                     {
                         string filext = Path.GetExtension(path);
-                        if (filext == ext) found = true;
+                        if (filext.ToLower() == ext.ToLower()) found = true;
                     }
                 }
 
+                string not = string.Empty;
+                if (found) not = " not";
+
+                SparkleLogger.LogInfo("SyncRules", String.Format("Path" + path + " is{0} ok", not));
                 return !found;
 
             }
