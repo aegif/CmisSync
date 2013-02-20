@@ -347,21 +347,25 @@ namespace SparkleLib.Cmis
                 Boolean success = false;
                 try
                 {
-                    // Create Stream with the local file in append mode, if file is empty it's like a full download.
-                    localfile = new StreamWriter(tmpfilepath, true);
-                    localfile.AutoFlush = true;
+                    // Get the last position in the localfile. By default position 0 (Nuxeo do not support partial getContentStream #107
+                    Int64 Offset = 0;
 
-                    // Get the last position in the localfile.
-                    Int64 Offset = localfile.BaseStream.Position;
 
                     // Nuxeo don't support partial getContentStream
                     if (session.RepositoryInfo.VendorName.ToLower().Contains("nuxeo"))
                     {
-                        if (localfile.BaseStream.Position != 0) { localfile.Close(); File.Delete(tmpfilepath); localfile = new StreamWriter(tmpfilepath); }
+                        // Mode rewrite for Nuxeo
+                        localfile = new StreamWriter(tmpfilepath);
                         contentStream = remoteDocument.GetContentStream();
                     }
                     else
+                    {
+                        // Create Stream with the local file in append mode, if file is empty it's like a full download (Offset 0)
+                        localfile = new StreamWriter(tmpfilepath, true);
+                        localfile.AutoFlush = true;
+                        Offset = localfile.BaseStream.Position;
                         contentStream = remoteDocument.GetContentStream(remoteDocument.Id, Offset, remoteDocument.ContentStreamLength);
+                    }
 
                     if (contentStream == null)
                     {
