@@ -357,7 +357,7 @@ namespace SparkleLib.Cmis
                     // Nuxeo don't support partial getContentStream
                     if (session.RepositoryInfo.VendorName.ToLower().Contains("nuxeo"))
                     {
-                        if (File.Exists(tmpfilepath)) File.Delete(tmpfilepath);
+                        if (localfile.BaseStream.Position != 0) { localfile.Close(); File.Delete(tmpfilepath); localfile = new StreamWriter(tmpfilepath); }
                         contentStream = remoteDocument.GetContentStream();
                     }
                     else
