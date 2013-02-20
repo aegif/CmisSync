@@ -350,13 +350,13 @@ namespace SparkleLib.Cmis
                     // Get the last position in the localfile. By default position 0 (Nuxeo do not support partial getContentStream #107
                     Int64 Offset = 0;
 
-
                     // Nuxeo don't support partial getContentStream
                     if (session.RepositoryInfo.VendorName.ToLower().Contains("nuxeo"))
                     {
                         // Mode rewrite for Nuxeo
                         localfile = new StreamWriter(tmpfilepath);
                         contentStream = remoteDocument.GetContentStream();
+                        SparkleLogger.LogInfo("CmisDirectory", "Nuxeo don't support partial download, so restart from start!");
                     }
                     else
                     {
@@ -392,6 +392,7 @@ namespace SparkleLib.Cmis
                     }
                     if (contentStream != null) contentStream.Stream.Close();
                 }
+
                 // Rename file
                 // TODO - Yannick - Control file integrity by using hash compare - Is it necessary ?
                 if (success)
@@ -644,7 +645,8 @@ namespace SparkleLib.Cmis
                 // Upload each file in this folder.
                 foreach (string file in Directory.GetFiles(localFolder))
                 {
-                    UploadFile(file, folder);
+                    if (CheckRules(Path.Combine(localFolder, file), RulesType.File))
+                        UploadFile(file, folder);
                 }
 
                 // Recurse for each subfolder in this folder.
