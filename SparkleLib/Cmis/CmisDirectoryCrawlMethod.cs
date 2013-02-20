@@ -244,44 +244,45 @@ namespace SparkleLib.Cmis
                 {
                     string fileName = Path.GetFileName(filePath);
 
-                    if (!CheckRules(filePath, RulesType.File)) return;
-
-                    if (!remoteFiles.Contains(fileName))
+                    if (!CheckRules(filePath, RulesType.File))
                     {
-                        // This local file is not on the CMIS server now, so
-                        // check whether it used to exist on server or not.
-                        if (database.ContainsFile(filePath))
+                        if (!remoteFiles.Contains(fileName))
                         {
-                            // If file has changed locally, move to 'your_version' and warn about conflict
-                            // TODO
+                            // This local file is not on the CMIS server now, so
+                            // check whether it used to exist on server or not.
+                            if (database.ContainsFile(filePath))
+                            {
+                                // If file has changed locally, move to 'your_version' and warn about conflict
+                                // TODO
 
-                            // File has been deleted on server, so delete it locally.
-                            SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
-                            File.Delete(filePath);
+                                // File has been deleted on server, so delete it locally.
+                                SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
+                                File.Delete(filePath);
 
-                            // Delete file from database.
-                            database.RemoveFile(filePath);
+                                // Delete file from database.
+                                database.RemoveFile(filePath);
+                            }
+                            else
+                            {
+                                if (BIDIRECTIONAL)
+                                {
+                                    // New file, sync up.
+                                    SparkleLogger.LogInfo("Sync", "Uploading file absent on repository: " + filePath);
+                                    UploadFile(filePath, remoteFolder);
+                                }
+                            }
                         }
                         else
                         {
-                            if (BIDIRECTIONAL)
+                            // The file exists both on server and locally.
+                            if (database.LocalFileHasChanged(filePath))
                             {
-                                // New file, sync up.
-                                SparkleLogger.LogInfo("Sync", "Uploading file absent on repository: " + filePath);
-                                UploadFile(filePath, remoteFolder);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // The file exists both on server and locally.
-                        if (database.LocalFileHasChanged(filePath))
-                        {
-                            if (BIDIRECTIONAL)
-                            {
-                                // Upload new version of file content.
-                                SparkleLogger.LogInfo("Sync", "Uploading file update on repository: " + filePath);
-                                UpdateFile(filePath, remoteFolder);
+                                if (BIDIRECTIONAL)
+                                {
+                                    // Upload new version of file content.
+                                    SparkleLogger.LogInfo("Sync", "Uploading file update on repository: " + filePath);
+                                    UpdateFile(filePath, remoteFolder);
+                                }
                             }
                         }
                     }
