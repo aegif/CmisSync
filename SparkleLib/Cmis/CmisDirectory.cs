@@ -336,6 +336,7 @@ namespace SparkleLib.Cmis
                 if (remoteDocument.ContentStreamLength == 0)
                 {
                     SparkleLogger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                    activityListener.ActivityStopped();
                     return;
                 }
 
@@ -462,6 +463,7 @@ namespace SparkleLib.Cmis
                     if (file.Length == 0)
                     {
                         SparkleLogger.LogInfo("CmisDirectory", "Skipping upload of file with null content stream: " + filePath);
+                        activityListener.ActivityStopped();
                         return;
                     }
 
