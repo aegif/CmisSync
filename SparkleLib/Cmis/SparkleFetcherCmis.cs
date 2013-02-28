@@ -43,6 +43,18 @@ namespace SparkleLib.Cmis
             RemoteUrl = repoInfo.Address;
 
             String localPath = Path.Combine(SparkleFolder.ROOT_FOLDER, repoInfo.TargetDirectory);
+            if (!Directory.Exists(SparkleFolder.ROOT_FOLDER))
+            {
+                SparkleLogger.LogInfo("Fecther", String.Format("ERROR - SparkleRootFolder {0} do not exist", SparkleFolder.ROOT_FOLDER));
+                throw new DirectoryNotFoundException();
+            }
+
+            if (!SparkleFolder.HasWritePermissionOnDir(SparkleFolder.ROOT_FOLDER))
+            {
+                SparkleLogger.LogInfo("Fetcher",String.Format("ERROR - SparkleRootFolder {0} is not writable",SparkleFolder.ROOT_FOLDER));
+                throw new UnauthorizedAccessException();
+            }
+            
             Directory.CreateDirectory(localPath);
 
             CmisRepo = new SparkleRepoCmis(localPath, repoInfo, activityListener);
@@ -104,7 +116,7 @@ namespace SparkleLib.Cmis
 
         private void InstallConfiguration()
         {
-            SparkleLogger.LogInfo("Fetcher","Cmis SparkleFetcher InstallConfiguration");
+            SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher InstallConfiguration");
         }
 
     }

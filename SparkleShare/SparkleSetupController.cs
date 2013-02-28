@@ -468,13 +468,21 @@ namespace SparkleShare
             Program.Controller.FolderFetchError += AddPageFetchErrorDelegate;
             Program.Controller.FolderFetching += SyncingPageFetchingDelegate;
 
-            new Thread(() =>
+            try
             {
-                Program.Controller.StartFetcher(PreviousAddress, SelectedPlugin.Fingerprint, PreviousPath, SyncingFolder,
-                    SelectedPlugin.AnnouncementsUrl, this.fetch_prior_history,
-                    PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd());
+                new Thread(() =>
+                {
+                    Program.Controller.StartFetcher(PreviousAddress, SelectedPlugin.Fingerprint, PreviousPath, SyncingFolder,
+                        SelectedPlugin.AnnouncementsUrl, this.fetch_prior_history,
+                        PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd());
 
-            }).Start();
+                }).Start();
+            }
+            catch (Exception ex)
+            {
+                SparkleLogger.LogInfo("Fetcher", ex.ToString());
+                System.Windows.Forms.MessageBox.Show("An error occur during first sync, see debug log for details!");
+            }
 
         }
 

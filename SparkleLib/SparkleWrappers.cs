@@ -86,6 +86,30 @@ namespace SparkleLib {
         {
             Name = name;
         }
+
+        public static bool HasWritePermissionOnDir(string path)
+        {
+            var writeAllow = false;
+            var writeDeny = false;
+            var accessControlList = Directory.GetAccessControl(path);
+            if (accessControlList == null)
+                return false;
+            var accessRules = accessControlList.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+            if (accessRules == null)
+                return false;
+
+            foreach (System.Security.AccessControl.FileSystemAccessRule rule in accessRules)
+            {
+                if ((System.Security.AccessControl.FileSystemRights.Write & rule.FileSystemRights) != System.Security.AccessControl.FileSystemRights.Write) continue;
+
+                if (rule.AccessControlType == System.Security.AccessControl.AccessControlType.Allow)
+                    writeAllow = true;
+                else if (rule.AccessControlType == System.Security.AccessControl.AccessControlType.Deny)
+                    writeDeny = true;
+            }
+
+            return writeAllow && !writeDeny;
+        }
     }
 
 

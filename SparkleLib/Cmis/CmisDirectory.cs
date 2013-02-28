@@ -332,6 +332,14 @@ namespace SparkleLib.Cmis
             private void DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 activityListener.ActivityStarted();
+
+                if (remoteDocument.ContentStreamLength == 0)
+                {
+                    SparkleLogger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                    activityListener.ActivityStopped();
+                    return;
+                }
+
                 StreamWriter localfile = null;
                 DotCMIS.Data.IContentStream contentStream = null;
 
@@ -389,6 +397,7 @@ namespace SparkleLib.Cmis
                     {
                         localfile.Flush();
                         localfile.Close();
+                        File.Delete(tmpfilepath);
                     }
                     if (contentStream != null) contentStream.Stream.Close();
                 }
@@ -452,16 +461,28 @@ namespace SparkleLib.Cmis
 
                     // Prepare content stream
                     Stream file = File.OpenRead(filePath);
+                    if (file.Length == 0)
+                    {
+                        SparkleLogger.LogInfo("CmisDirectory", "Skipping upload of file with null content stream: " + filePath);
+                        activityListener.ActivityStopped();
+                        return;
+                    }
+
                     ContentStream contentStream = new ContentStream();
                     contentStream.FileName = fileName;
-                    contentStream.Stream = new MemoryStream();
+                    // contentStream.Stream = new MemoryStream(8 * 1024);
                     contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
-                    //contentStream.Length = file.Length;
-                    //contentStream.Stream = file;
+                    // contentStream.Length = 8 * 1024;
+                    contentStream.Length = file.Length;
+                    contentStream.Stream = file;
 
                     // Upload
                     try
                     {
+                        // This two method have same effect at this time, but first could be helpful when AppendMethod will be available (CMIS1.1)
+                        // The second update file is not working propertly
+                        // https://issues.apache.org/jira/browse/CMIS-632
+                        /**
                         try
                         {
                             string remotepath = remoteFolder.Path + '/' + tmpfileName;
@@ -478,10 +499,33 @@ namespace SparkleLib.Cmis
                             remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                             SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
                         }
-                        if (remoteDocument == null) return;
 
-                        // This two method have same effect at this time, but first could be helpful when AppendMethod will be available (CMIS1.1)
+                        if (remoteDocument == null)
+                        {
+                            SparkleLogger.LogInfo("Sync", String.Format("Unable to create remote file {0}", fileName));
+                            return;
+                        }
+
                         UpdateFile(filePath, remoteDocument);
+                         **/
+
+                        try
+                        {
+                            string remotepath = remoteFolder.Path + '/' + tmpfileName;
+                            ICmisObject obj = session.GetObjectByPath(remotepath);
+                            if (obj != null)
+                            {
+                                SparkleLogger.LogInfo("Sync", "Temp file exist on remote server, so delete it");
+                                remoteDocument = (IDocument)obj;
+                                remoteDocument.DeleteAllVersions();
+                            }
+                        }
+                        catch (DotCMIS.Exceptions.CmisObjectNotFoundException)
+                        {
+                            // Create an empty file on remote server and get ContentStream
+                            SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
+                        }
+                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                         success = true;
                     }
                     catch (Exception ex)
@@ -494,8 +538,9 @@ namespace SparkleLib.Cmis
                     if (success)
                     {
                         SparkleLogger.LogInfo("Sync", String.Format("Upload of file {0} finished", filePath));
-                        if (contentStream != null) contentStream.Stream.Close();
+                        if (contentStream != null) { contentStream.Stream.Close(); contentStream.Stream.Dispose(); }
                         properties[PropertyIds.Name] = fileName;
+                        file.Close();
 
                         // Object update change ID
                         DotCMIS.Client.IObjectId objID = remoteDocument.UpdateProperties(properties, true);
@@ -518,6 +563,9 @@ namespace SparkleLib.Cmis
 
                         // Create database entry for this file.
                         database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+
+                        // No close method, No dispose method
+                        remoteDocument = null;
                     }
                 }
                 catch (Exception e)
@@ -571,33 +619,32 @@ namespace SparkleLib.Cmis
                 }
             }
 
-
-
             private void UpdateFile(string filePath, IDocument remoteFile)
             {
                 Stream localfile = File.OpenRead(filePath);
-                if (localfile == null)
+                if ((localfile == null) && (localfile.Length == 0))
                 {
-                    SparkleLogger.LogInfo("Sync", "Skipping upload/update of file with null content stream: " + filePath);
-                    throw new IOException();
+                    SparkleLogger.LogInfo("Sync", "Skipping update of file with null or empty content stream: " + filePath);
+                    return;
                 }
 
                 // Prepare content stream
                 string fileName = Path.GetFileName(filePath);
 
                 ContentStream remoteStream = new ContentStream();
-                remoteStream.Stream = localfile;
+                remoteStream.FileName = remoteFile.ContentStreamFileName;
                 remoteStream.Length = localfile.Length;
                 remoteStream.MimeType = MimeType.GetMIMEType(fileName);
+                remoteStream.Stream = localfile;
 
                 // CMIS do not have a Method to upload block by block. So upload file must be full.
                 // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
                 // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
+                // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
                 DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
-
                 localfile.Close();
+                localfile.Dispose();
                 SparkleLogger.LogInfo("Sync", "Update finished:" + filePath);
-
             }
 
             /**
