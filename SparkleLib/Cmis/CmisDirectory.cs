@@ -378,6 +378,8 @@ namespace SparkleLib.Cmis
                     if (contentStream == null)
                     {
                         SparkleLogger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                        localfile.Close();
+                        File.Delete(tmpfilepath);
                         throw new IOException();
                     }
 
