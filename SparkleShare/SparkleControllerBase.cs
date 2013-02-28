@@ -573,6 +573,7 @@ namespace SparkleShare
             repoInfo.RepoID = repository;
             repoInfo.User = user;
             repoInfo.Password = CmisCrypto.Protect(password);
+            repoInfo.TargetDirectory = Path.Combine(config.FoldersPath, local_path);
 
             fetcher = new SparkleLib.Cmis.SparkleFetcher(repoInfo, activityListenerAggregator);
 
