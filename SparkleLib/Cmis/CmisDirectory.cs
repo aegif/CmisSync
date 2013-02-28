@@ -592,7 +592,7 @@ namespace SparkleLib.Cmis
                 if (localfile == null)
                 {
                     SparkleLogger.LogInfo("Sync", "Skipping upload/update of file with null content stream: " + filePath);
-                    throw new IOException();
+                    return;
                 }
 
                 // Prepare content stream
@@ -754,7 +754,7 @@ namespace SparkleLib.Cmis
                 string not = string.Empty;
                 if (found) not = " not";
 
-                SparkleLogger.LogInfo("SyncRules", String.Format("Path" + path + " is{0} ok", not));
+                SparkleLogger.LogInfo("SyncRules", String.Format("Path " + path + " is{0} ok", not));
                 return !found;
 
             }
