@@ -332,6 +332,13 @@ namespace SparkleLib.Cmis
             private void DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 activityListener.ActivityStarted();
+
+                if (remoteDocument.ContentStreamLength == 0)
+                {
+                    SparkleLogger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                    return;
+                }
+
                 StreamWriter localfile = null;
                 DotCMIS.Data.IContentStream contentStream = null;
 
