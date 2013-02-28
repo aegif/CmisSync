@@ -42,19 +42,21 @@ namespace SparkleLib.Cmis
             TargetFolder = repoInfo.TargetDirectory;
             RemoteUrl = repoInfo.Address;
 
-            String localPath = Path.Combine(SparkleFolder.ROOT_FOLDER, repoInfo.TargetDirectory);
-            if (!Directory.Exists(SparkleFolder.ROOT_FOLDER))
+            // String localPath = Path.Combine(SparkleFolder.ROOT_FOLDER, repoInfo.TargetDirectory);
+            String localPath = Path.Combine(SparkleConfig.DefaultConfig.FoldersPath, repoInfo.TargetDirectory);
+
+            if (!Directory.Exists(SparkleConfig.DefaultConfig.FoldersPath))
             {
-                SparkleLogger.LogInfo("Fecther", String.Format("ERROR - SparkleRootFolder {0} do not exist", SparkleFolder.ROOT_FOLDER));
+                SparkleLogger.LogInfo("Fecther", String.Format("ERROR - Cmis Default Folder {0} do not exist", SparkleConfig.DefaultConfig.FoldersPath));
                 throw new DirectoryNotFoundException();
             }
 
-            if (!SparkleFolder.HasWritePermissionOnDir(SparkleFolder.ROOT_FOLDER))
+            if (!SparkleFolder.HasWritePermissionOnDir(SparkleConfig.DefaultConfig.FoldersPath))
             {
-                SparkleLogger.LogInfo("Fetcher",String.Format("ERROR - SparkleRootFolder {0} is not writable",SparkleFolder.ROOT_FOLDER));
+                SparkleLogger.LogInfo("Fetcher", String.Format("ERROR - Cmis Default Folder {0} is not writable", SparkleConfig.DefaultConfig.FoldersPath));
                 throw new UnauthorizedAccessException();
             }
-            
+
             Directory.CreateDirectory(localPath);
 
             CmisRepo = new SparkleRepoCmis(localPath, repoInfo, activityListener);

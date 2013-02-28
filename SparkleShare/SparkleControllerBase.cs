@@ -711,7 +711,7 @@ namespace SparkleShare
 
             //AddRepository (target_folder_path);
             // AddRepository(Path.Combine(SparkleFolder.ROOT_FOLDER, fetcher.CanonicalName));
-            AddRepository(Path.Combine(SparkleFolder.ROOT_FOLDER, repoInfo.TargetDirectory));
+            AddRepository(repoInfo.TargetDirectory);
 
             FolderListChanged();
 

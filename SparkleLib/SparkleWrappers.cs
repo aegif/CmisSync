@@ -55,13 +55,13 @@ namespace SparkleLib {
 
     public class SparkleFolder {
 
-        public static string ROOT_FOLDER =
-            (Environment.OSVersion.Platform == PlatformID.Unix || 
-            Environment.OSVersion.Platform == PlatformID.MacOSX) ?
-                   Environment.GetEnvironmentVariable("HOME") :
-                   Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%")
-            + Path.DirectorySeparatorChar
-            + "CmisSync";
+        //public static string ROOT_FOLDER =
+        //    (Environment.OSVersion.Platform == PlatformID.Unix || 
+        //    Environment.OSVersion.Platform == PlatformID.MacOSX) ?
+        //           Environment.GetEnvironmentVariable("HOME") :
+        //           Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%")
+        //    + Path.DirectorySeparatorChar
+        //    + "CmisSync";
 
         // public static string APPDATA_FOLDER =
 
@@ -71,13 +71,13 @@ namespace SparkleLib {
 
         public string FullPath {
             get {
-                //string custom_path = SparkleConfig.DefaultConfig.GetFolderOptionalAttribute (Name, "path");
-                //
-                //if (custom_path != null)
-                //    return Path.Combine (custom_path, Name);
-                //else
-                //    return Path.Combine (SparkleConfig.DefaultConfig.FoldersPath, Name);
-                return Path.Combine(ROOT_FOLDER, Name);
+                string custom_path = SparkleConfig.DefaultConfig.GetFolderOptionalAttribute(Name, "path");
+
+                if (custom_path != null)
+                    return Path.Combine(custom_path, Name);
+                else
+                    return Path.Combine(SparkleConfig.DefaultConfig.FoldersPath, Name);
+                // return Path.Combine(ROOT_FOLDER, Name);
             }
         }
 
