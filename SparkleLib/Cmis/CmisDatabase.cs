@@ -50,6 +50,7 @@ namespace SparkleLib.Cmis
         {
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
+                SparkleLogger.LogInfo("Database", "Checking whether database exists");
                 bool createDatabase = !File.Exists(databaseFileName);
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
@@ -76,6 +77,7 @@ namespace SparkleLib.Cmis
                                 key TEXT PRIMARY KEY,
                                 value TEXT);";    /* Other data such as ChangeLog token */
                         command.ExecuteNonQuery();
+                        SparkleLogger.LogInfo("Database", "Database created");
                     }
                 }
             }
