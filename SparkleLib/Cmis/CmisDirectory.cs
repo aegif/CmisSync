@@ -459,6 +459,12 @@ namespace SparkleLib.Cmis
 
                     // Prepare content stream
                     Stream file = File.OpenRead(filePath);
+                    if (file.Length == 0)
+                    {
+                        SparkleLogger.LogInfo("CmisDirectory", "Skipping upload of file with null content stream: " + filePath);
+                        return;
+                    }
+
                     ContentStream contentStream = new ContentStream();
                     contentStream.FileName = fileName;
                     contentStream.Stream = new MemoryStream();
