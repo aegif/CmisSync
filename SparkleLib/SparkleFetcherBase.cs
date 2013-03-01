@@ -127,56 +127,57 @@ namespace SparkleLib
 
             SparkleLogger.LogInfo("Fetcher", TargetFolder + " | Fetching folder: " + RemoteUrl);
 
-            if (Directory.Exists(TargetFolder))
-                Directory.Delete(TargetFolder, true);
+            // Not necessary for CmisSync
+            //if (Directory.Exists(TargetFolder))
+            //    Directory.Delete(TargetFolder, true);
 
-            string host_key = "";
+            //string host_key = "";
 
-            if (!RemoteUrl.Scheme.StartsWith("http"))
-            {
-                host_key = FetchHostKey();
+            //if (!RemoteUrl.Scheme.StartsWith("http"))
+            //{
+            //    host_key = FetchHostKey();
 
-                if (string.IsNullOrEmpty(RemoteUrl.Host) || host_key == null)
-                {
-                    SparkleLogger.LogInfo("Auth", "Could not fetch host key");
-                    Failed();
+            //    if (string.IsNullOrEmpty(RemoteUrl.Host) || host_key == null)
+            //    {
+            //        SparkleLogger.LogInfo("Auth", "Could not fetch host key");
+            //        Failed();
 
-                    return;
-                }
+            //        return;
+            //    }
 
-                bool warn = true;
-                if (RequiredFingerprint != null)
-                {
-                    string host_fingerprint = DeriveFingerprint(host_key);
+            //    bool warn = true;
+            //    if (RequiredFingerprint != null)
+            //    {
+            //        string host_fingerprint = DeriveFingerprint(host_key);
 
-                    if (host_fingerprint == null || !RequiredFingerprint.Equals(host_fingerprint))
-                    {
-                        SparkleLogger.LogInfo("Auth", "Fingerprint doesn't match");
+            //        if (host_fingerprint == null || !RequiredFingerprint.Equals(host_fingerprint))
+            //        {
+            //            SparkleLogger.LogInfo("Auth", "Fingerprint doesn't match");
 
-                        this.errors.Add("error: Host fingerprint doesn't match");
-                        Failed();
+            //            this.errors.Add("error: Host fingerprint doesn't match");
+            //            Failed();
 
-                        return;
-                    }
+            //            return;
+            //        }
 
-                    warn = false;
-                    SparkleLogger.LogInfo("Auth", "Fingerprint matches");
+            //        warn = false;
+            //        SparkleLogger.LogInfo("Auth", "Fingerprint matches");
 
-                }
-                else
-                {
-                    SparkleLogger.LogInfo("Auth", "Skipping fingerprint check");
-                }
+            //    }
+            //    else
+            //    {
+            //        SparkleLogger.LogInfo("Auth", "Skipping fingerprint check");
+            //    }
 
-                AcceptHostKey(host_key, warn);
-            }
+            //    AcceptHostKey(host_key, warn);
+            //}
 
             this.thread = new Thread(() =>
             {
                 if (Fetch())
                 {
                     Thread.Sleep(500);
-                    SparkleLogger.LogInfo("Fetcher", "Finished");
+                    SparkleLogger.LogInfo("Fetcher", OriginalRepoInfo.Name + " | Finished");
 
                     IsActive = false;
 
@@ -189,7 +190,7 @@ namespace SparkleLib
                 else
                 {
                     Thread.Sleep(500);
-                    SparkleLogger.LogInfo("Fetcher", "Failed");
+                    SparkleLogger.LogInfo("Fetcher", OriginalRepoInfo.Name + " | Failed");
 
                     IsActive = false;
                     Failed();
@@ -207,7 +208,6 @@ namespace SparkleLib
             if (File.Exists(identifier_path))
             {
                 Identifier = File.ReadAllText(identifier_path).Trim();
-
             }
             else
             {
@@ -217,8 +217,8 @@ namespace SparkleLib
                 CreateInitialChangeSet();
             }
 
+            OriginalRepoInfo.Identifier = Identifier;
             File.SetAttributes(identifier_path, FileAttributes.Hidden);
-
         }
 
 

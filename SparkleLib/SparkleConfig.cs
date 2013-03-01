@@ -206,7 +206,7 @@ namespace SparkleLib
 
         public void AddFolder(SparkleRepoInfo repoInfo)
         {
-            this.AddFolder(repoInfo.Name,repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password);
+            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password);
         }
 
         public void AddFolder(string name, string path, string identifier, string url, string backend,

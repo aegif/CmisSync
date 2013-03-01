@@ -118,13 +118,13 @@ namespace SparkleLib.Cmis
             /**
              * Constructor for SparkleRepo (at every launch of CmisSync)
              */
-            public CmisDirectory(string localPath, SparkleRepoInfo repoInfo,
+            public CmisDirectory(SparkleRepoInfo repoInfo,
                 ActivityListener activityListener)
             {
                 this.activityListener = activityListener;
                 this.repoinfo = repoInfo;
                 // Set local root folder
-                String FolderName = Path.GetFileName(localPath);
+                // String FolderName = repoinfo.Name;
                 // this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, FolderName);
 
                 // Database is place in appdata of the users instead of sync folder (more secure)

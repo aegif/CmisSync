@@ -19,9 +19,11 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace SparkleLib {
+namespace SparkleLib
+{
 
-    public enum SparkleChangeType {
+    public enum SparkleChangeType
+    {
         Added,
         Edited,
         Deleted,
@@ -29,9 +31,10 @@ namespace SparkleLib {
     }
 
 
-    public class SparkleChangeSet {
+    public class SparkleChangeSet
+    {
 
-        public SparkleUser User = new SparkleUser ("Unknown", "Unknown");
+        public SparkleUser User = new SparkleUser("Unknown", "Unknown");
 
         public SparkleFolder Folder;
         public string Revision;
@@ -39,21 +42,23 @@ namespace SparkleLib {
         public DateTime FirstTimestamp;
         public Uri RemoteUrl;
 
-        public List<SparkleChange> Changes = new List<SparkleChange> ();
+        public List<SparkleChange> Changes = new List<SparkleChange>();
     }
 
 
-    public class SparkleChange {
+    public class SparkleChange
+    {
 
         public SparkleChangeType Type;
-		public DateTime Timestamp;
-		
+        public DateTime Timestamp;
+
         public string Path;
         public string MovedToPath;
     }
 
 
-    public class SparkleFolder {
+    public class SparkleFolder
+    {
 
         //public static string ROOT_FOLDER =
         //    (Environment.OSVersion.Platform == PlatformID.Unix || 
@@ -69,12 +74,15 @@ namespace SparkleLib {
         public string Name;
         public Uri RemoteAddress;
 
-        public string FullPath {
-            get {
+        public string FullPath
+        {
+            get
+            {
                 string custom_path = SparkleConfig.DefaultConfig.GetFolderOptionalAttribute(Name, "path");
+                // if (String.IsNullOrEmpty(custom_path)) custom_path = SparkleConfig.DefaultConfig.FoldersPath;
 
                 if (custom_path != null)
-                    return Path.Combine(custom_path, Name);
+                    return custom_path;
                 else
                     return Path.Combine(SparkleConfig.DefaultConfig.FoldersPath, Name);
                 // return Path.Combine(ROOT_FOLDER, Name);
@@ -82,7 +90,7 @@ namespace SparkleLib {
         }
 
 
-        public SparkleFolder (string name)
+        public SparkleFolder(string name)
         {
             Name = name;
         }
@@ -113,16 +121,17 @@ namespace SparkleLib {
     }
 
 
-    public class SparkleAnnouncement {
+    public class SparkleAnnouncement
+    {
 
         public readonly string FolderIdentifier;
         public readonly string Message;
 
 
-        public SparkleAnnouncement (string folder_identifier, string message)
+        public SparkleAnnouncement(string folder_identifier, string message)
         {
             FolderIdentifier = folder_identifier;
-            Message          = message;
+            Message = message;
         }
     }
 }

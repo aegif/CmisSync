@@ -668,7 +668,7 @@ namespace SparkleShare
 
         public void OpenFolderClicked()
         {
-            Program.Controller.OpenSparkleShareFolder(Path.GetFileName(SyncingFolder));
+            Program.Controller.OpenSparkleShareFolder(SyncingFolder);
             SyncingFolder = String.Empty;
             FinishPageCompleted();
         }
