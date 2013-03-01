@@ -48,7 +48,8 @@ namespace SparkleLib.Cmis
              * Local folder where the changes are synchronized to.
              * Example: "C:\CmisSync"
              */
-            private string localRootFolder;
+            // Store in repoInfo
+            // private string localRootFolder;
 
             /**
              * Path of the root in the remote repository.
@@ -124,7 +125,7 @@ namespace SparkleLib.Cmis
                 this.repoinfo = repoInfo;
                 // Set local root folder
                 String FolderName = Path.GetFileName(localPath);
-                this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, FolderName);
+                // this.localRootFolder = Path.Combine(SparkleFolder.ROOT_FOLDER, FolderName);
 
                 // Database is place in appdata of the users instead of sync folder (more secure)
                 // database = new CmisDatabase(localRootFolder);
@@ -173,7 +174,9 @@ namespace SparkleLib.Cmis
                     }
                     if (session == null)
                     {
-                        SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + this.localRootFolder + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
+                        // SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + this.localRootFolder + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
+                        SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + repoinfo.TargetDirectory + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
+
                         System.Threading.Thread.Sleep(10 * 1000);
                     }
                 }
@@ -192,7 +195,8 @@ namespace SparkleLib.Cmis
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just copy everything.
-                    RecursiveFolderCopy(remoteFolder, localRootFolder);
+                    // RecursiveFolderCopy(remoteFolder, localRootFolder);
+                    RecursiveFolderCopy(remoteFolder, repoinfo.TargetDirectory);
                 }
                 else
                 {
@@ -239,7 +243,8 @@ namespace SparkleLib.Cmis
                         if (cmisObject is DotCMIS.Client.Impl.Folder)
                         {
                             IFolder remoteFolder = (IFolder)cmisObject;
-                            string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
+                            // string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
+                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
                             RecursiveFolderCopy(remoteFolder, localFolder);
                         }
                         else if (cmisObject is DotCMIS.Client.Impl.Document)
@@ -254,7 +259,8 @@ namespace SparkleLib.Cmis
                             string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
                             string relativeFolderPath = Path.GetDirectoryName(relativePath);
                             relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
-                            string localFolderPath = Path.Combine(localRootFolder, relativeFolderPath);
+                            // string localFolderPath = Path.Combine(localRootFolder, relativeFolderPath);
+                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
                             DownloadFile(remoteDocument, localFolderPath);
                         }
                         break;
@@ -263,7 +269,8 @@ namespace SparkleLib.Cmis
                         if (cmisObject is DotCMIS.Client.Impl.Folder)
                         {
                             IFolder remoteFolder = (IFolder)cmisObject;
-                            string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
+                            // string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
+                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
                             RemoveFolderLocally(localFolder); // Remove from filesystem and database.
                         }
                         else if (cmisObject is DotCMIS.Client.Impl.Document)
@@ -278,7 +285,7 @@ namespace SparkleLib.Cmis
                             string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
                             string relativeFolderPath = Path.GetDirectoryName(relativePath);
                             relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
-                            string localFolderPath = Path.Combine(localRootFolder, relativeFolderPath);
+                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
                             // TODO DeleteFile(localFolderPath); // Delete on filesystem and in database
                         }
                         break;

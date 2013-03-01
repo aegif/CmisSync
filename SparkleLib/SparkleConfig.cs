@@ -206,13 +206,14 @@ namespace SparkleLib
 
         public void AddFolder(SparkleRepoInfo repoInfo)
         {
-            this.AddFolder(repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password);
+            this.AddFolder(repoInfo.Name,repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password);
         }
 
-        public void AddFolder(string name, string identifier, string url, string backend,
+        public void AddFolder(string name, string path, string identifier, string url, string backend,
             string repository, string remoteFolder, string user, string password)
         {
             XmlNode node_name = CreateElement("name");
+            XmlNode node_path = CreateElement("path");
             XmlNode node_identifier = CreateElement("identifier");
             XmlNode node_url = CreateElement("url");
             XmlNode node_backend = CreateElement("backend");
@@ -222,6 +223,7 @@ namespace SparkleLib
             XmlNode node_password = CreateElement("password");
 
             node_name.InnerText = name;
+            node_path.InnerText = path;
             node_identifier.InnerText = identifier;
             node_url.InnerText = url;
             node_backend.InnerText = backend;
@@ -233,6 +235,7 @@ namespace SparkleLib
             XmlNode node_folder = CreateNode(XmlNodeType.Element, "folder", null);
 
             node_folder.AppendChild(node_name);
+            node_folder.AppendChild(node_path);
             node_folder.AppendChild(node_identifier);
             node_folder.AppendChild(node_url);
             node_folder.AppendChild(node_backend);
@@ -357,6 +360,11 @@ namespace SparkleLib
             repoInfo.Address = new Uri(GetUrlForFolder(FolderName));
             repoInfo.RepoID = GetFolderOptionalAttribute(FolderName, "repository");
             repoInfo.RemotePath = GetFolderOptionalAttribute(FolderName, "remoteFolder");
+            repoInfo.TargetDirectory = GetFolderOptionalAttribute(FolderName, "path");
+            if (String.IsNullOrEmpty(repoInfo.TargetDirectory))
+            {
+                repoInfo.TargetDirectory = Path.Combine(FoldersPath, FolderName);
+            }
 
             return repoInfo;
         }

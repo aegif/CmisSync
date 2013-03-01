@@ -338,7 +338,8 @@ namespace SparkleLib.Cmis
                 //            else
                 //            {
                 // No ChangeLog capability, so we have to crawl remote and local folders.
-                CrawlSync(remoteFolder, localRootFolder);
+                // CrawlSync(remoteFolder, localRootFolder);
+                CrawlSync(remoteFolder, repoinfo.TargetDirectory);
                 //            }
             }
 
@@ -349,7 +350,8 @@ namespace SparkleLib.Cmis
             {
                 if (syncing)
                 {
-                    SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", this.localRootFolder));
+                    // SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", this.localRootFolder));
+                    SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", repoinfo.TargetDirectory));
                     return;
                 }
                 syncing = true;
@@ -358,7 +360,8 @@ namespace SparkleLib.Cmis
                 bw.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
-                        SparkleLogger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", this.localRootFolder));
+                        // SparkleLogger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", this.localRootFolder));
+                        SparkleLogger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
 #if !DEBUG
                         try
                         {

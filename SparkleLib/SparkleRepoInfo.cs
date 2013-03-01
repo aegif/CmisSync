@@ -8,6 +8,9 @@ namespace SparkleLib
 {
     public class SparkleRepoInfo
     {
+        private string name;
+        public string Name { get { return name; } set { name = value; } }
+
         private string cmisdatase;
         public string CmisDatabase { get { return cmisdatase; } set { cmisdatase = value; } }
 
@@ -42,10 +45,10 @@ namespace SparkleLib
         private string backend;
         public string Backend { get { return "Cmis"; } }
 
-        public SparkleRepoInfo(string folderName, string cmisDatabasePath )
+        public SparkleRepoInfo(string folderName, string cmisDatabasePath)
         {
-            targetdirectory = folderName;
-            cmisdatase = Path.Combine(cmisDatabasePath, targetdirectory + ".cmissync");
+            name = folderName;
+            cmisdatase = Path.Combine(cmisDatabasePath, folderName + ".cmissync");
         }
     }
 }
