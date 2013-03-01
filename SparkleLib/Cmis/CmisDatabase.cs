@@ -55,8 +55,8 @@ namespace SparkleLib.Cmis
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
 
-                // Hidden database file
-                File.SetAttributes(databaseFileName, FileAttributes.Hidden);
+                // Hidden database file - No more necessary because file is moved on a system folder
+                // File.SetAttributes(databaseFileName, FileAttributes.Hidden);
 
                 if (createDatabase)
                 {
