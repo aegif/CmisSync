@@ -45,10 +45,10 @@ namespace SparkleLib.Cmis
     {
         private CmisDirectory cmis;
 
-        public SparkleRepoCmis(string path, SparkleRepoInfo repoInfo, ActivityListener activityListener)
-            : base(path, repoInfo)
+        public SparkleRepoCmis(SparkleRepoInfo repoInfo, ActivityListener activityListener)
+            : base(repoInfo)
         {
-            cmis = new CmisDirectory(path, repoInfo, activityListener);
+            cmis = new CmisDirectory(repoInfo, activityListener);
             SparkleLogger.LogInfo("Sync", "Cmis:" + cmis);
         }
 

@@ -293,7 +293,8 @@ namespace SparkleShare
             //        new object [] { folder_path, this.config }
             //);
 
-            repo = new SparkleLib.Cmis.SparkleRepoCmis(folder_path, config.GetRepoInfo(folder_name), activityListenerAggregator);
+            SparkleRepoInfo repositoryInfo = config.GetRepoInfo(folder_name);
+            repo = new SparkleLib.Cmis.SparkleRepoCmis(repositoryInfo, activityListenerAggregator);
 
             //} catch (Exception e) {
             //    SparkleLogger.LogInfo ("Controller",
@@ -667,8 +668,8 @@ namespace SparkleShare
             // string canonical_name = Path.GetFileName (this.fetcher.RemoteFolder);
 
             // string target_folder_path = Path.Combine(this.config.FoldersPath, fetcher.CanonicalName);
-            string target_folder_path = Path.Combine(this.config.FoldersPath, repoInfo.TargetDirectory);
-            bool target_folder_exists = Directory.Exists(target_folder_path);
+            //string target_folder_path = Path.Combine(this.config.FoldersPath, repoInfo.TargetDirectory);
+            //bool target_folder_exists = Directory.Exists(target_folder_path);
 
             // Add a numbered suffix to the name if a folder with the same name
             // already exists. Example: "Folder (2)"
