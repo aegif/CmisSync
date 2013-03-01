@@ -244,7 +244,7 @@ namespace SparkleLib.Cmis
                 {
                     string fileName = Path.GetFileName(filePath);
 
-                    if (!CheckRules(filePath, RulesType.File))
+                    if (CheckRules(fileName, RulesType.File))
                     {
                         if (!remoteFiles.Contains(fileName))
                         {

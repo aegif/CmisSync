@@ -476,7 +476,7 @@ namespace SparkleLib.Cmis
                     }
 
                     ContentStream contentStream = new ContentStream();
-                    contentStream.FileName = fileName;
+                    contentStream.FileName = tmpfileName;
                     // contentStream.Stream = new MemoryStream(8 * 1024);
                     contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
                     // contentStream.Length = 8 * 1024;
