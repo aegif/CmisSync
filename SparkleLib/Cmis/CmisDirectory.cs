@@ -389,7 +389,8 @@ namespace SparkleLib.Cmis
                     }
 
                     SparkleLogger.LogInfo("CmisDirectory", String.Format("Start download of file with offset {0}", Offset));
-
+                    
+                    contentStream.Stream.Flush();
                     CopyStream(contentStream.Stream, localfile.BaseStream);
                     localfile.Flush();
                     localfile.Close();
@@ -482,6 +483,7 @@ namespace SparkleLib.Cmis
                     // contentStream.Length = 8 * 1024;
                     contentStream.Length = file.Length;
                     contentStream.Stream = file;
+                    contentStream.Stream.Flush();
 
                     // Upload
                     try
@@ -643,6 +645,7 @@ namespace SparkleLib.Cmis
                 remoteStream.Length = localfile.Length;
                 remoteStream.MimeType = MimeType.GetMIMEType(fileName);
                 remoteStream.Stream = localfile;
+                remoteStream.Stream.Flush();
 
                 // CMIS do not have a Method to upload block by block. So upload file must be full.
                 // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
@@ -760,13 +763,14 @@ namespace SparkleLib.Cmis
             ".~ppt", ".~pptx",
             ".~xls", ".~xlsx",
             ".~doc", ".~docx",
-            ".cvsignore", ".~cvsignore", // CVS
+            ".cvsignore", ".~cvsignore",// CVS
+            ".gitignore", // GIT
             ".sync", // CmisSync File Downloading/Uploading
             ".cmissync" // CmisSync Database 
             };
 
                 string[] directories = new string[] {
-                "CVS",".svn",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
+                "CVS",".svn",".git",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
             };
 
                 SparkleLogger.LogInfo("SyncRules", "Check rules for " + path);
