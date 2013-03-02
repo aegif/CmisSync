@@ -576,6 +576,7 @@ namespace SparkleLib.Cmis
                         // No close method, No dispose method
                         remoteDocument = null;
                     }
+                    contentStream.Stream.Close();
                 }
                 catch (Exception e)
                 {
@@ -654,6 +655,7 @@ namespace SparkleLib.Cmis
                 DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
                 localfile.Close();
                 localfile.Dispose();
+                remoteStream.Stream.Close();
                 SparkleLogger.LogInfo("Sync", "Update finished:" + filePath);
             }
 
