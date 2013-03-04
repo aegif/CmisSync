@@ -191,7 +191,13 @@ namespace SparkleLib.Cmis
                                         {
                                             SparkleLogger.LogInfo("Sync", "Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
                                             // Rename locally modified file.
-                                            File.Move(filePath, SuffixIfExists(filePath + "_your-version"));
+                                            String ext = Path.GetExtension(filePath);
+                                            String filename = Path.GetFileNameWithoutExtension(filePath);
+                                            String path = Path.GetDirectoryName(filePath);
+
+                                            String NewFileName = SuffixIfExists(filename + "_" + repoinfo.User + "-version");
+                                            String newFilePath = Path.Combine(path,NewFileName);
+                                            File.Move(filePath, newFilePath);
 
                                             // Download server version
                                             DownloadFile(remoteDocument, localFolder);

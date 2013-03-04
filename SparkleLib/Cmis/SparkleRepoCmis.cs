@@ -114,6 +114,8 @@ namespace SparkleLib.Cmis
 
         public override bool HasRemoteChanges
         {
+            // TODO - Yannick - Use ChangeLogToken on the repository to determine if someone is change.
+            // ChangeLogToken must be store physicaly (CmisDatabase ?)
             get
             {
                 SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] HasRemoteChanges get", this.Name));
@@ -148,6 +150,7 @@ namespace SparkleLib.Cmis
 
         public override bool HasLocalChanges
         {
+            // TODO - Yannick - Use FileSystemWatcher to determine what is changed.
             get
             {
                 SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] HasLocalChanges get", this.Name));
