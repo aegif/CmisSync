@@ -53,50 +53,51 @@ namespace SparkleLib.Cmis
         }
 
 
+        // Not used.
         public override List<string> ExcludePaths
         {
             get
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] ExcludePaths get", this.Name));
                 return new List<string>();
             }
         }
 
 
+        // Not used.
         public override double Size
         {
             get
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] Size get", this.Name));
-                return 1234567; // TODO
+                return 1234567;
             }
         }
 
 
+        // Not used.
         public override double HistorySize
         {
             get
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] HistorySize get", this.Name));
-                return 1234567; // TODO
+                return 1234567;
             }
         }
 
 
+        // Not used.
         private void UpdateSizes()
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] UpdateSizes", this.Name));
-            // TODO
+            
         }
 
 
         public override string[] UnsyncedFilePaths
         {
+            // Not used.
             get
             {
                 SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] UnsyncedFilePaths get", this.Name));
                 List<string> file_paths = new List<string>();
-                //file_paths.Add (path); TODO
+                //file_paths.Add (path);
                 return file_paths.ToArray();
             }
         }
@@ -104,40 +105,39 @@ namespace SparkleLib.Cmis
 
         public override string CurrentRevision
         {
+            // Not used.
             get
             {
                 SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] CurrentRevision get", this.Name));
-                return null; // TODO
+                return null;
             }
         }
 
 
         public override bool HasRemoteChanges
         {
-            // TODO - Yannick - Use ChangeLogToken on the repository to determine if someone is change.
-            // ChangeLogToken must be store physicaly (CmisDatabase ?)
+            // Not used.
             get
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] HasRemoteChanges get", this.Name));
-                return false; // TODO
+                return false;
             }
         }
 
 
         public override bool SyncUp()
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] SyncUp", this.Name));
-            if (cmis != null)
-                cmis.SyncInBackground();
-            return true; // TODO
+  //          SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] SyncUp", this.Name));
+  //          if (cmis != null)
+  //              cmis.SyncInBackground();
+            return true;
         }
 
 
         public override bool SyncDown()
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] SyncDown", this.Name));
-            if (cmis != null)
-                cmis.SyncInBackground();
+   //         SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] SyncDown", this.Name));
+   //         if (cmis != null)
+   //             cmis.SyncInBackground();
             return true;
         }
 
@@ -150,11 +150,10 @@ namespace SparkleLib.Cmis
 
         public override bool HasLocalChanges
         {
-            // TODO - Yannick - Use FileSystemWatcher to determine what is changed.
+            // Not used.
             get
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] HasLocalChanges get", this.Name));
-                return false; // TODO
+                return false;
             }
         }
 
@@ -171,8 +170,7 @@ namespace SparkleLib.Cmis
 
             set
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] HasUnsyncedChanges set", this.Name));
-                // TODO
+                // Not used.
             }
         }
 
@@ -180,52 +178,49 @@ namespace SparkleLib.Cmis
         // Stages the made changes
         private void Add()
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] Add", this.Name));
-            // TODO
+            // Not used.
         }
 
 
         // Commits the made changes
         private void Commit(string message)
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] Commit", this.Name));
-            // TODO
+            // Not used.
         }
 
 
         // Merges the fetched changes
         private void Rebase()
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] Rebase", this.Name));
-            // TODO
+            // Not used.
         }
 
 
         private void ResolveConflict()
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] ResolveConflict", this.Name));
-            // TODO
+            // Not used.
         }
 
 
         public override void RevertFile(string path, string revision)
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] RevertFile", this.Name));
-            // TODO
+            // Not used.
         }
 
 
         public override List<SparkleChangeSet> GetChangeSets(string path, int count)
         {
+            // Not used.
             SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] GetChangeSets", this.Name));
-            return new List<SparkleChangeSet>(); // TODO
+            return new List<SparkleChangeSet>();
         }
 
 
         public override List<SparkleChangeSet> GetChangeSets(int count)
         {
+            // Not used.
             SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] GetChangeSets", this.Name));
-            return new List<SparkleChangeSet>(); // TODO
+            return new List<SparkleChangeSet>();
         }
 
     }
