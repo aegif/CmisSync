@@ -339,7 +339,7 @@ namespace SparkleLib
 
         private void AcceptHostKey(string host_key, bool warn)
         {
-            string ssh_config_path = Path.Combine(SparkleConfig.DefaultConfig.HomePath, ".ssh");
+            string ssh_config_path = Path.Combine(SparkleConfig.HomePath, ".ssh");
             string known_hosts_file_path = Path.Combine(ssh_config_path, "known_hosts");
 
             if (!File.Exists(known_hosts_file_path))

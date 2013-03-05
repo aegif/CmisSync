@@ -39,7 +39,7 @@ namespace SparkleLib.Cmis
             this.databaseFileName = dataPath;
             // pathPrefixSize = dataPath.Length + 1; // +1 for the slash
             // pathPrefixSize = SparkleFolder.ROOT_FOLDER.Length + 1;
-            pathPrefixSize = SparkleConfig.DefaultConfig.FoldersPath.Length + 1;
+            pathPrefixSize = SparkleConfig.FoldersPath.Length + 1;
         }
 
 

@@ -196,7 +196,7 @@ namespace SparkleShare
 
             this.config = new SparkleConfig(config_path, "config.xml");
             SparkleConfig.DefaultConfig = this.config;
-            FoldersPath = this.config.FoldersPath;
+            FoldersPath = SparkleConfig.FoldersPath;
         }
 
 
@@ -380,7 +380,7 @@ namespace SparkleShare
         {
             lock (this.check_repos_lock)
             {
-                string path = this.config.FoldersPath;
+                string path = SparkleConfig.FoldersPath;
 
                 foreach (string folder_path in Directory.GetDirectories(path))
                 {
@@ -574,7 +574,7 @@ namespace SparkleShare
             repoInfo.RepoID = repository;
             repoInfo.User = user;
             repoInfo.Password = CmisCrypto.Protect(password);
-            repoInfo.TargetDirectory = Path.Combine(config.FoldersPath, local_path);
+            repoInfo.TargetDirectory = Path.Combine(SparkleConfig.FoldersPath, local_path);
 
             fetcher = new SparkleLib.Cmis.SparkleFetcher(repoInfo, activityListenerAggregator);
 
@@ -748,7 +748,7 @@ namespace SparkleShare
 
         public void OpenSparkleShareFolder()
         {
-            OpenFolder(this.config.FoldersPath);
+            OpenFolder(SparkleConfig.FoldersPath);
         }
 
 

@@ -36,7 +36,7 @@ namespace SparkleLib
 
         public string ConfigPath { get { return configpath; } }
 
-        public string HomePath
+        public static string HomePath
         {
             get
             {
@@ -48,7 +48,7 @@ namespace SparkleLib
         }
 
 
-        public string FoldersPath
+        public static string FoldersPath
         {
             get
             {
