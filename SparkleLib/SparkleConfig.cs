@@ -27,7 +27,6 @@ namespace SparkleLib
     {
 
         public static SparkleConfig DefaultConfig;
-        public static bool DebugMode = true;
 
         public string FullPath;
         public string TmpPath;
@@ -56,6 +55,22 @@ namespace SparkleLib
             }
         }
 
+        public bool DebugMode
+        {
+            get
+            {
+                try
+                {
+                    XmlNode debugNode = SelectSingleNode(@"/sparkleshare/debug");
+                    bool debug = false;
+                    bool.TryParse(debugNode.InnerText,out debug);
+                    return debug;
+                }
+                catch {
+                    return false;
+                }
+            }
+        }
 
         public SparkleConfig(string config_path, string config_file_name)
         {
@@ -83,17 +98,14 @@ namespace SparkleLib
             try
             {
                 Load(FullPath);
-
             }
             catch (TypeInitializationException)
             {
                 CreateInitialConfig();
-
             }
             catch (FileNotFoundException)
             {
                 CreateInitialConfig();
-
             }
             catch (XmlException)
             {
@@ -103,7 +115,6 @@ namespace SparkleLib
                 {
                     File.Delete(FullPath);
                     CreateInitialConfig();
-
                 }
                 else
                 {
@@ -151,6 +162,7 @@ namespace SparkleLib
                 "    <name>" + user_name + "</name>" + n +
                 "    <email>Unknown</email>" + n +
                 "  </user>" + n +
+                "  <debug>0</debug>" + n +
                 "</sparkleshare>");
         }
 
