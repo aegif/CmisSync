@@ -314,7 +314,8 @@ namespace SparkleLib.Cmis
                             // Create local folder.
                             Directory.CreateDirectory(localSubFolder);
 
-                            // Create database entry for this folder.
+                            // Create database entry for this folder
+                            // TODO - Yannick - Add metadata
                             database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                             // Recurse into folder.
@@ -389,7 +390,7 @@ namespace SparkleLib.Cmis
                     }
 
                     SparkleLogger.LogInfo("CmisDirectory", String.Format("Start download of file with offset {0}", Offset));
-                    
+
                     contentStream.Stream.Flush();
                     CopyStream(contentStream.Stream, localfile.BaseStream);
                     localfile.Flush();
@@ -410,26 +411,33 @@ namespace SparkleLib.Cmis
                     if (contentStream != null) contentStream.Stream.Close();
                 }
 
-                // Rename file
-                // TODO - Yannick - Control file integrity by using hash compare - Is it necessary ?
-                if (success)
+                try
                 {
-                    File.Move(tmpfilepath, filepath);
+                    // Rename file
+                    // TODO - Yannick - Control file integrity by using hash compare - Is it necessary ?
+                    if (success)
+                    {
+                        File.Move(tmpfilepath, filepath);
 
-                    // Get metadata.
-                    Dictionary<string, string> metadata = new Dictionary<string, string>();
-                    metadata.Add("Id", remoteDocument.Id);
-                    metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
-                    metadata.Add("VersionLabel", remoteDocument.VersionLabel);
-                    metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
-                    metadata.Add("CreatedBy", remoteDocument.CreatedBy);
-                    metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
-                    metadata.Add("CheckinComment", remoteDocument.CheckinComment);
-                    metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
-                    metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
+                        // Get metadata.
+                        Dictionary<string, string> metadata = new Dictionary<string, string>();
+                        metadata.Add("Id", remoteDocument.Id);
+                        metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
+                        metadata.Add("VersionLabel", remoteDocument.VersionLabel);
+                        metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
+                        metadata.Add("CreatedBy", remoteDocument.CreatedBy);
+                        metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
+                        metadata.Add("CheckinComment", remoteDocument.CheckinComment);
+                        metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
+                        metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
 
-                    // Create database entry for this file.
-                    database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+                        // Create database entry for this file.
+                        database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SparkleLogger.LogInfo("CmisDirectory", "Unable to write metadata in the CmisDatabase: " + ex.ToString());
                 }
                 activityListener.ActivityStopped();
             }
@@ -612,7 +620,8 @@ namespace SparkleLib.Cmis
                 properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
                 IFolder folder = remoteBaseFolder.CreateFolder(properties);
 
-                // Create database entry for this folder.
+                // Create database entry for this folder
+                // TODO - Yannick - Add metadata
                 database.AddFolder(localFolder, folder.LastModificationDate);
 
                 // Upload each file in this folder.
@@ -695,6 +704,9 @@ namespace SparkleLib.Cmis
                 // Read new last modification date.
                 // Update timestamp in database.
                 database.SetFileServerSideModificationDate(filePath, document.LastModificationDate);
+
+                // TODO - Yannick - Update metadata ?
+
                 activityListener.ActivityStopped();
             }
 
