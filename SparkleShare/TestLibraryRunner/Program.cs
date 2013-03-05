@@ -13,13 +13,13 @@ namespace TestLibraryRunner
     {
         static void Main(string[] args)
         {
-            int serverId = 2; // Which server in test-servers.json (first=0)
+            int serverId = 0; // Which server in test-servers.json (first=0)
 
             IEnumerable<object[]> servers = JsonConvert.DeserializeObject<List<object[]>>(
                     File.ReadAllText("../../../TestLibrary/test-servers.json"));
             object[] server = servers.ElementAt(serverId);
-            //new CmisSyncTests().ClientSideSmallFileAddition((string)server[0], (string)server[1],
-            //    (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
+            new CmisSyncTests().Sync((string)server[0], (string)server[1],
+                (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
 
 // Let the console open.
 #if DEBUG
