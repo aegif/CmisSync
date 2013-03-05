@@ -22,7 +22,7 @@ namespace SparkleLib.Cmis
         /**
          * Synchronization with a particular CMIS folder.
          */
-        private partial class CmisDirectory
+        public partial class CmisDirectory
         {
             /**
              * Synchronize by checking all folders/files one-by-one.

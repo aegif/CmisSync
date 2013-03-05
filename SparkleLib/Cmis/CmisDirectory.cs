@@ -19,12 +19,12 @@ namespace SparkleLib.Cmis
 {
     public partial class SparkleRepoCmis : SparkleRepoBase
     {
-        private enum RulesType { Folder, File };
+        public enum RulesType { Folder, File };
 
         /**
          * Synchronization with a particular CMIS folder.
          */
-        private partial class CmisDirectory
+        public partial class CmisDirectory
         {
             /**
              * Whether sync is bidirectional or only from server to client.
