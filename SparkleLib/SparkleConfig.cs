@@ -63,10 +63,11 @@ namespace SparkleLib
                 {
                     XmlNode debugNode = SelectSingleNode(@"/sparkleshare/debug");
                     bool debug = false;
-                    bool.TryParse(debugNode.InnerText,out debug);
+                    bool.TryParse(debugNode.InnerText, out debug);
                     return debug;
                 }
-                catch {
+                catch
+                {
                     return false;
                 }
             }
@@ -154,16 +155,94 @@ namespace SparkleLib
             if (string.IsNullOrEmpty(user_name))
                 user_name = "Unknown";
 
-            string n = Environment.NewLine;
-            File.WriteAllText(FullPath,
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + n +
-                "<sparkleshare>" + n +
-                "  <user>" + n +
-                "    <name>" + user_name + "</name>" + n +
-                "    <email>Unknown</email>" + n +
-                "  </user>" + n +
-                "  <debug>0</debug>" + n +
-                "</sparkleshare>");
+
+            AppendChild(CreateXmlDeclaration("1.0", "UTF-8", "yes"));
+            AppendChild(CreateElement("sparkleshare"));
+            XmlNode user = CreateElement("user");
+            XmlNode username = CreateElement("name");
+            username.InnerText = user_name;
+            XmlNode email = CreateElement("email");
+            email.InnerText = "Unknown";
+
+            user.AppendChild(username);
+            user.AppendChild(email);
+
+            XmlNode folders = CreateElement("folders");
+            DocumentElement.AppendChild(user);
+            CreateLog4NetDefaultConfig();
+            DocumentElement.AppendChild(folders);
+
+            //string n = Environment.NewLine;
+            //File.WriteAllText(FullPath,
+            //    "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + n +
+            //    "<sparkleshare>" + n +
+            //    "  <user>" + n +
+            //    "    <name>" + user_name + "</name>" + n +
+            //    "    <email>Unknown</email>" + n +
+            //    "  </user>" + n +
+            //    "  <log4net>" + n +
+            //    "  <log4net>" + n +
+            //    "</sparkleshare>");
+        }
+
+        public XmlNode GetLog4NetConfig()
+        {
+            return SelectSingleNode("/sparkleshare/log4net");
+        }
+
+        private void CreateLog4NetDefaultConfig()
+        {
+            XmlNode log4net = CreateElement("log4net");
+
+            XmlNode appender = CreateElement("appender");
+            appender.Attributes["name"].Value = "CmisSyncFileAppender";
+            appender.Attributes["type"].Value = "log4net.Appender.RollingFileAppender";
+
+            XmlNode file = CreateElement("file");
+            file.Attributes["value"].Value = "log.txt";
+            appender.AppendChild(file);
+
+            XmlNode appendToFile = CreateElement("appendToFile");
+            appendToFile.Attributes["value"].Value = "true";
+            appender.AppendChild(appendToFile);
+
+            XmlNode rollingStyle = CreateElement("rollingStyle");
+            rollingStyle.Attributes["value"].Value = "Size";
+            appender.AppendChild(rollingStyle);
+
+            XmlNode maxSizeRollBackups = CreateElement("maxSizeRollBackups");
+            maxSizeRollBackups.Attributes["value"].Value = "10";
+            appender.AppendChild(maxSizeRollBackups);
+
+            XmlNode maximumFileSize = CreateElement("maximumFileSize");
+            maximumFileSize.Attributes["value"].Value = "100KB";
+            appender.AppendChild(maximumFileSize);
+
+            XmlNode staticLogFileName = CreateElement("staticLogFileName");
+            staticLogFileName.Attributes["value"].Value = "true";
+            appender.AppendChild(staticLogFileName);
+
+            XmlNode layout = CreateElement("layout");
+            layout.Attributes["type"].Value = "log4net.Layout.PatternLayout";
+
+            XmlNode conversionPattern = CreateElement("conversionPattern");
+            conversionPattern.Attributes["value"].Value = "%date [%thread] %-5level %logger [%property{NDC}] - %message%newline";
+            layout.AppendChild(conversionPattern);
+            appender.AppendChild(layout);
+            log4net.AppendChild(appender);
+
+            XmlNode root = CreateElement("root");
+            XmlNode level = CreateElement("level");
+            level.Attributes["value"].InnerText = "DEBUG";
+            root.AppendChild(level);
+
+            XmlNode appenderref = CreateElement("appender-ref");
+            appenderref.Attributes["ref"].Value = "CmisSyncFileAppender";
+            root.AppendChild(appenderref);
+
+            log4net.AppendChild(root);
+
+            DocumentElement.AppendChild(log4net);
         }
 
 
@@ -209,7 +288,7 @@ namespace SparkleLib
             {
                 List<string> folders = new List<string>();
 
-                foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folder"))
+                foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folders/folder"))
                     folders.Add(node_folder["name"].InnerText);
 
                 return folders;
@@ -256,7 +335,7 @@ namespace SparkleLib
             node_folder.AppendChild(node_user);
             node_folder.AppendChild(node_password);
 
-            XmlNode node_root = SelectSingleNode("/sparkleshare");
+            XmlNode node_root = SelectSingleNode("/sparkleshare/folders");
             node_root.AppendChild(node_folder);
 
             Save();
@@ -265,10 +344,10 @@ namespace SparkleLib
 
         public void RemoveFolder(string name)
         {
-            foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folder"))
+            foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folders/folder"))
             {
                 if (node_folder["name"].InnerText.Equals(name))
-                    SelectSingleNode("/sparkleshare").RemoveChild(node_folder);
+                    SelectSingleNode("/sparkleshare/folders").RemoveChild(node_folder);
             }
 
             Save();
@@ -278,7 +357,7 @@ namespace SparkleLib
         public void RenameFolder(string identifier, string name)
         {
             XmlNode node_folder = SelectSingleNode(
-                string.Format("/sparkleshare/folder[identifier=\"{0}\"]", identifier));
+                string.Format("/sparkleshare/folders/folder[identifier=\"{0}\"]", identifier));
 
             node_folder["name"].InnerText = name;
             Save();
@@ -308,7 +387,7 @@ namespace SparkleLib
             if (identifier == null)
                 throw new ArgumentNullException();
 
-            foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folder"))
+            foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folders/folder"))
             {
                 XmlElement folder_id = node_folder["identifier"];
 
@@ -383,7 +462,7 @@ namespace SparkleLib
 
         private XmlNode GetFolder(string name)
         {
-            return SelectSingleNode(string.Format("/sparkleshare/folder[name=\"{0}\"]", name));
+            return SelectSingleNode(string.Format("/sparkleshare/folders/folder[name=\"{0}\"]", name));
         }
 
 
