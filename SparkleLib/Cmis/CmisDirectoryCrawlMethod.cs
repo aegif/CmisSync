@@ -22,7 +22,7 @@ namespace SparkleLib.Cmis
         /**
          * Synchronization with a particular CMIS folder.
          */
-        private partial class CmisDirectory
+        public partial class CmisDirectory
         {
             /**
              * Synchronize by checking all folders/files one-by-one.
@@ -70,15 +70,15 @@ namespace SparkleLib.Cmis
                 IList remoteSubfolders = new ArrayList();
 
                 // Crawl remote children.
-                SparkleLogger.LogInfo("Sync", String.Format("Parse remote folder {0}", this.remoteFolderPath));
+                // SparkleLogger.LogInfo("Sync", String.Format("Crawl remote folder {0}", this.remoteFolderPath));
                 crawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
 
                 // Crawl local files.
-                SparkleLogger.LogInfo("Sync", String.Format("Parse local files in the local folder {0}", localFolder));
+                // SparkleLogger.LogInfo("Sync", String.Format("Crawl local files in the local folder {0}", localFolder));
                 crawlLocalFiles(localFolder, remoteFolder, remoteFiles);
 
                 // Crawl local folders.
-                SparkleLogger.LogInfo("Sync", String.Format("Parse local folder {0}", localFolder));
+                // SparkleLogger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
                 crawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
             }
 
@@ -357,7 +357,6 @@ namespace SparkleLib.Cmis
             {
                 if (syncing)
                 {
-                    // SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", this.localRootFolder));
                     SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", repoinfo.TargetDirectory));
                     return;
                 }
@@ -367,7 +366,6 @@ namespace SparkleLib.Cmis
                 bw.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
-                        // SparkleLogger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", this.localRootFolder));
                         SparkleLogger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
 #if !DEBUG
                         try

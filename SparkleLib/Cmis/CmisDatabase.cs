@@ -39,7 +39,7 @@ namespace SparkleLib.Cmis
             this.databaseFileName = dataPath;
             // pathPrefixSize = dataPath.Length + 1; // +1 for the slash
             // pathPrefixSize = SparkleFolder.ROOT_FOLDER.Length + 1;
-            pathPrefixSize = SparkleConfig.DefaultConfig.FoldersPath.Length + 1;
+            pathPrefixSize = SparkleConfig.FoldersPath.Length + 1;
         }
 
 
@@ -51,6 +51,7 @@ namespace SparkleLib.Cmis
         {
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
+                SparkleLogger.LogInfo("Database", "Checking whether database exists");
                 bool createDatabase = !File.Exists(databaseFileName);
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
@@ -77,6 +78,7 @@ namespace SparkleLib.Cmis
                                 key TEXT PRIMARY KEY,
                                 value TEXT);";    /* Other data such as ChangeLog token */
                         command.ExecuteNonQuery();
+                        SparkleLogger.LogInfo("Database", "Database created");
                     }
                 }
             }

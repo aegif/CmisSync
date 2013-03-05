@@ -19,12 +19,12 @@ namespace SparkleLib.Cmis
 {
     public partial class SparkleRepoCmis : SparkleRepoBase
     {
-        private enum RulesType { Folder, File };
+        public enum RulesType { Folder, File };
 
         /**
          * Synchronization with a particular CMIS folder.
          */
-        private partial class CmisDirectory
+        public partial class CmisDirectory
         {
             /**
              * Whether sync is bidirectional or only from server to client.
@@ -787,7 +787,7 @@ namespace SparkleLib.Cmis
                 "CVS",".svn",".git",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
             };
 
-                SparkleLogger.LogInfo("SyncRules", "Check rules for " + path);
+                //SparkleLogger.LogInfo("SyncRules", "Check rules for " + path);
                 Boolean found = false;
                 foreach (string content in contents)
                 {
@@ -813,7 +813,7 @@ namespace SparkleLib.Cmis
                 string not = string.Empty;
                 if (found) not = " not";
 
-                SparkleLogger.LogInfo("SyncRules", String.Format("Path " + path + " is{0} ok", not));
+                //SparkleLogger.LogInfo("SyncRules", String.Format("Path" + path + " is{0} ok", not));
                 return !found;
 
             }

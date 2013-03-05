@@ -84,7 +84,7 @@ namespace SparkleLib
                 if (custom_path != null)
                     return custom_path;
                 else
-                    return Path.Combine(SparkleConfig.DefaultConfig.FoldersPath, Name);
+                    return Path.Combine(SparkleConfig.FoldersPath, Name);
                 // return Path.Combine(ROOT_FOLDER, Name);
             }
         }
