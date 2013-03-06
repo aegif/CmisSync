@@ -30,7 +30,7 @@ namespace SparkleLib {
             string timestamp = DateTime.Now.ToString ("HH:mm:ss");
             string line      = timestamp + " | " + type + " | " + message;
 
-            if (SparkleConfig.DebugMode)
+            if (SparkleConfig.DefaultConfig.DebugMode)
                 Console.WriteLine (line);
 
             lock (debug_lock)

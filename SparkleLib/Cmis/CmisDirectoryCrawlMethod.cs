@@ -134,6 +134,7 @@ namespace SparkleLib.Cmis
                                     Directory.CreateDirectory(localSubFolder);
 
                                     // Create database entry for this folder.
+                                    // TODO - Yannick - Add metadata
                                     database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                                     // Recursive copy of the whole folder.
