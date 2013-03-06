@@ -72,7 +72,7 @@ namespace SparkleLib
             this.user = user;
             this.password = password;
             this.repoid = repoid;
-            this.targetdirectory = Path.Combine(SparkleConfig.FoldersPath, name);
+            this.targetdirectory = Path.Combine(SparkleConfig.DefaultConfig.FoldersPath, name);
         }
     }
 }
