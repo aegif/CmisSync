@@ -25,12 +25,14 @@ using System.Threading;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
+using log4net;
 
 namespace CmisSync
 {
 
     public abstract class ControllerBase : ActivityListener
     {
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(ControllerBase));
         private RepoInfo repoInfo;
 
         public RepoBase[] Repositories
@@ -180,7 +182,6 @@ namespace CmisSync
 
         private ActivityListener activityListenerAggregator;
         private Config config;
-        // private FetcherBase fetcher;
         private Fetcher fetcher;
         private FileSystemWatcher watcher;
         private Object repo_lock = new Object();
@@ -191,11 +192,6 @@ namespace CmisSync
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
 
-            string app_data_path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string config_path = Path.Combine(app_data_path, "cmissync");
-
-            this.config = new Config(config_path, "config.xml");
-            Config.DefaultConfig = this.config;
             FoldersPath = this.config.FoldersPath;
         }
 
@@ -406,8 +402,7 @@ namespace CmisSync
                             string new_folder_path = Path.Combine(path, folder_name);
                             AddRepository(new_folder_path);
 
-                            Logger.LogInfo("Controller",
-                                "Renamed folder with identifier " + identifier + " to '" + folder_name + "'");
+                            Logger.Info("Controller | Renamed folder with identifier " + identifier + " to '" + folder_name + "'");
                         }
                     }
                 }
@@ -421,8 +416,7 @@ namespace CmisSync
                         RemoveRepository(folder_path);
                         this.config.RemoveFolder(folder_name);
 
-                        Logger.LogInfo("Controller",
-                            "Removed folder '" + folder_name + "' from config");
+                        Logger.Info("Controller | Removed folder '" + folder_name + "' from config");
 
                     }
                     else
@@ -637,13 +631,12 @@ namespace CmisSync
                 try
                 {
                     Directory.Delete(this.fetcher.TargetFolder, true);
-                    Logger.LogInfo("Controller", "Deleted " + this.fetcher.TargetFolder);
+                    Logger.Info("Controller | Deleted " + this.fetcher.TargetFolder);
 
                 }
                 catch (Exception e)
                 {
-                    Logger.LogInfo("Controller",
-                        "Failed to delete " + this.fetcher.TargetFolder + ": " + e.Message);
+                    Logger.Info("Controller | Failed to delete " + this.fetcher.TargetFolder + ": " + e.Message);
                 }
             }
 
@@ -803,11 +796,11 @@ namespace CmisSync
                     if (!Directory.Exists(avatars_path))
                     {
                         Directory.CreateDirectory(avatars_path);
-                        Logger.LogInfo("Controller", "Created '" + avatars_path + "'");
+                        Logger.Info("Controller | Created '" + avatars_path + "'");
                     }
 
                     File.WriteAllBytes(avatar_file_path, buffer);
-                    Logger.LogInfo("Controller", "Fetched " + size + "x" + size + " avatar for " + email);
+                    Logger.Info("Controller | Fetched " + size + "x" + size + " avatar for " + email);
 
                     return avatar_file_path;
 
@@ -820,7 +813,7 @@ namespace CmisSync
             }
             catch (WebException e)
             {
-                Logger.LogInfo("Controller", "Error fetching avatar: " + e.Message);
+                Logger.Fatal("Controller | Error fetching avatar: " + e.Message);
                 return null;
             }
         }

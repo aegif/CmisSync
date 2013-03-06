@@ -25,15 +25,14 @@ namespace CmisSync.Lib
 
     public class Config : XmlDocument
     {
-
-        public static Config DefaultConfig;
-
         public string FullPath;
         public string TmpPath;
         public string LogFilePath;
         private string configpath;
 
         public string ConfigPath { get { return configpath; } }
+
+        public static Config DefaultConfig;
 
         public string HomePath
         {
@@ -174,9 +173,9 @@ namespace CmisSync.Lib
             Save(LogFilePath);
         }
 
-        public XmlNode GetLog4NetConfig()
+        public XmlElement GetLog4NetConfig()
         {
-            return SelectSingleNode("/CmisSync/log4net");
+            return (XmlElement)SelectSingleNode("/CmisSync/log4net");
         }
 
         private void CreateLog4NetDefaultConfig()
@@ -496,7 +495,6 @@ namespace CmisSync.Lib
             }
 
             Save();
-            Logger.LogInfo("Config", "Updated option " + name + ":" + content);
         }
 
 
@@ -506,7 +504,6 @@ namespace CmisSync.Lib
                 throw new FileNotFoundException(FullPath + " does not exist");
 
             Save(FullPath);
-            Logger.LogInfo("Config", "Wrote to '" + FullPath + "'");
         }
     }
 }

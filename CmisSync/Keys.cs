@@ -21,93 +21,101 @@ using System.IO;
 using System.Net;
 
 using CmisSync.Lib;
+using log4net;
 
-namespace CmisSync {
+namespace CmisSync
+{
 
-    public static class Keys {
+    public static class Keys
+    {
 
-        public static string [] GenerateKeyPair (string output_path, string key_name)
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Keys));
+
+        public static string[] GenerateKeyPair(string output_path, string key_name)
         {
             key_name += ".key";
-            string key_file_path = Path.Combine (output_path, key_name);
+            string key_file_path = Path.Combine(output_path, key_name);
 
-            if (File.Exists (key_file_path)) {
-                Logger.LogInfo ("Auth", "A key pair exists ('" + key_name + "'), leaving it untouched");
-                return new string [] { key_file_path, key_file_path + ".pub" };
+            if (File.Exists(key_file_path))
+            {
+                Logger.Info("Auth | A key pair exists ('" + key_name + "'), leaving it untouched");
+                return new string[] { key_file_path, key_file_path + ".pub" };
 
-            } else {
-                if (!Directory.Exists (output_path))
-                    Directory.CreateDirectory (output_path);
+            }
+            else
+            {
+                if (!Directory.Exists(output_path))
+                    Directory.CreateDirectory(output_path);
             }
 
-            Process process = new Process ();
+            Process process = new Process();
 
-            process.StartInfo.FileName         = "ssh-keygen";
+            process.StartInfo.FileName = "ssh-keygen";
             process.StartInfo.WorkingDirectory = output_path;
-            process.StartInfo.UseShellExecute  = false;
-            process.StartInfo.CreateNoWindow   = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
 
-            string computer_name = Dns.GetHostName ();
+            string computer_name = Dns.GetHostName();
 
-            if (computer_name.EndsWith (".local"))
-                computer_name = computer_name.Substring (0, computer_name.Length - 6);
+            if (computer_name.EndsWith(".local"))
+                computer_name = computer_name.Substring(0, computer_name.Length - 6);
 
             process.StartInfo.Arguments = "-t rsa " + // crypto type
                 "-P \"\"" /* password (none) */ + " " +
                 "-C \"" + computer_name + "\"" /* key comment */ + " " +
                 "-f \"" + key_name + "\"" /* file name */;
 
-            process.Start ();
-            process.WaitForExit ();
+            process.Start();
+            process.WaitForExit();
 
             if (process.ExitCode == 0)
-                Logger.LogInfo ("Auth", "Created keypair '" + key_file_path + "'");
+                Logger.Info("Auth | Created keypair '" + key_file_path + "'");
             else
-                Logger.LogInfo ("Auth", "Could not create key pair '" + key_file_path + "'");
+                Logger.Info("Auth | Could not create key pair '" + key_file_path + "'");
 
-            return new string [] { key_file_path, key_file_path + ".pub" };
+            return new string[] { key_file_path, key_file_path + ".pub" };
         }
 
 
-        public static void ImportPrivateKey (string key_file_path)
+        public static void ImportPrivateKey(string key_file_path)
         {
-            Process process = new Process ();
+            Process process = new Process();
 
-            process.StartInfo.FileName              = "ssh-add";
-            process.StartInfo.Arguments             = "\"" + key_file_path + "\"";
-            process.StartInfo.UseShellExecute       = false;
-            process.StartInfo.CreateNoWindow        = true;
+            process.StartInfo.FileName = "ssh-add";
+            process.StartInfo.Arguments = "\"" + key_file_path + "\"";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardError = true;
 
-            process.Start ();
-            process.WaitForExit ();
+            process.Start();
+            process.WaitForExit();
 
             if (process.ExitCode == 0)
-                Logger.LogInfo ("Auth", "Imported key '" + key_file_path + "'");
+                Logger.Info("Auth | Imported key '" + key_file_path + "'");
             else
-                Logger.LogInfo ("Auth", "Could not import key '" + key_file_path + "'");
+                Logger.Info("Auth | Could not import key '" + key_file_path + "'");
         }
 
 
-        public static void ListPrivateKeys ()
+        public static void ListPrivateKeys()
         {
-            Process process = new Process ();
+            Process process = new Process();
 
-            process.StartInfo.FileName               = "ssh-add";
-            process.StartInfo.Arguments              = "-l";
-            process.StartInfo.UseShellExecute        = false;
+            process.StartInfo.FileName = "ssh-add";
+            process.StartInfo.Arguments = "-l";
+            process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.CreateNoWindow         = true;
+            process.StartInfo.CreateNoWindow = true;
 
-            process.Start ();
+            process.Start();
 
             // Reading the standard output HAS to go before
             // WaitForExit, or it will hang forever on output > 4096 bytes
-            string keys_in_use = process.StandardOutput.ReadToEnd ();
-            process.WaitForExit ();
+            string keys_in_use = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
 
-            Logger.LogInfo ("Auth", "The following keys may be used: " +
-                Environment.NewLine + keys_in_use.Trim ());
+            Logger.Info("Auth | The following keys may be used: " +
+                Environment.NewLine + keys_in_use.Trim());
         }
     }
 }

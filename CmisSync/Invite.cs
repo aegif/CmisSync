@@ -22,10 +22,13 @@ using System.Text;
 using System.Xml;
 
 using CmisSync.Lib;
+using log4net;
 
 namespace CmisSync {
 
     public class Invite {
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Invite));
 
         public string Address { get; private set; }
         public string RemotePath { get; private set; }
@@ -73,7 +76,7 @@ namespace CmisSync {
                 Initialize (address, remote_path, accept_url, announcements_url, fingerprint);
 
             } catch (XmlException e) {
-                Logger.LogInfo ("Invite", "Invalid XML: " + e.Message);
+                Logger.Info ("Invite | Invalid XML: " + e.Message);
                 return;
             }
         }
@@ -104,12 +107,12 @@ namespace CmisSync {
                 response.Close ();
 
             } catch (WebException e) {
-                Logger.LogInfo ("Invite", "Failed uploading public key to " + AcceptUrl + ": " + e.Message);
+                Logger.Fatal("Invite | Failed uploading public key to " + AcceptUrl + ": " + e.Message);
                 return false;
             }
 
             if (response != null && response.StatusCode == HttpStatusCode.OK) {
-                Logger.LogInfo ("Invite", "Uploaded public key to " + AcceptUrl);
+                Logger.Info("Invite | Uploaded public key to " + AcceptUrl);
                 return true;
 
             } else {

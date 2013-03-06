@@ -34,7 +34,6 @@ namespace CmisSync
 
     public class Controller : ControllerBase
     {
-
         private int ssh_agent_pid;
 
 
@@ -147,7 +146,7 @@ namespace CmisSync
             Directory.CreateDirectory(FoldersPath);
             File.SetAttributes(FoldersPath, File.GetAttributes(FoldersPath) | FileAttributes.System);
 
-            Logger.LogInfo("Config", "Created '" + FoldersPath + "'");
+            Logger.Info("Config | Created '" + FoldersPath + "'");
 
             string app_path = Path.GetDirectoryName(Forms.Application.ExecutablePath);
             string icon_file_path = Path.Combine(app_path, "Pixmaps", "CmisSync-folder.ico");
@@ -172,8 +171,7 @@ namespace CmisSync
                 }
                 catch (IOException e)
                 {
-                    Logger.LogInfo("Config",
-                        "Failed setting icon for '" + FoldersPath + "': " + e.Message);
+                    Logger.Info("Config | Failed setting icon for '" + FoldersPath + "': " + e.Message);
                 }
 
                 return true;

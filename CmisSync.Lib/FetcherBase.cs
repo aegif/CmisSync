@@ -21,12 +21,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
+using log4net;
 
 namespace CmisSync.Lib
 {
 
     public abstract class FetcherBase
     {
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(FetcherBase));
 
         public event Action Started = delegate { };
         public event Action Failed = delegate { };
@@ -125,7 +127,7 @@ namespace CmisSync.Lib
             IsActive = true;
             Started();
 
-            Logger.LogInfo("Fetcher", TargetFolder + " | Fetching folder: " + RemoteUrl);
+            Logger.Info("Fetcher | " + TargetFolder + " | Fetching folder: " + RemoteUrl);
 
             // Not necessary for CmisSync
             //if (Directory.Exists(TargetFolder))
@@ -177,7 +179,7 @@ namespace CmisSync.Lib
                 if (Fetch())
                 {
                     Thread.Sleep(500);
-                    Logger.LogInfo("Fetcher", OriginalRepoInfo.Name + " | Finished");
+                    Logger.Info("Fetcher | " + OriginalRepoInfo.Name + " | Finished");
 
                     IsActive = false;
 
@@ -190,7 +192,7 @@ namespace CmisSync.Lib
                 else
                 {
                     Thread.Sleep(500);
-                    Logger.LogInfo("Fetcher", OriginalRepoInfo.Name + " | Failed");
+                    Logger.Warn("Fetcher | " + OriginalRepoInfo.Name + " | Failed");
 
                     IsActive = false;
                     Failed();
@@ -283,7 +285,7 @@ namespace CmisSync.Lib
 
         private string FetchHostKey()
         {
-            Logger.LogInfo("Auth", "Fetching host key for " + RemoteUrl.Host);
+            Logger.Info("Auth | Fetching host key for " + RemoteUrl.Host);
 
             Process process = new Process();
             process.StartInfo.FileName = "ssh-keyscan";
@@ -302,7 +304,7 @@ namespace CmisSync.Lib
                 else
                     process.StartInfo.Arguments = "-t " + key_type + " -p " + RemoteUrl.Port + " " + RemoteUrl.Host;
 
-                Logger.LogInfo("Cmd", process.StartInfo.FileName + " " + process.StartInfo.Arguments);
+                Logger.Info("Cmd | "+ process.StartInfo.FileName + " " + process.StartInfo.Arguments);
 
                 process.Start();
                 string host_key = process.StandardOutput.ReadToEnd().Trim();
@@ -331,7 +333,7 @@ namespace CmisSync.Lib
             }
             catch (Exception e)
             {
-                Logger.LogInfo("Fetcher", "Failed creating fingerprint: " + e.Message + " " + e.StackTrace);
+                Logger.Info("Fetcher | Failed creating fingerprint: " + e.Message + " " + e.StackTrace);
                 return null;
             }
         }
@@ -365,7 +367,7 @@ namespace CmisSync.Lib
             else
                 File.AppendAllText(known_hosts_file_path, "\n" + host_key + "\n");
 
-            Logger.LogInfo("Auth", "Accepted host key for " + host);
+            Logger.Info("Auth | Accepted host key for " + host);
 
             if (warn)
                 this.warnings.Add("The following host key has been accepted:\n" + DeriveFingerprint(host_key));

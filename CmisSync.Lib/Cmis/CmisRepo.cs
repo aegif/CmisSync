@@ -47,7 +47,7 @@ namespace CmisSync.Lib.Cmis
             : base(repoInfo)
         {
             cmis = new CmisDirectory(repoInfo, activityListener);
-            Logger.LogInfo("Sync", "Cmis:" + cmis);
+            Logger.Info("Sync | Cmis:" + cmis);
         }
 
 
@@ -84,7 +84,7 @@ namespace CmisSync.Lib.Cmis
         // Not used.
         private void UpdateSizes()
         {
-            
+
         }
 
 
@@ -93,7 +93,7 @@ namespace CmisSync.Lib.Cmis
             // Not used.
             get
             {
-                Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] UnsyncedFilePaths get", this.Name));
+                Logger.Info(String.Format("Sync | Cmis Repo [{0}] UnsyncedFilePaths get", this.Name));
                 List<string> file_paths = new List<string>();
                 //file_paths.Add (path);
                 return file_paths.ToArray();
@@ -106,7 +106,7 @@ namespace CmisSync.Lib.Cmis
             // Not used.
             get
             {
-                Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] CurrentRevision get", this.Name));
+                Logger.Info(String.Format("Sync | Cmis Repo [{0}] CurrentRevision get", this.Name));
                 return null;
             }
         }
@@ -124,24 +124,24 @@ namespace CmisSync.Lib.Cmis
 
         public override bool SyncUp()
         {
-  //          Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] SyncUp", this.Name));
-  //          if (cmis != null)
-  //              cmis.SyncInBackground();
+            //          Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] SyncUp", this.Name));
+            //          if (cmis != null)
+            //              cmis.SyncInBackground();
             return true;
         }
 
 
         public override bool SyncDown()
         {
-   //         Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] SyncDown", this.Name));
-   //         if (cmis != null)
-   //             cmis.SyncInBackground();
+            //         Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] SyncDown", this.Name));
+            //         if (cmis != null)
+            //             cmis.SyncInBackground();
             return true;
         }
 
         public void DoFirstSync()
         {
-            Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] First sync", this.Name));
+            Logger.Info(String.Format("Sync | Cmis Repo [{0}] First sync", this.Name));
             if (cmis != null)
                 cmis.Sync();
         }
@@ -160,7 +160,7 @@ namespace CmisSync.Lib.Cmis
         {
             get
             {
-                Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] HasUnsyncedChanges get", this.Name));
+                Logger.Info(String.Format("Sync | Cmis Repo [{0}] HasUnsyncedChanges get", this.Name));
                 if (cmis != null) // Because it is sometimes called before the object's constructor has completed.
                     cmis.SyncInBackground();
                 return false; // TODO
@@ -209,7 +209,7 @@ namespace CmisSync.Lib.Cmis
         public override List<ChangeSet> GetChangeSets(string path, int count)
         {
             // Not used.
-            Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] GetChangeSets", this.Name));
+            Logger.Info(String.Format("Sync | Cmis Repo [{0}] GetChangeSets", this.Name));
             return new List<ChangeSet>();
         }
 
@@ -217,7 +217,7 @@ namespace CmisSync.Lib.Cmis
         public override List<ChangeSet> GetChangeSets(int count)
         {
             // Not used.
-            Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] GetChangeSets", this.Name));
+            Logger.Info(String.Format("Sync | Cmis Repo [{0}] GetChangeSets", this.Name));
             return new List<ChangeSet>();
         }
 

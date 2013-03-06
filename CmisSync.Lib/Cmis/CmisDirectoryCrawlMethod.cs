@@ -166,7 +166,7 @@ namespace CmisSync.Lib.Cmis
                             // It sometimes happen on IBM P8 CMIS server, not sure why.
                             if (remoteDocumentFileName == null)
                             {
-                                Logger.LogInfo("Sync", "Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
+                                Logger.Info("Sync | Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
                                 continue;
                             }
 
@@ -180,7 +180,7 @@ namespace CmisSync.Lib.Cmis
 
                                 if (lastDatabaseUpdate == null)
                                 {
-                                    Logger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
+                                    Logger.Info("Sync | Downloading file absent from database: " + remoteDocumentFileName);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                                 else
@@ -190,14 +190,14 @@ namespace CmisSync.Lib.Cmis
                                     {
                                         if (database.LocalFileHasChanged(filePath))
                                         {
-                                            Logger.LogInfo("Sync", "Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
+                                            Logger.Info("Sync | Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
                                             // Rename locally modified file.
                                             String ext = Path.GetExtension(filePath);
                                             String filename = Path.GetFileNameWithoutExtension(filePath);
                                             String path = Path.GetDirectoryName(filePath);
 
                                             String NewFileName = SuffixIfExists(filename + "_" + repoinfo.User + "-version");
-                                            String newFilePath = Path.Combine(path,NewFileName);
+                                            String newFilePath = Path.Combine(path, NewFileName);
                                             File.Move(filePath, newFilePath);
 
                                             // Download server version
@@ -210,7 +210,7 @@ namespace CmisSync.Lib.Cmis
                                         }
                                         else
                                         {
-                                            Logger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
+                                            Logger.Info("Sync | Downloading modified file: " + remoteDocumentFileName);
                                             DownloadFile(remoteDocument, localFolder);
                                         }
                                     }
@@ -232,7 +232,7 @@ namespace CmisSync.Lib.Cmis
                                 else
                                 {
                                     // New remote file, download it.
-                                    Logger.LogInfo("Sync", "Downloading new file: " + remoteDocumentFileName);
+                                    Logger.Info("SyncSync | Downloading new file: " + remoteDocumentFileName);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                             }
@@ -263,7 +263,7 @@ namespace CmisSync.Lib.Cmis
                                 // TODO
 
                                 // File has been deleted on server, so delete it locally.
-                                Logger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
+                                Logger.Info("Sync | Removing remotely deleted file: " + filePath);
                                 File.Delete(filePath);
 
                                 // Delete file from database.
@@ -274,7 +274,7 @@ namespace CmisSync.Lib.Cmis
                                 if (BIDIRECTIONAL)
                                 {
                                     // New file, sync up.
-                                    Logger.LogInfo("Sync", "Uploading file absent on repository: " + filePath);
+                                    Logger.Info("Sync | Uploading file absent on repository: " + filePath);
                                     UploadFile(filePath, remoteFolder);
                                 }
                             }
@@ -287,7 +287,7 @@ namespace CmisSync.Lib.Cmis
                                 if (BIDIRECTIONAL)
                                 {
                                     // Upload new version of file content.
-                                    Logger.LogInfo("Sync", "Uploading file update on repository: " + filePath);
+                                    Logger.Info("Sync | Uploading file update on repository: " + filePath);
                                     UpdateFile(filePath, remoteFolder);
                                 }
                             }
@@ -357,7 +357,7 @@ namespace CmisSync.Lib.Cmis
             {
                 if (syncing)
                 {
-                    Logger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", repoinfo.TargetDirectory));
+                    Logger.Info(String.Format("Sync | [{0}] - sync is already running in background.", repoinfo.TargetDirectory));
                     return;
                 }
                 syncing = true;
@@ -366,7 +366,7 @@ namespace CmisSync.Lib.Cmis
                 bw.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
-                        Logger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
+                        Logger.Info(String.Format("Sync | [{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
 #if !DEBUG
                         try
                         {
@@ -376,9 +376,9 @@ namespace CmisSync.Lib.Cmis
                         }
                         catch (CmisBaseException e)
                         {
-                            Logger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
-                            Logger.LogInfo("Sync", e.StackTrace);
-                            Logger.LogInfo("Sync", e.ErrorContent);
+                            Logger.Fatal("Sync | CMIS exception while syncing:" + e.Message);
+                            Logger.Fatal("Sync | " + e.StackTrace);
+                            Logger.Fatal("Sync | " + e.ErrorContent);
                         }
 #endif
                     }

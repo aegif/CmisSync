@@ -21,6 +21,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using log4net;
 
 using Timers = System.Timers;
 
@@ -38,6 +39,7 @@ namespace CmisSync.Lib
 
     public abstract class RepoBase
     {
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(RepoBase));
 
         public abstract string CurrentRevision { get; }
         public abstract double Size { get; }
@@ -104,7 +106,7 @@ namespace CmisSync.Lib
                     // File.WriteAllText (id_path, this.identifier);
                     // File.SetAttributes (id_path, FileAttributes.Hidden);
 
-                    Logger.LogInfo("Local", Name + " | Assigned identifier: " + this.identifier);
+                    Logger.Info("Local | " + Name + " | Assigned identifier: " + this.identifier);
 
                     return this.identifier;
                 }
@@ -234,7 +236,7 @@ namespace CmisSync.Lib
             IsBuffering = true;
             this.watcher.Disable();
 
-            Logger.LogInfo("Local", Name + " | Activity detected, waiting for it to settle...");
+            Logger.Info("Local | " + Name + " | Activity detected, waiting for it to settle...");
 
             List<double> size_buffer = new List<double>();
 
@@ -252,7 +254,7 @@ namespace CmisSync.Lib
                     size_buffer[2].Equals(size_buffer[3]))
                 {
 
-                    Logger.LogInfo("Local", Name + " | Activity has settled");
+                    Logger.Info("Local | " + Name + " | Activity has settled");
                     IsBuffering = false;
 
                     if (HasLocalChanges)
@@ -308,14 +310,14 @@ namespace CmisSync.Lib
         {
             this.watcher.Disable();
 
-            Logger.LogInfo("SyncUp", Name + " | Initiated");
+            Logger.Info("SyncUp | " + Name + " | Initiated");
             HasUnsyncedChanges = true;
 
             SyncStatusChanged(SyncStatus.SyncUp);
 
             if (SyncUp())
             {
-                Logger.LogInfo("SyncUp", Name + " | Done");
+                Logger.Info("SyncUp | " + Name + " | Done");
                 ChangeSets = GetChangeSets();
 
                 HasUnsyncedChanges = false;
@@ -326,7 +328,7 @@ namespace CmisSync.Lib
             }
             else
             {
-                Logger.LogInfo("SyncUp", Name + " | Error");
+                Logger.Info("SyncUp | " + Name + " | Error");
                 SyncDownBase();
 
                 this.watcher.Disable();
@@ -357,14 +359,14 @@ namespace CmisSync.Lib
         {
             this.watcher.Disable();
 
-            Logger.LogInfo("SyncDown", Name + " | Initiated");
+            Logger.Info("SyncDown | " + Name + " | Initiated");
 
             SyncStatusChanged(SyncStatus.SyncDown);
             string pre_sync_revision = CurrentRevision;
 
             if (SyncDown())
             {
-                Logger.LogInfo("SyncDown", Name + " | Done");
+                Logger.Info("SyncDown | " + Name + " | Done");
                 ServerOnline = true;
 
                 ChangeSets = GetChangeSets();
@@ -402,7 +404,7 @@ namespace CmisSync.Lib
             }
             else
             {
-                Logger.LogInfo("SyncDown", Name + " | Error");
+                Logger.Info("SyncDown | " + Name + " | Error");
                 ServerOnline = false;
 
                 ChangeSets = GetChangeSets();
@@ -468,7 +470,7 @@ namespace CmisSync.Lib
         private void ListenerDisconnectedDelegate()
         {
             this.poll_interval = PollInterval.Short;
-            Logger.LogInfo(Name, "Falling back to polling");
+            Logger.Info(Name + "Falling back to polling");
         }
 
 
@@ -484,14 +486,14 @@ namespace CmisSync.Lib
                 while (this.is_syncing)
                     Thread.Sleep(100);
 
-                Logger.LogInfo("Listener", "Syncing due to announcement");
+                Logger.Info("Listener | Syncing due to announcement");
                 SyncDownBase();
 
             }
             else
             {
                 if (announcement.FolderIdentifier.Equals(identifier))
-                    Logger.LogInfo("Listener", "Not syncing, message is for current revision");
+                    Logger.Info("Listener |  Not syncing, message is for current revision");
             }
         }
 

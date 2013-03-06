@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using log4net;
 
 namespace CmisSync.Lib
 {
@@ -24,7 +25,7 @@ namespace CmisSync.Lib
     public static class ListenerFactory {
 
         private static List<ListenerBase> listeners = new List<ListenerBase> ();
-
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ListenerFactory));
 
         public static ListenerBase CreateListener (string folder_name, string folder_identifier)
         {
@@ -49,7 +50,7 @@ namespace CmisSync.Lib
             // the number of connections as low as possible
             foreach (ListenerBase listener in listeners) {
                 if (listener.Server.Equals (announce_uri)) {
-                    Logger.LogInfo ("ListenerFactory", "Refered to existing listener for " + announce_uri);
+                    Logger.Info("ListenerFactory | Refered to existing listener for " + announce_uri);
 
                     // We already seem to have a listener for this server,
                     // refer to the existing one instead
@@ -59,7 +60,7 @@ namespace CmisSync.Lib
             }
 
             listeners.Add (new ListenerTcp (announce_uri, folder_identifier));
-            Logger.LogInfo ("ListenerFactory", "Issued new listener for " + announce_uri);
+            Logger.Info ("ListenerFactory | Issued new listener for " + announce_uri);
 
             return (ListenerBase) listeners [listeners.Count - 1];
         }

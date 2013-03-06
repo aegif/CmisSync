@@ -6,6 +6,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
+using log4net;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -15,6 +16,8 @@ namespace CmisSync.Lib.Cmis
      */
     public class CmisDatabase
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FetcherBase));
+
         /**
          * Name of the SQLite database file.
          */
@@ -51,7 +54,7 @@ namespace CmisSync.Lib.Cmis
         {
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
-                Logger.LogInfo("Database", "Checking whether database exists");
+                Logger.Info("Database | Checking whether database exists");
                 bool createDatabase = !File.Exists(databaseFileName);
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
@@ -78,7 +81,7 @@ namespace CmisSync.Lib.Cmis
                                 key TEXT PRIMARY KEY,
                                 value TEXT);";    /* Other data such as ChangeLog token */
                         command.ExecuteNonQuery();
-                        Logger.LogInfo("Database", "Database created");
+                        Logger.Info("Database | Database created");
                     }
                 }
             }
@@ -161,7 +164,7 @@ namespace CmisSync.Lib.Cmis
         public void AddFile(string path, DateTime? serverSideModificationDate,
             Dictionary<string, string> metadata)
         {
-            Logger.LogInfo("CmisDatabase", "Start adding data in db for: " + path);
+            Logger.Info("CmisDatabase | Start adding data in db for: " + path);
             string normalizedPath = Normalize(path);
             string checksum = String.Empty;
             try
@@ -170,14 +173,14 @@ namespace CmisSync.Lib.Cmis
             }
             catch (IOException e)
             {
-                Logger.LogInfo("CmisDatabase", "IOException while reading file checksum during addition: " + path);
+                Logger.Fatal("CmisDatabase | IOException while reading file checksum during addition: " + path);
                 // The file was removed while reading. Just skip it, as it does not need to be added anymore.
                 return;
             }
 
             if (String.IsNullOrEmpty(checksum))
             {
-                Logger.LogInfo("CmisDatabase", "Bad checksum for " + path);
+                Logger.Warn("CmisDatabase | Bad checksum for " + path);
                 return;
             }
 
@@ -199,10 +202,10 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Fatal("CmisDatabase | " + e.Message);
                 }
             }
-            Logger.LogInfo("CmisDatabase", "Adding data in db for: " + path + " finished");
+            Logger.Info("CmisDatabase | Adding data in db for: " + path + " finished");
         }
 
 
@@ -223,7 +226,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Info("CmisDatabase | " + e.Message);
                 }
             }
         }
@@ -244,7 +247,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Fatal("CmisDatabase | " + e.Message);
                 }
             }
         }
@@ -266,7 +269,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Info("CmisDatabase | " + e.Message);
                 }
             }
 
@@ -281,7 +284,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Info("CmisDatabase | " + e.Message);
                 }
             }
 
@@ -296,7 +299,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Fatal("CmisDatabase | " + e.Message);
                 }
             }
         }
@@ -318,7 +321,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Info("CmisDatabase | " + e.Message);
                     return null;
                 }
             }
@@ -343,7 +346,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Fatal("CmisDatabase | " + e.Message);
                 }
             }
         }
@@ -393,7 +396,7 @@ namespace CmisSync.Lib.Cmis
             }
             catch (IOException e)
             {
-                Logger.LogInfo("CmisDatabase", "IOException while reading file checksum: " + path);
+                Logger.Fatal("CmisDatabase | IOException while reading file checksum: " + path);
                 return true;
             }
 

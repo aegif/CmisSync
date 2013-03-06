@@ -38,7 +38,7 @@ namespace CmisSync.Lib.Cmis
         public Fetcher(RepoInfo repoInfo, ActivityListener activityListener)
             : base(repoInfo)
         {
-            Logger.LogInfo("Fetcher", "Cmis Fetcher constructor");
+            Logger.Info("Fetcher | Cmis Fetcher constructor");
             TargetFolder = repoInfo.TargetDirectory;
             RemoteUrl = repoInfo.Address;
 
@@ -47,19 +47,19 @@ namespace CmisSync.Lib.Cmis
 
             if (!Directory.Exists(Config.DefaultConfig.FoldersPath))
             {
-                Logger.LogInfo("Fecther", String.Format("ERROR - Cmis Default Folder {0} do not exist", Config.DefaultConfig.FoldersPath));
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} do not exist", Config.DefaultConfig.FoldersPath));
                 throw new DirectoryNotFoundException("Root folder don't exist !");
             }
 
             if (!Folder.HasWritePermissionOnDir(Config.DefaultConfig.FoldersPath))
             {
-                Logger.LogInfo("Fetcher", String.Format("ERROR - Cmis Default Folder {0} is not writable", Config.DefaultConfig.FoldersPath));
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", Config.DefaultConfig.FoldersPath));
                 throw new UnauthorizedAccessException("Root folder is not writable!");
             }
 
             if (Directory.Exists(repoInfo.TargetDirectory))
             {
-                Logger.LogInfo("Fetcher", String.Format("ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
                 throw new UnauthorizedAccessException("Repository folder already exist!");
             }
 
@@ -74,7 +74,7 @@ namespace CmisSync.Lib.Cmis
 
         public override bool Fetch()
         {
-            Logger.LogInfo("Fetcher", "Cmis Fetcher Fetch");
+            Logger.Info("Fetcher | Cmis Fetcher Fetch");
             //double percentage = 1.0;
             //Regex progress_regex = new Regex(@"([0-9]+)%", RegexOptions.Compiled);
             //DateTime last_change = DateTime.Now;
@@ -89,7 +89,7 @@ namespace CmisSync.Lib.Cmis
         {
             get
             {
-                Logger.LogInfo("Fetcher", "Cmis Fetcher IsFetchedRepoEmpty");
+                Logger.Info("Fetcher | Cmis Fetcher IsFetchedRepoEmpty");
                 return false; // TODO
             }
         }
@@ -97,34 +97,34 @@ namespace CmisSync.Lib.Cmis
 
         public override void EnableFetchedRepoCrypto(string password)
         {
-            Logger.LogInfo("Fetcher", "Cmis Fetcher EnableFetchedRepoCrypto");
+            Logger.Info("Fetcher | Cmis Fetcher EnableFetchedRepoCrypto");
             // TODO
         }
 
 
         public override bool IsFetchedRepoPasswordCorrect(string password)
         {
-            Logger.LogInfo("Fetcher", "Cmis Fetcher IsFetchedRepoPasswordCorrect");
+            Logger.Info("Fetcher | Cmis Fetcher IsFetchedRepoPasswordCorrect");
             return true; // TODO
         }
 
 
         public override void Stop()
         {
-            Logger.LogInfo("Fetcher", "Cmis Fetcher Stop");
+            Logger.Info("Fetcher | Cmis Fetcher Stop");
         }
 
 
         public override void Complete()
         {
-            Logger.LogInfo("Fetcher", "Cmis Fetcher Complete");
+            Logger.Info("Fetcher | Cmis Fetcher Complete");
             // base.Complete();
         }
 
 
         private void InstallConfiguration()
         {
-            Logger.LogInfo("Fetcher", "Cmis Fetcher InstallConfiguration");
+            Logger.Info("Fetcher | Cmis Fetcher InstallConfiguration");
         }
 
     }

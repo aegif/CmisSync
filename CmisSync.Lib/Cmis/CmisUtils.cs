@@ -6,6 +6,7 @@ using DotCMIS.Client;
 using DotCMIS.Client.Impl;
 using DotCMIS;
 using DotCMIS.Exceptions;
+using log4net;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -22,6 +23,8 @@ namespace CmisSync.Lib.Cmis
 
     public class CmisUtils
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
+
         /**
          * Try to find the CMIS server associated to any URL.
          * Users can provide the URL of the web interface, and we have to return the CMIS URL
@@ -57,7 +60,7 @@ namespace CmisSync.Lib.Cmis
             for (int i=0; i < suffixes.Length; i++)
             {
                 string fuzzyUrl = prefix + suffixes[i];
-                Logger.LogInfo("Sync", "Trying with " + fuzzyUrl);
+                Logger.Info("Sync | Trying with " + fuzzyUrl);
                 repositories = GetRepositories(fuzzyUrl, user, password);
                 if (repositories != null)
                     return new CmisServer(fuzzyUrl, repositories);
@@ -134,8 +137,8 @@ namespace CmisSync.Lib.Cmis
             ISession session = factory.CreateSession(cmisParameters);
 
             IFolder folder = (IFolder)session.GetObjectByPath(path);
-            
-            Logger.LogInfo("Sync", "folder.Properties.Count:" + folder.Properties.Count);
+
+            Logger.Info("Sync | folder.Properties.Count:" + folder.Properties.Count);
             IItemEnumerable<ICmisObject> children = folder.GetChildren();
             foreach (var subfolder in children.OfType<IFolder>())
             {

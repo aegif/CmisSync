@@ -18,168 +18,189 @@
 using System;
 using System.Collections.Generic;
 using System.Timers;
+using log4net;
 
 namespace CmisSync.Lib
 {
 
     // A persistent connection to the server that
     // listens for change notifications
-    public abstract class ListenerBase {
+    public abstract class ListenerBase
+    {
+
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(ListenerBase));
 
         public event Action Connected = delegate { };
         public event Action Disconnected = delegate { };
 
         public event AnnouncementReceivedEventHandler AnnouncementReceived = delegate { };
-        public delegate void AnnouncementReceivedEventHandler (Announcement announcement);
+        public delegate void AnnouncementReceivedEventHandler(Announcement announcement);
 
         public readonly Uri Server;
 
-        public abstract void Connect ();
+        public abstract void Connect();
         public abstract bool IsConnected { get; }
         public abstract bool IsConnecting { get; }
 
 
-        protected abstract void AnnounceInternal (Announcement announcent);
-        protected abstract void AlsoListenToInternal (string folder_identifier);
+        protected abstract void AnnounceInternal(Announcement announcent);
+        protected abstract void AlsoListenToInternal(string folder_identifier);
 
-        protected List<string> channels = new List<string> ();
+        protected List<string> channels = new List<string>();
 
 
         private int max_recent_announcements = 10;
 
         private Dictionary<string, List<Announcement>> recent_announcements =
-            new Dictionary<string, List<Announcement>> ();
+            new Dictionary<string, List<Announcement>>();
 
-        private Dictionary<string, Announcement> queue_up   = new Dictionary<string, Announcement> ();
-        private Dictionary<string, Announcement> queue_down = new Dictionary<string, Announcement> ();
+        private Dictionary<string, Announcement> queue_up = new Dictionary<string, Announcement>();
+        private Dictionary<string, Announcement> queue_down = new Dictionary<string, Announcement>();
 
-        private Timer reconnect_timer = new Timer {
+        private Timer reconnect_timer = new Timer
+        {
             Interval = 60 * 1000,
             Enabled = true
         };
 
 
-        public ListenerBase (Uri server, string folder_identifier)
+        public ListenerBase(Uri server, string folder_identifier)
         {
             Server = server;
-            this.channels.Add (folder_identifier);
+            this.channels.Add(folder_identifier);
 
-            this.reconnect_timer.Elapsed += delegate {
+            this.reconnect_timer.Elapsed += delegate
+            {
                 if (!IsConnected && !IsConnecting)
-                    Reconnect ();
+                    Reconnect();
             };
 
-            this.reconnect_timer.Start ();
+            this.reconnect_timer.Start();
         }
 
 
-        public void Announce (Announcement announcement)
+        public void Announce(Announcement announcement)
         {
-            if (!IsRecentAnnouncement (announcement)) {
-                if (IsConnected) {
-                    Logger.LogInfo ("Listener", "Announcing message " + announcement.Message +
+            if (!IsRecentAnnouncement(announcement))
+            {
+                if (IsConnected)
+                {
+                    Logger.Info("Listener | Announcing message " + announcement.Message +
                         " to " + announcement.FolderIdentifier + " on " + Server);
 
-                    AnnounceInternal (announcement);
-                    AddRecentAnnouncement (announcement);
+                    AnnounceInternal(announcement);
+                    AddRecentAnnouncement(announcement);
 
-                } else {
-                    Logger.LogInfo ("Listener", "Can't send message to " + Server + ". Queuing message");
-                    this.queue_up [announcement.FolderIdentifier] = announcement;
+                }
+                else
+                {
+                    Logger.Info("Listener | Can't send message to " + Server + ". Queuing message");
+                    this.queue_up[announcement.FolderIdentifier] = announcement;
                 }
 
-            } else {
-                Logger.LogInfo ("Listener", "Already processed message " + announcement.Message +
+            }
+            else
+            {
+                Logger.Info("Listener | Already processed message " + announcement.Message +
                     " to " + announcement.FolderIdentifier + " from " + Server);
             }
         }
 
 
-        public void AlsoListenTo (string channel)
+        public void AlsoListenTo(string channel)
         {
-            if (!this.channels.Contains (channel))
-                this.channels.Add (channel);
+            if (!this.channels.Contains(channel))
+                this.channels.Add(channel);
 
-            if (IsConnected) {
-                Logger.LogInfo ("Listener", "Subscribing to channel " + channel + " on " + Server);
-                AlsoListenToInternal (channel);
+            if (IsConnected)
+            {
+                Logger.Info("Listener | Subscribing to channel " + channel + " on " + Server);
+                AlsoListenToInternal(channel);
             }
         }
 
 
-        public void Reconnect ()
+        public void Reconnect()
         {
-            Logger.LogInfo ("Listener", "Trying to reconnect to " + Server);
-            Connect ();
+            Logger.Info("Listener | Trying to reconnect to " + Server);
+            Connect();
         }
 
 
-        public void OnConnected ()
+        public void OnConnected()
         {
-            foreach (string channel in this.channels.GetRange (0, this.channels.Count)) {
-                Logger.LogInfo ("Listener", "Subscribing to channel " + channel + " on " + Server);
-                AlsoListenToInternal (channel);
+            foreach (string channel in this.channels.GetRange(0, this.channels.Count))
+            {
+                Logger.Info("Listener | Subscribing to channel " + channel + " on " + Server);
+                AlsoListenToInternal(channel);
             }
 
-            Logger.LogInfo ("Listener", "Listening for announcements on " + Server);
-            Connected ();
+            Logger.Info("Listener | Listening for announcements on " + Server);
+            Connected();
 
-            if (this.queue_up.Count > 0) {
-                Logger.LogInfo ("Listener", "Delivering " + this.queue_up.Count + " queued messages...");
+            if (this.queue_up.Count > 0)
+            {
+                Logger.Info("Listener | Delivering " + this.queue_up.Count + " queued messages...");
 
-                foreach (KeyValuePair<string, Announcement> item in this.queue_up) {
+                foreach (KeyValuePair<string, Announcement> item in this.queue_up)
+                {
                     Announcement announcement = item.Value;
-                    Announce (announcement);
+                    Announce(announcement);
                 }
 
-                this.queue_down.Clear ();
+                this.queue_down.Clear();
             }
         }
 
 
-        public void OnDisconnected (string message)
+        public void OnDisconnected(string message)
         {
-            Logger.LogInfo ("Listener", "Disconnected from " + Server + ": " + message);
-            Disconnected ();
+            Logger.Info("Listener | Disconnected from " + Server + ": " + message);
+            Disconnected();
         }
 
 
-        public void OnAnnouncement (Announcement announcement)
+        public void OnAnnouncement(Announcement announcement)
         {
-            Logger.LogInfo ("Listener", "Got message " + announcement.Message + " from " +
+            Logger.Info("Listener | Got message " + announcement.Message + " from " +
                 announcement.FolderIdentifier + " on " + Server);
 
-            if (IsRecentAnnouncement (announcement)) {
-                Logger.LogInfo ("Listener", "Ignoring previously processed message " + announcement.Message +
+            if (IsRecentAnnouncement(announcement))
+            {
+                Logger.Info("Listener | Ignoring previously processed message " + announcement.Message +
                     " from " + announcement.FolderIdentifier + " on " + Server);
-                
-                  return;
+
+                return;
             }
 
-            Logger.LogInfo ("Listener", "Processing message " + announcement.Message + " from " +
+            Logger.Info("Listener | Processing message " + announcement.Message + " from " +
                 announcement.FolderIdentifier + " on " + Server);
 
-            AddRecentAnnouncement (announcement);
-            this.queue_down [announcement.FolderIdentifier] = announcement;
+            AddRecentAnnouncement(announcement);
+            this.queue_down[announcement.FolderIdentifier] = announcement;
 
-            AnnouncementReceived (announcement);
+            AnnouncementReceived(announcement);
         }
 
 
-        public virtual void Dispose ()
+        public virtual void Dispose()
         {
-            this.reconnect_timer.Dispose ();
+            this.reconnect_timer.Dispose();
         }
 
 
-        private bool IsRecentAnnouncement (Announcement announcement)
+        private bool IsRecentAnnouncement(Announcement announcement)
         {
-            if (!this.recent_announcements.ContainsKey (announcement.FolderIdentifier)) {
+            if (!this.recent_announcements.ContainsKey(announcement.FolderIdentifier))
+            {
                 return false;
 
-            } else {
-                foreach (Announcement recent_announcement in GetRecentAnnouncements (announcement.FolderIdentifier)) {
-                    if (recent_announcement.Message.Equals (recent_announcement.Message))
+            }
+            else
+            {
+                foreach (Announcement recent_announcement in GetRecentAnnouncements(announcement.FolderIdentifier))
+                {
+                    if (recent_announcement.Message.Equals(recent_announcement.Message))
                         return true;
                 }
 
@@ -188,25 +209,25 @@ namespace CmisSync.Lib
         }
 
 
-        private List<Announcement> GetRecentAnnouncements (string folder_identifier)
+        private List<Announcement> GetRecentAnnouncements(string folder_identifier)
         {
-            if (!this.recent_announcements.ContainsKey (folder_identifier))
-                this.recent_announcements [folder_identifier] = new List<Announcement> ();
+            if (!this.recent_announcements.ContainsKey(folder_identifier))
+                this.recent_announcements[folder_identifier] = new List<Announcement>();
 
-            return this.recent_announcements [folder_identifier];
+            return this.recent_announcements[folder_identifier];
         }
 
 
-        private void AddRecentAnnouncement (Announcement announcement)
+        private void AddRecentAnnouncement(Announcement announcement)
         {
             List<Announcement> recent_announcements =
-                GetRecentAnnouncements (announcement.FolderIdentifier);
+                GetRecentAnnouncements(announcement.FolderIdentifier);
 
-            if (!IsRecentAnnouncement (announcement))
-                recent_announcements.Add (announcement);
+            if (!IsRecentAnnouncement(announcement))
+                recent_announcements.Add(announcement);
 
             if (recent_announcements.Count > this.max_recent_announcements)
-                recent_announcements.RemoveRange (0, recent_announcements.Count - this.max_recent_announcements);
+                recent_announcements.RemoveRange(0, recent_announcements.Count - this.max_recent_announcements);
         }
     }
 }

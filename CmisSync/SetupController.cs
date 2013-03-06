@@ -23,6 +23,7 @@ using System.Threading;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
+using log4net;
 
 namespace CmisSync
 {
@@ -52,6 +53,7 @@ namespace CmisSync
 
     public class SetupController
     {
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(SetupController));
 
         public event Action ShowWindowEvent = delegate { };
         public event Action HideWindowEvent = delegate { };
@@ -480,7 +482,7 @@ namespace CmisSync
             }
             catch (Exception ex)
             {
-                Logger.LogInfo("Fetcher", ex.ToString());
+                Logger.Fatal("Fetcher | " + ex.ToString());
                 System.Windows.Forms.MessageBox.Show("An error occur during first sync, see debug log for details!");
             }
 
@@ -514,13 +516,13 @@ namespace CmisSync
                     if (new_plugin != null)
                     {
                         Plugins.Insert(1, new_plugin);
-                        Logger.LogInfo("Controller", "Added plugin for " + uri.Host);
+                        Logger.Info("Controller | Added plugin for " + uri.Host);
                     }
 
                 }
                 catch
                 {
-                    Logger.LogInfo("Controller", "Failed adding plugin for " + uri.Host);
+                    Logger.Info("Controller | Failed adding plugin for " + uri.Host);
                 }
             }
 
