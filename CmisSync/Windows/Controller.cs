@@ -200,69 +200,8 @@ namespace CmisSync
 
         public override void Quit()
         {
-            StopSSH();
             base.Quit();
         }
 
-
-        private void StartSSH()
-        {
-            string auth_sock = Environment.GetEnvironmentVariable("SSH_AUTH_SOCK");
-
-            if (!string.IsNullOrEmpty(auth_sock))
-            {
-                Logger.LogInfo("Controller", "Using existing ssh-agent with PID=" + this.ssh_agent_pid);
-                return;
-            }
-
-            Process process = new Process();
-            process.StartInfo.FileName = "ssh-agent";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.CreateNoWindow = true;
-
-            process.Start();
-
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            Match auth_sock_match = new Regex(@"SSH_AUTH_SOCK=([^;\n\r]*)").Match(output);
-            Match ssh_pid_match = new Regex(@"SSH_AGENT_PID=([^;\n\r]*)").Match(output);
-
-            if (auth_sock_match.Success)
-                Environment.SetEnvironmentVariable("SSH_AUTH_SOCK", auth_sock_match.Groups[1].Value);
-
-            if (ssh_pid_match.Success)
-            {
-                string ssh_pid = ssh_pid_match.Groups[1].Value;
-
-                Int32.TryParse(ssh_pid, out this.ssh_agent_pid);
-                Environment.SetEnvironmentVariable("SSH_AGENT_PID", ssh_pid);
-
-                Logger.LogInfo("Controller", "ssh-agent started, PID=" + ssh_pid);
-
-            }
-            else
-            {
-                Logger.LogInfo("Controller", "ssh-agent started, PID=Unknown");
-            }
-        }
-
-
-        private void StopSSH()
-        {
-            if (this.ssh_agent_pid == 0)
-                return;
-
-            try
-            {
-                Process.GetProcessById(this.ssh_agent_pid).Kill();
-
-            }
-            catch (ArgumentException e)
-            {
-                Logger.LogInfo("SSH", "Could not stop ssh-agent: " + e.Message);
-            }
-        }
     }
 }
