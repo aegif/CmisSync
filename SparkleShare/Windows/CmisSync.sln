@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleShare", "SparkleShare.csproj", "{728483AA-E34B-4441-BF2C-C8BC2901E4E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync", "CmisSync.csproj", "{728483AA-E34B-4441-BF2C-C8BC2901E4E0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2} = {1DB5492D-B897-4A5E-8DD7-175EC65F52F2}
 		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE} = {009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleShareInviteOpener", "SparkleShareInviteOpener\SparkleShareInviteOpener.csproj", "{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InviteOpener", "SparkleShareInviteOpener\InviteOpener.csproj", "{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleLib", "..\..\SparkleLib\SparkleLib.csproj", "{2C914413-B31C-4362-93C7-1AE34F09112A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib", "..\..\SparkleLib\Lib.csproj", "{2C914413-B31C-4362-93C7-1AE34F09112A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparkleLib.Cmis", "..\..\SparkleLib\Cmis\SparkleLib.Cmis.csproj", "{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Cmis", "..\..\SparkleLib\Cmis\Lib.Cmis.csproj", "{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLibrary", "..\TestLibrary\TestLibrary.csproj", "{295D2B18-B6EB-4EF4-9862-4E3C0C383888}"
 EndProject
