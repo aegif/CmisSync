@@ -42,7 +42,7 @@ namespace CmisSync.Lib.Cmis
             this.databaseFileName = dataPath;
             // pathPrefixSize = dataPath.Length + 1; // +1 for the slash
             // pathPrefixSize = Folder.ROOT_FOLDER.Length + 1;
-            pathPrefixSize = Config.DefaultConfig.FoldersPath.Length + 1;
+            pathPrefixSize = ConfigManager.CurrentConfig.FoldersPath.Length + 1;
         }
 
 

@@ -289,7 +289,7 @@ namespace CmisSync.Lib
 
             Process process = new Process();
             process.StartInfo.FileName = "ssh-keyscan";
-            process.StartInfo.WorkingDirectory = Config.DefaultConfig.TmpPath;
+            process.StartInfo.WorkingDirectory = ConfigManager.CurrentConfig.TmpPath;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.CreateNoWindow = true;
@@ -341,7 +341,7 @@ namespace CmisSync.Lib
 
         private void AcceptHostKey(string host_key, bool warn)
         {
-            string ssh_config_path = Path.Combine(Config.DefaultConfig.HomePath, ".ssh");
+            string ssh_config_path = Path.Combine(ConfigManager.CurrentConfig.HomePath, ".ssh");
             string known_hosts_file_path = Path.Combine(ssh_config_path, "known_hosts");
 
             if (!File.Exists(known_hosts_file_path))

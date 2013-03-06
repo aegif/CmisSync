@@ -89,7 +89,7 @@ namespace CmisSync
         {
             get
             {
-                return this.config.User.Email.Equals("Unknown");
+                return ConfigManager.CurrentConfig.User.Email.Equals("Unknown");
             }
         }
 
@@ -97,7 +97,7 @@ namespace CmisSync
         {
             get
             {
-                List<string> folders = this.config.Folders;
+                List<string> folders = ConfigManager.CurrentConfig.Folders;
                 folders.Sort();
 
                 return folders;
@@ -124,12 +124,12 @@ namespace CmisSync
         {
             get
             {
-                return this.config.User;
+                return ConfigManager.CurrentConfig.User;
             }
 
             set
             {
-                this.config.User = value;
+                ConfigManager.CurrentConfig.User = value;
             }
         }
 
@@ -137,11 +137,11 @@ namespace CmisSync
         {
             get
             {
-                string notifications_enabled = this.config.GetConfigOption("notifications");
+                string notifications_enabled = ConfigManager.CurrentConfig.GetConfigOption("notifications");
 
                 if (string.IsNullOrEmpty(notifications_enabled))
                 {
-                    this.config.SetConfigOption("notifications", bool.TrueString);
+                    ConfigManager.CurrentConfig.SetConfigOption("notifications", bool.TrueString);
                     return true;
 
                 }
@@ -181,7 +181,6 @@ namespace CmisSync
 
 
         private ActivityListener activityListenerAggregator;
-        private Config config;
         private Fetcher fetcher;
         private FileSystemWatcher watcher;
         private Object repo_lock = new Object();
@@ -191,8 +190,7 @@ namespace CmisSync
         public ControllerBase()
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
-
-            FoldersPath = this.config.FoldersPath;
+            FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
         }
 
 
@@ -207,7 +205,7 @@ namespace CmisSync
 
             if (FirstRun)
             {
-                this.config.SetConfigOption("notifications", bool.TrueString);
+                ConfigManager.CurrentConfig.SetConfigOption("notifications", bool.TrueString);
 
             }
             else
@@ -289,7 +287,7 @@ namespace CmisSync
             //        new object [] { folder_path, this.config }
             //);
 
-            RepoInfo repositoryInfo = config.GetRepoInfo(folder_name);
+            RepoInfo repositoryInfo = ConfigManager.CurrentConfig.GetRepoInfo(folder_name);
             repo = new CmisSync.Lib.Cmis.CmisRepo(repositoryInfo, activityListenerAggregator);
 
             //} catch (Exception e) {
@@ -368,7 +366,7 @@ namespace CmisSync
 
         private void RemoveCmisDatabase(string folder_path)
         {
-            string databasefile = Path.Combine(this.config.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
+            string databasefile = Path.Combine(ConfigManager.CurrentConfig.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
             if (File.Exists(databasefile)) File.Delete(databasefile);
         }
 
@@ -376,7 +374,7 @@ namespace CmisSync
         {
             lock (this.check_repos_lock)
             {
-                string path = this.config.FoldersPath;
+                string path = ConfigManager.CurrentConfig.FoldersPath;
 
                 foreach (string folder_path in Directory.GetDirectories(path))
                 {
@@ -385,7 +383,7 @@ namespace CmisSync
                     if (folder_name.Equals(".tmp"))
                         continue;
 
-                    if (this.config.GetIdentifierForFolder(folder_name) == null)
+                    if (ConfigManager.CurrentConfig.GetIdentifierForFolder(folder_name) == null)
                     {
                         string identifier_file_path = Path.Combine(folder_path, ".CmisSync");
 
@@ -394,10 +392,10 @@ namespace CmisSync
 
                         string identifier = File.ReadAllText(identifier_file_path).Trim();
 
-                        if (this.config.IdentifierExists(identifier))
+                        if (ConfigManager.CurrentConfig.IdentifierExists(identifier))
                         {
                             RemoveRepository(folder_path);
-                            this.config.RenameFolder(identifier, folder_name);
+                            ConfigManager.CurrentConfig.RenameFolder(identifier, folder_name);
 
                             string new_folder_path = Path.Combine(path, folder_name);
                             AddRepository(new_folder_path);
@@ -407,14 +405,14 @@ namespace CmisSync
                     }
                 }
 
-                foreach (string folder_name in this.config.Folders)
+                foreach (string folder_name in ConfigManager.CurrentConfig.Folders)
                 {
                     string folder_path = new Folder(folder_name).FullPath;
 
                     if (!Directory.Exists(folder_path))
                     {
                         RemoveRepository(folder_path);
-                        this.config.RemoveFolder(folder_name);
+                        ConfigManager.CurrentConfig.RemoveFolder(folder_name);
 
                         Logger.Info("Controller | Removed folder '" + folder_name + "' from config");
 
@@ -545,7 +543,7 @@ namespace CmisSync
             if (announcements_url != null)
                 announcements_url = announcements_url.Trim();
 
-            string tmp_path = this.config.TmpPath;
+            string tmp_path = ConfigManager.CurrentConfig.TmpPath;
 
             //if (!Directory.Exists (tmp_path)) {
             //    Directory.CreateDirectory (tmp_path);
@@ -560,7 +558,7 @@ namespace CmisSync
             //fetcher = new CmisSync.Lib.Cmis.Fetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
             //    fetch_prior_history, canonical_name, repository, path, user, password, activityListenerAggregator);
 
-            repoInfo = new RepoInfo(local_path, this.config.ConfigPath);
+            repoInfo = new RepoInfo(local_path, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = new Uri(address);
             repoInfo.Fingerprint = required_fingerprint;
             repoInfo.RemotePath = remote_path;
@@ -568,7 +566,7 @@ namespace CmisSync
             repoInfo.RepoID = repository;
             repoInfo.User = user;
             repoInfo.Password = CmisCrypto.Protect(password);
-            repoInfo.TargetDirectory = Path.Combine(this.config.FoldersPath, local_path);
+            repoInfo.TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, local_path);
 
             fetcher = new CmisSync.Lib.Cmis.Fetcher(repoInfo, activityListenerAggregator);
 
@@ -694,7 +692,7 @@ namespace CmisSync
             //this.config.AddFolder(fetcher.CanonicalName, this.fetcher.Identifier,
             //    this.fetcher.RemoteUrl.ToString(), backend,
             //    this.fetcher.Repository, this.fetcher.RemoteFolder, this.fetcher.User, this.fetcher.Password);
-            this.config.AddFolder(repoInfo);
+            ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
             FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.Warnings.ToArray());
 
@@ -741,7 +739,7 @@ namespace CmisSync
 
         public void OpenCmisSyncFolder()
         {
-            OpenFolder(this.config.FoldersPath);
+            OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
         }
 
 
@@ -753,14 +751,14 @@ namespace CmisSync
 
         public void ToggleNotifications()
         {
-            bool notifications_enabled = this.config.GetConfigOption("notifications").Equals(bool.TrueString);
-            this.config.SetConfigOption("notifications", (!notifications_enabled).ToString());
+            bool notifications_enabled = ConfigManager.CurrentConfig.GetConfigOption("notifications").Equals(bool.TrueString);
+            ConfigManager.CurrentConfig.SetConfigOption("notifications", (!notifications_enabled).ToString());
         }
 
 
         public string GetAvatar(string email, int size)
         {
-            string fetch_avatars_option = this.config.GetConfigOption("fetch_avatars");
+            string fetch_avatars_option = ConfigManager.CurrentConfig.GetConfigOption("fetch_avatars");
 
             if (fetch_avatars_option != null &&
                 fetch_avatars_option.Equals(bool.FalseString))
@@ -771,7 +769,7 @@ namespace CmisSync
 
             email = email.ToLower();
 
-            string avatars_path = new string[] { Path.GetDirectoryName (this.config.FullPath),
+            string avatars_path = new string[] { Path.GetDirectoryName (ConfigManager.CurrentConfig.FullPath),
                 "avatars", size + "x" + size }.Combine();
 
             string avatar_file_path = Path.Combine(avatars_path, email.MD5() + ".png");

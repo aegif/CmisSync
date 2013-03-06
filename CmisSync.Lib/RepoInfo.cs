@@ -72,7 +72,7 @@ namespace CmisSync.Lib
             this.user = user;
             this.password = password;
             this.repoid = repoid;
-            this.targetdirectory = Path.Combine(Config.DefaultConfig.FoldersPath, name);
+            this.targetdirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
         }
     }
 }

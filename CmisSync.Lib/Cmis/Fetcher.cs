@@ -45,15 +45,15 @@ namespace CmisSync.Lib.Cmis
             // String localPath = Path.Combine(Folder.ROOT_FOLDER, repoInfo.TargetDirectory);
             // String localPath = Path.Combine(Config.DefaultConfig.FoldersPath, repoInfo.TargetDirectory);
 
-            if (!Directory.Exists(Config.DefaultConfig.FoldersPath))
+            if (!Directory.Exists(ConfigManager.CurrentConfig.FoldersPath))
             {
-                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} do not exist", Config.DefaultConfig.FoldersPath));
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} do not exist", ConfigManager.CurrentConfig.FoldersPath));
                 throw new DirectoryNotFoundException("Root folder don't exist !");
             }
 
-            if (!Folder.HasWritePermissionOnDir(Config.DefaultConfig.FoldersPath))
+            if (!Folder.HasWritePermissionOnDir(ConfigManager.CurrentConfig.FoldersPath))
             {
-                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", Config.DefaultConfig.FoldersPath));
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", ConfigManager.CurrentConfig.FoldersPath));
                 throw new UnauthorizedAccessException("Root folder is not writable!");
             }
 

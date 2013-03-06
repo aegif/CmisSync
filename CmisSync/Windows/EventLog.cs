@@ -252,7 +252,7 @@ namespace CmisSync {
                     html = Controller.HTML;
                 
                 string pixmaps_path = Path.Combine (
-                    CmisSync.Lib.Config.DefaultConfig.TmpPath, "Pixmaps");
+                    CmisSync.Lib.ConfigManager.CurrentConfig.TmpPath, "Pixmaps");
                 
                 pixmaps_path = pixmaps_path.Replace ("\\", "/");
                 
@@ -306,7 +306,7 @@ namespace CmisSync {
         
         private void WriteOutImages ()
         {
-            string tmp_path     = CmisSync.Lib.Config.DefaultConfig.TmpPath;
+            string tmp_path = CmisSync.Lib.ConfigManager.CurrentConfig.TmpPath;
             string pixmaps_path = Path.Combine (tmp_path, "Pixmaps");
             
             if (!Directory.Exists (pixmaps_path)) {

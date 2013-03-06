@@ -23,16 +23,15 @@ using System.Xml;
 namespace CmisSync.Lib
 {
 
-    public class Config : XmlDocument
+    public class Config
     {
+        private XmlDocument configXml;
         public string FullPath;
         public string TmpPath;
-        public string LogFilePath;
+        // public string LogFilePath;
         private string configpath;
 
         public string ConfigPath { get { return configpath; } }
-
-        public static Config DefaultConfig;
 
         public string HomePath
         {
@@ -60,7 +59,7 @@ namespace CmisSync.Lib
             {
                 try
                 {
-                    XmlNode debugNode = SelectSingleNode(@"/CmisSync/debug");
+                    XmlNode debugNode = configXml.SelectSingleNode(@"/CmisSync/debug");
                     bool debug = false;
                     bool.TryParse(debugNode.InnerText, out debug);
                     return debug;
@@ -77,27 +76,30 @@ namespace CmisSync.Lib
             configpath = config_path;
             FullPath = Path.Combine(config_path, config_file_name);
             Console.WriteLine("FullPath:" + FullPath);
-            LogFilePath = Path.Combine(config_path, "debug_log.txt");
+            //LogFilePath = Path.Combine(config_path, "debug_log.txt");
 
-            if (File.Exists(LogFilePath))
-            {
-                try
-                {
-                    File.Delete(LogFilePath);
+            //if (File.Exists(LogFilePath))
+            //{
+            //    try
+            //    {
+            //        File.Delete(LogFilePath);
 
-                }
-                catch (Exception)
-                {
-                    // Don't delete the debug.log if, for example, 'tail' is reading it
-                }
-            }
+            //    }
+            //    catch (Exception)
+            //    {
+            //        // Don't delete the debug.log if, for example, 'tail' is reading it
+            //    }
+            //}
 
             if (!Directory.Exists(config_path))
                 Directory.CreateDirectory(config_path);
 
+            if (!File.Exists(FullPath))
+                CreateInitialConfig();
+
             try
             {
-                Load(FullPath);
+                configXml.Load(FullPath);
             }
             catch (TypeInitializationException)
             {
@@ -124,7 +126,7 @@ namespace CmisSync.Lib
             }
             finally
             {
-                Load(FullPath);
+                configXml.Load(FullPath);
                 //TmpPath = Path.Combine (FoldersPath, ".tmp");
                 //Directory.CreateDirectory (TmpPath);
             }
@@ -154,83 +156,83 @@ namespace CmisSync.Lib
             if (string.IsNullOrEmpty(user_name))
                 user_name = "Unknown";
 
-
-            AppendChild(CreateXmlDeclaration("1.0", "UTF-8", "yes"));
-            AppendChild(CreateElement("CmisSync"));
-            XmlNode user = CreateElement("user");
-            XmlNode username = CreateElement("name");
+            configXml = new XmlDocument();
+            configXml.AppendChild(configXml.CreateXmlDeclaration("1.0", "UTF-8", "yes"));
+            configXml.AppendChild(configXml.CreateElement("CmisSync"));
+            XmlNode user = configXml.CreateElement("user");
+            XmlNode username = configXml.CreateElement("name");
             username.InnerText = user_name;
-            XmlNode email = CreateElement("email");
+            XmlNode email = configXml.CreateElement("email");
             email.InnerText = "Unknown";
 
             user.AppendChild(username);
             user.AppendChild(email);
 
-            XmlNode folders = CreateElement("folders");
-            DocumentElement.AppendChild(user);
+            XmlNode folders = configXml.CreateElement("folders");
+            configXml.DocumentElement.AppendChild(user);
             CreateLog4NetDefaultConfig();
-            DocumentElement.AppendChild(folders);
-            Save(LogFilePath);
+            configXml.DocumentElement.AppendChild(folders);
+            Save();
         }
 
         public XmlElement GetLog4NetConfig()
         {
-            return (XmlElement)SelectSingleNode("/CmisSync/log4net");
+            return (XmlElement)configXml.SelectSingleNode("/CmisSync/log4net");
         }
 
         private void CreateLog4NetDefaultConfig()
         {
-            XmlNode log4net = CreateElement("log4net");
+            XmlNode log4net = configXml.CreateElement("log4net");
 
-            XmlNode appender = CreateElement("appender");
+            XmlNode appender = configXml.CreateElement("appender");
             appender.Attributes["name"].Value = "CmisSyncFileAppender";
             appender.Attributes["type"].Value = "log4net.Appender.RollingFileAppender";
 
-            XmlNode file = CreateElement("file");
+            XmlNode file = configXml.CreateElement("file");
             file.Attributes["value"].Value = "log.txt";
             appender.AppendChild(file);
 
-            XmlNode appendToFile = CreateElement("appendToFile");
+            XmlNode appendToFile = configXml.CreateElement("appendToFile");
             appendToFile.Attributes["value"].Value = "true";
             appender.AppendChild(appendToFile);
 
-            XmlNode rollingStyle = CreateElement("rollingStyle");
+            XmlNode rollingStyle = configXml.CreateElement("rollingStyle");
             rollingStyle.Attributes["value"].Value = "Size";
             appender.AppendChild(rollingStyle);
 
-            XmlNode maxSizeRollBackups = CreateElement("maxSizeRollBackups");
+            XmlNode maxSizeRollBackups = configXml.CreateElement("maxSizeRollBackups");
             maxSizeRollBackups.Attributes["value"].Value = "10";
             appender.AppendChild(maxSizeRollBackups);
 
-            XmlNode maximumFileSize = CreateElement("maximumFileSize");
+            XmlNode maximumFileSize = configXml.CreateElement("maximumFileSize");
             maximumFileSize.Attributes["value"].Value = "100KB";
             appender.AppendChild(maximumFileSize);
 
-            XmlNode staticLogFileName = CreateElement("staticLogFileName");
+            XmlNode staticLogFileName = configXml.CreateElement("staticLogFileName");
             staticLogFileName.Attributes["value"].Value = "true";
             appender.AppendChild(staticLogFileName);
 
-            XmlNode layout = CreateElement("layout");
+            XmlNode layout = configXml.CreateElement("layout");
             layout.Attributes["type"].Value = "log4net.Layout.PatternLayout";
 
-            XmlNode conversionPattern = CreateElement("conversionPattern");
+            XmlNode conversionPattern = configXml.CreateElement("conversionPattern");
             conversionPattern.Attributes["value"].Value = "%date [%thread] %-5level %logger [%property{NDC}] - %message%newline";
             layout.AppendChild(conversionPattern);
             appender.AppendChild(layout);
             log4net.AppendChild(appender);
 
-            XmlNode root = CreateElement("root");
-            XmlNode level = CreateElement("level");
-            level.Attributes["value"].InnerText = "DEBUG";
+            XmlNode root = configXml.CreateElement("root");
+            XmlNode level = configXml.CreateElement("level");
+            level.Attributes["value"].Value = "DEBUG";
             root.AppendChild(level);
 
-            XmlNode appenderref = CreateElement("appender-ref");
+            XmlNode appenderref = configXml.CreateElement("appender-ref");
             appenderref.Attributes["ref"].Value = "CmisSyncFileAppender";
             root.AppendChild(appenderref);
 
             log4net.AppendChild(root);
 
-            DocumentElement.AppendChild(log4net);
+            configXml.DocumentElement.AppendChild(log4net);
         }
 
 
@@ -238,10 +240,10 @@ namespace CmisSync.Lib
         {
             get
             {
-                XmlNode name_node = SelectSingleNode("/CmisSync/user/name/text()");
+                XmlNode name_node = configXml.SelectSingleNode("/CmisSync/user/name/text()");
                 string name = name_node.Value;
 
-                XmlNode email_node = SelectSingleNode("/CmisSync/user/email/text()");
+                XmlNode email_node = configXml.SelectSingleNode("/CmisSync/user/email/text()");
                 string email = email_node.Value;
 
                 string pubkey_file_path = Path.Combine(
@@ -259,10 +261,10 @@ namespace CmisSync.Lib
             {
                 User user = (User)value;
 
-                XmlNode name_node = SelectSingleNode("/CmisSync/user/name/text()");
+                XmlNode name_node = configXml.SelectSingleNode("/CmisSync/user/name/text()");
                 name_node.InnerText = user.Name;
 
-                XmlNode email_node = SelectSingleNode("/CmisSync/user/email/text()");
+                XmlNode email_node = configXml.SelectSingleNode("/CmisSync/user/email/text()");
                 email_node.InnerText = user.Email;
 
                 Save();
@@ -276,7 +278,7 @@ namespace CmisSync.Lib
             {
                 List<string> folders = new List<string>();
 
-                foreach (XmlNode node_folder in SelectNodes("/CmisSync/folders/folder"))
+                foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
                     folders.Add(node_folder["name"].InnerText);
 
                 return folders;
@@ -291,15 +293,15 @@ namespace CmisSync.Lib
         public void AddFolder(string name, string path, string identifier, string url, string backend,
             string repository, string remoteFolder, string user, string password)
         {
-            XmlNode node_name = CreateElement("name");
-            XmlNode node_path = CreateElement("path");
-            XmlNode node_identifier = CreateElement("identifier");
-            XmlNode node_url = CreateElement("url");
-            XmlNode node_backend = CreateElement("backend");
-            XmlNode node_repository = CreateElement("repository");
-            XmlNode node_remoteFolder = CreateElement("remoteFolder");
-            XmlNode node_user = CreateElement("user");
-            XmlNode node_password = CreateElement("password");
+            XmlNode node_name = configXml.CreateElement("name");
+            XmlNode node_path = configXml.CreateElement("path");
+            XmlNode node_identifier = configXml.CreateElement("identifier");
+            XmlNode node_url = configXml.CreateElement("url");
+            XmlNode node_backend = configXml.CreateElement("backend");
+            XmlNode node_repository = configXml.CreateElement("repository");
+            XmlNode node_remoteFolder = configXml.CreateElement("remoteFolder");
+            XmlNode node_user = configXml.CreateElement("user");
+            XmlNode node_password = configXml.CreateElement("password");
 
             node_name.InnerText = name;
             node_path.InnerText = path;
@@ -311,7 +313,7 @@ namespace CmisSync.Lib
             node_user.InnerText = user;
             node_password.InnerText = password;
 
-            XmlNode node_folder = CreateNode(XmlNodeType.Element, "folder", null);
+            XmlNode node_folder = configXml.CreateNode(XmlNodeType.Element, "folder", null);
 
             node_folder.AppendChild(node_name);
             node_folder.AppendChild(node_path);
@@ -323,7 +325,7 @@ namespace CmisSync.Lib
             node_folder.AppendChild(node_user);
             node_folder.AppendChild(node_password);
 
-            XmlNode node_root = SelectSingleNode("/CmisSync/folders");
+            XmlNode node_root = configXml.SelectSingleNode("/CmisSync/folders");
             node_root.AppendChild(node_folder);
 
             Save();
@@ -332,10 +334,10 @@ namespace CmisSync.Lib
 
         public void RemoveFolder(string name)
         {
-            foreach (XmlNode node_folder in SelectNodes("/CmisSync/folders/folder"))
+            foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
             {
                 if (node_folder["name"].InnerText.Equals(name))
-                    SelectSingleNode("/CmisSync/folders").RemoveChild(node_folder);
+                    configXml.SelectSingleNode("/CmisSync/folders").RemoveChild(node_folder);
             }
 
             Save();
@@ -344,7 +346,7 @@ namespace CmisSync.Lib
 
         public void RenameFolder(string identifier, string name)
         {
-            XmlNode node_folder = SelectSingleNode(
+            XmlNode node_folder = configXml.SelectSingleNode(
                 string.Format("/CmisSync/folders/folder[identifier=\"{0}\"]", identifier));
 
             node_folder["name"].InnerText = name;
@@ -375,7 +377,7 @@ namespace CmisSync.Lib
             if (identifier == null)
                 throw new ArgumentNullException();
 
-            foreach (XmlNode node_folder in SelectNodes("/CmisSync/folders/folder"))
+            foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
             {
                 XmlElement folder_id = node_folder["identifier"];
 
@@ -401,7 +403,7 @@ namespace CmisSync.Lib
             }
             else
             {
-                XmlNode new_node = CreateElement(key);
+                XmlNode new_node = configXml.CreateElement(key);
                 new_node.InnerText = value;
                 folder.AppendChild(new_node);
             }
@@ -450,7 +452,7 @@ namespace CmisSync.Lib
 
         private XmlNode GetFolder(string name)
         {
-            return SelectSingleNode(string.Format("/CmisSync/folders/folder[name=\"{0}\"]", name));
+            return configXml.SelectSingleNode(string.Format("/CmisSync/folders/folder[name=\"{0}\"]", name));
         }
 
 
@@ -467,7 +469,7 @@ namespace CmisSync.Lib
 
         public string GetConfigOption(string name)
         {
-            XmlNode node = SelectSingleNode("/CmisSync/" + name);
+            XmlNode node = configXml.SelectSingleNode("/CmisSync/" + name);
 
             if (node != null)
                 return node.InnerText;
@@ -478,7 +480,7 @@ namespace CmisSync.Lib
 
         public void SetConfigOption(string name, string content)
         {
-            XmlNode node = SelectSingleNode("/CmisSync/" + name);
+            XmlNode node = configXml.SelectSingleNode("/CmisSync/" + name);
 
             if (node != null)
             {
@@ -487,10 +489,10 @@ namespace CmisSync.Lib
             }
             else
             {
-                node = CreateElement(name);
+                node = configXml.CreateElement(name);
                 node.InnerText = content;
 
-                XmlNode node_root = SelectSingleNode("/CmisSync");
+                XmlNode node_root = configXml.SelectSingleNode("/CmisSync");
                 node_root.AppendChild(node);
             }
 
@@ -503,7 +505,7 @@ namespace CmisSync.Lib
             if (!File.Exists(FullPath))
                 throw new FileNotFoundException(FullPath + " does not exist");
 
-            Save(FullPath);
+            configXml.Save(FullPath);
         }
     }
 }

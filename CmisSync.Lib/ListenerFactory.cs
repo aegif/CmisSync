@@ -30,11 +30,11 @@ namespace CmisSync.Lib
         public static ListenerBase CreateListener (string folder_name, string folder_identifier)
         {
             // Check if the user wants to use a global custom notification service
-            string uri = Config.DefaultConfig.GetConfigOption ("announcements_url");
+            string uri = ConfigManager.CurrentConfig.GetConfigOption ("announcements_url");
 
             // Check if the user wants a use a custom notification service for this folder
             if (string.IsNullOrEmpty (uri))
-                uri = Config.DefaultConfig.GetFolderOptionalAttribute (folder_name, "announcements_url");
+                uri = ConfigManager.CurrentConfig.GetFolderOptionalAttribute(folder_name, "announcements_url");
 
             // This is CmisSync's centralized notification service.
             // It communicates "It's time to sync!" signals between clients.

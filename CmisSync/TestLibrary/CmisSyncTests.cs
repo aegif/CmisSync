@@ -50,7 +50,7 @@ namespace TestLibrary
 
         public CmisSyncTests()
         {
-            Config.DefaultConfig = new Config(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
+            // Config.DefaultConfig = new Config(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
         }
 
         public static IEnumerable<object[]> TestServers

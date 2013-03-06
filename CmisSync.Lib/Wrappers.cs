@@ -65,13 +65,13 @@ namespace CmisSync.Lib
         {
             get
             {
-                string custom_path = Config.DefaultConfig.GetFolderOptionalAttribute(Name, "path");
+                string custom_path = ConfigManager.CurrentConfig.GetFolderOptionalAttribute(Name, "path");
                 // if (String.IsNullOrEmpty(custom_path)) custom_path = Config.DefaultConfig.FoldersPath;
 
                 if (custom_path != null)
                     return custom_path;
                 else
-                    return Path.Combine(Config.DefaultConfig.FoldersPath, Name);
+                    return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, Name);
                 // return Path.Combine(ROOT_FOLDER, Name);
             }
         }
