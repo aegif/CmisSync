@@ -147,7 +147,7 @@ namespace TestLibrary
                     SparkleRepoCmis.CmisDirectory cmisDirectory = new SparkleRepoCmis.CmisDirectory(
                         new SparkleRepoInfo(
                             canonical_name,
-                            localPath,
+                            ".",
                             remoteFolderPath,
                             url,
                             user,
