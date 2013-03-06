@@ -18,66 +18,67 @@
 using System;
 using System.IO;
 
+
 namespace CmisSync.Lib {
     
-    public static class Logger {
+    //public static class Logger {
 
-        private static Object debug_lock = new Object ();
-
-
-        public static void LogInfo (string type, string message)
-        {
-            string timestamp = DateTime.Now.ToString ("HH:mm:ss");
-            string line      = timestamp + " | " + type + " | " + message;
-
-            if (Config.DefaultConfig.DebugMode)
-                Console.WriteLine (line);
-
-            lock (debug_lock)
-                File.AppendAllText (Config.DefaultConfig.LogFilePath, line + Environment.NewLine);
-        }
+    //    private static Object debug_lock = new Object ();
 
 
-        public static void WriteCrashReport (Exception e)
-        {
-            string home_path = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
+    //    public static void LogInfo (string type, string message)
+    //    {
+    //        string timestamp = DateTime.Now.ToString ("HH:mm:ss");
+    //        string line      = timestamp + " | " + type + " | " + message;
 
-            if (Backend.Platform == PlatformID.Win32NT)
-                home_path = Environment.GetFolderPath (Environment.SpecialFolder.UserProfile);
+    //        if (Config.DefaultConfig.DebugMode)
+    //            Console.WriteLine (line);
 
-            // Invalid for CmisSync
-            // string crash_report_file_path = new string [] { home_path, "CmisSync", "crash_report.txt" }.Combine ();
-            string crash_report_file_path = Path.Combine(Config.DefaultConfig.ConfigPath, "crash_report.txt");
+    //        lock (debug_lock)
+    //            File.AppendAllText (Config.DefaultConfig.LogFilePath, line + Environment.NewLine);
+    //    }
 
-            string n = Environment.NewLine;
-            string crash_report = "Oops! CmisSync has crashed... :(" + n + n +
-                "If you want to help fix this crash, please report it at " + n +
-                "https://github.com/hbons/CmisSync/issues and include the lines below." + n + n +
-                "Remove any sensitive information like file names, IP addresses, domain names, etc. if needed." + n + n +
-                "------" +  n + n +
-                "CmisSync version: " + CmisSync.Lib.Backend.Version + n +
-                "Operating system: " + CmisSync.Lib.Backend.Platform + " " + Environment.OSVersion + n;
 
-            crash_report += n + e.Message + n + e.StackTrace + n;
+    //    public static void WriteCrashReport (Exception e)
+    //    {
+    //        string home_path = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
 
-            if (e.InnerException != null)
-                crash_report += n + e.InnerException.Message + n + e.InnerException.StackTrace + n;
+    //        if (Backend.Platform == PlatformID.Win32NT)
+    //            home_path = Environment.GetFolderPath (Environment.SpecialFolder.UserProfile);
 
-            if (Config.DefaultConfig != null && File.Exists (Config.DefaultConfig.LogFilePath)) {
-                string debug_log      = File.ReadAllText (Config.DefaultConfig.LogFilePath);
-                string [] debug_lines = debug_log.Split (Environment.NewLine.ToCharArray ()); 
-                int line_count        = 50;
+    //        // Invalid for CmisSync
+    //        // string crash_report_file_path = new string [] { home_path, "CmisSync", "crash_report.txt" }.Combine ();
+    //        string crash_report_file_path = Path.Combine(Config.DefaultConfig.ConfigPath, "crash_report.txt");
+
+    //        string n = Environment.NewLine;
+    //        string crash_report = "Oops! CmisSync has crashed... :(" + n + n +
+    //            "If you want to help fix this crash, please report it at " + n +
+    //            "https://github.com/hbons/CmisSync/issues and include the lines below." + n + n +
+    //            "Remove any sensitive information like file names, IP addresses, domain names, etc. if needed." + n + n +
+    //            "------" +  n + n +
+    //            "CmisSync version: " + CmisSync.Lib.Backend.Version + n +
+    //            "Operating system: " + CmisSync.Lib.Backend.Platform + " " + Environment.OSVersion + n;
+
+    //        crash_report += n + e.Message + n + e.StackTrace + n;
+
+    //        if (e.InnerException != null)
+    //            crash_report += n + e.InnerException.Message + n + e.InnerException.StackTrace + n;
+
+    //        if (Config.DefaultConfig != null && File.Exists (Config.DefaultConfig.LogFilePath)) {
+    //            string debug_log      = File.ReadAllText (Config.DefaultConfig.LogFilePath);
+    //            string [] debug_lines = debug_log.Split (Environment.NewLine.ToCharArray ()); 
+    //            int line_count        = 50;
                     
-                if (debug_lines.Length > line_count) {
-                    crash_report += string.Join (Environment.NewLine, debug_lines,
-                        (debug_lines.Length - line_count), line_count) + n;
+    //            if (debug_lines.Length > line_count) {
+    //                crash_report += string.Join (Environment.NewLine, debug_lines,
+    //                    (debug_lines.Length - line_count), line_count) + n;
                 
-                } else {
-                    crash_report += debug_log + n;
-                }
-            }
+    //            } else {
+    //                crash_report += debug_log + n;
+    //            }
+    //        }
 
-            File.WriteAllText (crash_report_file_path, crash_report);
-        }
-    }
+    //        File.WriteAllText (crash_report_file_path, crash_report);
+    //    }
+    //}
 }

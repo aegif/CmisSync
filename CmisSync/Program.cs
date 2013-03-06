@@ -16,9 +16,12 @@
 
 
 using System;
+using System.IO;
 using System.Threading;
 
 using CmisSync.Lib;
+using log4net;
+using log4net.Config;
 
 namespace CmisSync {
 
@@ -29,12 +32,22 @@ namespace CmisSync {
         public static UI UI;
 
         private static Mutex program_mutex = new Mutex (false, "CmisSync");
-     
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
+        private static Config config;
+
         #if !__MonoCS__
         [STAThread]
         #endif
         public static void Main (string [] args)
         {
+            string app_data_path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string config_path = Path.Combine(app_data_path, "cmissync");
+            config = new Config(config_path, "config.xml");
+            Config.DefaultConfig = config;
+
+            log4net.Config.XmlConfigurator.Configure(config.GetLog4NetConfig());
+
 			Console.WriteLine("start");
             if (args.Length != 0 && !args [0].Equals ("start") &&
                 Backend.Platform != PlatformID.MacOSX &&
@@ -75,7 +88,7 @@ namespace CmisSync {
 //#if !DEBUG
             } catch (Exception e) {
 				Console.WriteLine("Exception in Program.Main");
-                Logger.WriteCrashReport (e);
+                Logger.Fatal(e);
                 Environment.Exit (-1);
             }
 //#endif
