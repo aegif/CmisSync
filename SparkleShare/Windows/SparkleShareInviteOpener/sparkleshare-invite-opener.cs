@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@ using System;
 using System.IO;
 using System.Net;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleShare {
+    public class CmisSync {
 
         public static void Main (string [] args) {
 
@@ -49,9 +49,9 @@ namespace SparkleShare {
             string file_name = DateTime.UtcNow.Millisecond.ToString () + ".xml";
 
             string home_path   = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
-            string target_path = Path.Combine (home_path, "SparkleShare", file_name);
+            string target_path = Path.Combine (home_path, "CmisSync", file_name);
 
-            if (xml.Contains ("<sparkleshare>")) {
+            if (xml.Contains ("<CmisSync>")) {
                 File.WriteAllText (target_path, xml);
                 Console.WriteLine ("Downloaded invite: " + url);
             }

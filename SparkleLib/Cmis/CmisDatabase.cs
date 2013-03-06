@@ -7,7 +7,7 @@ using System.IO;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
     /**
      * Database to cache remote information from the CMIS server.
@@ -39,7 +39,7 @@ namespace SparkleLib.Cmis
             this.databaseFileName = dataPath;
             // pathPrefixSize = dataPath.Length + 1; // +1 for the slash
             // pathPrefixSize = SparkleFolder.ROOT_FOLDER.Length + 1;
-            pathPrefixSize = SparkleConfig.DefaultConfig.FoldersPath.Length + 1;
+            pathPrefixSize = Config.DefaultConfig.FoldersPath.Length + 1;
         }
 
 
@@ -51,7 +51,7 @@ namespace SparkleLib.Cmis
         {
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
-                SparkleLogger.LogInfo("Database", "Checking whether database exists");
+                Logger.LogInfo("Database", "Checking whether database exists");
                 bool createDatabase = !File.Exists(databaseFileName);
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
@@ -78,7 +78,7 @@ namespace SparkleLib.Cmis
                                 key TEXT PRIMARY KEY,
                                 value TEXT);";    /* Other data such as ChangeLog token */
                         command.ExecuteNonQuery();
-                        SparkleLogger.LogInfo("Database", "Database created");
+                        Logger.LogInfo("Database", "Database created");
                     }
                 }
             }
@@ -161,7 +161,7 @@ namespace SparkleLib.Cmis
         public void AddFile(string path, DateTime? serverSideModificationDate,
             Dictionary<string, string> metadata)
         {
-            SparkleLogger.LogInfo("CmisDatabase", "Start adding data in db for: " + path);
+            Logger.LogInfo("CmisDatabase", "Start adding data in db for: " + path);
             string normalizedPath = Normalize(path);
             string checksum = String.Empty;
             try
@@ -170,14 +170,14 @@ namespace SparkleLib.Cmis
             }
             catch (IOException e)
             {
-                SparkleLogger.LogInfo("CmisDatabase", "IOException while reading file checksum during addition: " + path);
+                Logger.LogInfo("CmisDatabase", "IOException while reading file checksum during addition: " + path);
                 // The file was removed while reading. Just skip it, as it does not need to be added anymore.
                 return;
             }
 
             if (String.IsNullOrEmpty(checksum))
             {
-                SparkleLogger.LogInfo("CmisDatabase", "Bad checksum for " + path);
+                Logger.LogInfo("CmisDatabase", "Bad checksum for " + path);
                 return;
             }
 
@@ -199,10 +199,10 @@ namespace SparkleLib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.LogInfo("CmisDatabase", e.Message);
                 }
             }
-            SparkleLogger.LogInfo("CmisDatabase", "Adding data in db for: " + path + " finished");
+            Logger.LogInfo("CmisDatabase", "Adding data in db for: " + path + " finished");
         }
 
 
@@ -223,7 +223,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.LogInfo("CmisDatabase", e.Message);
                 }
             }
         }
@@ -244,7 +244,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.LogInfo("CmisDatabase", e.Message);
                 }
             }
         }
@@ -266,7 +266,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.LogInfo("CmisDatabase", e.Message);
                 }
             }
 
@@ -281,7 +281,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.LogInfo("CmisDatabase", e.Message);
                 }
             }
 
@@ -296,7 +296,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.LogInfo("CmisDatabase", e.Message);
                 }
             }
         }
@@ -318,7 +318,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.LogInfo("CmisDatabase", e.Message);
                     return null;
                 }
             }
@@ -343,7 +343,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.LogInfo("CmisDatabase", e.Message);
                 }
             }
         }
@@ -393,7 +393,7 @@ namespace SparkleLib.Cmis
             }
             catch (IOException e)
             {
-                SparkleLogger.LogInfo("CmisDatabase", "IOException while reading file checksum: " + path);
+                Logger.LogInfo("CmisDatabase", "IOException while reading file checksum: " + path);
                 return true;
             }
 

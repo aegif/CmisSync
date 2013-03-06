@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -19,11 +19,12 @@ using System;
 using System.Collections.Generic;
 using System.Timers;
 
-namespace SparkleLib {
+namespace CmisSync.Lib
+{
 
     // A persistent connection to the server that
     // listens for change notifications
-    public abstract class SparkleListenerBase {
+    public abstract class ListenerBase {
 
         public event Action Connected = delegate { };
         public event Action Disconnected = delegate { };
@@ -58,7 +59,7 @@ namespace SparkleLib {
         };
 
 
-        public SparkleListenerBase (Uri server, string folder_identifier)
+        public ListenerBase (Uri server, string folder_identifier)
         {
             Server = server;
             this.channels.Add (folder_identifier);
@@ -76,19 +77,19 @@ namespace SparkleLib {
         {
             if (!IsRecentAnnouncement (announcement)) {
                 if (IsConnected) {
-                    SparkleLogger.LogInfo ("Listener", "Announcing message " + announcement.Message +
+                    Logger.LogInfo ("Listener", "Announcing message " + announcement.Message +
                         " to " + announcement.FolderIdentifier + " on " + Server);
 
                     AnnounceInternal (announcement);
                     AddRecentAnnouncement (announcement);
 
                 } else {
-                    SparkleLogger.LogInfo ("Listener", "Can't send message to " + Server + ". Queuing message");
+                    Logger.LogInfo ("Listener", "Can't send message to " + Server + ". Queuing message");
                     this.queue_up [announcement.FolderIdentifier] = announcement;
                 }
 
             } else {
-                SparkleLogger.LogInfo ("Listener", "Already processed message " + announcement.Message +
+                Logger.LogInfo ("Listener", "Already processed message " + announcement.Message +
                     " to " + announcement.FolderIdentifier + " from " + Server);
             }
         }
@@ -100,7 +101,7 @@ namespace SparkleLib {
                 this.channels.Add (channel);
 
             if (IsConnected) {
-                SparkleLogger.LogInfo ("Listener", "Subscribing to channel " + channel + " on " + Server);
+                Logger.LogInfo ("Listener", "Subscribing to channel " + channel + " on " + Server);
                 AlsoListenToInternal (channel);
             }
         }
@@ -108,7 +109,7 @@ namespace SparkleLib {
 
         public void Reconnect ()
         {
-            SparkleLogger.LogInfo ("Listener", "Trying to reconnect to " + Server);
+            Logger.LogInfo ("Listener", "Trying to reconnect to " + Server);
             Connect ();
         }
 
@@ -116,15 +117,15 @@ namespace SparkleLib {
         public void OnConnected ()
         {
             foreach (string channel in this.channels.GetRange (0, this.channels.Count)) {
-                SparkleLogger.LogInfo ("Listener", "Subscribing to channel " + channel + " on " + Server);
+                Logger.LogInfo ("Listener", "Subscribing to channel " + channel + " on " + Server);
                 AlsoListenToInternal (channel);
             }
 
-            SparkleLogger.LogInfo ("Listener", "Listening for announcements on " + Server);
+            Logger.LogInfo ("Listener", "Listening for announcements on " + Server);
             Connected ();
 
             if (this.queue_up.Count > 0) {
-                SparkleLogger.LogInfo ("Listener", "Delivering " + this.queue_up.Count + " queued messages...");
+                Logger.LogInfo ("Listener", "Delivering " + this.queue_up.Count + " queued messages...");
 
                 foreach (KeyValuePair<string, SparkleAnnouncement> item in this.queue_up) {
                     SparkleAnnouncement announcement = item.Value;
@@ -138,24 +139,24 @@ namespace SparkleLib {
 
         public void OnDisconnected (string message)
         {
-            SparkleLogger.LogInfo ("Listener", "Disconnected from " + Server + ": " + message);
+            Logger.LogInfo ("Listener", "Disconnected from " + Server + ": " + message);
             Disconnected ();
         }
 
 
         public void OnAnnouncement (SparkleAnnouncement announcement)
         {
-            SparkleLogger.LogInfo ("Listener", "Got message " + announcement.Message + " from " +
+            Logger.LogInfo ("Listener", "Got message " + announcement.Message + " from " +
                 announcement.FolderIdentifier + " on " + Server);
 
             if (IsRecentAnnouncement (announcement)) {
-                SparkleLogger.LogInfo ("Listener", "Ignoring previously processed message " + announcement.Message +
+                Logger.LogInfo ("Listener", "Ignoring previously processed message " + announcement.Message +
                     " from " + announcement.FolderIdentifier + " on " + Server);
                 
                   return;
             }
 
-            SparkleLogger.LogInfo ("Listener", "Processing message " + announcement.Message + " from " +
+            Logger.LogInfo ("Listener", "Processing message " + announcement.Message + " from " +
                 announcement.FolderIdentifier + " on " + Server);
 
             AddRecentAnnouncement (announcement);

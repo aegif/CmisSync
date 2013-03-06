@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
     /**
      * Utility to find a file's MIME type.

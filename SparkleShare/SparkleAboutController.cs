@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@ using System;
 using System.Net;
 using System.Threading;
 
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
     public class SparkleAboutController {
 
@@ -39,7 +39,7 @@ namespace SparkleShare {
 
         public string RunningVersion {
             get {
-                return SparkleBackend.Version;
+                return Backend.Version;
             }
         }
 
@@ -64,7 +64,7 @@ namespace SparkleShare {
             CheckingForNewVersionEvent ();
 
             WebClient web_client = new WebClient ();
-            Uri uri = new Uri ("http://www.sparkleshare.org/version");
+            Uri uri = new Uri ("http://www.CmisSync.org/version");
 
             web_client.DownloadStringCompleted += delegate (object o, DownloadStringCompletedEventArgs args) {
                 if (args.Error != null)

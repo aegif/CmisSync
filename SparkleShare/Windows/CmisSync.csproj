@@ -6,9 +6,9 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <ProjectGuid>{728483AA-E34B-4441-BF2C-C8BC2901E4E0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>SparkleShare</AssemblyName>
+    <AssemblyName>CmisSync</AssemblyName>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>SparkleShare</RootNamespace>
+    <RootNamespace>CmisSync</RootNamespace>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -57,7 +57,7 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\Debug\SparkleShare.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\CmisSync.xml</DocumentationFile>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -99,28 +99,28 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SparkleShortcut.cs" />
-    <Compile Include="SparkleUI.cs" />
+    <Compile Include="Shortcut.cs" />
+    <Compile Include="UI.cs" />
     <Compile Include="..\SparkleAboutController.cs" />
-    <Compile Include="SparkleBubbles.cs" />
-    <Compile Include="SparkleAbout.cs" />
-    <Compile Include="SparkleController.cs" />
-    <Compile Include="SparkleEventLog.cs" />
-    <Compile Include="SparkleSetup.cs" />
-    <Compile Include="SparkleStatusIcon.cs" />
-    <Compile Include="SparkleUIHelpers.cs" />
+    <Compile Include="Bubbles.cs" />
+    <Compile Include="About.cs" />
+    <Compile Include="Controller.cs" />
+    <Compile Include="EventLog.cs" />
+    <Compile Include="Setup.cs" />
+    <Compile Include="StatusIcon.cs" />
+    <Compile Include="UIHelpers.cs" />
     <Compile Include="..\SparkleEventLogController.cs">
       <Link>SparkleEventLogController.cs</Link>
     </Compile>
     <Compile Include="..\SparkleKeys.cs">
       <Link>SparkleKeys.cs</Link>
     </Compile>
-    <Compile Include="SparkleSetupWindow.cs" />
+    <Compile Include="SetupWindow.cs" />
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="SparkleNotifyIcon.cs" />
-    <Compile Include="SparkleSpinner.cs" />
+    <Compile Include="NotifyIcon.cs" />
+    <Compile Include="Spinner.cs" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

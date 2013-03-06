@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -22,9 +22,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
     public class SparkleEventLogController {
 
@@ -100,7 +100,7 @@ namespace SparkleShare {
             get {
                 double size = 0;
 
-                foreach (SparkleRepoBase repo in Program.Controller.Repositories) {
+                foreach (RepoBase repo in Program.Controller.Repositories) {
                     if (this.selected_folder == null) {
                         size += repo.Size;
 
@@ -123,7 +123,7 @@ namespace SparkleShare {
             get {
                 double size = 0;
 
-                foreach (SparkleRepoBase repo in Program.Controller.Repositories) {
+                foreach (RepoBase repo in Program.Controller.Repositories) {
                     if (this.selected_folder == null) {
                         size += repo.HistorySize;
 
@@ -200,13 +200,13 @@ namespace SparkleShare {
         {
             List<SparkleChangeSet> list = new List<SparkleChangeSet> ();
 
-            foreach (SparkleRepoBase repo in Program.Controller.Repositories) {
+            foreach (RepoBase repo in Program.Controller.Repositories) {
                 List<SparkleChangeSet> change_sets = repo.ChangeSets;
 
                 if (change_sets != null)
                     list.AddRange (change_sets);
                 else
-                    SparkleLogger.LogInfo ("Log", "Could not create log for " + repo.Name);
+                    Logger.LogInfo ("Log", "Could not create log for " + repo.Name);
             }
 
             list.Sort ((x, y) => (x.Timestamp.CompareTo (y.Timestamp)));
@@ -224,7 +224,7 @@ namespace SparkleShare {
             if (name == null)
                 return GetLog ();
 
-            foreach (SparkleRepoBase repo in Program.Controller.Repositories) {
+            foreach (RepoBase repo in Program.Controller.Repositories) {
                 if (repo.Name.Equals (name))
                     return repo.ChangeSets;
             }

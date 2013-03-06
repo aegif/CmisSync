@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,9 @@
 using System;
 using System.IO;
 
-namespace SparkleLib {
+namespace CmisSync.Lib {
     
-    public static class SparkleLogger {
+    public static class Logger {
 
         private static Object debug_lock = new Object ();
 
@@ -30,11 +30,11 @@ namespace SparkleLib {
             string timestamp = DateTime.Now.ToString ("HH:mm:ss");
             string line      = timestamp + " | " + type + " | " + message;
 
-            if (SparkleConfig.DefaultConfig.DebugMode)
+            if (Config.DefaultConfig.DebugMode)
                 Console.WriteLine (line);
 
             lock (debug_lock)
-                File.AppendAllText (SparkleConfig.DefaultConfig.LogFilePath, line + Environment.NewLine);
+                File.AppendAllText (Config.DefaultConfig.LogFilePath, line + Environment.NewLine);
         }
 
 
@@ -42,29 +42,29 @@ namespace SparkleLib {
         {
             string home_path = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
 
-            if (SparkleBackend.Platform == PlatformID.Win32NT)
+            if (Backend.Platform == PlatformID.Win32NT)
                 home_path = Environment.GetFolderPath (Environment.SpecialFolder.UserProfile);
 
             // Invalid for CmisSync
-            // string crash_report_file_path = new string [] { home_path, "SparkleShare", "crash_report.txt" }.Combine ();
-            string crash_report_file_path = Path.Combine(SparkleConfig.DefaultConfig.ConfigPath, "crash_report.txt");
+            // string crash_report_file_path = new string [] { home_path, "CmisSync", "crash_report.txt" }.Combine ();
+            string crash_report_file_path = Path.Combine(Config.DefaultConfig.ConfigPath, "crash_report.txt");
 
             string n = Environment.NewLine;
-            string crash_report = "Oops! SparkleShare has crashed... :(" + n + n +
+            string crash_report = "Oops! CmisSync has crashed... :(" + n + n +
                 "If you want to help fix this crash, please report it at " + n +
-                "https://github.com/hbons/SparkleShare/issues and include the lines below." + n + n +
+                "https://github.com/hbons/CmisSync/issues and include the lines below." + n + n +
                 "Remove any sensitive information like file names, IP addresses, domain names, etc. if needed." + n + n +
                 "------" +  n + n +
-                "SparkleShare version: " + SparkleLib.SparkleBackend.Version + n +
-                "Operating system: " + SparkleLib.SparkleBackend.Platform + " " + Environment.OSVersion + n;
+                "CmisSync version: " + CmisSync.Lib.Backend.Version + n +
+                "Operating system: " + CmisSync.Lib.Backend.Platform + " " + Environment.OSVersion + n;
 
             crash_report += n + e.Message + n + e.StackTrace + n;
 
             if (e.InnerException != null)
                 crash_report += n + e.InnerException.Message + n + e.InnerException.StackTrace + n;
 
-            if (SparkleConfig.DefaultConfig != null && File.Exists (SparkleConfig.DefaultConfig.LogFilePath)) {
-                string debug_log      = File.ReadAllText (SparkleConfig.DefaultConfig.LogFilePath);
+            if (Config.DefaultConfig != null && File.Exists (Config.DefaultConfig.LogFilePath)) {
+                string debug_log      = File.ReadAllText (Config.DefaultConfig.LogFilePath);
                 string [] debug_lines = debug_log.Split (Environment.NewLine.ToCharArray ()); 
                 int line_count        = 50;
                     

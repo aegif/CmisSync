@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -21,12 +21,12 @@ using System.Timers;
 
 using Threading = System.Threading;
 
-using SparkleLib;
+using CmisSync.Lib;
 using System.Globalization;
 
-using SparkleShare.Properties;
+using CmisSync.Properties;
 
-namespace SparkleShare {
+namespace CmisSync {
 
     public enum IconState {
         Idle,
@@ -88,7 +88,7 @@ namespace SparkleShare {
             get {
                 double size = 0;
 
-                foreach (SparkleRepoBase repo in Program.Controller.Repositories)
+                foreach (RepoBase repo in Program.Controller.Repositories)
                     size += repo.Size;
 
                 if (size == 0)
@@ -168,7 +168,7 @@ namespace SparkleShare {
 				int repos_syncing_up   = 0;
 				int repos_syncing_down = 0;
 				
-				foreach (SparkleRepoBase repo in Program.Controller.Repositories) {
+				foreach (RepoBase repo in Program.Controller.Repositories) {
 					if (repo.Status == SyncStatus.SyncUp)
 						repos_syncing_up++;
 					
@@ -213,15 +213,15 @@ namespace SparkleShare {
         }
 
 
-        public void SparkleShareClicked ()
+        public void CmisSyncClicked ()
         {
-            Program.Controller.OpenSparkleShareFolder ();
+            Program.Controller.OpenCmisSyncFolder ();
         }
 
 
         public void SubfolderClicked (string subfolder)
         {
-            Program.Controller.OpenSparkleShareFolder (subfolder);
+            Program.Controller.OpenCmisSyncFolder (subfolder);
         }
 
 

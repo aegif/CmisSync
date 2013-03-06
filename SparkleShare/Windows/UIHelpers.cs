@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -25,9 +25,9 @@ using System.Windows.Media.Imaging;
 
 using Drawing = System.Drawing;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public static class SparkleUIHelpers {
+    public static class UIHelpers {
         
         public static string ToHex (this Drawing.Color color)
         {
@@ -44,7 +44,7 @@ namespace SparkleShare {
         public static BitmapFrame GetImageSource (string name, string type)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            Stream image_stream = assembly.GetManifestResourceStream("SparkleShare.Pixmaps." + name + "." + type);
+            Stream image_stream = assembly.GetManifestResourceStream("CmisSync.Pixmaps." + name + "." + type);
             return BitmapFrame.Create(image_stream);
         }
         
@@ -52,7 +52,7 @@ namespace SparkleShare {
         public static Drawing.Bitmap GetBitmap (string name)
         {                                          
             Assembly assembly   = Assembly.GetExecutingAssembly ();
-            Stream image_stream = assembly.GetManifestResourceStream ("SparkleShare.Pixmaps." + name + ".png");
+            Stream image_stream = assembly.GetManifestResourceStream ("CmisSync.Pixmaps." + name + ".png");
             return (Drawing.Bitmap) Drawing.Bitmap.FromStream (image_stream);
         }
 		
@@ -61,7 +61,7 @@ namespace SparkleShare {
         {                                          
             Assembly assembly        = Assembly.GetExecutingAssembly ();
             StreamReader html_reader = new StreamReader (
-				assembly.GetManifestResourceStream ("SparkleShare.HTML." + name));
+				assembly.GetManifestResourceStream ("CmisSync.HTML." + name));
             
 			return html_reader.ReadToEnd ();
         }

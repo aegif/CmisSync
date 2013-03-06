@@ -15,9 +15,9 @@ using DotCMIS.Data.Impl;
 
 using System.Net;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
-    public partial class SparkleRepoCmis : SparkleRepoBase
+    public partial class RepoCmis : RepoBase
     {
         public enum RulesType { Folder, File };
 
@@ -82,7 +82,7 @@ namespace SparkleLib.Cmis
             /**
              * Config 
              * */
-            private SparkleRepoInfo repoinfo;
+            private RepoInfo repoinfo;
 
             // Why use a special constructor, add folder in config before syncing and use standard constructor instead
             /**
@@ -118,7 +118,7 @@ namespace SparkleLib.Cmis
             /**
              * Constructor for SparkleRepo (at every launch of CmisSync)
              */
-            public CmisDirectory(SparkleRepoInfo repoInfo,
+            public CmisDirectory(RepoInfo repoInfo,
                 ActivityListener activityListener)
             {
                 this.activityListener = activityListener;
@@ -165,17 +165,17 @@ namespace SparkleLib.Cmis
                         // Detect whether the repository has the ChangeLog capability.
                         ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
                                 || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-                        SparkleLogger.LogInfo("Sync", "ChangeLog capability: " + ChangeLogCapability);
-                        SparkleLogger.LogInfo("Sync", "Created CMIS session: " + session.ToString());
+                        Logger.LogInfo("Sync", "ChangeLog capability: " + ChangeLogCapability);
+                        Logger.LogInfo("Sync", "Created CMIS session: " + session.ToString());
                     }
                     catch (CmisRuntimeException e)
                     {
-                        SparkleLogger.LogInfo("Sync", "Exception: " + e.Message + ", error content: " + e.ErrorContent);
+                        Logger.LogInfo("Sync", "Exception: " + e.Message + ", error content: " + e.ErrorContent);
                     }
                     if (session == null)
                     {
                         // SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + this.localRootFolder + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
-                        SparkleLogger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + repoinfo.TargetDirectory + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
+                        Logger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + repoinfo.TargetDirectory + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
 
                         System.Threading.Thread.Sleep(10 * 1000);
                     }
@@ -203,7 +203,7 @@ namespace SparkleLib.Cmis
                     // If there are remote changes, apply them.
                     if (lastTokenOnServer.Equals(lastTokenOnClient))
                     {
-                        SparkleLogger.LogInfo("Sync", "No changes on server, ChangeLog token: " + lastTokenOnServer);
+                        Logger.LogInfo("Sync", "No changes on server, ChangeLog token: " + lastTokenOnServer);
                     }
                     else
                     {
@@ -219,7 +219,7 @@ namespace SparkleLib.Cmis
 
                         // Save change log token locally.
                         // TODO only if successful
-                        SparkleLogger.LogInfo("Sync", "Updating ChangeLog token: " + lastTokenOnServer);
+                        Logger.LogInfo("Sync", "Updating ChangeLog token: " + lastTokenOnServer);
                         database.SetChangeLogToken(lastTokenOnServer);
                     }
 
@@ -234,7 +234,7 @@ namespace SparkleLib.Cmis
              */
             private void ApplyRemoteChange(IChangeEvent change)
             {
-                SparkleLogger.LogInfo("Sync", "Change type:" + change.ChangeType + " id:" + change.ObjectId + " properties:" + change.Properties);
+                Logger.LogInfo("Sync", "Change type:" + change.ChangeType + " id:" + change.ObjectId + " properties:" + change.Properties);
                 switch (change.ChangeType)
                 {
                     case ChangeType.Created:
@@ -253,7 +253,7 @@ namespace SparkleLib.Cmis
                             string remoteDocumentPath = remoteDocument.Paths.First();
                             if (!remoteDocumentPath.StartsWith(remoteFolderPath))
                             {
-                                SparkleLogger.LogInfo("Sync", "Change in unrelated document: " + remoteDocumentPath);
+                                Logger.LogInfo("Sync", "Change in unrelated document: " + remoteDocumentPath);
                                 break; // The change is not under the folder we care about.
                             }
                             string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
@@ -279,7 +279,7 @@ namespace SparkleLib.Cmis
                             string remoteDocumentPath = remoteDocument.Paths.First();
                             if (!remoteDocumentPath.StartsWith(remoteFolderPath))
                             {
-                                SparkleLogger.LogInfo("Sync", "Change in unrelated document: " + remoteDocumentPath);
+                                Logger.LogInfo("Sync", "Change in unrelated document: " + remoteDocumentPath);
                                 break; // The change is not under the folder we care about.
                             }
                             string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
@@ -343,7 +343,7 @@ namespace SparkleLib.Cmis
 
                 if (remoteDocument.ContentStreamLength == 0)
                 {
-                    SparkleLogger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                    Logger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
                     activityListener.ActivityStopped();
                     return;
                 }
@@ -372,7 +372,7 @@ namespace SparkleLib.Cmis
                         // Mode rewrite for Nuxeo
                         localfile = new StreamWriter(tmpfilepath);
                         contentStream = remoteDocument.GetContentStream();
-                        SparkleLogger.LogInfo("CmisDirectory", "Nuxeo don't support partial download, so restart from start!");
+                        Logger.LogInfo("CmisDirectory", "Nuxeo don't support partial download, so restart from start!");
                     }
                     else
                     {
@@ -385,11 +385,11 @@ namespace SparkleLib.Cmis
 
                     if (contentStream == null)
                     {
-                        SparkleLogger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                        Logger.LogInfo("CmisDirectory", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
                         throw new IOException();
                     }
 
-                    SparkleLogger.LogInfo("CmisDirectory", String.Format("Start download of file with offset {0}", Offset));
+                    Logger.LogInfo("CmisDirectory", String.Format("Start download of file with offset {0}", Offset));
 
                     contentStream.Stream.Flush();
                     CopyStream(contentStream.Stream, localfile.BaseStream);
@@ -400,7 +400,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (Exception ex)
                 {
-                    SparkleLogger.LogInfo("CmisDirectory", String.Format("Download of file {0} abort: {1}", remoteDocument.ContentStreamFileName, ex));
+                    Logger.LogInfo("CmisDirectory", String.Format("Download of file {0} abort: {1}", remoteDocument.ContentStreamFileName, ex));
                     success = false;
                     if (localfile != null)
                     {
@@ -437,7 +437,7 @@ namespace SparkleLib.Cmis
                 }
                 catch (Exception ex)
                 {
-                    SparkleLogger.LogInfo("CmisDirectory", "Unable to write metadata in the CmisDatabase: " + ex.ToString());
+                    Logger.LogInfo("CmisDirectory", "Unable to write metadata in the CmisDatabase: " + ex.ToString());
                 }
                 activityListener.ActivityStopped();
             }
@@ -464,7 +464,7 @@ namespace SparkleLib.Cmis
                 IDocument remoteDocument = null;
                 try
                 {
-                    SparkleLogger.LogInfo("Sync", String.Format("Start upload of file {0}", filePath));
+                    Logger.LogInfo("Sync", String.Format("Start upload of file {0}", filePath));
 
                     // Prepare properties
                     string fileName = Path.GetFileName(filePath);
@@ -479,7 +479,7 @@ namespace SparkleLib.Cmis
                     Stream file = File.OpenRead(filePath);
                     if (file.Length == 0)
                     {
-                        SparkleLogger.LogInfo("CmisDirectory", "Skipping upload of file with null content stream: " + filePath);
+                        Logger.LogInfo("CmisDirectory", "Skipping upload of file with null content stream: " + filePath);
                         activityListener.ActivityStopped();
                         return;
                     }
@@ -532,7 +532,7 @@ namespace SparkleLib.Cmis
                             ICmisObject obj = session.GetObjectByPath(remotepath);
                             if (obj != null)
                             {
-                                SparkleLogger.LogInfo("Sync", "Temp file exist on remote server, so delete it");
+                                Logger.LogInfo("Sync", "Temp file exist on remote server, so delete it");
                                 remoteDocument = (IDocument)obj;
                                 remoteDocument.DeleteAllVersions();
                             }
@@ -540,21 +540,21 @@ namespace SparkleLib.Cmis
                         catch (DotCMIS.Exceptions.CmisObjectNotFoundException)
                         {
                             // Create an empty file on remote server and get ContentStream
-                            SparkleLogger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
+                            Logger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
                         }
                         remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                         success = true;
                     }
                     catch (Exception ex)
                     {
-                        SparkleLogger.LogInfo("Sync", String.Format("Upload of file {0} abort: {1}", filePath, ex));
+                        Logger.LogInfo("Sync", String.Format("Upload of file {0} abort: {1}", filePath, ex));
                         success = false;
                         if (contentStream != null) contentStream.Stream.Close();
                     }
 
                     if (success)
                     {
-                        SparkleLogger.LogInfo("Sync", String.Format("Upload of file {0} finished", filePath));
+                        Logger.LogInfo("Sync", String.Format("Upload of file {0} finished", filePath));
                         if (contentStream != null) { contentStream.Stream.Close(); contentStream.Stream.Dispose(); }
                         properties[PropertyIds.Name] = fileName;
                         file.Close();
@@ -591,7 +591,7 @@ namespace SparkleLib.Cmis
                     if (e is FileNotFoundException ||
                         e is IOException)
                     {
-                        SparkleLogger.LogInfo("Sync", "File deleted while trying to upload it, reverting.");
+                        Logger.LogInfo("Sync", "File deleted while trying to upload it, reverting.");
                         // File has been deleted while we were trying to upload/checksum/add.
                         // This can typically happen in Windows when creating a new text file and giving it a name.
                         // Revert the upload.
@@ -643,7 +643,7 @@ namespace SparkleLib.Cmis
                 Stream localfile = File.OpenRead(filePath);
                 if ((localfile == null) && (localfile.Length == 0))
                 {
-                    SparkleLogger.LogInfo("Sync", "Skipping update of file with null or empty content stream: " + filePath);
+                    Logger.LogInfo("Sync", "Skipping update of file with null or empty content stream: " + filePath);
                     return;
                 }
 
@@ -665,7 +665,7 @@ namespace SparkleLib.Cmis
                 localfile.Close();
                 localfile.Dispose();
                 remoteStream.Stream.Close();
-                SparkleLogger.LogInfo("Sync", "Update finished:" + filePath);
+                Logger.LogInfo("Sync", "Update finished:" + filePath);
             }
 
             /**
@@ -673,7 +673,7 @@ namespace SparkleLib.Cmis
              */
             private void UpdateFile(string filePath, IFolder remoteFolder)
             {
-                SparkleLogger.LogInfo("Sync", "Updated " + filePath);
+                Logger.LogInfo("Sync", "Updated " + filePath);
                 activityListener.ActivityStarted();
                 string fileName = Path.GetFileName(filePath);
 
@@ -695,7 +695,7 @@ namespace SparkleLib.Cmis
                 // If not found, it means the document has been deleted, will be processed at the next sync cycle.
                 if (!found)
                 {
-                    SparkleLogger.LogInfo("Sync", filePath + " not found on server, must be uploaded instead of updated");
+                    Logger.LogInfo("Sync", filePath + " not found on server, must be uploaded instead of updated");
                     return;
                 }
 
@@ -716,7 +716,7 @@ namespace SparkleLib.Cmis
             private void RemoveFolderLocally(string folderPath)
             {
                 // Folder has been deleted on server, delete it locally too.
-                SparkleLogger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
+                Logger.LogInfo("Sync", "Removing remotely deleted folder: " + folderPath);
                 Directory.Delete(folderPath, true);
 
                 // Delete folder from database.

@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -17,20 +17,21 @@
 
 using System;
 
-namespace SparkleLib {
+namespace CmisSync {
+    
+    public class Bubbles {
 
-    public class SparkleUser {
-
-        public readonly string Name;
-        public readonly string Email;
-
-        public string PublicKey;
+        public SparkleBubblesController Controller = new SparkleBubblesController ();
 
 
-        public SparkleUser (string name, string email)
+        public Bubbles ()
         {
-            Name  = name;
-            Email = email;
+            Controller.ShowBubbleEvent += delegate (string title,
+                string subtext, string image_path) {
+
+                Program.UI.StatusIcon.ShowBalloon (title, subtext, image_path);
+            };
         }
     }
 }
+

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
     public static class CmisCrypto
     {

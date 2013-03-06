@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,10 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace SparkleLib {
+namespace CmisSync.Lib
+{
 
-    public static class SparkleBackend {
+    public static class Backend {
 
         public static string Version {
             get {

@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2C914413-B31C-4362-93C7-1AE34F09112A}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SparkleLib</RootNamespace>
-    <AssemblyName>SparkleLib</AssemblyName>
+    <RootNamespace>CmisSync.Lib</RootNamespace>
+    <AssemblyName>CmisSync.Lib</AssemblyName>
     <ReleaseVersion />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -35,22 +35,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SparkleFetcherBase.cs" />
-    <Compile Include="SparkleRepoBase.cs" />
-    <Compile Include="SparkleRepoInfo.cs" />
-    <Compile Include="SparkleWrappers.cs" />
-    <Compile Include="SparkleListenerBase.cs" />
-    <Compile Include="SparkleListenerFactory.cs" />
-    <Compile Include="SparkleListenerTcp.cs" />
-    <Compile Include="SparkleBackend.cs" />
-    <Compile Include="SparkleConfig.cs" />
-    <Compile Include="SparkleWatcher.cs">
+    <Compile Include="FetcherBase.cs" />
+    <Compile Include="RepoBase.cs" />
+    <Compile Include="RepoInfo.cs" />
+    <Compile Include="Wrappers.cs" />
+    <Compile Include="ListenerBase.cs" />
+    <Compile Include="ListenerFactory.cs" />
+    <Compile Include="ListenerTcp.cs" />
+    <Compile Include="Backend.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SparkleExtensions.cs" />
-    <Compile Include="SparkleExceptions.cs" />
-    <Compile Include="SparkleUser.cs" />
-    <Compile Include="SparkleLogger.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Defines.cs" />
     <Compile Include="ActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />

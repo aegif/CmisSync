@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -18,15 +18,15 @@
 using System;
 using System.Threading;
 
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    // This is SparkleShare!
+    // This is CmisSync!
     public class Program {
 
-        public static SparkleController Controller;
-        public static SparkleUI UI;
+        public static Controller Controller;
+        public static UI UI;
 
         private static Mutex program_mutex = new Mutex (false, "CmisSync");
      
@@ -37,27 +37,27 @@ namespace SparkleShare {
         {
 			Console.WriteLine("start");
             if (args.Length != 0 && !args [0].Equals ("start") &&
-                SparkleBackend.Platform != PlatformID.MacOSX &&
-                SparkleBackend.Platform != PlatformID.Win32NT) {
+                Backend.Platform != PlatformID.MacOSX &&
+                Backend.Platform != PlatformID.Win32NT) {
 
                 string n = Environment.NewLine;
 
                 Console.WriteLine (n +
-                    "SparkleShare is a collaboration and sharing tool that is" + n +
+                    "CmisSync is a collaboration and sharing tool that is" + n +
                     "designed to keep things simple and to stay out of your way." + n +
                     n +
-                    "Version: " + SparkleLib.SparkleBackend.Version + n +
+                    "Version: " + CmisSync.Lib.Backend.Version + n +
                     "Copyright (C) 2010 Hylke Bons" + n +
                     "This program comes with ABSOLUTELY NO WARRANTY." + n +
                     n +
                     "This is free software, and you are welcome to redistribute it" + n +
                     "under certain conditions. Please read the GNU GPLv3 for details." + n +
                     n +
-                    "Usage: sparkleshare [start|stop|restart]");
+                    "Usage: CmisSync [start|stop|restart]");
                 Environment.Exit (-1);
             }
 
-			// Only allow one instance of SparkleShare (on Windows)
+			// Only allow one instance of CmisSync (on Windows)
 			if (!program_mutex.WaitOne (0, false)) {
 				Console.WriteLine ("CmisSync is already running.");
 				Environment.Exit (-1);
@@ -66,16 +66,16 @@ namespace SparkleShare {
 //#if !DEBUG
             try {
 //#endif
-                Controller = new SparkleController ();
+                Controller = new Controller ();
                 Controller.Initialize ();
 
-                UI = new SparkleUI ();
+                UI = new UI ();
                 UI.Run ();
             
 //#if !DEBUG
             } catch (Exception e) {
 				Console.WriteLine("Exception in Program.Main");
-                SparkleLogger.WriteCrashReport (e);
+                Logger.WriteCrashReport (e);
                 Environment.Exit (-1);
             }
 //#endif

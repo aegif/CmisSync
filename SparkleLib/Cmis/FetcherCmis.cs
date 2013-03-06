@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -20,52 +20,52 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
 
     // Sets up a fetcher that can get remote folders
-    public class SparkleFetcher : SparkleFetcherBase
+    public class SparkleFetcher : FetcherBase
     {
-        SparkleRepoCmis CmisRepo;
+        RepoCmis CmisRepo;
 
         //public SparkleFetcher(string server, string required_fingerprint, string remote_path,
         //    string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
         //    string user, string password, SparkleConfig config, ActivityListener activityListener)
         //    : base(server, required_fingerprint,
         //        remote_path, target_folder, fetch_prior_history, repository, path, user, password)
-        public SparkleFetcher(SparkleRepoInfo repoInfo, ActivityListener activityListener)
+        public SparkleFetcher(RepoInfo repoInfo, ActivityListener activityListener)
             : base(repoInfo)
         {
-            SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher constructor");
+            Logger.LogInfo("Fetcher", "Cmis SparkleFetcher constructor");
             TargetFolder = repoInfo.TargetDirectory;
             RemoteUrl = repoInfo.Address;
 
             // String localPath = Path.Combine(SparkleFolder.ROOT_FOLDER, repoInfo.TargetDirectory);
             // String localPath = Path.Combine(SparkleConfig.DefaultConfig.FoldersPath, repoInfo.TargetDirectory);
 
-            if (!Directory.Exists(SparkleConfig.DefaultConfig.FoldersPath))
+            if (!Directory.Exists(Config.DefaultConfig.FoldersPath))
             {
-                SparkleLogger.LogInfo("Fecther", String.Format("ERROR - Cmis Default Folder {0} do not exist", SparkleConfig.DefaultConfig.FoldersPath));
+                Logger.LogInfo("Fecther", String.Format("ERROR - Cmis Default Folder {0} do not exist", Config.DefaultConfig.FoldersPath));
                 throw new DirectoryNotFoundException("Root folder don't exist !");
             }
 
-            if (!SparkleFolder.HasWritePermissionOnDir(SparkleConfig.DefaultConfig.FoldersPath))
+            if (!SparkleFolder.HasWritePermissionOnDir(Config.DefaultConfig.FoldersPath))
             {
-                SparkleLogger.LogInfo("Fetcher", String.Format("ERROR - Cmis Default Folder {0} is not writable", SparkleConfig.DefaultConfig.FoldersPath));
+                Logger.LogInfo("Fetcher", String.Format("ERROR - Cmis Default Folder {0} is not writable", Config.DefaultConfig.FoldersPath));
                 throw new UnauthorizedAccessException("Root folder is not writable!");
             }
 
             if (Directory.Exists(repoInfo.TargetDirectory))
             {
-                SparkleLogger.LogInfo("Fetcher", String.Format("ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
+                Logger.LogInfo("Fetcher", String.Format("ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
                 throw new UnauthorizedAccessException("Repository folder already exist!");
             }
 
             Directory.CreateDirectory(repoInfo.TargetDirectory);
 
-            CmisRepo = new SparkleRepoCmis(repoInfo, activityListener);
+            CmisRepo = new RepoCmis(repoInfo, activityListener);
 
             // CmisDirectory cmis = new CmisDirectory(canonical_name, path, remote_path, server, user, password, repository, activityListener);
             // cmis.Sync();
@@ -74,7 +74,7 @@ namespace SparkleLib.Cmis
 
         public override bool Fetch()
         {
-            SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher Fetch");
+            Logger.LogInfo("Fetcher", "Cmis SparkleFetcher Fetch");
             //double percentage = 1.0;
             //Regex progress_regex = new Regex(@"([0-9]+)%", RegexOptions.Compiled);
             //DateTime last_change = DateTime.Now;
@@ -89,7 +89,7 @@ namespace SparkleLib.Cmis
         {
             get
             {
-                SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher IsFetchedRepoEmpty");
+                Logger.LogInfo("Fetcher", "Cmis SparkleFetcher IsFetchedRepoEmpty");
                 return false; // TODO
             }
         }
@@ -97,34 +97,34 @@ namespace SparkleLib.Cmis
 
         public override void EnableFetchedRepoCrypto(string password)
         {
-            SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher EnableFetchedRepoCrypto");
+            Logger.LogInfo("Fetcher", "Cmis SparkleFetcher EnableFetchedRepoCrypto");
             // TODO
         }
 
 
         public override bool IsFetchedRepoPasswordCorrect(string password)
         {
-            SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher IsFetchedRepoPasswordCorrect");
+            Logger.LogInfo("Fetcher", "Cmis SparkleFetcher IsFetchedRepoPasswordCorrect");
             return true; // TODO
         }
 
 
         public override void Stop()
         {
-            SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher Stop");
+            Logger.LogInfo("Fetcher", "Cmis SparkleFetcher Stop");
         }
 
 
         public override void Complete()
         {
-            SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher Complete");
+            Logger.LogInfo("Fetcher", "Cmis SparkleFetcher Complete");
             // base.Complete();
         }
 
 
         private void InstallConfiguration()
         {
-            SparkleLogger.LogInfo("Fetcher", "Cmis SparkleFetcher InstallConfiguration");
+            Logger.LogInfo("Fetcher", "Cmis SparkleFetcher InstallConfiguration");
         }
 
     }

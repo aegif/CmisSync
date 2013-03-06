@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -20,13 +20,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Xml;
 
-namespace SparkleLib
+namespace CmisSync.Lib
 {
 
-    public class SparkleConfig : XmlDocument
+    public class Config : XmlDocument
     {
 
-        public static SparkleConfig DefaultConfig;
+        public static Config DefaultConfig;
 
         public string FullPath;
         public string TmpPath;
@@ -39,7 +39,7 @@ namespace SparkleLib
         {
             get
             {
-                if (SparkleBackend.Platform == PlatformID.Win32NT)
+                if (Backend.Platform == PlatformID.Win32NT)
                     return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 else
                     return Environment.GetFolderPath(Environment.SpecialFolder.Personal);
@@ -61,7 +61,7 @@ namespace SparkleLib
             {
                 try
                 {
-                    XmlNode debugNode = SelectSingleNode(@"/sparkleshare/debug");
+                    XmlNode debugNode = SelectSingleNode(@"/CmisSync/debug");
                     bool debug = false;
                     bool.TryParse(debugNode.InnerText, out debug);
                     return debug;
@@ -73,7 +73,7 @@ namespace SparkleLib
             }
         }
 
-        public SparkleConfig(string config_path, string config_file_name)
+        public Config(string config_path, string config_file_name)
         {
             configpath = config_path;
             FullPath = Path.Combine(config_path, config_file_name);
@@ -136,8 +136,8 @@ namespace SparkleLib
         {
             string user_name = "Unknown";
 
-            if (SparkleBackend.Platform == PlatformID.Unix ||
-                SparkleBackend.Platform == PlatformID.MacOSX)
+            if (Backend.Platform == PlatformID.Unix ||
+                Backend.Platform == PlatformID.MacOSX)
             {
 
                 user_name = Environment.UserName;
@@ -157,7 +157,7 @@ namespace SparkleLib
 
 
             AppendChild(CreateXmlDeclaration("1.0", "UTF-8", "yes"));
-            AppendChild(CreateElement("sparkleshare"));
+            AppendChild(CreateElement("CmisSync"));
             XmlNode user = CreateElement("user");
             XmlNode username = CreateElement("name");
             username.InnerText = user_name;
@@ -175,19 +175,19 @@ namespace SparkleLib
             //string n = Environment.NewLine;
             //File.WriteAllText(FullPath,
             //    "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + n +
-            //    "<sparkleshare>" + n +
+            //    "<CmisSync>" + n +
             //    "  <user>" + n +
             //    "    <name>" + user_name + "</name>" + n +
             //    "    <email>Unknown</email>" + n +
             //    "  </user>" + n +
             //    "  <log4net>" + n +
             //    "  <log4net>" + n +
-            //    "</sparkleshare>");
+            //    "</CmisSync>");
         }
 
         public XmlNode GetLog4NetConfig()
         {
-            return SelectSingleNode("/sparkleshare/log4net");
+            return SelectSingleNode("/CmisSync/log4net");
         }
 
         private void CreateLog4NetDefaultConfig()
@@ -246,20 +246,20 @@ namespace SparkleLib
         }
 
 
-        public SparkleUser User
+        public User User
         {
             get
             {
-                XmlNode name_node = SelectSingleNode("/sparkleshare/user/name/text()");
+                XmlNode name_node = SelectSingleNode("/CmisSync/user/name/text()");
                 string name = name_node.Value;
 
-                XmlNode email_node = SelectSingleNode("/sparkleshare/user/email/text()");
+                XmlNode email_node = SelectSingleNode("/CmisSync/user/email/text()");
                 string email = email_node.Value;
 
                 string pubkey_file_path = Path.Combine(
-                    Path.GetDirectoryName(FullPath), "sparkleshare." + email + ".key.pub");
+                    Path.GetDirectoryName(FullPath), "CmisSync." + email + ".key.pub");
 
-                SparkleUser user = new SparkleUser(name, email);
+                User user = new User(name, email);
 
                 if (File.Exists(pubkey_file_path))
                     user.PublicKey = File.ReadAllText(pubkey_file_path);
@@ -269,12 +269,12 @@ namespace SparkleLib
 
             set
             {
-                SparkleUser user = (SparkleUser)value;
+                User user = (User)value;
 
-                XmlNode name_node = SelectSingleNode("/sparkleshare/user/name/text()");
+                XmlNode name_node = SelectSingleNode("/CmisSync/user/name/text()");
                 name_node.InnerText = user.Name;
 
-                XmlNode email_node = SelectSingleNode("/sparkleshare/user/email/text()");
+                XmlNode email_node = SelectSingleNode("/CmisSync/user/email/text()");
                 email_node.InnerText = user.Email;
 
                 Save();
@@ -288,14 +288,14 @@ namespace SparkleLib
             {
                 List<string> folders = new List<string>();
 
-                foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folders/folder"))
+                foreach (XmlNode node_folder in SelectNodes("/CmisSync/folders/folder"))
                     folders.Add(node_folder["name"].InnerText);
 
                 return folders;
             }
         }
 
-        public void AddFolder(SparkleRepoInfo repoInfo)
+        public void AddFolder(RepoInfo repoInfo)
         {
             this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password);
         }
@@ -335,7 +335,7 @@ namespace SparkleLib
             node_folder.AppendChild(node_user);
             node_folder.AppendChild(node_password);
 
-            XmlNode node_root = SelectSingleNode("/sparkleshare/folders");
+            XmlNode node_root = SelectSingleNode("/CmisSync/folders");
             node_root.AppendChild(node_folder);
 
             Save();
@@ -344,10 +344,10 @@ namespace SparkleLib
 
         public void RemoveFolder(string name)
         {
-            foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folders/folder"))
+            foreach (XmlNode node_folder in SelectNodes("/CmisSync/folders/folder"))
             {
                 if (node_folder["name"].InnerText.Equals(name))
-                    SelectSingleNode("/sparkleshare/folders").RemoveChild(node_folder);
+                    SelectSingleNode("/CmisSync/folders").RemoveChild(node_folder);
             }
 
             Save();
@@ -357,7 +357,7 @@ namespace SparkleLib
         public void RenameFolder(string identifier, string name)
         {
             XmlNode node_folder = SelectSingleNode(
-                string.Format("/sparkleshare/folders/folder[identifier=\"{0}\"]", identifier));
+                string.Format("/CmisSync/folders/folder[identifier=\"{0}\"]", identifier));
 
             node_folder["name"].InnerText = name;
             Save();
@@ -387,7 +387,7 @@ namespace SparkleLib
             if (identifier == null)
                 throw new ArgumentNullException();
 
-            foreach (XmlNode node_folder in SelectNodes("/sparkleshare/folders/folder"))
+            foreach (XmlNode node_folder in SelectNodes("/CmisSync/folders/folder"))
             {
                 XmlElement folder_id = node_folder["identifier"];
 
@@ -442,9 +442,9 @@ namespace SparkleLib
             }
         }
 
-        public SparkleRepoInfo GetRepoInfo(string FolderName)
+        public RepoInfo GetRepoInfo(string FolderName)
         {
-            SparkleRepoInfo repoInfo = new SparkleRepoInfo(FolderName, ConfigPath);
+            RepoInfo repoInfo = new RepoInfo(FolderName, ConfigPath);
 
             repoInfo.User = GetFolderOptionalAttribute(FolderName, "user");
             repoInfo.Password = GetFolderOptionalAttribute(FolderName, "password");
@@ -462,7 +462,7 @@ namespace SparkleLib
 
         private XmlNode GetFolder(string name)
         {
-            return SelectSingleNode(string.Format("/sparkleshare/folders/folder[name=\"{0}\"]", name));
+            return SelectSingleNode(string.Format("/CmisSync/folders/folder[name=\"{0}\"]", name));
         }
 
 
@@ -479,7 +479,7 @@ namespace SparkleLib
 
         public string GetConfigOption(string name)
         {
-            XmlNode node = SelectSingleNode("/sparkleshare/" + name);
+            XmlNode node = SelectSingleNode("/CmisSync/" + name);
 
             if (node != null)
                 return node.InnerText;
@@ -490,7 +490,7 @@ namespace SparkleLib
 
         public void SetConfigOption(string name, string content)
         {
-            XmlNode node = SelectSingleNode("/sparkleshare/" + name);
+            XmlNode node = SelectSingleNode("/CmisSync/" + name);
 
             if (node != null)
             {
@@ -502,12 +502,12 @@ namespace SparkleLib
                 node = CreateElement(name);
                 node.InnerText = content;
 
-                XmlNode node_root = SelectSingleNode("/sparkleshare");
+                XmlNode node_root = SelectSingleNode("/CmisSync");
                 node_root.AppendChild(node);
             }
 
             Save();
-            SparkleLogger.LogInfo("Config", "Updated option " + name + ":" + content);
+            Logger.LogInfo("Config", "Updated option " + name + ":" + content);
         }
 
 
@@ -517,7 +517,7 @@ namespace SparkleLib
                 throw new FileNotFoundException(FullPath + " does not exist");
 
             Save(FullPath);
-            SparkleLogger.LogInfo("Config", "Wrote to '" + FullPath + "'");
+            Logger.LogInfo("Config", "Wrote to '" + FullPath + "'");
         }
     }
 }

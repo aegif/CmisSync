@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,10 @@
 using System;
 using System.IO;
 
-namespace SparkleLib {
+namespace CmisSync.Lib
+{
 
-    public class SparkleWatcher : FileSystemWatcher {
+    public class Watcher : FileSystemWatcher {
 
         public event ChangeEventEventHandler ChangeEvent = delegate { };
         public delegate void ChangeEventEventHandler (FileSystemEventArgs args);
@@ -28,7 +29,7 @@ namespace SparkleLib {
         private Object thread_lock = new Object ();
 
 
-        public SparkleWatcher (string path) : base (path)
+        public Watcher (string path) : base (path)
         {
             IncludeSubdirectories = true;
             EnableRaisingEvents   = true;

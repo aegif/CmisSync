@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,22 @@
 
 using System;
 
-namespace SparkleShare {
-    
-    public class SparkleBubbles {
+namespace CmisSync.Lib
+{
 
-        public SparkleBubblesController Controller = new SparkleBubblesController ();
+    public class QuotaExceededException : Exception {
+
+        public readonly int QuotaLimit = -1;
 
 
-        public SparkleBubbles ()
+        public QuotaExceededException ()
         {
-            Controller.ShowBubbleEvent += delegate (string title,
-                string subtext, string image_path) {
+        }
 
-                Program.UI.StatusIcon.ShowBalloon (title, subtext, image_path);
-            };
+
+        public QuotaExceededException (string message, int quota_limit) : base (message)
+        {
+            QuotaLimit = quota_limit;
         }
     }
 }
-

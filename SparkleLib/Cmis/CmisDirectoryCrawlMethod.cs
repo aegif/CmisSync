@@ -15,9 +15,9 @@ using DotCMIS.Data.Impl;
 
 using System.Net;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
-    public partial class SparkleRepoCmis : SparkleRepoBase
+    public partial class RepoCmis : RepoBase
     {
         /**
          * Synchronization with a particular CMIS folder.
@@ -166,7 +166,7 @@ namespace SparkleLib.Cmis
                             // It sometimes happen on IBM P8 CMIS server, not sure why.
                             if (remoteDocumentFileName == null)
                             {
-                                SparkleLogger.LogInfo("Sync", "Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
+                                Logger.LogInfo("Sync", "Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
                                 continue;
                             }
 
@@ -180,7 +180,7 @@ namespace SparkleLib.Cmis
 
                                 if (lastDatabaseUpdate == null)
                                 {
-                                    SparkleLogger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
+                                    Logger.LogInfo("Sync", "Downloading file absent from database: " + remoteDocumentFileName);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                                 else
@@ -190,7 +190,7 @@ namespace SparkleLib.Cmis
                                     {
                                         if (database.LocalFileHasChanged(filePath))
                                         {
-                                            SparkleLogger.LogInfo("Sync", "Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
+                                            Logger.LogInfo("Sync", "Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
                                             // Rename locally modified file.
                                             String ext = Path.GetExtension(filePath);
                                             String filename = Path.GetFileNameWithoutExtension(filePath);
@@ -210,7 +210,7 @@ namespace SparkleLib.Cmis
                                         }
                                         else
                                         {
-                                            SparkleLogger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
+                                            Logger.LogInfo("Sync", "Downloading modified file: " + remoteDocumentFileName);
                                             DownloadFile(remoteDocument, localFolder);
                                         }
                                     }
@@ -232,7 +232,7 @@ namespace SparkleLib.Cmis
                                 else
                                 {
                                     // New remote file, download it.
-                                    SparkleLogger.LogInfo("Sync", "Downloading new file: " + remoteDocumentFileName);
+                                    Logger.LogInfo("Sync", "Downloading new file: " + remoteDocumentFileName);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                             }
@@ -263,7 +263,7 @@ namespace SparkleLib.Cmis
                                 // TODO
 
                                 // File has been deleted on server, so delete it locally.
-                                SparkleLogger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
+                                Logger.LogInfo("Sync", "Removing remotely deleted file: " + filePath);
                                 File.Delete(filePath);
 
                                 // Delete file from database.
@@ -274,7 +274,7 @@ namespace SparkleLib.Cmis
                                 if (BIDIRECTIONAL)
                                 {
                                     // New file, sync up.
-                                    SparkleLogger.LogInfo("Sync", "Uploading file absent on repository: " + filePath);
+                                    Logger.LogInfo("Sync", "Uploading file absent on repository: " + filePath);
                                     UploadFile(filePath, remoteFolder);
                                 }
                             }
@@ -287,7 +287,7 @@ namespace SparkleLib.Cmis
                                 if (BIDIRECTIONAL)
                                 {
                                     // Upload new version of file content.
-                                    SparkleLogger.LogInfo("Sync", "Uploading file update on repository: " + filePath);
+                                    Logger.LogInfo("Sync", "Uploading file update on repository: " + filePath);
                                     UpdateFile(filePath, remoteFolder);
                                 }
                             }
@@ -357,7 +357,7 @@ namespace SparkleLib.Cmis
             {
                 if (syncing)
                 {
-                    SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", repoinfo.TargetDirectory));
+                    Logger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", repoinfo.TargetDirectory));
                     return;
                 }
                 syncing = true;
@@ -366,7 +366,7 @@ namespace SparkleLib.Cmis
                 bw.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
-                        SparkleLogger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
+                        Logger.LogInfo("Sync", String.Format("[{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
 #if !DEBUG
                         try
                         {
@@ -376,9 +376,9 @@ namespace SparkleLib.Cmis
                         }
                         catch (CmisBaseException e)
                         {
-                            SparkleLogger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
-                            SparkleLogger.LogInfo("Sync", e.StackTrace);
-                            SparkleLogger.LogInfo("Sync", e.ErrorContent);
+                            Logger.LogInfo("Sync", "CMIS exception while syncing:" + e.Message);
+                            Logger.LogInfo("Sync", e.StackTrace);
+                            Logger.LogInfo("Sync", e.ErrorContent);
                         }
 #endif
                     }

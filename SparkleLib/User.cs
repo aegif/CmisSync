@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,21 @@
 
 using System;
 
-namespace SparkleLib {
+namespace CmisSync.Lib
+{
 
-    public class QuotaExceededException : Exception {
+    public class User {
 
-        public readonly int QuotaLimit = -1;
+        public readonly string Name;
+        public readonly string Email;
+
+        public string PublicKey;
 
 
-        public QuotaExceededException ()
+        public User (string name, string email)
         {
-        }
-
-
-        public QuotaExceededException (string message, int quota_limit) : base (message)
-        {
-            QuotaLimit = quota_limit;
+            Name  = name;
+            Email = email;
         }
     }
 }

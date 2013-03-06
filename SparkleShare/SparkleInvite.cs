@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons (hylkebons@gmail.com)
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -21,9 +21,9 @@ using System.Net;
 using System.Text;
 using System.Xml;
 
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
     public class SparkleInvite {
 
@@ -55,25 +55,25 @@ namespace SparkleShare {
             try {
                 xml_document.Load (xml_file_path);
 
-                node = xml_document.SelectSingleNode ("/sparkleshare/invite/address/text()");
+                node = xml_document.SelectSingleNode ("/CmisSync/invite/address/text()");
                 if (node != null) { address = node.Value; }
 
-                node = xml_document.SelectSingleNode ("/sparkleshare/invite/remote_path/text()");
+                node = xml_document.SelectSingleNode ("/CmisSync/invite/remote_path/text()");
                 if (node != null) { remote_path = node.Value; }
 
-                node = xml_document.SelectSingleNode ("/sparkleshare/invite/accept_url/text()");
+                node = xml_document.SelectSingleNode ("/CmisSync/invite/accept_url/text()");
                 if (node != null) { accept_url = node.Value; }
 
-                node = xml_document.SelectSingleNode ("/sparkleshare/invite/announcements_url/text()");
+                node = xml_document.SelectSingleNode ("/CmisSync/invite/announcements_url/text()");
                 if (node != null) { announcements_url = node.Value; }
 
-                node = xml_document.SelectSingleNode ("/sparkleshare/invite/fingerprint/text()");
+                node = xml_document.SelectSingleNode ("/CmisSync/invite/fingerprint/text()");
                 if (node != null) { fingerprint = node.Value; }
 
                 Initialize (address, remote_path, accept_url, announcements_url, fingerprint);
 
             } catch (XmlException e) {
-                SparkleLogger.LogInfo ("Invite", "Invalid XML: " + e.Message);
+                Logger.LogInfo ("Invite", "Invalid XML: " + e.Message);
                 return;
             }
         }
@@ -104,12 +104,12 @@ namespace SparkleShare {
                 response.Close ();
 
             } catch (WebException e) {
-                SparkleLogger.LogInfo ("Invite", "Failed uploading public key to " + AcceptUrl + ": " + e.Message);
+                Logger.LogInfo ("Invite", "Failed uploading public key to " + AcceptUrl + ": " + e.Message);
                 return false;
             }
 
             if (response != null && response.StatusCode == HttpStatusCode.OK) {
-                SparkleLogger.LogInfo ("Invite", "Uploaded public key to " + AcceptUrl);
+                Logger.LogInfo ("Invite", "Uploaded public key to " + AcceptUrl);
                 return true;
 
             } else {

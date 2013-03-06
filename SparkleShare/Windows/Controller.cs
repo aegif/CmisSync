@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -27,18 +27,18 @@ using System.Threading;
 using Forms = System.Windows.Forms;
 
 using Microsoft.Win32;
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare
+namespace CmisSync
 {
 
-    public class SparkleController : SparkleControllerBase
+    public class Controller : SparkleControllerBase
     {
 
         private int ssh_agent_pid;
 
 
-        public SparkleController()
+        public Controller()
             : base()
         {
         }
@@ -79,8 +79,8 @@ namespace SparkleShare
         {
             get
             {
-                string html = SparkleUIHelpers.GetHTML("event-log.html");
-                return html.Replace("<!-- $jquery -->", SparkleUIHelpers.GetHTML("jquery.js"));
+                string html = UIHelpers.GetHTML("event-log.html");
+                return html.Replace("<!-- $jquery -->", UIHelpers.GetHTML("jquery.js"));
             }
         }
 
@@ -89,7 +89,7 @@ namespace SparkleShare
         {
             get
             {
-                return SparkleUIHelpers.GetHTML("day-entry.html");
+                return UIHelpers.GetHTML("day-entry.html");
             }
         }
 
@@ -98,7 +98,7 @@ namespace SparkleShare
         {
             get
             {
-                return SparkleUIHelpers.GetHTML("event-entry.html");
+                return UIHelpers.GetHTML("event-entry.html");
             }
         }
 
@@ -139,7 +139,7 @@ namespace SparkleShare
         }
 
 
-        public override bool CreateSparkleShareFolder()
+        public override bool CreateCmisSyncFolder()
         {
             if (Directory.Exists(FoldersPath))
                 return false;
@@ -147,10 +147,10 @@ namespace SparkleShare
             Directory.CreateDirectory(FoldersPath);
             File.SetAttributes(FoldersPath, File.GetAttributes(FoldersPath) | FileAttributes.System);
 
-            SparkleLogger.LogInfo("Config", "Created '" + FoldersPath + "'");
+            Logger.LogInfo("Config", "Created '" + FoldersPath + "'");
 
             string app_path = Path.GetDirectoryName(Forms.Application.ExecutablePath);
-            string icon_file_path = Path.Combine(app_path, "Pixmaps", "sparkleshare-folder.ico");
+            string icon_file_path = Path.Combine(app_path, "Pixmaps", "CmisSync-folder.ico");
 
             if (!File.Exists(icon_file_path))
             {
@@ -159,7 +159,7 @@ namespace SparkleShare
                 string ini_file = "[.ShellClassInfo]" +
                     "IconFile=" + icon_file_path +
                     "IconIndex=0" +
-                    "InfoTip=SparkleShare";
+                    "InfoTip=CmisSync";
 
                 try
                 {
@@ -172,7 +172,7 @@ namespace SparkleShare
                 }
                 catch (IOException e)
                 {
-                    SparkleLogger.LogInfo("Config",
+                    Logger.LogInfo("Config",
                         "Failed setting icon for '" + FoldersPath + "': " + e.Message);
                 }
 
@@ -211,7 +211,7 @@ namespace SparkleShare
 
             if (!string.IsNullOrEmpty(auth_sock))
             {
-                SparkleLogger.LogInfo("Controller", "Using existing ssh-agent with PID=" + this.ssh_agent_pid);
+                Logger.LogInfo("Controller", "Using existing ssh-agent with PID=" + this.ssh_agent_pid);
                 return;
             }
 
@@ -239,12 +239,12 @@ namespace SparkleShare
                 Int32.TryParse(ssh_pid, out this.ssh_agent_pid);
                 Environment.SetEnvironmentVariable("SSH_AGENT_PID", ssh_pid);
 
-                SparkleLogger.LogInfo("Controller", "ssh-agent started, PID=" + ssh_pid);
+                Logger.LogInfo("Controller", "ssh-agent started, PID=" + ssh_pid);
 
             }
             else
             {
-                SparkleLogger.LogInfo("Controller", "ssh-agent started, PID=Unknown");
+                Logger.LogInfo("Controller", "ssh-agent started, PID=Unknown");
             }
         }
 
@@ -261,7 +261,7 @@ namespace SparkleShare
             }
             catch (ArgumentException e)
             {
-                SparkleLogger.LogInfo("SSH", "Could not stop ssh-agent: " + e.Message);
+                Logger.LogInfo("SSH", "Could not stop ssh-agent: " + e.Message);
             }
         }
     }

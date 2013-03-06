@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -23,17 +23,17 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-using SparkleLib;
-using SparkleLib.Cmis;
+using CmisSync.Lib;
+using CmisSync.Lib.Cmis;
 
-namespace SparkleShare
+namespace CmisSync
 {
 
     public abstract class SparkleControllerBase : ActivityListener
     {
-        private SparkleRepoInfo repoInfo;
+        private RepoInfo repoInfo;
 
-        public SparkleRepoBase[] Repositories
+        public RepoBase[] Repositories
         {
             get
             {
@@ -44,7 +44,7 @@ namespace SparkleShare
 
         public bool RepositoriesLoaded { get; private set; }
 
-        private List<SparkleRepoBase> repositories = new List<SparkleRepoBase>();
+        private List<RepoBase> repositories = new List<RepoBase>();
         public string FoldersPath { get; private set; }
 
         public double ProgressPercentage = 0.0;
@@ -108,7 +108,7 @@ namespace SparkleShare
             {
                 List<string> unsynced_folders = new List<string>();
 
-                foreach (SparkleRepoBase repo in Repositories)
+                foreach (RepoBase repo in Repositories)
                 {
                     if (repo.HasUnsyncedChanges)
                         unsynced_folders.Add(repo.Name);
@@ -118,7 +118,7 @@ namespace SparkleShare
             }
         }
 
-        public SparkleUser CurrentUser
+        public User CurrentUser
         {
             get
             {
@@ -158,20 +158,20 @@ namespace SparkleShare
         // Path where the plugins are kept
         public abstract string PluginsPath { get; }
 
-        // Enables SparkleShare to start automatically at login
+        // Enables CmisSync to start automatically at login
         public abstract void CreateStartupItem();
 
-        // Installs the sparkleshare:// protocol handler
+        // Installs the CmisSync:// protocol handler
         public abstract void InstallProtocolHandler();
 
-        // Adds the SparkleShare folder to the user's
+        // Adds the CmisSync folder to the user's
         // list of bookmarked places
         public abstract void AddToBookmarks();
 
-        // Creates the SparkleShare folder in the user's home folder
-        public abstract bool CreateSparkleShareFolder();
+        // Creates the CmisSync folder in the user's home folder
+        public abstract bool CreateCmisSyncFolder();
 
-        // Opens the SparkleShare folder or an (optional) subfolder
+        // Opens the CmisSync folder or an (optional) subfolder
         public abstract void OpenFolder(string path);
 
         // Opens a file with the appropriate application
@@ -179,7 +179,7 @@ namespace SparkleShare
 
 
         private ActivityListener activityListenerAggregator;
-        private SparkleConfig config;
+        private Config config;
         // private SparkleFetcherBase fetcher;
         private SparkleFetcher fetcher;
         private FileSystemWatcher watcher;
@@ -194,8 +194,8 @@ namespace SparkleShare
             string app_data_path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string config_path = Path.Combine(app_data_path, "cmissync");
 
-            this.config = new SparkleConfig(config_path, "config.xml");
-            SparkleConfig.DefaultConfig = this.config;
+            this.config = new Config(config_path, "config.xml");
+            Config.DefaultConfig = this.config;
             FoldersPath = this.config.FoldersPath;
         }
 
@@ -205,8 +205,8 @@ namespace SparkleShare
             SparklePlugin.PluginsPath = PluginsPath;
             InstallProtocolHandler();
 
-            // Create the SparkleShare folder and add it to the bookmarks
-            if (CreateSparkleShareFolder())
+            // Create the CmisSync folder and add it to the bookmarks
+            if (CreateCmisSyncFolder())
                 AddToBookmarks();
 
             if (FirstRun)
@@ -234,7 +234,7 @@ namespace SparkleShare
                     string link_code_file_path  = Path.Combine (FoldersPath, CurrentUser.Name + "'s link code.txt");
 
                     // Create an easily accessible copy of the public
-                    // key in the user's SparkleShare folder
+                    // key in the user's CmisSync folder
                     if (File.Exists (public_key_file_path) && !File.Exists (link_code_file_path))
                         File.Copy (public_key_file_path, link_code_file_path, true);
 
@@ -245,7 +245,7 @@ namespace SparkleShare
                 */
             }
 
-            // Watch the SparkleShare folder
+            // Watch the CmisSync folder
             this.watcher = new FileSystemWatcher()
             {
                 Filter = "*",
@@ -283,18 +283,18 @@ namespace SparkleShare
 
         private void AddRepository(string folder_path)
         {
-            SparkleRepoBase repo = null;
+            RepoBase repo = null;
             string folder_name = Path.GetFileName(folder_path);
             //string backend       = this.config.GetBackendForFolder (folder_name);
 
             //try {
             //repo = (SparkleRepoBase) Activator.CreateInstance (
-            //    Type.GetType ("SparkleLib." + backend + ".SparkleRepo, SparkleLib." + backend),
+            //    Type.GetType ("CmisSync.Lib." + backend + ".SparkleRepo, CmisSync.Lib." + backend),
             //        new object [] { folder_path, this.config }
             //);
 
-            SparkleRepoInfo repositoryInfo = config.GetRepoInfo(folder_name);
-            repo = new SparkleLib.Cmis.SparkleRepoCmis(repositoryInfo, activityListenerAggregator);
+            RepoInfo repositoryInfo = config.GetRepoInfo(folder_name);
+            repo = new CmisSync.Lib.Cmis.RepoCmis(repositoryInfo, activityListenerAggregator);
 
             //} catch (Exception e) {
             //    SparkleLogger.LogInfo ("Controller",
@@ -337,7 +337,7 @@ namespace SparkleShare
             {
                 if (NotificationsEnabled)
                     AlertNotificationRaised("Conflict detected",
-                        "Don't worry, SparkleShare made a copy of each conflicting file.");
+                        "Don't worry, CmisSync made a copy of each conflicting file.");
             };
 
             this.repositories.Add(repo);
@@ -351,7 +351,7 @@ namespace SparkleShare
             {
                 for (int i = 0; i < this.repositories.Count; i++)
                 {
-                    SparkleRepoBase repo = this.repositories[i];
+                    RepoBase repo = this.repositories[i];
 
                     if (repo.LocalPath.Equals(folder_path))
                     {
@@ -391,7 +391,7 @@ namespace SparkleShare
 
                     if (this.config.GetIdentifierForFolder(folder_name) == null)
                     {
-                        string identifier_file_path = Path.Combine(folder_path, ".sparkleshare");
+                        string identifier_file_path = Path.Combine(folder_path, ".CmisSync");
 
                         if (!File.Exists(identifier_file_path))
                             continue;
@@ -406,7 +406,7 @@ namespace SparkleShare
                             string new_folder_path = Path.Combine(path, folder_name);
                             AddRepository(new_folder_path);
 
-                            SparkleLogger.LogInfo("Controller",
+                            Logger.LogInfo("Controller",
                                 "Renamed folder with identifier " + identifier + " to '" + folder_name + "'");
                         }
                     }
@@ -421,7 +421,7 @@ namespace SparkleShare
                         RemoveRepository(folder_path);
                         this.config.RemoveFolder(folder_name);
 
-                        SparkleLogger.LogInfo("Controller",
+                        Logger.LogInfo("Controller",
                             "Removed folder '" + folder_name + "' from config");
 
                     }
@@ -441,7 +441,7 @@ namespace SparkleShare
         {
             bool has_unsynced_repos = false;
 
-            foreach (SparkleRepoBase repo in Repositories)
+            foreach (RepoBase repo in Repositories)
             {
                 if (repo.Status == SyncStatus.SyncDown || repo.Status == SyncStatus.SyncUp || repo.IsBuffering)
                 {
@@ -513,7 +513,7 @@ namespace SparkleShare
                 this.fetcher.IsActive)
             {
 
-                AlertNotificationRaised("SparkleShare Setup seems busy", "Please wait for it to finish");
+                AlertNotificationRaised("CmisSync Setup seems busy", "Please wait for it to finish");
 
             }
             else
@@ -563,10 +563,10 @@ namespace SparkleShare
             //string tmp_folder     = Path.Combine (tmp_path, canonical_name);
             //string backend        = SparkleFetcherBase.GetBackend (remote_path);
 
-            //fetcher = new SparkleLib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
+            //fetcher = new CmisSync.Lib.Cmis.SparkleFetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
             //    fetch_prior_history, canonical_name, repository, path, user, password, activityListenerAggregator);
 
-            repoInfo = new SparkleRepoInfo(local_path, this.config.ConfigPath);
+            repoInfo = new RepoInfo(local_path, this.config.ConfigPath);
             repoInfo.Address = new Uri(address);
             repoInfo.Fingerprint = required_fingerprint;
             repoInfo.RemotePath = remote_path;
@@ -576,12 +576,12 @@ namespace SparkleShare
             repoInfo.Password = CmisCrypto.Protect(password);
             repoInfo.TargetDirectory = Path.Combine(this.config.FoldersPath, local_path);
 
-            fetcher = new SparkleLib.Cmis.SparkleFetcher(repoInfo, activityListenerAggregator);
+            fetcher = new CmisSync.Lib.Cmis.SparkleFetcher(repoInfo, activityListenerAggregator);
 
             //try {
-            //    SparkleLogger.LogInfo("Controller", "Getting type " + "SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend);
+            //    SparkleLogger.LogInfo("Controller", "Getting type " + "CmisSync.Lib." + backend + ".SparkleFetcher, CmisSync.Lib." + backend);
             //    this.fetcher = (SparkleFetcherBase) Activator.CreateInstance (
-            //        Type.GetType("SparkleLib." + backend + ".SparkleFetcher, SparkleLib." + backend),
+            //        Type.GetType("CmisSync.Lib." + backend + ".SparkleFetcher, CmisSync.Lib." + backend),
             //            address, required_fingerprint, remote_path, tmp_folder, fetch_prior_history
             //    );
             //
@@ -637,12 +637,12 @@ namespace SparkleShare
                 try
                 {
                     Directory.Delete(this.fetcher.TargetFolder, true);
-                    SparkleLogger.LogInfo("Controller", "Deleted " + this.fetcher.TargetFolder);
+                    Logger.LogInfo("Controller", "Deleted " + this.fetcher.TargetFolder);
 
                 }
                 catch (Exception e)
                 {
-                    SparkleLogger.LogInfo("Controller",
+                    Logger.LogInfo("Controller",
                         "Failed to delete " + this.fetcher.TargetFolder + ": " + e.Message);
                 }
             }
@@ -746,13 +746,13 @@ namespace SparkleShare
         }
 
 
-        public void OpenSparkleShareFolder()
+        public void OpenCmisSyncFolder()
         {
             OpenFolder(this.config.FoldersPath);
         }
 
 
-        public void OpenSparkleShareFolder(string name)
+        public void OpenCmisSyncFolder(string name)
         {
             OpenFolder(new SparkleFolder(name).FullPath);
         }
@@ -803,11 +803,11 @@ namespace SparkleShare
                     if (!Directory.Exists(avatars_path))
                     {
                         Directory.CreateDirectory(avatars_path);
-                        SparkleLogger.LogInfo("Controller", "Created '" + avatars_path + "'");
+                        Logger.LogInfo("Controller", "Created '" + avatars_path + "'");
                     }
 
                     File.WriteAllBytes(avatar_file_path, buffer);
-                    SparkleLogger.LogInfo("Controller", "Fetched " + size + "x" + size + " avatar for " + email);
+                    Logger.LogInfo("Controller", "Fetched " + size + "x" + size + " avatar for " + email);
 
                     return avatar_file_path;
 
@@ -820,7 +820,7 @@ namespace SparkleShare
             }
             catch (WebException e)
             {
-                SparkleLogger.LogInfo("Controller", "Error fetching avatar: " + e.Message);
+                Logger.LogInfo("Controller", "Error fetching avatar: " + e.Message);
                 return null;
             }
         }
@@ -856,7 +856,7 @@ namespace SparkleShare
 
         public virtual void Quit()
         {
-            foreach (SparkleRepoBase repo in Repositories)
+            foreach (RepoBase repo in Repositories)
                 repo.Dispose();
 
             Environment.Exit(0);

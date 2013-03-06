@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -34,11 +34,11 @@ using Drawing = System.Drawing;
 using Imaging = System.Windows.Interop.Imaging;
 using WPF = System.Windows.Controls;
 
-using SparkleLib.Cmis;
-using SparkleLib;
+using CmisSync.Lib.Cmis;
+using CmisSync.Lib;
 using System.Globalization;
 
-namespace SparkleShare
+namespace CmisSync
 {
 
     /**
@@ -56,12 +56,12 @@ namespace SparkleShare
         }
     }
 
-    public class SparkleSetup : SparkleSetupWindow
+    public class Setup : SetupWindow
     {
 
         public SparkleSetupController Controller = new SparkleSetupController();
 
-        public SparkleSetup()
+        public Setup()
         {
             Controller.ShowWindowEvent += delegate
             {
@@ -93,17 +93,17 @@ namespace SparkleShare
                         #region Page Setup
                         case PageType.Setup:
                             {
-                                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
-                                Description = SparkleShare.Properties.Resources.ResourceManager.GetString("Intro", CultureInfo.CurrentCulture);
+                                Header = CmisSync.Properties.Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
+                                Description = CmisSync.Properties.Resources.ResourceManager.GetString("Intro", CultureInfo.CurrentCulture);
 
                                 Button cancel_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                                 };
 
                                 Button continue_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture),
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture),
                                     IsEnabled = false
                                 };
 
@@ -144,7 +144,7 @@ namespace SparkleShare
                         case PageType.Invite:
                             {
                                 Header = "You've received an invite!";
-                                Description = "Do you want to add this project to SparkleShare?";
+                                Description = "Do you want to add this project to CmisSync?";
 
 
                                 TextBlock address_label = new TextBlock()
@@ -226,12 +226,12 @@ namespace SparkleShare
                         #region Page Add1
                         case PageType.Add1:
                             {
-                                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Where", CultureInfo.CurrentCulture);
+                                Header = CmisSync.Properties.Resources.ResourceManager.GetString("Where", CultureInfo.CurrentCulture);
 
                                 // Address
                                 TextBlock address_label = new TextBlock()
                                 {
-                                    Text = SparkleShare.Properties.Resources.ResourceManager.GetString("EnterWebAddress", CultureInfo.CurrentCulture),
+                                    Text = CmisSync.Properties.Resources.ResourceManager.GetString("EnterWebAddress", CultureInfo.CurrentCulture),
                                     FontWeight = FontWeights.Bold
                                 };
 
@@ -244,11 +244,11 @@ namespace SparkleShare
 
                                 TextBlock address_help_label = new TextBlock()
                                 {
-                                    Text = SparkleShare.Properties.Resources.ResourceManager.GetString("Help", CultureInfo.CurrentCulture) + ": ",
+                                    Text = CmisSync.Properties.Resources.ResourceManager.GetString("Help", CultureInfo.CurrentCulture) + ": ",
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
                                 };
-                                Run run = new Run(SparkleShare.Properties.Resources.ResourceManager.GetString("WhereToFind", CultureInfo.CurrentCulture));
+                                Run run = new Run(CmisSync.Properties.Resources.ResourceManager.GetString("WhereToFind", CultureInfo.CurrentCulture));
                                 Hyperlink link = new Hyperlink(run);
                                 link.NavigateUri = new Uri("https://github.com/nicolas-raoul/CmisSync/wiki/What-address");
                                 address_help_label.Inlines.Add(link);
@@ -267,7 +267,7 @@ namespace SparkleShare
                                 // User
                                 TextBlock user_label = new TextBlock()
                                 {
-                                    Text = SparkleShare.Properties.Resources.ResourceManager.GetString("User", CultureInfo.CurrentCulture) + ":",
+                                    Text = CmisSync.Properties.Resources.ResourceManager.GetString("User", CultureInfo.CurrentCulture) + ":",
                                     FontWeight = FontWeights.Bold,
                                     Width = 200
                                 };
@@ -290,7 +290,7 @@ namespace SparkleShare
                                 // Password
                                 TextBlock password_label = new TextBlock()
                                 {
-                                    Text = SparkleShare.Properties.Resources.ResourceManager.GetString("Password", CultureInfo.CurrentCulture) + ":",
+                                    Text = CmisSync.Properties.Resources.ResourceManager.GetString("Password", CultureInfo.CurrentCulture) + ":",
                                     FontWeight = FontWeights.Bold,
                                     Width = 200
                                 };
@@ -311,12 +311,12 @@ namespace SparkleShare
 
                                 Button cancel_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                                 };
 
                                 Button continue_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                                 };
 
                                 Buttons.Add(continue_button);
@@ -420,7 +420,7 @@ namespace SparkleShare
                                     string error = Controller.CheckAddPage(address_box.Text);
                                     if (!String.IsNullOrEmpty(error))
                                     {
-                                        address_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                        address_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
                                         address_error_label.Visibility = Visibility.Visible;
                                     }
                                     else address_error_label.Visibility = Visibility.Hidden;
@@ -431,7 +431,7 @@ namespace SparkleShare
                                 //    string error = Controller.CheckAddPage(address_box.Text);
                                 //    if (!String.IsNullOrEmpty(error))
                                 //    {
-                                //        address_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                //        address_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
                                 //        address_error_label.Visibility = Visibility.Visible;
                                 //    }
                                 //    else address_error_label.Visibility = Visibility.Hidden;
@@ -459,7 +459,7 @@ namespace SparkleShare
                                     catch (CmisPermissionDeniedException ex)
                                     {
                                         // Show warning
-                                        address_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString(ex.Message, CultureInfo.CurrentCulture);
+                                        address_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(ex.Message, CultureInfo.CurrentCulture);
                                         address_error_label.Visibility = Visibility.Visible;
                                         return;
                                     }
@@ -471,7 +471,7 @@ namespace SparkleShare
                                     if (Controller.repositories == null)
                                     {
                                         // Show warning
-                                        address_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture);
+                                        address_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture);
                                         address_error_label.Visibility = Visibility.Visible;
                                     }
                                     else
@@ -489,7 +489,7 @@ namespace SparkleShare
                         #region Page Add2
                         case PageType.Add2:
                             {
-                                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Which", CultureInfo.CurrentCulture);
+                                Header = CmisSync.Properties.Resources.ResourceManager.GetString("Which", CultureInfo.CurrentCulture);
 
                                 System.Windows.Controls.TreeView treeView = new System.Windows.Controls.TreeView();
                                 treeView.Width = 410;
@@ -551,17 +551,17 @@ namespace SparkleShare
 
                                 Button cancel_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                                 };
 
                                 Button continue_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                                 };
 
                                 Button back_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture)
                                 };
 
                                 Buttons.Add(back_button);
@@ -592,12 +592,12 @@ namespace SparkleShare
                         #region Page Customize
                         case PageType.Customize:
                             {
-                                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Customize", CultureInfo.CurrentCulture);
+                                Header = CmisSync.Properties.Resources.ResourceManager.GetString("Customize", CultureInfo.CurrentCulture);
 
                                 // Customize local folder name
                                 TextBlock localfolder_label = new TextBlock()
                                 {
-                                    Text = SparkleShare.Properties.Resources.ResourceManager.GetString("EnterLocalFolderName", CultureInfo.CurrentCulture),
+                                    Text = CmisSync.Properties.Resources.ResourceManager.GetString("EnterLocalFolderName", CultureInfo.CurrentCulture),
                                     FontWeight = FontWeights.Bold
                                 };
 
@@ -617,17 +617,17 @@ namespace SparkleShare
 
                                 Button cancel_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                                 };
 
                                 Button add_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
                                 };
 
                                 Button back_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture)
                                 };
 
                                 Buttons.Add(back_button);
@@ -678,7 +678,7 @@ namespace SparkleShare
                                 string error = Controller.CheckLocalFolderName(localfolder_box.Text);
                                 if (!String.IsNullOrEmpty(error))
                                 {
-                                    localfolder_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                    localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
                                     localfolder_error_label.Visibility = Visibility.Visible;
                                 }
                                 else localfolder_error_label.Visibility = Visibility.Hidden;
@@ -688,7 +688,7 @@ namespace SparkleShare
                                     error = Controller.CheckLocalFolderName(localfolder_box.Text);
                                     if (!String.IsNullOrEmpty(error))
                                     {
-                                        localfolder_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                        localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
                                         localfolder_error_label.Visibility = Visibility.Visible;
                                     }
                                     else localfolder_error_label.Visibility = Visibility.Hidden;
@@ -715,18 +715,18 @@ namespace SparkleShare
                         #region Page Syncing
                         case PageType.Syncing:
                             {
-                                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("AddingFolder", CultureInfo.CurrentCulture) + " ‘" + Controller.SyncingFolder + "’…";
-                                Description = SparkleShare.Properties.Resources.ResourceManager.GetString("MayTakeTime", CultureInfo.CurrentCulture);
+                                Header = CmisSync.Properties.Resources.ResourceManager.GetString("AddingFolder", CultureInfo.CurrentCulture) + " ‘" + Controller.SyncingFolder + "’…";
+                                Description = CmisSync.Properties.Resources.ResourceManager.GetString("MayTakeTime", CultureInfo.CurrentCulture);
 
                                 Button finish_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture),
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture),
                                     IsEnabled = false
                                 };
 
                                 Button cancel_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                                 };
 
                                 ProgressBar progress_bar = new ProgressBar()
@@ -841,17 +841,17 @@ namespace SparkleShare
                         #region Page Finished
                         case PageType.Finished:
                             {
-                                Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Ready", CultureInfo.CurrentCulture);
-                                Description = SparkleShare.Properties.Resources.ResourceManager.GetString("YouCanFind", CultureInfo.CurrentCulture);
+                                Header = CmisSync.Properties.Resources.ResourceManager.GetString("Ready", CultureInfo.CurrentCulture);
+                                Description = CmisSync.Properties.Resources.ResourceManager.GetString("YouCanFind", CultureInfo.CurrentCulture);
 
                                 Button finish_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture)
                                 };
 
                                 Button open_folder_button = new Button()
                                 {
-                                    Content = SparkleShare.Properties.Resources.ResourceManager.GetString("OpenFolder", CultureInfo.CurrentCulture)
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("OpenFolder", CultureInfo.CurrentCulture)
                                 };
 
                                 /*if (warnings.Length > 0) {
@@ -906,8 +906,8 @@ namespace SparkleShare
                                 {
                                     case 1:
                                         {
-                                            Header = SparkleShare.Properties.Resources.ResourceManager.GetString("WhatsNext", CultureInfo.CurrentCulture);
-                                            Description = SparkleShare.Properties.Resources.ResourceManager.GetString("CmisSyncCreates", CultureInfo.CurrentCulture);
+                                            Header = CmisSync.Properties.Resources.ResourceManager.GetString("WhatsNext", CultureInfo.CurrentCulture);
+                                            Description = CmisSync.Properties.Resources.ResourceManager.GetString("CmisSyncCreates", CultureInfo.CurrentCulture);
 
 
                                             WPF.Image slide_image = new WPF.Image()
@@ -916,16 +916,16 @@ namespace SparkleShare
                                                 Height = 200
                                             };
 
-                                            slide_image.Source = SparkleUIHelpers.GetImageSource("tutorial-slide-1");
+                                            slide_image.Source = UIHelpers.GetImageSource("tutorial-slide-1");
 
                                             Button skip_tutorial_button = new Button()
                                             {
-                                                Content = SparkleShare.Properties.Resources.ResourceManager.GetString("SkipTutorial", CultureInfo.CurrentCulture)
+                                                Content = CmisSync.Properties.Resources.ResourceManager.GetString("SkipTutorial", CultureInfo.CurrentCulture)
                                             };
 
                                             Button continue_button = new Button()
                                             {
-                                                Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
+                                                Content = CmisSync.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                                             };
 
 
@@ -952,13 +952,13 @@ namespace SparkleShare
 
                                     case 2:
                                         {
-                                            Header = SparkleShare.Properties.Resources.ResourceManager.GetString("Synchronization", CultureInfo.CurrentCulture);
-                                            Description = SparkleShare.Properties.Resources.ResourceManager.GetString("DocumentsAre", CultureInfo.CurrentCulture);
+                                            Header = CmisSync.Properties.Resources.ResourceManager.GetString("Synchronization", CultureInfo.CurrentCulture);
+                                            Description = CmisSync.Properties.Resources.ResourceManager.GetString("DocumentsAre", CultureInfo.CurrentCulture);
 
 
                                             Button continue_button = new Button()
                                             {
-                                                Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
+                                                Content = CmisSync.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                                             };
 
                                             WPF.Image slide_image = new WPF.Image()
@@ -967,7 +967,7 @@ namespace SparkleShare
                                                 Height = 200
                                             };
 
-                                            slide_image.Source = SparkleUIHelpers.GetImageSource("tutorial-slide-2");
+                                            slide_image.Source = UIHelpers.GetImageSource("tutorial-slide-2");
 
 
                                             ContentCanvas.Children.Add(slide_image);
@@ -987,13 +987,13 @@ namespace SparkleShare
 
                                     case 3:
                                         {
-                                            Header = SparkleShare.Properties.Resources.ResourceManager.GetString("StatusIcon", CultureInfo.CurrentCulture);
-                                            Description = SparkleShare.Properties.Resources.ResourceManager.GetString("StatusIconShows", CultureInfo.CurrentCulture);
+                                            Header = CmisSync.Properties.Resources.ResourceManager.GetString("StatusIcon", CultureInfo.CurrentCulture);
+                                            Description = CmisSync.Properties.Resources.ResourceManager.GetString("StatusIconShows", CultureInfo.CurrentCulture);
 
 
                                             Button continue_button = new Button()
                                             {
-                                                Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
+                                                Content = CmisSync.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                                             };
 
                                             WPF.Image slide_image = new WPF.Image()
@@ -1002,7 +1002,7 @@ namespace SparkleShare
                                                 Height = 200
                                             };
 
-                                            slide_image.Source = SparkleUIHelpers.GetImageSource("tutorial-slide-3");
+                                            slide_image.Source = UIHelpers.GetImageSource("tutorial-slide-3");
 
 
                                             ContentCanvas.Children.Add(slide_image);
@@ -1022,13 +1022,13 @@ namespace SparkleShare
 
                                     case 4:
                                         {
-                                            Header = SparkleShare.Properties.Resources.ResourceManager.GetString("AddFolders", CultureInfo.CurrentCulture);
-                                            Description = SparkleShare.Properties.Resources.ResourceManager.GetString("YouCan", CultureInfo.CurrentCulture);
+                                            Header = CmisSync.Properties.Resources.ResourceManager.GetString("AddFolders", CultureInfo.CurrentCulture);
+                                            Description = CmisSync.Properties.Resources.ResourceManager.GetString("YouCan", CultureInfo.CurrentCulture);
 
 
                                             Button finish_button = new Button()
                                             {
-                                                Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture)
+                                                Content = CmisSync.Properties.Resources.ResourceManager.GetString("Finish", CultureInfo.CurrentCulture)
                                             };
 
                                             WPF.Image slide_image = new WPF.Image()
@@ -1037,11 +1037,11 @@ namespace SparkleShare
                                                 Height = 200
                                             };
 
-                                            slide_image.Source = SparkleUIHelpers.GetImageSource("tutorial-slide-4");
+                                            slide_image.Source = UIHelpers.GetImageSource("tutorial-slide-4");
 
                                             CheckBox check_box = new CheckBox()
                                             {
-                                                Content = SparkleShare.Properties.Resources.ResourceManager.GetString("Startup", CultureInfo.CurrentCulture),
+                                                Content = CmisSync.Properties.Resources.ResourceManager.GetString("Startup", CultureInfo.CurrentCulture),
                                                 IsChecked = true
                                             };
 

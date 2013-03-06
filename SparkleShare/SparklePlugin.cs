@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons (hylkebons@gmail.com)
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -20,14 +20,14 @@ using System.Xml;
 
 using IO = System.IO;
 
-namespace SparkleShare {
+namespace CmisSync {
 
     public class SparklePlugin {
 
         public static string PluginsPath = "";
 
         public static string LocalPluginsPath = new string [] {
-            Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "sparkleshare", "plugins" }.Combine ();
+            Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "CmisSync", "plugins" }.Combine ();
 
         public string Name { get { return GetValue ("info", "name"); } }
         public string Description { get { return GetValue ("info", "description"); } }
@@ -90,7 +90,7 @@ namespace SparkleShare {
                 return null;
 
             string plugin_xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                "<sparkleshare>" +
+                "<CmisSync>" +
                 "  <plugin>" +
                 "    <info>" +
                 "        <name>" + name + "</name>" +
@@ -118,7 +118,7 @@ namespace SparkleShare {
                 "      <example>" + password_example + "</example>" +
                 "    </password>" +
                 "  </plugin>" +
-                "</sparkleshare>";
+                "</CmisSync>";
 
             plugin_xml = plugin_xml.Replace ("<value></value>", "<value/>");
             plugin_xml = plugin_xml.Replace ("<example></example>", "<example/>");
@@ -134,7 +134,7 @@ namespace SparkleShare {
 
         private string GetValue (string a, string b)
         {
-            XmlNode node = this.xml.SelectSingleNode ("/sparkleshare/plugin/" + a + "/" + b + "/text()");
+            XmlNode node = this.xml.SelectSingleNode ("/CmisSync/plugin/" + a + "/" + b + "/text()");
 
             if (node != null && !string.IsNullOrEmpty (node.Value))
                 return node.Value;

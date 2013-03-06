@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -20,9 +20,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
     public static class SparkleKeys {
 
@@ -32,7 +32,7 @@ namespace SparkleShare {
             string key_file_path = Path.Combine (output_path, key_name);
 
             if (File.Exists (key_file_path)) {
-                SparkleLogger.LogInfo ("Auth", "A key pair exists ('" + key_name + "'), leaving it untouched");
+                Logger.LogInfo ("Auth", "A key pair exists ('" + key_name + "'), leaving it untouched");
                 return new string [] { key_file_path, key_file_path + ".pub" };
 
             } else {
@@ -61,9 +61,9 @@ namespace SparkleShare {
             process.WaitForExit ();
 
             if (process.ExitCode == 0)
-                SparkleLogger.LogInfo ("Auth", "Created keypair '" + key_file_path + "'");
+                Logger.LogInfo ("Auth", "Created keypair '" + key_file_path + "'");
             else
-                SparkleLogger.LogInfo ("Auth", "Could not create key pair '" + key_file_path + "'");
+                Logger.LogInfo ("Auth", "Could not create key pair '" + key_file_path + "'");
 
             return new string [] { key_file_path, key_file_path + ".pub" };
         }
@@ -83,9 +83,9 @@ namespace SparkleShare {
             process.WaitForExit ();
 
             if (process.ExitCode == 0)
-                SparkleLogger.LogInfo ("Auth", "Imported key '" + key_file_path + "'");
+                Logger.LogInfo ("Auth", "Imported key '" + key_file_path + "'");
             else
-                SparkleLogger.LogInfo ("Auth", "Could not import key '" + key_file_path + "'");
+                Logger.LogInfo ("Auth", "Could not import key '" + key_file_path + "'");
         }
 
 
@@ -106,7 +106,7 @@ namespace SparkleShare {
             string keys_in_use = process.StandardOutput.ReadToEnd ();
             process.WaitForExit ();
 
-            SparkleLogger.LogInfo ("Auth", "The following keys may be used: " +
+            Logger.LogInfo ("Auth", "The following keys may be used: " +
                 Environment.NewLine + keys_in_use.Trim ());
         }
     }

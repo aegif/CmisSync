@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace SparkleLib
+namespace CmisSync.Lib
 {
 
     public enum SparkleChangeType
@@ -34,7 +34,7 @@ namespace SparkleLib
     public class SparkleChangeSet
     {
 
-        public SparkleUser User = new SparkleUser("Unknown", "Unknown");
+        public User User = new User("Unknown", "Unknown");
 
         public SparkleFolder Folder;
         public string Revision;
@@ -78,13 +78,13 @@ namespace SparkleLib
         {
             get
             {
-                string custom_path = SparkleConfig.DefaultConfig.GetFolderOptionalAttribute(Name, "path");
+                string custom_path = Config.DefaultConfig.GetFolderOptionalAttribute(Name, "path");
                 // if (String.IsNullOrEmpty(custom_path)) custom_path = SparkleConfig.DefaultConfig.FoldersPath;
 
                 if (custom_path != null)
                     return custom_path;
                 else
-                    return Path.Combine(SparkleConfig.DefaultConfig.FoldersPath, Name);
+                    return Path.Combine(Config.DefaultConfig.FoldersPath, Name);
                 // return Path.Combine(ROOT_FOLDER, Name);
             }
         }

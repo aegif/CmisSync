@@ -9,8 +9,8 @@
     <ProjectGuid>{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SparkleLib.Cmis</RootNamespace>
-    <AssemblyName>SparkleLib.Cmis</AssemblyName>
+    <RootNamespace>CmisSync.Lib.Cmis</RootNamespace>
+    <AssemblyName>CmisSync.Lib.Cmis</AssemblyName>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -67,11 +67,8 @@
     <Compile Include="CmisUtils.cs" />
     <Compile Include="CmisDirectoryCrawlMethod.cs" />
     <Compile Include="MimeType.cs" />
-    <Compile Include="SparkleFetcherCmis.cs" />
-    <Compile Include="SparkleCmis.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="SparkleRepoCmis.cs" />
+    <Compile Include="FetcherCmis.cs" />
+    <Compile Include="RepoCmis.cs" />
     <Compile Include="CmisDirectory.cs" />
   </ItemGroup>
   <ItemGroup>

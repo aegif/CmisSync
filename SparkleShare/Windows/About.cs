@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons (hylkebons@gmail.com)
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -25,22 +25,22 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xaml;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleAbout : Window {
+    public class About : Window {
 
         public SparkleAboutController Controller = new SparkleAboutController ();
 
         private Label updates;
 
 
-        public SparkleAbout ()
+        public About ()
         {
             Title      = "About CmisSync";
             ResizeMode = ResizeMode.NoResize;
             Height     = 288;
             Width      = 640;
-            Icon       = SparkleUIHelpers.GetImageSource("sparkleshare-app", "ico");
+            Icon       = UIHelpers.GetImageSource("CmisSync-app", "ico");
             
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Closing += Close;
@@ -91,7 +91,7 @@ namespace SparkleShare {
                 Height = 260
             };
         
-            image.Source = SparkleUIHelpers.GetImageSource ("about");
+            image.Source = UIHelpers.GetImageSource ("about");
             
             
             Label version = new Label () {

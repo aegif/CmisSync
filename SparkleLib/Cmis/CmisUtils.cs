@@ -7,7 +7,7 @@ using DotCMIS.Client.Impl;
 using DotCMIS;
 using DotCMIS.Exceptions;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
     public class CmisServer
     {
@@ -57,7 +57,7 @@ namespace SparkleLib.Cmis
             for (int i=0; i < suffixes.Length; i++)
             {
                 string fuzzyUrl = prefix + suffixes[i];
-                SparkleLogger.LogInfo("Sync", "Trying with " + fuzzyUrl);
+                Logger.LogInfo("Sync", "Trying with " + fuzzyUrl);
                 repositories = GetRepositories(fuzzyUrl, user, password);
                 if (repositories != null)
                     return new CmisServer(fuzzyUrl, repositories);
@@ -90,7 +90,7 @@ namespace SparkleLib.Cmis
             catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
                 //throw new CmisServerNotFoundException("CMIS server found, but permission denied. Please check username/password");
-                throw new SparkleLib.Cmis.CmisPermissionDeniedException("PermissionDenied");
+                throw new CmisSync.Lib.Cmis.CmisPermissionDeniedException("PermissionDenied");
             }
             catch (CmisRuntimeException e)
             {
@@ -135,7 +135,7 @@ namespace SparkleLib.Cmis
 
             IFolder folder = (IFolder)session.GetObjectByPath(path);
             
-            SparkleLogger.LogInfo("Sync", "folder.Properties.Count:" + folder.Properties.Count);
+            Logger.LogInfo("Sync", "folder.Properties.Count:" + folder.Properties.Count);
             IItemEnumerable<ICmisObject> children = folder.GetChildren();
             foreach (var subfolder in children.OfType<IFolder>())
             {

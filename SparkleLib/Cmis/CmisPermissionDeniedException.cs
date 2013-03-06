@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
     public class CmisPermissionDeniedException : Exception
     {

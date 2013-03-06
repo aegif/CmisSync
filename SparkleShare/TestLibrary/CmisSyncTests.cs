@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 
 using Xunit;
-using SparkleLib.Cmis;
-using SparkleLib;
+using CmisSync.Lib.Cmis;
+using CmisSync.Lib;
 using DotCMIS;
 using DotCMIS.Client.Impl;
 using DotCMIS.Client;
@@ -50,7 +50,7 @@ namespace TestLibrary
 
         public CmisSyncTests()
         {
-            SparkleConfig.DefaultConfig = new SparkleConfig(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
+            Config.DefaultConfig = new Config(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
         }
 
         public static IEnumerable<object[]> TestServers
@@ -66,7 +66,7 @@ namespace TestLibrary
         {
         }
         
-        private void Clean(string localDirectory, SparkleRepoCmis.CmisDirectory cmisDirectory)
+        private void Clean(string localDirectory, RepoCmis.CmisDirectory cmisDirectory)
         {
             DirectoryInfo directory = new DirectoryInfo(localDirectory);
             // Delete all local files/folders.
@@ -144,8 +144,8 @@ namespace TestLibrary
                     // Mock.
                     ActivityListener activityListener = new Mock<ActivityListener>().Object;
                     // Sync.
-                    SparkleRepoCmis.CmisDirectory cmisDirectory = new SparkleRepoCmis.CmisDirectory(
-                        new SparkleRepoInfo(
+                    RepoCmis.CmisDirectory cmisDirectory = new RepoCmis.CmisDirectory(
+                        new RepoInfo(
                             canonical_name,
                             ".",
                             remoteFolderPath,

@@ -27,7 +27,7 @@ using DotCMIS.Client;
 using DotCMIS.Data.Impl;
 using DotCMIS.Data.Extensions;
 
-using SparkleLib;
+using CmisSync.Lib;
 using System.ComponentModel;
 using DotCMIS.Enums;
 using DotCMIS.Exceptions;
@@ -36,20 +36,20 @@ using System.Data;
 using System.Data.SQLite;
 using System.Collections;
 
-using SparkleLib.Cmis;
+using CmisSync.Lib.Cmis;
 
-namespace SparkleLib.Cmis
+namespace CmisSync.Lib.Cmis
 {
 
-    public partial class SparkleRepoCmis : SparkleRepoBase
+    public partial class RepoCmis : RepoBase
     {
         private CmisDirectory cmis;
 
-        public SparkleRepoCmis(SparkleRepoInfo repoInfo, ActivityListener activityListener)
+        public RepoCmis(RepoInfo repoInfo, ActivityListener activityListener)
             : base(repoInfo)
         {
             cmis = new CmisDirectory(repoInfo, activityListener);
-            SparkleLogger.LogInfo("Sync", "Cmis:" + cmis);
+            Logger.LogInfo("Sync", "Cmis:" + cmis);
         }
 
 
@@ -95,7 +95,7 @@ namespace SparkleLib.Cmis
             // Not used.
             get
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] UnsyncedFilePaths get", this.Name));
+                Logger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] UnsyncedFilePaths get", this.Name));
                 List<string> file_paths = new List<string>();
                 //file_paths.Add (path);
                 return file_paths.ToArray();
@@ -108,7 +108,7 @@ namespace SparkleLib.Cmis
             // Not used.
             get
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] CurrentRevision get", this.Name));
+                Logger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] CurrentRevision get", this.Name));
                 return null;
             }
         }
@@ -143,7 +143,7 @@ namespace SparkleLib.Cmis
 
         public void DoFirstSync()
         {
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] First sync", this.Name));
+            Logger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] First sync", this.Name));
             if (cmis != null)
                 cmis.Sync();
         }
@@ -162,7 +162,7 @@ namespace SparkleLib.Cmis
         {
             get
             {
-                SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] HasUnsyncedChanges get", this.Name));
+                Logger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] HasUnsyncedChanges get", this.Name));
                 if (cmis != null) // Because it is sometimes called before the object's constructor has completed.
                     cmis.SyncInBackground();
                 return false; // TODO
@@ -211,7 +211,7 @@ namespace SparkleLib.Cmis
         public override List<SparkleChangeSet> GetChangeSets(string path, int count)
         {
             // Not used.
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] GetChangeSets", this.Name));
+            Logger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] GetChangeSets", this.Name));
             return new List<SparkleChangeSet>();
         }
 
@@ -219,7 +219,7 @@ namespace SparkleLib.Cmis
         public override List<SparkleChangeSet> GetChangeSets(int count)
         {
             // Not used.
-            SparkleLogger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] GetChangeSets", this.Name));
+            Logger.LogInfo("Sync", String.Format("Cmis SparkleRepo [{0}] GetChangeSets", this.Name));
             return new List<SparkleChangeSet>();
         }
 

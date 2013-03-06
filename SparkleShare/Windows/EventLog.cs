@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons (hylkebons@gmail.com)
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -28,9 +28,9 @@ using System.Windows.Media.Imaging;
 
 using Shapes = System.Windows.Shapes;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleEventLog : Window {
+    public class EventLog : Window {
 
         public SparkleEventLogController Controller = new SparkleEventLogController ();
 
@@ -39,10 +39,10 @@ namespace SparkleShare {
         private Label history_label_value;
         private ComboBox combo_box;
         private WebBrowser web_browser;
-        private SparkleSpinner spinner;
+        private Spinner spinner;
         
         
-        public SparkleEventLog ()
+        public EventLog ()
         {
             Title              = "Recent Changes";
             Height             = 640;
@@ -50,7 +50,7 @@ namespace SparkleShare {
             ResizeMode         = ResizeMode.NoResize; // TODO
             Background         = new SolidColorBrush (Color.FromRgb (240, 240, 240));    
             AllowsTransparency = false;
-            Icon               = SparkleUIHelpers.GetImageSource("sparkleshare-app", "ico");
+            Icon               = UIHelpers.GetImageSource("CmisSync-app", "ico");
 
             int x = (int) (SystemParameters.PrimaryScreenWidth * 0.61);
             int y = (int) (SystemParameters.PrimaryScreenHeight * 0.5 - (Height * 0.5));
@@ -104,7 +104,7 @@ namespace SparkleShare {
 
             this.web_browser.ObjectForScripting = new SparkleScriptingObject ();
                     
-            spinner = new SparkleSpinner (22);
+            spinner = new Spinner (22);
             
             // Disable annoying IE clicking sound
             CoInternetSetFeatureEnabled (21, 0x00000002, true);
@@ -252,7 +252,7 @@ namespace SparkleShare {
                     html = Controller.HTML;
                 
                 string pixmaps_path = Path.Combine (
-                    SparkleLib.SparkleConfig.DefaultConfig.TmpPath, "Pixmaps");
+                    CmisSync.Lib.Config.DefaultConfig.TmpPath, "Pixmaps");
                 
                 pixmaps_path = pixmaps_path.Replace ("\\", "/");
                 
@@ -306,7 +306,7 @@ namespace SparkleShare {
         
         private void WriteOutImages ()
         {
-            string tmp_path     = SparkleLib.SparkleConfig.DefaultConfig.TmpPath;
+            string tmp_path     = CmisSync.Lib.Config.DefaultConfig.TmpPath;
             string pixmaps_path = Path.Combine (tmp_path, "Pixmaps");
             
             if (!Directory.Exists (pixmaps_path)) {
@@ -320,7 +320,7 @@ namespace SparkleShare {
                 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k'};
             
             foreach (char letter in letters) {    
-                BitmapSource image = SparkleUIHelpers.GetImageSource ("avatar-" + letter);
+                BitmapSource image = UIHelpers.GetImageSource ("avatar-" + letter);
                 string file_path = Path.Combine (pixmaps_path, "avatar-" + letter + ".png");
                     
                 using (FileStream stream = new FileStream (file_path, FileMode.Create))
@@ -335,7 +335,7 @@ namespace SparkleShare {
                 "deleted", "edited", "moved"};
             
             foreach (string action in actions) {    
-                BitmapSource image = SparkleUIHelpers.GetImageSource ("document-" + action + "-12");
+                BitmapSource image = UIHelpers.GetImageSource ("document-" + action + "-12");
                 string file_path = Path.Combine (pixmaps_path, "document-" + action + "-12.png");
                     
                 using (FileStream stream = new FileStream (file_path, FileMode.Create))

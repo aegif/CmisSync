@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-using SparkleLib;
-using SparkleLib.Cmis;
+using CmisSync.Lib;
+using CmisSync.Lib.Cmis;
 
-namespace SparkleShare
+namespace CmisSync
 {
 
     public enum PageType
@@ -286,7 +286,7 @@ namespace SparkleShare
 
         public void SetupPageCompleted()
         {
-            Program.Controller.CurrentUser = new SparkleUser("Dummy", "dummy@example.org");
+            Program.Controller.CurrentUser = new User("Dummy", "dummy@example.org");
 
             /*
             new Thread (() => {
@@ -300,7 +300,7 @@ namespace SparkleShare
                     Program.Controller.CurrentUser.Name + "'s link code.txt");
 
                 // Create an easily accessible copy of the public
-                // key in the user's SparkleShare folder
+                // key in the user's CmisSync folder
                 File.Copy (key_pair [1], link_code_file_path, true);
 
             }).Start ();
@@ -480,7 +480,7 @@ namespace SparkleShare
             }
             catch (Exception ex)
             {
-                SparkleLogger.LogInfo("Fetcher", ex.ToString());
+                Logger.LogInfo("Fetcher", ex.ToString());
                 System.Windows.Forms.MessageBox.Show("An error occur during first sync, see debug log for details!");
             }
 
@@ -514,13 +514,13 @@ namespace SparkleShare
                     if (new_plugin != null)
                     {
                         Plugins.Insert(1, new_plugin);
-                        SparkleLogger.LogInfo("Controller", "Added plugin for " + uri.Host);
+                        Logger.LogInfo("Controller", "Added plugin for " + uri.Host);
                     }
 
                 }
                 catch
                 {
-                    SparkleLogger.LogInfo("Controller", "Failed adding plugin for " + uri.Host);
+                    Logger.LogInfo("Controller", "Failed adding plugin for " + uri.Host);
                 }
             }
 
@@ -668,7 +668,7 @@ namespace SparkleShare
 
         public void OpenFolderClicked()
         {
-            Program.Controller.OpenSparkleShareFolder(SyncingFolder);
+            Program.Controller.OpenCmisSyncFolder(SyncingFolder);
             SyncingFolder = String.Empty;
             FinishPageCompleted();
         }

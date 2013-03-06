@@ -1,4 +1,4 @@
-﻿//   SparkleShare, a collaboration and sharing tool.
+﻿//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,10 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 
-namespace SparkleLib
+namespace CmisSync.Lib
 {
 
-    public abstract class SparkleFetcherBase
+    public abstract class FetcherBase
     {
 
         public event Action Started = delegate { };
@@ -50,7 +50,7 @@ namespace SparkleLib
         public string TargetFolder { get; protected set; }
         public bool IsActive { get; private set; }
         public string Identifier;
-        public SparkleRepoInfo OriginalRepoInfo;
+        public RepoInfo OriginalRepoInfo;
 
         public string[] Warnings
         {
@@ -96,7 +96,7 @@ namespace SparkleLib
         private Thread thread;
 
 
-        public SparkleFetcherBase(SparkleRepoInfo info)
+        public FetcherBase(RepoInfo info)
         {
             OriginalRepoInfo = info;
             RequiredFingerprint = info.Fingerprint;
@@ -125,7 +125,7 @@ namespace SparkleLib
             IsActive = true;
             Started();
 
-            SparkleLogger.LogInfo("Fetcher", TargetFolder + " | Fetching folder: " + RemoteUrl);
+            Logger.LogInfo("Fetcher", TargetFolder + " | Fetching folder: " + RemoteUrl);
 
             // Not necessary for CmisSync
             //if (Directory.Exists(TargetFolder))
@@ -177,12 +177,12 @@ namespace SparkleLib
                 if (Fetch())
                 {
                     Thread.Sleep(500);
-                    SparkleLogger.LogInfo("Fetcher", OriginalRepoInfo.Name + " | Finished");
+                    Logger.LogInfo("Fetcher", OriginalRepoInfo.Name + " | Finished");
 
                     IsActive = false;
 
                     bool repo_is_encrypted = (RemoteUrl.AbsolutePath.Contains("-crypto") ||
-                                              RemoteUrl.Host.Equals("sparkleshare.net"));
+                                              RemoteUrl.Host.Equals("CmisSync.net"));
 
                     Finished(repo_is_encrypted, IsFetchedRepoEmpty, Warnings);
 
@@ -190,7 +190,7 @@ namespace SparkleLib
                 else
                 {
                     Thread.Sleep(500);
-                    SparkleLogger.LogInfo("Fetcher", OriginalRepoInfo.Name + " | Failed");
+                    Logger.LogInfo("Fetcher", OriginalRepoInfo.Name + " | Failed");
 
                     IsActive = false;
                     Failed();
@@ -203,7 +203,7 @@ namespace SparkleLib
 
         public virtual void Complete()
         {
-            string identifier_path = Path.Combine(TargetFolder, ".sparkleshare");
+            string identifier_path = Path.Combine(TargetFolder, ".CmisSync");
 
             if (File.Exists(identifier_path))
             {
@@ -226,7 +226,7 @@ namespace SparkleLib
         // user has fetched an empty remote folder
         private void CreateInitialChangeSet()
         {
-            string file_path = Path.Combine(TargetFolder, "SparkleShare.txt");
+            string file_path = Path.Combine(TargetFolder, "CmisSync.txt");
             string n = Environment.NewLine;
 
             UriBuilder uri_builder = new UriBuilder(RemoteUrl);
@@ -237,18 +237,18 @@ namespace SparkleLib
                 uri_builder.Password = "";
             }
 
-            string text = "Congratulations, you've successfully created a SparkleShare repository!" + n +
+            string text = "Congratulations, you've successfully created a CmisSync repository!" + n +
                 n +
                 "Any files you add or change in this folder will be automatically synced to " + n +
                 uri_builder.ToString() + " and everyone connected to it." + n +
                 n +
-                "SparkleShare is an Open Source software program that helps people collaborate and " + n +
-                "share files. If you like what we do, consider buying us a beer: http://www.sparkleshare.org/" + n +
+                "CmisSync is an Open Source software program that helps people collaborate and " + n +
+                "share files. If you like what we do, consider buying us a beer: http://www.CmisSync.org/" + n +
                 n +
                 "Have fun! :)" + n;
 
-            if (RemoteUrl.AbsolutePath.Contains("-crypto") || RemoteUrl.Host.Equals("sparkleshare.net"))
-                text = text.Replace("a SparkleShare repository", "an encrypted SparkleShare repository");
+            if (RemoteUrl.AbsolutePath.Contains("-crypto") || RemoteUrl.Host.Equals("CmisSync.net"))
+                text = text.Replace("a CmisSync repository", "an encrypted CmisSync repository");
 
             File.WriteAllText(file_path, text);
         }
@@ -283,11 +283,11 @@ namespace SparkleLib
 
         private string FetchHostKey()
         {
-            SparkleLogger.LogInfo("Auth", "Fetching host key for " + RemoteUrl.Host);
+            Logger.LogInfo("Auth", "Fetching host key for " + RemoteUrl.Host);
 
             Process process = new Process();
             process.StartInfo.FileName = "ssh-keyscan";
-            process.StartInfo.WorkingDirectory = SparkleConfig.DefaultConfig.TmpPath;
+            process.StartInfo.WorkingDirectory = Config.DefaultConfig.TmpPath;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.CreateNoWindow = true;
@@ -302,7 +302,7 @@ namespace SparkleLib
                 else
                     process.StartInfo.Arguments = "-t " + key_type + " -p " + RemoteUrl.Port + " " + RemoteUrl.Host;
 
-                SparkleLogger.LogInfo("Cmd", process.StartInfo.FileName + " " + process.StartInfo.Arguments);
+                Logger.LogInfo("Cmd", process.StartInfo.FileName + " " + process.StartInfo.Arguments);
 
                 process.Start();
                 string host_key = process.StandardOutput.ReadToEnd().Trim();
@@ -331,7 +331,7 @@ namespace SparkleLib
             }
             catch (Exception e)
             {
-                SparkleLogger.LogInfo("Fetcher", "Failed creating fingerprint: " + e.Message + " " + e.StackTrace);
+                Logger.LogInfo("Fetcher", "Failed creating fingerprint: " + e.Message + " " + e.StackTrace);
                 return null;
             }
         }
@@ -339,7 +339,7 @@ namespace SparkleLib
 
         private void AcceptHostKey(string host_key, bool warn)
         {
-            string ssh_config_path = Path.Combine(SparkleConfig.DefaultConfig.HomePath, ".ssh");
+            string ssh_config_path = Path.Combine(Config.DefaultConfig.HomePath, ".ssh");
             string known_hosts_file_path = Path.Combine(ssh_config_path, "known_hosts");
 
             if (!File.Exists(known_hosts_file_path))
@@ -365,7 +365,7 @@ namespace SparkleLib
             else
                 File.AppendAllText(known_hosts_file_path, "\n" + host_key + "\n");
 
-            SparkleLogger.LogInfo("Auth", "Accepted host key for " + host);
+            Logger.LogInfo("Auth", "Accepted host key for " + host);
 
             if (warn)
                 this.warnings.Add("The following host key has been accepted:\n" + DeriveFingerprint(host_key));

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SparkleLib
+namespace CmisSync.Lib
 {
     /**
      * Aggregates the activity status of multiple processes
