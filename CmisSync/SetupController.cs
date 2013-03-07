@@ -460,7 +460,7 @@ namespace CmisSync
             PreviousPath = remote_path;
         }
 
-        public void CustomizePageCompleted(String localFolderName)
+        public void CustomizePageCompleted(String localFolderName, bool syncnow)
         {
             SyncingFolder = localFolderName;
 
@@ -476,7 +476,7 @@ namespace CmisSync
                 {
                     Program.Controller.StartFetcher(PreviousAddress, SelectedPlugin.Fingerprint, PreviousPath, SyncingFolder,
                         SelectedPlugin.AnnouncementsUrl, this.fetch_prior_history,
-                        PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd());
+                        PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), syncnow);
 
                 }).Start();
             }

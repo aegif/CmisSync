@@ -234,6 +234,9 @@ les données XML obtenues dans le forum de CmisSync.</value>
   <data name="SyncingChanges" xml:space="preserve">
     <value>Synchronisation des modifications...</value>
   </data>
+  <data name="SyncNow" xml:space="preserve">
+    <value>Synchoniser maintenant !</value>
+  </data>
   <data name="User" xml:space="preserve">
     <value>Utilisateur</value>
   </data>

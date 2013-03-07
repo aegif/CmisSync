@@ -626,14 +626,15 @@ namespace CmisSync.Lib.Cmis
                 // Upload each file in this folder.
                 foreach (string file in Directory.GetFiles(localFolder))
                 {
-                    if (CheckRules(Path.Combine(localFolder, file), RulesType.File))
+                    if (CheckRules(file, RulesType.File))
                         UploadFile(file, folder);
                 }
 
                 // Recurse for each subfolder in this folder.
                 foreach (string subfolder in Directory.GetDirectories(localFolder))
                 {
-                    UploadFolderRecursively(folder, subfolder);
+                    if (CheckRules(subfolder, RulesType.Folder))
+                        UploadFolderRecursively(folder, subfolder);
                 }
             }
 
@@ -797,7 +798,7 @@ namespace CmisSync.Lib.Cmis
                 {
                     foreach (string dir in directories)
                     {
-                        if (path.Contains(dir)) found = true;
+                        if (path.ToLower().Contains(dir)) found = true;
                     }
                 }
                 else

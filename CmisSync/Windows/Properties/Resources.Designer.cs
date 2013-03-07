@@ -390,6 +390,15 @@ namespace CmisSync.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Sync Now !.
+        /// </summary>
+        internal static string SyncNow {
+            get {
+                return ResourceManager.GetString("SyncNow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User.
         /// </summary>
         internal static string User {

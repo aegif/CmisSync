@@ -538,7 +538,7 @@ namespace CmisSync
 
         public void StartFetcher(string address, string required_fingerprint,
             string remote_path, string local_path, string announcements_url, bool fetch_prior_history,
-            string repository, string path, string user, string password)
+            string repository, string path, string user, string password, bool syncnow)
         {
             if (announcements_url != null)
                 announcements_url = announcements_url.Trim();
@@ -616,7 +616,9 @@ namespace CmisSync
                 FolderFetching(percentage);
             };
 
-            this.fetcher.Start();
+            if (syncnow)
+                this.fetcher.Start();
+            else this.FinishFetcher();
         }
 
 

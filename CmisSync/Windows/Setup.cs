@@ -414,7 +414,7 @@ namespace CmisSync
                                 };
 
                                 Controller.CheckAddPage(address_box.Text);
-                                
+
                                 address_box.TextChanged += delegate
                                 {
                                     string error = Controller.CheckAddPage(address_box.Text);
@@ -620,6 +620,11 @@ namespace CmisSync
                                     Content = CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                                 };
 
+                                Button sync_button = new Button()
+                                {
+                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("SyncNow", CultureInfo.CurrentCulture)
+                                };
+
                                 Button add_button = new Button()
                                 {
                                     Content = CmisSync.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
@@ -631,6 +636,7 @@ namespace CmisSync
                                 };
 
                                 Buttons.Add(back_button);
+                                Buttons.Add(sync_button);
                                 Buttons.Add(add_button);
                                 Buttons.Add(cancel_button);
 
@@ -704,9 +710,14 @@ namespace CmisSync
                                     Controller.BackToPage2();
                                 };
 
+                                sync_button.Click += delegate
+                                {
+                                    Controller.CustomizePageCompleted(localfolder_box.Text, true);
+                                };
+
                                 add_button.Click += delegate
                                 {
-                                    Controller.CustomizePageCompleted(localfolder_box.Text);
+                                    Controller.CustomizePageCompleted(localfolder_box.Text, false);
                                 };
                                 break;
                             }

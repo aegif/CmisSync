@@ -230,6 +230,9 @@ the resulting XML to the CmisSync forum.</value>
   <data name="SyncingChanges" xml:space="preserve">
     <value>Syncing changes…</value>
   </data>
+  <data name="SyncNow" xml:space="preserve">
+    <value>Sync Now !</value>
+  </data>
   <data name="User" xml:space="preserve">
     <value>User</value>
   </data>
