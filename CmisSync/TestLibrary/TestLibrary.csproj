@@ -39,6 +39,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SparkleLib\Cmis\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -67,6 +71,18 @@
     <ProjectReference Include="..\..\Extras\chemistry-dotcmis-0.5-src\src\DotCMIS.csproj">
       <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
       <Name>DotCMIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SparkleLib\Cmis\chemistry-dotcmis-0.5-src\src\DotCMIS.csproj">
+      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+      <Name>DotCMIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SparkleLib\Cmis\SparkleLib.Cmis.csproj">
+      <Project>{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}</Project>
+      <Name>SparkleLib.Cmis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SparkleLib\SparkleLib.csproj">
+      <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
+      <Name>SparkleLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
