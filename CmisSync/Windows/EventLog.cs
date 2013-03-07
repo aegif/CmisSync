@@ -50,7 +50,7 @@ namespace CmisSync {
             ResizeMode         = ResizeMode.NoResize; // TODO
             Background         = new SolidColorBrush (Color.FromRgb (240, 240, 240));    
             AllowsTransparency = false;
-            Icon               = UIHelpers.GetImageSource("CmisSync-app", "ico");
+            Icon = UIHelpers.GetImageSource("sparkleshare-app", "ico");
 
             int x = (int) (SystemParameters.PrimaryScreenWidth * 0.61);
             int y = (int) (SystemParameters.PrimaryScreenHeight * 0.5 - (Height * 0.5));

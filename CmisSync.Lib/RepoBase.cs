@@ -470,7 +470,7 @@ namespace CmisSync.Lib
         private void ListenerDisconnectedDelegate()
         {
             this.poll_interval = PollInterval.Short;
-            Logger.Info(Name + "Falling back to polling");
+            Logger.Info(Name + " Falling back to polling");
         }
 
 

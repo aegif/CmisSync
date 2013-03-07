@@ -25,7 +25,7 @@ namespace CmisSync.Lib
 
     public class Config
     {
-        private XmlDocument configXml;
+        private XmlDocument configXml = new XmlDocument();
         public string FullPath;
         public string TmpPath;
         // public string LogFilePath;
@@ -156,7 +156,6 @@ namespace CmisSync.Lib
             if (string.IsNullOrEmpty(user_name))
                 user_name = "Unknown";
 
-            configXml = new XmlDocument();
             configXml.AppendChild(configXml.CreateXmlDeclaration("1.0", "UTF-8", "yes"));
             configXml.AppendChild(configXml.CreateElement("CmisSync"));
             XmlNode user = configXml.CreateElement("user");
@@ -185,49 +184,74 @@ namespace CmisSync.Lib
             XmlNode log4net = configXml.CreateElement("log4net");
 
             XmlNode appender = configXml.CreateElement("appender");
-            appender.Attributes["name"].Value = "CmisSyncFileAppender";
-            appender.Attributes["type"].Value = "log4net.Appender.RollingFileAppender";
+            XmlAttribute name = configXml.CreateAttribute("name");
+            name.Value = "CmisSyncFileAppender";
+            appender.Attributes.Append(name);
+
+            XmlAttribute type = configXml.CreateAttribute("type");
+            type.Value = "log4net.Appender.RollingFileAppender";
+            appender.Attributes.Append(type);
 
             XmlNode file = configXml.CreateElement("file");
-            file.Attributes["value"].Value = "log.txt";
+            XmlAttribute filevalue = configXml.CreateAttribute("value");
+            filevalue.Value = Path.Combine(configpath, "debug_log.txt").ToString();
+            file.Attributes.Append(filevalue);
             appender.AppendChild(file);
 
             XmlNode appendToFile = configXml.CreateElement("appendToFile");
-            appendToFile.Attributes["value"].Value = "true";
+            XmlAttribute appendtofileValue = configXml.CreateAttribute("value");
+            appendtofileValue.Value = "true";
+            appendToFile.Attributes.Append(appendtofileValue);
             appender.AppendChild(appendToFile);
 
             XmlNode rollingStyle = configXml.CreateElement("rollingStyle");
-            rollingStyle.Attributes["value"].Value = "Size";
+            XmlAttribute rollingStyleValue = configXml.CreateAttribute("value");
+            rollingStyleValue.Value = "Size";
+            rollingStyle.Attributes.Append(rollingStyleValue);
             appender.AppendChild(rollingStyle);
 
             XmlNode maxSizeRollBackups = configXml.CreateElement("maxSizeRollBackups");
-            maxSizeRollBackups.Attributes["value"].Value = "10";
+            XmlAttribute maxSizeRollBackupsValue = configXml.CreateAttribute("value");
+            maxSizeRollBackupsValue.Value = "10";
+            maxSizeRollBackups.Attributes.Append(maxSizeRollBackupsValue);
             appender.AppendChild(maxSizeRollBackups);
 
             XmlNode maximumFileSize = configXml.CreateElement("maximumFileSize");
-            maximumFileSize.Attributes["value"].Value = "100KB";
+            XmlAttribute maximumFileSizeValue = configXml.CreateAttribute("value");
+            maximumFileSizeValue.Value = "5MB";
+            maximumFileSize.Attributes.Append(maximumFileSizeValue);
             appender.AppendChild(maximumFileSize);
 
             XmlNode staticLogFileName = configXml.CreateElement("staticLogFileName");
-            staticLogFileName.Attributes["value"].Value = "true";
+            XmlAttribute staticLogFileNameValue = configXml.CreateAttribute("value");
+            staticLogFileNameValue.Value = "true";
+            staticLogFileName.Attributes.Append(staticLogFileNameValue);
             appender.AppendChild(staticLogFileName);
 
             XmlNode layout = configXml.CreateElement("layout");
-            layout.Attributes["type"].Value = "log4net.Layout.PatternLayout";
+            XmlAttribute layouttype = configXml.CreateAttribute("type");
+            layouttype.Value = "log4net.Layout.PatternLayout";
+            layout.Attributes.Append(layouttype);
 
             XmlNode conversionPattern = configXml.CreateElement("conversionPattern");
-            conversionPattern.Attributes["value"].Value = "%date [%thread] %-5level %logger [%property{NDC}] - %message%newline";
+            XmlAttribute conversionPatternValue = configXml.CreateAttribute("value");
+            conversionPatternValue.Value = "%date [%thread] %-5level %logger [%property{NDC}] - %message%newline";
+            conversionPattern.Attributes.Append(conversionPatternValue);
             layout.AppendChild(conversionPattern);
             appender.AppendChild(layout);
             log4net.AppendChild(appender);
 
             XmlNode root = configXml.CreateElement("root");
             XmlNode level = configXml.CreateElement("level");
-            level.Attributes["value"].Value = "DEBUG";
+            XmlAttribute levelvalue = configXml.CreateAttribute("value");
+            levelvalue.Value = "DEBUG";
+            level.Attributes.Append(levelvalue);
             root.AppendChild(level);
 
             XmlNode appenderref = configXml.CreateElement("appender-ref");
-            appenderref.Attributes["ref"].Value = "CmisSyncFileAppender";
+            XmlAttribute appenderrefvalue = configXml.CreateAttribute("ref");
+            appenderrefvalue.Value = "CmisSyncFileAppender";
+            appenderref.Attributes.Append(appenderrefvalue);
             root.AppendChild(appenderref);
 
             log4net.AppendChild(root);
@@ -502,8 +526,8 @@ namespace CmisSync.Lib
 
         private void Save()
         {
-            if (!File.Exists(FullPath))
-                throw new FileNotFoundException(FullPath + " does not exist");
+            //if (!File.Exists(FullPath))
+            //    throw new FileNotFoundException(FullPath + " does not exist");
 
             configXml.Save(FullPath);
         }

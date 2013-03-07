@@ -40,6 +40,7 @@ namespace CmisSync {
         #endif
         public static void Main (string [] args)
         {
+
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
 
 			Console.WriteLine("start");

@@ -3,14 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-<<<<<<< HEAD:CmisSync/TestLibrary/CmisSyncTests.cs
-using Xunit;
-using CmisSync.Lib.Cmis;
-using CmisSync.Lib;
-=======
-using SparkleLib.Cmis;
-using SparkleLib;
->>>>>>> 22e6ec65f05e1a40b4a81477665a92548e6cfa4c:SparkleShare/TestLibrary/CmisSyncTests.cs
 using DotCMIS;
 using DotCMIS.Client.Impl;
 using DotCMIS.Client;
@@ -72,13 +64,8 @@ namespace TestLibrary
         public void Dispose()
         {
         }
-<<<<<<< HEAD:CmisSync/TestLibrary/CmisSyncTests.cs
-        
-        private void Clean(string localDirectory, CmisRepo.CmisDirectory cmisDirectory)
-=======
 
-        private void Clean(string localDirectory, SparkleRepoCmis.CmisDirectory cmisDirectory)
->>>>>>> 22e6ec65f05e1a40b4a81477665a92548e6cfa4c:SparkleShare/TestLibrary/CmisSyncTests.cs
+        private void Clean(string localDirectory, CmisRepo.CmisDirectory cmisDirectory)
         {
             DirectoryInfo directory = new DirectoryInfo(localDirectory);
             // Delete all local files/folders.

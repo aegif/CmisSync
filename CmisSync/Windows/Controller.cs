@@ -149,16 +149,25 @@ namespace CmisSync
             Logger.Info("Config | Created '" + FoldersPath + "'");
 
             string app_path = Path.GetDirectoryName(Forms.Application.ExecutablePath);
-            string icon_file_path = Path.Combine(app_path, "Pixmaps", "CmisSync-folder.ico");
+            string icon_file_path = Path.Combine(app_path, "Pixmaps", "sparkleshare-folder.ico");
 
             if (!File.Exists(icon_file_path))
             {
                 string ini_file_path = Path.Combine(FoldersPath, "desktop.ini");
 
-                string ini_file = "[.ShellClassInfo]" +
-                    "IconFile=" + icon_file_path +
-                    "IconIndex=0" +
-                    "InfoTip=CmisSync";
+                //string ini_file = "[.ShellClassInfo]\r\n" +
+                //    "IconFile=" + icon_file_path + "\r\n" +
+                //    "IconIndex=0\r\n" +
+                //    "InfoTip=CmisSync\r\n";
+                string ini_file = "[.ShellClassInfo]\r\n" +
+                    "IconFile=" + Assembly.GetExecutingAssembly().Location + "\r\n" +
+                    "IconIndex=0\r\n" +
+                    "InfoTip=CmisSync\r\n" +
+                    "IconResource=" + Assembly.GetExecutingAssembly().Location + ",0\r\n" +
+                    "[ViewState]\r\n" +
+                    "Mode=\r\n" +
+                    "Vid=\r\n" +
+                    "FolderType=Generic\r\n";
 
                 try
                 {

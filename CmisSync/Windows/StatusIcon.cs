@@ -113,7 +113,7 @@ namespace CmisSync
 
             Image folder_image = new Image()
             {
-                Source = UIHelpers.GetImageSource("CmisSync-folder"),
+                Source = UIHelpers.GetImageSource("sparkleshare-folder"),
                 Width = 16,
                 Height = 16
             };

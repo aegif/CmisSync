@@ -40,7 +40,7 @@ namespace CmisSync {
             ResizeMode = ResizeMode.NoResize;
             Height     = 288;
             Width      = 640;
-            Icon       = UIHelpers.GetImageSource("CmisSync-app", "ico");
+            Icon = UIHelpers.GetImageSource("sparkleshare-app", "ico");
             
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Closing += Close;
