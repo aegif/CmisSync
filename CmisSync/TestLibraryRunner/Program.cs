@@ -23,7 +23,7 @@ namespace TestLibraryRunner
 
 // Let the console open.
 #if DEBUG
-            Console.WriteLine("Press any key to close...");
+            Console.WriteLine("Press Enter to close...");
             Console.ReadLine();
 #endif
         }
