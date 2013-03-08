@@ -1,0 +1,20 @@
+[
+    [
+	"unittest1",
+        "my first workspace",
+        "/default-domain/workspaces/my first workspace",
+        "http://192.168.0.181/nuxeo/atom/cmis",
+        "Administrator",
+        "Administrator",
+        "default"
+    ],
+	[
+	"Nuxeo",
+        "workspace 1",
+        "/default-domain/workspaces/workspace 1",
+        "http://192.168.0.181/nuxeo/atom/cmis",
+        "Administrator",
+        "Administrator",
+        "default"
+    ]
+]
