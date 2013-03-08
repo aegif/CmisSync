@@ -16,7 +16,7 @@ namespace CmisSync.Lib.Cmis
      */
     public class CmisDatabase
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(FetcherBase));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisDatabase));
 
         /**
          * Name of the SQLite database file.
