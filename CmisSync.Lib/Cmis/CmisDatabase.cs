@@ -206,7 +206,7 @@ namespace CmisSync.Lib.Cmis
                     Logger.Fatal("CmisDatabase | " + e.Message);
                 }
             }
-            Logger.Info("CmisDatabase | Adding data in db for: " + path + " finished");
+            Logger.Debug("CmisDatabase | Adding data in db for: " + path + " finished");
         }
 
 
