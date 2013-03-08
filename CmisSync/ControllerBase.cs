@@ -538,7 +538,7 @@ namespace CmisSync
 
         public void StartFetcher(string address, string required_fingerprint,
             string remote_path, string local_path, string announcements_url, bool fetch_prior_history,
-            string repository, string path, string user, string password, bool syncnow)
+            string repository, string path, string user, string password, string localrepopath, bool syncnow)
         {
             if (announcements_url != null)
                 announcements_url = announcements_url.Trim();
@@ -566,7 +566,7 @@ namespace CmisSync
             repoInfo.RepoID = repository;
             repoInfo.User = user;
             repoInfo.Password = CmisCrypto.Protect(password);
-            repoInfo.TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, local_path);
+            repoInfo.TargetDirectory = localrepopath;
             repoInfo.PollInterval = 5000;
 
             fetcher = new CmisSync.Lib.Cmis.Fetcher(repoInfo, activityListenerAggregator);

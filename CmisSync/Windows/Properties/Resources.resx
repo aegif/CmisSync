@@ -257,4 +257,10 @@ the resulting XML to the CmisSync forum.</value>
   <data name="YouCanFind" xml:space="preserve">
     <value>You can find them in your CmisSync folder.</value>
   </data>
+  <data name="ChangeRepoPath" xml:space="preserve">
+    <value>Change the local path of this repository:</value>
+  </data>
+  <data name="LocalDirectoryExist" xml:space="preserve">
+    <value>This local folder already exist, so it can not be use to sync data !</value>
+  </data>
 </root>

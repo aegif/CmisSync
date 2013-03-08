@@ -166,7 +166,7 @@ namespace CmisSync.Lib.Cmis
                             // It sometimes happen on IBM P8 CMIS server, not sure why.
                             if (remoteDocumentFileName == null)
                             {
-                                Logger.Info("Sync | Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
+                                Logger.Warn("Sync | Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
                                 continue;
                             }
 
@@ -232,7 +232,7 @@ namespace CmisSync.Lib.Cmis
                                 else
                                 {
                                     // New remote file, download it.
-                                    Logger.Info("SyncSync | Downloading new file: " + remoteDocumentFileName);
+                                    Logger.Info("Sync | Downloading new file: " + remoteDocumentFileName);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                             }

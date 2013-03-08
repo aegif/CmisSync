@@ -604,8 +604,26 @@ namespace CmisSync
                                 TextBox localfolder_box = new TextBox()
                                 {
                                     Width = 420,
-                                    Text = Controller.SyncingFolder
+                                    Text = Controller.SyncingReponame
                                     // IsEnabled = (Controller.SelectedPlugin.Address == null)
+                                };
+
+                                TextBlock localrepopath_label = new TextBlock()
+                                {
+                                    Text = CmisSync.Properties.Resources.ResourceManager.GetString("ChangeRepoPath", CultureInfo.CurrentCulture),
+                                    FontWeight = FontWeights.Bold
+                                };
+
+                                TextBox localrepopath_box = new TextBox()
+                                {
+                                    Width = 420,
+                                    Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text)
+                                    // IsEnabled = (Controller.SelectedPlugin.Address == null)
+                                };
+
+                                localfolder_box.TextChanged += delegate
+                                {
+                                    localrepopath_box.Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text);
                                 };
 
                                 TextBlock localfolder_error_label = new TextBlock()
@@ -651,8 +669,16 @@ namespace CmisSync
                                 Canvas.SetTop(localfolder_box, 180);
                                 Canvas.SetLeft(localfolder_box, 185);
 
+                                ContentCanvas.Children.Add(localrepopath_label);
+                                Canvas.SetTop(localrepopath_label, 200);
+                                Canvas.SetLeft(localrepopath_label, 185);
+
+                                ContentCanvas.Children.Add(localrepopath_box);
+                                Canvas.SetTop(localrepopath_box, 220);
+                                Canvas.SetLeft(localrepopath_box, 185);
+
                                 ContentCanvas.Children.Add(localfolder_error_label);
-                                Canvas.SetTop(localfolder_error_label, 235);
+                                Canvas.SetTop(localfolder_error_label, 275);
                                 Canvas.SetLeft(localfolder_error_label, 185);
 
                                 TaskbarItemInfo.ProgressValue = 0.0;
@@ -681,7 +707,8 @@ namespace CmisSync
                                     });
                                 };
 
-                                string error = Controller.CheckLocalFolderName(localfolder_box.Text);
+                                string error = Controller.CheckRepoName(localfolder_box.Text);
+
                                 if (!String.IsNullOrEmpty(error))
                                 {
                                     localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
@@ -691,7 +718,26 @@ namespace CmisSync
 
                                 localfolder_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckLocalFolderName(localfolder_box.Text);
+                                    error = Controller.CheckRepoName(localfolder_box.Text);
+                                    if (!String.IsNullOrEmpty(error))
+                                    {
+                                        localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                        localfolder_error_label.Visibility = Visibility.Visible;
+                                    }
+                                    else localfolder_error_label.Visibility = Visibility.Hidden;
+                                };
+
+                                error = Controller.CheckRepoPath(localrepopath_box.Text);
+                                if (!String.IsNullOrEmpty(error))
+                                {
+                                    localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                    localfolder_error_label.Visibility = Visibility.Visible;
+                                }
+                                else localfolder_error_label.Visibility = Visibility.Hidden;
+
+                                localrepopath_box.TextChanged += delegate
+                                {
+                                    error = Controller.CheckRepoPath(localrepopath_box.Text);
                                     if (!String.IsNullOrEmpty(error))
                                     {
                                         localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
@@ -712,12 +758,12 @@ namespace CmisSync
 
                                 sync_button.Click += delegate
                                 {
-                                    Controller.CustomizePageCompleted(localfolder_box.Text, true);
+                                    Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text, true);
                                 };
 
                                 add_button.Click += delegate
                                 {
-                                    Controller.CustomizePageCompleted(localfolder_box.Text, false);
+                                    Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text, false);
                                 };
                                 break;
                             }
@@ -726,7 +772,7 @@ namespace CmisSync
                         #region Page Syncing
                         case PageType.Syncing:
                             {
-                                Header = CmisSync.Properties.Resources.ResourceManager.GetString("AddingFolder", CultureInfo.CurrentCulture) + " ‘" + Controller.SyncingFolder + "’…";
+                                Header = CmisSync.Properties.Resources.ResourceManager.GetString("AddingFolder", CultureInfo.CurrentCulture) + " ‘" + Controller.SyncingReponame + "’…";
                                 Description = CmisSync.Properties.Resources.ResourceManager.GetString("MayTakeTime", CultureInfo.CurrentCulture);
 
                                 Button finish_button = new Button()
@@ -910,9 +956,9 @@ namespace CmisSync
                             }
                         #endregion
 
+                        #region Page Tutorial
                         case PageType.Tutorial:
                             {
-
                                 switch (Controller.TutorialPageNumber)
                                 {
                                     case 1:
@@ -1082,6 +1128,7 @@ namespace CmisSync
                                         }
                                 }
                                 break;
+                        #endregion
                             }
                     }
 

@@ -261,4 +261,10 @@ les données XML obtenues dans le forum de CmisSync.</value>
   <data name="YouCanFind" xml:space="preserve">
     <value>Vous pouvez les trouver dans votre dossier CmisSync.</value>
   </data>
+  <data name="LocalDirectoryExist" xml:space="preserve">
+    <value>Ce dossier local existe déjà, donc vous ne pouvez pas l'utiliser pour synchroniser des données !</value>
+  </data>
+  <data name="ChangeRepoPath" xml:space="preserve">
+    <value>Changer l'emplacement local de ce dossier:</value>
+  </data>
 </root>

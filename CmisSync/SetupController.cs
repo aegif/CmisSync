@@ -101,7 +101,8 @@ namespace CmisSync
         public string PreviousAddress { get; private set; }
         public string PreviousPath { get; private set; }
         public string PreviousRepository { get; private set; }
-        public string SyncingFolder { get; private set; }
+        public string SyncingReponame { get; private set; }
+        public string DefaultRepoPath { get; private set; }
         public double ProgressBarPercentage { get; private set; }
 
 
@@ -154,7 +155,8 @@ namespace CmisSync
             PreviousAddress = "";
             PreviousPath = "";
             PreviousUrl = "";
-            SyncingFolder = "";
+            SyncingReponame = "";
+            DefaultRepoPath = Program.Controller.FoldersPath;
 
             string local_plugins_path = Plugin.LocalPluginsPath;
             int local_plugins_count = 0;
@@ -408,21 +410,33 @@ namespace CmisSync
             return String.Empty;
         }
 
-        public string CheckLocalFolderName(string foldername)
+        public string CheckRepoName(string reponame)
         {
             // Check if foldername do not contains invalid car
             Regex regx = new Regex(@"^([a-zA-Z0-9][^*/><?\|:]*)$");
 
             // Check if foldername is already in use
-            bool folder_already_exist = (Program.Controller.Folders.FindIndex(x => x.Equals(foldername, StringComparison.OrdinalIgnoreCase)) != -1);
+            bool folder_already_exist = (Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase)) != -1);
 
-            bool fields_valid = (regx.IsMatch(foldername) && (!folder_already_exist));
+            bool fields_valid = (regx.IsMatch(reponame) && (!folder_already_exist));
 
             UpdateAddProjectButtonEvent(fields_valid);
 
             if (folder_already_exist) return "FolderAlreadyExist";
-            if (!regx.IsMatch(foldername)) return "InvalidFolderName";
+            if (!regx.IsMatch(reponame)) return "InvalidFolderName";
             return String.Empty;
+        }
+
+        public string CheckRepoPath(string localpath)
+        {
+            bool folder_exist = Directory.Exists(localpath);
+
+            bool fields_valid = !folder_exist;
+            UpdateAddProjectButtonEvent(fields_valid);
+
+            if (folder_exist) return "LocalDirectoryExist";
+            return String.Empty;
+
         }
 
         public void Add1PageCompleted(string address, string user, string password)
@@ -443,7 +457,7 @@ namespace CmisSync
 
         public void Add2PageCompleted(string repository, string remote_path)
         {
-            SyncingFolder = Path.GetFileName(remote_path);
+            SyncingReponame = Path.GetFileName(remote_path);
             ProgressBarPercentage = 1.0;
 
             ChangePageEvent(PageType.Customize, null);
@@ -460,9 +474,9 @@ namespace CmisSync
             PreviousPath = remote_path;
         }
 
-        public void CustomizePageCompleted(String localFolderName, bool syncnow)
+        public void CustomizePageCompleted(String repoName, String localrepopath, bool syncnow)
         {
-            SyncingFolder = localFolderName;
+            SyncingReponame = repoName;
 
             ChangePageEvent(PageType.Syncing, null);
 
@@ -474,9 +488,9 @@ namespace CmisSync
             {
                 new Thread(() =>
                 {
-                    Program.Controller.StartFetcher(PreviousAddress, SelectedPlugin.Fingerprint, PreviousPath, SyncingFolder,
+                    Program.Controller.StartFetcher(PreviousAddress, SelectedPlugin.Fingerprint, PreviousPath, repoName,
                         SelectedPlugin.AnnouncementsUrl, this.fetch_prior_history,
-                        PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), syncnow);
+                        PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), localrepopath, syncnow);
 
                 }).Start();
             }
@@ -535,7 +549,7 @@ namespace CmisSync
 
         private void AddPageFetchErrorDelegate(string remote_url, string[] errors)
         {
-            SyncingFolder = "";
+            SyncingReponame = "";
             PreviousUrl = remote_url;
 
             ChangePageEvent(PageType.Error, errors);
@@ -585,7 +599,7 @@ namespace CmisSync
 
         private void InvitePageFetchedDelegate(string remote_url, string[] warnings)
         {
-            SyncingFolder = "";
+            SyncingReponame = "";
             PendingInvite = null;
 
             ChangePageEvent(PageType.Finished, warnings);
@@ -597,7 +611,7 @@ namespace CmisSync
 
         private void InvitePageFetchErrorDelegate(string remote_url, string[] errors)
         {
-            SyncingFolder = "";
+            SyncingReponame = "";
             PreviousUrl = remote_url;
 
             ChangePageEvent(PageType.Error, errors);
@@ -670,8 +684,8 @@ namespace CmisSync
 
         public void OpenFolderClicked()
         {
-            Program.Controller.OpenCmisSyncFolder(SyncingFolder);
-            SyncingFolder = String.Empty;
+            Program.Controller.OpenCmisSyncFolder(SyncingReponame);
+            SyncingReponame = String.Empty;
             FinishPageCompleted();
         }
 

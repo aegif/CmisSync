@@ -115,6 +115,15 @@ namespace CmisSync.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Change the local path of this repository:.
+        /// </summary>
+        internal static string ChangeRepoPath {
+            get {
+                return ResourceManager.GetString("ChangeRepoPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à CmisSync creates a special folder on your computer where the documents are synchronized..
         /// </summary>
         internal static string CmisSyncCreates {
@@ -257,6 +266,15 @@ namespace CmisSync.Properties {
         internal static string InvalidURL {
             get {
                 return ResourceManager.GetString("InvalidURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This local folder already exist, so it can not be use to sync data !.
+        /// </summary>
+        internal static string LocalDirectoryExist {
+            get {
+                return ResourceManager.GetString("LocalDirectoryExist", resourceCulture);
             }
         }
         
