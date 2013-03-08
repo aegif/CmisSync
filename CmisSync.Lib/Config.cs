@@ -311,11 +311,11 @@ namespace CmisSync.Lib
 
         public void AddFolder(RepoInfo repoInfo)
         {
-            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password);
+            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
         }
 
         public void AddFolder(string name, string path, string identifier, string url, string backend,
-            string repository, string remoteFolder, string user, string password)
+            string repository, string remoteFolder, string user, string password, double pollinterval)
         {
             XmlNode node_name = configXml.CreateElement("name");
             XmlNode node_path = configXml.CreateElement("path");
@@ -326,6 +326,7 @@ namespace CmisSync.Lib
             XmlNode node_remoteFolder = configXml.CreateElement("remoteFolder");
             XmlNode node_user = configXml.CreateElement("user");
             XmlNode node_password = configXml.CreateElement("password");
+            XmlNode node_pollinterval = configXml.CreateElement("pollinterval");
 
             node_name.InnerText = name;
             node_path.InnerText = path;
@@ -336,6 +337,7 @@ namespace CmisSync.Lib
             node_remoteFolder.InnerText = remoteFolder;
             node_user.InnerText = user;
             node_password.InnerText = password;
+            node_pollinterval.InnerText = pollinterval.ToString();
 
             XmlNode node_folder = configXml.CreateNode(XmlNodeType.Element, "folder", null);
 
@@ -348,6 +350,7 @@ namespace CmisSync.Lib
             node_folder.AppendChild(node_remoteFolder);
             node_folder.AppendChild(node_user);
             node_folder.AppendChild(node_password);
+            node_folder.AppendChild(node_pollinterval);
 
             XmlNode node_root = configXml.SelectSingleNode("/CmisSync/folders");
             node_root.AppendChild(node_folder);
@@ -466,6 +469,12 @@ namespace CmisSync.Lib
             repoInfo.RepoID = GetFolderOptionalAttribute(FolderName, "repository");
             repoInfo.RemotePath = GetFolderOptionalAttribute(FolderName, "remoteFolder");
             repoInfo.TargetDirectory = GetFolderOptionalAttribute(FolderName, "path");
+            
+            double pollinterval = 0;
+            double.TryParse(GetFolderOptionalAttribute(FolderName, "pollinterval"), out pollinterval);
+            if (pollinterval == 0) pollinterval = 5000;
+            repoInfo.PollInterval = pollinterval;
+
             if (String.IsNullOrEmpty(repoInfo.TargetDirectory))
             {
                 repoInfo.TargetDirectory = Path.Combine(FoldersPath, FolderName);

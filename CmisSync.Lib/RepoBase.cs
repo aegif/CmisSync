@@ -132,7 +132,8 @@ namespace CmisSync.Lib
         private DateTime last_poll = DateTime.Now;
         private DateTime progress_last_change = DateTime.Now;
         private TimeSpan progress_change_interval = new TimeSpan(0, 0, 0, 1);
-        private Timers.Timer remote_timer = new Timers.Timer() { Interval = 5000 };
+        // private Timers.Timer remote_timer = new Timers.Timer() { Interval = 5000 };
+        private Timers.Timer remote_timer = new Timers.Timer();
 
         private bool is_syncing
         {
@@ -159,6 +160,9 @@ namespace CmisSync.Lib
             ServerOnline = true;
             this.identifier = Identifier;
             ChangeSets = GetChangeSets();
+
+            Logger.Info(String.Format("Repo [{0}] - Set poll interval to {1} ms", repoInfo.Name, repoInfo.PollInterval));
+            this.remote_timer.Interval = repoInfo.PollInterval;
 
             SyncStatusChanged += delegate(SyncStatus status)
             {
