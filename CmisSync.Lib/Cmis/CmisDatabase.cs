@@ -54,8 +54,9 @@ namespace CmisSync.Lib.Cmis
         {
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
-                Logger.Info("Database | Checking whether database exists");
+                Logger.Info(String.Format("CmisDatabase | Checking whether database {0} exists", databaseFileName));
                 bool createDatabase = !File.Exists(databaseFileName);
+
                 sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
                 sqliteConnection.Open();
 
