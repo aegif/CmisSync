@@ -42,6 +42,7 @@ using NUnit.Framework;
 namespace TestLibrary
 {
     using NUnit.Framework;
+    using CmisSync.Lib.Cmis;
 
     public class CmisSyncTests
     {
@@ -64,7 +65,7 @@ namespace TestLibrary
         public void Dispose()
         {
         }
-
+        /*
         private void Clean(string localDirectory, CmisRepo.CmisDirectory cmisDirectory)
         {
             DirectoryInfo directory = new DirectoryInfo(localDirectory);
