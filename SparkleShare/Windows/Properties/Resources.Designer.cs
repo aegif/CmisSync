@@ -243,7 +243,7 @@ namespace SparkleShare.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The folder name is invalid. Special car are not allow..
+        ///   Looks up a localized string similar to The folder name is invalid. Special characters are not allowed..
         /// </summary>
         internal static string InvalidFolderName {
             get {

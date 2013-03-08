@@ -180,7 +180,7 @@
 It is like Dropbox for Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>The folder name is invalid. Special car are not allow.</value>
+    <value>The folder name is invalid. Special characters are not allowed.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
     <value>Invalid URL</value>
