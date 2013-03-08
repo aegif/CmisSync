@@ -567,6 +567,7 @@ namespace CmisSync
             repoInfo.User = user;
             repoInfo.Password = CmisCrypto.Protect(password);
             repoInfo.TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, local_path);
+            repoInfo.PollInterval = 5000;
 
             fetcher = new CmisSync.Lib.Cmis.Fetcher(repoInfo, activityListenerAggregator);
 

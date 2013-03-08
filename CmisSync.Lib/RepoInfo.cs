@@ -57,13 +57,16 @@ namespace CmisSync.Lib
         private string backend;
         public string Backend { get { return "Cmis"; } }
 
+        private double pollinterval;
+        public double PollInterval { get { return pollinterval; } set { pollinterval = value; } }
+
         public RepoInfo(string name, string cmisDatabaseFolder)
         {
             this.name = name;
             this.cmisdatabase = Path.Combine(cmisDatabaseFolder, name + ".cmissync");
         }
 
-        public RepoInfo(string name, string cmisDatabaseFolder, string remotepath, string address, string user, string password, string repoid)
+        public RepoInfo(string name, string cmisDatabaseFolder, string remotepath, string address, string user, string password, string repoid, double pollinterval)
         {
             this.name = name;
             this.cmisdatabase = Path.Combine(cmisDatabaseFolder, name + ".cmissync");
@@ -73,6 +76,7 @@ namespace CmisSync.Lib
             this.password = password;
             this.repoid = repoid;
             this.targetdirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
+            this.pollinterval = pollinterval;
         }
     }
 }
