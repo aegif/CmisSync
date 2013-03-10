@@ -355,12 +355,12 @@ namespace SparkleLib.Cmis
      */
             public void SyncInBackground()
             {
-                if (syncing)
+                if (this.syncing)
                 {
                     SparkleLogger.LogInfo("Sync", String.Format("[{0}] - sync is already running in background.", repoinfo.TargetDirectory));
                     return;
                 }
-                syncing = true;
+                this.syncing = true;
 
                 BackgroundWorker bw = new BackgroundWorker();
                 bw.DoWork += new DoWorkEventHandler(
@@ -386,7 +386,7 @@ namespace SparkleLib.Cmis
                 bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
                     delegate(object o, RunWorkerCompletedEventArgs args)
                     {
-                        syncing = false;
+                        this.syncing = false;
                     }
                 );
                 bw.RunWorkerAsync();
