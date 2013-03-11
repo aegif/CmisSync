@@ -69,7 +69,7 @@ namespace CmisSync.Lib.Cmis
             for (int i=0; i < suffixes.Length; i++)
             {
                 string fuzzyUrl = prefix + suffixes[i];
-                Logger.Info("Sync - Trying with " + fuzzyUrl);
+                SparkleLogger.LogInfo("Sync", "Trying with " + fuzzyUrl);
                 try
                 {
                     repositories = GetRepositories(fuzzyUrl, user, password);
