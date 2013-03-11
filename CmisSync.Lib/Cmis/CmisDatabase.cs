@@ -373,7 +373,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
+                    Logger.Error("CmisDatabase | " + e.Message);
                 }
             }
         }
@@ -439,8 +439,8 @@ namespace CmisSync.Lib.Cmis
                 previousChecksum = (string)obj;
             }
 
-            if(!currentChecksum.Equals(previousChecksum))
-                SparkleLogger.LogInfo("CmisDatabase", "Checksum of " + path + " has changed from " + previousChecksum + " to " + currentChecksum);
+            if (!currentChecksum.Equals(previousChecksum))
+                Logger.Info("CmisDatabase | Checksum of " + path + " has changed from " + previousChecksum + " to " + currentChecksum);
             return !currentChecksum.Equals(previousChecksum);
         }
 
