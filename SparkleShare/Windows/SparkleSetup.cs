@@ -448,22 +448,10 @@ namespace SparkleShare
                                     System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
                                     // Try to find the CMIS server
-                                    try
-                                    {
-                                        CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
-                                            address_box.Text, user_box.Text, password_box.Password);
-                                        Controller.repositories = cmisServer.repositories;
-                                        address_box.Text = cmisServer.url;
-
-                                    }
-                                    catch (CmisPermissionDeniedException ex)
-                                    {
-                                        // Show warning
-                                        address_error_label.Text = SparkleShare.Properties.Resources.ResourceManager.GetString(ex.Message, CultureInfo.CurrentCulture);
-                                        address_error_label.Visibility = Visibility.Visible;
-                                        return;
-                                    }
-
+                                    CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
+                                        address_box.Text, user_box.Text, password_box.Password);
+                                    Controller.repositories = cmisServer.repositories;
+                                    address_box.Text = cmisServer.url;
 
                                     // Hide wait cursor
                                     System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
