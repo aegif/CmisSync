@@ -45,7 +45,6 @@ _ReSharper.*
 *.msi
 *.wixobj
 *.wixpdb
-*.wxs
 *.dotCover
 SparkleShare/TestLibrary/test-servers.json
 SparkleShare/TestLibrary/test-servers-disabled.json
