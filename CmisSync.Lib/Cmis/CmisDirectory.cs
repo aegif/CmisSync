@@ -640,6 +640,7 @@ namespace CmisSync.Lib.Cmis
 
             private void UpdateFile(string filePath, IDocument remoteFile)
             {
+                SparkleLogger.LogInfo("CmisDirectory", "## Updating " + filePath);
                 Stream localfile = File.OpenRead(filePath);
                 if ((localfile == null) && (localfile.Length == 0))
                 {
@@ -648,24 +649,24 @@ namespace CmisSync.Lib.Cmis
                 }
 
                 // Prepare content stream
-                string fileName = Path.GetFileName(filePath);
-
                 ContentStream remoteStream = new ContentStream();
                 remoteStream.FileName = remoteFile.ContentStreamFileName;
                 remoteStream.Length = localfile.Length;
-                remoteStream.MimeType = MimeType.GetMIMEType(fileName);
+                remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
                 remoteStream.Stream = localfile;
                 remoteStream.Stream.Flush();
+                SparkleLogger.LogInfo("CmisDirectory", "before SetContentStream");
 
                 // CMIS do not have a Method to upload block by block. So upload file must be full.
                 // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
                 // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
                 // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
-                DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
+                remoteFile.SetContentStream(remoteStream, true, true);
+                SparkleLogger.LogInfo("CmisDirectory", "after SetContentStream");
                 localfile.Close();
                 localfile.Dispose();
                 remoteStream.Stream.Close();
-                Logger.Info("Sync | Update finished:" + filePath);
+                Logger.Info("CmisDirectory", "## Updated " + filePath);
             }
 
             /**
@@ -673,7 +674,7 @@ namespace CmisSync.Lib.Cmis
              */
             private void UpdateFile(string filePath, IFolder remoteFolder)
             {
-                Logger.Info("Sync | Updated " + filePath);
+                Logger.Info("CmisDirectory", "# Updating " + filePath);
                 activityListener.ActivityStarted();
                 string fileName = Path.GetFileName(filePath);
 
@@ -695,19 +696,23 @@ namespace CmisSync.Lib.Cmis
                 // If not found, it means the document has been deleted, will be processed at the next sync cycle.
                 if (!found)
                 {
-                    Logger.Info("Sync | " + filePath + " not found on server, must be uploaded instead of updated");
+                    Logger.Info("CmisDirectory", filePath + " not found on server, must be uploaded instead of updated");
                     return;
                 }
 
                 UpdateFile(filePath, document);
 
-                // Read new last modification date.
                 // Update timestamp in database.
                 database.SetFileServerSideModificationDate(filePath, document.LastModificationDate);
+                // Update checksum
+                database.RecalculateChecksum(filePath);
 
                 // TODO - Yannick - Update metadata ?
 
                 activityListener.ActivityStopped();
+
+                this.syncing = false;
+                SparkleLogger.LogInfo("CmisDirectory", "# Updated " + filePath);
             }
 
             /**

@@ -32,8 +32,17 @@ namespace CmisSync.Lib.Cmis
          */
         static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
         {
-            // Try the given URL
-            Dictionary<string, string> repositories = GetRepositories(url, user, password);
+            Dictionary<string, string> repositories = null;
+
+            // Try the given URL, maybe user directly entered the CMIS AtomPub endpoint URL.
+            try
+            {
+                repositories = GetRepositories(url, user, password);
+            }
+            catch (CmisPermissionDeniedException ex)
+            {
+                // Do nothing.
+            }
             if (repositories != null)
             {
                 return new CmisServer(url, repositories);
@@ -60,8 +69,15 @@ namespace CmisSync.Lib.Cmis
             for (int i=0; i < suffixes.Length; i++)
             {
                 string fuzzyUrl = prefix + suffixes[i];
-                Logger.Info("Sync | Trying with " + fuzzyUrl);
-                repositories = GetRepositories(fuzzyUrl, user, password);
+                SparkleLogger.LogInfo("Sync", "Trying with " + fuzzyUrl);
+                try
+                {
+                    repositories = GetRepositories(fuzzyUrl, user, password);
+                }
+                catch (CmisPermissionDeniedException ex)
+                {
+                    // Do nothing.
+                }
                 if (repositories != null)
                     return new CmisServer(fuzzyUrl, repositories);
             }

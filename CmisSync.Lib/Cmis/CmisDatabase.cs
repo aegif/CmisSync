@@ -329,6 +329,7 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        // TODO Combine this method and the next in a new method ModifyFile, and find out if GetServerSideModificationDate is really needed.
         public void SetFileServerSideModificationDate(string path, DateTime? serverSideModificationDate)
         {
             path = Normalize(path);
@@ -348,6 +349,31 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Fatal("CmisDatabase | " + e.Message);
+                }
+            }
+        }
+
+
+        public void RecalculateChecksum(string path)
+        {
+            string checksum = Checksum(path);
+            path = Normalize(path);
+            var connection = GetSQLiteConnection();
+            using (var command = new SQLiteCommand(connection))
+            {
+                try
+                {
+                    command.CommandText =
+                        @"UPDATE files
+                            SET checksum=@checksum
+                            WHERE path=@path";
+                    command.Parameters.AddWithValue("checksum", checksum);
+                    command.Parameters.AddWithValue("path", path);
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    SparkleLogger.LogInfo("CmisDatabase", e.Message);
                 }
             }
         }
@@ -413,6 +439,8 @@ namespace CmisSync.Lib.Cmis
                 previousChecksum = (string)obj;
             }
 
+            if(!currentChecksum.Equals(previousChecksum))
+                SparkleLogger.LogInfo("CmisDatabase", "Checksum of " + path + " has changed from " + previousChecksum + " to " + currentChecksum);
             return !currentChecksum.Equals(previousChecksum);
         }
 
