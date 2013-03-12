@@ -219,11 +219,15 @@ namespace CmisSync {
         }
 
 
-        public void SubfolderClicked (string subfolder)
+        public void LocalFolderClicked (string reponame)
         {
-            Program.Controller.OpenCmisSyncFolder (subfolder);
+            Program.Controller.OpenCmisSyncFolder (reponame);
         }
 
+        public void RemoteFolderClicked(string reponame)
+        {
+            Program.Controller.OpenRemoteFolder(reponame);
+        }
 
         public void AddHostedProjectClicked ()
         {

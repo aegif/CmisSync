@@ -23,34 +23,37 @@ using CmisSync.Lib;
 using log4net;
 using log4net.Config;
 
-namespace CmisSync {
+namespace CmisSync
+{
 
     // This is CmisSync!
-    public class Program {
+    public class Program
+    {
 
         public static Controller Controller;
         public static UI UI;
 
-        private static Mutex program_mutex = new Mutex (false, "CmisSync");
+        private static Mutex program_mutex = new Mutex(false, "CmisSync");
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
-        #if !__MonoCS__
+#if !__MonoCS__
         [STAThread]
-        #endif
-        public static void Main (string [] args)
+#endif
+        public static void Main(string[] args)
         {
 
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
 
-			Console.WriteLine("start");
-            if (args.Length != 0 && !args [0].Equals ("start") &&
+            Console.WriteLine("start");
+            if (args.Length != 0 && !args[0].Equals("start") &&
                 Backend.Platform != PlatformID.MacOSX &&
-                Backend.Platform != PlatformID.Win32NT) {
+                Backend.Platform != PlatformID.Win32NT)
+            {
 
                 string n = Environment.NewLine;
 
-                Console.WriteLine (n +
+                Console.WriteLine(n +
                     "CmisSync is a collaboration and sharing tool that is" + n +
                     "designed to keep things simple and to stay out of your way." + n +
                     n +
@@ -62,37 +65,40 @@ namespace CmisSync {
                     "under certain conditions. Please read the GNU GPLv3 for details." + n +
                     n +
                     "Usage: CmisSync [start|stop|restart]");
-                Environment.Exit (-1);
+                Environment.Exit(-1);
             }
 
-			// Only allow one instance of CmisSync (on Windows)
-			if (!program_mutex.WaitOne (0, false)) {
-				Console.WriteLine ("CmisSync is already running.");
-				Environment.Exit (-1);
-			}
-
-//#if !DEBUG
-            try {
-//#endif
-                Controller = new Controller ();
-                Controller.Initialize ();
-
-                UI = new UI ();
-                UI.Run ();
-            
-//#if !DEBUG
-            } catch (Exception e) {
-				Console.WriteLine("Exception in Program.Main");
-                Logger.Fatal(e);
-                Environment.Exit (-1);
+            // Only allow one instance of CmisSync (on Windows)
+            if (!program_mutex.WaitOne(0, false))
+            {
+                Logger.Error("CmisSync is already running.");
+                Environment.Exit(-1);
             }
-//#endif
 
-            #if !__MonoCS__
+            //#if !DEBUG
+            try
+            {
+                //#endif
+                Controller = new Controller();
+                Controller.Initialize();
+
+                UI = new UI();
+                UI.Run();
+
+                //#if !DEBUG
+            }
+            catch (Exception e)
+            {
+                Logger.Fatal("Exception in Program.Main", e);
+                Environment.Exit(-1);
+            }
+            //#endif
+
+#if !__MonoCS__
             // Suppress assertion messages in debug mode
-            GC.Collect (GC.MaxGeneration, GCCollectionMode.Forced);
-            GC.WaitForPendingFinalizers ();
-            #endif
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            GC.WaitForPendingFinalizers();
+#endif
         }
     }
 }

@@ -740,18 +740,6 @@ namespace CmisSync
         }
 
 
-        public void OpenCmisSyncFolder()
-        {
-            OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
-        }
-
-
-        public void OpenCmisSyncFolder(string name)
-        {
-            OpenFolder(new Folder(name).FullPath);
-        }
-
-
         public void ToggleNotifications()
         {
             bool notifications_enabled = ConfigManager.CurrentConfig.GetConfigOption("notifications").Equals(bool.TrueString);

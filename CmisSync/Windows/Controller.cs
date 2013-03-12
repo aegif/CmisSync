@@ -205,6 +205,23 @@ namespace CmisSync
             process.Start();
         }
 
+        public void OpenCmisSyncFolder()
+        {
+            OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
+        }
+
+
+        public void OpenCmisSyncFolder(string name)
+        {
+            OpenFolder(new Folder(name).FullPath);
+        }
+
+        public void OpenRemoteFolder(string name)
+        {
+            RepoInfo info = ConfigManager.CurrentConfig.GetRepoInfo(name);
+            Process.Start(info.Address.AbsoluteUri + info.RemotePath);
+        }
+
         public override void Quit()
         {
             base.Quit();

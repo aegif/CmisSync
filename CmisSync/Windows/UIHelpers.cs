@@ -55,7 +55,11 @@ namespace CmisSync {
             Stream image_stream = assembly.GetManifestResourceStream ("CmisSync.Pixmaps." + name + ".png");
             return (Drawing.Bitmap) Drawing.Bitmap.FromStream (image_stream);
         }
-		
+
+        public static Drawing.Icon GetIcon(string name)
+        {
+            return Drawing.Icon.FromHandle(GetBitmap(name).GetHicon());
+        }
 		
 		public static string GetHTML (string name)
         {                                          

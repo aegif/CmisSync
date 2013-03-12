@@ -16,58 +16,69 @@
 
 
 using System;
+using System.Windows.Forms;
 using CmisSync.Lib;
 
-namespace CmisSync {
+namespace CmisSync
+{
 
-    public class BubblesController {
+    public class BubblesController
+    {
 
         public event ShowBubbleEventHandler ShowBubbleEvent = delegate { };
-        public delegate void ShowBubbleEventHandler (string title, string subtext, string image_path);
+        public delegate void ShowBubbleEventHandler(string title, string subtext, ToolTipIcon tticon);
 
 
-        public BubblesController ()
+        public BubblesController()
         {
-            Program.Controller.AlertNotificationRaised += delegate (string title, string message) {
-                ShowBubble (title, message, null);
+            Program.Controller.AlertNotificationRaised += delegate(string title, string message)
+            {
+                ShowBubble(title, message, ToolTipIcon.Error);
             };
 
-            Program.Controller.NotificationRaised += delegate (ChangeSet change_set) {
-                ShowBubble (change_set.User.Name, FormatMessage (change_set),
-                    Program.Controller.GetAvatar (change_set.User.Email, 48));
+            Program.Controller.NotificationRaised += delegate(ChangeSet change_set)
+            {
+                ShowBubble(change_set.User.Name, FormatMessage(change_set),
+                    ToolTipIcon.Info);
             };
         }
 
 
-        public void ShowBubble (string title, string subtext, string image_path)
+        public void ShowBubble(string title, string subtext, ToolTipIcon tticon)
         {
-            ShowBubbleEvent (title, subtext, image_path);
+            ShowBubbleEvent(title, subtext, tticon);
         }
 
 
-        public void BubbleClicked ()
+        public void BubbleClicked()
         {
-            Program.Controller.ShowEventLogWindow ();
+            Program.Controller.ShowEventLogWindow();
         }
 
 
-        private string FormatMessage (ChangeSet change_set)
+        private string FormatMessage(ChangeSet change_set)
         {
             string message = "added ‘{0}’";
 
-            switch (change_set.Changes [0].Type) {
-                case CmisChangeType.Edited:  message = "edited ‘{0}’"; break;
+            switch (change_set.Changes[0].Type)
+            {
+                case CmisChangeType.Edited: message = "edited ‘{0}’"; break;
                 case CmisChangeType.Deleted: message = "deleted ‘{0}’"; break;
                 case CmisChangeType.Moved: message = "moved ‘{0}’"; break;
             }
 
-            if (change_set.Changes.Count == 1) {
-                return message = string.Format (message, change_set.Changes [0].Path);
+            if (change_set.Changes.Count == 1)
+            {
+                return message = string.Format(message, change_set.Changes[0].Path);
 
-            } else if (change_set.Changes.Count > 1) {
-                return string.Format (message + " and {0} more", change_set.Changes.Count - 1);
+            }
+            else if (change_set.Changes.Count > 1)
+            {
+                return string.Format(message + " and {0} more", change_set.Changes.Count - 1);
 
-            } else {
+            }
+            else
+            {
                 return "did something magical";
             }
         }

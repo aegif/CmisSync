@@ -38,7 +38,7 @@ namespace CmisSync {
             EventLog   = new EventLog ();
             About      = new About ();
             Bubbles    = new Bubbles ();
-            StatusIcon = new StatusIcon ();
+            //StatusIcon = new StatusIcon ();
             
             Program.Controller.UIHasLoaded ();
         }
@@ -46,7 +46,7 @@ namespace CmisSync {
         
         public void Run ()
         {
-            Application.Run ();
+            Application.Run (StatusIcon = new StatusIcon ());
             StatusIcon.Dispose ();
         }
     }

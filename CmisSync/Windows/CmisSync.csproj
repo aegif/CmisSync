@@ -110,19 +110,20 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Shortcut.cs" />
+    <Compile Include="StatusIcon.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI.cs" />
     <Compile Include="Bubbles.cs" />
     <Compile Include="About.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="EventLog.cs" />
     <Compile Include="Setup.cs" />
-    <Compile Include="StatusIcon.cs" />
     <Compile Include="UIHelpers.cs" />
     <Compile Include="SetupWindow.cs" />
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="NotifyIcon.cs" />
     <Compile Include="Spinner.cs" />
   </ItemGroup>
   <ProjectExtensions>
@@ -248,7 +249,6 @@
     <EmbeddedResource Include="Properties\Resources.fr.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.tlh-AA.resx" />
     <EmbeddedResource Include="Properties\Resources.uk.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>

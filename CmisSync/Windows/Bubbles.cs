@@ -13,23 +13,25 @@
 //
 //   You should have received a copy of the GNU General Public License
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-
 using System;
+using System.Windows.Forms;
 
-namespace CmisSync {
-    
-    public class Bubbles {
+namespace CmisSync
+{
 
-        public BubblesController Controller = new BubblesController ();
+    public class Bubbles
+    {
+
+        public BubblesController Controller = new BubblesController();
 
 
-        public Bubbles ()
+        public Bubbles()
         {
-            Controller.ShowBubbleEvent += delegate (string title,
-                string subtext, string image_path) {
+            Controller.ShowBubbleEvent += delegate(string title,
+                string subtext, ToolTipIcon tticon)
+            {
 
-                Program.UI.StatusIcon.ShowBalloon (title, subtext, image_path);
+                Program.UI.StatusIcon.ShowBalloon(title, subtext, tticon);
             };
         }
     }
