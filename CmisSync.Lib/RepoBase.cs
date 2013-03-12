@@ -287,7 +287,7 @@ namespace CmisSync.Lib
         }
 
 
-        protected void OnConflictResolved()
+        protected internal void OnConflictResolved()
         {
             ConflictResolved();
         }
