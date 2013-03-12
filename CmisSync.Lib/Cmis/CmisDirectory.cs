@@ -84,43 +84,18 @@ namespace CmisSync.Lib.Cmis
              * */
             private RepoInfo repoinfo;
 
-            // Why use a special constructor, add folder in config before syncing and use standard constructor instead
             /**
-             * Constructor for Fetcher (when a new CMIS folder is first added)
-             * 
-             */
-            //public CmisDirectory(string canonical_name, string localPath, string remoteFolderPath,
-            //    string url, string user, string password, string repositoryId,
-            //    ActivityListener activityListener)
-            //{
-            //    this.activityListener = activityListener;
-            //    this.remoteFolderPath = remoteFolderPath;
-
-            //    // Set local root folder.
-            //    this.localRootFolder = Path.Combine(Folder.ROOT_FOLDER, canonical_name);
-
-            //    // Database is place in appdata of the users instead of sync folder (more secure)
-            //    // database = new CmisDatabase(localRootFolder);
-            //    string cmis_path = Path.Combine(config.ConfigPath, canonical_name + ".cmissync");
-            //    database = new CmisDatabase(cmis_path);
-
-            //    cmisParameters = new Dictionary<string, string>();
-            //    cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            //    cmisParameters[SessionParameter.AtomPubUrl] = url;
-            //    cmisParameters[SessionParameter.User] = user;
-            //    cmisParameters[SessionParameter.Password] = password;
-            //    cmisParameters[SessionParameter.RepositoryId] = repositoryId;
-
-            //    syncing = false;
-            //}
-
+             * Link to parent object
+             **/
+            private RepoBase repo;
 
             /**
              * Constructor for Repo (at every launch of CmisSync)
              */
             public CmisDirectory(RepoInfo repoInfo,
-                ActivityListener activityListener)
+                ActivityListener activityListener, CmisRepo repo)
             {
+                this.repo = repo;
                 this.activityListener = activityListener;
                 this.repoinfo = repoInfo;
                 // Set local root folder
@@ -667,6 +642,7 @@ namespace CmisSync.Lib.Cmis
                 localfile.Dispose();
                 remoteStream.Stream.Close();
                 Logger.Info("CmisDirectory | ## Updated " + filePath);
+
             }
 
             /**

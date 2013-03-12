@@ -202,6 +202,7 @@ namespace CmisSync.Lib.Cmis
 
                                             // Download server version
                                             DownloadFile(remoteDocument, localFolder);
+                                            repo.OnConflictResolved();
 
                                             // TODO move to OS-dependant layer
                                             //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
