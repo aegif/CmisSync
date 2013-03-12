@@ -46,7 +46,7 @@ namespace CmisSync.Lib.Cmis
         public CmisRepo(RepoInfo repoInfo, ActivityListener activityListener)
             : base(repoInfo)
         {
-            cmis = new CmisDirectory(repoInfo, activityListener);
+            cmis = new CmisDirectory(repoInfo, activityListener, this);
             Logger.Info("Sync | Cmis:" + cmis);
         }
 
