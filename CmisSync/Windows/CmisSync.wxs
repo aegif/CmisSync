@@ -18,7 +18,6 @@
             </Component>
             <Component Id='Libraries' Guid='f982a0bb-824d-4835-921d-e51b47b8598b'>
               <File Id='CmisSync.Lib.dll' Name='CmisSync.Lib.dll' Source='!(wix.root)\bin\CmisSync.Lib.dll' DiskId='1' />
-              <File Id='CmisSync.dll' Name='CmisSync.dll' Source='!(wix.root)\bin\CmisSync.dll' DiskId='1' />
               <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\bin\DotCMIS.dll' DiskId='1' />
               <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\Extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\System.Data.SQLite.dll' DiskId='1' />
               <File Id='SQLite.Interop.dll' Name='SQLite.Interop.dll' Source='!(wix.root)\Extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\SQLite.Interop.dll' DiskId='1' />
