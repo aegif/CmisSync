@@ -42,7 +42,7 @@ namespace CmisSync.Lib
             // Please see the CmisSync wiki if you wish to run
             // your own service instead
             if (string.IsNullOrEmpty (uri))
-                uri = "tcp://notifications.CmisSync.org:80";
+                uri = "tcp://notifications.sparkleshare.org:80";
 
             Uri announce_uri = new Uri (uri);
 
