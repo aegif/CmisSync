@@ -53,6 +53,9 @@ namespace CmisSync {
 		
 		public event UpdateOpenRecentEventsItemEventHandler UpdateOpenRecentEventsItemEvent = delegate { };
         public delegate void UpdateOpenRecentEventsItemEventHandler (bool open_recent_events_item_enabled);
+
+        public event UpdateSuspendSyncFolderEventHandler UpdateSuspendSyncFolderEvent = delegate { };
+        public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
 		
         public IconState CurrentState = IconState.Idle;
         public string StateText = Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
@@ -252,6 +255,9 @@ namespace CmisSync {
                 Program.Controller.Quit ();
         }
 
+        public void SuspendSyncClicked(string reponame)
+        {
+        }
 
         private void InitAnimation ()
         {

@@ -88,6 +88,11 @@ namespace CmisSync
                     });
                 }
             };
+
+            Controller.UpdateSuspendSyncFolderEvent += delegate(string reponame)
+            {
+                //TODO - Yannick
+            };
         }
 
         protected override void Dispose(bool isDisposing)
@@ -137,9 +142,17 @@ namespace CmisSync
                         Text = "Open remote folder"
                     };
                     open_remotefolder_item.Click += OpenRemoteFolderDelegate(folder_name);
-                
+
+                    ToolStripMenuItem suspend_folder_item = new ToolStripMenuItem()
+                    {
+                        Text = "Suspend sync!"
+                    };
+                    suspend_folder_item.Click += SuspendSyncFolderDelegate(folder_name);
+
                     subfolder_item.DropDownItems.Add(open_localfolder_item);
                     subfolder_item.DropDownItems.Add(open_remotefolder_item);
+                    subfolder_item.DropDownItems.Add(new ToolStripSeparator());
+                    subfolder_item.DropDownItems.Add(suspend_folder_item);
                     this.traymenu.Items.Add(subfolder_item);
                 }
             }
@@ -163,7 +176,7 @@ namespace CmisSync
             {
                 Text = "About CmisSync"
             };
-            about_item.Click+= delegate
+            about_item.Click += delegate
             {
                 Controller.AboutClicked();
             };
@@ -212,6 +225,14 @@ namespace CmisSync
             return delegate
             {
                 Controller.RemoteFolderClicked(reponame);
+            };
+        }
+
+        private EventHandler SuspendSyncFolderDelegate(string reponame)
+        {
+            return delegate
+            {
+                Controller.SuspendSyncClicked(reponame);
             };
         }
     }
