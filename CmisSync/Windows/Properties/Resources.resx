@@ -195,7 +195,7 @@ It is like Dropbox for Enterprise Content Management!</value>
     <value>Password</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>CMIS server found, but permission denied. Please check username/password !</value>
+    <value>CMIS server found, but permission denied. Please check username/password.</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Your documents are ready!</value>
@@ -231,7 +231,7 @@ the resulting XML to the CmisSync forum.</value>
     <value>Syncing changes…</value>
   </data>
   <data name="SyncNow" xml:space="preserve">
-    <value>Sync Now !</value>
+    <value>Sync Now!</value>
   </data>
   <data name="User" xml:space="preserve">
     <value>User</value>
@@ -261,6 +261,6 @@ the resulting XML to the CmisSync forum.</value>
     <value>Change the local path of this repository:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>This local folder already exist, so it can not be use to sync data !</value>
+    <value>A local folder with the same name already exist, please use a different name.</value>
   </data>
 </root>
