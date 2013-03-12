@@ -291,25 +291,6 @@ namespace CmisSync
         public void SetupPageCompleted()
         {
             Program.Controller.CurrentUser = new User("Dummy", "dummy@example.org");
-
-            /*
-            new Thread (() => {
-                string keys_path     = Path.GetDirectoryName (Config.DefaultConfig.FullPath);
-                string key_file_name = DateTime.Now.ToString ("yyyy-MM-dd HH\\hmm");
-
-                string [] key_pair = Keys.GenerateKeyPair (keys_path, key_file_name);
-                Keys.ImportPrivateKey (key_pair [0]);
-
-                string link_code_file_path = Path.Combine (Program.Controller.FoldersPath,
-                    Program.Controller.CurrentUser.Name + "'s link code.txt");
-
-                // Create an easily accessible copy of the public
-                // key in the user's CmisSync folder
-                File.Copy (key_pair [1], link_code_file_path, true);
-
-            }).Start ();
-            */
-
             TutorialPageNumber = 1;
             ChangePageEvent(PageType.Tutorial, null);
         }
@@ -346,42 +327,6 @@ namespace CmisSync
             else
             {
                 ChangePageEvent(PageType.Tutorial, null);
-            }
-        }
-
-
-        public void SelectedPluginChanged(int plugin_index)
-        {
-            SelectedPlugin = Plugins[plugin_index];
-
-            if (SelectedPlugin.Address != null)
-            {
-                ChangeAddressFieldEvent(SelectedPlugin.Address, "", FieldState.Disabled);
-
-            }
-            else if (SelectedPlugin.AddressExample != null)
-            {
-                ChangeAddressFieldEvent(this.saved_address, SelectedPlugin.AddressExample, FieldState.Enabled);
-
-            }
-            else
-            {
-                ChangeAddressFieldEvent(this.saved_address, "", FieldState.Enabled);
-            }
-
-            if (SelectedPlugin.Path != null)
-            {
-                ChangePathFieldEvent(SelectedPlugin.Path, "", FieldState.Disabled);
-
-            }
-            else if (SelectedPlugin.PathExample != null)
-            {
-                ChangePathFieldEvent(this.saved_remote_path, SelectedPlugin.PathExample, FieldState.Enabled);
-
-            }
-            else
-            {
-                ChangePathFieldEvent(this.saved_remote_path, "", FieldState.Enabled);
             }
         }
 
@@ -512,34 +457,6 @@ namespace CmisSync
 
         private void AddPageFetchedDelegate(string remote_url, string[] warnings)
         {
-            //SyncingFolder = "";
-
-            // Create a local plugin for succesfully added projects, so
-            // so the user can easily use the same host again
-            if (SelectedPluginIndex == 0)
-            {
-                Plugin new_plugin;
-                Uri uri = new Uri(remote_url);
-
-                try
-                {
-                    string address = remote_url.Replace(uri.AbsolutePath, "");
-
-                    new_plugin = Plugin.Create(uri.Host, address, address, "", "", "", "", "/path/to/project", "", "", "", "");
-
-                    if (new_plugin != null)
-                    {
-                        Plugins.Insert(1, new_plugin);
-                        Logger.Info("Controller | Added plugin for " + uri.Host);
-                    }
-
-                }
-                catch
-                {
-                    Logger.Info("Controller | Failed adding plugin for " + uri.Host);
-                }
-            }
-
             ChangePageEvent(PageType.Finished, warnings);
 
             Program.Controller.FolderFetched -= AddPageFetchedDelegate;
@@ -565,34 +482,6 @@ namespace CmisSync
             UpdateProgressBarEvent(ProgressBarPercentage);
         }
 
-
-        public void InvitePageCompleted()
-        {
-            /*SyncingFolder   = Path.GetFileNameWithoutExtension (PendingInvite.RemotePath);
-            PreviousAddress = PendingInvite.Address;
-            PreviousPath    = PendingInvite.RemotePath;
-
-            ChangePageEvent (PageType.Syncing, null);
-
-            new Thread (() => {
-                if (!PendingInvite.Accept (Program.Controller.CurrentUser.PublicKey)) {
-                    PreviousUrl = PendingInvite.Address +
-                        PendingInvite.RemotePath.TrimStart ("/".ToCharArray ());
-
-                    ChangePageEvent (PageType.Error, new string [] { "error: Failed to upload the public key" });
-                    return;
-                }
-
-                Program.Controller.FolderFetched    += InvitePageFetchedDelegate;
-                Program.Controller.FolderFetchError += InvitePageFetchErrorDelegate;
-                Program.Controller.FolderFetching   += SyncingPageFetchingDelegate;
-
-                Program.Controller.StartFetcher (PendingInvite.Address, PendingInvite.Fingerprint,
-                    PendingInvite.RemotePath, PendingInvite.AnnouncementsUrl, false,
-                    repository, remote_path, user, password); // TODO: checkbox on invite page
-
-            }).Start ();*/
-        }
 
         // The following private methods are
         // delegates used by the previous method
@@ -700,12 +589,6 @@ namespace CmisSync
 
             this.current_page = PageType.None;
             HideWindowEvent();
-        }
-
-
-        private bool IsValidEmail(string email)
-        {
-            return new Regex(@"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$", RegexOptions.IgnoreCase).IsMatch(email);
         }
     }
 }

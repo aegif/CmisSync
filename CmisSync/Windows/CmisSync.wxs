@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
 
-  <Product Name='CmisSync' Id='fb3bdb0a-3977-4477-bb53-c8c28a0ee18d' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
-    Language='1033' Codepage='1252' Version='0.4.2' Manufacturer='CmisSync'>
+  <Product Name='CmisSync' Id='fb3bdb0a-3977-4477-bc53-c8c28a0ee18d' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
+    Language='1033' Codepage='1252' Version='0.4.4' Manufacturer='CmisSync'>
 
     <Package Id='*' Keywords='Installer' Description="CmisSync Setup" Manufacturer='CmisSync'
       InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
@@ -14,33 +14,33 @@
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
           <Directory Id='INSTALLDIR' Name='CmisSync'>
             <Component Id='CmisSync.exe' Guid='bab5a922-b5c4-4958-ab79-5e303b767a61'>
-              <File Id='CmisSync.exe' Name='CmisSync.exe' Source='!(wix.root)\bin\CmisSync.exe' KeyPath='yes' DiskId='1' />
+              <File Id='CmisSync.exe' Name='CmisSync.exe' Source='!(wix.root)\CmisSync\Windows\bin\Debug\CmisSync.exe' KeyPath='yes' DiskId='1' />
             </Component>
             <Component Id='Libraries' Guid='f982a0bb-824d-4835-921d-e51b47b8598b'>
-              <File Id='CmisSync.Lib.dll' Name='CmisSync.Lib.dll' Source='!(wix.root)\bin\CmisSync.Lib.dll' DiskId='1' />
-              <File Id='CmisSync.dll' Name='CmisSync.dll' Source='!(wix.root)\bin\CmisSync.dll' DiskId='1' />
-              <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\bin\DotCMIS.dll' DiskId='1' />
-              <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\Extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\System.Data.SQLite.dll' DiskId='1' />
-              <File Id='SQLite.Interop.dll' Name='SQLite.Interop.dll' Source='!(wix.root)\Extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\SQLite.Interop.dll' DiskId='1' />
-              <File Id='Newtonsoft.Json.dll' Name='Newtonsoft.Json.dll' Source='!(wix.root)\bin\Newtonsoft.Json.dll' DiskId='1' />
+              <File Id='CmisSync.Lib.dll' Name='CmisSync.Lib.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\CmisSync.Lib.dll' DiskId='1' />
+              <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\DotCMIS.dll' DiskId='1' />
+              <File Id='log4net.dll' Name='log4net.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\log4net.dll' DiskId='1' />
+              <File Id='Newtonsoft.Json.dll' Name='Newtonsoft.Json.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\Newtonsoft.Json.dll' DiskId='1' />
+              <File Id='SQLite.Interop.dll' Name='SQLite.Interop.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\SQLite.Interop.dll' DiskId='1' />
+              <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\System.Data.SQLite.dll' DiskId='1' />
               <File Id='sparkleshare_app.ico' Name='sparkleshare.ico' Source='!(wix.root)\CmisSync\Windows\Pixmaps\sparkleshare-app.ico' DiskId='1' />
             </Component>
             <Directory Id='localeDirectoryFR' Name='fr'>
               <Component Id='localeComponentFR' Guid='01612d5d-6c9d-46e9-96c5-7105bbbea7db'>
                 <CreateFolder />
-                <File Id='localeFileFR' Name='CmisSync.resources.dll' Source='!(wix.root)\bin\fr\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileFR' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\fr\CmisSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <Directory Id='localeDirectoryJA' Name='ja'>
               <Component Id='localeComponentJA' Guid='8d77c457-54b0-41d6-9f1c-c91338b25505'>
                 <CreateFolder />
-                <File Id='localeFileJA' Name='CmisSync.resources.dll' Source='!(wix.root)\bin\ja\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileJA' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\ja\CmisSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <Directory Id='localeDirectoryUK' Name='uk'>
               <Component Id='localeComponentUK' Guid='6de4a765-0904-421b-b71c-8c7bef136a92'>
                 <CreateFolder />
-                <File Id='localeFileUK' Name='CmisSync.resources.dll' Source='!(wix.root)\bin\uk\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileUK' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\uk\CmisSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <Directory Id='PLUGINS_DIR' Name='plugins'>
