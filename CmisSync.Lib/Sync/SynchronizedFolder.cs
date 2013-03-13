@@ -136,7 +136,6 @@ namespace CmisSync.Lib.Cmis
                         // Create session factory.
                         SessionFactory factory = SessionFactory.NewInstance();
                         session = factory.CreateSession(cmisParameters);
-
                         // Detect whether the repository has the ChangeLog capability.
                         ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
                                 || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
@@ -145,7 +144,7 @@ namespace CmisSync.Lib.Cmis
                     }
                     catch (CmisRuntimeException e)
                     {
-                        Logger.Fatal("Sync | Exception: " + e.Message + ", error content: " + e.ErrorContent);
+                        Logger.Fatal("Sync | Exception: ", e);
                     }
                     if (session == null)
                     {
@@ -208,9 +207,7 @@ namespace CmisSync.Lib.Cmis
                         }
                         catch (CmisBaseException e)
                         {
-                            Logger.Fatal("Sync | CMIS exception while syncing:" + e.Message);
-                            Logger.Fatal("Sync | " + e.StackTrace);
-                            Logger.Fatal("Sync | " + e.ErrorContent);
+                            Logger.Fatal("Sync | CMIS exception while syncing:", e);
                         }
 #endif
                     }

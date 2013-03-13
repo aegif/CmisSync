@@ -54,9 +54,10 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-    <DebugType>full</DebugType>
+    <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\Debug\CmisSync.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\CmisSync.XML</DocumentationFile>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -324,6 +325,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Pixmaps\media_playback_pause.png" />
+    <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
+    <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
     <Content Include="Pixmaps\sparkleshare-folder.ico" />
   </ItemGroup>
   <PropertyGroup>
