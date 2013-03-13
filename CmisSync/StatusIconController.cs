@@ -257,6 +257,8 @@ namespace CmisSync {
 
         public void SuspendSyncClicked(string reponame)
         {
+            Program.Controller.StartOrSuspendRepository(reponame);
+            UpdateSuspendSyncFolderEvent(reponame);
         }
 
         private void InitAnimation ()

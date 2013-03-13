@@ -92,6 +92,26 @@ namespace CmisSync
             Controller.UpdateSuspendSyncFolderEvent += delegate(string reponame)
             {
                 //TODO - Yannick
+                if (IsHandleCreated)
+                {
+                    BeginInvoke((Action)delegate
+                    {
+                        ToolStripMenuItem repoitem = (ToolStripMenuItem)this.traymenu.Items["tsmi" + reponame];
+                        ToolStripMenuItem syncitem = (ToolStripMenuItem)repoitem.DropDownItems[3];
+
+                        if (syncitem.Tag == "pause")
+                        {
+                            syncitem.Text = "Resume sync!";
+                            syncitem.Tag = "resume";
+                        }
+                        else
+                        {
+                            syncitem.Text = "Pause sync!";
+                            syncitem.Tag = "pause";
+                        }
+                    });
+                }
+
             };
         }
 
@@ -128,12 +148,14 @@ namespace CmisSync
                     ToolStripMenuItem subfolder_item = new ToolStripMenuItem()
                     {
                         Text = folder_name,
+                        Name = "tsmi" + folder_name,
                         Image = UIHelpers.GetBitmap("folder")
                     };
 
                     ToolStripMenuItem open_localfolder_item = new ToolStripMenuItem()
                     {
-                        Text = "Open local folder"
+                        Text = "Open local folder",
+                        Image = UIHelpers.GetBitmap("folder")
                     };
                     open_localfolder_item.Click += OpenFolderDelegate(folder_name);
 
@@ -145,7 +167,8 @@ namespace CmisSync
 
                     ToolStripMenuItem suspend_folder_item = new ToolStripMenuItem()
                     {
-                        Text = "Suspend sync!"
+                        Text = "Pause sync!",
+                        Tag="pause"
                     };
                     suspend_folder_item.Click += SuspendSyncFolderDelegate(folder_name);
 

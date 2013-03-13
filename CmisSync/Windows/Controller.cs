@@ -132,7 +132,6 @@ namespace CmisSync
                 File.Delete(shortcut_path);
 
             Shortcut shortcut = new Shortcut();
-            // shortcut.Create(FoldersPath, shortcut_path);
 
             shortcut.Create(FoldersPath, shortcut_path, Forms.Application.ExecutablePath, 0);
         }

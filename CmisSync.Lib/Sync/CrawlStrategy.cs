@@ -65,6 +65,12 @@ namespace CmisSync.Lib.Cmis
              */
             private void CrawlSync(IFolder remoteFolder, string localFolder)
             {
+                while (repo.Status == SyncStatus.Suspend)
+                {
+                    Logger.Info(String.Format("Sync | Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
+                    System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
+                }
+
                 // Lists of files/folders, to delete those that have been removed on the server.
                 IList remoteFiles = new ArrayList();
                 IList remoteSubfolders = new ArrayList();
@@ -90,6 +96,12 @@ namespace CmisSync.Lib.Cmis
             {
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
+                    while (repo.Status == SyncStatus.Suspend)
+                    {
+                        Logger.Info(String.Format("Sync | Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
+                        System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
+                    }
+
                     #region Cmis Folder
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
@@ -250,6 +262,12 @@ namespace CmisSync.Lib.Cmis
             {
                 foreach (string filePath in Directory.GetFiles(localFolder))
                 {
+                    while (repo.Status == SyncStatus.Suspend)
+                    {
+                        Logger.Info(String.Format("Sync | Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
+                        System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
+                    }
+
                     string fileName = Path.GetFileName(filePath);
 
                     if (CheckRules(fileName, RulesType.File))
@@ -304,6 +322,12 @@ namespace CmisSync.Lib.Cmis
             {
                 foreach (string localSubFolder in Directory.GetDirectories(localFolder))
                 {
+                    while (repo.Status == SyncStatus.Suspend)
+                    {
+                        Logger.Info(String.Format("Sync | Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
+                        System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
+                    }
+
                     if (CheckRules(localSubFolder, RulesType.Folder))
                     {
                         string folderName = Path.GetFileName(localSubFolder);

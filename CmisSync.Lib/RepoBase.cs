@@ -33,7 +33,8 @@ namespace CmisSync.Lib
         Idle,
         SyncUp,
         SyncDown,
-        Error
+        Error,
+        Suspend
     }
 
 
@@ -121,6 +122,15 @@ namespace CmisSync.Lib
             }
         }
 
+        public void Resume()
+        {
+            Status = SyncStatus.Idle;
+        }
+
+        public void Suspend()
+        {
+            Status = SyncStatus.Suspend;
+        }
 
         protected RepoInfo local_repoInfo;
 

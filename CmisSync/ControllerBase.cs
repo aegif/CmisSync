@@ -364,6 +364,19 @@ namespace CmisSync
             RemoveCmisDatabase(folder_path);
         }
 
+        public void StartOrSuspendRepository(string repoName)
+        {
+            foreach (RepoBase aRepo in this.repositories)
+            {
+                if (aRepo.Name == repoName)
+                {
+                    if (aRepo.Status != SyncStatus.Suspend)
+                        aRepo.Suspend();
+                    else aRepo.Resume();
+                }
+            }
+        }
+
         private void RemoveCmisDatabase(string folder_path)
         {
             string databasefile = Path.Combine(ConfigManager.CurrentConfig.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
