@@ -14,9 +14,9 @@ namespace CmisSync.Lib.Cmis
      * Database to cache remote information from the CMIS server.
      * Implemented with SQLite.
      */
-    public class CmisDatabase
+    public class Database
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisDatabase));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Database));
 
         /**
          * Name of the SQLite database file.
@@ -37,7 +37,7 @@ namespace CmisSync.Lib.Cmis
         /**
          * Constructor.
          */
-        public CmisDatabase(string dataPath)
+        public Database(string dataPath)
         {
             this.databaseFileName = dataPath;
             // pathPrefixSize = dataPath.Length + 1; // +1 for the slash

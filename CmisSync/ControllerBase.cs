@@ -565,7 +565,7 @@ namespace CmisSync
             repoInfo.FetchPriorHistory = fetch_prior_history;
             repoInfo.RepoID = repository;
             repoInfo.User = user;
-            repoInfo.Password = CmisCrypto.Protect(password);
+            repoInfo.Password = Crypto.Protect(password);
             repoInfo.TargetDirectory = localrepopath;
             repoInfo.PollInterval = 5000;
 

@@ -24,7 +24,7 @@ namespace CmisSync.Lib.Cmis
         /**
          * Synchronization with a particular CMIS folder.
          */
-        public partial class CmisDirectory
+        public partial class SynchronizedFolder
         {
             /**
              * Whether sync is bidirectional or only from server to client.
@@ -72,7 +72,7 @@ namespace CmisSync.Lib.Cmis
             /**
              * Database to cache remote information from the CMIS server.
              */
-            private CmisDatabase database;
+            private Database database;
 
             /**
              * Listener we inform about activity (used by spinner)
@@ -92,7 +92,7 @@ namespace CmisSync.Lib.Cmis
             /**
              * Constructor for Repo (at every launch of CmisSync)
              */
-            public CmisDirectory(RepoInfo repoInfo,
+            public SynchronizedFolder(RepoInfo repoInfo,
                 ActivityListener activityListener, CmisRepo repo)
             {
                 this.repo = repo;
@@ -104,7 +104,7 @@ namespace CmisSync.Lib.Cmis
 
                 // Database is place in appdata of the users instead of sync folder (more secure)
                 // database = new CmisDatabase(localRootFolder);
-                database = new CmisDatabase(repoinfo.CmisDatabase);
+                database = new Database(repoinfo.CmisDatabase);
 
                 // Get path on remote repository.
                 remoteFolderPath = repoInfo.RemotePath;
@@ -114,7 +114,7 @@ namespace CmisSync.Lib.Cmis
                 cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
                 cmisParameters[SessionParameter.User] = repoInfo.User;
                 // Uncrypt password
-                cmisParameters[SessionParameter.Password] = CmisCrypto.Unprotect(repoInfo.Password);
+                cmisParameters[SessionParameter.Password] = Crypto.Unprotect(repoInfo.Password);
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
 
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
@@ -158,114 +158,70 @@ namespace CmisSync.Lib.Cmis
             }
 
 
-            private void ChangeLogSync(IFolder remoteFolder)
-            {
-                // Get last change log token on server side.
-                string lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
-
-                // Get last change token that had been saved on client side.
-                string lastTokenOnClient = database.GetChangeLogToken();
-
-                if (lastTokenOnClient == null)
-                {
-                    // Token is null, which means no sync has ever happened yet, so just copy everything.
-                    // RecursiveFolderCopy(remoteFolder, localRootFolder);
-                    RecursiveFolderCopy(remoteFolder, repoinfo.TargetDirectory);
-                }
-                else
-                {
-                    // If there are remote changes, apply them.
-                    if (lastTokenOnServer.Equals(lastTokenOnClient))
-                    {
-                        Logger.Info("Sync | No changes on server, ChangeLog token: " + lastTokenOnServer);
-                    }
-                    else
-                    {
-                        // Check which files/folders have changed.
-                        int maxNumItems = 1000;
-                        IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
-
-                        // Replicate each change to the local side.
-                        foreach (IChangeEvent change in changes.ChangeEventList)
-                        {
-                            ApplyRemoteChange(change);
-                        }
-
-                        // Save change log token locally.
-                        // TODO only if successful
-                        Logger.Info("Sync | Updating ChangeLog token: " + lastTokenOnServer);
-                        database.SetChangeLogToken(lastTokenOnServer);
-                    }
-
-                    // Upload local changes by comparing with database.
-                    // TODO
-                }
-            }
-
 
             /**
-             * Apply a remote change.
+             * Synchronize between CMIS folder and local folder.
              */
-            private void ApplyRemoteChange(IChangeEvent change)
+            public void Sync()
             {
-                Logger.Info("Sync | Change type:" + change.ChangeType + " id:" + change.ObjectId + " properties:" + change.Properties);
-                switch (change.ChangeType)
+                // If not connected, connect.
+                if (session == null)
+                    Connect();
+
+                IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+
+                //            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
+                //            {
+                //                ChangeLogSync(remoteFolder);
+                //            }
+                //            else
+                //            {
+                // No ChangeLog capability, so we have to crawl remote and local folders.
+                // CrawlSync(remoteFolder, localRootFolder);
+                CrawlSync(remoteFolder, repoinfo.TargetDirectory);
+                //            }
+            }
+
+            /**
+             * Sync in the background.
+             */
+            public void SyncInBackground()
+            {
+                if (this.syncing)
                 {
-                    case ChangeType.Created:
-                    case ChangeType.Updated:
-                        ICmisObject cmisObject = session.GetObject(change.ObjectId);
-                        if (cmisObject is DotCMIS.Client.Impl.Folder)
-                        {
-                            IFolder remoteFolder = (IFolder)cmisObject;
-                            // string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
-                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
-                            RecursiveFolderCopy(remoteFolder, localFolder);
-                        }
-                        else if (cmisObject is DotCMIS.Client.Impl.Document)
-                        {
-                            IDocument remoteDocument = (IDocument)cmisObject;
-                            string remoteDocumentPath = remoteDocument.Paths.First();
-                            if (!remoteDocumentPath.StartsWith(remoteFolderPath))
-                            {
-                                Logger.Info("Sync | Change in unrelated document: " + remoteDocumentPath);
-                                break; // The change is not under the folder we care about.
-                            }
-                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
-                            string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
-                            // string localFolderPath = Path.Combine(localRootFolder, relativeFolderPath);
-                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
-                            DownloadFile(remoteDocument, localFolderPath);
-                        }
-                        break;
-                    case ChangeType.Deleted:
-                        cmisObject = session.GetObject(change.ObjectId);
-                        if (cmisObject is DotCMIS.Client.Impl.Folder)
-                        {
-                            IFolder remoteFolder = (IFolder)cmisObject;
-                            // string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
-                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
-                            RemoveFolderLocally(localFolder); // Remove from filesystem and database.
-                        }
-                        else if (cmisObject is DotCMIS.Client.Impl.Document)
-                        {
-                            IDocument remoteDocument = (IDocument)cmisObject;
-                            string remoteDocumentPath = remoteDocument.Paths.First();
-                            if (!remoteDocumentPath.StartsWith(remoteFolderPath))
-                            {
-                                Logger.Info("Sync | Change in unrelated document: " + remoteDocumentPath);
-                                break; // The change is not under the folder we care about.
-                            }
-                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
-                            string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
-                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
-                            // TODO DeleteFile(localFolderPath); // Delete on filesystem and in database
-                        }
-                        break;
-                    case ChangeType.Security:
-                        break;
+                    Logger.Info(String.Format("Sync | [{0}] - sync is already running in background.", repoinfo.TargetDirectory));
+                    return;
                 }
+                this.syncing = true;
+
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.DoWork += new DoWorkEventHandler(
+                    delegate(Object o, DoWorkEventArgs args)
+                    {
+                        Logger.Info(String.Format("Sync | [{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
+#if !DEBUG
+                        try
+                        {
+#endif
+                            Sync();
+#if !DEBUG
+                        }
+                        catch (CmisBaseException e)
+                        {
+                            Logger.Fatal("Sync | CMIS exception while syncing:" + e.Message);
+                            Logger.Fatal("Sync | " + e.StackTrace);
+                            Logger.Fatal("Sync | " + e.ErrorContent);
+                        }
+#endif
+                    }
+                );
+                bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                    delegate(object o, RunWorkerCompletedEventArgs args)
+                    {
+                        this.syncing = false;
+                    }
+                );
+                bw.RunWorkerAsync();
             }
 
 
@@ -343,10 +299,9 @@ namespace CmisSync.Lib.Cmis
                     // Nuxeo don't support partial getContentStream
                     if (session.RepositoryInfo.VendorName.ToLower().Contains("nuxeo"))
                     {
-                        // Mode rewrite for Nuxeo
+                        Logger.Warn("CmisDirectory | Nuxeo does not support partial download, so restart from zero.");
                         localfile = new StreamWriter(tmpfilepath);
                         contentStream = remoteDocument.GetContentStream();
-                        Logger.Warn("CmisDirectory | Nuxeo don't support partial download, so restart from start!");
                     }
                     else
                     {

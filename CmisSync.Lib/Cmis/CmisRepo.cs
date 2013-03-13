@@ -41,12 +41,12 @@ namespace CmisSync.Lib.Cmis
 
     public partial class CmisRepo : RepoBase
     {
-        private CmisDirectory cmis;
+        private SynchronizedFolder cmis;
 
         public CmisRepo(RepoInfo repoInfo, ActivityListener activityListener)
             : base(repoInfo)
         {
-            cmis = new CmisDirectory(repoInfo, activityListener, this);
+            cmis = new SynchronizedFolder(repoInfo, activityListener, this);
             Logger.Info("Sync | Cmis:" + cmis);
         }
 

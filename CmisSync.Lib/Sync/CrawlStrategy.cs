@@ -22,7 +22,7 @@ namespace CmisSync.Lib.Cmis
         /**
          * Synchronization with a particular CMIS folder.
          */
-        public partial class CmisDirectory
+        public partial class SynchronizedFolder
         {
             /**
              * Synchronize by checking all folders/files one-by-one.
@@ -327,72 +327,6 @@ namespace CmisSync.Lib.Cmis
                     }
                 }
             }
-
-            /**
-             * Synchronize between CMIS folder and local folder.
-             */
-            public void Sync()
-            {
-                // If not connected, connect.
-                if (session == null)
-                    Connect();
-
-                IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
-
-                //            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
-                //            {
-                //                ChangeLogSync(remoteFolder);
-                //            }
-                //            else
-                //            {
-                // No ChangeLog capability, so we have to crawl remote and local folders.
-                // CrawlSync(remoteFolder, localRootFolder);
-                CrawlSync(remoteFolder, repoinfo.TargetDirectory);
-                //            }
-            }
-
-            /**
-     * Sync in the background.
-     */
-            public void SyncInBackground()
-            {
-                if (this.syncing)
-                {
-                    Logger.Info(String.Format("Sync | [{0}] - sync is already running in background.", repoinfo.TargetDirectory));
-                    return;
-                }
-                this.syncing = true;
-
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.DoWork += new DoWorkEventHandler(
-                    delegate(Object o, DoWorkEventArgs args)
-                    {
-                        Logger.Info(String.Format("Sync | [{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
-#if !DEBUG
-                        try
-                        {
-#endif
-                            Sync();
-#if !DEBUG
-                        }
-                        catch (CmisBaseException e)
-                        {
-                            Logger.Fatal("Sync | CMIS exception while syncing:" + e.Message);
-                            Logger.Fatal("Sync | " + e.StackTrace);
-                            Logger.Fatal("Sync | " + e.ErrorContent);
-                        }
-#endif
-                    }
-                );
-                bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                    delegate(object o, RunWorkerCompletedEventArgs args)
-                    {
-                        this.syncing = false;
-                    }
-                );
-                bw.RunWorkerAsync();
-            }
         }
     }
-
 }

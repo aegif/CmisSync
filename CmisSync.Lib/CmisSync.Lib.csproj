@@ -44,10 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cmis\CmisCrypto.cs" />
-    <Compile Include="Cmis\CmisDatabase.cs" />
-    <Compile Include="Cmis\CmisDirectory.cs" />
-    <Compile Include="Cmis\CmisDirectoryCrawlMethod.cs" />
+    <Compile Include="Cmis\Crypto.cs" />
+    <Compile Include="Cmis\Database.cs" />
+    <Compile Include="Sync\ChangeLogStrategy.cs" />
+    <Compile Include="Sync\SynchronizedFolder.cs" />
+    <Compile Include="Sync\CrawlStrategy.cs" />
     <Compile Include="Cmis\CmisPermissionDeniedException.cs" />
     <Compile Include="Cmis\CmisServerNotFoundException.cs" />
     <Compile Include="Cmis\CmisUtils.cs" />

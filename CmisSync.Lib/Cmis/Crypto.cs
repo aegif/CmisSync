@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace CmisSync.Lib.Cmis
 {
-    public static class CmisCrypto
+    public static class Crypto
     {
         /**
          * You can specify DataProtectionScope.CurrentUser to encrypt data using the current user's Windows login password,
