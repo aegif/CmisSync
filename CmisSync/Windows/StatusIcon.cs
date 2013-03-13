@@ -103,11 +103,13 @@ namespace CmisSync
                         {
                             syncitem.Text = "Resume sync!";
                             syncitem.Tag = "resume";
+                            syncitem.Image = UIHelpers.GetBitmap("media_playback_start");
                         }
                         else
                         {
                             syncitem.Text = "Pause sync!";
                             syncitem.Tag = "pause";
+                            syncitem.Image = UIHelpers.GetBitmap("media_playback_pause");
                         }
                     });
                 }
@@ -161,14 +163,16 @@ namespace CmisSync
 
                     ToolStripMenuItem open_remotefolder_item = new ToolStripMenuItem()
                     {
-                        Text = "Open remote folder"
+                        Text = "Open remote folder",
+                        Image = UIHelpers.GetBitmap("classic_folder_web")
                     };
                     open_remotefolder_item.Click += OpenRemoteFolderDelegate(folder_name);
 
                     ToolStripMenuItem suspend_folder_item = new ToolStripMenuItem()
                     {
                         Text = "Pause sync!",
-                        Tag="pause"
+                        Tag="pause",
+                        Image = UIHelpers.GetBitmap("media_playback_pause")
                     };
                     suspend_folder_item.Click += SuspendSyncFolderDelegate(folder_name);
 
