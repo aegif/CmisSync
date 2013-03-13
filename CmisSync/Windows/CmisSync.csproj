@@ -327,6 +327,6 @@
     <Content Include="Pixmaps\sparkleshare-folder.ico" />
   </ItemGroup>
   <PropertyGroup>
-    <PreBuildEvent>Copy “$(SolutionDir)..\..\extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\SQLite.Interop.dll” “$(ProjectDir)$(OutDir)SQLite.Interop.dll”</PreBuildEvent>
+    <PreBuildEvent>Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)SQLite.Interop.dll"</PreBuildEvent>
   </PropertyGroup>
 </Project>
