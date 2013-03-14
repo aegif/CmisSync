@@ -59,7 +59,7 @@ namespace CmisSync {
         }
 
 
-        private void CheckForNewVersion ()
+        private void CheckForNewVersion() // TODO https://github.com/nicolas-raoul/CmisSync/issues/148
         {
             CheckingForNewVersionEvent ();
 

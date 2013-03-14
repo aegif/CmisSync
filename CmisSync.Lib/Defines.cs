@@ -19,8 +19,8 @@ using System;
 using System.Reflection;
 
 [assembly:AssemblyTitle ("CmisSync.Lib")]
-[assembly:AssemblyVersion ("0.9.1")]
-[assembly:AssemblyCopyright ("Copyright (c) 2010 Hylke Bons and others")]
+[assembly:AssemblyVersion ("0.4.6")]
+[assembly:AssemblyCopyright ("Copyright (c) 2010 Aegif and others")]
 [assembly:AssemblyTrademark ("CmisSync is a trademark of CmisSync Ltd.")]
 
 namespace CmisSync.Lib

@@ -77,7 +77,7 @@ namespace CmisSync {
 
             Controller.CheckingForNewVersionEvent += delegate {
                 Dispatcher.BeginInvoke ((Action) delegate {
-                    this.updates.Content = "Checking for updates...";
+                    //this.updates.Content = "Checking for updates...";
                     this.updates.UpdateLayout ();
                 });
             };
@@ -101,7 +101,7 @@ namespace CmisSync {
             };
 
             this.updates = new Label () {
-                Content    = "Checking for updates...",
+                Content    = "Please check for updates at CmisSync.com", //"Checking for updates...",
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
@@ -109,7 +109,7 @@ namespace CmisSync {
             TextBlock credits = new TextBlock () {
                 FontSize     = 11,
                 Foreground   = new SolidColorBrush (Colors.White),
-                Text         = "Copyright © 2010–" + DateTime.Now.Year + " Hylke Bons and others.\n" +
+                Text         = "Copyright © 2010–" + DateTime.Now.Year + " Aegif and others.\n" +
                     "\n" +
                     "CmisSync is Open Source software. You are free to use, modify, " +
                     "and redistribute it under the GNU General Public License version 3 or later.",
