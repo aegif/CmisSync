@@ -43,6 +43,7 @@ namespace TestLibrary
 {
     using NUnit.Framework;
     using CmisSync.Lib.Cmis;
+    using CmisSync.Lib;
 
     public class CmisSyncTests
     {
@@ -65,8 +66,8 @@ namespace TestLibrary
         public void Dispose()
         {
         }
-        /*
-        private void Clean(string localDirectory, CmisRepo.CmisDirectory cmisDirectory)
+        
+        private void Clean(string localDirectory, CmisRepo.SynchronizedFolder synchronizedFolder)
         {
             DirectoryInfo directory = new DirectoryInfo(localDirectory);
             // Delete all local files/folders.
@@ -79,7 +80,7 @@ namespace TestLibrary
                 dir.Delete(true);
             }
             // Sync deletions to server.
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
             // Remove checkout folder.
             directory.Delete(false); // Not recursive, should not contain anything at this point.
         }
@@ -136,19 +137,21 @@ namespace TestLibrary
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
-            SparkleRepoCmis.CmisDirectory cmisDirectory = new SparkleRepoCmis.CmisDirectory(
-                new SparkleRepoInfo(
+            RepoInfo repoInfo =  new RepoInfo(
                     canonical_name,
                     ".",
                     remoteFolderPath,
                     url,
                     user,
                     password,
-                    repositoryId)
-                ,
-                activityListener
+                    repositoryId,
+                    5000);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                new CmisRepo(repoInfo, activityListener)
             );
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
         }
 
         [Test, TestCaseSource("TestServers")]
@@ -161,33 +164,35 @@ namespace TestLibrary
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
-            SparkleRepoCmis.CmisDirectory cmisDirectory = new SparkleRepoCmis.CmisDirectory(
-                new SparkleRepoInfo(
+            RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
                     ".",
                     remoteFolderPath,
                     url,
                     user,
                     password,
-                    repositoryId)
-                ,
-                activityListener
+                    repositoryId,
+                    5000);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                new CmisRepo(repoInfo, activityListener)
             );
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
 
             // Create random small file.
             LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
 
             // Sync again.
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
             Console.WriteLine("Second sync done.");
 
             // Check that file is present server-side.
             // TODO
 
             // Clean.
-            Clean(localDirectory, cmisDirectory);
+            Clean(localDirectory, synchronizedFolder);
         }
 
         [Test, TestCaseSource("TestServers")]
@@ -200,33 +205,35 @@ namespace TestLibrary
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
-            SparkleRepoCmis.CmisDirectory cmisDirectory = new SparkleRepoCmis.CmisDirectory(
-                new SparkleRepoInfo(
+            RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
                     ".",
                     remoteFolderPath,
                     url,
                     user,
                     password,
-                    repositoryId)
-                ,
-                activityListener
+                    repositoryId,
+                    5000);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                new CmisRepo(repoInfo, activityListener)
             );
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
 
             // Create random big file.
             LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000); // 1 MB ... no that big to not load servers too much.
 
             // Sync again.
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
             Console.WriteLine("Second sync done.");
 
             // Check that file is present server-side.
             // TODO
 
             // Clean.
-            Clean(localDirectory, cmisDirectory);
+            Clean(localDirectory, synchronizedFolder);
         }
 
         [Test, TestCaseSource("TestServers")]
@@ -239,34 +246,36 @@ namespace TestLibrary
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
-            SparkleRepoCmis.CmisDirectory cmisDirectory = new SparkleRepoCmis.CmisDirectory(
-                new SparkleRepoInfo(
+            RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
                     ".",
                     remoteFolderPath,
                     url,
                     user,
                     password,
-                    repositoryId)
-                ,
-                activityListener
+                    repositoryId,
+                    5000);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                new CmisRepo(repoInfo, activityListener)
             );
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
 
             // Create directory and small files.
             LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
 
             // Sync again.
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
             Console.WriteLine("Post sync done.");
 
             // Clean.
-            Clean(localDirectory, cmisDirectory);
+            Clean(localDirectory, synchronizedFolder);
         }
 
         // Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
-        /*[Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers")]
         public void SyncWhileModifyingFile(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -276,19 +285,21 @@ namespace TestLibrary
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
-            SparkleRepoCmis.CmisDirectory cmisDirectory = new SparkleRepoCmis.CmisDirectory(
-                new SparkleRepoInfo(
+            RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
                     ".",
                     remoteFolderPath,
                     url,
                     user,
                     password,
-                    repositoryId)
-                ,
-                activityListener
+                    repositoryId,
+                    5000);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                new CmisRepo(repoInfo, activityListener)
             );
-            cmisDirectory.Sync();
+            synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
 
             // Sync a few times in a different thread.
@@ -297,32 +308,30 @@ namespace TestLibrary
             bw.DoWork += new DoWorkEventHandler(
                 delegate(Object o, DoWorkEventArgs args)
                 {
-<<<<<<< HEAD:CmisSync/TestLibrary/CmisSyncTests.cs
                     // Clean.
                     CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
                     // Mock.
-                    ActivityListener activityListener = new Mock<ActivityListener>().Object;
+                    ActivityListener activityListener2 = new Mock<ActivityListener>().Object;
                     // Sync.
-                    CmisRepo.CmisDirectory cmisDirectory = new CmisRepo.CmisDirectory(
-                        new RepoInfo(
-                            canonical_name,
-                            ".",
-                            remoteFolderPath,
-                            url,
-                            user,
-                            password,
-                            repositoryId)
-                        ,
-                        activityListener
+                    RepoInfo repoInfo2 = new RepoInfo(
+                        canonical_name,
+                        ".",
+                        remoteFolderPath,
+                        url,
+                        user,
+                        password,
+                        repositoryId,
+                        5000);
+                    CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
+                        repoInfo,
+                        activityListener,
+                        new CmisRepo(repoInfo, activityListener)
                     );
-                    cmisDirectory.Sync();
-=======
                     for (int i = 0; i < 10; i++)
                     {
                         Console.WriteLine("Sync.");
-                        cmisDirectory.Sync();
+                        synchronizedFolder2.Sync();
                     }
->>>>>>> 22e6ec65f05e1a40b4a81477665a92548e6cfa4c:SparkleShare/TestLibrary/CmisSyncTests.cs
                 }
             );
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -353,11 +362,11 @@ namespace TestLibrary
             }
 
             // Clean.
-            Clean(localDirectory, cmisDirectory);
-        }*/
+            Clean(localDirectory, synchronizedFolder);
+        }
 
         // Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
-        /*[Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers")]
         public void SyncWhileModifyingFolders(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -367,19 +376,20 @@ namespace TestLibrary
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
-            SparkleRepoCmis.CmisDirectory cmisDirectory = new SparkleRepoCmis.CmisDirectory(
-                new SparkleRepoInfo(
+            RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
                     ".",
                     remoteFolderPath,
                     url,
                     user,
                     password,
-                    repositoryId)
-                ,
-                activityListener
+                    repositoryId,
+                    5000);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                new CmisRepo(repoInfo, activityListener)
             );
-            cmisDirectory.Sync();
             Console.WriteLine("Synced to clean state.");
 
             // Sync a few times in a different thread.
@@ -391,7 +401,7 @@ namespace TestLibrary
                     for (int i = 0; i < 10; i++)
                     {
                         Console.WriteLine("Sync.");
-                        cmisDirectory.Sync();
+                        synchronizedFolder.Sync();
                     }
                 }
             );
@@ -434,8 +444,8 @@ namespace TestLibrary
             }
 
             // Clean.
-            Clean(localDirectory, cmisDirectory);
-        }*/
+            Clean(localDirectory, synchronizedFolder);
+        }
 
         // Write a file and immediately check whether it has been created.
         // Should help see whether CMIS servers are synchronous or not.
