@@ -118,7 +118,6 @@
     <Compile Include="Bubbles.cs" />
     <Compile Include="About.cs" />
     <Compile Include="Controller.cs" />
-    <Compile Include="EventLog.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="UIHelpers.cs" />
     <Compile Include="SetupWindow.cs" />

@@ -23,7 +23,6 @@ namespace CmisSync {
     public class UI {
 
         public Setup Setup;
-        public EventLog EventLog;
         public Bubbles Bubbles;
         public StatusIcon StatusIcon;
         public About About;
@@ -32,10 +31,9 @@ namespace CmisSync {
         public UI ()
         {   
 			// FIXME: The second time windows are shown, the windows
-			// don't have the smooth ease in animation, but appear abruptly. 
+			// don't have the smooth ease in animation, but appear abruptly.
 			// The ease out animation always seems to work
             Setup      = new Setup ();
-            EventLog   = new EventLog ();
             About      = new About ();
             Bubbles    = new Bubbles ();
             //StatusIcon = new StatusIcon ();

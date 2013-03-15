@@ -44,7 +44,7 @@ namespace CmisSync
         public delegate void UpdateChooserEventHandler(string[] folders);
 
         public event UpdateSizeInfoEventHandler UpdateSizeInfoEvent = delegate { };
-        public delegate void UpdateSizeInfoEventHandler(string size, string history_size);
+        public delegate void UpdateSizeInfoEventHandler(string size);
 
 
         private string selected_folder;
@@ -64,7 +64,7 @@ namespace CmisSync
                 this.selected_folder = value;
 
                 ContentLoadingEvent();
-                UpdateSizeInfoEvent("…", "…");
+                UpdateSizeInfoEvent("…");
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
@@ -82,7 +82,7 @@ namespace CmisSync
                         Thread.Sleep(delay - (int)watch.ElapsedMilliseconds);
 
                     UpdateContentEvent(html);
-                    UpdateSizeInfoEvent(Size, HistorySize);
+                    UpdateSizeInfoEvent(Size);
 
                 }).Start();
             }
@@ -95,7 +95,7 @@ namespace CmisSync
                 List<ChangeSet> change_sets = GetLog(this.selected_folder);
 
                 string html = GetHTMLLog(change_sets);
-                UpdateSizeInfoEvent(Size, HistorySize);
+                UpdateSizeInfoEvent(Size);
 
                 return html;
             }
@@ -138,35 +138,6 @@ namespace CmisSync
             }
         }
 
-        public string HistorySize
-        {
-            get
-            {
-                double size = 0;
-
-                foreach (RepoBase repo in Program.Controller.Repositories)
-                {
-                    if (this.selected_folder == null)
-                    {
-                        size += repo.HistorySize;
-
-                    }
-                    else if (this.selected_folder.Equals(repo.Name))
-                    {
-                        if (repo.HistorySize == 0)
-                            return "???";
-                        else
-                            return Program.Controller.FormatSize(repo.HistorySize);
-                    }
-                }
-
-                if (size == 0)
-                    return "???";
-                else
-                    return Program.Controller.FormatSize(size);
-            }
-        }
-
 
         public EventLogController()
         {
@@ -192,7 +163,7 @@ namespace CmisSync
             Program.Controller.OnIdle += delegate
             {
                 UpdateContentEvent(HTML);
-                UpdateSizeInfoEvent(Size, HistorySize);
+                UpdateSizeInfoEvent(Size);
             };
 
             Program.Controller.FolderListChanged += delegate
@@ -201,7 +172,7 @@ namespace CmisSync
                     this.selected_folder = null;
 
                 UpdateChooserEvent(Folders);
-                UpdateSizeInfoEvent(Size, HistorySize);
+                UpdateSizeInfoEvent(Size);
             };
         }
 

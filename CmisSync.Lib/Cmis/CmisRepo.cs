@@ -47,179 +47,31 @@ namespace CmisSync.Lib.Cmis
             : base(repoInfo)
         {
             cmis = new SynchronizedFolder(repoInfo, activityListener, this);
-            Logger.Info("Sync | Cmis:" + cmis);
+            Logger.Info("CmisRepo | " + cmis);
         }
 
-
-        // Not used.
-        public override List<string> ExcludePaths
-        {
-            get
-            {
-                return new List<string>();
-            }
-        }
-
-
-        // Not used.
-        public override double Size
-        {
-            get
-            {
-                return 1234567;
-            }
-        }
-
-
-        // Not used.
-        public override double HistorySize
-        {
-            get
-            {
-                return 1234567;
-            }
-        }
-
-
-        // Not used.
-        private void UpdateSizes()
-        {
-
-        }
-
-
-        public override string[] UnsyncedFilePaths
-        {
-            // Not used.
-            get
-            {
-                Logger.Info(String.Format("Sync | Cmis Repo [{0}] UnsyncedFilePaths get", this.Name));
-                List<string> file_paths = new List<string>();
-                //file_paths.Add (path);
-                return file_paths.ToArray();
-            }
-        }
-
-
-        public override string CurrentRevision
-        {
-            // Not used.
-            get
-            {
-                Logger.Info(String.Format("Sync | Cmis Repo [{0}] CurrentRevision get", this.Name));
-                return null;
-            }
-        }
-
-
-        public override bool HasRemoteChanges
-        {
-            // Not used.
-            get
-            {
-                return false;
-            }
-        }
-
-
-        public override bool SyncUp()
-        {
-            //          Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] SyncUp", this.Name));
-            //          if (cmis != null)
-            //              cmis.SyncInBackground();
-            return true;
-        }
-
-
-        public override bool SyncDown()
-        {
-            //         Logger.LogInfo("Sync", String.Format("Cmis Repo [{0}] SyncDown", this.Name));
-            //         if (cmis != null)
-            //             cmis.SyncInBackground();
-            return true;
-        }
 
         public void DoFirstSync()
         {
-            Logger.Info(String.Format("Sync | Cmis Repo [{0}] First sync", this.Name));
+            Logger.Info(String.Format("CmisRepo | First sync", this.Name));
             if (cmis != null)
                 cmis.Sync();
         }
 
-        public override bool HasLocalChanges
+
+        public override void HasUnsyncedChanges()
         {
-            // Not used.
-            get
-            {
-                return false;
-            }
+            Logger.Info(String.Format("CmisRepo | HasUnsyncedChanges get", this.Name));
+            if (cmis != null) // Because it is sometimes called before the object's constructor has completed.
+                cmis.SyncInBackground();
         }
 
-
-        public override bool HasUnsyncedChanges
+        public override double Size
         {
             get
             {
-                Logger.Info(String.Format("Sync | Cmis Repo [{0}] HasUnsyncedChanges get", this.Name));
-                if (cmis != null) // Because it is sometimes called before the object's constructor has completed.
-                    cmis.SyncInBackground();
-                return false; // TODO
-            }
-
-            set
-            {
-                // Not used.
+                return 1234567; // TODO
             }
         }
-
-
-        // Stages the made changes
-        private void Add()
-        {
-            // Not used.
-        }
-
-
-        // Commits the made changes
-        private void Commit(string message)
-        {
-            // Not used.
-        }
-
-
-        // Merges the fetched changes
-        private void Rebase()
-        {
-            // Not used.
-        }
-
-
-        private void ResolveConflict()
-        {
-            // Not used.
-        }
-
-
-        public override void RevertFile(string path, string revision)
-        {
-            // Not used.
-        }
-
-
-        public override List<ChangeSet> GetChangeSets(string path, int count)
-        {
-            // Not used.
-            Logger.Info(String.Format("Sync | Cmis Repo [{0}] GetChangeSets", this.Name));
-            return new List<ChangeSet>();
-        }
-
-
-        public override List<ChangeSet> GetChangeSets(int count)
-        {
-            // Not used.
-            Logger.Info(String.Format("Sync | Cmis Repo [{0}] GetChangeSets", this.Name));
-            return new List<ChangeSet>();
-        }
-
     }
 }

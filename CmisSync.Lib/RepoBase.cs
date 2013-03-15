@@ -42,18 +42,8 @@ namespace CmisSync.Lib
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(RepoBase));
 
-        public abstract string CurrentRevision { get; }
+        public abstract void HasUnsyncedChanges();
         public abstract double Size { get; }
-        public abstract double HistorySize { get; }
-        public abstract List<string> ExcludePaths { get; }
-        public abstract bool HasUnsyncedChanges { get; set; }
-        public abstract bool HasLocalChanges { get; }
-        public abstract bool HasRemoteChanges { get; }
-        public abstract bool SyncUp();
-        public abstract bool SyncDown();
-        public abstract List<ChangeSet> GetChangeSets(int count);
-        public abstract List<ChangeSet> GetChangeSets(string path, int count);
-        public abstract void RevertFile(string path, string revision);
 
         public event SyncStatusChangedEventHandler SyncStatusChanged = delegate { };
         public delegate void SyncStatusChangedEventHandler(SyncStatus new_status);
@@ -169,7 +159,6 @@ namespace CmisSync.Lib
             IsBuffering = false;
             ServerOnline = true;
             this.identifier = Identifier;
-            ChangeSets = GetChangeSets();
 
             Logger.Info(String.Format("Repo [{0}] - Set poll interval to {1} ms", repoInfo.Name, repoInfo.PollInterval));
             this.remote_timer.Interval = repoInfo.PollInterval;
@@ -180,7 +169,6 @@ namespace CmisSync.Lib
             };
 
             this.watcher = new Watcher(LocalPath);
-            new Thread(() => CreateListener()).Start();
 
             this.remote_timer.Elapsed += delegate
             {
@@ -194,14 +182,11 @@ namespace CmisSync.Lib
                 {
                     this.last_poll = DateTime.Now;
 
-                    if (HasRemoteChanges)
-                        SyncDownBase();
                 }
 
                 // In the unlikely case that we haven't synced up our
                 // changes or the server was down, sync up again
-                if (HasUnsyncedChanges && !is_syncing && ServerOnline)
-                    SyncUpBase();
+                HasUnsyncedChanges();
             };
         }
 
@@ -212,21 +197,9 @@ namespace CmisSync.Lib
 
             // Sync up everything that changed
             // since we've been offline
-            if (HasLocalChanges)
-            {
-                SyncUpBase();
-
-                while (HasUnsyncedChanges)
-                    SyncUpBase();
-            }
+            HasUnsyncedChanges();
 
             this.remote_timer.Start();
-        }
-
-
-        public List<ChangeSet> GetChangeSets()
-        {
-            return GetChangeSets(30);
         }
 
 
@@ -237,15 +210,6 @@ namespace CmisSync.Lib
 
             ChangesDetected();
             string relative_path = args.FullPath.Replace(LocalPath, "");
-
-            foreach (string exclude_path in ExcludePaths)
-            {
-                if (relative_path.Contains(exclude_path))
-                    return;
-            }
-
-            if (IsBuffering || !HasLocalChanges)
-                return;
 
             IsBuffering = true;
             this.watcher.Disable();
@@ -270,21 +234,6 @@ namespace CmisSync.Lib
 
                     Logger.Info("Local | " + Name + " | Activity has settled");
                     IsBuffering = false;
-
-                    if (HasLocalChanges)
-                    {
-                        do
-                        {
-                            SyncUpBase();
-
-                        } while (HasLocalChanges);
-
-                    }
-                    else
-                    {
-                        SyncStatusChanged(SyncStatus.Idle);
-                    }
-
                 }
                 else
                 {
@@ -320,198 +269,6 @@ namespace CmisSync.Lib
         }
 
 
-        private void SyncUpBase()
-        {
-            this.watcher.Disable();
-
-            Logger.Info("SyncUp | " + Name + " | Initiated");
-            HasUnsyncedChanges = true;
-
-            SyncStatusChanged(SyncStatus.SyncUp);
-
-            if (SyncUp())
-            {
-                Logger.Info("SyncUp | " + Name + " | Done");
-                ChangeSets = GetChangeSets();
-
-                HasUnsyncedChanges = false;
-
-                SyncStatusChanged(SyncStatus.Idle);
-                this.listener.Announce(new Announcement(Identifier, CurrentRevision));
-
-            }
-            else
-            {
-                Logger.Info("SyncUp | " + Name + " | Error");
-                SyncDownBase();
-
-                this.watcher.Disable();
-
-                if (ServerOnline && SyncUp())
-                {
-                    HasUnsyncedChanges = false;
-
-                    SyncStatusChanged(SyncStatus.Idle);
-                    this.listener.Announce(new Announcement(Identifier, CurrentRevision));
-
-                }
-                else
-                {
-                    ServerOnline = false;
-                    SyncStatusChanged(SyncStatus.Error);
-                }
-            }
-
-            ProgressPercentage = 0.0;
-            ProgressSpeed = "";
-
-            this.watcher.Enable();
-        }
-
-
-        private void SyncDownBase()
-        {
-            this.watcher.Disable();
-
-            Logger.Info("SyncDown | " + Name + " | Initiated");
-
-            SyncStatusChanged(SyncStatus.SyncDown);
-            string pre_sync_revision = CurrentRevision;
-
-            if (SyncDown())
-            {
-                Logger.Info("SyncDown | " + Name + " | Done");
-                ServerOnline = true;
-
-                ChangeSets = GetChangeSets();
-
-                if (!pre_sync_revision.Equals(CurrentRevision) && ChangeSets != null && ChangeSets.Count > 0)
-                {
-                    bool emit_change_event = true;
-
-                    foreach (Change change in ChangeSets[0].Changes)
-                    {
-                        if (change.Path.EndsWith(".CmisSync"))
-                        {
-                            emit_change_event = false;
-                            break;
-                        }
-                    }
-
-                    if (emit_change_event)
-                        NewChangeSet(ChangeSets[0]);
-                }
-
-                // There could be changes from a resolved
-                // conflict. Tries only once, then lets
-                // the timer try again periodically
-                if (HasUnsyncedChanges)
-                {
-                    SyncStatusChanged(SyncStatus.SyncUp);
-
-                    SyncUp();
-                    HasUnsyncedChanges = false;
-                }
-
-                SyncStatusChanged(SyncStatus.Idle);
-
-            }
-            else
-            {
-                Logger.Info("SyncDown | " + Name + " | Error");
-                ServerOnline = false;
-
-                ChangeSets = GetChangeSets();
-
-                SyncStatusChanged(SyncStatus.Error);
-            }
-
-            ProgressPercentage = 0.0;
-            ProgressSpeed = "";
-
-            this.watcher.Enable();
-
-            SyncStatusChanged(SyncStatus.Idle);
-        }
-
-
-        private void CreateListener()
-        {
-            this.listener = ListenerFactory.CreateListener(Name, Identifier);
-
-            if (this.listener.IsConnected)
-            {
-                this.poll_interval = PollInterval.Long;
-
-                new Thread(() =>
-                {
-                    if (!is_syncing && !HasLocalChanges && HasRemoteChanges)
-                        SyncDownBase();
-
-                }).Start();
-            }
-
-            this.listener.Connected += ListenerConnectedDelegate;
-            this.listener.Disconnected += ListenerDisconnectedDelegate;
-            this.listener.AnnouncementReceived += ListenerAnnouncementReceivedDelegate;
-
-            // Start listening
-            if (!this.listener.IsConnected && !this.listener.IsConnecting)
-                this.listener.Connect();
-        }
-
-
-        // Stop polling when the connection to the irc channel is succesful
-        private void ListenerConnectedDelegate()
-        {
-            this.poll_interval = PollInterval.Long;
-            this.last_poll = DateTime.Now;
-
-            if (!is_syncing)
-            {
-                // Check for changes manually one more time
-                if (HasRemoteChanges)
-                    SyncDownBase();
-
-                // Push changes that were made since the last disconnect
-                if (HasUnsyncedChanges)
-                    SyncUpBase();
-            }
-        }
-
-
-        // Start polling when the connection to the channel is lost
-        private void ListenerDisconnectedDelegate()
-        {
-            this.poll_interval = PollInterval.Short;
-            Logger.Info(Name + " Falling back to polling");
-        }
-
-
-        // Fetch changes when there is an announcement
-        private void ListenerAnnouncementReceivedDelegate(Announcement announcement)
-        {
-            string identifier = Identifier;
-
-            if (announcement.FolderIdentifier.Equals(identifier) &&
-                !announcement.Message.Equals(CurrentRevision))
-            {
-
-                while (this.is_syncing)
-                    Thread.Sleep(100);
-
-                Logger.Info("Listener | Syncing due to announcement");
-                SyncDownBase();
-
-            }
-            else
-            {
-                if (announcement.FolderIdentifier.Equals(identifier))
-                    Logger.Info("Listener |  Not syncing, message is for current revision");
-            }
-        }
-
-
         // Recursively gets a folder's size in bytes
         private double CalculateSize(DirectoryInfo parent)
         {
@@ -519,9 +276,6 @@ namespace CmisSync.Lib
                 return 0;
 
             double size = 0;
-
-            if (ExcludePaths.Contains(parent.Name))
-                return 0;
 
             try
             {
@@ -550,10 +304,6 @@ namespace CmisSync.Lib
         {
             this.remote_timer.Stop();
             this.remote_timer.Dispose();
-
-            this.listener.Connected -= ListenerConnectedDelegate;
-            this.listener.Disconnected -= ListenerDisconnectedDelegate;
-            this.listener.AnnouncementReceived -= ListenerAnnouncementReceivedDelegate;
 
             this.watcher.Dispose();
         }

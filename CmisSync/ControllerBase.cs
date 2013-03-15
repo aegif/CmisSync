@@ -112,8 +112,7 @@ namespace CmisSync
 
                 foreach (RepoBase repo in Repositories)
                 {
-                    if (repo.HasUnsyncedChanges)
-                        unsynced_folders.Add(repo.Name);
+                    repo.HasUnsyncedChanges();
                 }
 
                 return unsynced_folders;
@@ -448,16 +447,7 @@ namespace CmisSync
 
             foreach (RepoBase repo in Repositories)
             {
-                if (repo.Status == SyncStatus.SyncDown || repo.Status == SyncStatus.SyncUp || repo.IsBuffering)
-                {
-                    OnSyncing();
-                    return;
-
-                }
-                else if (repo.HasUnsyncedChanges)
-                {
-                    has_unsynced_repos = true;
-                }
+                repo.HasUnsyncedChanges();
             }
 
             if (has_unsynced_repos)
