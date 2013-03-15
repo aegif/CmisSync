@@ -57,6 +57,8 @@ namespace CmisSync.Lib
         private string backend;
         public string Backend { get { return "Cmis"; } }
 
+        // Poll interval, in milliseconds.
+        // CmisSync will sync this remote folder once during this interval of time.
         private double pollinterval;
         public double PollInterval { get { return pollinterval; } set { pollinterval = value; } }
 

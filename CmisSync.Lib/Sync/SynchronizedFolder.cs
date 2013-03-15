@@ -35,7 +35,8 @@ namespace CmisSync.Lib.Cmis
             /**
              * At which degree the repository supports Change Logs.
              * See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
-             * Possible values: none, objectidsonly, properties, all
+             * The possible values are actually none, objectidsonly, properties, all
+             * But for now we only distinguish between none (false) and the rest (true)
              */
             private bool ChangeLogCapability;
 
