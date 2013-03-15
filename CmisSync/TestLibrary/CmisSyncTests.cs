@@ -372,7 +372,10 @@ namespace TestLibrary
         {
             // Prepare checkout directory.
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
+            
+            //CleanDirectory(localDirectory);
+            //Console.WriteLine("Synced to clean state.");
+            
             // Mock.
             ActivityListener activityListener = new Mock<ActivityListener>().Object;
             // Sync.
@@ -390,8 +393,7 @@ namespace TestLibrary
                 activityListener,
                 new CmisRepo(repoInfo, activityListener)
             );
-            Console.WriteLine("Synced to clean state.");
-
+            
             // Sync a few times in a different thread.
             bool syncing = true;
             BackgroundWorker bw = new BackgroundWorker();
