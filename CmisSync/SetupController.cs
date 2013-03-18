@@ -91,9 +91,6 @@ namespace CmisSync
         public event ChangePasswordFieldEventHandler ChangePasswordFieldEvent = delegate { };
         public delegate void ChangePasswordFieldEventHandler(string text, string example_text, FieldState state);
 
-        public readonly List<Plugin> Plugins = new List<Plugin>();
-        public Plugin SelectedPlugin;
-
         public bool WindowIsOpen { get; private set; }
         public Invite PendingInvite { get; private set; }
         public int TutorialPageNumber { get; private set; }
@@ -117,14 +114,6 @@ namespace CmisSync
             return CmisUtils.GetSubfolders(repositoryId, path, address, user, password);
         }
 
-        public int SelectedPluginIndex
-        {
-            get
-            {
-                return Plugins.IndexOf(SelectedPlugin);
-            }
-        }
-
         public bool FetchPriorHistory
         {
             get
@@ -146,6 +135,7 @@ namespace CmisSync
 
         public SetupController()
         {
+            Logger.Info("Entering constructor.");
             ChangePageEvent += delegate(PageType page_type, string[] warnings)
             {
                 this.current_page = page_type;
@@ -157,43 +147,6 @@ namespace CmisSync
             PreviousUrl = "";
             SyncingReponame = "";
             DefaultRepoPath = Program.Controller.FoldersPath;
-
-            string local_plugins_path = Plugin.LocalPluginsPath;
-            int local_plugins_count = 0;
-
-            // Import all of the plugins
-            if (Directory.Exists(local_plugins_path))
-                // Local plugins go first...
-                foreach (string xml_file_path in Directory.GetFiles(local_plugins_path, "*.xml"))
-                {
-                    Plugins.Add(new Plugin(xml_file_path));
-                    local_plugins_count++;
-                }
-
-            // ...system plugins after that...
-            if (Directory.Exists(Program.Controller.PluginsPath))
-            {
-                foreach (string xml_file_path in Directory.GetFiles(Program.Controller.PluginsPath, "*.xml"))
-                {
-                    // ...and "Own server" at the very top
-                    if (xml_file_path.EndsWith("own-server.xml"))
-                    {
-                        Plugins.Insert(0, new Plugin(xml_file_path));
-
-                    }
-                    else if (xml_file_path.EndsWith("ssnet.xml"))
-                    {
-                        // Plugins.Insert ((local_plugins_count + 1), new Plugin (xml_file_path)); TODO: Skip this plugin for now
-
-                    }
-                    else
-                    {
-                        Plugins.Add(new Plugin(xml_file_path));
-                    }
-                }
-            }
-
-            SelectedPlugin = Plugins[0];
 
             Program.Controller.InviteReceived += delegate(Invite invite)
             {
@@ -257,13 +210,13 @@ namespace CmisSync
                 ChangePageEvent(page_type, null);
                 ShowWindowEvent();
             };
+            Logger.Info("Exiting constructor.");
         }
 
 
         public void PageCancelled()
         {
             PendingInvite = null;
-            SelectedPlugin = Plugins[0];
             PreviousAddress = "";
             PreviousRepository = "";
             PreviousPath = "";
@@ -411,9 +364,6 @@ namespace CmisSync
             repository = repository.Trim();
             remote_path = remote_path.Trim();
 
-            if (SelectedPlugin.PathUsesLowerCase)
-                remote_path = remote_path.ToLower();
-
             PreviousAddress = address;
             PreviousRepository = repository;
             PreviousPath = remote_path;
@@ -433,8 +383,8 @@ namespace CmisSync
             {
                 new Thread(() =>
                 {
-                    Program.Controller.StartFetcher(PreviousAddress, SelectedPlugin.Fingerprint, PreviousPath, repoName,
-                        SelectedPlugin.AnnouncementsUrl, this.fetch_prior_history,
+                    Program.Controller.StartFetcher(PreviousAddress, "SelectedPlugin.Fingerprint", PreviousPath, repoName,
+                        "SelectedPlugin.AnnouncementsUrl", this.fetch_prior_history,
                         PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), localrepopath, syncnow);
 
                 }).Start();
@@ -581,7 +531,6 @@ namespace CmisSync
 
         public void FinishPageCompleted()
         {
-            SelectedPlugin = Plugins[0];
             PreviousUrl = "";
             PreviousAddress = "";
             PreviousPath = "";

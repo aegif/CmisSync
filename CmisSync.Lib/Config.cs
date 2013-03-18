@@ -156,7 +156,7 @@ namespace CmisSync.Lib
             if (string.IsNullOrEmpty(user_name))
                 user_name = "Unknown";
 
-            configXml.AppendChild(configXml.CreateXmlDeclaration("1.0", "UTF-8", "yes"));
+            configXml.AppendChild(configXml.CreateXmlDeclaration("1.0", "UTF-8", null));
             configXml.AppendChild(configXml.CreateElement("CmisSync"));
             XmlNode user = configXml.CreateElement("user");
             XmlNode username = configXml.CreateElement("name");

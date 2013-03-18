@@ -37,6 +37,7 @@ using WPF = System.Windows.Controls;
 using CmisSync.Lib.Cmis;
 using CmisSync.Lib;
 using System.Globalization;
+using log4net;
 
 namespace CmisSync
 {
@@ -58,18 +59,22 @@ namespace CmisSync
 
     public class Setup : SetupWindow
     {
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(Setup));
 
         public SetupController Controller = new SetupController();
 
         public Setup()
         {
+            Logger.Info("Entering constructor.");
             Controller.ShowWindowEvent += delegate
             {
                 Dispatcher.BeginInvoke((Action)delegate
                 {
+                    Logger.Info("Entering ShowWindowEvent.");
                     Show();
                     Activate();
                     BringIntoView();
+                    Logger.Info("Exiting ShowWindowEvent.");
                 });
             };
 
@@ -85,6 +90,7 @@ namespace CmisSync
             {
                 Dispatcher.BeginInvoke((Action)delegate
                 {
+                    Logger.Info("Entering ChangePageEvent.");
                     Reset();
 
                     switch (type)
@@ -191,13 +197,11 @@ namespace CmisSync
                                 TextBox user_box = new TextBox()
                                 {
                                     Width = 200,
-                                    Text = Controller.PreviousPath,
-                                    IsEnabled = (Controller.SelectedPlugin.Path == null)
+                                    Text = Controller.PreviousPath
                                 };
 
                                 TextBlock user_help_label = new TextBlock()
                                 {
-                                    Text = Controller.SelectedPlugin.UserExample,
                                     FontSize = 11,
                                     Width = 200,
                                     Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
@@ -213,13 +217,11 @@ namespace CmisSync
 
                                 PasswordBox password_box = new PasswordBox()
                                 {
-                                    Width = 200,
-                                    IsEnabled = (Controller.SelectedPlugin.Path == null),
+                                    Width = 200
                                 };
 
                                 TextBlock password_help_label = new TextBlock()
                                 {
-                                    Text = Controller.SelectedPlugin.PasswordExample,
                                     FontSize = 11,
                                     Width = 200,
                                     Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
@@ -509,7 +511,6 @@ namespace CmisSync
                                 {
                                     Width = 420,
                                     Text = Controller.SyncingReponame
-                                    // IsEnabled = (Controller.SelectedPlugin.Address == null)
                                 };
 
                                 TextBlock localrepopath_label = new TextBlock()
@@ -522,7 +523,6 @@ namespace CmisSync
                                 {
                                     Width = 420,
                                     Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text)
-                                    // IsEnabled = (Controller.SelectedPlugin.Address == null)
                                 };
 
                                 localfolder_box.TextChanged += delegate
@@ -1037,8 +1037,10 @@ namespace CmisSync
                     }
 
                     ShowAll();
+                    Logger.Info("Exiting ChangePageEvent.");
                 });
             };
+            Logger.Info("Exiting constructor.");
         }
     }
 }

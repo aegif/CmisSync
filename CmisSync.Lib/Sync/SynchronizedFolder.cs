@@ -99,12 +99,8 @@ namespace CmisSync.Lib.Cmis
                 this.repo = repo;
                 this.activityListener = activityListener;
                 this.repoinfo = repoInfo;
-                // Set local root folder
-                // String FolderName = repoinfo.Name;
-                // this.localRootFolder = Path.Combine(Folder.ROOT_FOLDER, FolderName);
 
-                // Database is place in appdata of the users instead of sync folder (more secure)
-                // database = new CmisDatabase(localRootFolder);
+                // Database is the user's AppData/Roaming
                 database = new Database(repoinfo.CmisDatabase);
 
                 // Get path on remote repository.
@@ -114,7 +110,7 @@ namespace CmisSync.Lib.Cmis
                 cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
                 cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
                 cmisParameters[SessionParameter.User] = repoInfo.User;
-                // Uncrypt password
+                // Unprotect password
                 cmisParameters[SessionParameter.Password] = Crypto.Unprotect(repoInfo.Password);
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
 
@@ -149,7 +145,6 @@ namespace CmisSync.Lib.Cmis
                     }
                     if (session == null)
                     {
-                        // Logger.LogInfo("Sync", "Connection failed, waiting for 10 seconds: " + this.localRootFolder + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
                         Logger.Warn("Sync | Connection failed, waiting for 10 seconds: " + repoinfo.TargetDirectory + "(" + cmisParameters[SessionParameter.AtomPubUrl] + ")");
                         System.Threading.Thread.Sleep(10 * 1000);
                     }
@@ -263,7 +258,6 @@ namespace CmisSync.Lib.Cmis
 
             /**
              * Download a single file from the CMIS server.
-             * Full rewrite by Yannick
              */
             private void DownloadFile(IDocument remoteDocument, string localFolder)
             {
@@ -413,9 +407,7 @@ namespace CmisSync.Lib.Cmis
 
                     ContentStream contentStream = new ContentStream();
                     contentStream.FileName = tmpfileName;
-                    // contentStream.Stream = new MemoryStream(8 * 1024);
                     contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
-                    // contentStream.Length = 8 * 1024;
                     contentStream.Length = file.Length;
                     contentStream.Stream = file;
                     contentStream.Stream.Flush();

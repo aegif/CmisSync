@@ -44,8 +44,8 @@ namespace CmisSync
         {
 
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            Logger.Info("Starting.");
 
-            Console.WriteLine("start");
             if (args.Length != 0 && !args[0].Equals("start") &&
                 Backend.Platform != PlatformID.MacOSX &&
                 Backend.Platform != PlatformID.Win32NT)

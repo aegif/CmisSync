@@ -132,7 +132,6 @@ namespace CmisSync.Lib
         private DateTime last_poll = DateTime.Now;
         private DateTime progress_last_change = DateTime.Now;
         private TimeSpan progress_change_interval = new TimeSpan(0, 0, 0, 1);
-        // private Timers.Timer remote_timer = new Timers.Timer() { Interval = 5000 };
         private Timers.Timer remote_timer = new Timers.Timer();
 
         private bool is_syncing
