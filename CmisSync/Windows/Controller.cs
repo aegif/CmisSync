@@ -28,6 +28,7 @@ using Forms = System.Windows.Forms;
 
 using Microsoft.Win32;
 using CmisSync.Lib;
+using CmisSync.Lib.Cmis;
 
 namespace CmisSync
 {
@@ -192,8 +193,8 @@ namespace CmisSync
 
         public void OpenRemoteFolder(string name)
         {
-            RepoInfo info = ConfigManager.CurrentConfig.GetRepoInfo(name);
-            Process.Start(info.Address.AbsoluteUri + info.RemotePath);
+            RepoInfo repo = ConfigManager.CurrentConfig.GetRepoInfo(name);
+            Process.Start(CmisUtils.GetBrowsableURL(repo));
         }
 
         public override void Quit()

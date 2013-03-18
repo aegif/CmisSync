@@ -162,5 +162,31 @@ namespace CmisSync.Lib.Cmis
             }
             return result.ToArray();
         }
+
+        // Guess the web address where files can be seen using a browser.
+        // Not bulletproof. It depends on the server, and there is no web UI at all.
+        static public string GetBrowsableURL(RepoInfo repo)
+        {
+            if (repo.Address.AbsoluteUri.EndsWith("alfresco/cmisatom"))
+            {
+                // Alfresco
+                string root = repo.Address.AbsoluteUri.Substring(0, repo.Address.AbsoluteUri.Length - "alfresco/cmisatom".Length);
+                if (repo.RemotePath.StartsWith("/Sites"))
+                {
+                    // Alfresco Share
+                    string site = repo.RemotePath.Substring("/Sites/".Length);
+                    return root + "share/page/site/" + site + "/documentlibrary";
+                }
+                else
+                {
+                    // Alfresco Web Client
+                    return root;
+                }
+            }
+            else
+            {
+                return repo.Address.AbsoluteUri + repo.RemotePath;
+            }
+        }
     }
 }
