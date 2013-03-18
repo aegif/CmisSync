@@ -63,6 +63,15 @@ namespace TestLibrary
             }
         }
 
+        public static IEnumerable<object[]> TestServersFuzzy
+        {
+            get
+            {
+                return JsonConvert.DeserializeObject<List<object[]>>(
+                    File.ReadAllText("../../test-servers-fuzzy.json"));
+            }
+        }
+
         public void Dispose()
         {
         }
@@ -534,6 +543,13 @@ namespace TestLibrary
                     Console.WriteLine(subFolder.Path);
                 }
             }
+        }
+
+        [Test, TestCaseSource("TestServersFuzzy")]
+        public void GetRepositoriesFuzzy(string url, string user, string password)
+        {
+            CmisServer server = CmisUtils.GetRepositoriesFuzzy(url, user, password);
+            Assert.NotNull(server);
         }
     }
 }

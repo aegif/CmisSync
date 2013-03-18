@@ -81,6 +81,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="test-servers-fuzzy.json" />
     <None Include="test-servers-disabled.json" />
     <None Include="test-servers.json" />
   </ItemGroup>
