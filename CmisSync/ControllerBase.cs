@@ -33,6 +33,7 @@ namespace CmisSync
     public abstract class ControllerBase : ActivityListener
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(ControllerBase));
+        private bool firstRun;
         private RepoInfo repoInfo;
 
         public RepoBase[] Repositories
@@ -89,7 +90,7 @@ namespace CmisSync
         {
             get
             {
-                return ConfigManager.CurrentConfig.User.Email.Equals("Unknown");
+                return firstRun;
             }
         }
 
@@ -156,9 +157,6 @@ namespace CmisSync
         public abstract string DayEntryHTML { get; }
         public abstract string EventEntryHTML { get; }
 
-        // Path where the plugins are kept
-        public abstract string PluginsPath { get; }
-
         // Enables CmisSync to start automatically at login
         public abstract void CreateStartupItem();
 
@@ -193,49 +191,18 @@ namespace CmisSync
         }
 
 
-        public virtual void Initialize()
+        public virtual void Initialize(Boolean firstRun)
         {
-            Plugin.PluginsPath = PluginsPath;
+            this.firstRun = firstRun;
             InstallProtocolHandler();
 
             // Create the CmisSync folder and add it to the bookmarks
             if (CreateCmisSyncFolder())
                 AddToBookmarks();
 
-            if (FirstRun)
+            if (firstRun)
             {
                 ConfigManager.CurrentConfig.SetConfigOption("notifications", bool.TrueString);
-
-            }
-            else
-            {
-                /*
-                string keys_path = Path.GetDirectoryName (this.config.FullPath);
-                string key_file_path = "";
-
-                foreach (string file_name in Directory.GetFiles (keys_path)) {
-                    if (file_name.EndsWith (".key")) {
-                        key_file_path = Path.Combine (keys_path, file_name);
-                        Keys.ImportPrivateKey (key_file_path);
-
-                        break;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty (key_file_path)) {
-                    string public_key_file_path = key_file_path + ".pub";
-                    string link_code_file_path  = Path.Combine (FoldersPath, CurrentUser.Name + "'s link code.txt");
-
-                    // Create an easily accessible copy of the public
-                    // key in the user's CmisSync folder
-                    if (File.Exists (public_key_file_path) && !File.Exists (link_code_file_path))
-                        File.Copy (public_key_file_path, link_code_file_path, true);
-
-                    CurrentUser.PublicKey = File.ReadAllText (public_key_file_path);
-                }
-
-                Keys.ListPrivateKeys ();
-                */
             }
 
             // Watch the CmisSync folder
@@ -256,7 +223,7 @@ namespace CmisSync
 
         public void UIHasLoaded()
         {
-            if (FirstRun)
+            if (firstRun)
             {
                 ShowSetupWindow(PageType.Setup);
 
@@ -278,23 +245,9 @@ namespace CmisSync
         {
             RepoBase repo = null;
             string folder_name = Path.GetFileName(folder_path);
-            //string backend       = this.config.GetBackendForFolder (folder_name);
-
-            //try {
-            //repo = (RepoBase) Activator.CreateInstance (
-            //    Type.GetType ("CmisSync.Lib." + backend + ".Repo, CmisSync.Lib." + backend),
-            //        new object [] { folder_path, this.config }
-            //);
 
             RepoInfo repositoryInfo = ConfigManager.CurrentConfig.GetRepoInfo(folder_name);
             repo = new CmisSync.Lib.Cmis.CmisRepo(repositoryInfo, activityListenerAggregator);
-
-            //} catch (Exception e) {
-            //    Logger.LogInfo ("Controller",
-            //        "Failed to load '" + backend + "' backend for '" + folder_name + "': " + e.ToString());
-            //
-            //      return;
-            //}
 
             repo.ChangesDetected += delegate
             {
@@ -349,7 +302,7 @@ namespace CmisSync
                     if (repo.LocalPath.Equals(folder_path))
                     {
                         // Remove Cmis Database File
-                        RemoveCmisDatabase(folder_path);
+                        RemoveDatabase(folder_path);
 
                         repo.Dispose();
                         this.repositories.Remove(repo);
@@ -360,7 +313,7 @@ namespace CmisSync
                 }
             }
 
-            RemoveCmisDatabase(folder_path);
+            RemoveDatabase(folder_path);
         }
 
         public void StartOrSuspendRepository(string repoName)
@@ -376,7 +329,7 @@ namespace CmisSync
             }
         }
 
-        private void RemoveCmisDatabase(string folder_path)
+        private void RemoveDatabase(string folder_path)
         {
             string databasefile = Path.Combine(ConfigManager.CurrentConfig.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
             if (File.Exists(databasefile)) File.Delete(databasefile);

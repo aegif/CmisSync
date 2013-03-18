@@ -71,12 +71,11 @@ namespace CmisSync.Lib
             }
         }
 
-        public Config(string config_path, string config_file_name)
+        public Config(string FullPath)
         {
-            configpath = config_path;
-            FullPath = Path.Combine(config_path, config_file_name);
+            this.FullPath = FullPath;
+            configpath = Path.GetDirectoryName(FullPath);
             Console.WriteLine("FullPath:" + FullPath);
-            //LogFilePath = Path.Combine(config_path, "debug_log.txt");
 
             //if (File.Exists(LogFilePath))
             //{
@@ -91,8 +90,8 @@ namespace CmisSync.Lib
             //    }
             //}
 
-            if (!Directory.Exists(config_path))
-                Directory.CreateDirectory(config_path);
+            if (!Directory.Exists(configpath))
+                Directory.CreateDirectory(configpath);
 
             if (!File.Exists(FullPath))
                 CreateInitialConfig();
@@ -353,6 +352,11 @@ namespace CmisSync.Lib
             node_folder.AppendChild(node_pollinterval);
 
             XmlNode node_root = configXml.SelectSingleNode("/CmisSync/folders");
+            if (node_root == null)
+            {
+                node_root = configXml.CreateElement("folders");
+                configXml.SelectSingleNode("/CmisSync").AppendChild(node_root);
+            }
             node_root.AppendChild(node_folder);
 
             Save();

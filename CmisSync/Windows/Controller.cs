@@ -43,34 +43,9 @@ namespace CmisSync
         }
 
 
-        public override string PluginsPath
+        public override void Initialize(Boolean firstRun)
         {
-            get
-            {
-                return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plugins");
-            }
-        }
-
-
-        public override void Initialize()
-        {
-            // Not necessary for CmisSync
-            // Add msysgit to path, as we cannot asume it is added to the path
-            // Asume it is installed in @"<exec dir>\msysgit\bin"
-            //string executable_path = Path.GetDirectoryName(Forms.Application.ExecutablePath);
-            //string msysgit_path = Path.Combine(executable_path, "msysgit");
-
-            //string new_PATH = msysgit_path + @"\bin" + ";" +
-            //    msysgit_path + @"\mingw\bin" + ";" +
-            //    msysgit_path + @"\cmd" + ";" +
-            //    Environment.ExpandEnvironmentVariables("%PATH%");
-
-            //Environment.SetEnvironmentVariable("PATH", new_PATH);
-            //Environment.SetEnvironmentVariable("PLINK_PROTOCOL", "ssh");
-            //Environment.SetEnvironmentVariable("HOME", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-
-            // StartSSH ();
-            base.Initialize();
+            base.Initialize(firstRun);
         }
 
 

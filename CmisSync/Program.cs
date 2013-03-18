@@ -22,6 +22,7 @@ using System.Threading;
 using CmisSync.Lib;
 using log4net;
 using log4net.Config;
+using CmisSync.Lib.Sync;
 
 namespace CmisSync
 {
@@ -42,6 +43,11 @@ namespace CmisSync
 #endif
         public static void Main(string[] args)
         {
+            bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
+
+            // Migrate config.xml from past versions, if necessary.
+            if ( ! firstRun )
+                ConfigMigration.Migrate();
 
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             Logger.Info("Starting.");
@@ -80,7 +86,7 @@ namespace CmisSync
             {
                 //#endif
                 Controller = new Controller();
-                Controller.Initialize();
+                Controller.Initialize(firstRun);
 
                 UI = new UI();
                 UI.Run();
