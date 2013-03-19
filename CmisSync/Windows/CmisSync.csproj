@@ -90,12 +90,6 @@
     <Compile Include="..\Extensions.cs">
       <Link>Extensions.cs</Link>
     </Compile>
-    <Compile Include="..\Invite.cs">
-      <Link>Invite.cs</Link>
-    </Compile>
-    <Compile Include="..\Keys.cs">
-      <Link>Keys.cs</Link>
-    </Compile>
     <Compile Include="..\Plugin.cs">
       <Link>Plugin.cs</Link>
     </Compile>

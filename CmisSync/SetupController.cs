@@ -92,7 +92,6 @@ namespace CmisSync
         public delegate void ChangePasswordFieldEventHandler(string text, string example_text, FieldState state);
 
         public bool WindowIsOpen { get; private set; }
-        public Invite PendingInvite { get; private set; }
         public int TutorialPageNumber { get; private set; }
         public string PreviousUrl { get; private set; }
         public string PreviousAddress { get; private set; }
@@ -148,14 +147,6 @@ namespace CmisSync
             SyncingReponame = "";
             DefaultRepoPath = Program.Controller.FoldersPath;
 
-            Program.Controller.InviteReceived += delegate(Invite invite)
-            {
-                PendingInvite = invite;
-
-                ChangePageEvent(PageType.Invite, null);
-                ShowWindowEvent();
-            };
-
             Program.Controller.ShowSetupWindowEvent += delegate(PageType page_type)
             {
                 if (this.current_page == PageType.Syncing ||
@@ -202,7 +193,6 @@ namespace CmisSync
 
         public void PageCancelled()
         {
-            PendingInvite = null;
             PreviousAddress = "";
             PreviousRepository = "";
             PreviousPath = "";
@@ -426,20 +416,13 @@ namespace CmisSync
         public void SyncingCancelled()
         {
             Program.Controller.StopFetcher();
-
-            if (PendingInvite != null)
-                ChangePageEvent(PageType.Invite, null);
-            else
-                ChangePageEvent(PageType.Add1, null);
+            ChangePageEvent(PageType.Add1, null);
         }
 
 
         public void ErrorPageCompleted()
         {
-            if (PendingInvite != null)
-                ChangePageEvent(PageType.Invite, null);
-            else
-                ChangePageEvent(PageType.Add1, null);
+            ChangePageEvent(PageType.Add1, null);
         }
 
 

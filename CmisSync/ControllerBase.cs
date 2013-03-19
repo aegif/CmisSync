@@ -76,9 +76,6 @@ namespace CmisSync
         public event Action OnError = delegate { };
 
 
-        public event InviteReceivedHandler InviteReceived = delegate { };
-        public delegate void InviteReceivedHandler(Invite invite);
-
         public event NotificationRaisedEventHandler NotificationRaised = delegate { };
         public delegate void NotificationRaisedEventHandler(ChangeSet change_set);
 
@@ -437,58 +434,10 @@ namespace CmisSync
 
         public void OnFolderActivity(object o, FileSystemEventArgs args)
         {
-            if (args != null && args.FullPath.EndsWith(".xml") &&
-                args.ChangeType == WatcherChangeTypes.Created)
-            {
-
-                HandleInvite(args);
+            if (Directory.Exists(args.FullPath) && args.ChangeType == WatcherChangeTypes.Created)
                 return;
 
-            }
-            else
-            {
-                if (Directory.Exists(args.FullPath) && args.ChangeType == WatcherChangeTypes.Created)
-                    return;
-
-                // CheckRepositories (); // NR Disabled because was creating tons of Cmis objects
-            }
-        }
-
-
-        public void HandleInvite(FileSystemEventArgs args)
-        {
-            if (this.fetcher != null &&
-                this.fetcher.IsActive)
-            {
-
-                AlertNotificationRaised("CmisSync Setup seems busy", "Please wait for it to finish");
-
-            }
-            else
-            {
-                Invite invite = new Invite(args.FullPath);
-
-                // It may be that the invite we received a path to isn't
-                // fully downloaded yet, so we try to read it several times
-                int tries = 0;
-                while (!invite.IsValid)
-                {
-                    Thread.Sleep(100);
-                    invite = new Invite(args.FullPath);
-                    tries++;
-
-                    if (tries > 10)
-                    {
-                        AlertNotificationRaised("Oh noes!", "This invite seems screwed up...");
-                        break;
-                    }
-                }
-
-                if (invite.IsValid)
-                    InviteReceived(invite);
-
-                File.Delete(args.FullPath);
-            }
+            // CheckRepositories (); // NR Disabled because was creating tons of Cmis objects
         }
 
 
@@ -500,19 +449,6 @@ namespace CmisSync
                 announcements_url = announcements_url.Trim();
 
             string tmp_path = ConfigManager.CurrentConfig.TmpPath;
-
-            //if (!Directory.Exists (tmp_path)) {
-            //    Directory.CreateDirectory (tmp_path);
-            //    File.SetAttributes (tmp_path, File.GetAttributes (tmp_path) | FileAttributes.Hidden);
-            //}
-
-            // string canonical_name = Path.GetFileName(remote_path);
-
-            //string tmp_folder     = Path.Combine (tmp_path, canonical_name);
-            //string backend        = FetcherBase.GetBackend (remote_path);
-
-            //fetcher = new CmisSync.Lib.Cmis.Fetcher(address, required_fingerprint, remote_path, "dummy_tmp_folder",
-            //    fetch_prior_history, canonical_name, repository, path, user, password, activityListenerAggregator);
 
             repoInfo = new RepoInfo(local_path, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = new Uri(address);
@@ -527,34 +463,15 @@ namespace CmisSync
 
             fetcher = new CmisSync.Lib.Cmis.Fetcher(repoInfo, activityListenerAggregator);
 
-            //try {
-            //    Logger.LogInfo("Controller", "Getting type " + "CmisSync.Lib." + backend + ".Fetcher, CmisSync.Lib." + backend);
-            //    this.fetcher = (FetcherBase) Activator.CreateInstance (
-            //        Type.GetType("CmisSync.Lib." + backend + ".Fetcher, CmisSync.Lib." + backend),
-            //            address, required_fingerprint, remote_path, tmp_folder, fetch_prior_history
-            //    );
-            //
-            //} catch (Exception e) {
-            //    Logger.LogInfo ("Controller",
-            //        "Failed to load '" + backend + "' backend for '" + canonical_name + "' " + e.Message);
-            //
-            //    FolderFetchError (Path.Combine (address, remote_path).Replace (@"\", "/"),
-            //        new string [] {"Failed to load \"" + backend + "\" backend for \"" + canonical_name + "\""});
-            //
-            //    return;
-            //}
-
             this.fetcher.Finished += delegate(bool repo_is_encrypted, bool repo_is_empty, string[] warnings)
             {
                 if (repo_is_encrypted && repo_is_empty)
                 {
                     ShowSetupWindowEvent(PageType.CryptoSetup);
-
                 }
                 else if (repo_is_encrypted)
                 {
                     ShowSetupWindowEvent(PageType.CryptoPassword);
-
                 }
                 else
                 {
@@ -615,54 +532,10 @@ namespace CmisSync
         public void FinishFetcher()
         {
             this.fetcher.Complete();
-            // string canonical_name = Path.GetFileName (this.fetcher.RemoteFolder);
-
-            // string target_folder_path = Path.Combine(this.config.FoldersPath, fetcher.CanonicalName);
-            //string target_folder_path = Path.Combine(this.config.FoldersPath, repoInfo.TargetDirectory);
-            //bool target_folder_exists = Directory.Exists(target_folder_path);
-
-            // Add a numbered suffix to the name if a folder with the same name
-            // already exists. Example: "Folder (2)"
-            /*int suffix = 1;
-            while (target_folder_exists) {
-                suffix++;
-                target_folder_exists = Directory.Exists (
-                    Path.Combine (this.config.FoldersPath, canonical_name + " (" + suffix + ")"));
-            }*/
-
-            // string target_folder_name = canonical_name;
-
-            /*if (suffix > 1)   TODO make this work by first creating checkout in temp directory (also paragraph just above)
-                target_folder_name += " (" + suffix + ")";*/
-
-
-
-            //try {
-            //    ClearFolderAttributes (this.fetcher.TargetFolder);
-            //    Directory.Move (this.fetcher.TargetFolder, target_folder_path);
-            //
-            //} catch (Exception e) {
-            //    Logger.LogInfo ("Controller", "Error moving directory: " + e.Message);
-            //    return;
-            //}
-
-            //string backend = FetcherBase.GetBackend(this.fetcher.RemoteUrl.AbsolutePath);
-
-            //this.config.AddFolder(fetcher.CanonicalName, this.fetcher.Identifier,
-            //    this.fetcher.RemoteUrl.ToString(), backend,
-            //    this.fetcher.Repository, this.fetcher.RemoteFolder, this.fetcher.User, this.fetcher.Password);
             ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
             FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.Warnings.ToArray());
 
-            /* TODO
-            if (!string.IsNullOrEmpty (announcements_url)) {
-                this.config.SetFolderOptionalAttribute (
-                    target_folder_name, "announcements_url", announcements_url);
-            */
-
-            //AddRepository (target_folder_path);
-            // AddRepository(Path.Combine(Folder.ROOT_FOLDER, fetcher.CanonicalName));
             AddRepository(repoInfo.TargetDirectory);
 
             FolderListChanged();
