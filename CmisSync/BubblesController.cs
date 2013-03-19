@@ -38,7 +38,7 @@ namespace CmisSync
 
             Program.Controller.NotificationRaised += delegate(ChangeSet change_set)
             {
-                ShowBubble(change_set.User.Name, FormatMessage(change_set),
+                ShowBubble("change_set.User.Name", FormatMessage(change_set),
                     ToolTipIcon.Info);
             };
         }

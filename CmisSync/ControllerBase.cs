@@ -117,19 +117,6 @@ namespace CmisSync
             }
         }
 
-        public User CurrentUser
-        {
-            get
-            {
-                return ConfigManager.CurrentConfig.User;
-            }
-
-            set
-            {
-                ConfigManager.CurrentConfig.User = value;
-            }
-        }
-
         public bool NotificationsEnabled
         {
             get

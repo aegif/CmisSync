@@ -259,42 +259,6 @@ namespace CmisSync.Lib
         }
 
 
-        public User User
-        {
-            get
-            {
-                XmlNode name_node = configXml.SelectSingleNode("/CmisSync/user/name/text()");
-                string name = name_node.Value;
-
-                XmlNode email_node = configXml.SelectSingleNode("/CmisSync/user/email/text()");
-                string email = email_node.Value;
-
-                string pubkey_file_path = Path.Combine(
-                    Path.GetDirectoryName(FullPath), "CmisSync." + email + ".key.pub");
-
-                User user = new User(name, email);
-
-                if (File.Exists(pubkey_file_path))
-                    user.PublicKey = File.ReadAllText(pubkey_file_path);
-
-                return user;
-            }
-
-            set
-            {
-                User user = (User)value;
-
-                XmlNode name_node = configXml.SelectSingleNode("/CmisSync/user/name/text()");
-                name_node.InnerText = user.Name;
-
-                XmlNode email_node = configXml.SelectSingleNode("/CmisSync/user/email/text()");
-                email_node.InnerText = user.Email;
-
-                Save();
-            }
-        }
-
-
         public List<string> Folders
         {
             get

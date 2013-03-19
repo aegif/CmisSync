@@ -1,12 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+# Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync", "CmisSync.csproj", "{728483AA-E34B-4441-BF2C-C8BC2901E4E0}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2} = {1DB5492D-B897-4A5E-8DD7-175EC65F52F2}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InviteOpener", "SparkleShareInviteOpener\InviteOpener.csproj", "{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Lib", "..\..\CmisSync.Lib\CmisSync.Lib.csproj", "{2C914413-B31C-4362-93C7-1AE34F09112A}"
 EndProject
@@ -38,16 +33,6 @@ Global
 		{728483AA-E34B-4441-BF2C-C8BC2901E4E0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{728483AA-E34B-4441-BF2C-C8BC2901E4E0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{728483AA-E34B-4441-BF2C-C8BC2901E4E0}.Release|x86.ActiveCfg = Release|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{1DB5492D-B897-4A5E-8DD7-175EC65F52F2}.Release|x86.ActiveCfg = Release|Any CPU
 		{2C914413-B31C-4362-93C7-1AE34F09112A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C914413-B31C-4362-93C7-1AE34F09112A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C914413-B31C-4362-93C7-1AE34F09112A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

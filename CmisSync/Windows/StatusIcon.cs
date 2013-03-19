@@ -101,13 +101,13 @@ namespace CmisSync
 
                         if (syncitem.Tag == "pause")
                         {
-                            syncitem.Text = "Resume sync!";
+                            syncitem.Text = CmisSync.Properties.Resources.ResourceManager.GetString("ResumeSync", CultureInfo.CurrentCulture); ;
                             syncitem.Tag = "resume";
                             syncitem.Image = UIHelpers.GetBitmap("media_playback_start");
                         }
                         else
                         {
-                            syncitem.Text = "Pause sync!";
+                            syncitem.Text = CmisSync.Properties.Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture); ;
                             syncitem.Tag = "pause";
                             syncitem.Image = UIHelpers.GetBitmap("media_playback_pause");
                         }

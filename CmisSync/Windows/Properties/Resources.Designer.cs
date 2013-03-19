@@ -306,6 +306,15 @@ namespace CmisSync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pause sync.
+        /// </summary>
+        internal static string PauseSync {
+            get {
+                return ResourceManager.GetString("PauseSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CMIS server found, but permission denied. Please check username/password..
         /// </summary>
         internal static string PermissionDenied {
@@ -329,6 +338,15 @@ namespace CmisSync.Properties {
         internal static string ReceivingChanges {
             get {
                 return ResourceManager.GetString("ReceivingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resume sync.
+        /// </summary>
+        internal static string ResumeSync {
+            get {
+                return ResourceManager.GetString("ResumeSync", resourceCulture);
             }
         }
         

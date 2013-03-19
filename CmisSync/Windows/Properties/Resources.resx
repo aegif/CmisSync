@@ -263,4 +263,10 @@ the resulting XML to the CmisSync forum.</value>
   <data name="LocalDirectoryExist" xml:space="preserve">
     <value>A local folder with the same name already exist, please use a different name.</value>
   </data>
+  <data name="PauseSync" xml:space="preserve">
+    <value>Pause sync</value>
+  </data>
+  <data name="ResumeSync" xml:space="preserve">
+    <value>Resume sync</value>
+  </data>
 </root>

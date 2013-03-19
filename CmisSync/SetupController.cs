@@ -208,7 +208,6 @@ namespace CmisSync
 
         public void SetupPageCompleted()
         {
-            Program.Controller.CurrentUser = new User("Dummy", "dummy@example.org");
             TutorialPageNumber = 1;
             ChangePageEvent(PageType.Tutorial, null);
         }

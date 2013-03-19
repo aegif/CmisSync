@@ -68,7 +68,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Exceptions.cs" />
-    <Compile Include="User.cs" />
     <Compile Include="Defines.cs" />
     <Compile Include="ActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />

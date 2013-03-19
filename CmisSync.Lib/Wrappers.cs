@@ -34,8 +34,6 @@ namespace CmisSync.Lib
     public class ChangeSet
     {
 
-        public User User = new User("Unknown", "Unknown");
-
         public Folder Folder;
         public string Revision;
         public DateTime Timestamp;
