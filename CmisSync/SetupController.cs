@@ -334,7 +334,7 @@ namespace CmisSync
             PreviousPath = remote_path;
         }
 
-        public void CustomizePageCompleted(String repoName, String localrepopath, bool syncnow)
+        public void CustomizePageCompleted(String repoName, String localrepopath)
         {
             SyncingReponame = repoName;
 
@@ -350,7 +350,7 @@ namespace CmisSync
                 {
                     Program.Controller.StartFetcher(PreviousAddress, "SelectedPlugin.Fingerprint", PreviousPath, repoName,
                         "SelectedPlugin.AnnouncementsUrl", this.fetch_prior_history,
-                        PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), localrepopath, syncnow);
+                        PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), localrepopath);
 
                 }).Start();
             }

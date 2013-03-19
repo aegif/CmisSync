@@ -542,11 +542,6 @@ namespace CmisSync
                                     Content = CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
                                 };
 
-                                Button sync_button = new Button()
-                                {
-                                    Content = CmisSync.Properties.Resources.ResourceManager.GetString("SyncNow", CultureInfo.CurrentCulture)
-                                };
-
                                 Button add_button = new Button()
                                 {
                                     Content = CmisSync.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
@@ -558,7 +553,6 @@ namespace CmisSync
                                 };
 
                                 Buttons.Add(back_button);
-                                Buttons.Add(sync_button);
                                 Buttons.Add(add_button);
                                 Buttons.Add(cancel_button);
 
@@ -591,18 +585,6 @@ namespace CmisSync
                                 localfolder_box.Focus();
                                 localfolder_box.Select(localfolder_box.Text.Length, 0);
 
-                                /*
-                                Controller.ChangeLocalFolderFieldEvent += delegate(string text,
-                                    string example_text, FieldState state)
-                                {
-                                    Dispatcher.BeginInvoke((Action)delegate
-                                    {
-                                        localfolder_box.Text = text;
-                                        localfolder_box.IsEnabled = (state == FieldState.Enabled);
-                                        localfolder_help_label.Text = example_text;
-                                    });
-                                };
-                                */
                                 Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
                                 {
                                     Dispatcher.BeginInvoke((Action)delegate
@@ -660,14 +642,9 @@ namespace CmisSync
                                     Controller.BackToPage2();
                                 };
 
-                                sync_button.Click += delegate
-                                {
-                                    Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text, true);
-                                };
-
                                 add_button.Click += delegate
                                 {
-                                    Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text, false);
+                                    Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text);
                                 };
                                 break;
                             }

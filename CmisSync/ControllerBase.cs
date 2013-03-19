@@ -430,7 +430,7 @@ namespace CmisSync
 
         public void StartFetcher(string address, string required_fingerprint,
             string remote_path, string local_path, string announcements_url, bool fetch_prior_history,
-            string repository, string path, string user, string password, string localrepopath, bool syncnow)
+            string repository, string path, string user, string password, string localrepopath)
         {
             if (announcements_url != null)
                 announcements_url = announcements_url.Trim();
@@ -466,9 +466,7 @@ namespace CmisSync
                 FolderFetching(percentage);
             };
 
-            if (syncnow)
-                this.fetcher.Start();
-            else this.FinishFetcher();
+            this.FinishFetcher();
         }
 
 
@@ -481,12 +479,12 @@ namespace CmisSync
                 try
                 {
                     Directory.Delete(this.fetcher.TargetFolder, true);
-                    Logger.Info("Controller | Deleted " + this.fetcher.TargetFolder);
+                    Logger.Info("Deleted " + this.fetcher.TargetFolder);
 
                 }
                 catch (Exception e)
                 {
-                    Logger.Info("Controller | Failed to delete " + this.fetcher.TargetFolder + ": " + e.Message);
+                    Logger.Info("Failed to delete " + this.fetcher.TargetFolder + ": " + e.Message);
                 }
             }
 

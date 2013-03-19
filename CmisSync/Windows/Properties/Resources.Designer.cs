@@ -342,7 +342,7 @@ namespace CmisSync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your documents are ready!.
+        ///   Looks up a localized string similar to Your documents are now being synchronized.
         /// </summary>
         internal static string Ready {
             get {
@@ -440,15 +440,6 @@ namespace CmisSync.Properties {
         internal static string SyncingChanges {
             get {
                 return ResourceManager.GetString("SyncingChanges", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sync Now!.
-        /// </summary>
-        internal static string SyncNow {
-            get {
-                return ResourceManager.GetString("SyncNow", resourceCulture);
             }
         }
         

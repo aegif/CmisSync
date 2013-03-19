@@ -198,7 +198,7 @@ It is like Dropbox for Enterprise Content Management!</value>
     <value>CMIS server found, but permission denied. Please check username/password.</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>Your documents are ready!</value>
+    <value>Your documents are now being synchronized</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
     <value>Receiving changes…</value>
@@ -229,9 +229,6 @@ the resulting XML to the CmisSync forum.</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
     <value>Syncing changes…</value>
-  </data>
-  <data name="SyncNow" xml:space="preserve">
-    <value>Sync Now!</value>
   </data>
   <data name="User" xml:space="preserve">
     <value>User</value>

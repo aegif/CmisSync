@@ -122,57 +122,13 @@ namespace CmisSync.Lib
         }
 
 
+        // TODO used?
         public void Start()
         {
             IsActive = true;
             Started();
 
             Logger.Info("Fetcher | " + TargetFolder + " | Fetching folder: " + RemoteUrl);
-
-            // Not necessary for CmisSync
-            //if (Directory.Exists(TargetFolder))
-            //    Directory.Delete(TargetFolder, true);
-
-            //string host_key = "";
-
-            //if (!RemoteUrl.Scheme.StartsWith("http"))
-            //{
-            //    host_key = FetchHostKey();
-
-            //    if (string.IsNullOrEmpty(RemoteUrl.Host) || host_key == null)
-            //    {
-            //        Logger.LogInfo("Auth", "Could not fetch host key");
-            //        Failed();
-
-            //        return;
-            //    }
-
-            //    bool warn = true;
-            //    if (RequiredFingerprint != null)
-            //    {
-            //        string host_fingerprint = DeriveFingerprint(host_key);
-
-            //        if (host_fingerprint == null || !RequiredFingerprint.Equals(host_fingerprint))
-            //        {
-            //            Logger.LogInfo("Auth", "Fingerprint doesn't match");
-
-            //            this.errors.Add("error: Host fingerprint doesn't match");
-            //            Failed();
-
-            //            return;
-            //        }
-
-            //        warn = false;
-            //        Logger.LogInfo("Auth", "Fingerprint matches");
-
-            //    }
-            //    else
-            //    {
-            //        Logger.LogInfo("Auth", "Skipping fingerprint check");
-            //    }
-
-            //    AcceptHostKey(host_key, warn);
-            //}
 
             this.thread = new Thread(() =>
             {
@@ -184,7 +140,7 @@ namespace CmisSync.Lib
                     IsActive = false;
 
                     bool repo_is_encrypted = (RemoteUrl.AbsolutePath.Contains("-crypto") ||
-                                              RemoteUrl.Host.Equals("CmisSync.net"));
+                                              RemoteUrl.Host.Equals("CmisSync.com"));
 
                     Finished(repo_is_encrypted, IsFetchedRepoEmpty, Warnings);
 
