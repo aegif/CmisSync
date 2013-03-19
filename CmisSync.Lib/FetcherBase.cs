@@ -213,9 +213,6 @@ namespace CmisSync.Lib
             }
             else
             {
-                Identifier = CreateIdentifier();
-                File.WriteAllText(identifier_path, Identifier);
-
                 CreateInitialChangeSet();
             }
 
@@ -256,13 +253,6 @@ namespace CmisSync.Lib
         }
 
 
-        public static string CreateIdentifier()
-        {
-            string random = Path.GetRandomFileName();
-            return random.SHA1();
-        }
-
-
         public void Dispose()
         {
             if (this.thread != null)
@@ -273,121 +263,6 @@ namespace CmisSync.Lib
         protected void OnProgressChanged(double percentage)
         {
             ProgressChanged(percentage);
-        }
-
-
-        protected string GenerateCryptoSalt()
-        {
-            string salt = Path.GetRandomFileName().SHA1();
-            return salt.Substring(0, 16);
-        }
-
-
-        private string FetchHostKey()
-        {
-            Logger.Info("Auth | Fetching host key for " + RemoteUrl.Host);
-
-            Process process = new Process();
-            process.StartInfo.FileName = "ssh-keyscan";
-            process.StartInfo.WorkingDirectory = ConfigManager.CurrentConfig.TmpPath;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.CreateNoWindow = true;
-            process.EnableRaisingEvents = true;
-
-            string[] key_types = { "rsa", "dsa", "ecdsa" };
-
-            foreach (string key_type in key_types)
-            {
-                if (RemoteUrl.Port < 1)
-                    process.StartInfo.Arguments = "-t " + key_type + " -p 22 " + RemoteUrl.Host;
-                else
-                    process.StartInfo.Arguments = "-t " + key_type + " -p " + RemoteUrl.Port + " " + RemoteUrl.Host;
-
-                Logger.Info("Cmd | "+ process.StartInfo.FileName + " " + process.StartInfo.Arguments);
-
-                process.Start();
-                string host_key = process.StandardOutput.ReadToEnd().Trim();
-                process.WaitForExit();
-
-                if (process.ExitCode == 0 && !string.IsNullOrWhiteSpace(host_key))
-                    return host_key;
-            }
-
-            return null;
-        }
-
-
-        private string DeriveFingerprint(string public_key)
-        {
-            try
-            {
-                MD5 md5 = new MD5CryptoServiceProvider();
-                string key = public_key.Split(" ".ToCharArray())[2];
-                byte[] b64_bytes = Convert.FromBase64String(key);
-                byte[] md5_bytes = md5.ComputeHash(b64_bytes);
-                string fingerprint = BitConverter.ToString(md5_bytes);
-
-                return fingerprint.ToLower().Replace("-", ":");
-
-            }
-            catch (Exception e)
-            {
-                Logger.Info("Fetcher | Failed creating fingerprint: " + e.Message + " " + e.StackTrace);
-                return null;
-            }
-        }
-
-
-        private void AcceptHostKey(string host_key, bool warn)
-        {
-            string ssh_config_path = Path.Combine(ConfigManager.CurrentConfig.HomePath, ".ssh");
-            string known_hosts_file_path = Path.Combine(ssh_config_path, "known_hosts");
-
-            if (!File.Exists(known_hosts_file_path))
-            {
-                if (!Directory.Exists(ssh_config_path))
-                    Directory.CreateDirectory(ssh_config_path);
-
-                File.Create(known_hosts_file_path).Close();
-            }
-
-            string host = RemoteUrl.Host;
-            string known_hosts = File.ReadAllText(known_hosts_file_path);
-            string[] known_hosts_lines = File.ReadAllLines(known_hosts_file_path);
-
-            foreach (string line in known_hosts_lines)
-            {
-                if (line.StartsWith(host + " "))
-                    return;
-            }
-
-            if (known_hosts.EndsWith("\n"))
-                File.AppendAllText(known_hosts_file_path, host_key + "\n");
-            else
-                File.AppendAllText(known_hosts_file_path, "\n" + host_key + "\n");
-
-            Logger.Info("Auth | Accepted host key for " + host);
-
-            if (warn)
-                this.warnings.Add("The following host key has been accepted:\n" + DeriveFingerprint(host_key));
-        }
-
-
-        public static string GetBackend(string address)
-        {
-            if (address.StartsWith("ssh+"))
-            {
-                string backend = address.Substring(0, address.IndexOf("://"));
-                backend = backend.Substring(4);
-
-                return char.ToUpper(backend[0]) + backend.Substring(1);
-
-            }
-            else
-            {
-                return "Cmis";
-            }
         }
     }
 }

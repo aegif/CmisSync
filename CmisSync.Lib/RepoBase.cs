@@ -68,41 +68,6 @@ namespace CmisSync.Lib
         public double ProgressPercentage { get; private set; }
         public string ProgressSpeed { get; private set; }
 
-        public string Identifier
-        {
-            get
-            {
-                if (this.identifier != null)
-                    return this.identifier;
-
-                string id_path = Path.Combine(LocalPath, ".CmisSync");
-
-                if (File.Exists(id_path))
-                    this.identifier = File.ReadAllText(id_path).Trim();
-
-                if (!string.IsNullOrEmpty(this.identifier))
-                {
-                    return this.identifier;
-
-                }
-                else
-                {
-                    string config_identifier = this.local_repoInfo.Identifier;
-
-                    if (!string.IsNullOrEmpty(config_identifier))
-                        this.identifier = config_identifier;
-                    else
-                        this.identifier = FetcherBase.CreateIdentifier();
-
-                    // File.WriteAllText (id_path, this.identifier);
-                    // File.SetAttributes (id_path, FileAttributes.Hidden);
-
-                    Logger.Info("Local | " + Name + " | Assigned identifier: " + this.identifier);
-
-                    return this.identifier;
-                }
-            }
-        }
 
         public virtual string[] UnsyncedFilePaths
         {
@@ -157,7 +122,6 @@ namespace CmisSync.Lib
             RemoteUrl = repoInfo.Address;
             IsBuffering = false;
             ServerOnline = true;
-            this.identifier = Identifier;
 
             Logger.Info(String.Format("Repo [{0}] - Set poll interval to {1} ms", repoInfo.Name, repoInfo.PollInterval));
             this.remote_timer.Interval = repoInfo.PollInterval;

@@ -70,7 +70,6 @@
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Extensions.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Defines.cs" />
