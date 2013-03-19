@@ -62,9 +62,6 @@
     <Compile Include="RepoBase.cs" />
     <Compile Include="RepoInfo.cs" />
     <Compile Include="Wrappers.cs" />
-    <Compile Include="ListenerBase.cs" />
-    <Compile Include="ListenerFactory.cs" />
-    <Compile Include="ListenerTcp.cs" />
     <Compile Include="Backend.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Watcher.cs">

@@ -91,7 +91,6 @@ namespace CmisSync.Lib
 
 
         private string identifier;
-        private ListenerBase listener;
         private Watcher watcher;
         private TimeSpan poll_interval = PollInterval.Short;
         private DateTime last_poll = DateTime.Now;
