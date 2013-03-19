@@ -101,13 +101,13 @@ namespace CmisSync
 
                         if (syncitem.Tag == "pause")
                         {
-                            syncitem.Text = CmisSync.Properties.Resources.ResourceManager.GetString("ResumeSync", CultureInfo.CurrentCulture); ;
+                            syncitem.Text = CmisSync.Properties.Resources.ResourceManager.GetString("ResumeSync", CultureInfo.CurrentCulture);
                             syncitem.Tag = "resume";
                             syncitem.Image = UIHelpers.GetBitmap("media_playback_start");
                         }
                         else
                         {
-                            syncitem.Text = CmisSync.Properties.Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture); ;
+                            syncitem.Text = CmisSync.Properties.Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture);
                             syncitem.Tag = "pause";
                             syncitem.Image = UIHelpers.GetBitmap("media_playback_pause");
                         }
@@ -156,21 +156,21 @@ namespace CmisSync
 
                     ToolStripMenuItem open_localfolder_item = new ToolStripMenuItem()
                     {
-                        Text = "Open local folder",
+                        Text = CmisSync.Properties.Resources.ResourceManager.GetString("OpenLocalFolder", CultureInfo.CurrentCulture),
                         Image = UIHelpers.GetBitmap("folder")
                     };
                     open_localfolder_item.Click += OpenFolderDelegate(folder_name);
 
                     ToolStripMenuItem open_remotefolder_item = new ToolStripMenuItem()
                     {
-                        Text = "Open remote folder",
+                        Text = CmisSync.Properties.Resources.ResourceManager.GetString("BrowseRemoteFolder", CultureInfo.CurrentCulture),
                         Image = UIHelpers.GetBitmap("classic_folder_web")
                     };
                     open_remotefolder_item.Click += OpenRemoteFolderDelegate(folder_name);
 
                     ToolStripMenuItem suspend_folder_item = new ToolStripMenuItem()
                     {
-                        Text = "Pause sync!",
+                        Text = CmisSync.Properties.Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture),
                         Tag="pause",
                         Image = UIHelpers.GetBitmap("media_playback_pause")
                     };

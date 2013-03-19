@@ -106,6 +106,15 @@ namespace CmisSync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse remote folder.
+        /// </summary>
+        internal static string BrowseRemoteFolder {
+            get {
+                return ResourceManager.GetString("BrowseRemoteFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string Cancel {
@@ -293,6 +302,15 @@ namespace CmisSync.Properties {
         internal static string OpenFolder {
             get {
                 return ResourceManager.GetString("OpenFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open local folder.
+        /// </summary>
+        internal static string OpenLocalFolder {
+            get {
+                return ResourceManager.GetString("OpenLocalFolder", resourceCulture);
             }
         }
         
