@@ -35,13 +35,10 @@ namespace CmisSync
         Add1,
         Add2,
         Customize,
-        Invite,
         Syncing,
         Error,
         Finished,
-        Tutorial,
-        CryptoSetup,
-        CryptoPassword
+        Tutorial
     }
 
     public enum FieldState
@@ -66,12 +63,6 @@ namespace CmisSync
 
         public event UpdateSetupContinueButtonEventHandler UpdateSetupContinueButtonEvent = delegate { };
         public delegate void UpdateSetupContinueButtonEventHandler(bool button_enabled);
-
-        public event UpdateCryptoSetupContinueButtonEventHandler UpdateCryptoSetupContinueButtonEvent = delegate { };
-        public delegate void UpdateCryptoSetupContinueButtonEventHandler(bool button_enabled);
-
-        public event UpdateCryptoPasswordContinueButtonEventHandler UpdateCryptoPasswordContinueButtonEvent = delegate { };
-        public delegate void UpdateCryptoPasswordContinueButtonEventHandler(bool button_enabled);
 
         public event UpdateAddProjectButtonEventHandler UpdateAddProjectButtonEvent = delegate { };
         public delegate void UpdateAddProjectButtonEventHandler(bool button_enabled);
@@ -150,9 +141,7 @@ namespace CmisSync
             Program.Controller.ShowSetupWindowEvent += delegate(PageType page_type)
             {
                 if (this.current_page == PageType.Syncing ||
-                    this.current_page == PageType.Finished ||
-                    this.current_page == PageType.CryptoSetup ||
-                    this.current_page == PageType.CryptoPassword)
+                    this.current_page == PageType.Finished)
                 {
                     ShowWindowEvent();
                     return;
@@ -368,7 +357,7 @@ namespace CmisSync
             }
             catch (Exception ex)
             {
-                Logger.Fatal("Fetcher | " + ex.ToString());
+                Logger.Fatal(ex.ToString());
                 System.Windows.Forms.MessageBox.Show("An error occur during first sync, see debug log for details!");
             }
 

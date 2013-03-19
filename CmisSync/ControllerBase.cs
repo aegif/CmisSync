@@ -465,18 +465,7 @@ namespace CmisSync
 
             this.fetcher.Finished += delegate(bool repo_is_encrypted, bool repo_is_empty, string[] warnings)
             {
-                if (repo_is_encrypted && repo_is_empty)
-                {
-                    ShowSetupWindowEvent(PageType.CryptoSetup);
-                }
-                else if (repo_is_encrypted)
-                {
-                    ShowSetupWindowEvent(PageType.CryptoPassword);
-                }
-                else
-                {
-                    FinishFetcher();
-                }
+                FinishFetcher();
             };
 
             this.fetcher.Failed += delegate

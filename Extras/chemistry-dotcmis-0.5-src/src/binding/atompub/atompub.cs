@@ -413,7 +413,7 @@ namespace DotCMIS.Binding.AtomPub
             }
             catch (Exception e)
             {
-                throw new CmisConnectionException("Parsing exception!", e);
+                throw new CmisConnectionException("Parsing exception!", e); // CmisSync testers: don't worry about this exception, it is part of the fuzzy repo search.
             }
 
             AtomBase parseResult = parser.GetParseResults();

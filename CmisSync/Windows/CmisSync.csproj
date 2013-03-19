@@ -84,14 +84,8 @@
     <Compile Include="..\ControllerBase.cs">
       <Link>ControllerBase.cs</Link>
     </Compile>
-    <Compile Include="..\EventLogController.cs">
-      <Link>EventLogController.cs</Link>
-    </Compile>
     <Compile Include="..\Extensions.cs">
       <Link>Extensions.cs</Link>
-    </Compile>
-    <Compile Include="..\Plugin.cs">
-      <Link>Plugin.cs</Link>
     </Compile>
     <Compile Include="..\SetupController.cs">
       <Link>SetupController.cs</Link>
@@ -177,18 +171,6 @@
     <EmbeddedResource Include="..\Common\Pixmaps\tutorial-slide-4.png">
       <Link>Pixmaps\tutorial-slide-4.png</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Common\HTML\day-entry.html">
-      <Link>HTML\day-entry.html</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Common\HTML\event-entry.html">
-      <Link>HTML\event-entry.html</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Common\HTML\event-log.html">
-      <Link>HTML\event-log.html</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Common\HTML\jquery.js">
-      <Link>HTML\jquery.js</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="..\Common\Pixmaps\avatar-a.png">
       <Link>Pixmaps\avatar-a.png</Link>
     </EmbeddedResource>
@@ -256,42 +238,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Common\Plugins\own-server.png">
-      <Link>Plugins\own-server.png</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\alfresco.png">
-      <Link>Plugins\alfresco.png</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\filenet.png">
-      <Link>Plugins\filenet.png</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\nemakiware.png">
-      <Link>Plugins\nemakiware.png</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Common\Plugins\own-server.xml">
-      <Link>Plugins\own-server.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\alfresco.xml">
-      <Link>Plugins\alfresco.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\filenet.xml">
-      <Link>Plugins\filenet.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Common\Plugins\nemakiware.xml">
-      <Link>Plugins\nemakiware.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-error.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-i.png" />
@@ -322,6 +268,9 @@
     <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
     <Content Include="Pixmaps\sparkleshare-folder.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Plugins\" />
   </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent>Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)SQLite.Interop.dll"</PreBuildEvent>
