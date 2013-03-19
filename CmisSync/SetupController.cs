@@ -158,25 +158,11 @@ namespace CmisSync
 
             Program.Controller.ShowSetupWindowEvent += delegate(PageType page_type)
             {
-                if (page_type == PageType.CryptoSetup || page_type == PageType.CryptoPassword)
-                {
-                    ChangePageEvent(page_type, null);
-                    return;
-                }
-
-                if (PendingInvite != null)
-                {
-                    WindowIsOpen = true;
-                    ShowWindowEvent();
-                    return;
-                }
-
                 if (this.current_page == PageType.Syncing ||
                     this.current_page == PageType.Finished ||
                     this.current_page == PageType.CryptoSetup ||
                     this.current_page == PageType.CryptoPassword)
                 {
-
                     ShowWindowEvent();
                     return;
                 }
@@ -196,7 +182,7 @@ namespace CmisSync
                         ShowWindowEvent();
 
                     }
-                    else if (!Program.Controller.FirstRun && TutorialPageNumber == 0)
+                    else if (TutorialPageNumber == 0)
                     {
                         WindowIsOpen = true;
                         ChangePageEvent(PageType.Add1, null);
@@ -269,6 +255,7 @@ namespace CmisSync
             if (TutorialPageNumber == 5)
             {
                 TutorialPageNumber = 0;
+                this.current_page = PageType.None;
 
                 WindowIsOpen = false;
                 HideWindowEvent();
@@ -436,31 +423,6 @@ namespace CmisSync
         // The following private methods are
         // delegates used by the previous method
 
-        private void InvitePageFetchedDelegate(string remote_url, string[] warnings)
-        {
-            SyncingReponame = "";
-            PendingInvite = null;
-
-            ChangePageEvent(PageType.Finished, warnings);
-
-            Program.Controller.FolderFetched -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching -= SyncingPageFetchingDelegate;
-        }
-
-        private void InvitePageFetchErrorDelegate(string remote_url, string[] errors)
-        {
-            SyncingReponame = "";
-            PreviousUrl = remote_url;
-
-            ChangePageEvent(PageType.Error, errors);
-
-            Program.Controller.FolderFetched -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching -= SyncingPageFetchingDelegate;
-        }
-
-
         public void SyncingCancelled()
         {
             Program.Controller.StopFetcher();
@@ -478,46 +440,6 @@ namespace CmisSync
                 ChangePageEvent(PageType.Invite, null);
             else
                 ChangePageEvent(PageType.Add1, null);
-        }
-
-
-        public void CheckCryptoSetupPage(string password)
-        {
-            bool valid_password = (password.Length > 0 && !password.Contains(" "));
-            UpdateCryptoSetupContinueButtonEvent(valid_password);
-        }
-
-
-        public void CheckCryptoPasswordPage(string password)
-        {
-            bool password_correct = Program.Controller.CheckPassword(password);
-            UpdateCryptoPasswordContinueButtonEvent(password_correct);
-        }
-
-
-        public void CryptoPageCancelled()
-        {
-            SyncingCancelled();
-        }
-
-
-        public void CryptoSetupPageCompleted(string password)
-        {
-            CryptoPasswordPageCompleted(password);
-        }
-
-
-        public void CryptoPasswordPageCompleted(string password)
-        {
-            ProgressBarPercentage = 100.0;
-            ChangePageEvent(PageType.Syncing, null);
-
-            new Thread(() =>
-            {
-                Thread.Sleep(1000);
-                Program.Controller.FinishFetcher(password);
-
-            }).Start();
         }
 
 
