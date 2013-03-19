@@ -19,7 +19,7 @@ using System;
 using System.Reflection;
 
 [assembly:AssemblyTitle ("CmisSync.Lib")]
-[assembly:AssemblyVersion ("0.4.8")]
+[assembly:AssemblyVersion ("0.4.9")]
 [assembly:AssemblyCopyright ("Copyright (c) 2010 Aegif and others")]
 [assembly:AssemblyTrademark ("CmisSync is a trademark of CmisSync Ltd.")]
 
