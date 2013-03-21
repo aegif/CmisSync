@@ -68,42 +68,5 @@ namespace CmisSync.Lib.Cmis
             CmisRepo.DoFirstSync();
             return true; // TODO
         }
-
-
-        public override bool IsFetchedRepoEmpty
-        {
-            get
-            {
-                Logger.Info("Fetcher | Cmis Fetcher IsFetchedRepoEmpty");
-                return false; // TODO
-            }
-        }
-
-
-        public override void EnableFetchedRepoCrypto(string password)
-        {
-            Logger.Info("Fetcher | Cmis Fetcher EnableFetchedRepoCrypto");
-            // TODO
-        }
-
-
-        public override bool IsFetchedRepoPasswordCorrect(string password)
-        {
-            Logger.Info("Fetcher | Cmis Fetcher IsFetchedRepoPasswordCorrect");
-            return true; // TODO
-        }
-
-
-        public override void Stop()
-        {
-            Logger.Info("Fetcher | Cmis Fetcher Stop");
-        }
-
-
-        private void InstallConfiguration()
-        {
-            Logger.Info("Fetcher | Cmis Fetcher InstallConfiguration");
-        }
-
     }
 }

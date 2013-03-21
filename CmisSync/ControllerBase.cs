@@ -472,7 +472,7 @@ namespace CmisSync
 
         public void StopFetcher()
         {
-            this.fetcher.Stop();
+            //this.fetcher.Stop();
 
             if (Directory.Exists(this.fetcher.TargetFolder))
             {
@@ -495,7 +495,7 @@ namespace CmisSync
 
         public void FinishFetcher(string password)
         {
-            this.fetcher.EnableFetchedRepoCrypto(password);
+            //this.fetcher.EnableFetchedRepoCrypto(password);
 
             this.watcher.EnableRaisingEvents = false;
             FinishFetcher();
@@ -520,7 +520,7 @@ namespace CmisSync
 
         public bool CheckPassword(string password)
         {
-            return this.fetcher.IsFetchedRepoPasswordCorrect(password);
+            return true;// this.fetcher.IsFetchedRepoPasswordCorrect(password);
         }
 
 

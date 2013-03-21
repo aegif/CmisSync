@@ -41,10 +41,6 @@ namespace CmisSync.Lib
 
 
         public abstract bool Fetch();
-        public abstract void Stop();
-        public abstract bool IsFetchedRepoEmpty { get; }
-        public abstract bool IsFetchedRepoPasswordCorrect(string password);
-        public abstract void EnableFetchedRepoCrypto(string password);
 
         public Uri RemoteUrl { get; protected set; }
         public string RequiredFingerprint { get; protected set; }
@@ -142,8 +138,7 @@ namespace CmisSync.Lib
                     bool repo_is_encrypted = (RemoteUrl.AbsolutePath.Contains("-crypto") ||
                                               RemoteUrl.Host.Equals("CmisSync.com"));
 
-                    Finished(repo_is_encrypted, IsFetchedRepoEmpty, Warnings);
-
+                    Finished(repo_is_encrypted, false, Warnings);
                 }
                 else
                 {
