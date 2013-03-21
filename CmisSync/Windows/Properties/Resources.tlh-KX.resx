@@ -118,153 +118,156 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Añadir</value>
+    <value>chel</value>
   </data>
   <data name="AddARemoteFolder" xml:space="preserve">
-    <value>Añadir una carpeta remota...</value>
+    <value>ngaSwI' Hop chel</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Añadiendo carpetas sincronizadas a CmisSync</value>
+    <value>CmisSyncDaq ngaSwI'lIj rapmoHlu'bogh chellI'</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
-    <value>Añadiendo carpeta</value>
+    <value>ngaSwI' chellI'</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Atrás</value>
+    <value>DoH</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancelar</value>
+    <value>qIl</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync crea una carpeta especial en su ordenador donde se sincronizan los documentos.</value>
+    <value>navmey rapmoHlu'bogh De'wI'lIjDaq ngaswI' le' chenmoH CmisSync.</value>
   </data>
   <data name="Continue" xml:space="preserve">
-    <value>Continuar</value>
+    <value>taH</value>
   </data>
   <data name="Customize" xml:space="preserve">
-    <value>Personalizar el nombre de la carpeta local</value>
+    <value>ngaSwI' Sum pong choH</value>
   </data>
   <data name="DocumentsAre" xml:space="preserve">
-    <value>Los documentos se actualizan automáticamente para reflejar los cambios más recientes de sus compañeros y los cambios también se envían al servidor automáticamente.</value>
+    <value>juplI'vo' Hevbogh choHmey SuqmeH navmey chu'moH, 'ej tebwI'Daq je choHmeylIj ngeH je.</value>
   </data>
   <data name="EmptyURLNotAllowed" xml:space="preserve">
-    <value>URL vacío</value>
+    <value>URL chIm</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Introduzca un nombre para la carpeta local donde se sincronizan los documentos</value>
+    <value>De'wI' SumDaq navmey rapmoHlu'bogh ngaSwI''e' yIpong</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Escriba una dirección Web donde los documentos puedan ser vistos:</value>
+    <value>navmey leghlu'bogh weQmoQnaQ Quv'e' yIghItlh:</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Salir</value>
+    <value>chu'Ha'</value>
   </data>
   <data name="FailedToSendSomeChanges" xml:space="preserve">
-    <value>Fallo al enviar algunos cambios</value>
+    <value>choHmey ngeHlaHbe'</value>
   </data>
   <data name="FilesUpToDate" xml:space="preserve">
-    <value>Archivos actualizados</value>
+    <value>navmey chu'moH</value>
   </data>
   <data name="Finish" xml:space="preserve">
-    <value>Terminado</value>
+    <value>rInmoH</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Ya existe una carpeta en la carpeta raíz de CmisSync</value>
+    <value>CmisSync ngaSwI''a'Daq ngaSwI' tu'lu'pu'</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Ayuda</value>
+    <value>QaH</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync permite mantener sincronizado con cualquier servidor compatible con CMIS empresarial y utilizar sus documentos, incluso cuando está fuera de línea.  ¡ Es como Dropbox para los Gestores Documentales Empresariales!</value>
+    <value>rarbe'DI' CMIS lobbogh 'entepray' tebwI'Daq rapmoHtaH 'e' chaw' CmisSync.
+
+'entepray' ngaStaHghach vu'meH Dropbox rur!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>El nombre de la carpeta es válido. No se permiten caracteres especiales.</value>
+    <value>lughbe' ngaSwI' pong. pIqaD le' chaw'be'lu'.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
-    <value>URL no válida</value>
+    <value>Qapbe'bogh URL</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
-    <value>Esto puede tardar un menor o mayor tiempo dependiendo del tamaño de la carpeta.</value>
+    <value>tInchugh ngaSwI' 'ut poH nI'.</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
-    <value>Abra la carpeta sincronizada</value>
+    <value>ngaSwI' rapmoHlu'bogh poSmoH</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Contraseña</value>
+    <value>pegh mu'</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>Se ha encontrado el servidor de CMIS , pero negó el permiso. Por favor comprueba el nombre de usuario/contraseña.</value>
+    <value>CMIS De'wI''a' tu'lu', 'ach naw' chaw'be'lu'. lo'wI' pong pegh mu' je yInuD.</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>Sus documentos se estan siendo sincronizandos</value>
+    <value>DaH navmeylIj rapmoHlI'</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
-    <value>Recibiendo los cambios...</value>
+    <value>choHmey HevlI'…</value>
   </data>
   <data name="SendingChanges" xml:space="preserve">
-    <value>Enviando los cambios...</value>
+    <value>choHmey ngeHlI'</value>
   </data>
   <data name="SkipTutorial" xml:space="preserve">
-    <value>Saltar el tutorial</value>
+    <value>DevmeH mIw buSHa'</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Lo sentimos, CmisSync no puedo encontrar un servidor CMIS en esta dirección. Por favor reviselo de nuevo. Si estás seguro acerca de la dirección, ábralo en un navegador y publique el XML resultante en el foro de CmisSync.</value>
+    <value>pIQoS, QuvvamDaq CMIS De'wI''a' tu'laHbe' CmisSync. yInuDqa'.
+lughchugh Quvvam, chIjwI'Daq yIpoSmoH 'ej CmisSync vaSDaq XMLvetlh yIngeH.</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Añadir CmisSync a la barra de inicio</value>
+    <value>chu'meH tetlhDaq CmisSync chel</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>El icono de estado está aquí para ayudarle</value>
+    <value>naDev DuQaHmeH Dotlh mIllogh tu'lu'</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>El icono de estado de CmisSync muestra el progreso de la sincronización y ofrece un fácil acceso a las carpetas.</value>
+    <value>rapmoHlI'bogh mIw 'agh CmisSync Dotlh mIllogh, 'ej naw' ngeD chaw'.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
-    <value>Sincronización</value>
+    <value>rapmoHghach</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
-    <value>Sincronizando los cambios...</value>
+    <value>choHmey rapmoHlI'…</value>
   </data>
   <data name="User" xml:space="preserve">
-    <value>Usuario</value>
+    <value>lo'wI'</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>¡Bienvenido a CmisSync!</value>
+    <value>pIpIH</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>¿Qué ocurre a continuación?</value>
+    <value>ghIq qaS nuq?</value>
   </data>
   <data name="Where" xml:space="preserve">
-    <value>¿Dónde está el servidor de su organización?</value>
+    <value>nuqDaq 'oH ghomlIj De'wI''a'?</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>Dónde encontrar esta dirección</value>
+    <value>nuqDaq Quvvam tu'laH</value>
   </data>
   <data name="Which" xml:space="preserve">
-    <value>¿Qué carpeta remota desea sincronizar?</value>
+    <value>DarapmoHmeH ngaSwI' Hop yIwIv</value>
   </data>
   <data name="YouCan" xml:space="preserve">
-    <value>Usted puede agregar fácilmente una nueva carpeta CMIS en cualquier momento.</value>
+    <value>Hochlogh CMIS ngaSwI' chu' chellaH.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Usted puede encontrarlos en la carpeta CmisSync.</value>
+    <value>CmisSync ngaSwI'lIjDaq Datu'laH.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Cambiar la ruta de acceso local de este repositorio:</value>
+    <value>polmeH janvamDaq De' Quv choH:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Una carpeta local con el mismo nombre ya existe, utilice un nombre diferente.</value>
+    <value>ngaSwI' Sum pongvetlh tu'lu', pong pIm yIpong.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
-    <value>Pausar sincronización</value>
+    <value>rapmoH 'e' yImev</value>
   </data>
   <data name="ResumeSync" xml:space="preserve">
-    <value>Reanudar sincronización</value>
+    <value>rapqa'moH</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
-    <value>Buscar carpeta remota</value>
+    <value>ngaSwI' Hop legh</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
-    <value>Abrir carpeta local</value>
+    <value>ngaSwI' Sum poSmoH</value>
   </data>
 </root>
