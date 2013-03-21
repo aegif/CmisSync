@@ -55,7 +55,7 @@
     <Compile Include="Cmis\CmisServerNotFoundException.cs" />
     <Compile Include="Cmis\CmisUtils.cs" />
     <Compile Include="Cmis\MimeType.cs" />
-    <Compile Include="Cmis\CmisRepo.cs" />
+    <Compile Include="Sync\CmisRepo.cs" />
     <Compile Include="ConfigManager.cs" />
     <Compile Include="Fetcher.cs" />
     <Compile Include="RepoBase.cs" />

@@ -15,7 +15,7 @@ using DotCMIS.Data.Impl;
 
 using System.Net;
 
-namespace CmisSync.Lib.Cmis
+namespace CmisSync.Lib.Sync
 {
     public partial class CmisRepo : RepoBase
     {

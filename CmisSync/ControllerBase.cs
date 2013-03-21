@@ -231,7 +231,7 @@ namespace CmisSync
             string folder_name = Path.GetFileName(folder_path);
 
             RepoInfo repositoryInfo = ConfigManager.CurrentConfig.GetRepoInfo(folder_name);
-            repo = new CmisSync.Lib.Cmis.CmisRepo(repositoryInfo, activityListenerAggregator);
+            repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
 
             repo.ChangesDetected += delegate
             {

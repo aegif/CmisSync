@@ -44,6 +44,7 @@ namespace TestLibrary
     using NUnit.Framework;
     using CmisSync.Lib.Cmis;
     using CmisSync.Lib;
+    using CmisSync.Lib.Sync;
 
     public class CmisSyncTests
     {

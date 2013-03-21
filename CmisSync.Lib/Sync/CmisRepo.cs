@@ -36,7 +36,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Collections;
 
-namespace CmisSync.Lib.Cmis
+namespace CmisSync.Lib.Sync
 {
 
     public partial class CmisRepo : RepoBase
