@@ -22,13 +22,16 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using log4net;
+using CmisSync.Lib.Cmis;
 
 namespace CmisSync.Lib
 {
 
-    public abstract class FetcherBase
+    public class Fetcher
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof(FetcherBase));
+        CmisRepo CmisRepo;
+
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(Fetcher));
 
         public event Action Started = delegate { };
         public event Action Failed = delegate { };
@@ -38,9 +41,6 @@ namespace CmisSync.Lib
 
         public event ProgressChangedEventHandler ProgressChanged = delegate { };
         public delegate void ProgressChangedEventHandler(double percentage);
-
-
-        public abstract bool Fetch();
 
         public Uri RemoteUrl { get; protected set; }
         public string RequiredFingerprint { get; protected set; }
@@ -94,13 +94,14 @@ namespace CmisSync.Lib
         private Thread thread;
 
 
-        public FetcherBase(RepoInfo info)
+        // Sets up a fetcher that can get remote folders
+        public Fetcher(RepoInfo repoInfo, ActivityListener activityListener)
         {
-            OriginalRepoInfo = info;
-            RequiredFingerprint = info.Fingerprint;
-            FetchPriorHistory = info.FetchPriorHistory;
-            string remote_path = info.RemotePath.Trim("/".ToCharArray());
-            string address = info.Address.ToString();
+            OriginalRepoInfo = repoInfo;
+            RequiredFingerprint = repoInfo.Fingerprint;
+            FetchPriorHistory = repoInfo.FetchPriorHistory;
+            string remote_path = repoInfo.RemotePath.Trim("/".ToCharArray());
+            string address = repoInfo.Address.ToString();
 
             if (address.EndsWith("/"))
                 address = address.Substring(0, address.Length - 1);
@@ -111,10 +112,44 @@ namespace CmisSync.Lib
             if (!address.Contains("://"))
                 address = "ssh://" + address;
 
-            TargetFolder = info.TargetDirectory;
+            TargetFolder = repoInfo.TargetDirectory;
 
             RemoteUrl = new Uri(address + remote_path);
             IsActive = false;
+
+            Logger.Info("Fetcher | Cmis Fetcher constructor");
+            TargetFolder = repoInfo.TargetDirectory;
+            RemoteUrl = repoInfo.Address;
+
+            if (!Directory.Exists(ConfigManager.CurrentConfig.FoldersPath))
+            {
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} do not exist", ConfigManager.CurrentConfig.FoldersPath));
+                throw new DirectoryNotFoundException("Root folder don't exist !");
+            }
+
+            if (!Folder.HasWritePermissionOnDir(ConfigManager.CurrentConfig.FoldersPath))
+            {
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", ConfigManager.CurrentConfig.FoldersPath));
+                throw new UnauthorizedAccessException("Root folder is not writable!");
+            }
+
+            if (Directory.Exists(repoInfo.TargetDirectory))
+            {
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
+                throw new UnauthorizedAccessException("Repository folder already exists!");
+            }
+
+            Directory.CreateDirectory(repoInfo.TargetDirectory);
+
+            CmisRepo = new CmisRepo(repoInfo, activityListener);
+        }
+
+
+        public bool Fetch()
+        {
+            Logger.Info("Fetch");
+            CmisRepo.DoFirstSync();
+            return true; // TODO
         }
 
 
@@ -160,7 +195,7 @@ namespace CmisSync.Lib
                 this.thread.Abort();
         }
 
-
+        // TODO remove, not used
         protected void OnProgressChanged(double percentage)
         {
             ProgressChanged(percentage);

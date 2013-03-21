@@ -448,7 +448,7 @@ namespace CmisSync
             repoInfo.TargetDirectory = localrepopath;
             repoInfo.PollInterval = 5000;
 
-            fetcher = new CmisSync.Lib.Cmis.Fetcher(repoInfo, activityListenerAggregator);
+            fetcher = new Fetcher(repoInfo, activityListenerAggregator);
 
             this.fetcher.Finished += delegate(bool repo_is_encrypted, bool repo_is_empty, string[] warnings)
             {
