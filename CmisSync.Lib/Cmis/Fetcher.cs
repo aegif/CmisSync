@@ -115,13 +115,6 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        public override void Complete()
-        {
-            Logger.Info("Fetcher | Cmis Fetcher Complete");
-            // base.Complete();
-        }
-
-
         private void InstallConfiguration()
         {
             Logger.Info("Fetcher | Cmis Fetcher InstallConfiguration");

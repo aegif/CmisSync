@@ -505,7 +505,6 @@ namespace CmisSync
 
         public void FinishFetcher()
         {
-            this.fetcher.Complete();
             ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
             FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.Warnings.ToArray());

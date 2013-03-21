@@ -159,56 +159,6 @@ namespace CmisSync.Lib
         }
 
 
-        public virtual void Complete()
-        {
-            string identifier_path = Path.Combine(TargetFolder, ".CmisSync");
-
-            if (File.Exists(identifier_path))
-            {
-                Identifier = File.ReadAllText(identifier_path).Trim();
-            }
-            else
-            {
-                CreateInitialChangeSet();
-            }
-
-            OriginalRepoInfo.Identifier = Identifier;
-            File.SetAttributes(identifier_path, FileAttributes.Hidden);
-        }
-
-
-        // Create an initial change set when the
-        // user has fetched an empty remote folder
-        private void CreateInitialChangeSet()
-        {
-            string file_path = Path.Combine(TargetFolder, "CmisSync.txt");
-            string n = Environment.NewLine;
-
-            UriBuilder uri_builder = new UriBuilder(RemoteUrl);
-
-            if (RemoteUrl.Scheme.StartsWith("http"))
-            {
-                uri_builder.UserName = "";
-                uri_builder.Password = "";
-            }
-
-            string text = "Congratulations, you've successfully created a CmisSync repository!" + n +
-                n +
-                "Any files you add or change in this folder will be automatically synced to " + n +
-                uri_builder.ToString() + " and everyone connected to it." + n +
-                n +
-                "CmisSync is an Open Source software program that helps people collaborate and " + n +
-                "share files. If you like what we do, consider buying us a beer: http://www.CmisSync.org/" + n +
-                n +
-                "Have fun! :)" + n;
-
-            if (RemoteUrl.AbsolutePath.Contains("-crypto") || RemoteUrl.Host.Equals("CmisSync.net"))
-                text = text.Replace("a CmisSync repository", "an encrypted CmisSync repository");
-
-            File.WriteAllText(file_path, text);
-        }
-
-
         public void Dispose()
         {
             if (this.thread != null)
