@@ -30,20 +30,12 @@ namespace CmisSync.Lib.Cmis
     {
         CmisRepo CmisRepo;
 
-        //public Fetcher(string server, string required_fingerprint, string remote_path,
-        //    string target_folder, bool fetch_prior_history, string canonical_name, string repository, string path,
-        //    string user, string password, Config config, ActivityListener activityListener)
-        //    : base(server, required_fingerprint,
-        //        remote_path, target_folder, fetch_prior_history, repository, path, user, password)
         public Fetcher(RepoInfo repoInfo, ActivityListener activityListener)
             : base(repoInfo)
         {
             Logger.Info("Fetcher | Cmis Fetcher constructor");
             TargetFolder = repoInfo.TargetDirectory;
             RemoteUrl = repoInfo.Address;
-
-            // String localPath = Path.Combine(Folder.ROOT_FOLDER, repoInfo.TargetDirectory);
-            // String localPath = Path.Combine(Config.DefaultConfig.FoldersPath, repoInfo.TargetDirectory);
 
             if (!Directory.Exists(ConfigManager.CurrentConfig.FoldersPath))
             {
@@ -60,25 +52,18 @@ namespace CmisSync.Lib.Cmis
             if (Directory.Exists(repoInfo.TargetDirectory))
             {
                 Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
-                throw new UnauthorizedAccessException("Repository folder already exist!");
+                throw new UnauthorizedAccessException("Repository folder already exists!");
             }
 
             Directory.CreateDirectory(repoInfo.TargetDirectory);
 
             CmisRepo = new CmisRepo(repoInfo, activityListener);
-
-            // CmisDirectory cmis = new CmisDirectory(canonical_name, path, remote_path, server, user, password, repository, activityListener);
-            // cmis.Sync();
         }
 
 
         public override bool Fetch()
         {
-            Logger.Info("Fetcher | Cmis Fetcher Fetch");
-            //double percentage = 1.0;
-            //Regex progress_regex = new Regex(@"([0-9]+)%", RegexOptions.Compiled);
-            //DateTime last_change = DateTime.Now;
-            //TimeSpan change_interval = new TimeSpan(0, 0, 0, 1);
+            Logger.Info("Fetch");
 
             CmisRepo.DoFirstSync();
             return true; // TODO
