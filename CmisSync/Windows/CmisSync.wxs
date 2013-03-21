@@ -25,6 +25,18 @@
               <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\System.Data.SQLite.dll' DiskId='1' />
               <File Id='sparkleshare_app.ico' Name='sparkleshare.ico' Source='!(wix.root)\CmisSync\Windows\Pixmaps\sparkleshare-app.ico' DiskId='1' />
             </Component>
+            <Directory Id='localeDirectoryDE' Name='de'>
+              <Component Id='localeComponentDE' Guid='2ee0c16c-f4b8-4a8c-8d07-b3a73fc27f59'>
+                <CreateFolder />
+                <File Id='localeFileDE' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\de\CmisSync.resources.dll' DiskId='1' />
+              </Component>
+            </Directory>
+            <Directory Id='localeDirectoryES' Name='es-ES'>
+              <Component Id='localeComponentES' Guid='7f2303c0-a119-49d1-be73-17acb9637c76'>
+                <CreateFolder />
+                <File Id='localeFileES' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\es-ES\CmisSync.resources.dll' DiskId='1' />
+              </Component>
+            </Directory>
             <Directory Id='localeDirectoryFR' Name='fr'>
               <Component Id='localeComponentFR' Guid='01612d5d-6c9d-46e9-96c5-7105bbbea7db'>
                 <CreateFolder />
@@ -35,12 +47,6 @@
               <Component Id='localeComponentJA' Guid='8d77c457-54b0-41d6-9f1c-c91338b25505'>
                 <CreateFolder />
                 <File Id='localeFileJA' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\ja\CmisSync.resources.dll' DiskId='1' />
-              </Component>
-            </Directory>
-            <Directory Id='localeDirectoryES' Name='es-ES'>
-              <Component Id='localeComponentES' Guid='7f2303c0-a119-49d1-be73-17acb9637c76'>
-                <CreateFolder />
-                <File Id='localeFileES' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\es-ES\CmisSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <Directory Id='localeDirectoryUK' Name='uk'>
