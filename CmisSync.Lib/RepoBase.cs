@@ -61,12 +61,7 @@ namespace CmisSync.Lib
         public readonly string LocalPath;
         public readonly string Name;
         public readonly Uri RemoteUrl;
-        public List<ChangeSet> ChangeSets { get; protected set; }
         public SyncStatus Status { get; private set; }
-        public bool ServerOnline { get; private set; }
-        public bool IsBuffering { get; private set; }
-        public double ProgressPercentage { get; private set; }
-        public string ProgressSpeed { get; private set; }
 
 
         public virtual string[] UnsyncedFilePaths
@@ -90,21 +85,10 @@ namespace CmisSync.Lib
         protected RepoInfo local_repoInfo;
 
 
-        private string identifier;
         private Watcher watcher;
         private TimeSpan poll_interval = PollInterval.Short;
         private DateTime last_poll = DateTime.Now;
-        private DateTime progress_last_change = DateTime.Now;
-        private TimeSpan progress_change_interval = new TimeSpan(0, 0, 0, 1);
         private Timers.Timer remote_timer = new Timers.Timer();
-
-        private bool is_syncing
-        {
-            get
-            {
-                return (Status == SyncStatus.SyncUp || Status == SyncStatus.SyncDown || IsBuffering);
-            }
-        }
 
         private static class PollInterval
         {
@@ -119,8 +103,6 @@ namespace CmisSync.Lib
             LocalPath = repoInfo.TargetDirectory;
             Name = Path.GetFileName(LocalPath);
             RemoteUrl = repoInfo.Address;
-            IsBuffering = false;
-            ServerOnline = true;
 
             Logger.Info(String.Format("Repo [{0}] - Set poll interval to {1} ms", repoInfo.Name, repoInfo.PollInterval));
             this.remote_timer.Interval = repoInfo.PollInterval;
@@ -134,16 +116,12 @@ namespace CmisSync.Lib
 
             this.remote_timer.Elapsed += delegate
             {
-                if (this.is_syncing || IsBuffering)
-                    return;
-
                 int time_comparison = DateTime.Compare(this.last_poll, DateTime.Now.Subtract(this.poll_interval));
                 bool time_to_poll = (time_comparison < 0);
 
-                if (time_to_poll && !is_syncing)
+                if (time_to_poll)
                 {
                     this.last_poll = DateTime.Now;
-
                 }
 
                 // In the unlikely case that we haven't synced up our
@@ -167,43 +145,11 @@ namespace CmisSync.Lib
 
         public void OnFileActivity(FileSystemEventArgs args)
         {
-            if (IsBuffering)
-                return;
-
             ChangesDetected();
             string relative_path = args.FullPath.Replace(LocalPath, "");
 
-            IsBuffering = true;
             this.watcher.Disable();
-
-            Logger.Info("Local | " + Name + " | Activity detected, waiting for it to settle...");
-
-            List<double> size_buffer = new List<double>();
-
-            do
-            {
-                if (size_buffer.Count >= 4)
-                    size_buffer.RemoveAt(0);
-
-                DirectoryInfo info = new DirectoryInfo(LocalPath);
-                size_buffer.Add(CalculateSize(info));
-
-                if (size_buffer.Count >= 4 &&
-                    size_buffer[0].Equals(size_buffer[1]) &&
-                    size_buffer[1].Equals(size_buffer[2]) &&
-                    size_buffer[2].Equals(size_buffer[3]))
-                {
-
-                    Logger.Info("Local | " + Name + " | Activity has settled");
-                    IsBuffering = false;
-                }
-                else
-                {
-                    Thread.Sleep(500);
-                }
-
-            } while (IsBuffering);
-
+            // TODO
             this.watcher.Enable();
         }
 
@@ -211,23 +157,6 @@ namespace CmisSync.Lib
         protected internal void OnConflictResolved()
         {
             ConflictResolved();
-        }
-
-
-        protected void OnProgressChanged(double progress_percentage, string progress_speed)
-        {
-            // Only trigger the ProgressChanged event once per second
-            if (DateTime.Compare(this.progress_last_change, DateTime.Now.Subtract(this.progress_change_interval)) >= 0)
-                return;
-
-            if (progress_percentage == 100.0)
-                progress_percentage = 99.0;
-
-            ProgressPercentage = progress_percentage;
-            ProgressSpeed = progress_speed;
-            this.progress_last_change = DateTime.Now;
-
-            ProgressChanged(progress_percentage, progress_speed);
         }
 
 
