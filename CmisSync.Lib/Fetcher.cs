@@ -44,8 +44,6 @@ namespace CmisSync.Lib
         public delegate void ProgressChangedEventHandler(double percentage);
 
         public Uri RemoteUrl { get; protected set; }
-        public string RequiredFingerprint { get; protected set; }
-        public readonly bool FetchPriorHistory = false;
         public string TargetFolder { get; protected set; }
         public bool IsActive { get; private set; }
         public string Identifier;
@@ -99,8 +97,6 @@ namespace CmisSync.Lib
         public Fetcher(RepoInfo repoInfo, ActivityListener activityListener)
         {
             OriginalRepoInfo = repoInfo;
-            RequiredFingerprint = repoInfo.Fingerprint;
-            FetchPriorHistory = repoInfo.FetchPriorHistory;
             string remote_path = repoInfo.RemotePath.Trim("/".ToCharArray());
             string address = repoInfo.Address.ToString();
 

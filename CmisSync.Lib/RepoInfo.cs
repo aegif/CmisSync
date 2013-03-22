@@ -23,7 +23,8 @@ namespace CmisSync.Lib
         private string remotepath;
         public string RemotePath { get { return remotepath; } set { remotepath = value; } }
 
-        // 
+        // Address of the server's CMIS endpoint.
+        // For instance: http://192.168.0.1:8080/alfresco/cmisatom
         private Uri address;
         public Uri Address { get { return address; } set { address = value; } }
 
@@ -41,21 +42,9 @@ namespace CmisSync.Lib
         private string repoid;
         public string RepoID { get { return repoid; } set { repoid = value; } }
 
-        // For other backend ?
-        private string fingerprint;
-        public string Fingerprint { get { return fingerprint; } set { fingerprint = value; } }
-
-        private bool fetchpriorhistory;
-        public bool FetchPriorHistory { get { return fetchpriorhistory; } set { fetchpriorhistory = value; } }
-
+        // In case the user choose to put the synchronized folder outside of the CmisSync directory, this stores the path to it.
         private string targetdirectory;
         public string TargetDirectory { get { return targetdirectory; } set { targetdirectory = value; } }
-
-        private string identifier;
-        public string Identifier { get { return identifier; } set { identifier = value; } }
-
-        private string backend;
-        public string Backend { get { return "Cmis"; } }
 
         // Poll interval, in milliseconds.
         // CmisSync will sync this remote folder once during this interval of time.

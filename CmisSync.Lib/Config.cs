@@ -274,17 +274,15 @@ namespace CmisSync.Lib
 
         public void AddFolder(RepoInfo repoInfo)
         {
-            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Identifier, repoInfo.Address.ToString(), repoInfo.Backend, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
+            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address.ToString(), repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
         }
 
-        public void AddFolder(string name, string path, string identifier, string url, string backend,
-            string repository, string remoteFolder, string user, string password, double pollinterval)
+        public void AddFolder(string name, string path, string url, string repository,
+            string remoteFolder, string user, string password, double pollinterval)
         {
             XmlNode node_name = configXml.CreateElement("name");
             XmlNode node_path = configXml.CreateElement("path");
-            XmlNode node_identifier = configXml.CreateElement("identifier");
             XmlNode node_url = configXml.CreateElement("url");
-            XmlNode node_backend = configXml.CreateElement("backend");
             XmlNode node_repository = configXml.CreateElement("repository");
             XmlNode node_remoteFolder = configXml.CreateElement("remoteFolder");
             XmlNode node_user = configXml.CreateElement("user");
@@ -293,9 +291,7 @@ namespace CmisSync.Lib
 
             node_name.InnerText = name;
             node_path.InnerText = path;
-            node_identifier.InnerText = identifier;
             node_url.InnerText = url;
-            node_backend.InnerText = backend;
             node_repository.InnerText = repository;
             node_remoteFolder.InnerText = remoteFolder;
             node_user.InnerText = user;
@@ -306,9 +302,7 @@ namespace CmisSync.Lib
 
             node_folder.AppendChild(node_name);
             node_folder.AppendChild(node_path);
-            node_folder.AppendChild(node_identifier);
             node_folder.AppendChild(node_url);
-            node_folder.AppendChild(node_backend);
             node_folder.AppendChild(node_repository);
             node_folder.AppendChild(node_remoteFolder);
             node_folder.AppendChild(node_user);

@@ -439,9 +439,7 @@ namespace CmisSync
 
             repoInfo = new RepoInfo(local_path, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = new Uri(address);
-            repoInfo.Fingerprint = required_fingerprint;
             repoInfo.RemotePath = remote_path;
-            repoInfo.FetchPriorHistory = fetch_prior_history;
             repoInfo.RepoID = repository;
             repoInfo.User = user;
             repoInfo.Password = Crypto.Protect(password);
