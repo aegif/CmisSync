@@ -130,7 +130,7 @@
     <value>フォルダの追加</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>DoH</value>
+    <value>戻る</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>キャンセル</value>
@@ -148,7 +148,7 @@
     <value>ドキュメントは自動的に同僚の変更を反映し、更新されます。もちろんあなたの変更も自動的にサーバと同期されます。</value>
   </data>
   <data name="EmptyURLNotAllowed" xml:space="preserve">
-    <value>URL chIm</value>
+    <value>空の URL</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
     <value>ドキュメントが同期されるローカルフォルダの名前を入力する</value>
@@ -178,7 +178,7 @@
     <value>CmisSyncを使うと、CMIS 準拠のエンタープライズ サーバとの同期が保たれます。オフライン時もドキュメントを扱えます。</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>フォルダ名が無効です。特殊文字は許可されていません。</value>
+    <value>フォルダー名が無効です。特殊文字は使用できません。</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
     <value>無効なURLです</value>
@@ -193,10 +193,10 @@
     <value>パスワード</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>CMISサーバが見つかりましがた、権限がありません。ユーザ名/パスワードをチェックして下さい。</value>
+    <value>CMISサーバが見つかりましたが、権限がありません。ユーザ名/パスワードをチェックして下さい。</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>文書が準備出来ました！</value>
+    <value>現在同期中です。</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
     <value>変更を受信中...</value>
@@ -248,5 +248,23 @@
   </data>
   <data name="YouCanFind" xml:space="preserve">
     <value>CmisSyncフォルダで文書を扱えるようになりました。</value>
+  </data>
+  <data name="ChangeRepoPath" xml:space="preserve">
+    <value>このリポジトリのローカル パスを変更:</value>
+  </data>
+  <data name="LocalDirectoryExist" xml:space="preserve">
+    <value>同名のローカルフォルダが既に存在します。違う名前を使用して下さい。</value>
+  </data>
+  <data name="PauseSync" xml:space="preserve">
+    <value>同期の一時停止</value>
+  </data>
+  <data name="ResumeSync" xml:space="preserve">
+    <value>同期を再開</value>
+  </data>
+  <data name="BrowseRemoteFolder" xml:space="preserve">
+    <value>リモートフォルダをブラウズ</value>
+  </data>
+  <data name="OpenLocalFolder" xml:space="preserve">
+    <value>ローカルフォルダのオープン</value>
   </data>
 </root>
