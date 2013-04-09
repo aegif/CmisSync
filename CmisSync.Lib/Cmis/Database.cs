@@ -57,7 +57,7 @@ namespace CmisSync.Lib.Cmis
                 Logger.Info(String.Format("CmisDatabase | Checking whether database {0} exists", databaseFileName));
                 bool createDatabase = !File.Exists(databaseFileName);
 
-                sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName);
+                sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL;");
                 sqliteConnection.Open();
 
                 // Hidden database file - No more necessary because file is moved on a system folder

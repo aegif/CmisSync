@@ -27,7 +27,7 @@ using CmisSync.Lib.Sync;
 namespace CmisSync
 {
 
-    // This is CmisSync!
+    // The CmisSync main class.
     public class Program
     {
 
@@ -37,6 +37,9 @@ namespace CmisSync
         private static Mutex program_mutex = new Mutex(false, "CmisSync");
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
+
+
+
 
 #if !__MonoCS__
         [STAThread]
