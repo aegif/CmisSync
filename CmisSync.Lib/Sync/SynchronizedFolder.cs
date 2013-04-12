@@ -341,31 +341,8 @@ namespace CmisSync.Lib.Sync
                     {
                         File.Move(tmpfilepath, filepath);
 
-                        // Get mandatory metadata.
-                        Dictionary<string, string[]> metadata = new Dictionary<string, string[]>();
-                        metadata.Add("Id", new string[]{"readonly", remoteDocument.Id});
-                        metadata.Add("VersionSeriesId", new string[]{"readonly", remoteDocument.VersionSeriesId});
-                        metadata.Add("VersionLabel", new string[]{"readonly", remoteDocument.VersionLabel});
-                        metadata.Add("CreationDate", new string[]{"readonly", remoteDocument.CreationDate.ToString()});
-                        metadata.Add("CreatedBy", new string[]{"readonly", remoteDocument.CreatedBy});
-                        metadata.Add("lastModifiedBy", new string[]{"readonly", remoteDocument.LastModifiedBy});
-                        metadata.Add("CheckinComment", new string[]{"readonly", remoteDocument.CheckinComment});
-                        metadata.Add("IsImmutable", new string[]{"readonly", (bool)(remoteDocument.IsImmutable) ? "true" : "false"});
-                        metadata.Add("ContentStreamMimeType", new string[]{"readonly", remoteDocument.ContentStreamMimeType});
-                        
-                        // Get custom metadata.
-                        foreach(IProperty property in remoteDocument.Properties)
-                        {
-                            if (property.IsMultiValued)
-                            {
-                                metadata.Add(property.Id, new string[]{"editable", property.ValuesAsString});
-                            }
-                            else
-                            {
-                                metadata.Add(property.Id, new string[]{"readonly", property.ValueAsString});
-                            }
-                        }
-                        // TODO
+                        // Get metadata.
+                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                         // Create database entry for this file.
                         database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
@@ -497,23 +474,11 @@ namespace CmisSync.Lib.Sync
                         DotCMIS.Client.IObjectId objID = remoteDocument.UpdateProperties(properties, true);
                         remoteDocument = (IDocument)session.GetObject(objID);
 
+                        // Get metadata.
+                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+
                         // Create database entry for this file.
                         database.AddFile(filePath, remoteDocument.LastModificationDate, null);
-
-                        // Get metadata.
-                        Dictionary<string, string> metadata = new Dictionary<string, string>();
-                        metadata.Add("Id", remoteDocument.Id);
-                        metadata.Add("VersionSeriesId", remoteDocument.VersionSeriesId);
-                        metadata.Add("VersionLabel", remoteDocument.VersionLabel);
-                        metadata.Add("CreationDate", remoteDocument.CreationDate.ToString());
-                        metadata.Add("CreatedBy", remoteDocument.CreatedBy);
-                        metadata.Add("lastModifiedBy", remoteDocument.LastModifiedBy);
-                        metadata.Add("CheckinComment", remoteDocument.CheckinComment);
-                        metadata.Add("IsImmutable", (bool)(remoteDocument.IsImmutable) ? "true" : "false");
-                        metadata.Add("ContentStreamMimeType", remoteDocument.ContentStreamMimeType);
-
-                        // Create database entry for this file.
-                        database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
 
                         // No close method, No dispose method
                         remoteDocument = null;
@@ -662,6 +627,37 @@ namespace CmisSync.Lib.Sync
 
                 // Delete folder from database.
                 database.RemoveFolder(folderPath);
+            }
+
+            public static Dictionary<string, string[]> FetchMetadata(IDocument document)
+            {
+                Dictionary<string, string[]> metadata = new Dictionary<string, string[]>();
+
+                // Get mandatory metadata.
+                metadata.Add("Id", new string[]{"readonly", document.Id});
+                metadata.Add("VersionSeriesId", new string[]{"readonly", document.VersionSeriesId});
+                metadata.Add("VersionLabel", new string[]{"readonly", document.VersionLabel});
+                metadata.Add("CreationDate", new string[]{"readonly", document.CreationDate.ToString()});
+                metadata.Add("CreatedBy", new string[]{"readonly", document.CreatedBy});
+                metadata.Add("lastModifiedBy", new string[]{"readonly", document.LastModifiedBy});
+                metadata.Add("CheckinComment", new string[]{"readonly", document.CheckinComment});
+                metadata.Add("IsImmutable", new string[]{"readonly", (bool)(document.IsImmutable) ? "true" : "false"});
+                metadata.Add("ContentStreamMimeType", new string[]{"readonly", document.ContentStreamMimeType});
+                
+                // Get custom metadata.
+                foreach(IProperty property in document.Properties)
+                {
+                    if (property.IsMultiValued)
+                    {
+                        metadata.Add(property.Id, new string[]{"editable", property.ValuesAsString});
+                    }
+                    else
+                    {
+                        metadata.Add(property.Id, new string[]{"readonly", property.ValueAsString});
+                    }
+                }
+                
+                return metadata;
             }
 
             /**
