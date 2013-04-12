@@ -132,23 +132,9 @@ namespace CmisSync.Lib.Cmis
         /**
          * Put all the values of a dictionary into a JSON string.
          */
-        private string Json(Dictionary<string, string> dictionary)
+        private string Json(Dictionary<string, string[]> dictionary)
         {
             return JsonConvert.SerializeObject(dictionary);
-            /*StringBuilder json = new StringBuilder();
-            json.Append("{\n");
-            foreach (var entry in dictionary)
-            {
-                json.Append("\"");
-                json.Append(entry.Key);
-                json.Append("\" : \"");
-                json.Append(entry.Value);
-                json.Append("\"\n");
-                json.Append(",");
-                json.Append("\n");
-            }
-            json.Append("}");
-            return json.ToString();*/
         }
 
 
@@ -163,7 +149,7 @@ namespace CmisSync.Lib.Cmis
          */
 
         public void AddFile(string path, DateTime? serverSideModificationDate,
-            Dictionary<string, string> metadata)
+            Dictionary<string, string[]> metadata)
         {
             Logger.Info("CmisDatabase | Start adding data in db for: " + path);
             string normalizedPath = Normalize(path);
