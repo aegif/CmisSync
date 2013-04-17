@@ -15,6 +15,7 @@ using DotCMIS.Data.Impl;
 
 using System.Net;
 using CmisSync.Lib.Cmis;
+using DotCMIS.Data;
 
 namespace CmisSync.Lib.Sync
 {
@@ -478,7 +479,7 @@ namespace CmisSync.Lib.Sync
                         Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                         // Create database entry for this file.
-                        database.AddFile(filePath, remoteDocument.LastModificationDate, null);
+                        database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
 
                         // No close method, No dispose method
                         remoteDocument = null;
@@ -629,31 +630,35 @@ namespace CmisSync.Lib.Sync
                 database.RemoveFolder(folderPath);
             }
 
-            public static Dictionary<string, string[]> FetchMetadata(IDocument document)
+            public Dictionary<string, string[]> FetchMetadata(IDocument document)
             {
                 Dictionary<string, string[]> metadata = new Dictionary<string, string[]>();
 
-                // Get mandatory metadata.
-                metadata.Add("Id", new string[]{"readonly", document.Id});
-                metadata.Add("VersionSeriesId", new string[]{"readonly", document.VersionSeriesId});
-                metadata.Add("VersionLabel", new string[]{"readonly", document.VersionLabel});
-                metadata.Add("CreationDate", new string[]{"readonly", document.CreationDate.ToString()});
-                metadata.Add("CreatedBy", new string[]{"readonly", document.CreatedBy});
-                metadata.Add("lastModifiedBy", new string[]{"readonly", document.LastModifiedBy});
-                metadata.Add("CheckinComment", new string[]{"readonly", document.CheckinComment});
-                metadata.Add("IsImmutable", new string[]{"readonly", (bool)(document.IsImmutable) ? "true" : "false"});
-                metadata.Add("ContentStreamMimeType", new string[]{"readonly", document.ContentStreamMimeType});
-                
-                // Get custom metadata.
+                IObjectType typeDef = session.GetTypeDefinition(document.ObjectType.Id/*"cmis:document" not Name FullName*/); // TODO cache
+                IList<IPropertyDefinition> propertyDefs = typeDef.PropertyDefinitions;
+
+                // Get metadata.
                 foreach(IProperty property in document.Properties)
                 {
+                    // Mode
+                    string mode = "readonly";
+                    foreach (IPropertyDefinition propertyDef in propertyDefs)
+                    {
+                        if(propertyDef.Id.Equals("cmis:name"))
+                        {
+                            Updatability updatability = propertyDef.Updatability;
+                            mode = updatability.ToString();
+                        }
+                    }
+
+                    // Value
                     if (property.IsMultiValued)
                     {
-                        metadata.Add(property.Id, new string[]{"editable", property.ValuesAsString});
+                        metadata.Add(property.Id, new string[] { property.DisplayName, mode, property.ValuesAsString });
                     }
                     else
                     {
-                        metadata.Add(property.Id, new string[]{"readonly", property.ValueAsString});
+                        metadata.Add(property.Id, new string[] { property.DisplayName, mode, property.ValueAsString });
                     }
                 }
                 
