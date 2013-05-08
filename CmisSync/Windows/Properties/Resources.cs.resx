@@ -118,158 +118,153 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Ajouter</value>
+    <value>Přidat</value>
   </data>
   <data name="AddARemoteFolder" xml:space="preserve">
-    <value>Ajouter un dossier distant…</value>
+    <value>Přidat vzdálenou složku...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Ajouter des dossiers synchronisés à CmisSync</value>
+    <value>Přidání synchronizované složky do CmisSync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
-    <value>Ajouter un dossier</value>
+    <value>Přidat složku</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Retour</value>
+    <value>Zpět</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Annuler</value>
+    <value>Storno</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync crée un dossier spécial sur votre ordinateur où les documents sont synchronisés.</value>
+    <value>CmisSync vytváří speciální složku ve Vašem počítači, kde jsou dokumenty synchronizovány.</value>
   </data>
   <data name="Continue" xml:space="preserve">
-    <value>Continuer</value>
+    <value>Pokračovat</value>
   </data>
   <data name="Customize" xml:space="preserve">
-    <value>Personnaliser le nom du dossier local</value>
+    <value>Upravit název místní složky</value>
   </data>
   <data name="DocumentsAre" xml:space="preserve">
-    <value>Les documents sont automatiquement mis à jour pour refléter les derniers changements de vos collègues, et vos modifications sont aussi envoyées automatiquement au serveur.</value>
+    <value>Dokumenty jsou automaticky aktualizovány nejnovějšími změnami od vašich kolegů a Vámi provedené změny jsou odesílány na server také automaticky.</value>
   </data>
   <data name="EmptyURLNotAllowed" xml:space="preserve">
-    <value>URL vide</value>
+    <value>Prázdné URL</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Entrez un nom pour le dossier local où les documents seront synchronisés</value>
+    <value>Zadejte název místní složky, kde budou synchronizovány dokumenty</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Entrez une adresse Web où vos documents sont visibles:</value>
+    <value>Zadejte webovou adresu, kde lze dokumenty vidět:</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Quitter</value>
+    <value>Konec</value>
   </data>
   <data name="FailedToSendSomeChanges" xml:space="preserve">
-    <value>Impossible d'envoyer certaines modifications</value>
+    <value>Nepodařilo se odeslat některé změny</value>
   </data>
   <data name="FilesUpToDate" xml:space="preserve">
-    <value>Tous les fichiers sont à jour</value>
+    <value>Soubory jsou sesynchronizovány</value>
   </data>
   <data name="Finish" xml:space="preserve">
-    <value>Terminer</value>
+    <value>Dokončit</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Un dossier porte déjà ce nom dans le dossier racine de CmisSync</value>
+    <value>Složka již je v kořenové složce CmisSync</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Aide</value>
+    <value>Pomoc</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync permet de rester synchronisé avec n'importe quel serveur d'entreprise conforme CMIS et d'utiliser vos documents même si vous n'êtes pas connecté.
-
-C'est comme Dropbox pour les serveurs de gestion de contenu d'Entreprise (ECM) !</value>
+    <value>CmisSync umožňuje synchronizovat s jakýmkoli standardem CMIS enterprise serverem a používat vaše dokumenty, i když v režimu offline.  Je to jako Dropbox pro Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>Le nom du dossier n'est pas valide. Les caractères spéciaux ne sont pas autorisés.</value>
+    <value>Název složky je neplatný. Zvláštní znaky nejsou povoleny.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
-    <value>URL invalide</value>
+    <value>Neplatná adresa URL</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
-    <value>Cela peut prendre un certain temps en fonction de la taille du dossier.</value>
+    <value>Tato operace může trvat buď krátkou nebo dlouhou dobu v závislosti na velikosti složky.</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
-    <value>Ouvrir le dossier synchronisé</value>
+    <value>Otevřít synchronizovanou složku</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Mot de passe</value>
+    <value>Heslo</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>Le serveur CMIS a été trouvé mais l'accès a été refusé.
-Veuillez vérifier votre nom d'utilisateur et votre mot de passe.</value>
+    <value>CMIS server nalezen, ale přístup byl odepřen. Zkontrolujte uživatelské jméno a heslo.</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>Vos documents sont maintenant en cours de synchronisation</value>
+    <value>Vaše dokumenty jsou nyní synchronizovány</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
-    <value>Réception des modifications…</value>
+    <value>Přijímání úprav...</value>
   </data>
   <data name="SendingChanges" xml:space="preserve">
-    <value>Envoie des modifications…</value>
+    <value>Odesílání úprav...</value>
   </data>
   <data name="SkipTutorial" xml:space="preserve">
-    <value>Passer le tutoriel</value>
+    <value>Přeskočit kurz</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Désolé, CmisSync n'a pas trouvé de serveur CMIS à cette adresse.
-Vérifiez à nouveau l'adresse que vous avez saisie.
-Si vous êtes sûr(e) de l'adresse, ouvrez-la dans votre navigateur et ajoutez les données XML obtenues dans le forum de CmisSync.</value>
+    <value>Je nám líto CmisSync nemůže najít CMIS server na této adrese. Zkontrolujte ji prosím znovu. Pokud jste si adresou jisti, otevřete ji v prohlížeči a publikujte výsledné XML na CmisSync fóru.</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Ajouter CmisSync dans le menu démarrer</value>
+    <value>Přidat CmisSync do položek po spuštění</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>L'icône de statut est là pour vous aider</value>
+    <value>Ikona stavu je zde k nápomoci</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>L'icône d'état de CmisSync affiche la progression de la synchronisation et offre un accès simplifié à vos dossiers.</value>
+    <value>Ikona stavu CmisSync ukazuje průběh synchronizace a poskytuje snadný přístup k vašim složkám.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
-    <value>Synchronisation</value>
+    <value>Synchronizace</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
-    <value>Synchronisation des modifications...</value>
+    <value>Synchronizace změn...</value>
   </data>
   <data name="User" xml:space="preserve">
-    <value>Utilisateur</value>
+    <value>Uživatel</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Bienvenue dans CmisSync!</value>
+    <value>Vítejte v CmisSync!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>Que se passe-t-il ensuite ?</value>
+    <value>Co se stane dál?</value>
   </data>
   <data name="Where" xml:space="preserve">
-    <value>Où se trouve le serveur de votre organisation ?</value>
+    <value>Kde je server vaší organizace?</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>Où trouver cette adresse</value>
+    <value>Kde najít tuto adresu</value>
   </data>
   <data name="Which" xml:space="preserve">
-    <value>Quel dossier distant souhaitez-vous synchroniser ?</value>
+    <value>Kterou vzdálenou složku chcete synchronizovat?</value>
   </data>
   <data name="YouCan" xml:space="preserve">
-    <value>Vous pouvez ajouter facilement un nouveau dossier CMIS à tout moment.</value>
+    <value>Můžete snadno kdykoliv přidat novou CMIS složku.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Vous pouvez les trouver dans votre dossier CmisSync.</value>
+    <value>Najdete je ve své CmisSync složce.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Modifier le chemin local de ce dossier synchronisé :</value>
+    <value>Změňte místní cestu do tohoto úložiště:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Un dossier local portant le même nom existe déjà, veuillez utiliser un nom différent.</value>
+    <value>Místní složka se stejným názvem již existuje, použijte odlišný název.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
-    <value>Mettre en pause la synchronisation</value>
+    <value>Pozastavit synchronizaci</value>
   </data>
   <data name="ResumeSync" xml:space="preserve">
-    <value>Reprendre la synchronisation</value>
+    <value>Pokračovat v synchronizaci</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
-    <value>Naviguer le dossier distant</value>
+    <value>Procházet vzdálenou složku</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
-    <value>Ouvrir le dossier local</value>
+    <value>Otevřít místní složku</value>
   </data>
 </root>

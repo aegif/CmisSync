@@ -118,158 +118,155 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Ajouter</value>
+    <value>Toevoegen</value>
   </data>
   <data name="AddARemoteFolder" xml:space="preserve">
-    <value>Ajouter un dossier distant…</value>
+    <value>Externe map toevoegen</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Ajouter des dossiers synchronisés à CmisSync</value>
+    <value>Gesynchroniseerde mappen toevoegen aan CmisSync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
-    <value>Ajouter un dossier</value>
+    <value>Map wordt toevoegd</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Retour</value>
+    <value>Terug</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Annuler</value>
+    <value>Annuleren</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync crée un dossier spécial sur votre ordinateur où les documents sont synchronisés.</value>
+    <value>CmisSync maakt een speciale map op jouw computer aan waar de documenten worden gesynchroniseerd.</value>
   </data>
   <data name="Continue" xml:space="preserve">
-    <value>Continuer</value>
+    <value>Doorgaan</value>
   </data>
   <data name="Customize" xml:space="preserve">
-    <value>Personnaliser le nom du dossier local</value>
+    <value>Lokale mapnaam aanpassen</value>
   </data>
   <data name="DocumentsAre" xml:space="preserve">
-    <value>Les documents sont automatiquement mis à jour pour refléter les derniers changements de vos collègues, et vos modifications sont aussi envoyées automatiquement au serveur.</value>
+    <value>Documenten worden automatisch bijgewerkt om de laatste wijzigingen van je collega's weer te geven, en jouw veranderingen worden ook automatisch naar de server verzonden.</value>
   </data>
   <data name="EmptyURLNotAllowed" xml:space="preserve">
-    <value>URL vide</value>
+    <value>Lege URL</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Entrez un nom pour le dossier local où les documents seront synchronisés</value>
+    <value>Voer een naam in voor de lokale map waar de documenten worden gesynchroniseerd</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Entrez une adresse Web où vos documents sont visibles:</value>
+    <value>Voer een Web adres in waar de documenten zichtbaar zijn:</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Quitter</value>
+    <value>Verlaten</value>
   </data>
   <data name="FailedToSendSomeChanges" xml:space="preserve">
-    <value>Impossible d'envoyer certaines modifications</value>
+    <value>Het verzenden van bepaalde wijzigingen is mislukt</value>
   </data>
   <data name="FilesUpToDate" xml:space="preserve">
-    <value>Tous les fichiers sont à jour</value>
+    <value>Bestanden zijn bijgewerkt</value>
   </data>
   <data name="Finish" xml:space="preserve">
-    <value>Terminer</value>
+    <value>Beëindigen</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Un dossier porte déjà ce nom dans le dossier racine de CmisSync</value>
+    <value>Een map die reeds in de CmisSync hoofdmap is</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Aide</value>
+    <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync permet de rester synchronisé avec n'importe quel serveur d'entreprise conforme CMIS et d'utiliser vos documents même si vous n'êtes pas connecté.
+    <value>CmisSync laat je toe gesynchroniseerd te zijn met eender welke CMIS-compatibele bedrijfsserver, en zelfs offline jouw documenten te gebruiken.
 
-C'est comme Dropbox pour les serveurs de gestion de contenu d'Entreprise (ECM) !</value>
+Het is zoals Dropbox voor Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>Le nom du dossier n'est pas valide. Les caractères spéciaux ne sont pas autorisés.</value>
+    <value>De mapnaam is ongeldig. Speciale karakters zijn niet toegelaten.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
-    <value>URL invalide</value>
+    <value>Ongeldige URL</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
-    <value>Cela peut prendre un certain temps en fonction de la taille du dossier.</value>
+    <value>Dit kan zowel kort of lang duren afhankelijk van de mapgrootte.</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
-    <value>Ouvrir le dossier synchronisé</value>
+    <value>Gesynchroniseerde map openen</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Mot de passe</value>
+    <value>Paswoord</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>Le serveur CMIS a été trouvé mais l'accès a été refusé.
-Veuillez vérifier votre nom d'utilisateur et votre mot de passe.</value>
+    <value>CMIS server gevonden, maar toegang werd geweigerd. Gelieve uw gebruikersnaam/paswoord te controleren.</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>Vos documents sont maintenant en cours de synchronisation</value>
+    <value>Uw documenten worden nu gesynchroniseerd</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
-    <value>Réception des modifications…</value>
+    <value>Wijzigingen worden ontvangen...</value>
   </data>
   <data name="SendingChanges" xml:space="preserve">
-    <value>Envoie des modifications…</value>
+    <value>Wijzigingen doorsturen...</value>
   </data>
   <data name="SkipTutorial" xml:space="preserve">
-    <value>Passer le tutoriel</value>
+    <value>Introductie overslaan</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Désolé, CmisSync n'a pas trouvé de serveur CMIS à cette adresse.
-Vérifiez à nouveau l'adresse que vous avez saisie.
-Si vous êtes sûr(e) de l'adresse, ouvrez-la dans votre navigateur et ajoutez les données XML obtenues dans le forum de CmisSync.</value>
+    <value>Het spijt ons, CmisSync kan geen CMIS server vinden op dit adres. Gelieve de gegevens te controleren. Indien u zeker bent dat het adres correct is, open het in een browser en plaats de resulterende XML code op het CmisSync forum.</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Ajouter CmisSync dans le menu démarrer</value>
+    <value>CmisSync toevoegen aan opstartitems</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>L'icône de statut est là pour vous aider</value>
+    <value>Het status icon staat ter uw beschikking</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>L'icône d'état de CmisSync affiche la progression de la synchronisation et offre un accès simplifié à vos dossiers.</value>
+    <value>Het CmisSync status icon toont het synchronisatieproces en biedt gemakkelijk toegang tot jouw mappen.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
-    <value>Synchronisation</value>
+    <value>Synchronisatie</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
-    <value>Synchronisation des modifications...</value>
+    <value>Wijzigingen synchroniseren...</value>
   </data>
   <data name="User" xml:space="preserve">
-    <value>Utilisateur</value>
+    <value>Gebruiker</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Bienvenue dans CmisSync!</value>
+    <value>Welkom bij CmisSync!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>Que se passe-t-il ensuite ?</value>
+    <value>Wat kan u weldra verwachten?</value>
   </data>
   <data name="Where" xml:space="preserve">
-    <value>Où se trouve le serveur de votre organisation ?</value>
+    <value>Waar is de server van jouw organisatie?</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>Où trouver cette adresse</value>
+    <value>Waar je dit adres kan vinden</value>
   </data>
   <data name="Which" xml:space="preserve">
-    <value>Quel dossier distant souhaitez-vous synchroniser ?</value>
+    <value>Welke externe map wens je te synchroniseren?</value>
   </data>
   <data name="YouCan" xml:space="preserve">
-    <value>Vous pouvez ajouter facilement un nouveau dossier CMIS à tout moment.</value>
+    <value>Je kan op elk moment eenvoudig een nieuwe CMIS map toevoegen.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Vous pouvez les trouver dans votre dossier CmisSync.</value>
+    <value>Je kan ze vinden in jouw CmisSync map.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Modifier le chemin local de ce dossier synchronisé :</value>
+    <value>Verander het lokale pad van deze repository:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Un dossier local portant le même nom existe déjà, veuillez utiliser un nom différent.</value>
+    <value>Een lokale map met dezelfde naam bestaat reeds, gelieve een andere naam te gebruiken.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
-    <value>Mettre en pause la synchronisation</value>
+    <value>Synchronisatie pauzeren</value>
   </data>
   <data name="ResumeSync" xml:space="preserve">
-    <value>Reprendre la synchronisation</value>
+    <value>Synchronisatie hervatten</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
-    <value>Naviguer le dossier distant</value>
+    <value>Externe map verkennen</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
-    <value>Ouvrir le dossier local</value>
+    <value>Lokale map openen</value>
   </data>
 </root>
