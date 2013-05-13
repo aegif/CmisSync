@@ -198,6 +198,17 @@ namespace CmisSync
             this.traymenu.Items.Add(add_item);
             this.traymenu.Items.Add(new ToolStripSeparator());
 
+            // Log Menu
+            ToolStripMenuItem log_item = new ToolStripMenuItem()
+            {
+                Text = "View Log"
+            };
+            log_item.Click += delegate
+            {
+                Controller.LogClicked();
+            };
+            this.traymenu.Items.Add(log_item);
+
             // About Menu
             ToolStripMenuItem about_item = new ToolStripMenuItem()
             {

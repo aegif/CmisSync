@@ -193,7 +193,7 @@ namespace CmisSync.Lib
 
             XmlNode file = configXml.CreateElement("file");
             XmlAttribute filevalue = configXml.CreateAttribute("value");
-            filevalue.Value = Path.Combine(configpath, "debug_log.txt").ToString();
+            filevalue.Value = GetLogFilePath();
             file.Attributes.Append(filevalue);
             appender.AppendChild(file);
 
@@ -501,6 +501,12 @@ namespace CmisSync.Lib
             //    throw new FileNotFoundException(FullPath + " does not exist");
 
             configXml.Save(FullPath);
+        }
+
+
+        public string GetLogFilePath()
+        {
+            return Path.Combine(configpath, "debug_log.txt").ToString();
         }
     }
 }
