@@ -1,4 +1,4 @@
-Points of contact:
+﻿Points of contact:
 
 	Maintainer:
 	Nicolas Raoul <nicolas.raoul@aegif.jp>
@@ -31,11 +31,13 @@ Code:
 	Simon Pither <simon@pither.com>
 	Steven Harms <sharms@ubuntu.com>
 	Sven Mueller <thelightmaker@gmail.com>
+	Takuma Sugimoto <takuma.sugimoto@aegif.jp>
 	Travis Glenn Hansen <travisghansen@yahoo.com>
 	Vincent Untz <vuntz@gnome.org>
 	Will Thompson <will@willthompson.co.uk>
-	
-	
+	Yannick Molinet <yannick.molinet@dixinfor.com>
+
+
 Artwork:
 
 	Andreas Nilsson <andreasn@gnome.org>
