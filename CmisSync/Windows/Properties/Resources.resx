@@ -212,8 +212,8 @@ It is like Dropbox for Enterprise Content Management!</value>
   <data name="Sorry" xml:space="preserve">
     <value>Sorry, CmisSync can not find a CMIS server at this address.
 Please check again.
-If you are sure about the address, open it in a browser and post
-the resulting XML to the CmisSync forum.</value>
+If you are sure about the address, open it in a browser and send
+the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Add CmisSync to startup items</value>

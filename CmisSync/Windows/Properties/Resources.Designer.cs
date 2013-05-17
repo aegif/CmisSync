@@ -389,8 +389,8 @@ namespace CmisSync.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Sorry, CmisSync can not find a CMIS server at this address.
         ///Please check again.
-        ///If you are sure about the address, open it in a browser and post
-        ///the resulting XML to the CmisSync forum..
+        ///If you are sure about the address, open it in a browser and send
+        ///the resulting XML to cmissync@aegif.jp.
         /// </summary>
         internal static string Sorry {
             get {
