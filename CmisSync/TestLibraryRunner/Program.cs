@@ -34,7 +34,8 @@ namespace TestLibraryRunner
 
         static void Main(string[] args)
         {
-            testFuzzy();
+            test();
+            //testFuzzy();
 
             // Let the console open.
             Console.WriteLine("Press Enter to close...");
