@@ -25,6 +25,7 @@ using CmisSync.Lib;
 using System.Globalization;
 
 using CmisSync.Properties;
+using System.Diagnostics;
 
 namespace CmisSync {
 
@@ -244,13 +245,19 @@ namespace CmisSync {
         }
 
 
-        public void AboutClicked ()
+        public void LogClicked()
         {
-            Program.Controller.ShowAboutWindow ();
+            Process.Start("notepad.exe", ConfigManager.CurrentConfig.GetLogFilePath());
         }
-        
-		
-        public void QuitClicked ()
+
+
+        public void AboutClicked()
+        {
+            Program.Controller.ShowAboutWindow();
+        }
+
+
+        public void QuitClicked()
         {
                 Program.Controller.Quit ();
         }
