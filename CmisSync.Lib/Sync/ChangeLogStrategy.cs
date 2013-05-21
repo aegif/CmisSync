@@ -35,6 +35,7 @@ namespace CmisSync.Lib.Sync
                 string lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
 
                 // Get last change token that had been saved on client side.
+                // TODO catch exception invalidArgument which means that changelog has been truncated and this token is not found anymore.
                 string lastTokenOnClient = database.GetChangeLogToken();
 
                 if (lastTokenOnClient == null)
