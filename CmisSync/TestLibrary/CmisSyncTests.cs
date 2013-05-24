@@ -339,7 +339,7 @@ namespace TestLibrary
                     );
                     for (int i = 0; i < 10; i++)
                     {
-                        Console.WriteLine("Sync.");
+                        Console.WriteLine("Sync n" + i);
                         synchronizedFolder2.Sync();
                     }
                 }
@@ -355,7 +355,7 @@ namespace TestLibrary
             // Keep creating/removing a file as long as sync is going on.
             while (syncing)
             {
-                Console.WriteLine("Create/remove.");
+                //Console.WriteLine("Create/remove " + LocalFilesystemActivityGenerator.id);
                 LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
                 DirectoryInfo localDirectoryInfo = new DirectoryInfo(localDirectory);
                 foreach (FileInfo file in localDirectoryInfo.GetFiles())

@@ -8,7 +8,7 @@ namespace TestLibrary
 {
     class LocalFilesystemActivityGenerator
     {
-        private static int id = 1;
+        public static int id = 1;
 
         public static void CreateDirectoriesAndFiles(string path)
         {
