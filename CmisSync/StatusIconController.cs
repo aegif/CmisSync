@@ -142,7 +142,7 @@ namespace CmisSync {
                     if (Program.Controller.Folders.Count == 0)
                         StateText = Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
                     else
-                        StateText = Resources.ResourceManager.GetString("FilesUpToDate", CultureInfo.CurrentCulture) + " " + FolderSize;
+                        StateText = Resources.ResourceManager.GetString("FilesUpToDate", CultureInfo.CurrentCulture);
                 }
 
                 UpdateStatusItemEvent (StateText);
@@ -156,7 +156,7 @@ namespace CmisSync {
                     if (Program.Controller.Folders.Count == 0)
                         StateText = Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
                     else
-                        StateText = Resources.ResourceManager.GetString("FilesUpToDate", CultureInfo.CurrentCulture) + " " + FolderSize;
+                        StateText = Resources.ResourceManager.GetString("FilesUpToDate", CultureInfo.CurrentCulture);
                 }
 
                 UpdateQuitItemEvent (QuitItemEnabled);
@@ -169,33 +169,8 @@ namespace CmisSync {
             };
 
             Program.Controller.OnSyncing += delegate {
-				int repos_syncing_up   = 0;
-				int repos_syncing_down = 0;
-				
-				foreach (RepoBase repo in Program.Controller.Repositories) {
-					if (repo.Status == SyncStatus.SyncUp)
-						repos_syncing_up++;
-					
-					if (repo.Status == SyncStatus.SyncDown)
-						repos_syncing_down++;
-				}
-				
-				if (repos_syncing_up > 0 &&
-				    repos_syncing_down > 0) {
-					
-					CurrentState = IconState.Syncing;
-                    StateText = Resources.ResourceManager.GetString("SyncingChanges", CultureInfo.CurrentCulture);
-				
-				} else if (repos_syncing_down == 0) {
-					CurrentState = IconState.SyncingUp;
-                    StateText = Resources.ResourceManager.GetString("SendingChanges", CultureInfo.CurrentCulture);
-					
-				} else {
-					CurrentState = IconState.SyncingDown;
-                    StateText = Resources.ResourceManager.GetString("ReceivingChanges", CultureInfo.CurrentCulture);
-				}
-
-                StateText += " " + ProgressPercentage + "%  " + ProgressSpeed;
+				CurrentState = IconState.Syncing;
+                StateText = Resources.ResourceManager.GetString("SyncingChanges", CultureInfo.CurrentCulture);
 
                 UpdateStatusItemEvent (StateText);
                 UpdateQuitItemEvent (QuitItemEnabled);

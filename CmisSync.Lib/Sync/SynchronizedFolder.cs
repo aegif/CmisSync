@@ -391,16 +391,9 @@ namespace CmisSync.Lib.Sync
 
                     // Prepare content stream
                     Stream file = File.OpenRead(filePath);
-                    if (file.Length == 0)
-                    {
-                        Logger.Info("CmisDirectory | Skipping upload of file with null content stream: " + filePath);
-                        activityListener.ActivityStopped();
-                        return;
-                    }
-
                     ContentStream contentStream = new ContentStream();
                     contentStream.FileName = tmpfileName;
-                    contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
+                    contentStream.MimeType = MimeType.GetMIMEType(fileName);
                     contentStream.Length = file.Length;
                     contentStream.Stream = file;
                     contentStream.Stream.Flush();
@@ -408,36 +401,6 @@ namespace CmisSync.Lib.Sync
                     // Upload
                     try
                     {
-                        // This two method have same effect at this time, but first could be helpful when AppendMethod will be available (CMIS1.1)
-                        // The second update file is not working propertly
-                        // https://issues.apache.org/jira/browse/CMIS-632
-                        /**
-                        try
-                        {
-                            string remotepath = remoteFolder.Path + '/' + tmpfileName;
-                            ICmisObject obj = session.GetObjectByPath(remotepath);
-                            if (obj != null)
-                            {
-                                Logger.LogInfo("Sync", "Temp file exist on remote server, so use it");
-                                remoteDocument = (IDocument)obj;
-                            }
-                        }
-                        catch (DotCMIS.Exceptions.CmisObjectNotFoundException)
-                        {
-                            // Create an empty file on remote server and get ContentStream
-                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                            Logger.LogInfo("Sync", String.Format("File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
-                        }
-
-                        if (remoteDocument == null)
-                        {
-                            Logger.LogInfo("Sync", String.Format("Unable to create remote file {0}", fileName));
-                            return;
-                        }
-
-                        UpdateFile(filePath, remoteDocument);
-                         **/
-
                         try
                         {
                             string remotepath = remoteFolder.Path + '/' + tmpfileName;
