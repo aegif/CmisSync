@@ -153,23 +153,38 @@ namespace CmisSync.Lib
             }
 
             if (string.IsNullOrEmpty(user_name))
+            {
                 user_name = "Unknown";
+            }
 
-            configXml.AppendChild(configXml.CreateXmlDeclaration("1.0", "UTF-8", null));
-            configXml.AppendChild(configXml.CreateElement("CmisSync"));
-            XmlNode user = configXml.CreateElement("user");
-            XmlNode username = configXml.CreateElement("name");
-            username.InnerText = user_name;
-            XmlNode email = configXml.CreateElement("email");
-            email.InnerText = "Unknown";
+            configXml.LoadXml(@"<?xml version=""1.0"" encoding=""UTF-8""?>
+<CmisSync>
+  <user>
+    <name>" + user_name + @"</name>
+    <email>Unknown</email>
+  </user>
+  <log4net>
+    <appender name=""CmisSyncFileAppender"" type=""log4net.Appender.RollingFileAppender"">
+      <file value=""" + GetLogFilePath() + @""" />
+      <appendToFile value=""true"" />
+      <rollingStyle value=""Size"" />
+      <maxSizeRollBackups value=""10"" />
+      <maximumFileSize value=""5MB"" />
+      <staticLogFileName value=""true"" />
+      <layout type=""log4net.Layout.PatternLayout"">
+        <conversionPattern value=""%date [%thread] %-5level %logger [%property{NDC}] - %message%newline"" />
+      </layout>
+    </appender>
+    <root>
+      <level value=""DEBUG"" />
+      <appender-ref ref=""CmisSyncFileAppender"" />
+    </root>
+  </log4net>
+  <folders>
+  </folders>
+  <notifications>True</notifications>
+</CmisSync>");
 
-            user.AppendChild(username);
-            user.AppendChild(email);
-
-            XmlNode folders = configXml.CreateElement("folders");
-            configXml.DocumentElement.AppendChild(user);
-            CreateLog4NetDefaultConfig();
-            configXml.DocumentElement.AppendChild(folders);
             Save();
         }
 
@@ -177,87 +192,6 @@ namespace CmisSync.Lib
         {
             return (XmlElement)configXml.SelectSingleNode("/CmisSync/log4net");
         }
-
-        private void CreateLog4NetDefaultConfig()
-        {
-            XmlNode log4net = configXml.CreateElement("log4net");
-
-            XmlNode appender = configXml.CreateElement("appender");
-            XmlAttribute name = configXml.CreateAttribute("name");
-            name.Value = "CmisSyncFileAppender";
-            appender.Attributes.Append(name);
-
-            XmlAttribute type = configXml.CreateAttribute("type");
-            type.Value = "log4net.Appender.RollingFileAppender";
-            appender.Attributes.Append(type);
-
-            XmlNode file = configXml.CreateElement("file");
-            XmlAttribute filevalue = configXml.CreateAttribute("value");
-            filevalue.Value = GetLogFilePath();
-            file.Attributes.Append(filevalue);
-            appender.AppendChild(file);
-
-            XmlNode appendToFile = configXml.CreateElement("appendToFile");
-            XmlAttribute appendtofileValue = configXml.CreateAttribute("value");
-            appendtofileValue.Value = "true";
-            appendToFile.Attributes.Append(appendtofileValue);
-            appender.AppendChild(appendToFile);
-
-            XmlNode rollingStyle = configXml.CreateElement("rollingStyle");
-            XmlAttribute rollingStyleValue = configXml.CreateAttribute("value");
-            rollingStyleValue.Value = "Size";
-            rollingStyle.Attributes.Append(rollingStyleValue);
-            appender.AppendChild(rollingStyle);
-
-            XmlNode maxSizeRollBackups = configXml.CreateElement("maxSizeRollBackups");
-            XmlAttribute maxSizeRollBackupsValue = configXml.CreateAttribute("value");
-            maxSizeRollBackupsValue.Value = "10";
-            maxSizeRollBackups.Attributes.Append(maxSizeRollBackupsValue);
-            appender.AppendChild(maxSizeRollBackups);
-
-            XmlNode maximumFileSize = configXml.CreateElement("maximumFileSize");
-            XmlAttribute maximumFileSizeValue = configXml.CreateAttribute("value");
-            maximumFileSizeValue.Value = "5MB";
-            maximumFileSize.Attributes.Append(maximumFileSizeValue);
-            appender.AppendChild(maximumFileSize);
-
-            XmlNode staticLogFileName = configXml.CreateElement("staticLogFileName");
-            XmlAttribute staticLogFileNameValue = configXml.CreateAttribute("value");
-            staticLogFileNameValue.Value = "true";
-            staticLogFileName.Attributes.Append(staticLogFileNameValue);
-            appender.AppendChild(staticLogFileName);
-
-            XmlNode layout = configXml.CreateElement("layout");
-            XmlAttribute layouttype = configXml.CreateAttribute("type");
-            layouttype.Value = "log4net.Layout.PatternLayout";
-            layout.Attributes.Append(layouttype);
-
-            XmlNode conversionPattern = configXml.CreateElement("conversionPattern");
-            XmlAttribute conversionPatternValue = configXml.CreateAttribute("value");
-            conversionPatternValue.Value = "%date [%thread] %-5level %logger [%property{NDC}] - %message%newline";
-            conversionPattern.Attributes.Append(conversionPatternValue);
-            layout.AppendChild(conversionPattern);
-            appender.AppendChild(layout);
-            log4net.AppendChild(appender);
-
-            XmlNode root = configXml.CreateElement("root");
-            XmlNode level = configXml.CreateElement("level");
-            XmlAttribute levelvalue = configXml.CreateAttribute("value");
-            levelvalue.Value = "DEBUG";
-            level.Attributes.Append(levelvalue);
-            root.AppendChild(level);
-
-            XmlNode appenderref = configXml.CreateElement("appender-ref");
-            XmlAttribute appenderrefvalue = configXml.CreateAttribute("ref");
-            appenderrefvalue.Value = "CmisSyncFileAppender";
-            appenderref.Attributes.Append(appenderrefvalue);
-            root.AppendChild(appenderref);
-
-            log4net.AppendChild(root);
-
-            configXml.DocumentElement.AppendChild(log4net);
-        }
-
 
         public List<string> Folders
         {
