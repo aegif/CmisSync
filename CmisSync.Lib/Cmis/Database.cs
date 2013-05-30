@@ -54,21 +54,23 @@ namespace CmisSync.Lib.Cmis
         {
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
-                Logger.Info(String.Format("CmisDatabase | Checking whether database {0} exists", databaseFileName));
-                bool createDatabase = !File.Exists(databaseFileName);
-
-                sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL;");
-                sqliteConnection.Open();
-
-                // Hidden database file - No more necessary because file is moved on a system folder
-                // File.SetAttributes(databaseFileName, FileAttributes.Hidden);
-
-                if (createDatabase)
+                try
                 {
-                    using (var command = new SQLiteCommand(sqliteConnection))
+                    Logger.Info(String.Format("CmisDatabase | Checking whether database {0} exists", databaseFileName));
+                    bool createDatabase = !File.Exists(databaseFileName);
+
+                    sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL;");
+                    sqliteConnection.Open();
+
+                    // Hidden database file - No more necessary because file is moved on a system folder
+                    // File.SetAttributes(databaseFileName, FileAttributes.Hidden);
+
+                    if (createDatabase)
                     {
-                        command.CommandText =
-                            @"CREATE TABLE files (
+                        using (var command = new SQLiteCommand(sqliteConnection))
+                        {
+                            command.CommandText =
+                                @"CREATE TABLE files (
                                 path TEXT PRIMARY KEY,
                                 serverSideModificationDate DATE,
                                 metadata TEXT,
@@ -81,9 +83,14 @@ namespace CmisSync.Lib.Cmis
                             CREATE TABLE general (
                                 key TEXT PRIMARY KEY,
                                 value TEXT);";    /* Other data such as ChangeLog token */
-                        command.ExecuteNonQuery();
-                        Logger.Info("Database | Database created");
+                            command.ExecuteNonQuery();
+                            Logger.Info("Database | Database created");
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Error creating database: " + Utils.ToLogString(e));
                 }
             }
             return sqliteConnection;
