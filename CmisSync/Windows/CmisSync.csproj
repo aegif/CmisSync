@@ -275,6 +275,9 @@
     <Folder Include="Plugins\" />
   </ItemGroup>
   <PropertyGroup>
-    <PreBuildEvent>Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)SQLite.Interop.dll"</PreBuildEvent>
+    <PreBuildEvent>Mkdir "$(ProjectDir)$(OutDir)x86
+Mkdir "$(ProjectDir)$(OutDir)x64
+Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-static-binary-Win32-2010-1.0.86.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)x86\SQLite.Interop.dll"
+Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-static-binary-x64-2010-1.0.86.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)x64\SQLite.Interop.dll"</PreBuildEvent>
   </PropertyGroup>
 </Project>
