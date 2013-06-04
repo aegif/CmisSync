@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 m4_define([sparkleshare_version], [0.9.1])
 
 AC_PREREQ([2.54])
-AC_INIT([SparkleShare], sparkleshare_version)
+AC_INIT([CmisSync], sparkleshare_version)
 AM_INIT_AUTOMAKE([1.11 dist-bzip2 dist-zip foreign tar-pax])
 AM_MAINTAINER_MODE
 
@@ -108,7 +108,7 @@ if test "$OSNAME" = "Linux" ; then
 			AC_DEFINE(HAVE_APP_INDICATOR, 1, [Have AppIndicator])
 	fi
 
-	GUISUBDIRS=SparkleShare
+	GUISUBDIRS=CmisSync
 else
 	GUISUBDIRS=
 fi
@@ -128,28 +128,27 @@ build/Makefile
 build/m4/Makefile
 build/m4/shave/shave
 build/m4/shave/shave-libtool
-SparkleLib/Defines.cs
-SparkleLib/Makefile
-SparkleLib/Cmis/Makefile
-SparkleShare/Common/Makefile
-SparkleShare/Common/HTML/Makefile
-SparkleShare/Common/Plugins/Makefile
-SparkleShare/Common/Pixmaps/Makefile
-SparkleShare/Linux/Makefile
-SparkleShare/Linux/Pixmaps/Makefile
-SparkleShare/Linux/Pixmaps/icons/Makefile
-SparkleShare/Linux/Pixmaps/icons/ubuntu-mono-dark/Makefile
-SparkleShare/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
-SparkleShare/Linux/sparkleshare
-SparkleShare/Linux/Nautilus/Makefile
-SparkleShare/Linux/Nautilus/sparkleshare-nautilus-extension.py
-SparkleShare/Linux/Nautilus/sparkleshare-nautilus3-extension.py
-SparkleShare/Makefile
+CmisSync.Lib/Defines.cs
+CmisSync.Lib/Makefile
+CmisSync/Common/Makefile
+CmisSync/Common/HTML/Makefile
+CmisSync/Common/Plugins/Makefile
+CmisSync/Common/Pixmaps/Makefile
+CmisSync/Linux/Makefile
+CmisSync/Linux/Pixmaps/Makefile
+CmisSync/Linux/Pixmaps/icons/Makefile
+CmisSync/Linux/Pixmaps/icons/ubuntu-mono-dark/Makefile
+CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
+CmisSync/Linux/sparkleshare
+CmisSync/Linux/Nautilus/Makefile
+CmisSync/Linux/Nautilus/sparkleshare-nautilus-extension.py
+CmisSync/Linux/Nautilus/sparkleshare-nautilus3-extension.py
+CmisSync/Makefile
 Makefile
 ])
 
 echo "
-SparkleShare ${VERSION}
+CmisSync ${VERSION}
 
 Configuration:
        Prefix              : ${prefix}
