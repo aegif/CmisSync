@@ -40,7 +40,7 @@
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\Extras\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,8 +67,8 @@
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>CmisSync.Lib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Extras\chemistry-dotcmis-0.5-src\src\DotCMIS.csproj">
-      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+    <ProjectReference Include="..\..\Extras\chemistry-dotcmis-svn1490179-src\DotCMIS.csproj">
+      <Project>{529ef90f-a34c-4426-a4f9-65113ac23841}</Project>
       <Name>DotCMIS</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\SparkleLib\Cmis\chemistry-dotcmis-0.5-src\src\DotCMIS.csproj">
