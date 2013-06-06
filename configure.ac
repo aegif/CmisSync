@@ -1,13 +1,13 @@
 dnl Process this file with autoconf to produce a configure script.
-m4_define([sparkleshare_version], [0.9.1])
+m4_define([cmissync_version], [0.9.1])
 
 AC_PREREQ([2.54])
-AC_INIT([CmisSync], sparkleshare_version)
+AC_INIT([CmisSync], cmissync_version)
 AM_INIT_AUTOMAKE([1.11 dist-bzip2 dist-zip foreign tar-pax])
 AM_MAINTAINER_MODE
 
 dnl Export Version Info
-AC_SUBST([ASM_VERSION], [sparkleshare_version])
+AC_SUBST([ASM_VERSION], [cmissync_version])
 
 dnl pkg-config
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
