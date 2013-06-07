@@ -130,7 +130,6 @@ build/m4/shave/shave
 build/m4/shave/shave-libtool
 CmisSync.Lib/Defines.cs
 CmisSync.Lib/Makefile
-CmisSync.Lib/Cmis/Makefile
 CmisSync/Common/Makefile
 CmisSync/Common/HTML/Makefile
 CmisSync/Common/Plugins/Makefile
