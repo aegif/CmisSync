@@ -1,7 +1,7 @@
-basedirs = build SparkleLib SparkleLib/Cmis
+basedirs = build CmisSync.Lib CmisSync.Lib/Cmis
 
 SUBDIRS = $(basedirs) $(GUISUBDIRS)
-DIST_SUBDIRS = $(basedirs) SparkleShare
+DIST_SUBDIRS = $(basedirs) CmisSync
 
 EXTRA_DIST = \
 	NEWS \

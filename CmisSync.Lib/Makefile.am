@@ -21,6 +21,12 @@ SOURCES =  \
 	SparkleUser.cs \
 	SparkleWatcher.cs \
 	SparkleWrappers.cs
+	Cmis/CmisPermissionDeniedException.cs \
+	Cmis/CmisServerNotFoundException.cs \
+	Cmis/CmisUtils.cs \
+	Cmis/Crypto.cs \
+	Cmis/Database.cs \
+	Cmis/MimeType.cs
 
 
 install-data-hook:
