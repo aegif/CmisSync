@@ -1,8 +1,10 @@
 ## Building on Linux distributions
 
-You can choose to build SparkleShare from source or to get the package through your distribution's repositories.
+Warning: CmisSync is forked from SparkleShare, an excellent Git sync tool. Many mentions of SparkleShare still remain in the documentation and source code.
 
-To run SparkleShare, you'll need the following packages:
+You can choose to build CmisSync from source or to get the package through your distribution's repositories.
+
+To run CmisSync, you'll need the following packages:
 
 ```
 curl
@@ -63,7 +65,7 @@ $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
 
 ### Starting the build
 
-You can build and install SparkleShare like this:
+You can build and install CmisSync like this:
 
 ```bash
 $ ./configure --prefix=/usr (or ./autogen.sh if you build from the repository)
@@ -76,7 +78,7 @@ $ sudo cp SparkleLib/Cmis/lib/* /usr/lib/sparkleshare/
 **Note:** If there is no `configure` file, first run `./autogen.sh`
 
 
-### Resetting SparkleShare settings
+### Resetting CmisSync settings
 
 ```
 rm -Rf ~/SparkleShare
