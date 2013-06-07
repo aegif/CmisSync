@@ -2,8 +2,6 @@
 
 Warning: CmisSync is forked from SparkleShare, an excellent Git sync tool. Many mentions of SparkleShare still remain in the documentation and source code.
 
-You can choose to build CmisSync from source or to get the package through your distribution's repositories.
-
 To run CmisSync, you'll need the following packages:
 
 ```
