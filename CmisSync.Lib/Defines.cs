@@ -1,4 +1,4 @@
-//   CmisSync, a collaboration and sharing tool.
+//   SparkleShare, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -19,14 +19,13 @@ using System;
 using System.Reflection;
 
 [assembly:AssemblyTitle ("CmisSync.Lib")]
-[assembly:AssemblyVersion ("0.4.16")]
+[assembly:AssemblyVersion ("0.9.1")]
 [assembly:AssemblyCopyright ("Copyright (c) 2010 Aegif and others")]
-[assembly:AssemblyTrademark ("CmisSync is a trademark of CmisSync Ltd.")]
+[assembly:AssemblyTrademark ("CmisSync is a trademark of Aegif")]
 
-namespace CmisSync.Lib
-{
+namespace SparkleLib {
 
     public class Defines {
-        public const string INSTALL_DIR = "/usr/share/CmisSync";
+        public const string INSTALL_DIR = "/usr/local/share/cmissync";
     }
 }
