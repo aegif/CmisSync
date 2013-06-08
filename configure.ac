@@ -15,8 +15,6 @@ if test "x$PKG_CONFIG" = "xno"; then
         AC_MSG_ERROR([You need to install pkg-config])
 fi
 
-AC_SUBST([ACLOCAL_AMFLAGS], ["-I build/m4/sparkleshare -I build/m4/shamrock \${ACLOCAL_FLAGS}"])
-
 SHAMROCK_EXPAND_LIBDIR
 SHAMROCK_EXPAND_BINDIR
 SHAMROCK_EXPAND_DATADIR
@@ -32,6 +30,7 @@ PKG_CHECK_EXISTS([mono >= 2.8],
 SHAMROCK_CHECK_MONO_4_0_GAC_ASSEMBLIES([
     System
     System.Security
+    System.Windows.Forms
     Mono.Posix
 ])]
 )

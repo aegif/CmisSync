@@ -1824,7 +1824,7 @@
       <rect
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/process-syncing-cmissync-24.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/process-syncing-cmissync-24.png"
          y="16"
          x="331"
          width="120"
@@ -1867,7 +1867,7 @@
       <rect
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/folder-cmissync-24.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/folder-cmissync-24.png"
          height="24"
          id="rect4706"
          inkscape:label="24x24"
@@ -1878,7 +1878,7 @@
       <rect
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/hicolor/256x256/places/folder-cmissync.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/hicolor/256x256/places/folder-cmissync.png"
          height="256"
          id="rect4708"
          inkscape:label="256x256"
@@ -1942,14 +1942,14 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle0.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle0.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          style="display:inline;enable-background:new"
          id="g5147"
          transform="translate(216,-425)"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle0.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle0.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -2332,7 +2332,7 @@
          d="m 526.96673,-199.9854 c -0.1681,0.0217 -0.3164,0.15386 -0.3579,0.31842 l -0.7155,2.14935 c -0.019,0.0382 -0.032,0.0777 -0.039,0.11973 -0.038,-0.0191 -0.078,-0.0318 -0.1196,-0.0395 l -2.1866,0 c -0.1222,0 -0.2415,0.0637 -0.3181,0.15921 -0.1612,0.18061 -0.1208,0.50107 0.079,0.63685 l 1.7891,1.31355 0.038,0.19106 -0.6757,2.10948 c -0.094,0.32925 0.3466,0.66015 0.6361,0.47763 l 1.7889,-1.31343 0.229,0 1.7891,1.31343 c 0.1556,0.1019 0.3785,0.0841 0.5167,-0.0395 0.1171,-0.10827 0.1659,-0.28518 0.1196,-0.4379 l -0.6759,-2.10948 c -0.064,-0.0127 0.025,-0.12737 0.038,-0.19105 l 1.7889,-1.31356 c 0.2004,-0.13577 0.2401,-0.45623 0.079,-0.63684 -0.076,-0.0955 -0.1958,-0.15526 -0.318,-0.15921 -0.77058,-0.0202 -1.35701,-0.0594 -2.10293,-0.0268 z"
          id="path5179"
          sodipodi:nodetypes="cccsccsccccccccsccccsccc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle0.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle0.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
@@ -2770,7 +2770,7 @@
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle1.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle1.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -2782,7 +2782,7 @@
          transform="translate(236,-425)"
          id="g6045"
          style="display:inline;enable-background:new"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle1.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle1.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -2811,7 +2811,7 @@
          d="m 547.93859,-199.86621 c -0.16799,-0.0226 -0.34544,0.0667 -0.42812,0.21494 l -1.24741,1.89093 c -0.0282,0.032 -0.051,0.0668 -0.0687,0.10556 -0.0318,-0.0283 -0.0671,-0.0509 -0.1053,-0.0691 l -2.11209,-0.56594 c -0.11804,-0.0316 -0.24976,-9.7e-4 -0.34847,0.0715 -0.20245,0.13274 -0.24637,0.45273 -0.0885,0.6356 l 1.38816,1.73184 -0.0127,0.19439 -1.19865,1.86271 c -0.17601,0.29371 0.16393,0.72737 0.49081,0.62599 l 2.06788,-0.80567 0.2212,0.0593 1.3882,1.73173 c 0.12392,0.1387 0.34383,0.1792 0.50931,0.0956 0.14114,-0.0743 0.23406,-0.23253 0.22886,-0.39203 l -0.10689,-2.21253 c -0.0585,-0.0288 0.0571,-0.11656 0.0861,-0.17471 l 2.06792,-0.8058 c 0.22871,-0.0793 0.35,-0.37854 0.24113,-0.59469 -0.0487,-0.11192 -0.14894,-0.20065 -0.26595,-0.23609 l -2.15054,-0.57623 c -0.0439,0.001 -0.0835,-0.001 -0.12575,0.007 -0.002,-0.0439 0.002,-0.0839 -0.007,-0.12575 l -0.0966,-2.25104 c 1.4e-4,-0.0778 -0.0222,-0.15655 -0.064,-0.22325 -0.06,-0.10046 -0.16209,-0.17398 -0.27618,-0.19795 l 0.0135,0.004 -5.8e-4,-1.5e-4 z"
          style="fill:none;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
          inkscape:connector-curvature="0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle1.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle1.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
@@ -2822,14 +2822,14 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle2.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle2.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          style="display:inline;enable-background:new"
          id="g6057"
          transform="translate(256,-425)"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle2.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle2.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -2858,13 +2858,13 @@
          d="m 568.92521,-199.54136 c -0.15643,-0.0653 -0.35094,-0.025 -0.46916,0.0968 l -1.69431,1.50364 c -0.0355,0.0236 -0.0665,0.0513 -0.0937,0.0842 -0.0234,-0.0356 -0.0516,-0.0665 -0.0838,-0.094 l -1.89365,-1.0933 c -0.10583,-0.0611 -0.24099,-0.0656 -0.35509,-0.0212 -0.2299,0.0758 -0.35515,0.37354 -0.24999,0.59103 l 0.89263,2.03212 -0.0626,0.18447 -1.63991,1.48902 c -0.24603,0.23814 -0.0299,0.74501 0.31206,0.73169 l 2.20595,-0.24302 0.19832,0.11451 0.89269,2.03201 c 0.0838,0.16605 0.28574,0.26208 0.46722,0.22414 0.15555,-0.0352 0.28627,-0.16402 0.32253,-0.31943 l 0.4694,-2.16481 c -0.049,-0.043 0.0853,-0.0978 0.12838,-0.14647 l 2.20601,-0.24313 c 0.24144,-0.0174 0.43605,-0.27505 0.38683,-0.51202 -0.0181,-0.1207 -0.0919,-0.23236 -0.19578,-0.29688 l -1.92812,-1.1132 c -0.0428,-0.01 -0.0803,-0.0229 -0.12333,-0.0256 0.009,-0.0429 0.0237,-0.0805 0.0258,-0.12327 l 0.48931,-2.19934 c 0.0203,-0.0751 0.0191,-0.15696 -0.004,-0.2322 -0.0319,-0.11257 -0.11154,-0.21001 -0.21554,-0.2627 l 0.0121,0.007 -5.3e-4,-2.9e-4 z"
          id="path6065"
          sodipodi:nodetypes="cccsccsccccccccsccccsccsccscc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle2.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle2.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle3.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle3.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -2876,7 +2876,7 @@
          transform="translate(276,-425)"
          id="g6069"
          style="display:inline;enable-background:new"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle3.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle3.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -2905,7 +2905,7 @@
          d="m 589.84506,-198.91895 c -0.13421,-0.10353 -0.33252,-0.11493 -0.47823,-0.0279 l -2.02575,1.01389 c -0.0404,0.0136 -0.0775,0.0323 -0.11229,0.0571 -0.0134,-0.0404 -0.0326,-0.0776 -0.0566,-0.1125 l -1.54616,-1.54616 c -0.0864,-0.0864 -0.2158,-0.12572 -0.33751,-0.11235 -0.24168,0.0137 -0.43972,0.26889 -0.39444,0.50619 l 0.33626,2.19391 -0.10821,0.16198 -1.96941,1.01384 c -0.29929,0.16635 -0.22171,0.71188 0.11205,0.78752 l 2.19368,0.33621 0.16193,0.16193 0.33634,2.19382 c 0.038,0.18208 0.20818,0.32711 0.39329,0.33743 0.15936,0.006 0.31897,-0.0843 0.39422,-0.22507 l 1.0137,-1.96956 c -0.0362,-0.0542 0.1077,-0.0724 0.16191,-0.10825 l 2.19377,0.33612 c 0.23771,0.0457 0.49238,-0.15283 0.50617,-0.39446 0.0138,-0.12128 -0.0286,-0.24822 -0.11227,-0.33743 l -1.57431,-1.57431 c -0.0387,-0.0208 -0.0716,-0.0429 -0.1125,-0.0566 0.0198,-0.0392 0.0437,-0.0716 0.0568,-0.11239 l 1.04186,-1.99775 c 0.039,-0.0673 0.0591,-0.14667 0.0562,-0.22534 -0.002,-0.11699 -0.0534,-0.23171 -0.14021,-0.30952 l 0.01,0.01 -4.3e-4,-4.2e-4 z"
          style="fill:none;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
          inkscape:connector-curvature="0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle3.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle3.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
@@ -2916,14 +2916,14 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle4.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle4.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          style="display:inline;enable-background:new"
          id="g6081"
          transform="translate(296,-425)"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle4.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle4.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -2952,7 +2952,7 @@
          d="m 610.54792,-198.02311 c -0.10284,-0.13474 -0.29144,-0.19708 -0.4547,-0.15075 l -2.21914,0.45504 c -0.0426,0.003 -0.0832,0.0112 -0.12323,0.026 -0.002,-0.0425 -0.0114,-0.0834 -0.0256,-0.12331 l -1.0933,-1.89365 c -0.0611,-0.10583 -0.17591,-0.17729 -0.29693,-0.19588 -0.237,-0.0493 -0.49433,0.14592 -0.51201,0.38685 l -0.24302,2.20618 -0.14645,0.12846 -2.16471,0.46957 c -0.33214,0.0832 -0.3984,0.63025 -0.0956,0.78969 l 2.03191,0.89252 0.11451,0.19832 -0.24293,2.20612 c -0.0104,0.18571 0.11643,0.36985 0.29256,0.42773 0.15232,0.0472 0.32993,0.001 0.43904,-0.11537 l 1.48892,-1.64009 c -0.0209,-0.0617 0.12277,-0.0421 0.18441,-0.0627 l 2.03202,0.89246 c 0.21778,0.10566 0.51516,-0.0202 0.59102,-0.25001 0.0447,-0.11357 0.0366,-0.24717 -0.0211,-0.35499 l -1.11321,-1.92813 c -0.032,-0.0301 -0.0581,-0.0599 -0.094,-0.0838 0.0293,-0.0327 0.0608,-0.0579 0.084,-0.0939 l 1.52341,-1.66003 c 0.0551,-0.0549 0.095,-0.12637 0.11261,-0.20311 0.0283,-0.11352 0.008,-0.23764 -0.0553,-0.33526 l 0.007,0.0122 -3.1e-4,-5.2e-4 z"
          id="path6089"
          sodipodi:nodetypes="cccsccsccccccccsccccsccsccscc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/SparkleShare/Mac/SparkleShare/idle4.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/CmisSync/Mac/CmisSync/idle4.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3021,7 +3021,7 @@
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/error-active.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/error-active.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -3032,7 +3032,7 @@
       <g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/error-active.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/error-active.png"
          transform="translate(316,-425)"
          id="g7291"
          style="display:inline;enable-background:new">
@@ -3058,7 +3058,7 @@
          id="path12759-9"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="ccccssssssccc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3067,7 +3067,7 @@
          id="path12761-5"
          d="m 522.5906,-67.01456 c -0.32201,0.036 -0.56448,0.30099 -0.5625,0.625 l 0,0.90625 c -3e-5,0.26179 -0.23821,0.49997 -0.5,0.5 -0.18664,0 -0.24684,0.0427 -0.34375,0.1875 -0.0969,0.1448 -0.1875,0.41704 -0.1875,0.75 l 0,9.125 c 0,0.50984 0.24538,0.98446 0.59375,1.34375 0.34837,0.35929 0.80861,0.5625 1,0.5625 l 10.96875,0 c 0.1914,0 0.5954,-0.17788 0.90625,-0.53125 0.31085,-0.35337 0.53125,-0.84569 0.53125,-1.375 l 0,-9.90625 c 0,-0.11202 -0.085,-0.1875 -0.15625,-0.1875 l -6.35938,0 -0.87864,-2 z"
          style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline;enable-background:new"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3079,7 +3079,7 @@
          width="1.9999704"
          id="rect12657-0"
          style="color:#000000;fill:#b4b4b2;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3088,7 +3088,7 @@
          id="path12670-1"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="ccccccccccccccccc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3097,7 +3097,7 @@
          id="path12672-4"
          d="m 527.95777,-63.514217 -0.95078,-3.43e-4 -1.01569,2.021211 -2.50769,0.0014 0.007,2.45777 2.01317,1.531383 -0.98278,1.525808 -0.006,1.459651 1.48216,0.02348 2.01572,-0.973778 2,0.958667 1.49773,0.0026 9.9e-4,-1.503099 -1.01656,-1.490525 2.02188,-1.531544 0.004,-2.463825 -2.53024,0.0027 -0.99318,-2.016236 z"
          style="fill:none;stroke:#626262;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3106,7 +3106,7 @@
          id="path12726-8"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="ccccc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3115,7 +3115,7 @@
          id="rect12659-6"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cccc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3124,7 +3124,7 @@
          id="path12662-6"
          d="m 530.99685,-60.01456 -2,2 0,-2 z"
          style="color:#000000;fill:#626262;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3133,7 +3133,7 @@
          id="path12664-4"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cccc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3142,7 +3142,7 @@
          id="path12666-5"
          d="m 525.99682,-55.984662 2.99613,-2.002208 -1.98618,-0.02769 z"
          style="color:#000000;fill:#626262;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <path
@@ -3151,13 +3151,13 @@
          id="path12668-2"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cccc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-windows-i.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-windows-i.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -3168,7 +3168,7 @@
       <g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          transform="translate(216,-365)"
          id="g4656"
          style="fill:#dfdbd2;stroke:#dfdbd2;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1">
@@ -3195,7 +3195,7 @@
       <path
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          sodipodi:nodetypes="cccsccsccccccccsccccsccc"
          id="path4664"
          d="m 526.96673,-139.9854 c -0.1681,0.0217 -0.3164,0.15386 -0.3579,0.31842 l -0.7155,2.14935 c -0.019,0.0382 -0.032,0.0777 -0.039,0.11973 -0.038,-0.0191 -0.078,-0.0318 -0.1196,-0.0395 l -2.1866,0 c -0.1222,0 -0.2415,0.0637 -0.3181,0.15921 -0.1612,0.18061 -0.1208,0.50107 0.079,0.63685 l 1.7891,1.31355 0.038,0.19106 -0.6757,2.10948 c -0.094,0.32925 0.3466,0.66015 0.6361,0.47763 l 1.7889,-1.31343 0.229,0 1.7891,1.31343 c 0.1556,0.1019 0.3785,0.0841 0.5167,-0.0395 0.1171,-0.10827 0.1659,-0.28518 0.1196,-0.4379 l -0.6759,-2.10948 c -0.064,-0.0127 0.025,-0.12737 0.038,-0.19105 l 1.7889,-1.31356 c 0.2004,-0.13577 0.2401,-0.45623 0.079,-0.63684 -0.076,-0.0955 -0.1958,-0.15526 -0.318,-0.15921 -0.77058,-0.0202 -1.35701,-0.0594 -2.10293,-0.0268 z"
@@ -3209,13 +3209,13 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-i-24.png"
          style="fill:#dfdbd2;stroke:#dfdbd2;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1"
          id="g4668"
          transform="translate(236,-365)">
@@ -3242,7 +3242,7 @@
       <path
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-i-24.png"
          inkscape:connector-curvature="0"
          style="fill:none;stroke:#4c4a44;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
          d="m 547.93859,-139.86621 c -0.16799,-0.0226 -0.34544,0.0667 -0.42812,0.21494 l -1.24741,1.89093 c -0.0282,0.032 -0.051,0.0668 -0.0687,0.10556 -0.0318,-0.0283 -0.0671,-0.0509 -0.1053,-0.0691 l -2.11209,-0.56594 c -0.11804,-0.0316 -0.24976,-9.7e-4 -0.34847,0.0715 -0.20245,0.13274 -0.24637,0.45273 -0.0885,0.6356 l 1.38816,1.73184 -0.0127,0.19439 -1.19865,1.86271 c -0.17601,0.29371 0.16393,0.72737 0.49081,0.62599 l 2.06788,-0.80567 0.2212,0.0593 1.3882,1.73173 c 0.12392,0.1387 0.34383,0.1792 0.50931,0.0956 0.14114,-0.0743 0.23406,-0.23252 0.22886,-0.39202 l -0.10689,-2.21254 c -0.0585,-0.0288 0.0571,-0.11656 0.0861,-0.17471 l 2.06792,-0.8058 c 0.22871,-0.0793 0.35,-0.37854 0.24113,-0.59469 -0.0487,-0.11192 -0.14894,-0.20065 -0.26595,-0.23609 l -2.15054,-0.57623 c -0.0439,0.001 -0.0835,-0.001 -0.12575,0.007 -0.002,-0.0439 0.002,-0.0839 -0.007,-0.12575 l -0.0966,-2.25104 c 1.4e-4,-0.0778 -0.0222,-0.15655 -0.064,-0.22325 -0.06,-0.10046 -0.16209,-0.17398 -0.27618,-0.19795 l 0.0135,0.004 -5.8e-4,-1.5e-4 z"
@@ -3251,7 +3251,7 @@
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-ii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-ii-24.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -3262,7 +3262,7 @@
       <g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-ii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-ii-24.png"
          transform="translate(256,-365)"
          id="g4680"
          style="fill:#dfdbd2;stroke:#dfdbd2;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1">
@@ -3289,7 +3289,7 @@
       <path
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-ii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-ii-24.png"
          sodipodi:nodetypes="cccsccsccccccccsccccsccsccscc"
          id="path4688"
          d="m 568.92521,-139.54136 c -0.15643,-0.0653 -0.35094,-0.025 -0.46916,0.0968 l -1.69431,1.50364 c -0.0355,0.0236 -0.0665,0.0513 -0.0937,0.0842 -0.0234,-0.0356 -0.0516,-0.0665 -0.0838,-0.094 l -1.89365,-1.0933 c -0.10583,-0.0611 -0.24099,-0.0656 -0.35509,-0.0212 -0.2299,0.0758 -0.35515,0.37354 -0.24999,0.59103 l 0.89263,2.03212 -0.0626,0.18447 -1.63991,1.48902 c -0.24603,0.23814 -0.0299,0.745 0.31206,0.73169 l 2.20595,-0.24302 0.19832,0.11451 0.89269,2.03201 c 0.0838,0.16605 0.28574,0.26208 0.46722,0.22414 0.15555,-0.0352 0.28627,-0.16402 0.32253,-0.31943 l 0.4694,-2.16481 c -0.049,-0.043 0.0853,-0.0978 0.12838,-0.14647 l 2.20601,-0.24313 c 0.24144,-0.0174 0.43605,-0.27505 0.38683,-0.51202 -0.0181,-0.1207 -0.0919,-0.23236 -0.19578,-0.29688 l -1.92812,-1.1132 c -0.0428,-0.01 -0.0803,-0.0229 -0.12333,-0.0256 0.009,-0.0429 0.0237,-0.0805 0.0258,-0.12327 l 0.48931,-2.19934 c 0.0203,-0.0751 0.0191,-0.15696 -0.004,-0.2322 -0.0319,-0.11257 -0.11154,-0.21001 -0.21554,-0.2627 l 0.0121,0.007 -5.3e-4,-2.9e-4 z"
@@ -3303,13 +3303,13 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-iiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-iiii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-iiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-iiii-24.png"
          style="fill:#dfdbd2;stroke:#dfdbd2;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1"
          id="g4692"
          transform="translate(276,-365)">
@@ -3336,7 +3336,7 @@
       <path
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-iiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-iiii-24.png"
          inkscape:connector-curvature="0"
          style="fill:none;stroke:#4c4a44;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
          d="m 589.84506,-138.91895 c -0.13421,-0.10353 -0.33252,-0.11493 -0.47823,-0.0279 l -2.02575,1.01389 c -0.0404,0.0136 -0.0775,0.0323 -0.11229,0.0571 -0.0134,-0.0404 -0.0326,-0.0776 -0.0566,-0.1125 l -1.54616,-1.54616 c -0.0864,-0.0864 -0.2158,-0.12572 -0.33751,-0.11235 -0.24168,0.0137 -0.43972,0.26889 -0.39444,0.50619 l 0.33626,2.19391 -0.10821,0.16198 -1.96941,1.01384 c -0.29929,0.16635 -0.22171,0.71188 0.11205,0.78752 l 2.19368,0.33621 0.16193,0.16193 0.33634,2.19382 c 0.038,0.18208 0.20818,0.32711 0.39329,0.33743 0.15936,0.006 0.31897,-0.0843 0.39422,-0.22507 l 1.0137,-1.96956 c -0.0362,-0.0542 0.1077,-0.0724 0.16191,-0.10825 l 2.19377,0.33612 c 0.23771,0.0457 0.49238,-0.15283 0.50617,-0.39446 0.0138,-0.12128 -0.0286,-0.24822 -0.11227,-0.33743 l -1.57431,-1.57431 c -0.0387,-0.0208 -0.0716,-0.0429 -0.1125,-0.0566 0.0198,-0.0392 0.0437,-0.0716 0.0568,-0.11239 l 1.04186,-1.99775 c 0.039,-0.0673 0.0591,-0.14667 0.0562,-0.22534 -0.002,-0.11699 -0.0534,-0.23171 -0.14021,-0.30952 l 0.01,0.01 -4.3e-4,-4.2e-4 z"
@@ -3345,7 +3345,7 @@
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-iiiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-iiiii-24.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -3356,7 +3356,7 @@
       <g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-iiiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-iiiii-24.png"
          transform="translate(296,-365)"
          id="g4704"
          style="fill:#dfdbd2;stroke:#dfdbd2;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1">
@@ -3383,7 +3383,7 @@
       <path
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-iiiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-iiiii-24.png"
          sodipodi:nodetypes="cccsccsccccccccsccccsccsccscc"
          id="path4712"
          d="m 610.54792,-138.02311 c -0.10284,-0.13474 -0.29144,-0.19708 -0.4547,-0.15075 l -2.21914,0.45504 c -0.0426,0.003 -0.0832,0.0112 -0.12323,0.026 -0.002,-0.0425 -0.0114,-0.0834 -0.0256,-0.12331 l -1.0933,-1.89365 c -0.0611,-0.10583 -0.17591,-0.17729 -0.29693,-0.19588 -0.237,-0.0493 -0.49433,0.14592 -0.51201,0.38685 l -0.24302,2.20618 -0.14645,0.12846 -2.16471,0.46957 c -0.33214,0.0832 -0.3984,0.63025 -0.0956,0.78969 l 2.03191,0.89252 0.11451,0.19832 -0.24293,2.20612 c -0.0104,0.18571 0.11643,0.36985 0.29256,0.42773 0.15232,0.0472 0.32993,0.001 0.43904,-0.11537 l 1.48892,-1.64009 c -0.0209,-0.0617 0.12277,-0.0421 0.18441,-0.0627 l 2.03202,0.89246 c 0.21778,0.10566 0.51516,-0.0202 0.59102,-0.25001 0.0447,-0.11357 0.0366,-0.24717 -0.0211,-0.35499 l -1.11321,-1.92813 c -0.032,-0.0301 -0.0581,-0.0599 -0.094,-0.0838 0.0293,-0.0327 0.0608,-0.0579 0.084,-0.0939 l 1.52341,-1.66003 c 0.0551,-0.0549 0.095,-0.12637 0.11261,-0.20311 0.0283,-0.11352 0.008,-0.23764 -0.0553,-0.33526 l 0.007,0.0122 -3.1e-4,-5.2e-4 z"
@@ -3396,7 +3396,7 @@
          width="3"
          id="rect4714"
          style="fill:#4c4a44;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3406,7 +3406,7 @@
          height="1"
          x="523"
          y="-138"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3416,7 +3416,7 @@
          height="1"
          x="529"
          y="-136"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3426,7 +3426,7 @@
          width="1"
          id="rect4722"
          style="fill:#4c4a44;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3436,7 +3436,7 @@
          width="2"
          id="rect4724"
          style="fill:#4c4a44;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3446,7 +3446,7 @@
          height="1"
          x="529"
          y="-133"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3456,7 +3456,7 @@
          width="1"
          id="rect4728"
          style="fill:#4c4a44;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3466,7 +3466,7 @@
          width="1"
          id="rect4730"
          style="fill:#4c4a44;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3476,7 +3476,7 @@
          height="1"
          x="523"
          y="-137"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
@@ -3487,14 +3487,14 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/cmissync-syncing-error-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/cmissync-syncing-error-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          style="fill:#dfdbd2;display:inline;enable-background:new;fill-opacity:1"
          id="g4736"
          transform="translate(316,-365)"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/cmissync-syncing-error-radiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/cmissync-syncing-error-radiance-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -3512,14 +3512,14 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          style="fill:#3c3c3c;stroke:#3c3c3c;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1"
          id="g4742"
          transform="translate(216,-345)"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -3548,13 +3548,13 @@
          d="m 526.96673,-119.9854 c -0.1681,0.0217 -0.3164,0.15386 -0.3579,0.31842 l -0.7155,2.14935 c -0.019,0.0382 -0.032,0.0777 -0.039,0.11973 -0.038,-0.0191 -0.078,-0.0318 -0.1196,-0.0395 l -2.1866,0 c -0.1222,0 -0.2415,0.0637 -0.3181,0.15921 -0.1612,0.18061 -0.1208,0.50107 0.079,0.63685 l 1.7891,1.31355 0.038,0.19106 -0.6757,2.10948 c -0.094,0.32925 0.3466,0.66015 0.6361,0.47763 l 1.7889,-1.31343 0.229,0 1.7891,1.31343 c 0.1556,0.1019 0.3785,0.0841 0.5167,-0.0395 0.1171,-0.10827 0.1659,-0.28518 0.1196,-0.4379 l -0.6759,-2.10948 c -0.064,-0.0127 0.025,-0.12737 0.038,-0.19105 l 1.7889,-1.31356 c 0.2004,-0.13577 0.2401,-0.45623 0.079,-0.63684 -0.076,-0.0955 -0.1958,-0.15526 -0.318,-0.15921 -0.77058,-0.0202 -1.35701,-0.0594 -2.10293,-0.0268 z"
          id="path4750"
          sodipodi:nodetypes="cccsccsccccccccsccccsccc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-ii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-ii-24.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -3566,7 +3566,7 @@
          transform="translate(236,-345)"
          id="g4754"
          style="fill:#3c3c3c;stroke:#3c3c3c;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-ii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-ii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -3595,7 +3595,7 @@
          d="m 547.93859,-119.86621 c -0.16799,-0.0226 -0.34544,0.0667 -0.42812,0.21494 l -1.24741,1.89093 c -0.0282,0.032 -0.051,0.0668 -0.0687,0.10556 -0.0318,-0.0283 -0.0671,-0.0509 -0.1053,-0.0691 l -2.11209,-0.56594 c -0.11804,-0.0316 -0.24976,-9.7e-4 -0.34847,0.0715 -0.20245,0.13274 -0.24637,0.45273 -0.0885,0.6356 l 1.38816,1.73184 -0.0127,0.19439 -1.19865,1.86271 c -0.17601,0.29371 0.16393,0.72737 0.49081,0.62599 l 2.06788,-0.80567 0.2212,0.0593 1.3882,1.73173 c 0.12392,0.1387 0.34383,0.1792 0.50931,0.0956 0.14114,-0.0743 0.23406,-0.23253 0.22886,-0.39203 l -0.10689,-2.21253 c -0.0585,-0.0288 0.0571,-0.11656 0.0861,-0.17471 l 2.06792,-0.8058 c 0.22871,-0.0793 0.35,-0.37854 0.24113,-0.59469 -0.0487,-0.11192 -0.14894,-0.20065 -0.26595,-0.23609 l -2.15054,-0.57623 c -0.0439,10e-4 -0.0835,-0.001 -0.12575,0.007 -0.002,-0.0439 0.002,-0.0839 -0.007,-0.12575 l -0.0966,-2.25104 c 1.4e-4,-0.0778 -0.0222,-0.15655 -0.064,-0.22325 -0.06,-0.10046 -0.16209,-0.17398 -0.27618,-0.19795 l 0.0135,0.004 -5.8e-4,-1.5e-4 z"
          style="fill:none;stroke:#eeeae6;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
          inkscape:connector-curvature="0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-ii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-ii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
@@ -3606,14 +3606,14 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          style="fill:#3c3c3c;stroke:#3c3c3c;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1"
          id="g4766"
          transform="translate(256,-345)"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -3642,13 +3642,13 @@
          d="m 568.92521,-119.54136 c -0.15643,-0.0653 -0.35094,-0.025 -0.46916,0.0968 l -1.69431,1.50364 c -0.0355,0.0236 -0.0665,0.0513 -0.0937,0.0842 -0.0234,-0.0356 -0.0516,-0.0665 -0.0838,-0.094 l -1.89365,-1.0933 c -0.10583,-0.0611 -0.24099,-0.0656 -0.35509,-0.0212 -0.2299,0.0758 -0.35515,0.37354 -0.24999,0.59103 l 0.89263,2.03212 -0.0626,0.18447 -1.63991,1.48902 c -0.24603,0.23814 -0.0299,0.74501 0.31206,0.73169 l 2.20595,-0.24302 0.19832,0.11451 0.89269,2.03201 c 0.0838,0.16605 0.28574,0.26208 0.46722,0.22414 0.15555,-0.0352 0.28627,-0.16402 0.32253,-0.31943 l 0.4694,-2.16481 c -0.049,-0.043 0.0853,-0.0978 0.12838,-0.14647 l 2.20601,-0.24313 c 0.24144,-0.0174 0.43605,-0.27505 0.38683,-0.51202 -0.0181,-0.1207 -0.0919,-0.23236 -0.19578,-0.29688 l -1.92812,-1.1132 c -0.0428,-0.01 -0.0803,-0.0229 -0.12333,-0.0256 0.009,-0.0429 0.0237,-0.0805 0.0258,-0.12327 l 0.48931,-2.19934 c 0.0203,-0.0751 0.0191,-0.15696 -0.004,-0.2322 -0.0319,-0.11257 -0.11154,-0.21001 -0.21554,-0.2627 l 0.0121,0.007 -5.3e-4,-2.9e-4 z"
          id="path4774"
          sodipodi:nodetypes="cccsccsccccccccsccccsccsccscc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iiii-24.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -3660,7 +3660,7 @@
          transform="translate(276,-345)"
          id="g4778"
          style="fill:#3c3c3c;stroke:#3c3c3c;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iiii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -3689,7 +3689,7 @@
          d="m 589.84506,-118.91895 c -0.13421,-0.10353 -0.33252,-0.11493 -0.47823,-0.0279 l -2.02575,1.01389 c -0.0404,0.0136 -0.0775,0.0323 -0.11229,0.0571 -0.0134,-0.0404 -0.0326,-0.0776 -0.0566,-0.1125 l -1.54616,-1.54616 c -0.0864,-0.0864 -0.2158,-0.12572 -0.33751,-0.11235 -0.24168,0.0137 -0.43972,0.26889 -0.39444,0.50619 l 0.33626,2.19391 -0.10821,0.16198 -1.96941,1.01384 c -0.29929,0.16635 -0.22171,0.71188 0.11205,0.78752 l 2.19368,0.33621 0.16193,0.16193 0.33634,2.19382 c 0.038,0.18208 0.20818,0.32711 0.39329,0.33743 0.15936,0.006 0.31897,-0.0843 0.39422,-0.22507 l 1.0137,-1.96956 c -0.0362,-0.0542 0.1077,-0.0724 0.16191,-0.10825 l 2.19377,0.33612 c 0.23771,0.0457 0.49238,-0.15283 0.50617,-0.39446 0.0138,-0.12128 -0.0286,-0.24822 -0.11227,-0.33743 l -1.57431,-1.57431 c -0.0387,-0.0208 -0.0716,-0.0429 -0.1125,-0.0566 0.0198,-0.0392 0.0437,-0.0716 0.0568,-0.11239 l 1.04186,-1.99775 c 0.039,-0.0673 0.0591,-0.14667 0.0562,-0.22534 -0.002,-0.11699 -0.0534,-0.23171 -0.14021,-0.30952 l 0.01,0.01 -4.3e-4,-4.2e-4 z"
          style="fill:none;stroke:#eeeae6;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:new"
          inkscape:connector-curvature="0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iiii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
@@ -3700,14 +3700,14 @@
          height="16"
          width="16"
          style="opacity:0"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iiiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iiiii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <g
          style="fill:#3c3c3c;stroke:#3c3c3c;display:inline;enable-background:new;fill-opacity:1;stroke-opacity:1"
          id="g4790"
          transform="translate(296,-345)"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iiiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iiiii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <path
@@ -3736,7 +3736,7 @@
          d="m 610.54792,-118.02311 c -0.10284,-0.13474 -0.29144,-0.19708 -0.4547,-0.15075 l -2.21914,0.45504 c -0.0426,0.003 -0.0832,0.0112 -0.12323,0.026 -0.002,-0.0425 -0.0114,-0.0834 -0.0256,-0.12331 l -1.0933,-1.89365 c -0.0611,-0.10583 -0.17591,-0.17729 -0.29693,-0.19588 -0.237,-0.0493 -0.49433,0.14592 -0.51201,0.38685 l -0.24302,2.20618 -0.14645,0.12846 -2.16471,0.46957 c -0.33214,0.0832 -0.3984,0.63025 -0.0956,0.78969 l 2.03191,0.89252 0.11451,0.19832 -0.24293,2.20612 c -0.0104,0.18571 0.11643,0.36985 0.29256,0.42773 0.15232,0.0472 0.32993,0.001 0.43904,-0.11537 l 1.48892,-1.64009 c -0.0209,-0.0617 0.12277,-0.0421 0.18441,-0.0627 l 2.03202,0.89246 c 0.21778,0.10566 0.51516,-0.0202 0.59102,-0.25001 0.0447,-0.11357 0.0366,-0.24717 -0.0211,-0.35499 l -1.11321,-1.92813 c -0.032,-0.0301 -0.0581,-0.0599 -0.094,-0.0838 0.0293,-0.0327 0.0608,-0.0579 0.084,-0.0939 l 1.52341,-1.66003 c 0.0551,-0.0549 0.095,-0.12637 0.11261,-0.20311 0.0283,-0.11352 0.008,-0.23764 -0.0553,-0.33526 l 0.007,0.0122 -3.1e-4,-5.2e-4 z"
          id="path4798"
          sodipodi:nodetypes="cccsccsccccccccsccccsccsccscc"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-iiiii-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-iiiii-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3746,7 +3746,7 @@
          height="1"
          x="528"
          y="-118"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3756,7 +3756,7 @@
          width="3"
          id="rect4802"
          style="fill:#eeeae6;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3766,7 +3766,7 @@
          width="1"
          id="rect4806"
          style="fill:#eeeae6;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3776,7 +3776,7 @@
          height="1"
          x="524"
          y="-116"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3786,7 +3786,7 @@
          height="1"
          x="526"
          y="-114"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3796,7 +3796,7 @@
          width="1"
          id="rect4812"
          style="fill:#eeeae6;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3806,7 +3806,7 @@
          height="1"
          x="524"
          y="-113"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3816,7 +3816,7 @@
          height="1"
          x="530"
          y="-117"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -3826,13 +3826,13 @@
          width="1"
          id="rect4818"
          style="fill:#eeeae6;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/process-syncing-cmissync-ambiance-i-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/process-syncing-cmissync-ambiance-i-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <image
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/cmissync-syncing-error-ambiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/cmissync-syncing-error-ambiance-24.png"
          style="opacity:0"
          width="16"
          height="16"
@@ -3843,7 +3843,7 @@
       <g
          inkscape:export-ydpi="90"
          inkscape:export-xdpi="90"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/icons/cmissync-syncing-error-ambiance-24.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/icons/cmissync-syncing-error-ambiance-24.png"
          transform="translate(316,-345)"
          id="g4822"
          style="fill:#3c3c3c;display:inline;enable-background:new;fill-opacity:1">

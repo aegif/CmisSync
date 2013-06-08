@@ -15,7 +15,7 @@
    inkscape:version="0.48.0 r9654"
    width="128"
    height="128"
-   sodipodi:docname="sparkleshare-osx.svg"
+   sodipodi:docname="cmissync-osx.svg"
    inkscape:export-filename="/Users/hbons/Desktop/256.png"
    inkscape:export-xdpi="180"
    inkscape:export-ydpi="180">
@@ -598,7 +598,7 @@
   <rect
      inkscape:export-ydpi="90"
      inkscape:export-xdpi="90"
-     inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/process-syncing-sparkleshare-24.png"
+     inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/process-syncing-cmissync-24.png"
      y="-227.71104"
      x="877.12494"
      width="120"
@@ -641,7 +641,7 @@
   <rect
      inkscape:export-ydpi="90"
      inkscape:export-xdpi="90"
-     inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/folder-sparkleshare-24.png"
+     inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/folder-cmissync-24.png"
      height="24"
      id="rect4706"
      inkscape:label="24x24"
@@ -652,7 +652,7 @@
   <rect
      inkscape:export-ydpi="90"
      inkscape:export-xdpi="90"
-     inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/hicolor/256x256/places/folder-sparkleshare.png"
+     inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/hicolor/256x256/places/folder-cmissync.png"
      height="256"
      id="rect4708"
      inkscape:label="256x256"
@@ -682,7 +682,7 @@
        id="tspan4716"
        sodipodi:role="line"
        x="713.09564"
-       y="-472.19742">sparkleshare</tspan></text>
+       y="-472.19742">cmissync</tspan></text>
   <rect
      y="-316.71103"
      x="904.12494"
@@ -699,7 +699,7 @@
      inkscape:label="24x24"
      id="rect22380"
      height="24"
-     inkscape:export-filename="/home/hbons/github/sparkleshare/data/icons/sparkleshare-syncing-error-24.png"
+     inkscape:export-filename="/home/hbons/github/cmissync/data/icons/cmissync-syncing-error-24.png"
      inkscape:export-xdpi="90"
      inkscape:export-ydpi="90" />
   <path

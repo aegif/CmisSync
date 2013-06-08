@@ -9,6 +9,7 @@ DIR_BIN = $(top_builddir)/bin
 # External libraries to link against, generated from configure
 LIBS_SYSTEM = -r:System
 LIBS_MONO_POSIX = -r:Mono.Posix
+LIBS_WINDOWS_FORMS = -r:System.Windows.Forms
 
 LIBS_GLIB = $(GLIBSHARP_LIBS)
 LIBS_GNOME = $(GNOME_SHARP_LIBS)
@@ -28,7 +29,7 @@ REF_CMISSYNCLIB = $(LIBS_SYSTEM) $(LIBS_MONO_POSIX)
 LIBS_CMISSYNCLIB = -r:$(DIR_BIN)/CmisSync.Lib.dll
 LIBS_CMISSYNCLIB_DEPS = $(REF_CMISSYNCLIB) $(LIBS_CMISSYNCLIB)
 
-REF_CMISSYNC = $(LIBS_DBUS) $(GTKSHARP_LIBS) $(LIBS_CMISSYNCLIB_DEPS) $(LIBS_APP_INDICATOR)
+REF_CMISSYNC = $(LIBS_DBUS) $(GTKSHARP_LIBS) $(LIBS_CMISSYNCLIB_DEPS) $(LIBS_APP_INDICATOR) $(LIBS_WINDOWS_FORMS)
 
 # Cute hack to replace a space with something
 colon:= :

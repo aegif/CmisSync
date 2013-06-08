@@ -17,13 +17,13 @@
    inkscape:export-ydpi="90.000000"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="sparkleshare-mist.svg"
+   sodipodi:docname="cmissync-mist.svg"
    sodipodi:version="0.32"
    style="display:inline;enable-background:new"
    version="1.0"
    width="500">
   <title
-     id="title6349">Mist SparkleShare</title>
+     id="title6349">Mist CmisSync</title>
   <sodipodi:namedview
      bordercolor="#666666"
      borderopacity="0.25490196"
@@ -166,7 +166,7 @@
             <dc:title>Lapo Calamandrei</dc:title>
           </cc:Agent>
         </dc:creator>
-        <dc:title>Mist SparkleShare</dc:title>
+        <dc:title>Mist CmisSync</dc:title>
         <dc:subject>
           <rdf:Bag />
         </dc:subject>
@@ -1167,7 +1167,7 @@
   <g
      inkscape:groupmode="layer"
      id="layer17"
-     inkscape:label="artwork:sparkleshare"
+     inkscape:label="artwork:cmissync"
      style="display:inline"
      transform="translate(0,300)"
      sodipodi:insensitive="true">
@@ -1185,7 +1185,7 @@
          width="120"
          x="331"
          y="16"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/process-syncing-sparkleshare-24.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/process-syncing-cmissync-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -1206,7 +1206,7 @@
          inkscape:label="32x32"
          id="rect4700"
          height="32"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/rect4700.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/rect4700.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -1217,7 +1217,7 @@
          inkscape:label="24x24"
          id="rect4706"
          height="24"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/folder-sparkleshare-24.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/folder-cmissync-24.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -1228,7 +1228,7 @@
          inkscape:label="22x22"
          id="rect4702"
          height="22"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/rect4702.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/rect4702.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -1239,7 +1239,7 @@
          inkscape:label="16x16"
          id="rect4704"
          height="16"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/rect4704.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/rect4704.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -1250,7 +1250,7 @@
          inkscape:label="256x256"
          id="rect4708"
          height="256"
-         inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/sparkleshare-mist.png"
+         inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/cmissync-mist.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <text
@@ -1275,7 +1275,7 @@
            y="-228.48639"
            x="166.9707"
            sodipodi:role="line"
-           id="tspan4716">sparkleshare</tspan></text>
+           id="tspan4716">cmissync</tspan></text>
     </g>
     <g
        inkscape:groupmode="layer"

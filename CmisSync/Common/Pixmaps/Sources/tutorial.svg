@@ -16,7 +16,7 @@
    version="1.1"
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="tutorial.svg"
-   inkscape:export-filename="/home/hbons/SparkleShare/SparkleShare-Design-Corner/sparkleshare-slides.png"
+   inkscape:export-filename="/home/hbons/CmisSync/CmisSync-Design-Corner/cmissync-slides.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -6905,7 +6905,7 @@
              width="120"
              x="331"
              y="16"
-             inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/process-syncing-sparkleshare-24.png"
+             inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/process-syncing-cmissync-24.png"
              inkscape:export-xdpi="90"
              inkscape:export-ydpi="90" />
           <rect
@@ -6948,7 +6948,7 @@
              inkscape:label="24x24"
              id="rect4706-1"
              height="24"
-             inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/folder-sparkleshare-24.png"
+             inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/folder-cmissync-24.png"
              inkscape:export-xdpi="90"
              inkscape:export-ydpi="90" />
           <rect
@@ -6959,7 +6959,7 @@
              inkscape:label="256x256"
              id="rect4708-5"
              height="256"
-             inkscape:export-filename="/home/hbons/github/SparkleShare/data/icons/hicolor/256x256/places/folder-sparkleshare.png"
+             inkscape:export-filename="/home/hbons/github/CmisSync/data/icons/hicolor/256x256/places/folder-cmissync.png"
              inkscape:export-xdpi="90"
              inkscape:export-ydpi="90" />
           <text
@@ -6984,7 +6984,7 @@
                y="-228.48639"
                x="166.9707"
                sodipodi:role="line"
-               id="tspan4716-4">sparkleshare</tspan></text>
+               id="tspan4716-4">cmissync</tspan></text>
           <rect
              height="22"
              id="rect22378"
@@ -6996,7 +6996,7 @@
           <rect
              inkscape:export-ydpi="90"
              inkscape:export-xdpi="90"
-             inkscape:export-filename="/home/hbons/github/sparkleshare/data/icons/sparkleshare-syncing-error-24.png"
+             inkscape:export-filename="/home/hbons/github/cmissync/data/icons/cmissync-syncing-error-24.png"
              height="24"
              id="rect22380"
              inkscape:label="24x24"
@@ -9292,7 +9292,7 @@
            x="146"
            y="207.36218"
            style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Cantarell;-inkscape-font-specification:Cantarell" /></flowRegion><flowPara
-         id="flowPara128595">SparkleShare creates a special folder on your computer that will keep track of your projects.</flowPara></flowRoot>    <flowRoot
+         id="flowPara128595">CmisSync creates a special folder on your computer that will keep track of your projects.</flowPara></flowRoot>    <flowRoot
        transform="translate(900.6114,189.51201)"
        style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Cantarell;-inkscape-font-specification:Cantarell"
        id="flowRoot126287"
@@ -9432,7 +9432,7 @@
            height="218.51471"
            width="383.89951"
            id="rect5504" /></flowRegion><flowPara
-         id="flowPara5506">SparkleShare</flowPara></flowRoot>    <flowRoot
+         id="flowPara5506">CmisSync</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot128625"
        style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Cantarell;-inkscape-font-specification:Cantarell Bold"
@@ -9444,7 +9444,7 @@
            x="146"
            y="207.36218"
            style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;font-family:Cantarell;-inkscape-font-specification:Cantarell Bold" /></flowRegion><flowPara
-         id="flowPara128631">SparkleShare</flowPara></flowRoot>    <flowRoot
+         id="flowPara128631">CmisSync</flowPara></flowRoot>    <flowRoot
        transform="matrix(1.3499992,0,0,1.3499992,-48.955112,77.393726)"
        style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Cantarell;-inkscape-font-specification:Cantarell Bold"
        id="flowRoot128767"
@@ -9513,7 +9513,7 @@
            x="146"
            y="207.36218"
            style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Cantarell;-inkscape-font-specification:Cantarell" /></flowRegion><flowPara
-         id="flowPara128877">Whenever you see this button on a website, just click it, and the project will be immediately added to SparkleShare:</flowPara></flowRoot>    <flowRoot
+         id="flowPara128877">Whenever you see this button on a website, just click it, and the project will be immediately added to CmisSync:</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot128879"
        style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Cantarell;-inkscape-font-specification:Cantarell Bold"
