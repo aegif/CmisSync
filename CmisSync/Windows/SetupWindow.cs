@@ -47,7 +47,7 @@ namespace CmisSync {
             Height     = 440;
             ResizeMode = ResizeMode.NoResize;
             Background = new SolidColorBrush (Colors.WhiteSmoke);
-            Icon = UIHelpers.GetImageSource("sparkleshare-app", "ico");
+            Icon = UIHelpers.GetImageSource("cmissync-app", "ico");
 			
 			TaskbarItemInfo = new TaskbarItemInfo () {
 				Description = "CmisSync"

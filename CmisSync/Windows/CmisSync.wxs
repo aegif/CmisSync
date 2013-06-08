@@ -23,7 +23,7 @@
               <File Id='Newtonsoft.Json.dll' Name='Newtonsoft.Json.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\Newtonsoft.Json.dll' DiskId='1' />
               <!--<File Id='SQLite.Interop.dll' Name='SQLite.Interop.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\SQLite.Interop.dll' DiskId='1' />-->
               <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\System.Data.SQLite.dll' DiskId='1' />
-              <File Id='sparkleshare_app.ico' Name='sparkleshare.ico' Source='!(wix.root)\CmisSync\Windows\Pixmaps\sparkleshare-app.ico' DiskId='1' />
+              <File Id='cmissync_app.ico' Name='cmissync.ico' Source='!(wix.root)\CmisSync\Windows\Pixmaps\cmissync-app.ico' DiskId='1' />
             </Component>
             <Directory Id='DIR_x86' Name='x86'>
               <Component Id='COMP_x86' Guid='5623a717-035d-45fd-904c-4ed38a3955f1'>
