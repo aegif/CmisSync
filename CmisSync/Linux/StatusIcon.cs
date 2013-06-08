@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,11 @@ using AppIndicator;
 using Gtk;
 using Mono.Unix;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleStatusIcon {
+    public class StatusIcon {
 
-        public SparkleStatusIconController Controller = new SparkleStatusIconController ();
+        public StatusIconController Controller = new StatusIconController ();
 
         private Gdk.Pixbuf [] animation_frames;
 
@@ -43,12 +43,12 @@ namespace SparkleShare {
         #endif
 
 
-        public SparkleStatusIcon ()
+        public StatusIcon ()
         {
             CreateAnimationFrames ();
 
             #if HAVE_APP_INDICATOR
-            this.indicator = new ApplicationIndicator ("sparkleshare",
+            this.indicator = new ApplicationIndicator ("cmissync",
                 "process-syncing-i", Category.ApplicationStatus);
 
             this.indicator.Status = Status.Active;
@@ -88,7 +88,7 @@ namespace SparkleShare {
                         this.indicator.Status = Status.Attention;
                         this.indicator.Status = Status.Active;
                         #else
-						this.status_icon.Pixbuf = SparkleUIHelpers.GetIcon ("process-syncing-error", 24);
+						this.status_icon.Pixbuf = UIHelpers.GetIcon ("process-syncing-error", 24);
                         #endif
                     }
                 });
@@ -134,12 +134,12 @@ namespace SparkleShare {
             this.menu.Add (this.state_item);
             this.menu.Add (new SeparatorMenuItem ());
 
-                ImageMenuItem folder_item = new SparkleMenuItem ("CmisSync"){
-                    Image = new Image (SparkleUIHelpers.GetIcon ("folder-sparkleshare", 16))
+                ImageMenuItem folder_item = new CmisSyncMenuItem ("CmisSync"){
+                    Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
                 };
 
                 folder_item.Activated += delegate {
-                    Controller.SparkleShareClicked ();
+                    Controller.CmisSyncClicked ();
                 };
                 
             this.menu.Add (folder_item);
@@ -157,7 +157,7 @@ namespace SparkleShare {
                                 IconLookupFlags.GenericFallback);
                         }
 
-                        ImageMenuItem subfolder_item = new SparkleMenuItem (folder_name) {
+                        ImageMenuItem subfolder_item = new CmisSyncMenuItem (folder_name) {
                             Image = new Image (folder_icon)
                         };
 
@@ -179,7 +179,7 @@ namespace SparkleShare {
                                 IconLookupFlags.GenericFallback);
                         }
 
-                        ImageMenuItem subfolder_item = new SparkleMenuItem (folder_name) {
+                        ImageMenuItem subfolder_item = new CmisSyncMenuItem (folder_name) {
                             Image = new Image (folder_icon)
                         };
 
@@ -188,7 +188,7 @@ namespace SparkleShare {
                     }
 
                     if (submenu.Children.Length > 0) {
-                        SparkleMenuItem more_item = new SparkleMenuItem ("More Projects") {
+                        CmisSyncMenuItem more_item = new CmisSyncMenuItem ("More Projects") {
                             Submenu = submenu
                         };
 
@@ -282,11 +282,11 @@ namespace SparkleShare {
         private void CreateAnimationFrames ()
         {
             this.animation_frames = new Gdk.Pixbuf [] {
-                SparkleUIHelpers.GetIcon ("process-syncing-i", 24),
-                SparkleUIHelpers.GetIcon ("process-syncing-ii", 24),
-                SparkleUIHelpers.GetIcon ("process-syncing-iii", 24),
-                SparkleUIHelpers.GetIcon ("process-syncing-iiii", 24),
-                SparkleUIHelpers.GetIcon ("process-syncing-iiiii", 24)
+                UIHelpers.GetIcon ("process-syncing-i", 24),
+                UIHelpers.GetIcon ("process-syncing-ii", 24),
+                UIHelpers.GetIcon ("process-syncing-iii", 24),
+                UIHelpers.GetIcon ("process-syncing-iiii", 24),
+                UIHelpers.GetIcon ("process-syncing-iiiii", 24)
             };
         }
 
@@ -308,9 +308,9 @@ namespace SparkleShare {
     }
 
     
-    public class SparkleMenuItem : ImageMenuItem {
+    public class CmisSyncMenuItem : ImageMenuItem {
 
-        public SparkleMenuItem (string text) : base (text)
+        public CmisSyncMenuItem (string text) : base (text)
         {
             SetProperty ("always-show-image", new GLib.Value (true));
         }

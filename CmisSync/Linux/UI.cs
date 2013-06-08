@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -18,30 +18,28 @@
 using System;
 
 using Gtk;
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleUI {
+    public class UI {
 
-        public SparkleStatusIcon StatusIcon;
-        public SparkleEventLog EventLog;
-        public SparkleBubbles Bubbles;
-        public SparkleSetup Setup;
-        public SparkleAbout About;
+        public StatusIcon StatusIcon;
+        public Bubbles Bubbles;
+        public Setup Setup;
+        public About About;
 
-        public static string AssetsPath = /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare";
+        public static string AssetsPath = /*Defines.INSTALL_DIR*/"/usr/share/cmissync";
 
 
-        public SparkleUI ()
+        public UI ()
         {
             Application.Init ();
 
-            Setup      = new SparkleSetup ();
-            EventLog   = new SparkleEventLog ();
-            About      = new SparkleAbout ();
-            Bubbles    = new SparkleBubbles ();
-            StatusIcon = new SparkleStatusIcon ();
+            Setup      = new Setup ();
+            About      = new About ();
+            Bubbles    = new Bubbles ();
+            StatusIcon = new StatusIcon ();
         
 			Program.Controller.UIHasLoaded ();
         }

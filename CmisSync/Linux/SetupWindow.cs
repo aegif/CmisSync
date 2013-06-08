@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -25,9 +25,9 @@ using System.Timers;
 using Gtk;
 using Mono.Unix;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleSetupWindow : Window    {
+    public class SetupWindow : Window    {
 
         // TODO: caps
         private HBox HBox;
@@ -43,11 +43,11 @@ namespace SparkleShare {
 
         public Container Content;
 
-        public SparkleSetupWindow () : base ("")
+        public SetupWindow () : base ("")
         {
             Title          = Catalog.GetString ("CmisSync Setup");
             BorderWidth    = 0;
-            IconName       = "folder-sparkleshare";
+            IconName       = "folder-cmissync";
             Resizable      = false;
             WindowPosition = WindowPosition.Center;
             Deletable      = false;
@@ -56,10 +56,10 @@ namespace SparkleShare {
                 args.RetVal = true;
             };
 
-            SecondaryTextColor = SparkleUIHelpers.GdkColorToHex (Style.Foreground (StateType.Insensitive));
+            SecondaryTextColor = UIHelpers.GdkColorToHex (Style.Foreground (StateType.Insensitive));
                         
             SecondaryTextColorSelected =
-                SparkleUIHelpers.GdkColorToHex (
+                UIHelpers.GdkColorToHex (
                     MixColors (
                         new TreeView ().Style.Foreground (StateType.Selected),
                         new TreeView ().Style.Background (StateType.Selected),
@@ -99,7 +99,7 @@ namespace SparkleShare {
                 Gdk.Color.Parse ("#000", ref bg_color);
                 box.ModifyBg (StateType.Normal, bg_color);
 
-                Image side_splash = SparkleUIHelpers.GetImage ("side-splash.png");
+                Image side_splash = UIHelpers.GetImage ("side-splash.png");
                 side_splash.Yalign = 1;
 
             box.Add (side_splash);

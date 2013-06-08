@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons (hylkebons@gmail.com)
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,16 @@ using System;
 using Gtk;
 using Mono.Unix;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleAbout : Window {
+    public class About : Window {
 
-        public SparkleAboutController Controller = new SparkleAboutController ();
+        public AboutController Controller = new AboutController ();
 
         private Label updates;
 
 
-        public SparkleAbout () : base ("")
+        public About () : base ("")
         {
             DeleteEvent += delegate (object o, DeleteEventArgs args) {
                 Controller.WindowClosed ();
@@ -39,12 +39,12 @@ namespace SparkleShare {
             DefaultSize    = new Gdk.Size (600, 260);
             Resizable      = false;
             BorderWidth    = 0;
-            IconName       = "folder-sparkleshare";
+            IconName       = "folder-cmissync";
             WindowPosition = WindowPosition.Center;
             Title          = "About CmisSync";
             AppPaintable   = true;
 
-            string image_path = new string [] { SparkleUI.AssetsPath, "pixmaps", "about.png" }.Combine ();
+            string image_path = new string [] { UI.AssetsPath, "pixmaps", "about.png" }.Combine ();
 
             Realize ();
             Gdk.Pixbuf buf = new Gdk.Pixbuf (image_path);

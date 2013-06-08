@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 using System.Timers;
 using Gtk;
 
-namespace SparkleShare {
+namespace CmisSync {
         
     // This is a close implementation of GtkSpinner
-    public class SparkleSpinner : Image {
+    public class Spinner : Image {
 
         public bool Active;
 
@@ -33,14 +33,14 @@ namespace SparkleShare {
         private int Size;
 
 
-        public SparkleSpinner (int size) : base ()
+        public Spinner (int size) : base ()
         {
             Size = size;
 
             CycleDuration = 600;
             CurrentStep = 0;
 
-            Gdk.Pixbuf spinner_gallery = SparkleUIHelpers.GetIcon ("process-working", Size);
+            Gdk.Pixbuf spinner_gallery = UIHelpers.GetIcon ("process-working", Size);
 
             int frames_in_width  = spinner_gallery.Width / Size;
             int frames_in_height = spinner_gallery.Height / Size;

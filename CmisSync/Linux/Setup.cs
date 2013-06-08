@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -25,19 +25,18 @@ using System.Collections.Generic;
 using Gtk;
 using Mono.Unix;
 
-using SparkleLib;
-using SparkleLib.Cmis;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleSetup : SparkleSetupWindow {
+    public class Setup : SetupWindow {
 
-        public SparkleSetupController Controller = new SparkleSetupController ();
+        public SetupController Controller = new SetupController ();
 
         private ProgressBar progress_bar = new ProgressBar ();
 
 
-        public SparkleSetup () : base ()
+        public Setup () : base ()
         {
             Controller.HideWindowEvent += delegate {
                 Application.Invoke (delegate {
@@ -301,7 +300,7 @@ namespace SparkleShare {
 	                            // Show wait cursor
 	                            // TODO System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 	
-								SparkleLogger.LogInfo("SparkleSetup", "address:" + address_entry.Text + " user:" + user_entry.Text + " password:" + password_entry.Text);
+								Logger.LogInfo("Setup", "address:" + address_entry.Text + " user:" + user_entry.Text + " password:" + password_entry.Text);
 							
 	                            // Try to find the CMIS server
 	                            CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
@@ -320,7 +319,7 @@ namespace SparkleShare {
 	                            }
 	                            else
 	                            {
-									SparkleLogger.LogInfo("SparkleSetup", "repositories[0]:" + Controller.repositories[0]);
+									Logger.LogInfo("Setup", "repositories[0]:" + Controller.repositories[0]);
 	                                // Continue to folder selection
 	                                Controller.Add1PageCompleted(
 	                                    address_entry.Text, user_entry.Text, password_entry.Text);
@@ -459,7 +458,7 @@ namespace SparkleShare {
                     case PageType.Invite: {
 
                         Header      = "You've received an invite!";
-                        Description = "Do you want to add this project to SparkleShare?";
+                        Description = "Do you want to add this project to CmisSync?";
 
 
                         Table table = new Table (2, 3, true) {
@@ -557,9 +556,9 @@ namespace SparkleShare {
                         Header = "Oops! Something went wrong" + "…";
 
                         VBox points = new VBox (false, 0);
-                        Image list_point_one   = new Image (SparkleUIHelpers.GetIcon ("go-next", 16));
-                        Image list_point_two   = new Image (SparkleUIHelpers.GetIcon ("go-next", 16));
-                        Image list_point_three = new Image (SparkleUIHelpers.GetIcon ("go-next", 16));
+                        Image list_point_one   = new Image (UIHelpers.GetIcon ("go-next", 16));
+                        Image list_point_two   = new Image (UIHelpers.GetIcon ("go-next", 16));
+                        Image list_point_three = new Image (UIHelpers.GetIcon ("go-next", 16));
 
                         Label label_one = new Label () {
                             Markup = "<b>" + Controller.PreviousUrl + "</b> is the address we've compiled. " +
@@ -694,7 +693,7 @@ namespace SparkleShare {
 
                         
                         Image warning_image = new Image (
-                            SparkleUIHelpers.GetIcon ("dialog-information", 24)
+                            UIHelpers.GetIcon ("dialog-information", 24)
                         );
 
                         Label warning_label = new Label () {
@@ -825,7 +824,7 @@ namespace SparkleShare {
 
                         if (warnings.Length > 0) {
                             Image warning_image = new Image (
-                                SparkleUIHelpers.GetIcon ("dialog-information", 24)
+                                UIHelpers.GetIcon ("dialog-information", 24)
                             );
 
                             Label warning_label = new Label (warnings [0]) {
@@ -872,7 +871,7 @@ namespace SparkleShare {
                                 Controller.TutorialPageCompleted ();
                             };
 
-                            Image slide = SparkleUIHelpers.GetImage ("tutorial-slide-1.png");
+                            Image slide = UIHelpers.GetImage ("tutorial-slide-1.png");
 
                             Add (slide);
 
@@ -892,7 +891,7 @@ namespace SparkleShare {
                                 Controller.TutorialPageCompleted ();
                             };
 
-                            Image slide = SparkleUIHelpers.GetImage ("tutorial-slide-2.png");
+                            Image slide = UIHelpers.GetImage ("tutorial-slide-2.png");
 
                             Add (slide);
                             AddButton (continue_button);
@@ -910,7 +909,7 @@ namespace SparkleShare {
                                 Controller.TutorialPageCompleted ();
                             };
 
-                            Image slide = SparkleUIHelpers.GetImage ("tutorial-slide-3.png");
+                            Image slide = UIHelpers.GetImage ("tutorial-slide-3.png");
 
                             Add (slide);
                             AddButton (continue_button);
@@ -923,7 +922,7 @@ namespace SparkleShare {
                             Description = "           " +
                                 "           ";
 
-                            Image slide = SparkleUIHelpers.GetImage ("tutorial-slide-4.png");
+                            Image slide = UIHelpers.GetImage ("tutorial-slide-4.png");
 
                             Button finish_button = new Button ("Finish");
                             finish_button.Clicked += delegate {
@@ -976,24 +975,4 @@ namespace SparkleShare {
         }
     }
 
-
-    public class SparkleTreeView : TreeView {
-
-        public int SelectedRow
-        {
-            get {
-                TreeIter iter;
-                TreeModel model;
-
-                Selection.GetSelected (out model, out iter);
-
-                return int.Parse (model.GetPath (iter).ToString ());
-            }
-        }
-
-
-        public SparkleTreeView (ListStore store) : base (store)
-        {
-        }
-    }
 }

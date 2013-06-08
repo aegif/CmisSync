@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -20,14 +20,14 @@ using System;
 using Gtk;
 using Notifications;
 
-namespace SparkleShare {
+namespace CmisSync {
     
-    public class SparkleBubbles {
+    public class Bubbles {
 
-        public SparkleBubblesController Controller = new SparkleBubblesController ();
+        public BubblesController Controller = new BubblesController ();
 
 
-        public SparkleBubbles ()
+        public Bubbles ()
         {
             Controller.ShowBubbleEvent += delegate (string title, string subtext, string image_path) {
                 try {
@@ -41,7 +41,7 @@ namespace SparkleShare {
                     if (image_path != null)
                         notification.Icon = new Gdk.Pixbuf (image_path);
                     else
-                        notification.IconName = "folder-sparkleshare";
+                        notification.IconName = "folder-cmissync";
 
                     notification.Closed += delegate (object o, EventArgs args) {
                         if ((args as CloseArgs).Reason == CloseReason.User)

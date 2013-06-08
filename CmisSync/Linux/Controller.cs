@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -19,32 +19,25 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleController : SparkleControllerBase {
+    public class Controller : ControllerBase {
 
-        public SparkleController () : base ()
+        public Controller () : base ()
         {
         }
 
 
-        public override string PluginsPath {
-            get {
-                return new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "plugins" }.Combine ();
-            }
-        }
-
-
         // Creates a .desktop entry in autostart folder to
-        // start SparkleShare automatically at login
+        // start CmisSync automatically at login
         public override void CreateStartupItem ()
         {
             string autostart_path = Path.Combine (
                 Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "autostart");
 
-            string desktopfile_path = Path.Combine (autostart_path, "sparkleshare.desktop");
+            string desktopfile_path = Path.Combine (autostart_path, "cmissync.desktop");
 
             if (!Directory.Exists (autostart_path))
                 Directory.CreateDirectory (autostart_path);
@@ -54,17 +47,17 @@ namespace SparkleShare {
                     File.WriteAllText (desktopfile_path,
                         "[Desktop Entry]\n" +
                         "Type=Application\n" +
-                        "Name=SparkleShare\n" +
-                        "Exec=sparkleshare start\n" +
-                        "Icon=folder-sparkleshare\n" +
+                        "Name=CmisSync\n" +
+                        "Exec=cmissync start\n" +
+                        "Icon=folder-cmissync\n" +
                         "Terminal=false\n" +
                         "X-GNOME-Autostart-enabled=true\n" +
                         "Categories=Network");
 
-                    SparkleLogger.LogInfo ("Controller", "Added SparkleShare to login items");
+                    Logger.LogInfo ("Controller", "Added CmisSync to login items");
 
                 } catch (Exception e) {
-                    SparkleLogger.LogInfo ("Controller", "Failed adding SparkleShare to login items: " + e.Message);
+                    Logger.LogInfo ("Controller", "Failed adding CmisSync to login items: " + e.Message);
                 }
             }
         }
@@ -72,7 +65,7 @@ namespace SparkleShare {
         
         public override void InstallProtocolHandler ()
         {
-            // sparkleshare-invite-opener.desktop launches the handler on newer
+            // cmissync-invite-opener.desktop launches the handler on newer
             // systems (like GNOME 3) that implement the last freedesktop.org specs.
             // For GNOME 2 however we need to tell gconf about the protocol manually
 
@@ -81,13 +74,13 @@ namespace SparkleShare {
                 Process process = new Process ();
                 process.StartInfo.FileName  = "gconftool-2";
                 process.StartInfo.Arguments =
-                    "-s /desktop/gnome/url-handlers/sparkleshare/command 'sparkleshare open %s' --type String";
+                    "-s /desktop/gnome/url-handlers/cmissync/command 'cmissync open %s' --type String";
 
                 process.Start ();
                 process.WaitForExit ();
 
                 // ...and enable it
-                process.StartInfo.Arguments = "-s /desktop/gnome/url-handlers/sparkleshare/enabled --type Boolean true";
+                process.StartInfo.Arguments = "-s /desktop/gnome/url-handlers/cmissync/enabled --type Boolean true";
 
                 process.Start ();
                 process.WaitForExit ();
@@ -98,36 +91,36 @@ namespace SparkleShare {
         }
 
 
-        // Adds the SparkleShare folder to the user's
+        // Adds the CmisSync folder to the user's
         // list of bookmarked places
         public override void AddToBookmarks ()
         {
             string bookmarks_file_path   = Path.Combine (SparkleConfig.DefaultConfig.HomePath, ".gtk-bookmarks");
-            string sparkleshare_bookmark = "file://" + FoldersPath + " SparkleShare";
+            string cmissync_bookmark = "file://" + FoldersPath + " CmisSync";
 
             if (File.Exists (bookmarks_file_path)) {
                 string bookmarks = File.ReadAllText (bookmarks_file_path);
 
-                if (!bookmarks.Contains (sparkleshare_bookmark))
-                    File.AppendAllText (bookmarks_file_path, "file://" + FoldersPath + " SparkleShare");
+                if (!bookmarks.Contains (cmissync_bookmark))
+                    File.AppendAllText (bookmarks_file_path, "file://" + FoldersPath + " CmisSync");
 
             } else {
-                File.WriteAllText (bookmarks_file_path, "file://" + FoldersPath + " SparkleShare");
+                File.WriteAllText (bookmarks_file_path, "file://" + FoldersPath + " CmisSync");
             }
         }
 
 
-        // Creates the SparkleShare folder in the user's home folder
-        public override bool CreateSparkleShareFolder ()
+        // Creates the CmisSync folder in the user's home folder
+        public override bool CreateCmisSyncFolder ()
         {
             if (!Directory.Exists (SparkleConfig.DefaultConfig.FoldersPath)) {
                 Directory.CreateDirectory (SparkleConfig.DefaultConfig.FoldersPath);
-                SparkleLogger.LogInfo ("Controller", "Created '" + SparkleConfig.DefaultConfig.FoldersPath + "'");
+                Logger.LogInfo ("Controller", "Created '" + SparkleConfig.DefaultConfig.FoldersPath + "'");
 
                 string gvfs_command_path = new string [] { Path.VolumeSeparatorChar.ToString (),
                         "usr", "bin", "gvfs-set-attribute" }.Combine ();
 
-                // Add a special icon to the SparkleShare folder
+                // Add a special icon to the CmisSync folder
                 if (File.Exists (gvfs_command_path)) {
                     Process process = new Process ();
                     process.StartInfo.UseShellExecute = false;
@@ -140,9 +133,9 @@ namespace SparkleShare {
                     process.Start ();
                     process.WaitForExit ();
 
-                    // Give the SparkleShare folder an icon name, so that it scales
+                    // Give the CmisSync folder an icon name, so that it scales
                     process.StartInfo.Arguments = SparkleConfig.DefaultConfig.FoldersPath +
-                        " metadata::custom-icon-name 'folder-sparkleshare'";
+                        " metadata::custom-icon-name 'folder-cmissync'";
 
                     process.Start ();
                     process.WaitForExit ();
@@ -157,8 +150,8 @@ namespace SparkleShare {
 
         public override string EventLogHTML {
             get {
-                string html_path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "html", "event-log.html" }.Combine ();
-                string jquery_file_path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "html", "jquery.js" }.Combine ();
+                string html_path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/cmissync", "html", "event-log.html" }.Combine ();
+                string jquery_file_path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/cmissync", "html", "jquery.js" }.Combine ();
 
                 string html   = File.ReadAllText (html_path);
                 string jquery = File.ReadAllText (jquery_file_path);
@@ -170,7 +163,7 @@ namespace SparkleShare {
         
         public override string DayEntryHTML {
             get {
-                string path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "html", "day-entry.html" }.Combine ();
+                string path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/cmissync", "html", "day-entry.html" }.Combine ();
                 return File.ReadAllText (path);
             }
         }
@@ -178,7 +171,7 @@ namespace SparkleShare {
         
         public override string EventEntryHTML {
             get {
-                string path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/sparkleshare", "html", "event-entry.html" }.Combine ();
+                string path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/cmissync", "html", "event-entry.html" }.Combine ();
                 return File.ReadAllText (path);
             }
         }

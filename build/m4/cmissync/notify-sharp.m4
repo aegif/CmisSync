@@ -1,4 +1,4 @@
-AC_DEFUN([SPARKLESHARE_CHECK_NOTIFY_SHARP],
+AC_DEFUN([CMISSYNC_CHECK_NOTIFY_SHARP],
 [
 	PKG_CHECK_MODULES(NOTIFY_SHARP, notify-sharp, have_notify_sharp=yes, have_notify_sharp=no)
 	if test "x$have_notify_sharp" = "xyes"; then

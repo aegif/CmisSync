@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -19,15 +19,15 @@ using System.IO;
 
 using Gtk;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public static class SparkleUIHelpers {
+    public static class UIHelpers {
 
         // Looks up an icon from the system's theme
         public static Gdk.Pixbuf GetIcon (string name, int size)
         {
             IconTheme icon_theme = new IconTheme ();
-            icon_theme.AppendSearchPath (Path.Combine (SparkleUI.AssetsPath, "icons"));
+            icon_theme.AppendSearchPath (Path.Combine (UI.AssetsPath, "icons"));
 
             try {
                 return icon_theme.LoadIcon (name, size, IconLookupFlags.GenericFallback);
@@ -45,7 +45,7 @@ namespace SparkleShare {
 
         public static Image GetImage (string name)
         {
-            string image_path = new string [] { SparkleUI.AssetsPath, "pixmaps", name }.Combine ();
+            string image_path = new string [] { UI.AssetsPath, "pixmaps", name }.Combine ();
             return new Image (image_path);
         }
 

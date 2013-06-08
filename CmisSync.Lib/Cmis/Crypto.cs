@@ -7,11 +7,7 @@ namespace CmisSync.Lib.Cmis
 {
     public static class Crypto
     {
-        /**
-         * You can specify DataProtectionScope.CurrentUser to encrypt data using the current user's Windows login password,
-         * so that no other user can decrypt it (this also works if the user has no password)
-         * */
-
+        // Simple obfuscation using a hardcoded key.
 
         public static byte[] GetCryptoKey()
         {
@@ -23,12 +19,19 @@ namespace CmisSync.Lib.Cmis
         {
             try
             {
+                AesManaged myAes = new AesManaged();
+                myAes.Mode = CipherMode.ECB;
+                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // CRB mode uses an empty IV
+                myAes.Key = GetCryptoKey();  // Byte array representing the key
+                myAes.Padding = PaddingMode.None;
+
+                ICryptoTransform encryptor = myAes.CreateEncryptor();
+
                 byte[] data = System.Text.Encoding.UTF8.GetBytes(value);
-                // Encrypt the data using DataProtectionScope.CurrentUser. The result can be decrypted
-                //  only by the same current user.
-                byte[] crypt = ProtectedData.Protect(data, GetCryptoKey(), DataProtectionScope.CurrentUser);
+                byte[] crypt = encryptor.TransformFinalBlock(data, 0, data.Length);
                 return Convert.ToBase64String(crypt, Base64FormattingOptions.None);
             }
+
             catch (CryptographicException e)
             {
                 Console.WriteLine("Data was not encrypted. An error occurred.");
@@ -41,9 +44,17 @@ namespace CmisSync.Lib.Cmis
         {
             try
             {
+                AesManaged myAes = new AesManaged();
+                myAes.Mode = CipherMode.ECB;
+                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // CRB mode uses an empty IV
+                myAes.Key = GetCryptoKey();  // Byte array representing the key
+                myAes.Padding = PaddingMode.None;
+
+                ICryptoTransform decryptor = myAes.CreateDecryptor();
+
                 byte[] data = Convert.FromBase64String(value);
-                //Decrypt the data using DataProtectionScope.CurrentUser.
-                byte[] uncrypt = ProtectedData.Unprotect(data, GetCryptoKey(), DataProtectionScope.CurrentUser);
+
+                byte[] uncrypt = decryptor.TransformFinalBlock(data, 0, data.Length);
                 return System.Text.Encoding.UTF8.GetString(uncrypt);
             }
             catch (Exception e)

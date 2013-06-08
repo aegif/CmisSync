@@ -1,7 +1,7 @@
 EXTRA_DIST = \
-	$(srcdir)/sparkleshare/*.m4 \
-	$(srcdir)/shamrock/*.m4 \
-	$(srcdir)/shave/*.m4 
+	$(srcdir)/cmissync/*.m4 \
+	$(srcdir)/shamrock/*.m4
 
-MAINTAINERCLEANFILES = Makefile.in
+MAINTAINERCLEANFILES = Makefile.in \
+	cmissync/lt*.m4 cmissync/libtool.m4
 

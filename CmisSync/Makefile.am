@@ -1,27 +1,19 @@
 SUBDIRS = Linux \
 	Common
 
-ASSEMBLY = SparkleShare
+ASSEMBLY = CmisSync
 TARGET = exe
 
-LINK = $(REF_SPARKLESHARE) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS)
-
-if HAVE_APP_INDICATOR
-BUILD_DEFINES="-define:HAVE_APP_INDICATOR"
-endif
+LIBS = $(REF_CMISSYNC) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS)
 
 SOURCES =  \
 	Program.cs \
-	SparkleAboutController.cs \
-	SparkleBubblesController.cs \
-	SparkleControllerBase.cs \
-	SparkleEventLogController.cs \
-	SparkleExtensions.cs \
-	SparkleInvite.cs \
-	SparkleKeys.cs \
-	SparklePlugin.cs \
-	SparkleSetupController.cs \
-	SparkleStatusIconController.cs
+	AboutController.cs \
+	BubblesController.cs \
+	ControllerBase.cs \
+	Extensions.cs \
+	SetupController.cs \
+	StatusIconController.cs
 
 include $(top_srcdir)/build/build.mk
 	
