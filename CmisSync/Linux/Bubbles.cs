@@ -19,6 +19,7 @@ using System;
 
 using Gtk;
 using Notifications;
+using System.Windows.Forms;
 
 namespace CmisSync {
     
@@ -29,7 +30,7 @@ namespace CmisSync {
 
         public Bubbles ()
         {
-            Controller.ShowBubbleEvent += delegate (string title, string subtext, string image_path) {
+            Controller.ShowBubbleEvent += delegate (string title, string subtext, ToolTipIcon tticon) {
                 try {
                     Notification notification = new Notification () {
                         Summary = title,
@@ -37,14 +38,15 @@ namespace CmisSync {
                         Timeout = 5 * 1000,
                         Urgency = Urgency.Low
                     };
-    
+   /* XXX fixme use tticon 
                     if (image_path != null)
                         notification.Icon = new Gdk.Pixbuf (image_path);
                     else
+                    */
                         notification.IconName = "folder-cmissync";
 
                     notification.Closed += delegate (object o, EventArgs args) {
-                        if ((args as CloseArgs).Reason == CloseReason.User)
+                        if ((args as CloseArgs).Reason == Notifications.CloseReason.User)
                             Controller.BubbleClicked ();
                     };
 

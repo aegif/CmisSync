@@ -118,153 +118,153 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Hinzufügen</value>
+    <value>Añadir</value>
   </data>
   <data name="AddARemoteFolder" xml:space="preserve">
-    <value>Fügen Sie einen Remote Ordner ein...</value>
+    <value>Añadir una carpeta remota...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Hinzufügen von syncronisierten Ordnern zu CmisSync</value>
+    <value>Añadiendo carpetas sincronizadas a CmisSync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
-    <value>Ordner hinzufügen</value>
+    <value>Añadiendo carpeta</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Zurück</value>
+    <value>Atrás</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Abbrechen</value>
+    <value>Cancelar</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync erstellt einen speziellen Ordner auf Ihrem Computer, in welchem die Dokumente synchronisiert werden.</value>
+    <value>CmisSync crea una carpeta especial en su ordenador donde se sincronizan los documentos.</value>
   </data>
   <data name="Continue" xml:space="preserve">
-    <value>Weiter</value>
+    <value>Continuar</value>
   </data>
   <data name="Customize" xml:space="preserve">
-    <value>Lokalen Ordner-Namen anpassen</value>
+    <value>Personalizar el nombre de la carpeta local</value>
   </data>
   <data name="DocumentsAre" xml:space="preserve">
-    <value>Dokumente werden automatisch aktualisiert und die neuesten Änderungen werden an den Server gesendet.</value>
+    <value>Los documentos se actualizan automáticamente para reflejar los cambios más recientes de sus compañeros y los cambios también se envían al servidor automáticamente.</value>
   </data>
   <data name="EmptyURLNotAllowed" xml:space="preserve">
-    <value>Leere URL</value>
+    <value>URL vacío</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Geben Sie einen Namen für den lokalen Ordner ein, wo die Dokumente synchronisiert werden</value>
+    <value>Introduzca un nombre para la carpeta local donde se sincronizan los documentos</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Geben Sie eine CMIS Server Adresse ein:</value>
+    <value>Escriba una dirección Web donde los documentos puedan ser vistos:</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Beenden</value>
+    <value>Salir</value>
   </data>
   <data name="FailedToSendSomeChanges" xml:space="preserve">
-    <value>Fehler beim Senden der Änderungen</value>
+    <value>Fallo al enviar algunos cambios</value>
   </data>
   <data name="FilesUpToDate" xml:space="preserve">
-    <value>Dateien sind aktuell</value>
+    <value>Archivos actualizados</value>
   </data>
   <data name="Finish" xml:space="preserve">
-    <value>Fertig stellen</value>
+    <value>Terminado</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Der Ordner existiert bereits im Stammordner CmisSync</value>
+    <value>Ya existe una carpeta en la carpeta raíz de CmisSync</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Hilfe</value>
+    <value>Ayuda</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>Mit CmisSync können Sie mit jedem CMIS-konformen Server ihre Daten synchron halten, und Ihre Dokumente auch im Offlinemodus verwenden. Funktioniert wie Dropbox für Enterprise Content Management!</value>
+    <value>CmisSync permite mantener sincronizado con cualquier servidor compatible con CMIS empresarial y utilizar sus documentos, incluso cuando está fuera de línea.  ¡ Es como Dropbox para los Gestores Documentales Empresariales!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>Der Ordnername ist ungültig. Sonderzeichen sind nicht erlaubt.</value>
+    <value>El nombre de la carpeta es válido. No se permiten caracteres especiales.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
-    <value>ungültige URL</value>
+    <value>URL no válida</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
-    <value>Dies kann entweder eine kurze oder lange Zeit abhängig von der Größe des Ordners dauern.</value>
+    <value>Esto puede tardar un menor o mayor tiempo dependiendo del tamaño de la carpeta.</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
-    <value>Öffnen Sie den synchronisierten Ordner</value>
+    <value>Abra la carpeta sincronizada</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Passwort</value>
+    <value>Contraseña</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>CMIS-Server gefunden. Zugriff wurde verweigert. Bitte überprüfen Sie Benutzername und Kennwort.</value>
+    <value>Se ha encontrado el servidor de CMIS , pero negó el permiso. Por favor comprueba el nombre de usuario/contraseña.</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>Ihre Dokumente werden nun synchronisiert.</value>
+    <value>Sus documentos se estan siendo sincronizandos</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
-    <value>Empfange Änderungen...</value>
+    <value>Recibiendo los cambios...</value>
   </data>
   <data name="SendingChanges" xml:space="preserve">
-    <value>Änderungen werden gesendet...</value>
+    <value>Enviando los cambios...</value>
   </data>
   <data name="SkipTutorial" xml:space="preserve">
-    <value>Einführung überspringen</value>
+    <value>Saltar el tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Leider kann CmisSync keinen CMIS-Server unter dieser Adresse finden. Bitte prüfen Sie angegebene Adresse. Wenn Sie sich sicher sind das die Adresse stimmt, öffnen Sie diese in einem Browser um das resultierende XML im CmisSync Forum zu Posten.</value>
+    <value>Lo sentimos, CmisSync no puedo encontrar un servidor CMIS en esta dirección. Por favor reviselo de nuevo. Si estás seguro acerca de la dirección, ábralo en un navegador y publique el XML resultante en el foro de CmisSync.</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>CmisSync im Autostart hinzufügen</value>
+    <value>Añadir CmisSync a la barra de inicio</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>Das Symbol ist hier zu helfen</value>
+    <value>El icono de estado está aquí para ayudarle</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>Das CmisSync Status-Symbol zeigt den Fortschritt der Synchronisierung und bietet einfachen Zugriff auf Ihre Ordner.</value>
+    <value>El icono de estado de CmisSync muestra el progreso de la sincronización y ofrece un fácil acceso a las carpetas.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
-    <value>Synchronisation</value>
+    <value>Sincronización</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
-    <value>Synchronisieren die Änderungen...</value>
+    <value>Sincronizando los cambios...</value>
   </data>
   <data name="User" xml:space="preserve">
-    <value>Benutzer</value>
+    <value>Usuario</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Willkommen zu CmisSync!</value>
+    <value>¡Bienvenido a CmisSync!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>Was passiert als nächstes?</value>
+    <value>¿Qué ocurre a continuación?</value>
   </data>
   <data name="Where" xml:space="preserve">
-    <value>Serveradresse Ihrer Organisation?</value>
+    <value>¿Dónde está el servidor de su organización?</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>Wo diese Adresse zu finden</value>
+    <value>Dónde encontrar esta dirección</value>
   </data>
   <data name="Which" xml:space="preserve">
-    <value>Welche Remoteordner möchten Sie synchronisieren?</value>
+    <value>¿Qué carpeta remota desea sincronizar?</value>
   </data>
   <data name="YouCan" xml:space="preserve">
-    <value>Sie können einen neuen CMIS-Ordner jederzeit problemlos hinzufügen.</value>
+    <value>Usted puede agregar fácilmente una nueva carpeta CMIS en cualquier momento.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Sie finden den im Ordner CmisSync.</value>
+    <value>Usted puede encontrarlos en la carpeta CmisSync.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Ändern Sie den lokalen Pfad dieses Archivs:</value>
+    <value>Cambiar la ruta de acceso local de este repositorio:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Ein lokaler Ordner mit demselben Namen ist bereits vorhanden, bitte benutzen Sie einen anderen Namen.</value>
+    <value>Una carpeta local con el mismo nombre ya existe, utilice un nombre diferente.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
-    <value>Synchronisation anhalten</value>
+    <value>Pausar sincronización</value>
   </data>
   <data name="ResumeSync" xml:space="preserve">
-    <value>Synchronisation fortsetzen</value>
+    <value>Reanudar sincronización</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
-    <value>Remote-Ordner durchsuchen</value>
+    <value>Buscar carpeta remota</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
-    <value>Lokalen Ordner öffnen</value>
+    <value>Abrir carpeta local</value>
   </data>
 </root>

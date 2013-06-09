@@ -39,7 +39,7 @@ namespace CmisSync {
         #if HAVE_APP_INDICATOR
         private ApplicationIndicator indicator;
         #else
-        private StatusIcon status_icon;
+        private Gtk.StatusIcon status_icon;
         #endif
 
 
@@ -53,7 +53,7 @@ namespace CmisSync {
 
             this.indicator.Status = Status.Active;
             #else
-            this.status_icon        = new StatusIcon ();
+            this.status_icon        = new Gtk.StatusIcon ();
             this.status_icon.Pixbuf = this.animation_frames [0];
 
             this.status_icon.Activate  += ShowMenu; // Primary mouse button click
@@ -274,7 +274,7 @@ namespace CmisSync {
         private EventHandler OpenFolderDelegate (string name)
         {
             return delegate {
-                Controller.SubfolderClicked (name);
+                Controller.LocalFolderClicked (name);
             };
         }
 
@@ -302,7 +302,7 @@ namespace CmisSync {
         // Makes sure the menu pops up in the right position
         private void SetPosition (Menu menu, out int x, out int y, out bool push_in)
         {
-            StatusIcon.PositionMenu (menu, out x, out y, out push_in, this.status_icon.Handle);
+            Gtk.StatusIcon.PositionMenu (menu, out x, out y, out push_in, this.status_icon.Handle);
         }
         #endif
     }

@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.IO;
 
 using CmisSync.Lib;
+using CmisSync.Lib.Cmis;
 
 namespace CmisSync {
 
@@ -54,10 +55,10 @@ namespace CmisSync {
                         "X-GNOME-Autostart-enabled=true\n" +
                         "Categories=Network");
 
-                    Logger.LogInfo ("Controller", "Added CmisSync to login items");
+                    Logger.Info ("Added CmisSync to login items");
 
                 } catch (Exception e) {
-                    Logger.LogInfo ("Controller", "Failed adding CmisSync to login items: " + e.Message);
+                    Logger.Info ("Failed adding CmisSync to login items: " + e.Message);
                 }
             }
         }
@@ -95,7 +96,8 @@ namespace CmisSync {
         // list of bookmarked places
         public override void AddToBookmarks ()
         {
-            string bookmarks_file_path   = Path.Combine (SparkleConfig.DefaultConfig.HomePath, ".gtk-bookmarks");
+            string bookmarks_file_path   = Path.Combine (
+                    Environment.GetFolderPath (Environment.SpecialFolder.Personal), ".gtk-bookmarks");
             string cmissync_bookmark = "file://" + FoldersPath + " CmisSync";
 
             if (File.Exists (bookmarks_file_path)) {
@@ -113,9 +115,9 @@ namespace CmisSync {
         // Creates the CmisSync folder in the user's home folder
         public override bool CreateCmisSyncFolder ()
         {
-            if (!Directory.Exists (SparkleConfig.DefaultConfig.FoldersPath)) {
-                Directory.CreateDirectory (SparkleConfig.DefaultConfig.FoldersPath);
-                Logger.LogInfo ("Controller", "Created '" + SparkleConfig.DefaultConfig.FoldersPath + "'");
+            if (!Directory.Exists (FoldersPath)) {
+                Directory.CreateDirectory (FoldersPath);
+                Logger.Info ("Created '" + FoldersPath + "'");
 
                 string gvfs_command_path = new string [] { Path.VolumeSeparatorChar.ToString (),
                         "usr", "bin", "gvfs-set-attribute" }.Combine ();
@@ -128,13 +130,13 @@ namespace CmisSync {
 
                     // Clear the custom (legacy) icon path
                     process.StartInfo.Arguments = "-t unset " +
-                        SparkleConfig.DefaultConfig.FoldersPath + " metadata::custom-icon";
+                        FoldersPath + " metadata::custom-icon";
 
                     process.Start ();
                     process.WaitForExit ();
 
                     // Give the CmisSync folder an icon name, so that it scales
-                    process.StartInfo.Arguments = SparkleConfig.DefaultConfig.FoldersPath +
+                    process.StartInfo.Arguments = FoldersPath +
                         " metadata::custom-icon-name 'folder-cmissync'";
 
                     process.Start ();
@@ -190,5 +192,24 @@ namespace CmisSync {
             process.StartInfo.Arguments = "\"" + path + "\"";
             process.Start ();
         }
+
+        public void OpenCmisSyncFolder()
+        {
+            OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
+        }
+
+
+        public void OpenCmisSyncFolder(string name)
+        {
+            OpenFolder(new Folder(name).FullPath);
+        }
+
+        public void OpenRemoteFolder(string name)
+        {
+            RepoInfo repo = ConfigManager.CurrentConfig.GetRepoInfo(name);
+            Process.Start(CmisUtils.GetBrowsableURL(repo));
+        }
+
+
     }
 }

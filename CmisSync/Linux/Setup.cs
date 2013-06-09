@@ -300,7 +300,7 @@ namespace CmisSync {
 	                            // Show wait cursor
 	                            // TODO System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 	
-								Logger.LogInfo("Setup", "address:" + address_entry.Text + " user:" + user_entry.Text + " password:" + password_entry.Text);
+								Logger.Info("address:" + address_entry.Text + " user:" + user_entry.Text + " password:" + password_entry.Text);
 							
 	                            // Try to find the CMIS server
 	                            CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
@@ -319,7 +319,7 @@ namespace CmisSync {
 	                            }
 	                            else
 	                            {
-									Logger.LogInfo("Setup", "repositories[0]:" + Controller.repositories[0]);
+									Logger.Info("repositories[0]:" + Controller.repositories[0]);
 	                                // Continue to folder selection
 	                                Controller.Add1PageCompleted(
 	                                    address_entry.Text, user_entry.Text, password_entry.Text);
@@ -455,62 +455,6 @@ namespace CmisSync {
                         break;
                     }
 
-                    case PageType.Invite: {
-
-                        Header      = "You've received an invite!";
-                        Description = "Do you want to add this project to CmisSync?";
-
-
-                        Table table = new Table (2, 3, true) {
-                            RowSpacing    = 6,
-                            ColumnSpacing = 6
-                        };
-
-                            Label address_label = new Label ("Address:") {
-                                Xalign    = 1
-                            };
-
-                            Label path_label = new Label ("Remote Path:") {
-                                Xalign    = 1
-                            };
-
-                            Label address_value = new Label ("<b>" + Controller.PendingInvite.Address + "</b>") {
-                                UseMarkup = true,
-                                Xalign    = 0
-                            };
-
-                            Label path_value = new Label ("<b>" + Controller.PendingInvite.RemotePath + "</b>") {
-                                UseMarkup = true,
-                                Xalign    = 0
-                            };
-
-                        table.Attach (address_label, 0, 1, 0, 1);
-                        table.Attach (address_value, 1, 2, 0, 1);
-                        table.Attach (path_label, 0, 1, 1, 2);
-                        table.Attach (path_value, 1, 2, 1, 2);
-
-                        VBox wrapper = new VBox (false, 9);
-                        wrapper.PackStart (table, true, false, 0);
-
-                            Button cancel_button = new Button ("Cancel");
-
-                            cancel_button.Clicked += delegate {
-                                Controller.PageCancelled ();
-                            };
-
-                            Button add_button = new Button ("Add");
-
-                            add_button.Clicked += delegate {
-                                Controller.InvitePageCompleted ();
-                            };
-
-                        AddButton (cancel_button);
-                        AddButton (add_button);
-                        Add (wrapper);
-
-                        break;
-                    }
-
                     case PageType.Syncing: {
 
                         Header      = String.Format ("Adding project ‘{0}’…", Controller.SyncingFolder);
@@ -626,173 +570,6 @@ namespace CmisSync {
                         break;
                     }
     
-                    case PageType.CryptoSetup: {
-
-                        Header       = "Set up file encryption";
-                        Description  = "This project is supposed to be encrypted, but it doesn't yet have a password set. Please provide one below.";
-                        
-                        Label password_label = new Label ("<b>" + "Password:" + "</b>") {
-                            UseMarkup = true,
-                            Xalign    = 1
-                        };
-
-                        Entry password_entry = new Entry () {
-                            Xalign = 0,
-                            Visibility = false,
-                            ActivatesDefault = true
-                        };
-                        
-                        CheckButton show_password_check_button = new CheckButton ("Show password") {
-                            Active = false,
-                            Xalign = 0,
-                        };
-                        
-                        show_password_check_button.Toggled += delegate {
-                            password_entry.Visibility = !password_entry.Visibility;
-                        };
-
-                        password_entry.Changed += delegate {
-                            Controller.CheckCryptoSetupPage (password_entry.Text);
-                        };
-                         
-
-                        Button continue_button = new Button ("Continue") {
-                            Sensitive = false
-                        };
-
-                        continue_button.Clicked += delegate {
-                           Controller.CryptoSetupPageCompleted (password_entry.Text);
-                        };
-
-                        Button cancel_button = new Button ("Cancel");
-
-                        cancel_button.Clicked += delegate {
-                            Controller.CryptoPageCancelled ();
-                        };
-
-                        Controller.UpdateCryptoSetupContinueButtonEvent += delegate (bool button_enabled) {
-                            Application.Invoke (delegate {
-                                continue_button.Sensitive = button_enabled;
-                            });
-                        };
-                        
-                        
-                        Table table = new Table (2, 3, true) {
-                            RowSpacing    = 6,
-                            ColumnSpacing = 6
-                        };
-
-
-                        table.Attach (password_label, 0, 1, 0, 1);
-                        table.Attach (password_entry, 1, 2, 0, 1);
-                        
-                        table.Attach (show_password_check_button, 1, 2, 1, 2);
-                        
-                        VBox wrapper = new VBox (false, 9);
-                        wrapper.PackStart (table, true, false, 0);
-
-                        
-                        Image warning_image = new Image (
-                            UIHelpers.GetIcon ("dialog-information", 24)
-                        );
-
-                        Label warning_label = new Label () {
-                            Xalign = 0,
-                            Wrap   = true,
-                            Text   = "This password can't be changed later, and your files can't be recovered if it's forgotten."
-                        };
-
-                        HBox warning_layout = new HBox (false, 0);
-                        warning_layout.PackStart (warning_image, false, false, 15);
-                        warning_layout.PackStart (warning_label, true, true, 0);
-                        
-                        VBox warning_wrapper = new VBox (false, 0);
-                        warning_wrapper.PackStart (warning_layout, false, false, 15);
-
-                        wrapper.PackStart (warning_wrapper, false, false, 0);
-                    
-                        
-                        Add (wrapper);
-
-
-
-                        AddButton (cancel_button);
-                        AddButton (continue_button);
-
-                        break;
-                    }
-
-                    case PageType.CryptoPassword: {
-
-                        Header       = "This project contains encrypted files";
-                        Description  = "Please enter the password to see their contents.";
-                        
-                        Label password_label = new Label ("<b>" + "Password:" + "</b>") {
-                            UseMarkup = true,
-                            Xalign    = 1
-                        };
-
-                        Entry password_entry = new Entry () {
-                            Xalign = 0,
-                            Visibility = false,
-                            ActivatesDefault = true
-                        };
-                        
-                        CheckButton show_password_check_button = new CheckButton ("Show password") {
-                            Active = false,
-                            Xalign = 0
-                        };
-                        
-                        show_password_check_button.Toggled += delegate {
-                            password_entry.Visibility = !password_entry.Visibility;
-                        };
-
-                        password_entry.Changed += delegate {
-                            Controller.CheckCryptoPasswordPage (password_entry.Text);
-                        };
-                         
-
-                        Button continue_button = new Button ("Continue") {
-                            Sensitive = false
-                        };
-
-                        continue_button.Clicked += delegate {
-                           Controller.CryptoPasswordPageCompleted (password_entry.Text);
-                        };
-
-                        Button cancel_button = new Button ("Cancel");
-
-                        cancel_button.Clicked += delegate {
-                            Controller.CryptoPageCancelled ();
-                        };
-
-                        Controller.UpdateCryptoPasswordContinueButtonEvent += delegate (bool button_enabled) {
-                            Application.Invoke (delegate {
-                                continue_button.Sensitive = button_enabled;
-                            });
-                        };
-                        
-                        Table table = new Table (2, 3, true) {
-                            RowSpacing    = 6,
-                            ColumnSpacing = 6
-                        };
-
-                        table.Attach (password_label, 0, 1, 0, 1);
-                        table.Attach (password_entry, 1, 2, 0, 1);
-                        
-                        table.Attach (show_password_check_button, 1, 2, 1, 2);
-                        
-                        VBox wrapper = new VBox (false, 9);
-                        wrapper.PackStart (table, true, false, 0);
-
-                        Add (wrapper);
-
-                        AddButton (cancel_button);
-                        AddButton (continue_button);
-
-                        break;
-                    }
-                        
                     case PageType.Finished: {
 
                         UrgencyHint = true;

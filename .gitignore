@@ -27,6 +27,7 @@ ltmain.sh
 missing
 CmisSync/Linux/cmissync
 CmisSync/Mac/git
+CmisSync.Lib/Defines.cs
 gnome-doc-utils.make
 desktop.ini
 _ReSharper.*

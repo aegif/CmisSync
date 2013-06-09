@@ -21,7 +21,11 @@ SOURCES =  \
 	Spinner.cs \
 	StatusIcon.cs \
 	UI.cs \
-	UIHelpers.cs
+	UIHelpers.cs \
+	Properties/Resources.Designer.cs
+
+RESOURCES = \
+	$(wildcard Properties/*.resx)
 
 include $(top_srcdir)/build/build.mk
 
