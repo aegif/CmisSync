@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIconFile</key>
-	<string>sparkleshare-app</string>
+	<string>cmissync-app</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.sparkleshare.sparkleshare</string>
+	<string>org.cmissync.cmissync</string>
 	<key>CFBundleName</key>
-	<string>SparkleShare</string>
+	<string>CmisSync</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>

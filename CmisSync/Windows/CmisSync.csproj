@@ -15,7 +15,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <ApplicationIcon>Pixmaps\sparkleshare-app.ico</ApplicationIcon>
+    <ApplicationIcon>Pixmaps\cmissync-app.ico</ApplicationIcon>
     <ReleaseVersion />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -247,8 +247,8 @@
     <EmbeddedResource Include="Pixmaps\process-syncing-iii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiiii.png" />
-    <EmbeddedResource Include="Pixmaps\sparkleshare-app.ico" />
-    <EmbeddedResource Include="Pixmaps\sparkleshare-folder.png" />
+    <EmbeddedResource Include="Pixmaps\cmissync-app.ico" />
+    <EmbeddedResource Include="Pixmaps\cmissync-folder.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\tutorial-slide-1.png" />
@@ -269,7 +269,7 @@
     <EmbeddedResource Include="Pixmaps\media_playback_pause.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
-    <Content Include="Pixmaps\sparkleshare-folder.ico" />
+    <Content Include="Pixmaps\cmissync-folder.ico" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Plugins\" />

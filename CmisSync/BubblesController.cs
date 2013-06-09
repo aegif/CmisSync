@@ -16,8 +16,8 @@
 
 
 using System;
-using System.Windows.Forms;
 using CmisSync.Lib;
+using System.Windows.Forms;
 
 namespace CmisSync
 {

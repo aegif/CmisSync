@@ -33,7 +33,6 @@ using DotCMIS.Enums;
 using DotCMIS.Exceptions;
 
 using System.Data;
-using System.Data.SQLite;
 using System.Collections;
 
 namespace CmisSync.Lib.Sync

@@ -88,9 +88,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = SparkleShare.csproj
+		StartupItem = CmisSync.csproj
 		version = 
 		outputpath = bin
-		name = SparkleShare
+		name = CmisSync
 	EndGlobalSection
 EndGlobal

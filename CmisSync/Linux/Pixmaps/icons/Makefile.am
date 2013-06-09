@@ -6,21 +6,21 @@ system_themedir = $(datadir)/icons/$(theme)
 app_themedir = $(pkgdatadir)/icons/$(theme)
 
 system_theme_icons = \
-	apps,folder-sparkleshare-16.png \
-	apps,folder-sparkleshare-22.png	\
-	apps,folder-sparkleshare-24.png \
-	apps,folder-sparkleshare-256.png \
-	apps,folder-sparkleshare-32.png \
-	apps,folder-sparkleshare-48.png
+	apps,folder-cmissync-16.png \
+	apps,folder-cmissync-22.png	\
+	apps,folder-cmissync-24.png \
+	apps,folder-cmissync-256.png \
+	apps,folder-cmissync-32.png \
+	apps,folder-cmissync-48.png
 
 app_theme_icons = \
 	animations,process-working-22.png \
-	places,folder-sparkleshare-16.png \
-	places,folder-sparkleshare-22.png \
-	places,folder-sparkleshare-24.png \
-	places,folder-sparkleshare-256.png \
-	places,folder-sparkleshare-32.png \
-	places,folder-sparkleshare-48.png \
+	places,folder-cmissync-16.png \
+	places,folder-cmissync-22.png \
+	places,folder-cmissync-24.png \
+	places,folder-cmissync-256.png \
+	places,folder-cmissync-32.png \
+	places,folder-cmissync-48.png \
 	status,process-syncing-i-24.png \
 	status,process-syncing-ii-24.png \
 	status,process-syncing-iii-24.png \

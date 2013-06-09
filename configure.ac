@@ -3,7 +3,8 @@ m4_define([cmissync_version], [0.9.1])
 
 AC_PREREQ([2.54])
 AC_INIT([CmisSync], cmissync_version)
-AM_INIT_AUTOMAKE([1.11 dist-bzip2 dist-zip foreign tar-pax])
+AC_CONFIG_SRCDIR([CmisSync/Program.cs])
+AM_INIT_AUTOMAKE([foreign dist-bzip2 dist-zip no-dist-gzip])
 AM_MAINTAINER_MODE
 
 dnl Export Version Info
@@ -14,8 +15,6 @@ AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 if test "x$PKG_CONFIG" = "xno"; then
         AC_MSG_ERROR([You need to install pkg-config])
 fi
-
-AC_SUBST([ACLOCAL_AMFLAGS], ["-I build/m4/sparkleshare -I build/m4/shamrock -I build/m4/shave \${ACLOCAL_FLAGS}"])
 
 SHAMROCK_EXPAND_LIBDIR
 SHAMROCK_EXPAND_BINDIR
@@ -32,11 +31,12 @@ PKG_CHECK_EXISTS([mono >= 2.8],
 SHAMROCK_CHECK_MONO_4_0_GAC_ASSEMBLIES([
     System
     System.Security
+    System.Windows.Forms
     Mono.Posix
 ])]
 )
 
-SPARKLESHARE_CHECK_NOTIFY_SHARP
+CMISSYNC_CHECK_NOTIFY_SHARP
 
 AC_ARG_ENABLE(debug,
 	AC_HELP_STRING([--enable-debug],
@@ -67,7 +67,7 @@ dnl package checks, common for all configs
 #AC_SUBST(NDESK_DBUS_GLIB_LIBS)
 
 
-SPARKLESHARE_CHECK_GTK_SHARP
+CMISSYNC_CHECK_GTK_SHARP
 
 AC_ARG_ENABLE(appindicator,
 	AS_HELP_STRING([--enable-appindicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
@@ -90,6 +90,13 @@ if test "$OSNAME" = "Linux" ; then
 	fi
 	AC_SUBST(NOTIFY_SHARP_LIBS)
 
+    dnl check for log4net
+	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
+	if test "x$have_log4net" = "xno" ; then
+		AC_ERROR("log4net is a required dependency: you need to install the appropriate devel package before you can compile")
+	fi
+	AC_SUBST(LOG4NET_LIBS)
+
 	APPINDICATOR_REQUIRED=0.0.7
 
 	if test x$enable_appindicator = xauto ; then
@@ -105,44 +112,43 @@ if test "$OSNAME" = "Linux" ; then
 							appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED)
 			AC_SUBST(APP_INDICATOR_CFLAGS)
 			AC_SUBST(APP_INDICATOR_LIBS)
-			AC_DEFINE(HAVE_APP_INDICATOR, 1, [Have AppIndicator])
+            [BUILD_DEFINES="$BUILD_DEFINES -define:HAVE_APP_INDICATOR"]
 	fi
 
+    AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
+    AC_SUBST(JSONLIBS,[[-r:\$\(top_srcdir\)/Extras/Newtonsoft.Json.dll]])
+    AC_SUBST(DOTCMISLIBS,[[-r:\$\(top_srcdir\)/Extras/DotCMIS.dll]])
+
+    [BUILD_DEFINES="$BUILD_DEFINES -define:USE_MONO_SQLITE"]
+
+    AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
 	GUISUBDIRS=CmisSync
+    enable_gtkui=yes
 else
 	GUISUBDIRS=
+    enable_gtkui=no
 fi
 
-AM_CONDITIONAL(HAVE_APP_INDICATOR, test x"$enable_appindicator" = xyes)
 AC_SUBST([GUISUBDIRS])
 
 SHAMROCK_CHECK_NUNIT
 
-dnl Get nautilus extensions directory
-SPARKLESHARE_NAUTILUS_PYTHON
-
-SHAVE_INIT([build/m4/shave], [enable])
-
 AC_OUTPUT([
 build/Makefile
 build/m4/Makefile
-build/m4/shave/shave
-build/m4/shave/shave-libtool
 CmisSync.Lib/Defines.cs
 CmisSync.Lib/Makefile
 CmisSync/Common/Makefile
 CmisSync/Common/HTML/Makefile
 CmisSync/Common/Plugins/Makefile
 CmisSync/Common/Pixmaps/Makefile
+CmisSync/Linux/Defines.cs
 CmisSync/Linux/Makefile
 CmisSync/Linux/Pixmaps/Makefile
 CmisSync/Linux/Pixmaps/icons/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-dark/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
-CmisSync/Linux/sparkleshare
-CmisSync/Linux/Nautilus/Makefile
-CmisSync/Linux/Nautilus/sparkleshare-nautilus-extension.py
-CmisSync/Linux/Nautilus/sparkleshare-nautilus3-extension.py
+CmisSync/Linux/cmissync
 CmisSync/Makefile
 Makefile
 ])
@@ -153,8 +159,6 @@ CmisSync ${VERSION}
 Configuration:
        Prefix              : ${prefix}
        Build Gtk+ UI       : ${enable_gtkui}
-       Nautilus 2.x plugin : ${have_nautilus2_python}
-       Nautilus 3.x plugin : ${have_nautilus3_python}
 
 "
 

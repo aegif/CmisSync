@@ -16,7 +16,7 @@
    version="1.1"
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="side-splash.svg"
-   inkscape:export-filename="/home/hbons/github/SparkleShare/data/side-splash.png"
+   inkscape:export-filename="/home/hbons/github/CmisSync/data/side-splash.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <sodipodi:namedview
@@ -638,7 +638,7 @@
          height="321.83084"
          x="617.64337"
          y="-407.10275"
-         inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/about.png"
+         inkscape:export-filename="/Users/hbons/Code/CmisSync/data/about.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90"
          transform="matrix(0.6027834,0.79790486,0.79790486,-0.6027834,0,0)" />
@@ -733,7 +733,7 @@
          id="g100970"
          clip-path="url(#clipPath101003)"
          transform="matrix(0.80507706,-0.25168621,0.25168621,0.80507706,-174.16784,16.668277)"
-         inkscape:export-filename="/home/hbons/Projects/SparkleShare/data/side-splash.png"
+         inkscape:export-filename="/home/hbons/Projects/CmisSync/data/side-splash.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <rect
@@ -743,13 +743,13 @@
            height="441.28906"
            x="-471.73718"
            y="94.146225"
-           inkscape:export-filename="/Users/hbons/Code/SparkleShare/data/about.png"
+           inkscape:export-filename="/Users/hbons/Code/CmisSync/data/about.png"
            inkscape:export-xdpi="90"
            inkscape:export-ydpi="90" />
         <g
            inkscape:export-ydpi="90"
            inkscape:export-xdpi="90"
-           inkscape:export-filename="/home/hbons/SparkleShare/SparkleShare-Design-Corner/android/market-banner.png"
+           inkscape:export-filename="/home/hbons/CmisSync/CmisSync-Design-Corner/android/market-banner.png"
            clip-path="url(#clipPath76786)"
            style="opacity:0.3;fill:#000000;fill-opacity:1"
            transform="matrix(1.0746823,1.4126925,1.4225579,-1.0672295,-1721.0035,715.31306)"
@@ -904,7 +904,7 @@
          transform="matrix(0.94794592,-0.25400134,0.25400134,0.94794592,152.92196,89.255385)"
          id="g8347"
          clip-path="url(#clipPath8463)"
-         inkscape:export-filename="/home/hbons/Projects/SparkleShare/data/side-splash.png"
+         inkscape:export-filename="/home/hbons/Projects/CmisSync/data/side-splash.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <g
@@ -1180,7 +1180,7 @@
          id="g8475"
          transform="translate(-200,0)"
          clip-path="url(#clipPath8482)"
-         inkscape:export-filename="/home/hbons/Projects/SparkleShare/data/side-splash.png"
+         inkscape:export-filename="/home/hbons/Projects/CmisSync/data/side-splash.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90">
         <image
@@ -1216,7 +1216,7 @@
          x="-15.142853"
          y="103.66534"
          transform="scale(-1,1)"
-         inkscape:export-filename="/home/hbons/Projects/SparkleShare/data/side-splash.png"
+         inkscape:export-filename="/home/hbons/Projects/CmisSync/data/side-splash.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -1227,7 +1227,7 @@
          width="17.888323"
          id="rect3732"
          style="opacity:0.2;color:#000000;fill:url(#linearGradient3734);fill-opacity:1;stroke:none;stroke-width:3;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-         inkscape:export-filename="/home/hbons/Projects/SparkleShare/data/side-splash.png"
+         inkscape:export-filename="/home/hbons/Projects/CmisSync/data/side-splash.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
@@ -1238,7 +1238,7 @@
          x="-15.142853"
          y="103.66534"
          transform="scale(-1,1)"
-         inkscape:export-filename="/home/hbons/Projects/SparkleShare/data/side-splash.png"
+         inkscape:export-filename="/home/hbons/Projects/CmisSync/data/side-splash.png"
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
     </g>
