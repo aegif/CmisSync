@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -22,14 +22,14 @@ using MonoMac.AppKit;
 using MonoMac.Foundation;
 using MonoMac.Growl;
 
-namespace SparkleShare {
+namespace CmisSync {
     
-    public class SparkleBubbles : NSObject {
+    public class Bubbles : NSObject {
 
-        public SparkleBubblesController Controller = new SparkleBubblesController ();
+        public BubblesController Controller = new BubblesController ();
 
 
-        public SparkleBubbles ()
+        public Bubbles ()
         {
             Controller.ShowBubbleEvent += delegate (string title, string subtext, string image_path) {
                 InvokeOnMainThread (delegate {
@@ -54,7 +54,7 @@ namespace SparkleShare {
     }
 
 
-    public class SparkleGrowlDelegate : GrowlDelegate {
+    public class CmisSyncGrowlDelegate : GrowlDelegate {
 
         [Export("growlNotificationWasClicked")]
         public override void GrowlNotificationWasClicked (NSObject o)

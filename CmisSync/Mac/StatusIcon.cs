@@ -1,4 +1,4 @@
-//   SparkleShare, an instant update workflow to Git.
+//   CmisSync, an instant update workflow to Git.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,11 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleStatusIcon : NSObject {
+    public class StatusIcon : NSObject {
 
-        public SparkleStatusIconController Controller = new SparkleStatusIconController ();
+        public StatusIconController Controller = new StatusIconController ();
 
         private NSMenu menu;
         private NSMenu submenu;
@@ -52,13 +52,13 @@ namespace SparkleShare {
         private NSImage error_image_active;
         private NSImage folder_image;
         private NSImage caution_image;
-        private NSImage sparkleshare_image;
+        private NSImage cmissync_image;
 
         private EventHandler [] folder_tasks;
         private EventHandler [] overflow_tasks;
 
         
-        public SparkleStatusIcon () : base ()
+        public StatusIcon () : base ()
         {
             using (var a = new NSAutoreleasePool ())
             {
@@ -75,7 +75,7 @@ namespace SparkleShare {
 
                 this.folder_image       = NSImage.ImageNamed ("NSFolder");
                 this.caution_image      = NSImage.ImageNamed ("NSCaution");
-                this.sparkleshare_image = NSImage.ImageNamed ("sparkleshare-folder");
+                this.cmissync_image = NSImage.ImageNamed ("cmissync-folder");
 
                 CreateMenu ();
             }
@@ -150,14 +150,14 @@ namespace SparkleShare {
                 };
 
                 this.folder_item = new NSMenuItem () {
-                    Title = "SparkleShare"
+                    Title = "CmisSync"
                 };
 
                 this.folder_item.Activated += delegate {
-                    Controller.SparkleShareClicked ();
+                    Controller.CmisSyncClicked ();
                 };
 
-                this.folder_item.Image      = this.sparkleshare_image;
+                this.folder_item.Image      = this.cmissync_image;
                 this.folder_item.Image.Size = new SizeF (16, 16);
                 this.folder_item.Enabled    = true;
 
@@ -202,7 +202,7 @@ namespace SparkleShare {
                 };
 
                 this.about_item = new NSMenuItem () {
-                    Title   = "About SparkleShare",
+                    Title   = "About CmisSync",
                     Enabled = true
                 };
 
@@ -300,7 +300,7 @@ namespace SparkleShare {
 			    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.quit_item);
 
-                this.menu.Delegate    = new SparkleStatusIconMenuDelegate ();
+                this.menu.Delegate    = new StatusIconMenuDelegate ();
                 this.status_item.Menu = this.menu;
             }
         }
@@ -343,7 +343,7 @@ namespace SparkleShare {
     }
     
     
-    public class SparkleStatusIconMenuDelegate : NSMenuDelegate {
+    public class StatusIconMenuDelegate : NSMenuDelegate {
         
         public override void MenuWillHighlightItem (NSMenu menu, NSMenuItem item)
         {

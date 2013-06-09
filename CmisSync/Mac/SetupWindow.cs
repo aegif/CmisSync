@@ -1,4 +1,4 @@
-//   SparkleShare, an instant update workflow to Git.
+//   CmisSync, an instant update workflow to Git.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -25,9 +25,9 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using MonoMac.WebKit;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleSetupWindow : NSWindow {
+    public class SetupWindow : NSWindow {
 
         public List <NSButton> Buttons = new List <NSButton> ();
         public string Header;
@@ -39,7 +39,7 @@ namespace SparkleShare {
         private NSTextField description_text_field;
 
 
-        public SparkleSetupWindow () : base ()
+        public SetupWindow () : base ()
         {
             SetFrame (new RectangleF (0, 0, 640, 420), true);
 
@@ -124,7 +124,7 @@ namespace SparkleShare {
                         x += 15;
                     }
 
-                    button.Font = SparkleUI.Font;
+                    button.Font = UI.Font;
                     ContentView.AddSubview (button);
                     i++;
                 }
@@ -136,7 +136,7 @@ namespace SparkleShare {
 
         public override void OrderFrontRegardless ()
         {
-            NSApplication.SharedApplication.AddWindowsItem (this, "SparkleShare Setup", false);
+            NSApplication.SharedApplication.AddWindowsItem (this, "CmisSync Setup", false);
             NSApplication.SharedApplication.ActivateIgnoringOtherApps (true);
             MakeKeyAndOrderFront (this);
 

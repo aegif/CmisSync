@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -24,11 +24,11 @@ using MonoMac.Foundation;
 using MonoMac.ObjCRuntime;
 using MonoMac.WebKit;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleAbout : NSWindow {
+    public class About : NSWindow {
 
-        public SparkleAboutController Controller = new SparkleAboutController ();
+        public AboutController Controller = new AboutController ();
 
         private NSImage about_image;
         private NSImageView about_image_view;
@@ -36,37 +36,37 @@ namespace SparkleShare {
         private NSTextField updates_text_field;
         private NSTextField credits_text_field;
         private NSButton hidden_close_button;
-        private SparkleLink website_link;
-        private SparkleLink credits_link;
-        private SparkleLink report_problem_link;
+        private CmisSyncLink website_link;
+        private CmisSyncLink credits_link;
+        private CmisSyncLink report_problem_link;
 
 
-        public SparkleAbout (IntPtr handle) : base (handle) { }
+        public About (IntPtr handle) : base (handle) { }
 
-        public SparkleAbout () : base ()
+        public About () : base ()
         {
             using (var a = new NSAutoreleasePool ())
             {
                 SetFrame (new RectangleF (0, 0, 640, 281), true);
                 Center ();
 
-                Delegate    = new SparkleAboutDelegate ();
+                Delegate    = new AboutDelegate ();
                 StyleMask   = (NSWindowStyle.Closable | NSWindowStyle.Titled);
-                Title       = "About SparkleShare";
+                Title       = "About CmisSync";
                 MaxSize     = new SizeF (640, 281);
                 MinSize     = new SizeF (640, 281);
                 HasShadow   = true;
                 BackingType = NSBackingStore.Buffered;
 
-                this.website_link       = new SparkleLink ("Website", Controller.WebsiteLinkAddress);
+                this.website_link       = new CmisSyncLink ("Website", Controller.WebsiteLinkAddress);
                 this.website_link.Frame = new RectangleF (new PointF (295, 25), this.website_link.Frame.Size);
 
-                this.credits_link = new SparkleLink ("Credits", Controller.CreditsLinkAddress);
+                this.credits_link = new CmisSyncLink ("Credits", Controller.CreditsLinkAddress);
                 this.credits_link.Frame = new RectangleF (
                     new PointF (this.website_link.Frame.X + this.website_link.Frame.Width + 10, 25),
                     this.credits_link.Frame.Size);
 
-                this.report_problem_link = new SparkleLink ("Report a problem", Controller.ReportProblemLinkAddress);
+                this.report_problem_link = new CmisSyncLink ("Report a problem", Controller.ReportProblemLinkAddress);
                 this.report_problem_link.Frame = new RectangleF (
                     new PointF (this.credits_link.Frame.X + this.credits_link.Frame.Width + 10, 25),
                     this.report_problem_link.Frame.Size);
@@ -185,7 +185,7 @@ namespace SparkleShare {
                     StringValue     = @"Copyright © 2010–" + DateTime.Now.Year + " Hylke Bons and others." +
                                        "\n" +
                                        "\n" +
-                                       "SparkleShare is Open Source software. You are free to use, modify, and redistribute it " +
+                                       "CmisSync is Open Source software. You are free to use, modify, and redistribute it " +
                                        "under the GNU General Public License version 3 or later.",
                     Frame           = new RectangleF (295, Frame.Height - 260, 318, 98),
                     TextColor       = NSColor.White,
@@ -228,22 +228,22 @@ namespace SparkleShare {
     }
 
 
-    public class SparkleAboutDelegate : NSWindowDelegate {
+    public class AboutDelegate : NSWindowDelegate {
         
         public override bool WindowShouldClose (NSObject sender)
         {
-            (sender as SparkleAbout).Controller.WindowClosed ();
+            (sender as About).Controller.WindowClosed ();
             return false;
         }
     }
 
 
-    public class SparkleLink : NSTextField {
+    public class CmisSyncLink : NSTextField {
 
         private NSUrl url;
 
 
-        public SparkleLink (string text, string address) : base ()
+        public CmisSyncLink (string text, string address) : base ()
         {
             this.url = new NSUrl (address);
 

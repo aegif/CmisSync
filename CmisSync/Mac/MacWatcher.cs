@@ -1,6 +1,6 @@
 //   Originally taken from:
 //   https://github.com/jesse99/Continuum/blob/master/source/shared/DirectoryWatcher.cs
-//   Modified to use MonoMac and integrate into SparkleShare
+//   Modified to use MonoMac and integrate into CmisSync
 
 //   Copyright (C) 2008 Jesse Jones
 //
@@ -35,9 +35,9 @@ using System.Timers;
 using MonoMac.AppKit;
 using MonoMac.Foundation;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public sealed class SparkleMacWatcher : IDisposable {
+    public sealed class MacWatcher : IDisposable {
         
         public delegate void ChangedEventHandler (string path);
         public event ChangedEventHandler Changed;
@@ -70,13 +70,13 @@ namespace SparkleShare {
             IntPtr eventIds);
 
 
-        ~SparkleMacWatcher ()
+        ~MacWatcher ()
         {
             Dispose (false);
         }
 
 
-        public SparkleMacWatcher (string path)
+        public MacWatcher (string path)
         {
             Path       = path;
             m_callback = DoCallback;

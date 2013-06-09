@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -24,15 +24,14 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 using MonoMac.Growl;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleUI : AppDelegate {
+    public class UI : AppDelegate {
 
-        public SparkleStatusIcon StatusIcon;
-        public SparkleEventLog EventLog;
-        public SparkleSetup Setup;
-        public SparkleBubbles Bubbles;
-        public SparkleAbout About;
+        public StatusIcon StatusIcon;
+        public Setup Setup;
+        public Bubbles Bubbles;
+        public About About;
 		
 		public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
 			"Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
@@ -41,22 +40,21 @@ namespace SparkleShare {
 			"Lucida Grande", NSFontTraitMask.Bold, 0, 13);
 		
 
-        public SparkleUI ()
+        public UI ()
         {
             using (var a = new NSAutoreleasePool ())
             {
                 GrowlApplicationBridge.WeakDelegate = this;
-                GrowlApplicationBridge.Delegate     = new SparkleGrowlDelegate ();
+                GrowlApplicationBridge.Delegate     = new CmisSyncGrowlDelegate ();
 
-                NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("sparkleshare-app.icns");
+                NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("cmissync-app.icns");
 
                 SetFolderIcon ();
     
-                Setup      = new SparkleSetup ();
-                EventLog   = new SparkleEventLog ();
-                About      = new SparkleAbout ();
-                Bubbles    = new SparkleBubbles ();
-                StatusIcon = new SparkleStatusIcon ();
+                Setup      = new Setup ();
+                About      = new About ();
+                Bubbles    = new Bubbles ();
+                StatusIcon = new StatusIcon ();
 
                 Program.Controller.UIHasLoaded ();
             }
@@ -67,7 +65,7 @@ namespace SparkleShare {
         {
             using (var a = new NSAutoreleasePool ())
             {
-                NSImage folder_icon = NSImage.ImageNamed ("sparkleshare-folder.icns");
+                NSImage folder_icon = NSImage.ImageNamed ("cmissync-folder.icns");
                 NSWorkspace.SharedWorkspace.SetIconforFile (folder_icon, Program.Controller.FoldersPath, 0);
             }
         }
@@ -81,7 +79,7 @@ namespace SparkleShare {
 
         public void UpdateDockIconVisibility ()
         {
-            if (Setup.IsVisible || EventLog.IsVisible || About.IsVisible)
+            if (Setup.IsVisible || About.IsVisible)
                 ShowDockIcon ();
             else
                 HideDockIcon ();

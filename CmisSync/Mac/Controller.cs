@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,11 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
-using SparkleLib;
+using CmisSync.Lib;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-	public class SparkleController : SparkleControllerBase {
+	public class Controller : ControllerBase {
 
         public override string PluginsPath {
             get {
@@ -37,10 +37,10 @@ namespace SparkleShare {
 
         // We have to use our own custom made folder watcher, as
         // System.IO.FileSystemWatcher fails watching subfolders on Mac
-        private SparkleMacWatcher watcher;
+        private MacWatcher watcher;
 
         
-        public SparkleController () : base ()
+        public Controller () : base ()
         {
             using (var a = new NSAutoreleasePool ())
             {
@@ -110,11 +110,11 @@ namespace SparkleShare {
 
         public override void InstallProtocolHandler ()
         {
-             // We ship SparkleShareInviteHandler.app in the bundle
+             // We ship CmisSyncInviteHandler.app in the bundle
         }
 
 
-		// Adds the SparkleShare folder to the user's
+		// Adds the CmisSync folder to the user's
 		// list of bookmarked places
 		public override void AddToBookmarks ()
         {/*
@@ -144,7 +144,7 @@ namespace SparkleShare {
                             properties.SetValueForKey (new NSString ("1935819892"), new NSString ("com.apple.LSSharedFileList.TemplateSystemSelector"));
 
                             NSMutableDictionary new_favorite = new NSMutableDictionary ();
-                            new_favorite.SetValueForKey (new NSString ("SparkleShare"),  new NSString ("Name"));
+                            new_favorite.SetValueForKey (new NSString ("CmisSync"),  new NSString ("Name"));
 
                             new_favorite.SetValueForKey (NSData.FromString ("ImgR SYSL fldr"),  new NSString ("Icon"));
 
@@ -167,9 +167,9 @@ namespace SparkleShare {
 		}
 
 
-		public override bool CreateSparkleShareFolder ()
+		public override bool CreateCmisSyncFolder ()
 		{
-            this.watcher = new SparkleMacWatcher (Program.Controller.FoldersPath);
+            this.watcher = new MacWatcher (Program.Controller.FoldersPath);
 
             if (!Directory.Exists (Program.Controller.FoldersPath)) {
                 Directory.CreateDirectory (Program.Controller.FoldersPath);

@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -24,16 +24,16 @@ using MonoMac.AppKit;
 using MonoMac.Foundation;
 using MonoMac.Growl;
 
-namespace SparkleShare {
+namespace CmisSync {
     
-    public class SparkleBadger {
+    public class Badger {
 
         private Dictionary<string, NSImage> icons = new Dictionary<string, NSImage> ();
         private int [] sizes = new int [] {16, 32, 48, 128, 256, 512};
         private string [] paths;
 
 
-        public SparkleBadger (string [] paths)
+        public Badger (string [] paths)
         {
             this.paths = paths;
         }

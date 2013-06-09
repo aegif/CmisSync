@@ -8,8 +8,8 @@
     <ProjectGuid>{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}</ProjectGuid>
     <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SparkleShare</RootNamespace>
-    <AssemblyName>SparkleShare</AssemblyName>
+    <RootNamespace>CmisSync</RootNamespace>
+    <AssemblyName>CmisSync</AssemblyName>
     <ReleaseVersion>
     </ReleaseVersion>
   </PropertyGroup>
@@ -22,7 +22,7 @@
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="mkdir -p ${TargetDir}/${SolutionName}.app/Contents/Frameworks; cp -R Growl.framework ${TargetDir}/${SolutionName}.app/Contents/Frameworks; cp -R git ${TargetDir}/${SolutionName}.app/Contents/Resources; cp -R SparkleShareInviteOpener.app ${TargetDir}/${SolutionName}.app/Contents/Resources" />
+        <Command type="AfterBuild" command="mkdir -p ${TargetDir}/${SolutionName}.app/Contents/Frameworks; cp -R Growl.framework ${TargetDir}/${SolutionName}.app/Contents/Frameworks; cp -R git ${TargetDir}/${SolutionName}.app/Contents/Resources" />
       </CustomCommands>
     </CustomCommands>
     <EnableCodeSigning>False</EnableCodeSigning>
@@ -50,49 +50,36 @@
     <Compile Include="MainMenu.xib.designer.cs">
       <DependentUpon>MainMenu.xib</DependentUpon>
     </Compile>
-    <Compile Include="..\SparkleControllerBase.cs">
-      <Link>SparkleControllerBase.cs</Link>
+    <Compile Include="..\ControllerBase.cs">
+      <Link>ControllerBase.cs</Link>
     </Compile>
-    <Compile Include="SparkleStatusIcon.cs" />
-    <Compile Include="SparkleUI.cs" />
+    <Compile Include="StatusIcon.cs" />
+    <Compile Include="UI.cs" />
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="SparkleMacWatcher.cs" />
-    <Compile Include="SparkleEventLog.cs" />
-    <Compile Include="SparkleBadger.cs" />
-    <Compile Include="SparkleBubbles.cs" />
-    <Compile Include="SparkleSetup.cs" />
-    <Compile Include="SparkleSetupWindow.cs" />
-    <Compile Include="..\SparkleBubblesController.cs">
-      <Link>SparkleBubblesController.cs</Link>
+    <Compile Include="MacWatcher.cs" />
+    <Compile Include="Badger.cs" />
+    <Compile Include="Bubbles.cs" />
+    <Compile Include="Setup.cs" />
+    <Compile Include="SetupWindow.cs" />
+    <Compile Include="..\BubblesController.cs">
+      <Link>BubblesController.cs</Link>
     </Compile>
-    <Compile Include="..\SparkleEventLogController.cs">
-      <Link>SparkleEventLogController.cs</Link>
+    <Compile Include="..\SetupController.cs">
+      <Link>SetupController.cs</Link>
     </Compile>
-    <Compile Include="..\SparkleSetupController.cs">
-      <Link>SparkleSetupController.cs</Link>
+    <Compile Include="..\StatusIconController.cs">
+      <Link>StatusIconController.cs</Link>
     </Compile>
-    <Compile Include="..\SparkleStatusIconController.cs">
-      <Link>SparkleStatusIconController.cs</Link>
+    <Compile Include="..\AboutController.cs">
+      <Link>AboutController.cs</Link>
     </Compile>
-    <Compile Include="..\SparkleAboutController.cs">
-      <Link>SparkleAboutController.cs</Link>
+    <Compile Include="..\Extensions.cs">
+      <Link>Extensions.cs</Link>
     </Compile>
-    <Compile Include="..\SparkleExtensions.cs">
-      <Link>SparkleExtensions.cs</Link>
-    </Compile>
-    <Compile Include="SparkleController.cs" />
-    <Compile Include="..\SparklePlugin.cs">
-      <Link>SparklePlugin.cs</Link>
-    </Compile>
-    <Compile Include="SparkleAbout.cs" />
-    <Compile Include="..\SparkleInvite.cs">
-      <Link>SparkleInvite.cs</Link>
-    </Compile>
-    <Compile Include="..\SparkleKeys.cs">
-      <Link>SparkleKeys.cs</Link>
-    </Compile>
+    <Compile Include="Controller.cs" />
+    <Compile Include="About.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />
@@ -115,11 +102,11 @@
     <Content Include="..\Common\Pixmaps\side-splash.png">
       <Link>Pixmaps\side-splash.png</Link>
     </Content>
-    <Content Include="Pixmaps\sparkleshare-folder.icns">
-      <Link>sparkleshare-folder.icns</Link>
+    <Content Include="Pixmaps\cmissync-folder.icns">
+      <Link>cmissync-folder.icns</Link>
     </Content>
-    <Content Include="Pixmaps\sparkleshare-app.icns">
-      <Link>sparkleshare-app.icns</Link>
+    <Content Include="Pixmaps\cmissync-app.icns">
+      <Link>cmissync-app.icns</Link>
     </Content>
     <Content Include="Pixmaps\process-syncing-i-active.png">
       <Link>Pixmaps\process-syncing-i-active.png</Link>
@@ -228,13 +215,9 @@
     <Folder Include="Plugins\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SparkleLib\SparkleLib.csproj">
+    <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
-      <Name>SparkleLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SparkleLib\Cmis\SparkleLib.Cmis.csproj">
-      <Project>{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}</Project>
-      <Name>SparkleLib.Cmis</Name>
+      <Name>CmisSync.Lib</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

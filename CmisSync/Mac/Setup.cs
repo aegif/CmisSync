@@ -1,4 +1,4 @@
-//   SparkleShare, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -27,11 +27,11 @@ using MonoMac.WebKit;
 
 using Mono.Unix;
 
-namespace SparkleShare {
+namespace CmisSync {
 
-    public class SparkleSetup : SparkleSetupWindow {
+    public class Setup : SetupWindow {
 
-        public SparkleSetupController Controller = new SparkleSetupController ();
+        public SetupController Controller = new SetupController ();
 
         private NSButton ContinueButton;
         private NSButton AddButton;
@@ -66,10 +66,10 @@ namespace SparkleShare {
         private NSScrollView ScrollView;
         private NSTableColumn IconColumn;
         private NSTableColumn DescriptionColumn;
-        private SparkleDataSource DataSource;
+        private CmisSyncDataSource DataSource;
 
 
-        public SparkleSetup () : base ()
+        public Setup () : base ()
         {
             Controller.HideWindowEvent += delegate {
                 InvokeOnMainThread (delegate {
@@ -110,13 +110,13 @@ namespace SparkleShare {
                     Editable        = false,
                     Frame           = new RectangleF (165, Frame.Height - 234, 160, 17),
                     StringValue     = "Full Name:",
-                    Font            = SparkleUI.Font
+                    Font            = UI.Font
                 };
 
                 FullNameTextField = new NSTextField () {
                     Frame       = new RectangleF (330, Frame.Height - 238, 196, 22),
                     StringValue = UnixUserInfo.GetRealUser ().RealName,
-                    Delegate    = new SparkleTextFieldDelegate ()
+                    Delegate    = new CmisSyncTextFieldDelegate ()
                 };
 
                 EmailLabel = new NSTextField () {
@@ -126,12 +126,12 @@ namespace SparkleShare {
                     Editable        = false,
                     Frame           = new RectangleF (165, Frame.Height - 264, 160, 17),
                     StringValue     = "Email:",
-                    Font            = SparkleUI.Font
+                    Font            = UI.Font
                 };
 
                 EmailTextField = new NSTextField () {
                     Frame       = new RectangleF (330, Frame.Height - 268, 196, 22),
-                    Delegate    = new SparkleTextFieldDelegate ()
+                    Delegate    = new CmisSyncTextFieldDelegate ()
                 };
 
                 CancelButton = new NSButton () {
@@ -144,11 +144,11 @@ namespace SparkleShare {
                 };
 
 
-                (FullNameTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+                (FullNameTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
                     Controller.CheckSetupPage ();
                 };
 
-                (EmailTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+                (EmailTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
                     Controller.CheckSetupPage ();
                 };
 
@@ -183,7 +183,7 @@ namespace SparkleShare {
 
             if (type == PageType.Invite) {
                 Header      = "You've received an invite!";
-                Description = "Do you want to add this project to SparkleShare?";
+                Description = "Do you want to add this project to CmisSync?";
 
 
                 AddressLabel = new NSTextField () {
@@ -193,7 +193,7 @@ namespace SparkleShare {
                     Editable        = false,
                     Frame           = new RectangleF (165, Frame.Height - 240, 160, 17),
                     StringValue     = "Address:",
-                    Font            = SparkleUI.Font
+                    Font            = UI.Font
                 };
 
                 PathLabel = new NSTextField () {
@@ -203,7 +203,7 @@ namespace SparkleShare {
                     Editable        = false,
                     Frame           = new RectangleF (165, Frame.Height - 264, 160, 17),
                     StringValue     = "Remote Path:",
-                    Font            = SparkleUI.Font
+                    Font            = UI.Font
                 };
 
                 AddressTextField = new NSTextField () {
@@ -213,7 +213,7 @@ namespace SparkleShare {
                     Editable        = false,
                     Frame           = new RectangleF (330, Frame.Height - 240, 260, 17),
                     StringValue     = Controller.PendingInvite.Address,
-                    Font            = SparkleUI.BoldFont
+                    Font            = UI.BoldFont
                 };
 
                 PathTextField = new NSTextField () {
@@ -223,7 +223,7 @@ namespace SparkleShare {
                     Editable        = false,
                     Frame           = new RectangleF (330, Frame.Height - 264, 260, 17),
                     StringValue     = Controller.PendingInvite.RemotePath,
-                    Font            = SparkleUI.BoldFont
+                    Font            = UI.BoldFont
                 };
 
                 CancelButton = new NSButton () {
@@ -265,14 +265,14 @@ namespace SparkleShare {
 					Editable        = false,
 					Frame           = new RectangleF (190, Frame.Height - 308, 160, 17),
 					StringValue     = "Address:",
-					Font            = SparkleUI.BoldFont
+					Font            = UI.BoldFont
 				};
 				
 				AddressTextField = new NSTextField () {
 					Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
-					Font        = SparkleUI.Font,
+					Font        = UI.Font,
 					Enabled     = (Controller.SelectedPlugin.Address == null),
-					Delegate    = new SparkleTextFieldDelegate (),
+					Delegate    = new CmisSyncTextFieldDelegate (),
 					StringValue = "" + Controller.PreviousAddress
 				};
 				
@@ -285,13 +285,13 @@ namespace SparkleShare {
 					Editable        = false,
 					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 308, 160, 17),
 					StringValue     = "Remote Path:",
-					Font            = SparkleUI.BoldFont
+					Font            = UI.BoldFont
 				};
 				
 				PathTextField = new NSTextField () {
 					Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
 					Enabled     = (Controller.SelectedPlugin.Path == null),
-					Delegate    = new SparkleTextFieldDelegate (),
+					Delegate    = new CmisSyncTextFieldDelegate (),
 					StringValue = "" + Controller.PreviousPath
 				};
 				
@@ -324,7 +324,7 @@ namespace SparkleShare {
 					RowHeight        = 34,
 					IntercellSpacing = new SizeF (8, 12),
 					HeaderView       = null,
-					Delegate         = new SparkleTableViewDelegate ()
+					Delegate         = new CmisSyncTableDelegate ()
 				};
 				
 				ScrollView = new NSScrollView () {
@@ -354,7 +354,7 @@ namespace SparkleShare {
 				TableView.AddColumn (IconColumn);
 				TableView.AddColumn (DescriptionColumn);
 				
-				DataSource = new SparkleDataSource (Controller.Plugins);
+				DataSource = new CmisSyncDataSource (Controller.Plugins);
 				
 				TableView.DataSource = DataSource;
 				TableView.ReloadData ();
@@ -402,15 +402,15 @@ namespace SparkleShare {
 				TableView.SelectRow (Controller.SelectedPluginIndex, false);
 				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
 				
-				(AddressTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+				(AddressTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
-				(PathTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+				(PathTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
-				(TableView.Delegate as SparkleTableViewDelegate).SelectionChanged += delegate {
+				(TableView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
 					Controller.SelectedPluginChanged (TableView.SelectedRow);
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
@@ -461,14 +461,14 @@ namespace SparkleShare {
 					Editable        = false,
 					Frame           = new RectangleF (190, Frame.Height - 308, 160, 17),
 					StringValue     = "Address:",
-					Font            = SparkleUI.BoldFont
+					Font            = UI.BoldFont
 				};
 				
 				AddressTextField = new NSTextField () {
 					Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
-					Font        = SparkleUI.Font,
+					Font        = UI.Font,
 					Enabled     = (Controller.SelectedPlugin.Address == null),
-					Delegate    = new SparkleTextFieldDelegate (),
+					Delegate    = new CmisSyncTextFieldDelegate (),
 					StringValue = "" + Controller.PreviousAddress
 				};
 				
@@ -481,13 +481,13 @@ namespace SparkleShare {
 					Editable        = false,
 					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 308, 160, 17),
 					StringValue     = "Remote Path:",
-					Font            = SparkleUI.BoldFont
+					Font            = UI.BoldFont
 				};
 				
 				PathTextField = new NSTextField () {
 					Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
 					Enabled     = (Controller.SelectedPlugin.Path == null),
-					Delegate    = new SparkleTextFieldDelegate (),
+					Delegate    = new CmisSyncTextFieldDelegate (),
 					StringValue = "" + Controller.PreviousPath
 				};
 				
@@ -520,7 +520,7 @@ namespace SparkleShare {
 					RowHeight        = 34,
 					IntercellSpacing = new SizeF (8, 12),
 					HeaderView       = null,
-					Delegate         = new SparkleTableViewDelegate ()
+					Delegate         = new CmisSyncTableDelegate ()
 				};
 				
 				ScrollView = new NSScrollView () {
@@ -550,7 +550,7 @@ namespace SparkleShare {
 				TableView.AddColumn (IconColumn);
 				TableView.AddColumn (DescriptionColumn);
 				
-				DataSource = new SparkleDataSource (Controller.Plugins);
+				DataSource = new CmisSyncDataSource (Controller.Plugins);
 				
 				TableView.DataSource = DataSource;
 				TableView.ReloadData ();
@@ -598,15 +598,15 @@ namespace SparkleShare {
 				TableView.SelectRow (Controller.SelectedPluginIndex, false);
 				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
 				
-				(AddressTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+				(AddressTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
-				(PathTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+				(PathTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
-				(TableView.Delegate as SparkleTableViewDelegate).SelectionChanged += delegate {
+				(TableView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
 					Controller.SelectedPluginChanged (TableView.SelectedRow);
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
@@ -771,17 +771,17 @@ namespace SparkleShare {
                     Editable        = false,
                     Frame           = new RectangleF (155, Frame.Height - 204, 160, 17),
                     StringValue     = "Password:",
-                    Font            = SparkleUI.BoldFont
+                    Font            = UI.BoldFont
                 };
 
                 PasswordTextField = new NSSecureTextField () {
                     Frame       = new RectangleF (320, Frame.Height - 208, 196, 22),
-                    Delegate    = new SparkleTextFieldDelegate ()
+                    Delegate    = new CmisSyncTextFieldDelegate ()
                 };
 
                 VisiblePasswordTextField = new NSTextField () {
                     Frame       = new RectangleF (320, Frame.Height - 208, 196, 22),
-                    Delegate    = new SparkleTextFieldDelegate ()
+                    Delegate    = new CmisSyncTextFieldDelegate ()
                 };
 
                 ShowPasswordCheckButton = new NSButton () {
@@ -806,7 +806,7 @@ namespace SparkleShare {
                     BackgroundColor = NSColor.WindowBackground,
                     Bordered        = false,
                     Editable        = false,
-                    Font            = SparkleUI.Font
+                    Font            = UI.Font
                 };
 
                 CancelButton = new NSButton () {
@@ -830,12 +830,12 @@ namespace SparkleShare {
                     }
                 };
 
-                (PasswordTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+                (PasswordTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
                     VisiblePasswordTextField.StringValue = PasswordTextField.StringValue;
                     Controller.CheckCryptoSetupPage (PasswordTextField.StringValue);
                 };
 
-                (VisiblePasswordTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+                (VisiblePasswordTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
                     PasswordTextField.StringValue = VisiblePasswordTextField.StringValue;
                     Controller.CheckCryptoSetupPage (PasswordTextField.StringValue);
                 };
@@ -879,17 +879,17 @@ namespace SparkleShare {
                     Editable        = false,
                     Frame           = new RectangleF (155, Frame.Height - 224, 160, 17),
                     StringValue     = "Password:",
-                    Font            = SparkleUI.BoldFont
+                    Font            = UI.BoldFont
                 };
 
                 PasswordTextField = new NSSecureTextField () {
                     Frame       = new RectangleF (320, Frame.Height - 228, 196, 22),
-                    Delegate    = new SparkleTextFieldDelegate ()
+                    Delegate    = new CmisSyncTextFieldDelegate ()
                 };
 
                 VisiblePasswordTextField = new NSTextField () {
                     Frame       = new RectangleF (320, Frame.Height - 228, 196, 22),
-                    Delegate    = new SparkleTextFieldDelegate ()
+                    Delegate    = new CmisSyncTextFieldDelegate ()
                 };
 
                 ShowPasswordCheckButton = new NSButton () {
@@ -927,12 +927,12 @@ namespace SparkleShare {
                     }
                 };
 
-                (PasswordTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+                (PasswordTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
                     VisiblePasswordTextField.StringValue = PasswordTextField.StringValue;
                     Controller.CheckCryptoPasswordPage (PasswordTextField.StringValue);
                 };
 
-                (VisiblePasswordTextField.Delegate as SparkleTextFieldDelegate).StringValueChanged += delegate {
+                (VisiblePasswordTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
                     PasswordTextField.StringValue = VisiblePasswordTextField.StringValue;
                     Controller.CheckCryptoPasswordPage (PasswordTextField.StringValue);
                 };
@@ -959,7 +959,7 @@ namespace SparkleShare {
 
             if (type == PageType.Finished) {
                 Header      = "Your shared project is ready!";
-                Description = "You can find the files in your SparkleShare folder.";
+                Description = "You can find the files in your CmisSync folder.";
 
 
                 if (warnings.Length > 0) {
@@ -977,7 +977,7 @@ namespace SparkleShare {
                         BackgroundColor = NSColor.WindowBackground,
                         Bordered        = false,
                         Editable        = false,
-                        Font            = SparkleUI.Font
+                        Font            = UI.Font
                     };
 
                     ContentView.AddSubview (WarningImageView);
@@ -1029,7 +1029,7 @@ namespace SparkleShare {
 
                     case 1: {
                         Header      = "What's happening next?";
-                        Description = "SparkleShare creates a special folder on your computer " +
+                        Description = "CmisSync creates a special folder on your computer " +
                             "that will keep track of your projects.";
 
 
@@ -1096,14 +1096,14 @@ namespace SparkleShare {
                     }
 
                     case 4: {
-                        Header      = "Adding projects to SparkleShare";
+                        Header      = "Adding projects to CmisSync";
                         Description = "You can do this through the status icon menu, or by clicking " +
                             "magic buttons on webpages that look like this:";
 
 
                         StartupCheckButton = new NSButton () {
                             Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
-                            Title = "Add SparkleShare to startup items",
+                            Title = "Add CmisSync to startup items",
                             State = NSCellStateValue.On
                         };
 
@@ -1136,15 +1136,15 @@ namespace SparkleShare {
     }
 
 
-    [Register("SparkleDataSource")]
-    public class SparkleDataSource : NSTableViewDataSource {
+    [Register("CmisSyncDataSource")]
+    public class CmisSyncDataSource : NSTableViewDataSource {
 
         public List<object> Items ;
         public NSAttributedString [] Cells;
         public NSAttributedString [] SelectedCells;
 
 
-        public SparkleDataSource (List<SparklePlugin> plugins)
+        public CmisSyncDataSource (List<SparklePlugin> plugins)
         {
             Items         = new List <object> ();
             Cells         = new NSAttributedString [plugins.Count];
@@ -1241,7 +1241,7 @@ namespace SparkleShare {
     }
 
 
-    public class SparkleTextFieldDelegate : NSTextFieldDelegate {
+    public class CmisSyncTextFieldDelegate : NSTextFieldDelegate {
 
         public event StringValueChangedHandler StringValueChanged;
         public delegate void StringValueChangedHandler ();
@@ -1255,7 +1255,7 @@ namespace SparkleShare {
     }
 
 
-    public class SparkleTableViewDelegate : NSTableViewDelegate {
+    public class CmisSyncTableDelegate : NSTableViewDelegate {
 
         public event SelectionChangedHandler SelectionChanged;
         public delegate void SelectionChangedHandler ();
