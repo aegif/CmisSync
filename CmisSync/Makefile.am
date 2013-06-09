@@ -1,19 +1,18 @@
-SUBDIRS = Linux \
-	Common
+SUBDIRS = Linux Common
 
-ASSEMBLY = CmisSync
-TARGET = exe
+#ASSEMBLY = CmisSync
+#TARGET = exe
 
-LIBS = $(REF_CMISSYNC) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS)
+#LIBS = $(REF_CMISSYNC) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS)
 
-SOURCES =  \
-	Program.cs \
-	AboutController.cs \
-	BubblesController.cs \
-	ControllerBase.cs \
-	Extensions.cs \
-	SetupController.cs \
-	StatusIconController.cs
+#SOURCES =  \
+	#Program.cs \
+	#AboutController.cs \
+	#BubblesController.cs \
+	#ControllerBase.cs \
+	#Extensions.cs \
+	#SetupController.cs \
+	#StatusIconController.cs
 
 install-data-hook:
 	test -f $(datadir)/applications/defaults.list && \
