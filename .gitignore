@@ -40,3 +40,5 @@ CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibrary/test-servers-disabled.json
 CmisSync/TestLibrary/test-servers-fuzzy.json
 Extras/log4net-1.2.11/src/log4net.xml
+cmissync-*.zip
+cmissync-*.tar*

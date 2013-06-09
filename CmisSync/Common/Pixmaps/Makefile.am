@@ -16,5 +16,7 @@ dist_pixmaps_DATA = \
 
 pixmapsdir = $(pkgdatadir)/pixmaps/
 
+EXTRA_DIST = Sources
+
 MAINTAINERCLEANFILES = \
 	Makefile.in

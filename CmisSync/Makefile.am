@@ -15,8 +15,10 @@ SOURCES =  \
 	SetupController.cs \
 	StatusIconController.cs
 
-include $(top_srcdir)/build/build.mk
-	
 install-data-hook:
 	test -f $(datadir)/applications/defaults.list && \
 	test -z $(DESTDIR) && update-desktop-database $(datadir)/applications || :
+
+EXTRA_DIST =
+
+include $(top_srcdir)/build/build.mk

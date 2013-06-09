@@ -6,11 +6,12 @@ SUBDIRS = $(basedirs) $(GUISUBDIRS)
 DIST_SUBDIRS = $(basedirs) CmisSync
 
 EXTRA_DIST = \
-	NEWS \
 	README.md \
-	legal/LICENSE \
-	legal/TRADEMARK \
-	legal/AUTHORS
+	legal/LICENSE.txt \
+	legal/TRADEMARK.txt \
+	legal/AUTHORS.txt \
+	Extras/DotCMIS.dll \
+	Extras/Newtonsoft.Json.dll
 
 DISTCLEANFILES = \
 	intltool-extract \

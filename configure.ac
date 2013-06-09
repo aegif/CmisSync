@@ -3,7 +3,8 @@ m4_define([cmissync_version], [0.9.1])
 
 AC_PREREQ([2.54])
 AC_INIT([CmisSync], cmissync_version)
-AM_INIT_AUTOMAKE([1.11 dist-bzip2 dist-zip foreign tar-pax])
+AC_CONFIG_SRCDIR([CmisSync/Program.cs])
+AM_INIT_AUTOMAKE([foreign dist-bzip2 dist-zip no-dist-gzip])
 AM_MAINTAINER_MODE
 
 dnl Export Version Info

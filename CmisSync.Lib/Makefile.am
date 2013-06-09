@@ -41,4 +41,6 @@ uninstall-hook:
 		rm -f $(DESTDIR)$(moduledir)/`basename $$ASM`; \
 	done;
 
+EXTRA_DIST = CmisSync.Lib.csproj StaticDefines.cs
+
 include $(top_srcdir)/build/build.mk

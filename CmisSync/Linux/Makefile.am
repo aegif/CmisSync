@@ -35,10 +35,13 @@ RESOURCES_RESOURCES = $(addprefix CmisSync.Properties.,$(patsubst %.resx,%.resou
 CmisSync.Properties.%.resources: Properties/%.resx
 	resgen2 $< $@
 
-include $(top_srcdir)/build/build.mk
-
 bin_SCRIPTS = cmissync
 
 Applicationsdir = $(datadir)/applications
 dist_Applications_DATA = cmissync.desktop \
 	cmissync-invite-opener.desktop
+
+EXTRA_DIST = README.md
+
+include $(top_srcdir)/build/build.mk
+
