@@ -141,6 +141,7 @@ CmisSync/Common/Makefile
 CmisSync/Common/HTML/Makefile
 CmisSync/Common/Plugins/Makefile
 CmisSync/Common/Pixmaps/Makefile
+CmisSync/Linux/Defines.cs
 CmisSync/Linux/Makefile
 CmisSync/Linux/Pixmaps/Makefile
 CmisSync/Linux/Pixmaps/icons/Makefile

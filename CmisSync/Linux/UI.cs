@@ -29,19 +29,20 @@ namespace CmisSync {
         public Setup Setup;
         public About About;
 
-        public static string AssetsPath = /*Defines.INSTALL_DIR*/"/usr/share/cmissync";
-
+        public static string AssetsPath =
+            (null != Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR"))
+            ? Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR") : Defines.ASSETS_DIR;
 
         public UI ()
         {
-            Application.Init ();
+            Application.Init();
 
             Setup      = new Setup ();
             About      = new About ();
             Bubbles    = new Bubbles ();
             StatusIcon = new StatusIcon ();
-        
-			Program.Controller.UIHasLoaded ();
+
+            Program.Controller.UIHasLoaded ();
         }
 
 
