@@ -25,7 +25,13 @@ SOURCES =  \
 	Properties/Resources.Designer.cs
 
 RESOURCES = \
-	$(wildcard Properties/*.resx)
+	$(RESOURCES_RESOURCES)
+
+RESOURCES_RESX = $(wildcard Properties/*.resx)
+RESOURCES_RESOURCES = $(addprefix CmisSync.Properties.,$(patsubst %.resx,%.resources,$(notdir $(RESOURCES_RESX))))
+
+CmisSync.Properties.%.resources: Properties/%.resx
+	resgen2 $< $@
 
 include $(top_srcdir)/build/build.mk
 
