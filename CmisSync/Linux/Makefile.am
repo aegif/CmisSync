@@ -8,13 +8,13 @@ ASSEMBLY_INFO_SOURCE = Defines.cs
 LIBS = $(REF_CMISSYNC) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS) $(LOG4NET_LIBS)
 
 SOURCES =  \
-	$(srcdir)/../Program.cs \
-	$(srcdir)/../AboutController.cs \
-	$(srcdir)/../BubblesController.cs \
-	$(srcdir)/../ControllerBase.cs \
-	$(srcdir)/../Extensions.cs \
-	$(srcdir)/../SetupController.cs \
-	$(srcdir)/../StatusIconController.cs \
+	../Program.cs \
+	../AboutController.cs \
+	../BubblesController.cs \
+	../ControllerBase.cs \
+	../Extensions.cs \
+	../SetupController.cs \
+	../StatusIconController.cs \
 	About.cs \
 	Bubbles.cs \
 	Controller.cs \
@@ -24,7 +24,7 @@ SOURCES =  \
 	StatusIcon.cs \
 	UI.cs \
 	UIHelpers.cs \
-	$(srcdir)/../Properties/Resources.Designer.cs
+	../Properties/Resources.Designer.cs
 
 RESOURCES = $(RESOURCES_RESOURCES)
 
@@ -45,4 +45,3 @@ EXTRA_DIST = README.md
 include $(top_srcdir)/build/build.mk
 
 CLEANFILES += $(RESOURCES_RESOURCES)
-
