@@ -1,5 +1,6 @@
 %global _lib lib
 %global _libdir %{_prefix}/lib
+%global debug_package %{nil}
 
 Name: cmissync
 Version: @VERSION@
@@ -29,12 +30,17 @@ More information is available at http://cmissync.com/ .
 %setup -q
 
 %build
+#./configure --prefix=%{_prefix}
 %configure
 make
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+rm -rf %{buildroot}
+make install DESTDIR=%{buildroot}
+%__install -m 0755 Extras/Newtonsoft.Json.dll %{buildroot}%{_libdir}/cmissync/
+%__install -m 0755 Extras/DotCMIS.dll %{buildroot}%{_libdir}/cmissync/
+
+rm -f %{buildroot}%{_libdir}/cmissync/TestLibrary*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -42,13 +48,15 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{_bindir}/cmissync
+%{_libdir}/cmissync/*.dll
+%{_libdir}/cmissync/*.exe
+%{_libdir}/cmissync/*.mdb
 %{_datadir}/cmissync
-%{_libdir}/cmissync
 %{_datadir}/applications/*.desktop
-%{_datadir}/icons
+%{_datadir}/icons/*
 
 %changelog
-* Mon Jun 10 2013 Fritz Elfert <fritz.elfert@graudata.com>
+* Mon Jun 10 2013 Fritz Elfert <fritz.elfert@graudata.com> @VERSION@-1
 - initial rpm 
 
 # end of file
