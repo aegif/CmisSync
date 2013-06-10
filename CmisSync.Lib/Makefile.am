@@ -30,17 +30,6 @@ SOURCES =  \
 	Cmis/Database.cs \
 	Cmis/MimeType.cs
 
-
-install-data-hook:
-	for ASM in $(EXTRA_BUNDLE); do \
-		$(INSTALL) -m 0755 $$ASM $(DESTDIR)$(moduledir); \
-	done;
-
-uninstall-hook:
-	for ASM in $(EXTRA_BUNDLE); do \
-		rm -f $(DESTDIR)$(moduledir)/`basename $$ASM`; \
-	done;
-
 EXTRA_DIST = CmisSync.Lib.csproj StaticDefines.cs
 
 include $(top_srcdir)/build/build.mk

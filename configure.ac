@@ -148,6 +148,8 @@ CmisSync/Linux/Pixmaps/Makefile
 CmisSync/Linux/Pixmaps/icons/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-dark/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
+CmisSync/TestLibrary/Makefile
+CmisSync/TestLibraryRunner/Makefile
 CmisSync/Linux/cmissync
 CmisSync/Makefile
 Makefile
