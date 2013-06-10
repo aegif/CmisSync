@@ -59,7 +59,6 @@ if test -z "$CONFIG_REQUESTED" ; then
 	enable_debug=yes
 fi
 
-
 dnl package checks, common for all configs
 #PKG_CHECK_MODULES([NDESK_DBUS], [ndesk-dbus-1.0])
 #AC_SUBST(NDESK_DBUS_LIBS)
@@ -73,6 +72,42 @@ AC_ARG_ENABLE(appindicator,
 	AS_HELP_STRING([--enable-appindicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
 	[enable_appindicator=$enableval],
 	[enable_appindicator="auto"])
+
+TEST_URL="https://development.deutsche-wolke.de/cmis/atom"
+AC_ARG_WITH([test-url],
+    AS_HELP_STRING([--with-test-url=URL],[Specify server URL for testing]),
+    TEST_URL=${withval})
+AC_SUBST(TEST_URL)
+
+TEST_LOCALPATH="/localpath"
+AC_ARG_WITH([test-localpath],
+    AS_HELP_STRING([--with-test-localpath=PATH],[Specify local path for testing]),
+    TEST_LOCALPATH=${withval})
+AC_SUBST(TEST_LOCALPATH)
+
+TEST_REMOTEPATH="/remotepath"
+AC_ARG_WITH([test-localpath],
+    AS_HELP_STRING([--with-test-remotepath=PATH],[Specify remote path for testing]),
+    TEST_REMOTEPATH=${withval})
+AC_SUBST(TEST_REMOTEPATH)
+
+TEST_USER="testuser"
+AC_ARG_WITH([test-user],
+    AS_HELP_STRING([--with-test-user=PATH],[Specify username for testing]),
+    TEST_USER=${withval})
+AC_SUBST(TEST_USER)
+
+TEST_PASSWORD="secret"
+AC_ARG_WITH([test-password],
+    AS_HELP_STRING([--with-test-password=PATH],[Specify password for testing]),
+    TEST_PASSWORD=${withval})
+AC_SUBST(TEST_PASSWORD)
+
+TEST_REPOID="1094505"
+AC_ARG_WITH([test-repoid],
+    AS_HELP_STRING([--with-test-repoid=PATH],[Specify remote repository-ID for testing]),
+    TEST_REPOID=${withval})
+AC_SUBST(TEST_REPOID)
 
 OSNAME=`uname -s`
 if test "$OSNAME" = "Linux" ; then
@@ -150,6 +185,7 @@ CmisSync/Linux/Pixmaps/icons/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-dark/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
 CmisSync/TestLibrary/Makefile
+CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibraryRunner/Makefile
 CmisSync/Linux/cmissync
 CmisSync/Makefile
