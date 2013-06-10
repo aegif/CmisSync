@@ -1,20 +1,28 @@
-basedirs = build CmisSync.Lib CmisSync.Lib/Cmis
+ACLOCAL_AMFLAGS = -I build/m4/cmissync -I build/m4/shamrock
+
+basedirs = build CmisSync.Lib
 
 SUBDIRS = $(basedirs) $(GUISUBDIRS)
 DIST_SUBDIRS = $(basedirs) CmisSync
 
 EXTRA_DIST = \
-	NEWS \
-        README.md \
-	legal/LICENSE \
-	legal/TRADEMARK \
-	legal/AUTHORS
+	README.md \
+	legal/LICENSE.txt \
+	legal/TRADEMARK.txt \
+	legal/AUTHORS.txt \
+	Extras/DotCMIS.dll \
+	Extras/Newtonsoft.Json.dll
 
 DISTCLEANFILES = \
-	intltool-extract        \
-	intltool-merge          \
-	intltool-update		\
+	intltool-extract \
+	intltool-merge \
+	intltool-update \
 	gnome-doc-utils.make
 
-clean-local:
-	rm -rf $(top_builddir)/bin
+CLEANFILES = -r $(top_builddir)/bin
+
+MAINTAINERCLEANFILES = \
+	aclocal.m4 config.* configure install-sh ltmain* missing Makefile.in
+
+bootstrap:
+	autoreconf -f -s -i

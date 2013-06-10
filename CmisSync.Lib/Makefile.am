@@ -1,26 +1,28 @@
-ASSEMBLY = SparkleLib
+ASSEMBLY = CmisSync.Lib
 TARGET = library
 
 ASSEMBLY_INFO_SOURCE = Defines.cs
 
+LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSONLIBS) $(DOTCMISLIBS)
+
 SOURCES =  \
 	ActivityListener.cs \
 	ActivityListenerAggregator.cs \
-	Defines.cs \
-	SparkleBackend.cs \
-	SparkleConfig.cs \
-	SparkleExceptions.cs \
-	SparkleExtensions.cs \
-	SparkleFetcherBase.cs \
-	SparkleListenerBase.cs \
-	SparkleListenerFactory.cs \
-	SparkleListenerTcp.cs \
-	SparkleLogger.cs \
-	SparkleRepoBase.cs \
-	SparkleRepoInfo.cs \
-	SparkleUser.cs \
-	SparkleWatcher.cs \
-	SparkleWrappers.cs
+	Backend.cs \
+	Config.cs \
+	ConfigManager.cs \
+	ConfigMigration.cs \
+	Exceptions.cs \
+	Fetcher.cs \
+	RepoBase.cs \
+	RepoInfo.cs \
+	Utils.cs \
+	Watcher.cs \
+	Wrappers.cs \
+	Sync/ChangeLogStrategy.cs \
+	Sync/CmisRepo.cs \
+	Sync/CrawlStrategy.cs \
+	Sync/SynchronizedFolder.cs \
 	Cmis/CmisPermissionDeniedException.cs \
 	Cmis/CmisServerNotFoundException.cs \
 	Cmis/CmisUtils.cs \
@@ -38,5 +40,7 @@ uninstall-hook:
 	for ASM in $(EXTRA_BUNDLE); do \
 		rm -f $(DESTDIR)$(moduledir)/`basename $$ASM`; \
 	done;
+
+EXTRA_DIST = CmisSync.Lib.csproj StaticDefines.cs
 
 include $(top_srcdir)/build/build.mk

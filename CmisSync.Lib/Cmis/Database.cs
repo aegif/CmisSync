@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if USE_MONO_SQLITE
+using Mono.Data.Sqlite;
+#else
 using System.Data.SQLite;
+#endif
 using System.IO;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
@@ -10,6 +14,14 @@ using log4net;
 
 namespace CmisSync.Lib.Cmis
 {
+#if USE_MONO_SQLITE
+    // Mono's SQLite ADO implementation uses pure CamelCase (Sqlite vs. SQLite)
+    // so we define some aliases here
+    using SQLiteConnection = SqliteConnection;
+    using SQLiteCommand = SqliteCommand;
+    using SQLiteException = SqliteException;
+#endif
+
     /**
      * Database to cache remote information from the CMIS server.
      * Implemented with SQLite.

@@ -8,7 +8,7 @@ if not exist %msbuild% set msbuild="%WinDirNet%\v4.0.30319\msbuild.exe"
 set wixBinDir=%WIX%\bin
 
 if not exist ..\..\bin mkdir ..\..\bin
-copy Pixmaps\sparkleshare-app.ico ..\..\bin\
+copy Pixmaps\cmissync-app.ico ..\..\bin\
 
 %msbuild% /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" "%~dp0\CmisSync.sln"
 

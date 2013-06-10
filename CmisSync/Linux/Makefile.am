@@ -1,42 +1,47 @@
-SUBDIRS = Nautilus \
-	Pixmaps
+SUBDIRS = Pixmaps
 
-ASSEMBLY = SparkleShare
+ASSEMBLY = CmisSync
 TARGET = exe
 
-LINK = $(REF_SPARKLESHARE) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS) -r:../../bin/SparkleLib.Cmis.dll
+ASSEMBLY_INFO_SOURCE = Defines.cs
 
-if HAVE_APP_INDICATOR
-BUILD_DEFINES="-define:HAVE_APP_INDICATOR"
-endif
+LIBS = $(REF_CMISSYNC) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS) $(LOG4NET_LIBS)
 
 SOURCES =  \
 	../Program.cs \
-	../SparkleAboutController.cs \
-	../SparkleBubblesController.cs \
-	../SparkleControllerBase.cs \
-	../SparkleEventLogController.cs \
-	../SparkleExtensions.cs \
-	../SparkleInvite.cs \
-	../SparkleKeys.cs \
-	../SparklePlugin.cs \
-	../SparkleSetupController.cs \
-	../SparkleStatusIconController.cs \
-	SparkleAbout.cs \
-	SparkleBubbles.cs \
-	SparkleController.cs \
-	SparkleEventLog.cs \
-	SparkleSetup.cs \
-	SparkleSetupWindow.cs \
-	SparkleSpinner.cs \
-	SparkleStatusIcon.cs \
-	SparkleUI.cs \
-	SparkleUIHelpers.cs
+	../AboutController.cs \
+	../BubblesController.cs \
+	../ControllerBase.cs \
+	../Extensions.cs \
+	../SetupController.cs \
+	../StatusIconController.cs \
+	About.cs \
+	Bubbles.cs \
+	Controller.cs \
+	Setup.cs \
+	SetupWindow.cs \
+	Spinner.cs \
+	StatusIcon.cs \
+	UI.cs \
+	UIHelpers.cs \
+	Properties/Resources.Designer.cs
+
+RESOURCES = \
+	$(RESOURCES_RESOURCES)
+
+RESOURCES_RESX = $(wildcard Properties/*.resx)
+RESOURCES_RESOURCES = $(addprefix CmisSync.Properties.,$(patsubst %.resx,%.resources,$(notdir $(RESOURCES_RESX))))
+
+CmisSync.Properties.%.resources: Properties/%.resx
+	resgen2 $< $@
+
+bin_SCRIPTS = cmissync
+
+Applicationsdir = $(datadir)/applications
+dist_Applications_DATA = cmissync.desktop \
+	cmissync-invite-opener.desktop
+
+EXTRA_DIST = README.md
 
 include $(top_srcdir)/build/build.mk
 
-bin_SCRIPTS = sparkleshare
-
-Applicationsdir = $(datadir)/applications
-dist_Applications_DATA = sparkleshare.desktop \
-	sparkleshare-invite-opener.desktop

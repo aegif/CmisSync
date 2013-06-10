@@ -71,13 +71,9 @@
       <Project>{529ef90f-a34c-4426-a4f9-65113ac23841}</Project>
       <Name>DotCMIS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\SparkleLib\Cmis\chemistry-dotcmis-0.5-src\src\DotCMIS.csproj">
-      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
-      <Name>DotCMIS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
-      <Name>SparkleLib</Name>
+      <Name>CmisSync.Lib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

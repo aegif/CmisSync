@@ -124,7 +124,7 @@ namespace CmisSync
             Logger.Info("Config | Created '" + FoldersPath + "'");
 
             string app_path = Path.GetDirectoryName(Forms.Application.ExecutablePath);
-            string icon_file_path = Path.Combine(app_path, "Pixmaps", "sparkleshare-folder.ico");
+            string icon_file_path = Path.Combine(app_path, "Pixmaps", "cmissync-folder.ico");
 
             if (!File.Exists(icon_file_path))
             {
