@@ -1,0 +1,54 @@
+%global _lib lib
+%global _libdir %{_prefix}/lib
+
+Name: cmissync
+Version: @VERSION@
+Release: 1%{?dist}
+Summary: A CMIS Sync tool
+
+Group: Applications/Internet
+License: GPLv3
+URL: http://cmissync.com/
+Source0: %{name}-%{version}.tar.bz2
+
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+BuildRequires: gtk-sharp2-devel mono-core mono-devel
+BuildRequires: notify-sharp-devel webkit-sharp-devel
+BuildRequires: libtool intltool desktop-file-utils
+
+Requires: mono-data-sqlite
+
+%description
+CmisSync allows you to keep in sync with your CMIS repository.
+It is like Dropbox for Enterprise Content Management!
+
+More information is available at http://cmissync.com/ .
+
+%prep
+%setup -q
+
+%build
+%configure
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%{_bindir}/cmissync
+%{_datadir}/cmissync
+%{_libdir}/cmissync
+%{_datadir}/applications/*.desktop
+%{_datadir}/icons
+
+%changelog
+* Mon Jun 10 2013 Fritz Elfert <fritz.elfert@graudata.com>
+- initial rpm 
+
+# end of file

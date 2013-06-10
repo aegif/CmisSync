@@ -74,8 +74,8 @@ $ sudo make install
 ### Resetting CmisSync settings
 
 ```
-rm -Rf ~/CmisSync
-rm -Rf ~/.config/cmissync
+rm -rf ~/CmisSync
+rm -rf ~/.config/cmissync
 ```
 
 ### Uninstalling

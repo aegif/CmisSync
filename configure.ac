@@ -134,6 +134,7 @@ AC_SUBST([GUISUBDIRS])
 SHAMROCK_CHECK_NUNIT
 
 AC_OUTPUT([
+build/cmissync.spec
 build/Makefile
 build/m4/Makefile
 CmisSync.Lib/Defines.cs
