@@ -1,5 +1,4 @@
-SUBDIRS = Linux Common TestLibrary
-DIST_SUBDIRS = $(SUBDIRS) TestLibraryRunner
+SUBDIRS = Linux Common TestLibrary TestLibraryRunner
 
 ASSEMBLY = CmisSync
 TARGET = exe
