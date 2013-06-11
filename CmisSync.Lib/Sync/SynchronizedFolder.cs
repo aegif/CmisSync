@@ -664,32 +664,32 @@ namespace CmisSync.Lib.Sync
             public Boolean CheckRules(string path, RulesType ruletype)
             {
                 string[] contents = new string[] {
-                "~",             // gedit and emacs
-                "Thumbs.db", "Desktop.ini","desktop.ini","thumbs.db", // Windows
-                "$~"
-            };
+                    "~",             // gedit and emacs
+                    "Thumbs.db", "Desktop.ini","desktop.ini","thumbs.db", // Windows
+                    "$~"
+                };
 
                 string[] extensions = new string[] {
-            ".autosave", // Various autosaving apps
-            ".~lock", // LibreOffice
-            ".part", ".crdownload", // Firefox and Chromium temporary download files
-            ".sw[a-z]", ".un~", ".swp", ".swo", // vi(m)
-            ".directory", // KDE
-            ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes", // Mac OS X
-            ".(Autosaved).graffle", // Omnigraffle
-            ".tmp", ".TMP", // MS Office
-            ".~ppt", ".~pptx",
-            ".~xls", ".~xlsx",
-            ".~doc", ".~docx",
-            ".cvsignore", ".~cvsignore",// CVS
-            ".gitignore", // GIT
-            ".sync", // CmisSync File Downloading/Uploading
-            ".cmissync" // CmisSync Database 
-            };
+                    ".autosave", // Various autosaving apps
+                    ".~lock", // LibreOffice
+                    ".part", ".crdownload", // Firefox and Chromium temporary download files
+                    ".sw[a-z]", ".un~", ".swp", ".swo", // vi(m)
+                    ".directory", // KDE
+                    ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes", // Mac OS X
+                    ".(Autosaved).graffle", // Omnigraffle
+                    ".tmp", ".TMP", // MS Office
+                    ".~ppt", ".~pptx",
+                    ".~xls", ".~xlsx",
+                    ".~doc", ".~docx",
+                    ".cvsignore", ".~cvsignore",// CVS
+                    ".gitignore", // GIT
+                    ".sync", // CmisSync File Downloading/Uploading
+                    ".cmissync" // CmisSync Database 
+                };
 
                 string[] directories = new string[] {
-                "CVS",".svn",".git",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
-            };
+                    "CVS",".svn",".git",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
+                };
 
                 //Logger.LogInfo("SyncRules", "Check rules for " + path);
                 Boolean found = false;
