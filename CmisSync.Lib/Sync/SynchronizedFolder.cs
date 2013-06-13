@@ -331,6 +331,9 @@ namespace CmisSync.Lib.Sync
                         File.Delete(tmpfilepath);
                     }
                     if (contentStream != null) contentStream.Stream.Close();
+
+                    // Download with partial download feature failed. Try simple download.
+                    SimpleDownloadFile(remoteDocument, localFolder);
                 }
 
                 try
@@ -365,6 +368,76 @@ namespace CmisSync.Lib.Sync
                         return;
                     dst.Write(buffer, 0, read);
                 }
+            }
+
+            /**
+             * Download a single file from the CMIS server.
+             */
+            private void SimpleDownloadFile(IDocument remoteDocument, string localFolder)
+            {
+                activityListener.ActivityStarted();
+                DotCMIS.Data.IContentStream contentStream = remoteDocument.GetContentStream();
+
+                // If this file does not have a content stream, ignore it.
+                // Even 0 bytes files have a contentStream.
+                // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                if (contentStream == null)
+                {
+                    //SparkleLogger.LogInfo("Sync", "Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                    return;
+                }
+
+                // Download.
+                string filePath = localFolder + Path.DirectorySeparatorChar + contentStream.FileName;
+
+                // If there was previously a directory with this name, delete it.
+                // TODO warn if local changes inside the folder.
+                if (Directory.Exists(filePath))
+                {
+                    Directory.Delete(filePath);
+                }
+
+                bool success = false;
+                do
+                {
+                    try
+                    {
+                        SimpleDownloadFile(contentStream, filePath);
+                        success = true;
+                    }
+                    catch (WebException e)
+                    {
+                        //SparkleLogger.LogInfo("Sync", e.Message);
+                        //SparkleLogger.LogInfo("Sync", "Problem during download, waiting for 10 seconds...");
+                        System.Threading.Thread.Sleep(10 * 1000);
+                    }
+                }
+                while (!success);
+
+                // Get metadata.
+                Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+
+                // Create database entry for this file.
+                database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+                activityListener.ActivityStopped();
+            }
+
+            /**
+             * Download a file, without retrying
+             */
+            private void SimpleDownloadFile(DotCMIS.Data.IContentStream contentStream, string filePath)
+            {
+                //SparkleLogger.LogInfo("Sync", "Downloading " + filePath);
+                Stream file = File.OpenWrite(filePath);
+                byte[] buffer = new byte[8 * 1024];
+                int len;
+                while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0) // TODO catch WebException here and retry
+                {
+                    file.Write(buffer, 0, len);
+                }
+                file.Close();
+                contentStream.Stream.Close();
+                //SparkleLogger.LogInfo("Sync", "Downloaded");
             }
 
 
