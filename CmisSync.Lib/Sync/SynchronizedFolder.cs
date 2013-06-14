@@ -263,97 +263,59 @@ namespace CmisSync.Lib.Sync
             private void DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 activityListener.ActivityStarted();
+                Logger.Info(String.Format("CmisDirectory | Download of file {0}", remoteDocument.ContentStreamFileName));
 
                 if (remoteDocument.ContentStreamLength == 0)
                 {
-                    Logger.Info("CmisDirectory | Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                    Logger.Info("CmisDirectory | Skipping download of file with content length zero: " + remoteDocument.ContentStreamFileName);
                     activityListener.ActivityStopped();
                     return;
                 }
 
-                StreamWriter localfile = null;
                 DotCMIS.Data.IContentStream contentStream = null;
-
                 string filepath = Path.Combine(localFolder, remoteDocument.ContentStreamFileName);
-
-                // If a file exist, file is deleted.
-                if (File.Exists(filepath))
-                    File.Delete(filepath);
-
                 string tmpfilepath = filepath + ".sync";
 
-                // Download file, starting at the last download point
+                // If file exists, delete it.
+                File.Delete(filepath);
+                File.Delete(tmpfilepath);
+
+                // Download file.
                 Boolean success = false;
                 try
                 {
-                    // Get the last position in the localfile. By default position 0 (Nuxeo do not support partial getContentStream #107
-                    Int64 Offset = 0;
-
-                    // Nuxeo don't support partial getContentStream
-                    if (session.RepositoryInfo.VendorName.ToLower().Contains("nuxeo"))
-                    {
-                        Logger.Warn("CmisDirectory | Nuxeo does not support partial download, so restart from zero.");
-                        localfile = new StreamWriter(tmpfilepath);
-                        contentStream = remoteDocument.GetContentStream();
-                    }
-                    else
-                    {
-                        // Create Stream with the local file in append mode, if file is empty it's like a full download (Offset 0)
-                        localfile = new StreamWriter(tmpfilepath, true);
-                        localfile.AutoFlush = true;
-                        Offset = localfile.BaseStream.Position;
-                        contentStream = remoteDocument.GetContentStream(remoteDocument.Id, Offset, remoteDocument.ContentStreamLength);
-                    }
-
+                    contentStream = remoteDocument.GetContentStream();
                     if (contentStream == null)
                     {
                         Logger.Warn("CmisDirectory | Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
                         throw new IOException();
                     }
 
-                    Logger.Info(String.Format("CmisDirectory | Start download of file with offset {0}", Offset));
+                    SimpleDownloadFile(contentStream, tmpfilepath);
 
-                    contentStream.Stream.Flush();
-                    CopyStream(contentStream.Stream, localfile.BaseStream);
-                    localfile.Flush();
-                    localfile.Close();
                     contentStream.Stream.Close();
                     success = true;
                 }
                 catch (Exception ex)
                 {
-                    Logger.Fatal(String.Format("CmisDirectory | Download of file {0} abort: {1}", remoteDocument.ContentStreamFileName, ex));
+                    Logger.Fatal(String.Format("CmisDirectory | Download of file {0} failed: {1}", remoteDocument.ContentStreamFileName, ex));
                     success = false;
-                    if (localfile != null)
-                    {
-                        localfile.Flush();
-                        localfile.Close();
-                        File.Delete(tmpfilepath);
-                    }
+                    File.Delete(tmpfilepath);
                     if (contentStream != null) contentStream.Stream.Close();
-
-                    // Download with partial download feature failed. Try simple download.
-                    SimpleDownloadFile(remoteDocument, localFolder);
                 }
 
-                try
+                if (success)
                 {
+                    // TODO Control file integrity by using hash compare?
+
                     // Rename file
-                    // TODO - Yannick - Control file integrity by using hash compare - Is it necessary ?
-                    if (success)
-                    {
-                        File.Move(tmpfilepath, filepath);
+                    File.Move(tmpfilepath, filepath);
 
-                        // Get metadata.
-                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+                    // Get metadata.
+                    Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
-                        // Create database entry for this file.
-                        database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Fatal("CmisDirectory | Unable to write metadata in the CmisDatabase: " + ex.ToString());
+                    // Create database entry for this file.
+                    database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
                 }
                 activityListener.ActivityStopped();
             }
