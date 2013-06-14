@@ -110,7 +110,7 @@ namespace CmisSync
 
                 foreach (RepoBase repo in Repositories)
                 {
-                    repo.HasUnsyncedChanges();
+                    repo.SyncInBackground();
                 }
 
                 return unsynced_folders;
@@ -384,7 +384,7 @@ namespace CmisSync
 
             foreach (RepoBase repo in Repositories)
             {
-                repo.HasUnsyncedChanges();
+                repo.SyncInBackground();
             }
 
             if (has_unsynced_repos)

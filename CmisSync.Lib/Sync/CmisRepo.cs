@@ -58,9 +58,8 @@ namespace CmisSync.Lib.Sync
         }
 
 
-        public override void HasUnsyncedChanges()
+        public override void SyncInBackground()
         {
-            Logger.Info(String.Format("CmisRepo | HasUnsyncedChanges get", this.Name));
             if (cmis != null) // Because it is sometimes called before the object's constructor has completed.
                 cmis.SyncInBackground();
         }

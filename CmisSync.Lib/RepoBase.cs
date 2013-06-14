@@ -42,7 +42,7 @@ namespace CmisSync.Lib
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(RepoBase));
 
-        public abstract void HasUnsyncedChanges();
+        public abstract void SyncInBackground();
         public abstract double Size { get; }
 
         public event SyncStatusChangedEventHandler SyncStatusChanged = delegate { };
@@ -126,7 +126,7 @@ namespace CmisSync.Lib
 
                 // In the unlikely case that we haven't synced up our
                 // changes or the server was down, sync up again
-                HasUnsyncedChanges();
+                SyncInBackground();
             };
         }
 
@@ -137,7 +137,7 @@ namespace CmisSync.Lib
 
             // Sync up everything that changed
             // since we've been offline
-            HasUnsyncedChanges();
+            SyncInBackground();
 
             this.remote_timer.Start();
         }
