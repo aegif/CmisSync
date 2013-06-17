@@ -69,26 +69,6 @@ namespace CmisSync.Lib
         protected List<string> warnings = new List<string>();
         protected List<string> errors = new List<string>();
 
-        protected string[] ExcludeRules = new string[] {
-            "*.autosave", // Various autosaving apps
-            "*~", // gedit and emacs
-            ".~lock.*", // LibreOffice
-            "*.part", "*.crdownload", // Firefox and Chromium temporary download files
-            ".*.sw[a-z]", "*.un~", "*.swp", "*.swo", // vi(m)
-            ".directory", // KDE
-            ".DS_Store", "Icon\r", "._*", ".Spotlight-V100", ".Trashes", // Mac OS X
-            "*(Autosaved).graffle", // Omnigraffle
-            "Thumbs.db", "Desktop.ini", // Windows
-            "~*.tmp", "~*.TMP", "*~*.tmp", "*~*.TMP", // MS Office
-            "~*.ppt", "~*.PPT", "~*.pptx", "~*.PPTX",
-            "~*.xls", "~*.XLS", "~*.xlsx", "~*.XLSX",
-            "~*.doc", "~*.DOC", "~*.docx", "~*.DOCX",
-            "*/CVS/*", ".cvsignore", "*/.cvsignore", // CVS
-            "/.svn/*", "*/.svn/*", // Subversion
-            "/.hg/*", "*/.hg/*", "*/.hgignore", // Mercurial
-            "/.bzr/*", "*/.bzr/*", "*/.bzrignore" // Bazaar
-        };
-
 
         private Thread thread;
 
@@ -150,52 +130,10 @@ namespace CmisSync.Lib
         }
 
 
-        // TODO used?
-        public void Start()
-        {
-            IsActive = true;
-            Started();
-
-            Logger.Info("Fetcher | " + TargetFolder + " | Fetching folder: " + RemoteUrl);
-
-            this.thread = new Thread(() =>
-            {
-                if (Fetch())
-                {
-                    Thread.Sleep(500);
-                    Logger.Info("Fetcher | " + OriginalRepoInfo.Name + " | Finished");
-
-                    IsActive = false;
-
-                    bool repo_is_encrypted = (RemoteUrl.AbsolutePath.Contains("-crypto") ||
-                                              RemoteUrl.Host.Equals("CmisSync.com"));
-
-                    Finished(repo_is_encrypted, false, Warnings);
-                }
-                else
-                {
-                    Thread.Sleep(500);
-                    Logger.Warn("Fetcher | " + OriginalRepoInfo.Name + " | Failed");
-
-                    IsActive = false;
-                    Failed();
-                }
-            });
-
-            this.thread.Start();
-        }
-
-
         public void Dispose()
         {
             if (this.thread != null)
                 this.thread.Abort();
-        }
-
-        // TODO remove, not used
-        protected void OnProgressChanged(double percentage)
-        {
-            ProgressChanged(percentage);
         }
     }
 }

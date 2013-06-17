@@ -47,13 +47,6 @@ namespace CmisSync.Lib.Sync
             private ISession session;
 
             /**
-             * Local folder where the changes are synchronized to.
-             * Example: "C:\CmisSync"
-             */
-            // Store in repoInfo
-            // private string localRootFolder;
-
-            /**
              * Path of the root in the remote repository.
              * Example: "/User Homes/nicolas.raoul/demos"
              */
@@ -112,7 +105,7 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
                 cmisParameters[SessionParameter.User] = repoInfo.User;
                 // Unprotect password
-                cmisParameters[SessionParameter.Password] = Crypto.Unprotect(repoInfo.Password);
+                cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(repoInfo.Password);
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
 
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
@@ -664,8 +657,30 @@ namespace CmisSync.Lib.Sync
                 };
 
                 string[] directories = new string[] {
-                    "CVS",".svn",".git",".hg",".bzr",".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
+                    "CVS", ".svn", ".git", ".hg", ".bzr", // Version control local settings
+                    ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
                 };
+
+                // TODO: Consider these ones as well:
+                //string[] ExcludeRules = new string[] {
+                //    "*.autosave", // Various autosaving apps
+                //    "*~", // gedit and emacs
+                //    ".~lock.*", // LibreOffice
+                //    "*.part", "*.crdownload", // Firefox and Chromium temporary download files
+                //    ".*.sw[a-z]", "*.un~", "*.swp", "*.swo", // vi(m)
+                //    ".directory", // KDE
+                //    ".DS_Store", "Icon\r", "._*", ".Spotlight-V100", ".Trashes", // Mac OS X
+                //    "*(Autosaved).graffle", // Omnigraffle
+                //    "Thumbs.db", "Desktop.ini", // Windows
+                //    "~*.tmp", "~*.TMP", "*~*.tmp", "*~*.TMP", // MS Office
+                //    "~*.ppt", "~*.PPT", "~*.pptx", "~*.PPTX",
+                //    "~*.xls", "~*.XLS", "~*.xlsx", "~*.XLSX",
+                //    "~*.doc", "~*.DOC", "~*.docx", "~*.DOCX",
+                //    "*/CVS/*", ".cvsignore", "*/.cvsignore", // CVS
+                //    "/.svn/*", "*/.svn/*", // Subversion
+                //    "/.hg/*", "*/.hg/*", "*/.hgignore", // Mercurial
+                //    "/.bzr/*", "*/.bzr/*", "*/.bzrignore" // Bazaar
+                //};
 
                 //Logger.LogInfo("SyncRules", "Check rules for " + path);
                 Boolean found = false;

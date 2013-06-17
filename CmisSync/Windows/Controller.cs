@@ -16,17 +16,11 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using Forms = System.Windows.Forms;
 
-using Microsoft.Win32;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 
@@ -35,9 +29,6 @@ namespace CmisSync
 
     public class Controller : ControllerBase
     {
-        private int ssh_agent_pid;
-
-
         public Controller()
             : base()
         {
@@ -50,34 +41,9 @@ namespace CmisSync
         }
 
 
-        public override string EventLogHTML
-        {
-            get
-            {
-                string html = UIHelpers.GetHTML("event-log.html");
-                return html.Replace("<!-- $jquery -->", UIHelpers.GetHTML("jquery.js"));
-            }
-        }
-
-
-        public override string DayEntryHTML
-        {
-            get
-            {
-                return UIHelpers.GetHTML("day-entry.html");
-            }
-        }
-
-
-        public override string EventEntryHTML
-        {
-            get
-            {
-                return UIHelpers.GetHTML("event-entry.html");
-            }
-        }
-
-
+        /// <summary>
+        /// Add CmisSync to the list of programs to be started up when the user logs into Windows.
+        /// </summary>
         public override void CreateStartupItem()
         {
             string startup_folder_path = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
@@ -93,12 +59,9 @@ namespace CmisSync
         }
 
 
-        public override void InstallProtocolHandler()
-        {
-            // We ship a separate .exe for this
-        }
-
-
+        /// <summary>
+        /// Add CmisSync to the user's Windows Explorer bookmarks.
+        /// </summary>
         public override void AddToBookmarks()
         {
             string user_profile_path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -113,6 +76,11 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Create the user's CmisSync settings folder.
+        /// This folder contains databases, the settings file and the log file.
+        /// </summary>
+        /// <returns></returns>
         public override bool CreateCmisSyncFolder()
         {
             if (Directory.Exists(FoldersPath))
@@ -130,10 +98,6 @@ namespace CmisSync
             {
                 string ini_file_path = Path.Combine(FoldersPath, "desktop.ini");
 
-                //string ini_file = "[.ShellClassInfo]\r\n" +
-                //    "IconFile=" + icon_file_path + "\r\n" +
-                //    "IconIndex=0\r\n" +
-                //    "InfoTip=CmisSync\r\n";
                 string ini_file = "[.ShellClassInfo]\r\n" +
                     "IconFile=" + Assembly.GetExecutingAssembly().Location + "\r\n" +
                     "IconIndex=0\r\n" +
@@ -165,12 +129,10 @@ namespace CmisSync
         }
 
 
-        public override void OpenFile(string path)
-        {
-            Process.Start(path);
-        }
-
-
+        /// <summary>
+        /// Open a folder in Windows Explorer.
+        /// </summary>
+        /// <param name="path">Path to open</param>
         public override void OpenFolder(string path)
         {
             Process process = new Process();
@@ -180,27 +142,42 @@ namespace CmisSync
             process.Start();
         }
 
+
+        /// <summary>
+        /// With Windows Explorer, open the folder where the local synchronized folders are.
+        /// </summary>
         public void OpenCmisSyncFolder()
         {
             OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
         }
 
 
+        /// <summary>
+        /// With Windows Explorer, open the local folder of a CmisSync synchronized folder.
+        /// </summary>
+        /// <param name="name">Name of the synchronized folder</param>
         public void OpenCmisSyncFolder(string name)
         {
             OpenFolder(new Folder(name).FullPath);
         }
 
+        /// <summary>
+        /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
+        /// </summary>
+        /// <param name="name">Name of the synchronized folder</param>
         public void OpenRemoteFolder(string name)
         {
             RepoInfo repo = ConfigManager.CurrentConfig.GetRepoInfo(name);
             Process.Start(CmisUtils.GetBrowsableURL(repo));
         }
 
+
+        /// <summary>
+        /// Quit CmisSync.
+        /// </summary>
         public override void Quit()
         {
             base.Quit();
         }
-
     }
 }

@@ -14,56 +14,47 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-
-using DotCMIS;
-using DotCMIS.Client.Impl;
-using DotCMIS.Client;
-using DotCMIS.Data.Impl;
-using DotCMIS.Data.Extensions;
-
-using CmisSync.Lib;
-using System.ComponentModel;
-using DotCMIS.Enums;
-using DotCMIS.Exceptions;
-
-using System.Data;
-using System.Collections;
 
 namespace CmisSync.Lib.Sync
 {
 
     public partial class CmisRepo : RepoBase
     {
-        private SynchronizedFolder cmis;
+        private SynchronizedFolder synchronizedFolder;
 
         public CmisRepo(RepoInfo repoInfo, ActivityListener activityListener)
             : base(repoInfo)
         {
-            cmis = new SynchronizedFolder(repoInfo, activityListener, this);
-            Logger.Info("CmisRepo | " + cmis);
+            synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);
+            Logger.Info("CmisRepo | " + synchronizedFolder);
         }
 
-
+        /// <summary>
+        /// Sync for the first time.
+        /// This will create a database and download all files.
+        /// </summary>
         public void DoFirstSync()
         {
             Logger.Info(String.Format("CmisRepo | First sync", this.Name));
-            if (cmis != null)
-                cmis.Sync();
+            if (synchronizedFolder != null)
+                synchronizedFolder.Sync();
         }
 
-
+        /// <summary>
+        /// Synchronize.
+        /// The synchronization is performed in the background, so that the UI stays usable.
+        /// </summary>
         public override void SyncInBackground()
         {
-            if (cmis != null) // Because it is sometimes called before the object's constructor has completed.
-                cmis.SyncInBackground();
+            if (synchronizedFolder != null) // Because it is sometimes called before the object's constructor has completed.
+                synchronizedFolder.SyncInBackground();
         }
 
+        /// <summary>
+        /// Size of the repository in bytes.
+        /// Obtained by adding the individual sizes of all files.
+        /// </summary>
         public override double Size
         {
             get
