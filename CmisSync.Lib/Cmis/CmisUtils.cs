@@ -61,7 +61,7 @@ namespace CmisSync.Lib.Cmis
                 "/files/basic/cmis/my/servicedoc",
                 "/p8cmis/resources/Service",
                 "/_vti_bin/cmis/rest?getRepositories",
-                "/Nemaki/atom",
+                "/Nemaki/atom/bedroom",
                 "/nuxeo/atom/cmis"
             };
 
