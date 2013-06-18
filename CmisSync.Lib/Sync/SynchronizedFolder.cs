@@ -221,7 +221,7 @@ namespace CmisSync.Lib.Sync
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
                         string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
-                        if (CheckRules(localSubFolder, RulesType.Folder))
+                        if (WorthSyncing(localSubFolder))
                         {
 
                             // Create local folder.
@@ -237,7 +237,7 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        if (CheckRules(cmisObject.Name, RulesType.File))
+                        if (WorthSyncing(cmisObject.Name))
                             // It is a file, just download it.
                             DownloadFile((IDocument)cmisObject, localFolder);
                     }
@@ -346,7 +346,7 @@ namespace CmisSync.Lib.Sync
                 IDocument remoteDocument = null;
                 try
                 {
-                    Logger.Info(String.Format("SynchronizedFolder | Start upload of file {0}", filePath));
+                    Logger.Info(String.Format("SynchronizedFolder | Uploading: {0}", filePath));
 
                     // Prepare properties
                     string fileName = Path.GetFileName(filePath);
@@ -390,14 +390,14 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception ex)
                     {
-                        Logger.Fatal(String.Format("SynchronizedFolder | Upload of file {0} abort: {1}", filePath, ex));
+                        Logger.Fatal(String.Format("SynchronizedFolder | Upload failed {0} : {1}", filePath, ex));
                         success = false;
                         if (contentStream != null) contentStream.Stream.Close();
                     }
 
                     if (success)
                     {
-                        Logger.Info(String.Format("SynchronizedFolder | Upload of file {0} finished", filePath));
+                        Logger.Info(String.Format("SynchronizedFolder | Upload finished: {0}", filePath));
                         if (contentStream != null) { contentStream.Stream.Close(); contentStream.Stream.Dispose(); }
                         properties[PropertyIds.Name] = fileName;
                         file.Close();
@@ -458,14 +458,14 @@ namespace CmisSync.Lib.Sync
                 // Upload each file in this folder.
                 foreach (string file in Directory.GetFiles(localFolder))
                 {
-                    if (CheckRules(file, RulesType.File))
+                    if (WorthSyncing(file))
                         UploadFile(file, folder);
                 }
 
                 // Recurse for each subfolder in this folder.
                 foreach (string subfolder in Directory.GetDirectories(localFolder))
                 {
-                    if (CheckRules(subfolder, RulesType.Folder))
+                    if (WorthSyncing(subfolder))
                         UploadFolderRecursively(folder, subfolder);
                 }
             }
@@ -569,13 +569,13 @@ namespace CmisSync.Lib.Sync
                 IList<IPropertyDefinition> propertyDefs = typeDef.PropertyDefinitions;
 
                 // Get metadata.
-                foreach(IProperty property in document.Properties)
+                foreach (IProperty property in document.Properties)
                 {
                     // Mode
                     string mode = "readonly";
                     foreach (IPropertyDefinition propertyDef in propertyDefs)
                     {
-                        if(propertyDef.Id.Equals("cmis:name"))
+                        if (propertyDef.Id.Equals("cmis:name"))
                         {
                             Updatability updatability = propertyDef.Updatability;
                             mode = updatability.ToString();
@@ -592,7 +592,7 @@ namespace CmisSync.Lib.Sync
                         metadata.Add(property.Id, new string[] { property.DisplayName, mode, property.ValueAsString });
                     }
                 }
-                
+
                 return metadata;
             }
 
@@ -626,17 +626,32 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
+
+
             /**
-             * Check if the filename provide is compliance
-             * Return true if path is ok, or false is path contains one or more rule
+             * Check whether the file is worth syncing or not.
+             * Files that are not worth syncing include temp files, locks, etc.
              * */
-            public Boolean CheckRules(string path, RulesType ruletype)
+            public Boolean WorthSyncing(string filename)
             {
-                string[] contents = new string[] {
+                filename = filename.ToLower();
+
+                string[] filenames = new string[] {
                     "~",             // gedit and emacs
-                    "Thumbs.db", "Desktop.ini","desktop.ini","thumbs.db", // Windows
+                    "thumbs.db", "desktop.ini", // Windows
+                    "CVS", ".svn", ".git", ".hg", ".bzr", // Version control local settings
+                    ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes", // Mac OS X
                     "$~"
                 };
+
+                foreach (string ext in filenames)
+                {
+                    if (filename.ToLower() == ext.ToLower())
+                    {
+                        Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
+                        return false;
+                    }
+                }
 
                 string[] extensions = new string[] {
                     ".autosave", // Various autosaving apps
@@ -644,8 +659,8 @@ namespace CmisSync.Lib.Sync
                     ".part", ".crdownload", // Firefox and Chromium temporary download files
                     ".sw[a-z]", ".un~", ".swp", ".swo", // vi(m)
                     ".directory", // KDE
-                    ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes", // Mac OS X
-                    ".(Autosaved).graffle", // Omnigraffle
+                    ".ds_store", ".Icon\r\r", "._", ".spotlight-V100", ".trashes", // Mac OS X
+                    ".(autosaved).graffle", // Omnigraffle
                     ".tmp", ".TMP", // MS Office
                     ".~ppt", ".~pptx",
                     ".~xls", ".~xlsx",
@@ -655,12 +670,6 @@ namespace CmisSync.Lib.Sync
                     ".sync", // CmisSync File Downloading/Uploading
                     ".cmissync" // CmisSync Database 
                 };
-
-                string[] directories = new string[] {
-                    "CVS", ".svn", ".git", ".hg", ".bzr", // Version control local settings
-                    ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes" // Mac OS X
-                };
-
                 // TODO: Consider these ones as well:
                 //string[] ExcludeRules = new string[] {
                 //    "*.autosave", // Various autosaving apps
@@ -682,37 +691,18 @@ namespace CmisSync.Lib.Sync
                 //    "/.bzr/*", "*/.bzr/*", "*/.bzrignore" // Bazaar
                 //};
 
-                //Logger.LogInfo("SyncRules", "Check rules for " + path);
-                Boolean found = false;
-                foreach (string content in contents)
+                string filext = Path.GetExtension(filename);
+                foreach (string ext in extensions)
                 {
-                    if (path.Contains(content)) found = true;
-                }
-
-                if (ruletype == RulesType.Folder)
-                {
-                    foreach (string dir in directories)
+                    if (filext.Equals(ext))
                     {
-                        if (path.ToLower().Contains(dir)) found = true;
+                        Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
+                        return false;
                     }
                 }
-                else
-                {
-                    foreach (string ext in extensions)
-                    {
-                        string filext = Path.GetExtension(path);
-                        if (filext.ToLower() == ext.ToLower()) found = true;
-                    }
-                }
-
-                string not = string.Empty;
-                if (found) not = " not";
-
-                //Logger.LogInfo("SyncRules", String.Format("Path" + path + " is{0} ok", not));
-                return !found;
-
+                Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
+                return true;
             }
         }
     }
-
 }

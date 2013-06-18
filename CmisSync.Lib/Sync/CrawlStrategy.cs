@@ -106,7 +106,7 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        if (CheckRules(remoteSubFolder.Name, RulesType.Folder))
+                        if (WorthSyncing(remoteSubFolder.Name))
                         {
                             remoteFolders.Add(remoteSubFolder.Name);
                             string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
@@ -162,7 +162,7 @@ namespace CmisSync.Lib.Sync
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)cmisObject;
 
-                        if (CheckRules(remoteDocument.Name, RulesType.File))
+                        if (WorthSyncing(remoteDocument.Name))
                         {
                             // We use the filename of the document's content stream.
                             // This can be different from the name of the document.
@@ -269,7 +269,7 @@ namespace CmisSync.Lib.Sync
 
                     string fileName = Path.GetFileName(filePath);
 
-                    if (CheckRules(fileName, RulesType.File))
+                    if (WorthSyncing(fileName))
                     {
                         if (!remoteFiles.Contains(fileName))
                         {
@@ -293,7 +293,10 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // New file, sync up.
                                     Logger.Info("Sync | Uploading file absent on repository: " + filePath);
-                                    UploadFile(filePath, remoteFolder);
+                                    if (WorthSyncing(filePath))
+                                    {
+                                        UploadFile(filePath, remoteFolder);
+                                    }
                                 }
                             }
                         }
@@ -327,7 +330,7 @@ namespace CmisSync.Lib.Sync
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
 
-                    if (CheckRules(localSubFolder, RulesType.Folder))
+                    if (WorthSyncing(localSubFolder))
                     {
                         string folderName = Path.GetFileName(localSubFolder);
                         if (!remoteFolders.Contains(folderName))
