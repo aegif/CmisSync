@@ -106,7 +106,7 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        if (WorthSyncing(remoteSubFolder.Name))
+                        if (Utils.WorthSyncing(remoteSubFolder.Name))
                         {
                             remoteFolders.Add(remoteSubFolder.Name);
                             string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
@@ -162,7 +162,7 @@ namespace CmisSync.Lib.Sync
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)cmisObject;
 
-                        if (WorthSyncing(remoteDocument.Name))
+                        if (Utils.WorthSyncing(remoteDocument.Name))
                         {
                             // We use the filename of the document's content stream.
                             // This can be different from the name of the document.
@@ -269,7 +269,7 @@ namespace CmisSync.Lib.Sync
 
                     string fileName = Path.GetFileName(filePath);
 
-                    if (WorthSyncing(fileName))
+                    if (Utils.WorthSyncing(fileName))
                     {
                         if (!remoteFiles.Contains(fileName))
                         {
@@ -293,7 +293,7 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // New file, sync up.
                                     Logger.Info("Sync | Uploading file absent on repository: " + filePath);
-                                    if (WorthSyncing(filePath))
+                                    if (Utils.WorthSyncing(filePath))
                                     {
                                         UploadFile(filePath, remoteFolder);
                                     }
@@ -330,7 +330,7 @@ namespace CmisSync.Lib.Sync
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
 
-                    if (WorthSyncing(localSubFolder))
+                    if (Utils.WorthSyncing(localSubFolder))
                     {
                         string folderName = Path.GetFileName(localSubFolder);
                         if (!remoteFolders.Contains(folderName))

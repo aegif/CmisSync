@@ -478,7 +478,6 @@ namespace CmisSync
                 }
             }
 
-            this.fetcher.Dispose();
             this.fetcher = null;
         }
 
@@ -501,7 +500,6 @@ namespace CmisSync
 
             FolderListChanged();
 
-            this.fetcher.Dispose();
             this.fetcher = null;
         }
 

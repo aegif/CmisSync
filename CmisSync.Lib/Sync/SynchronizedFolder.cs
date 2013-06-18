@@ -221,7 +221,7 @@ namespace CmisSync.Lib.Sync
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
                         string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
-                        if (WorthSyncing(localSubFolder))
+                        if (Utils.WorthSyncing(localSubFolder))
                         {
 
                             // Create local folder.
@@ -237,7 +237,7 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        if (WorthSyncing(cmisObject.Name))
+                        if (Utils.WorthSyncing(cmisObject.Name))
                             // It is a file, just download it.
                             DownloadFile((IDocument)cmisObject, localFolder);
                     }
@@ -344,78 +344,45 @@ namespace CmisSync.Lib.Sync
             {
                 activityListener.ActivityStarted();
                 IDocument remoteDocument = null;
+                Boolean success = false;
                 try
                 {
                     Logger.Info(String.Format("SynchronizedFolder | Uploading: {0}", filePath));
 
                     // Prepare properties
                     string fileName = Path.GetFileName(filePath);
-                    string tmpfileName = fileName + ".sync";
                     Dictionary<string, object> properties = new Dictionary<string, object>();
-                    properties.Add(PropertyIds.Name, tmpfileName);
+                    properties.Add(PropertyIds.Name, fileName);
                     properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
-
-                    Boolean success = false;
 
                     // Prepare content stream
                     Stream file = File.OpenRead(filePath);
                     ContentStream contentStream = new ContentStream();
-                    contentStream.FileName = tmpfileName;
+                    contentStream.FileName = fileName;
                     contentStream.MimeType = MimeType.GetMIMEType(fileName);
                     contentStream.Length = file.Length;
                     contentStream.Stream = file;
-                    contentStream.Stream.Flush();
+                    //contentStream.Stream.Flush();
 
                     // Upload
                     try
                     {
-                        try
-                        {
-                            string remotepath = remoteFolder.Path + '/' + tmpfileName;
-                            ICmisObject obj = session.GetObjectByPath(remotepath);
-                            if (obj != null)
-                            {
-                                Logger.Info("SynchronizedFolder | Temp file exist on remote server, so delete it");
-                                remoteDocument = (IDocument)obj;
-                                remoteDocument.DeleteAllVersions();
-                            }
-                        }
-                        catch (DotCMIS.Exceptions.CmisObjectNotFoundException)
-                        {
-                            // Create an empty file on remote server and get ContentStream
-                            Logger.Info(String.Format("SynchronizedFolder | File do not exist on remote server, so create an Empty file on the CMIS Server for {0} and launch a simple update", filePath));
-                        }
                         remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                         success = true;
                     }
                     catch (Exception ex)
                     {
-                        Logger.Fatal(String.Format("SynchronizedFolder | Upload failed {0} : {1}", filePath, ex));
-                        success = false;
+                        Logger.Fatal(String.Format("SynchronizedFolder | Upload failed: {0} {1}", filePath, ex));
                         if (contentStream != null) contentStream.Stream.Close();
                     }
 
-                    if (success)
+                    // Close files.
+                    if (contentStream != null)
                     {
-                        Logger.Info(String.Format("SynchronizedFolder | Upload finished: {0}", filePath));
-                        if (contentStream != null) { contentStream.Stream.Close(); contentStream.Stream.Dispose(); }
-                        properties[PropertyIds.Name] = fileName;
-                        file.Close();
-
-                        // Object update change ID
-                        DotCMIS.Client.IObjectId objID = remoteDocument.UpdateProperties(properties, true);
-                        remoteDocument = (IDocument)session.GetObject(objID);
-
-                        // Get metadata.
-                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-
-                        // Create database entry for this file.
-                        database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
-
-                        // No close method, No dispose method
-                        remoteDocument = null;
+                        contentStream.Stream.Close();
+                        contentStream.Stream.Dispose();
                     }
-                    contentStream.Stream.Close();
+                    file.Close();
                 }
                 catch (Exception e)
                 {
@@ -424,8 +391,8 @@ namespace CmisSync.Lib.Sync
                     {
                         Logger.Warn("SynchronizedFolder | File deleted while trying to upload it, reverting.");
                         // File has been deleted while we were trying to upload/checksum/add.
-                        // This can typically happen in Windows when creating a new text file and giving it a name.
-                        // Revert the upload.
+                        // This can typically happen in Windows Explore when creating a new text file and giving it a name.
+                        // In this case, revert the upload.
                         if (remoteDocument != null)
                         {
                             remoteDocument.DeleteAllVersions();
@@ -436,6 +403,19 @@ namespace CmisSync.Lib.Sync
                         throw;
                     }
                 }
+                    
+                // Metadata.
+                if (success)
+                {
+                    Logger.Info("SynchronizedFolder | Uploaded: " + filePath);
+
+                    // Get metadata. Some metadata has probably been automatically added by the server.
+                    Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+
+                    // Create database entry for this file.
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+                }
+
                 activityListener.ActivityStopped();
             }
 
@@ -458,14 +438,14 @@ namespace CmisSync.Lib.Sync
                 // Upload each file in this folder.
                 foreach (string file in Directory.GetFiles(localFolder))
                 {
-                    if (WorthSyncing(file))
+                    if (Utils.WorthSyncing(file))
                         UploadFile(file, folder);
                 }
 
                 // Recurse for each subfolder in this folder.
                 foreach (string subfolder in Directory.GetDirectories(localFolder))
                 {
-                    if (WorthSyncing(subfolder))
+                    if (Utils.WorthSyncing(subfolder))
                         UploadFolderRecursively(folder, subfolder);
                 }
             }
@@ -624,84 +604,6 @@ namespace CmisSync.Lib.Sync
                     }
                     while (true);
                 }
-            }
-
-
-
-            /**
-             * Check whether the file is worth syncing or not.
-             * Files that are not worth syncing include temp files, locks, etc.
-             * */
-            public Boolean WorthSyncing(string filename)
-            {
-                filename = filename.ToLower();
-
-                string[] filenames = new string[] {
-                    "~",             // gedit and emacs
-                    "thumbs.db", "desktop.ini", // Windows
-                    "CVS", ".svn", ".git", ".hg", ".bzr", // Version control local settings
-                    ".DS_Store", ".Icon\r\r", "._", ".Spotlight-V100", ".Trashes", // Mac OS X
-                    "$~"
-                };
-
-                foreach (string ext in filenames)
-                {
-                    if (filename.ToLower() == ext.ToLower())
-                    {
-                        Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
-                        return false;
-                    }
-                }
-
-                string[] extensions = new string[] {
-                    ".autosave", // Various autosaving apps
-                    ".~lock", // LibreOffice
-                    ".part", ".crdownload", // Firefox and Chromium temporary download files
-                    ".sw[a-z]", ".un~", ".swp", ".swo", // vi(m)
-                    ".directory", // KDE
-                    ".ds_store", ".Icon\r\r", "._", ".spotlight-V100", ".trashes", // Mac OS X
-                    ".(autosaved).graffle", // Omnigraffle
-                    ".tmp", ".TMP", // MS Office
-                    ".~ppt", ".~pptx",
-                    ".~xls", ".~xlsx",
-                    ".~doc", ".~docx",
-                    ".cvsignore", ".~cvsignore",// CVS
-                    ".gitignore", // GIT
-                    ".sync", // CmisSync File Downloading/Uploading
-                    ".cmissync" // CmisSync Database 
-                };
-                // TODO: Consider these ones as well:
-                //string[] ExcludeRules = new string[] {
-                //    "*.autosave", // Various autosaving apps
-                //    "*~", // gedit and emacs
-                //    ".~lock.*", // LibreOffice
-                //    "*.part", "*.crdownload", // Firefox and Chromium temporary download files
-                //    ".*.sw[a-z]", "*.un~", "*.swp", "*.swo", // vi(m)
-                //    ".directory", // KDE
-                //    ".DS_Store", "Icon\r", "._*", ".Spotlight-V100", ".Trashes", // Mac OS X
-                //    "*(Autosaved).graffle", // Omnigraffle
-                //    "Thumbs.db", "Desktop.ini", // Windows
-                //    "~*.tmp", "~*.TMP", "*~*.tmp", "*~*.TMP", // MS Office
-                //    "~*.ppt", "~*.PPT", "~*.pptx", "~*.PPTX",
-                //    "~*.xls", "~*.XLS", "~*.xlsx", "~*.XLSX",
-                //    "~*.doc", "~*.DOC", "~*.docx", "~*.DOCX",
-                //    "*/CVS/*", ".cvsignore", "*/.cvsignore", // CVS
-                //    "/.svn/*", "*/.svn/*", // Subversion
-                //    "/.hg/*", "*/.hg/*", "*/.hgignore", // Mercurial
-                //    "/.bzr/*", "*/.bzr/*", "*/.bzrignore" // Bazaar
-                //};
-
-                string filext = Path.GetExtension(filename);
-                foreach (string ext in extensions)
-                {
-                    if (filext.Equals(ext))
-                    {
-                        Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
-                        return false;
-                    }
-                }
-                Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
-                return true;
             }
         }
     }

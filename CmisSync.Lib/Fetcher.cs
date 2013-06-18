@@ -70,9 +70,6 @@ namespace CmisSync.Lib
         protected List<string> errors = new List<string>();
 
 
-        private Thread thread;
-
-
         // Sets up a fetcher that can get remote folders
         public Fetcher(RepoInfo repoInfo, ActivityListener activityListener)
         {
@@ -127,13 +124,6 @@ namespace CmisSync.Lib
             Logger.Info("Fetch");
             CmisRepo.DoFirstSync();
             return true; // TODO
-        }
-
-
-        public void Dispose()
-        {
-            if (this.thread != null)
-                this.thread.Abort();
         }
     }
 }
