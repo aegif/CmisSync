@@ -5,6 +5,8 @@ using System.Text;
 using TestLibrary;
 using Newtonsoft.Json;
 using System.IO;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Sync;
@@ -15,8 +17,19 @@ using log4net.Config;
 // Useful to debug unit tests.
 namespace TestLibraryRunner
 {
+    class TrustAlways : ICertificatePolicy
+    {
+        public bool CheckValidationResult (ServicePoint sp, X509Certificate certificate, WebRequest request, int error)
+        {
+            // For testing, always accept any certificate
+            return true;
+        }
+
+    }
+
     class Program
     {
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
         static int serverId = 0; // Which server in the JSON file (first=0)
 
@@ -40,6 +53,7 @@ namespace TestLibraryRunner
 
         static void Main(string[] args)
         {
+            ServicePointManager.CertificatePolicy = new TrustAlways();
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
             // Migrate config.xml from past versions, if necessary.
