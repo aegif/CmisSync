@@ -27,13 +27,25 @@ using System.Xaml;
 
 namespace CmisSync {
 
+    /// <summary>
+    /// About dialog.
+    /// It shows information such as the CmisSync name and logo, the version, some copyright information.
+    /// </summary>
     public class About : Window {
 
+        /// <summary>
+        /// Controller.
+        /// </summary>
         public AboutController Controller = new AboutController ();
 
+        /// <summary>
+        /// Shows a message about software updates.
+        /// </summary>
         private Label updates;
 
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public About ()
         {
             Title      = "About CmisSync";
@@ -83,7 +95,9 @@ namespace CmisSync {
             };
         }
 
-
+        /// <summary>
+        /// Create the UI.
+        /// </summary>
         private void CreateAbout ()
         {
             Image image = new Image () {
@@ -154,7 +168,9 @@ namespace CmisSync {
             Content = canvas;
         }
         
-        
+        /// <summary>
+        /// Close the dialog.
+        /// </summary>
         private void Close (object sender, CancelEventArgs args)
         {
             Controller.WindowClosed ();
@@ -163,6 +179,9 @@ namespace CmisSync {
     }
 
 
+    /// <summary>
+    /// Hyperlink label that opens an URL in the default browser.
+    /// </summary>
 	public class Link : Label {
 
 		public Link (string title, string address)

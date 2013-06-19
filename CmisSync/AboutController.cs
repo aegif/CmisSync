@@ -23,8 +23,14 @@ using CmisSync.Lib;
 
 namespace CmisSync {
 
+    /// <summary>
+    /// Controller for the About dialog.
+    /// </summary>
     public class AboutController {
 
+        /// <summary>
+        /// Actions.
+        /// </summary>
         public event Action ShowWindowEvent = delegate { };
         public event Action HideWindowEvent = delegate { };
         public event Action VersionUpToDateEvent = delegate { };
@@ -33,33 +39,50 @@ namespace CmisSync {
         public event NewVersionEventDelegate NewVersionEvent = delegate { };
         public delegate void NewVersionEventDelegate (string new_version_string);
 
+        /// <summary>
+        /// URL addresses to display in the About dialog.
+        /// </summary>
         public readonly string WebsiteLinkAddress       = "http://CmisSync.github.com";
         public readonly string CreditsLinkAddress       = "http://www.github.com/nicolas-raoul/CmisSync/tree/master/legal/AUTHORS";
         public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
 
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public AboutController()
+        {
+            Program.Controller.ShowAboutWindowEvent += delegate
+            {
+                ShowWindowEvent();
+                CheckForNewVersion();
+            };
+        }
+
+
+        /// <summary>
+        /// Get the CmisSync version.
+        /// </summary>
         public string RunningVersion {
             get {
                 return Backend.Version;
             }
         }
 
-
-        public AboutController ()
-        {
-            Program.Controller.ShowAboutWindowEvent += delegate {
-                ShowWindowEvent ();
-                CheckForNewVersion ();
-            };
-        }
-
-
+        /// <summary>
+        /// Closing the dialog.
+        /// </summary>
         public void WindowClosed ()
         {
             HideWindowEvent ();
         }
 
 
-        private void CheckForNewVersion() // TODO https://github.com/nicolas-raoul/CmisSync/issues/148
+        /// <summary>
+        /// Check whether a new version of CmisSync is available.
+        ///  TODO https://github.com/nicolas-raoul/CmisSync/issues/148
+        /// </summary>
+        private void CheckForNewVersion()
         {
             CheckingForNewVersionEvent ();
 
@@ -83,6 +106,9 @@ namespace CmisSync {
         }
 
 
+        /// <summary>
+        /// Whether a software update is required or not.
+        /// </summary>
         private bool UpdateRequired (string running_version_string, string latest_version_string)
         {
             if (running_version_string == null)
@@ -97,6 +123,7 @@ namespace CmisSync {
             if (string.IsNullOrWhiteSpace (latest_version_string))
                 throw new ArgumentException ("latest_version_string");
 
+            // Get the version number (major.minor.micro) of the running CmisSync.
             int running_major;
             int running_minor;
             int running_micro;
@@ -110,6 +137,7 @@ namespace CmisSync {
                 throw new FormatException ("running_version_string", e);
             }
 
+            // Get the version number (major.minor.micro) of the latest available CmisSync.
             int latest_major;
             int latest_minor;
             int latest_micro;
@@ -123,10 +151,10 @@ namespace CmisSync {
                 throw new FormatException ("latest_version_string", e);
             }
 
+            // Compare versions.
             bool higher_major = latest_major > running_major;
             bool higher_minor = latest_major == running_major && latest_minor > running_minor;
             bool higher_micro = latest_major == running_major && latest_minor == running_minor && latest_micro > running_micro;
-
             return (higher_major || higher_minor || higher_micro);
         }
     }
