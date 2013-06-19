@@ -108,22 +108,27 @@ namespace CmisSync.Lib.Cmis
             }
             catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
-                //throw new CmisServerNotFoundException("CMIS server found, but permission denied. Please check username/password");
+                Logger.Error("CMIS server found, but permission denied. Please check username/password. " + Utils.ToLogString(e));
                 throw new CmisSync.Lib.Cmis.CmisPermissionDeniedException("PermissionDenied");
             }
             catch (CmisRuntimeException e)
             {
-                // No CMIS server at this address, or no connection.
+                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
                 return null;
             }
             catch (CmisObjectNotFoundException e)
             {
-                // No CMIS server at this address, or no connection.
+                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
                 return null;
             }
             catch (CmisConnectionException e)
             {
-                // No CMIS server at this address, or no connection.
+                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                return null;
+            }
+            catch (CmisInvalidArgumentException e)
+            {
+                Logger.Error("Invalid URL, maybe Alfresco Cloud? " + Utils.ToLogString(e));
                 return null;
             }
 
