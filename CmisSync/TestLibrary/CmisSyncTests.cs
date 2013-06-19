@@ -360,6 +360,11 @@ namespace TestLibrary
                 DirectoryInfo localDirectoryInfo = new DirectoryInfo(localDirectory);
                 foreach (FileInfo file in localDirectoryInfo.GetFiles())
                 {
+                    if (file.Name.EndsWith(".sync"))
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         file.Delete();
