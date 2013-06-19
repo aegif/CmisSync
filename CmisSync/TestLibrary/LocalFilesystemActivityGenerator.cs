@@ -42,14 +42,21 @@ namespace TestLibrary
             string filename = "file_" + id++ + ".bin";
             byte[] data = new byte[1024];
 
-            using (FileStream stream = File.OpenWrite(Path.Combine(path, filename)))
+            try
             {
-                // Write random data
-                for (int i = 0; i < sizeInKb; i++)
+                using (FileStream stream = File.OpenWrite(Path.Combine(path, filename)))
                 {
-                    rng.NextBytes(data);
-                    stream.Write(data, 0, data.Length);
+                    // Write random data
+                    for (int i = 0; i < sizeInKb; i++)
+                    {
+                        rng.NextBytes(data);
+                        stream.Write(data, 0, data.Length);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception on testing side, ignoring " + ex);
             }
         }
     }
