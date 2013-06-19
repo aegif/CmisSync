@@ -23,7 +23,6 @@ namespace CmisSync {
     public class UI {
 
         public Setup Setup;
-        public Bubbles Bubbles;
         public StatusIcon StatusIcon;
         public About About;
 
@@ -35,7 +34,6 @@ namespace CmisSync {
 			// The ease out animation always seems to work
             Setup      = new Setup ();
             About      = new About ();
-            Bubbles    = new Bubbles ();
             //StatusIcon = new StatusIcon ();
             
             Program.Controller.UIHasLoaded ();

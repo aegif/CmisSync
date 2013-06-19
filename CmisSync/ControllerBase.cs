@@ -110,7 +110,7 @@ namespace CmisSync
 
                 foreach (RepoBase repo in Repositories)
                 {
-                    repo.HasUnsyncedChanges();
+                    repo.SyncInBackground();
                 }
 
                 return unsynced_folders;
@@ -137,28 +137,21 @@ namespace CmisSync
         }
 
 
-        public abstract string EventLogHTML { get; }
-        public abstract string DayEntryHTML { get; }
-        public abstract string EventEntryHTML { get; }
-
-        // Enables CmisSync to start automatically at login
+        /// <summary>
+        /// Add CmisSync to the list of programs to be started up when the user logs into Windows.
+        /// </summary>
         public abstract void CreateStartupItem();
 
-        // Installs the CmisSync:// protocol handler
-        public abstract void InstallProtocolHandler();
-
-        // Adds the CmisSync folder to the user's
-        // list of bookmarked places
+        /// <summary>
+        /// Add CmisSync to the user's Windows Explorer bookmarks.
+        /// </summary>
         public abstract void AddToBookmarks();
 
         // Creates the CmisSync folder in the user's home folder
         public abstract bool CreateCmisSyncFolder();
-
+        
         // Opens the CmisSync folder or an (optional) subfolder
         public abstract void OpenFolder(string path);
-
-        // Opens a file with the appropriate application
-        public abstract void OpenFile(string path);
 
 
         private ActivityListener activityListenerAggregator;
@@ -178,7 +171,6 @@ namespace CmisSync
         public virtual void Initialize(Boolean firstRun)
         {
             this.firstRun = firstRun;
-            InstallProtocolHandler();
 
             // Create the CmisSync folder and add it to the bookmarks
             if (CreateCmisSyncFolder())
@@ -384,7 +376,7 @@ namespace CmisSync
 
             foreach (RepoBase repo in Repositories)
             {
-                repo.HasUnsyncedChanges();
+                repo.SyncInBackground();
             }
 
             if (has_unsynced_repos)
@@ -442,7 +434,7 @@ namespace CmisSync
             repoInfo.RemotePath = remote_path;
             repoInfo.RepoID = repository;
             repoInfo.User = user;
-            repoInfo.Password = Crypto.Protect(password);
+            repoInfo.Password = Crypto.Obfuscate(password);
             repoInfo.TargetDirectory = localrepopath;
             repoInfo.PollInterval = 5000;
 
@@ -486,15 +478,12 @@ namespace CmisSync
                 }
             }
 
-            this.fetcher.Dispose();
             this.fetcher = null;
         }
 
 
         public void FinishFetcher(string password)
         {
-            //this.fetcher.EnableFetchedRepoCrypto(password);
-
             this.watcher.EnableRaisingEvents = false;
             FinishFetcher();
             this.watcher.EnableRaisingEvents = true;
@@ -511,14 +500,7 @@ namespace CmisSync
 
             FolderListChanged();
 
-            this.fetcher.Dispose();
             this.fetcher = null;
-        }
-
-
-        public bool CheckPassword(string password)
-        {
-            return true;// this.fetcher.IsFetchedRepoPasswordCorrect(password);
         }
 
 

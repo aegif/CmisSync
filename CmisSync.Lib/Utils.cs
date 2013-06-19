@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using log4net;
+using System.IO;
 
 namespace CmisSync.Lib
 {
     public static class Utils
     {
- 
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Utils));
+
         /// <summary>
         /// <para>Creates a log-string from the Exception.</para>
         /// <para>The result includes the stacktrace, innerexception et cetera, separated by <seealso cref="Environment.NewLine"/>.</para>
@@ -82,6 +86,54 @@ namespace CmisSync.Lib
                 }
             }
             return msg.ToString();
+        }
+
+
+        private static HashSet<String> ignoredFilenames = new HashSet<String>{
+            "~", // gedit and emacs
+            "thumbs.db", "desktop.ini", // Windows
+            "cvs", ".svn", ".git", ".hg", ".bzr", // Version control local settings
+            ".directory", // KDE
+            ".ds_store", ".icon\r", ".spotlight-V100", ".trashes", // Mac OS X
+            ".cvsignore", ".~cvsignore", ".bzrignore", ".gitignore", // Version control ignore list
+            "$~"
+        };
+
+        private static HashSet<String> ignoredExtensions = new HashSet<String>{
+            ".autosave", // Various autosaving apps
+            ".~lock", // LibreOffice
+            ".part", ".crdownload", // Firefox and Chromium temporary download files
+            ".un~", ".swp", ".swo", // vi(m)
+            ".tmp", // Microsoft Office
+            ".sync", // CmisSync download
+            ".cmissync" // CmisSync database
+        };
+
+         /**
+         * Check whether the file is worth syncing or not.
+         * Files that are not worth syncing include temp files, locks, etc.
+         * */
+        public static Boolean WorthSyncing(string filename)
+        {
+            // TODO: Consider these ones as well:
+            //    "*~", // gedit and emacs
+            //    ".~lock.*", // LibreOffice
+            //    ".*.sw[a-z]", // vi(m)
+            //    "*(Autosaved).graffle", // Omnigraffle
+
+            filename = filename.ToLower();
+
+            if (ignoredFilenames.Contains(filename)
+                || ignoredExtensions.Contains(Path.GetExtension(filename))
+                || filename[0] == '~' // Microsoft Office temporary files start with ~
+                || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
+            {
+                Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
+                return false;
+            }
+
+            Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
+            return true;
         }
     }
 }

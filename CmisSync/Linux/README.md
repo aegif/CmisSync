@@ -62,14 +62,14 @@ $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
 
 You can build and install CmisSync like this:
 
+Download DotCMIS.dll from http://chemistry.apache.org/dotnet/dotcmis.html and copy it to Extras/
+
 ```bash
-$ ./configure --prefix=/usr
+$ make -f Makefile.am
+$ ./configure
 $ make
 $ sudo make install
 ```
-
-**Note:** If there is no `configure` file, first run ```make -f Makefile.am bootstrap```
-
 
 ### Resetting CmisSync settings
 
