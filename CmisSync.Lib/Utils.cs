@@ -168,5 +168,37 @@ namespace CmisSync.Lib
         /// </summary>
         private static Regex invalidFolderNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
+
+
+        /**
+         * Find an available name (potentially suffixed) for this file.
+         * For instance:
+         * - if /dir/file does not exist, return the same path
+         * - if /dir/file exists, return /dir/file (1)
+         * - if /dir/file (1) also exists, return /dir/file (2)
+         * - etc
+         */
+        public static string SuffixIfExists(String path)
+        {
+            if (!File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                int index = 1;
+                do
+                {
+                    string ret = path + " (" + index + ")";
+                    if (!File.Exists(ret))
+                    {
+                        return ret;
+                    }
+                    index++;
+                }
+                while (true);
+            }
+        }
+
     }
 }

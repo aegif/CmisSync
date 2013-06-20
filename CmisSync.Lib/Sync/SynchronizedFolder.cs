@@ -295,7 +295,8 @@ namespace CmisSync.Lib.Sync
                     if (contentStream == null)
                     {
                         Logger.Warn("SynchronizedFolder | Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
-                        throw new IOException();
+                        activityListener.ActivityStopped();
+                        return;
                     }
 
                     DownloadStream(contentStream, tmpfilepath);
@@ -330,11 +331,9 @@ namespace CmisSync.Lib.Sync
                         activityListener.ActivityStopped();
                         return;
                     }
-                    Logger.Info("SynchronizedFolder | 1: " + remoteDocument.ContentStreamFileName);
 
-                    // Rename file
+                    // Remove the ".sync" suffix.
                     File.Move(tmpfilepath, filepath);
-                    Logger.Info("SynchronizedFolder | 2: " + remoteDocument.ContentStreamFileName);
                     
                     // Create database entry for this file.
                     database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
@@ -598,36 +597,6 @@ namespace CmisSync.Lib.Sync
                 }
 
                 return metadata;
-            }
-
-            /**
-             * Find an available name (potentially suffixed) for this file.
-             * For instance:
-             * - if /dir/file does not exist, return the same path
-             * - if /dir/file exists, return /dir/file (1)
-             * - if /dir/file (1) also exists, return /dir/file (2)
-             * - etc
-             */
-            public static string SuffixIfExists(String path)
-            {
-                if (!File.Exists(path))
-                {
-                    return path;
-                }
-                else
-                {
-                    int index = 1;
-                    do
-                    {
-                        string ret = path + " (" + index + ")";
-                        if (!File.Exists(ret))
-                        {
-                            return ret;
-                        }
-                        index++;
-                    }
-                    while (true);
-                }
             }
         }
     }

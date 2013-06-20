@@ -215,7 +215,7 @@ namespace CmisSync.Lib.Sync
                                             String filename = Path.GetFileNameWithoutExtension(filePath);
                                             String path = Path.GetDirectoryName(filePath);
 
-                                            String NewFileName = SuffixIfExists(filename + "_" + repoinfo.User + "-version");
+                                            String NewFileName = Utils.SuffixIfExists(filename + "_" + repoinfo.User + "-version");
                                             String newFilePath = Path.Combine(path, NewFileName);
                                             File.Move(filePath, newFilePath);
 
