@@ -318,8 +318,8 @@ namespace TestLibrary
             bw.DoWork += new DoWorkEventHandler(
                 delegate(Object o, DoWorkEventArgs args)
                 {
-                    // Clean.
-                    CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
+                    //// Clean.
+                    //CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
                     // Mock.
                     ActivityListener activityListener2 = new Mock<ActivityListener>().Object;
                     // Sync.
