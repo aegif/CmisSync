@@ -29,22 +29,23 @@ using log4net;
 
 namespace CmisSync
 {
-
+    /// <summary>
+    /// Platform-independant part of the main CmisSync controller.
+    /// </summary>
     public abstract class ControllerBase : ActivityListener
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(ControllerBase));
+
+        /// <summary>
+        /// Whether it is the first time that CmisSync is being run.
+        /// </summary>
         private bool firstRun;
+
         private RepoInfo repoInfo;
 
-        public RepoBase[] Repositories
-        {
-            get
-            {
-                lock (this.repo_lock)
-                    return this.repositories.GetRange(0, this.repositories.Count).ToArray();
-            }
-        }
-
+        /// <summary>
+        /// Whether the reporsitories have finished loading.
+        /// </summary>
         public bool RepositoriesLoaded { get; private set; }
 
         private List<RepoBase> repositories = new List<RepoBase>();
@@ -83,6 +84,21 @@ namespace CmisSync
         public delegate void AlertNotificationRaisedEventHandler(string title, string message);
 
 
+        /// <summary>
+        /// Get the repositories configured in CmisSync.
+        /// </summary>
+        public RepoBase[] Repositories
+        {
+            get
+            {
+                lock (this.repo_lock)
+                    return this.repositories.GetRange(0, this.repositories.Count).ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Whether it is the first time that CmisSync is being run.
+        /// </summary>
         public bool FirstRun
         {
             get
@@ -91,6 +107,9 @@ namespace CmisSync
             }
         }
 
+        /// <summary>
+        /// The list of synchronized folders.
+        /// </summary>
         public List<string> Folders
         {
             get
@@ -117,26 +136,6 @@ namespace CmisSync
             }
         }
 
-        public bool NotificationsEnabled
-        {
-            get
-            {
-                string notifications_enabled = ConfigManager.CurrentConfig.GetConfigOption("notifications");
-
-                if (string.IsNullOrEmpty(notifications_enabled))
-                {
-                    ConfigManager.CurrentConfig.SetConfigOption("notifications", bool.TrueString);
-                    return true;
-
-                }
-                else
-                {
-                    return notifications_enabled.Equals(bool.TrueString);
-                }
-            }
-        }
-
-
         /// <summary>
         /// Add CmisSync to the list of programs to be started up when the user logs into Windows.
         /// </summary>
@@ -147,9 +146,12 @@ namespace CmisSync
         /// </summary>
         public abstract void AddToBookmarks();
 
-        // Creates the CmisSync folder in the user's home folder
+
+        /// <summary>
+        /// Creates the CmisSync folder in the user's home folder.
+        /// </summary>
         public abstract bool CreateCmisSyncFolder();
-        
+
 
         private ActivityListener activityListenerAggregator;
         private Fetcher fetcher;
@@ -158,6 +160,9 @@ namespace CmisSync
         private Object check_repos_lock = new Object();
 
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public ControllerBase()
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
@@ -165,6 +170,10 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Initialize the controller.
+        /// </summary>
+        /// <param name="firstRun">Whether it is the first time that CmisSync is being run.</param>
         public virtual void Initialize(Boolean firstRun)
         {
             this.firstRun = firstRun;
@@ -244,19 +253,6 @@ namespace CmisSync
                 ProgressSpeed = speed;
 
                 UpdateState();
-            };
-
-            repo.NewChangeSet += delegate(ChangeSet change_set)
-            {
-                if (NotificationsEnabled)
-                    NotificationRaised(change_set);
-            };
-
-            repo.ConflictResolved += delegate
-            {
-                if (NotificationsEnabled)
-                    AlertNotificationRaised("Conflict detected",
-                        "Don't worry, CmisSync made a copy of each conflicting file.");
             };
 
             this.repositories.Add(repo);

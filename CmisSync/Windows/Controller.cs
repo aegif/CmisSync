@@ -26,15 +26,24 @@ using CmisSync.Lib.Cmis;
 
 namespace CmisSync
 {
-
+    /// <summary>
+    /// Windows-specific part of the main CmisSync controller.
+    /// </summary>
     public class Controller : ControllerBase
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Controller()
             : base()
         {
         }
 
 
+        /// <summary>
+        /// Initialize the controller
+        /// </summary>
+        /// <param name="firstRun">Whether it is the first time that CmisSync is being run.</param>
         public override void Initialize(Boolean firstRun)
         {
             base.Initialize(firstRun);
