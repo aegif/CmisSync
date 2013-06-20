@@ -150,9 +150,6 @@ namespace CmisSync
         // Creates the CmisSync folder in the user's home folder
         public abstract bool CreateCmisSyncFolder();
         
-        // Opens the CmisSync folder or an (optional) subfolder
-        public abstract void OpenFolder(string path);
-
 
         private ActivityListener activityListenerAggregator;
         private Fetcher fetcher;
@@ -526,23 +523,6 @@ namespace CmisSync
         {
             bool notifications_enabled = ConfigManager.CurrentConfig.GetConfigOption("notifications").Equals(bool.TrueString);
             ConfigManager.CurrentConfig.SetConfigOption("notifications", (!notifications_enabled).ToString());
-        }
-
-
-        // Format a file size nicely with small caps.
-        // Example: 1048576 becomes "1 ᴍʙ"
-        public string FormatSize(double byte_count)
-        {
-            if (byte_count >= 1099511627776)
-                return String.Format("{0:##.##} ᴛʙ", Math.Round(byte_count / 1099511627776, 1));
-            else if (byte_count >= 1073741824)
-                return String.Format("{0:##.##} ɢʙ", Math.Round(byte_count / 1073741824, 1));
-            else if (byte_count >= 1048576)
-                return String.Format("{0:##.##} ᴍʙ", Math.Round(byte_count / 1048576, 0));
-            else if (byte_count >= 1024)
-                return String.Format("{0:##.##} ᴋʙ", Math.Round(byte_count / 1024, 0));
-            else
-                return byte_count.ToString() + " bytes";
         }
 
 

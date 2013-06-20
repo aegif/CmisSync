@@ -128,11 +128,11 @@ namespace CmisSync.Lib
                 || filename[0] == '~' // Microsoft Office temporary files start with ~
                 || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
             {
-                Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
+                //Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
                 return false;
             }
 
-            Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
+            //Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
             return true;
         }
     }

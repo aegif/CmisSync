@@ -130,25 +130,11 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Open a folder in Windows Explorer.
-        /// </summary>
-        /// <param name="path">Path to open</param>
-        public override void OpenFolder(string path)
-        {
-            Process process = new Process();
-            process.StartInfo.FileName = "explorer";
-            process.StartInfo.Arguments = path;
-
-            process.Start();
-        }
-
-
-        /// <summary>
         /// With Windows Explorer, open the folder where the local synchronized folders are.
         /// </summary>
         public void OpenCmisSyncFolder()
         {
-            OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
+            Utils.OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
         }
 
 
@@ -158,7 +144,7 @@ namespace CmisSync
         /// <param name="name">Name of the synchronized folder</param>
         public void OpenCmisSyncFolder(string name)
         {
-            OpenFolder(new Folder(name).FullPath);
+            Utils.OpenFolder(new Folder(name).FullPath);
         }
 
         /// <summary>
