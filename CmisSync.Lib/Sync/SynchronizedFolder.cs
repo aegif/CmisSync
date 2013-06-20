@@ -260,10 +260,8 @@ namespace CmisSync.Lib.Sync
                     return;
                 }
 
-                // Check for filename validity. See https://github.com/nicolas-raoul/CmisSync/issues/196
-                if(remoteDocument.ContentStreamFileName.Contains("..")
-                    || remoteDocument.ContentStreamFileName.Contains("/")
-                    || remoteDocument.ContentStreamFileName.Contains("\\"))
+                // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
+                if(Utils.IsInvalidFileName(remoteDocument.ContentStreamFileName))
                 {
                     Logger.Info("SynchronizedFolder | Skipping download of file with illegal filename: " + remoteDocument.ContentStreamFileName);
                     activityListener.ActivityStopped();

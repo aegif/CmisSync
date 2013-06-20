@@ -141,25 +141,23 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // The folder has been recently created on server, so download it.
 
-                                    // Check for foldername validity. See https://github.com/nicolas-raoul/CmisSync/issues/196
-                                    if (remoteSubFolder.Name.Contains("..")
-                                        || remoteSubFolder.Name.Contains("/")
-                                        || remoteSubFolder.Name.Contains("\\"))
+                                    // Skip if invalid folder name. See https://github.com/nicolas-raoul/CmisSync/issues/196
+                                    if (Utils.IsInvalidFileName(remoteSubFolder.Name))
                                     {
                                         Logger.Info("SynchronizedFolder | Skipping download of folder with illegal name: " + remoteSubFolder.Name);
-                                        activityListener.ActivityStopped();
-                                        return;
                                     }
+                                    else
+                                    {
+                                        // Create local folder.
+                                        Directory.CreateDirectory(localSubFolder);
 
-                                    // Create local folder.
-                                    Directory.CreateDirectory(localSubFolder);
+                                        // Create database entry for this folder.
+                                        // TODO - Yannick - Add metadata
+                                        database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
-                                    // Create database entry for this folder.
-                                    // TODO - Yannick - Add metadata
-                                    database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
-
-                                    // Recursive copy of the whole folder.
-                                    RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                        // Recursive copy of the whole folder.
+                                        RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                    }
                                 }
                             }
                         }

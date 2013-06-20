@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using log4net;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace CmisSync.Lib
 {
@@ -135,5 +136,37 @@ namespace CmisSync.Lib
             //Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
             return true;
         }
+
+
+        /// <summary>
+        /// Check whether a file name is valid or not.
+        /// </summary>
+        public static bool IsInvalidFileName(string name)
+        {
+            return invalidFileNameRegex.IsMatch(name);
+        }
+
+
+        /// <summary>
+        /// Regular expression to check whether a file name is valid or not.
+        /// </summary>
+        private static Regex invalidFileNameRegex = new Regex(
+            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())) + "]");
+
+
+        /// <summary>
+        /// Check whether a folder name is valid or not.
+        /// </summary>
+        public static bool IsInvalidFolderName(string name)
+        {
+            return invalidFolderNameRegex.IsMatch(name);
+        }
+
+
+        /// <summary>
+        /// Regular expression to check whether a filename is valid or not.
+        /// </summary>
+        private static Regex invalidFolderNameRegex = new Regex(
+            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
     }
 }
