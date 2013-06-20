@@ -174,7 +174,7 @@ namespace CmisSync.Lib.Sync
             {
                 if (this.syncing)
                 {
-                    Logger.Info(String.Format("SynchronizedFolder | [{0}] - sync is already running in background.", repoinfo.TargetDirectory));
+                    Logger.Info("SynchronizedFolder | Sync already running in background: " + repoinfo.TargetDirectory);
                     return;
                 }
                 this.syncing = true;
@@ -183,7 +183,7 @@ namespace CmisSync.Lib.Sync
                 bw.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
-                        Logger.Info(String.Format("SynchronizedFolder | [{0}] - Launching sync in background, so that the UI stays available.", repoinfo.TargetDirectory));
+                        Logger.Info("SynchronizedFolder | Launching sync: " + repoinfo.TargetDirectory);
 #if !DEBUG
                         try
                         {
@@ -223,7 +223,6 @@ namespace CmisSync.Lib.Sync
                         string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
                         if (Utils.WorthSyncing(localSubFolder))
                         {
-
                             // Create local folder.
                             Directory.CreateDirectory(localSubFolder);
 
@@ -252,7 +251,7 @@ namespace CmisSync.Lib.Sync
             private void DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 activityListener.ActivityStarted();
-                Logger.Info(String.Format("SynchronizedFolder | Download of file {0}", remoteDocument.ContentStreamFileName));
+                Logger.Info("SynchronizedFolder | Downloading: " + remoteDocument.ContentStreamFileName);
 
                 if (remoteDocument.ContentStreamLength == 0)
                 {
@@ -298,7 +297,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception ex)
                 {
-                    Logger.Fatal(String.Format("SynchronizedFolder | Download of file {0} failed: {1}", remoteDocument.ContentStreamFileName, ex));
+                    Logger.Error("SynchronizedFolder | Download failed: " + remoteDocument.ContentStreamFileName + " " + ex);
                     success = false;
                     File.Delete(tmpfilepath);
                     if (contentStream != null) contentStream.Stream.Close();
@@ -306,16 +305,33 @@ namespace CmisSync.Lib.Sync
 
                 if (success)
                 {
+                    Logger.Info("SynchronizedFolder | Downloaded: " + remoteDocument.ContentStreamFileName);
                     // TODO Control file integrity by using hash compare?
+
+                    // Get metadata.
+                    Dictionary<string, string[]> metadata = null;
+                    try
+                    {
+                        metadata = FetchMetadata(remoteDocument);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Info("SynchronizedFolder | Exception while fetching metadata: " + remoteDocument.ContentStreamFileName + " " + Utils.ToLogString(e));
+                        // Remove temporary local document to avoid it being considered a new document.
+                        File.Delete(tmpfilepath);
+                        activityListener.ActivityStopped();
+                        return;
+                    }
+                    Logger.Info("SynchronizedFolder | 1: " + remoteDocument.ContentStreamFileName);
 
                     // Rename file
                     File.Move(tmpfilepath, filepath);
-
-                    // Get metadata.
-                    Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-
+                    Logger.Info("SynchronizedFolder | 2: " + remoteDocument.ContentStreamFileName);
+                    
                     // Create database entry for this file.
                     database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+
+                    Logger.Info("SynchronizedFolder | Added to database: " + remoteDocument.ContentStreamFileName);
                 }
                 activityListener.ActivityStopped();
             }
@@ -347,7 +363,7 @@ namespace CmisSync.Lib.Sync
                 Boolean success = false;
                 try
                 {
-                    Logger.Info(String.Format("SynchronizedFolder | Uploading: {0}", filePath));
+                    Logger.Info("SynchronizedFolder | Uploading: " + filePath);
 
                     // Prepare properties
                     string fileName = Path.GetFileName(filePath);
@@ -372,7 +388,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception ex)
                     {
-                        Logger.Fatal(String.Format("SynchronizedFolder | Upload failed: {0} {1}", filePath, ex));
+                        Logger.Fatal("SynchronizedFolder | Upload failed: " + filePath + " " + ex);
                         if (contentStream != null) contentStream.Stream.Close();
                     }
 
