@@ -260,6 +260,16 @@ namespace CmisSync.Lib.Sync
                     return;
                 }
 
+                // Check for filename validity. See https://github.com/nicolas-raoul/CmisSync/issues/196
+                if(remoteDocument.ContentStreamFileName.Contains("..")
+                    || remoteDocument.ContentStreamFileName.Contains("/")
+                    || remoteDocument.ContentStreamFileName.Contains("\\"))
+                {
+                    Logger.Info("SynchronizedFolder | Skipping download of file with illegal filename: " + remoteDocument.ContentStreamFileName);
+                    activityListener.ActivityStopped();
+                    return;
+                }
+
                 DotCMIS.Data.IContentStream contentStream = null;
                 string filepath = Path.Combine(localFolder, remoteDocument.ContentStreamFileName);
                 string tmpfilepath = filepath + ".sync";
