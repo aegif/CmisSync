@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using log4net;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace CmisSync.Lib
 {
@@ -128,12 +129,76 @@ namespace CmisSync.Lib
                 || filename[0] == '~' // Microsoft Office temporary files start with ~
                 || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
             {
-                Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
+                //Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
                 return false;
             }
 
-            Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
+            //Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
             return true;
         }
+
+
+        /// <summary>
+        /// Check whether a file name is valid or not.
+        /// </summary>
+        public static bool IsInvalidFileName(string name)
+        {
+            return invalidFileNameRegex.IsMatch(name);
+        }
+
+
+        /// <summary>
+        /// Regular expression to check whether a file name is valid or not.
+        /// </summary>
+        private static Regex invalidFileNameRegex = new Regex(
+            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())) + "]");
+
+
+        /// <summary>
+        /// Check whether a folder name is valid or not.
+        /// </summary>
+        public static bool IsInvalidFolderName(string name)
+        {
+            return invalidFolderNameRegex.IsMatch(name);
+        }
+
+
+        /// <summary>
+        /// Regular expression to check whether a filename is valid or not.
+        /// </summary>
+        private static Regex invalidFolderNameRegex = new Regex(
+            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
+
+
+        /**
+         * Find an available name (potentially suffixed) for this file.
+         * For instance:
+         * - if /dir/file does not exist, return the same path
+         * - if /dir/file exists, return /dir/file (1)
+         * - if /dir/file (1) also exists, return /dir/file (2)
+         * - etc
+         */
+        public static string SuffixIfExists(String path)
+        {
+            if (!File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                int index = 1;
+                do
+                {
+                    string ret = path + " (" + index + ")";
+                    if (!File.Exists(ret))
+                    {
+                        return ret;
+                    }
+                    index++;
+                }
+                while (true);
+            }
+        }
+
     }
 }

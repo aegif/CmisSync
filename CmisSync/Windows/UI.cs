@@ -20,13 +20,30 @@ using System.Windows.Forms;
 
 namespace CmisSync {
 
+    /// <summary>
+    /// User interface of CmisSync.
+    /// </summary>
     public class UI {
 
+        /// <summary>
+        /// Dialog shown at first run to explain how CmisSync works.
+        /// </summary>
         public Setup Setup;
+
+        /// <summary>
+        /// CmisSync icon in the task bar.
+        /// It contains the main CmisSync menu.
+        /// </summary>
         public StatusIcon StatusIcon;
+
+        /// <summary>
+        /// Small dialog showing some information about CmisSync.
+        /// </summary>
         public About About;
 
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public UI ()
         {   
 			// FIXME: The second time windows are shown, the windows
@@ -34,12 +51,14 @@ namespace CmisSync {
 			// The ease out animation always seems to work
             Setup      = new Setup ();
             About      = new About ();
-            //StatusIcon = new StatusIcon ();
             
             Program.Controller.UIHasLoaded ();
         }
 
         
+        /// <summary>
+        /// Run the CmisSync user interface.
+        /// </summary>
         public void Run ()
         {
             Application.Run (StatusIcon = new StatusIcon ());

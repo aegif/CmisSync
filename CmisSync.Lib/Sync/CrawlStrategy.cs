@@ -141,15 +141,23 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // The folder has been recently created on server, so download it.
 
-                                    // Create local folder.
-                                    Directory.CreateDirectory(localSubFolder);
+                                    // Skip if invalid folder name. See https://github.com/nicolas-raoul/CmisSync/issues/196
+                                    if (Utils.IsInvalidFileName(remoteSubFolder.Name))
+                                    {
+                                        Logger.Info("SynchronizedFolder | Skipping download of folder with illegal name: " + remoteSubFolder.Name);
+                                    }
+                                    else
+                                    {
+                                        // Create local folder.
+                                        Directory.CreateDirectory(localSubFolder);
 
-                                    // Create database entry for this folder.
-                                    // TODO - Yannick - Add metadata
-                                    database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+                                        // Create database entry for this folder.
+                                        // TODO - Yannick - Add metadata
+                                        database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
-                                    // Recursive copy of the whole folder.
-                                    RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                        // Recursive copy of the whole folder.
+                                        RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                    }
                                 }
                             }
                         }
@@ -207,7 +215,7 @@ namespace CmisSync.Lib.Sync
                                             String filename = Path.GetFileNameWithoutExtension(filePath);
                                             String path = Path.GetDirectoryName(filePath);
 
-                                            String NewFileName = SuffixIfExists(filename + "_" + repoinfo.User + "-version");
+                                            String NewFileName = Utils.SuffixIfExists(filename + "_" + repoinfo.User + "-version");
                                             String newFilePath = Path.Combine(path, NewFileName);
                                             File.Move(filePath, newFilePath);
 

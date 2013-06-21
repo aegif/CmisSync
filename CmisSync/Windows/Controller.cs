@@ -26,15 +26,24 @@ using CmisSync.Lib.Cmis;
 
 namespace CmisSync
 {
-
+    /// <summary>
+    /// Windows-specific part of the main CmisSync controller.
+    /// </summary>
     public class Controller : ControllerBase
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Controller()
             : base()
         {
         }
 
 
+        /// <summary>
+        /// Initialize the controller
+        /// </summary>
+        /// <param name="firstRun">Whether it is the first time that CmisSync is being run.</param>
         public override void Initialize(Boolean firstRun)
         {
             base.Initialize(firstRun);
@@ -130,25 +139,11 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Open a folder in Windows Explorer.
-        /// </summary>
-        /// <param name="path">Path to open</param>
-        public override void OpenFolder(string path)
-        {
-            Process process = new Process();
-            process.StartInfo.FileName = "explorer";
-            process.StartInfo.Arguments = path;
-
-            process.Start();
-        }
-
-
-        /// <summary>
         /// With Windows Explorer, open the folder where the local synchronized folders are.
         /// </summary>
         public void OpenCmisSyncFolder()
         {
-            OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
+            Utils.OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
         }
 
 
@@ -158,7 +153,7 @@ namespace CmisSync
         /// <param name="name">Name of the synchronized folder</param>
         public void OpenCmisSyncFolder(string name)
         {
-            OpenFolder(new Folder(name).FullPath);
+            Utils.OpenFolder(new Folder(name).FullPath);
         }
 
         /// <summary>

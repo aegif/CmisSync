@@ -98,7 +98,7 @@ namespace CmisSync {
                 if (size == 0)
                     return "";
                 else
-                    return "— " + Program.Controller.FormatSize (size);
+                    return "— " + Utils.FormatSize (size);
             }
         }
 
