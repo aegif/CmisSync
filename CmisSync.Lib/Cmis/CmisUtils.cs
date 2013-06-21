@@ -7,6 +7,7 @@ using DotCMIS.Client.Impl;
 using DotCMIS;
 using DotCMIS.Exceptions;
 using log4net;
+using System.Web;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -179,8 +180,30 @@ namespace CmisSync.Lib.Cmis
                 if (repo.RemotePath.StartsWith("/Sites"))
                 {
                     // Alfresco Share
-                    string site = repo.RemotePath.Substring("/Sites/".Length);
-                    return root + "share/page/site/" + site + "/documentlibrary";
+                    // Example RemotePath: /Sites/thesite
+                    // Result: http://server/share/page/site/thesite/documentlibrary
+                    // Example RemotePath: /Sites/thesite/documentLibrary/somefolder/anotherfolder
+                    // Result: http://server/share/page/site/thesite/documentlibrary#filter=path|%2Fsomefolder%2Fanotherfolder
+                    // Example RemotePath: /Sites/s1/documentLibrary/éß和ệ
+                    // Result: http://server/share/page/site/s1/documentlibrary#filter=path|%2F%25E9%25DF%25u548C%25u1EC7
+                    // Example RemotePath: /Sites/s1/documentLibrary/a#bc/éß和ệ
+                    // Result: http://server/share/page/site/thesite/documentlibrary#filter=path%7C%2Fa%2523bc%2F%25E9%25DF%25u548C%25u1EC7%7C
+                    string path = repo.RemotePath.Substring("/Sites/".Length);
+                    if (path.Contains("documentLibrary"))
+                    {
+                        int firstSlashPosition = path.IndexOf("/");
+                        string siteName = path.Substring(0, firstSlashPosition);
+                        string pathWithinSite = path.Substring(firstSlashPosition + "/documentLibrary".Length);
+                        string escapedPathWithinSite = HttpUtility.UrlEncode(pathWithinSite);
+                        string reescapedPathWithinSite = HttpUtility.UrlEncode(escapedPathWithinSite);
+                        string sharePath = reescapedPathWithinSite.Replace("%252f", "%2F");
+                        return root + "share/page/site/" + siteName + "/documentlibrary#filter=path|" + sharePath;
+                    }
+                    else
+                    {
+                        // Site name only.
+                        return root + "share/page/site/" + path + "/documentlibrary";
+                    }
                 }
                 else
                 {
