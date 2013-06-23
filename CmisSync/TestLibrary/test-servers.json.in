@@ -1,0 +1,11 @@
+[
+    [
+		"unittest1",
+        "@TEST_LOCALPATH@",
+        "@TEST_REMOTEPATH@",
+        "@TEST_URL@",
+        "@TEST_USER@",
+        "@TEST_PASSWORD@",
+        "@TEST_REPOID@"
+    ]
+]
