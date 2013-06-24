@@ -24,14 +24,15 @@ SOURCES =  \
 	StatusIcon.cs \
 	UI.cs \
 	UIHelpers.cs \
+	Utils.cs \
 	../Properties/Resources.Designer.cs
 
 RESOURCES = $(RESOURCES_RESOURCES)
 
 RESOURCES_RESX = $(wildcard $(srcdir)/../Properties/*.resx)
-RESOURCES_RESOURCES = $(addprefix CmisSync.Properties.,$(patsubst %.resx,%.resources,$(notdir $(RESOURCES_RESX))))
+RESOURCES_RESOURCES = $(addprefix CmisSync.,$(patsubst %.resx,%.resources,$(notdir $(RESOURCES_RESX))))
 
-CmisSync.Properties.%.resources: $(srcdir)/../Properties/%.resx
+CmisSync.%.resources: $(srcdir)/../Properties/%.resx
 	resgen2 $< $@
 
 bin_SCRIPTS = cmissync

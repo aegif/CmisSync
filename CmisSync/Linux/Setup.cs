@@ -27,6 +27,7 @@ using Gtk;
 using Mono.Unix;
 
 using CmisSync.Lib;
+using CmisSync.Lib.Cmis;
 
 namespace CmisSync {
 
@@ -36,16 +37,21 @@ namespace CmisSync {
 
         private ProgressBar progress_bar = new ProgressBar ();
 
+        private static Gdk.Cursor hand_cursor = new Gdk.Cursor(Gdk.CursorType.Hand2);
 
         private string cancelText =
             CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture);
         private string continueText =
             CmisSync.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture);
+        private string backText =
+            CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture);
 
         private void ShowSetupPage()
         {
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
             Description = CmisSync.Properties.Resources.ResourceManager.GetString("Intro", CultureInfo.CurrentCulture);
+
+            Add(new Label("")); // Page must have at least one element in order to show Header and Descripton
 
             Button cancel_button = new Button (cancelText);
             cancel_button.Clicked += delegate {
@@ -81,74 +87,75 @@ namespace CmisSync {
             VBox layout_vertical   = new VBox (false, 12);
             HBox layout_fields     = new HBox (true, 12);
             VBox layout_address    = new VBox (true, 0);
+            HBox layout_address_help = new HBox(false, 3);
             VBox layout_user       = new VBox (true, 0);
             VBox layout_password   = new VBox (true, 0);
 
-
             // Address
-            Entry address_entry = new Entry () {
-                Text = Controller.PreviousAddress,
-                     //RM Sensitive = (Controller.SelectedPlugin.Address == null),
-                     ActivatesDefault = true
+            Label address_label = new Label()
+            {
+                UseMarkup = true,
+                          Xalign = 0,
+                          Markup = "<b>" + 
+                              CmisSync.Properties.Resources.ResourceManager.GetString("EnterWebAddress", CultureInfo.CurrentCulture) +
+                              "</b>"
             };
 
-            Label address_example = new Label () {
-                Xalign = 0,
-                       UseMarkup = true
-                           //RM Markup = "<span size=\"small\" fgcolor=\"" +
-                           //RM    SecondaryTextColor + "\">" + Controller.SelectedPlugin.AddressExample + "</span>"
+            Entry address_entry = new Entry () {
+                Text = Controller.PreviousAddress,
+                     ActivatesDefault = false
             };
 
             Label address_help_label = new Label()
             {
-                Text = CmisSync.Properties.Resources.ResourceManager.GetString("Help", CultureInfo.CurrentCulture) + ": "
-                    // TODO FontSize = 11,
-                    // TODO Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
+                Xalign = 0,
+                       UseMarkup = true,
+                       Markup = "<span foreground=\"#808080\" size=\"small\">" +
+                           CmisSync.Properties.Resources.ResourceManager.GetString("Help", CultureInfo.CurrentCulture) + ": " +
+                           "</span>"
             };
-            /* TODO Run run = new Run("Where to find this address");
-               Hyperlink link = new Hyperlink(run);
-               link.NavigateUri = new Uri("https://github.com/nicolas-raoul/CmisSync/wiki/What-address");
-               address_help_label.Inlines.Add(link);
-               link.RequestNavigate += (sender, e) =>
-               {
-               System.Diagnostics.Process.Start(e.Uri.ToString());
-               };*/
+            EventBox address_help_urlbox = new EventBox();
+            Label address_help_urllabel = new Label()
+            {
+                Xalign = 0,
+                       UseMarkup = true,
+                       Markup = "<span foreground=\"blue\" underline=\"single\" size=\"small\">" +
+                           CmisSync.Properties.Resources.ResourceManager.GetString("WhereToFind", CultureInfo.CurrentCulture) +
+                           "</span>"
+            };
+            address_help_urlbox.Add(address_help_urllabel);
+            address_help_urlbox.ButtonPressEvent += delegate(object o, ButtonPressEventArgs args) {
+                Process process = new Process();
+                process.StartInfo.FileName  = "xdg-open";
+                process.StartInfo.Arguments = "https://github.com/nicolas-raoul/CmisSync/wiki/What-address";
+                process.Start ();
+            };
+            address_help_urlbox.EnterNotifyEvent += delegate(object o, EnterNotifyEventArgs args) {
+                address_help_urlbox.GdkWindow.Cursor = hand_cursor;
+            };
 
             Label address_error_label = new Label()
             {
-                // TODO FontSize = 11,
-                // TODO Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
-                // TODO Visibility = Visibility.Hidden
+                Xalign = 0,
+                UseMarkup = true,
+                Markup = ""
             };
+            address_error_label.Hide();
 
             // User
             Entry user_entry = new Entry () {
                 Text = Controller.PreviousPath,
                      //RM Sensitive = (Controller.SelectedPlugin.User == null),
-                     ActivatesDefault = true
-            };
-
-            Label user_example = new Label () {
-                Xalign = 0,
-                       UseMarkup = true
-                           //RM Markup = "<span size=\"small\" fgcolor=\"" +
-                           //RM    SecondaryTextColor + "\">" + Controller.SelectedPlugin.UserExample + "</span>"
+                     ActivatesDefault = false
             };
 
             // Password
             Entry password_entry = new Entry () {
                 Text = Controller.PreviousPath,
+                     Visibility = false,
                      //RM Sensitive = (Controller.SelectedPlugin.Password == null),
                      ActivatesDefault = true
             };
-
-            Label password_example = new Label () {
-                Xalign = 0,
-                       UseMarkup = true
-                           //RM Markup = "<span size=\"small\" fgcolor=\"" +
-                           //RM    SecondaryTextColor + "\">" + Controller.SelectedPlugin.PasswordExample + "</span>"
-            };
-
 
             Controller.ChangeAddressFieldEvent += delegate (string text,
                     string example_text, FieldState state) {
@@ -156,8 +163,6 @@ namespace CmisSync {
                 Application.Invoke (delegate {
                         address_entry.Text      = text;
                         address_entry.Sensitive = (state == FieldState.Enabled);
-                        address_example.Markup  =  "<span size=\"small\" fgcolor=\"" +
-                        SecondaryTextColor + "\">" + example_text + "</span>";
                         });
             };
 
@@ -167,8 +172,6 @@ namespace CmisSync {
                 Application.Invoke (delegate {
                         user_entry.Text      = text;
                         user_entry.Sensitive = (state == FieldState.Enabled);
-                        user_example.Markup  =  "<span size=\"small\" fgcolor=\""
-                        + SecondaryTextColor + "\">" + example_text + "</span>";
                         });
             };
 
@@ -178,47 +181,46 @@ namespace CmisSync {
                 Application.Invoke (delegate {
                         password_entry.Text      = text;
                         password_entry.Sensitive = (state == FieldState.Enabled);
-                        password_example.Markup  =  "<span size=\"small\" fgcolor=\""
-                        + SecondaryTextColor + "\">" + example_text + "</span>";
                         });
             };
 
-            Controller.CheckAddPage (address_entry.Text);
-
             address_entry.Changed += delegate {
-                Controller.CheckAddPage (address_entry.Text);
+                string error = Controller.CheckAddPage(address_entry.Text);
+                if (!String.IsNullOrEmpty(error)) {
+                    address_error_label.Markup = "<span foreground=\"red\">" + CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) + "</span>";
+                    address_error_label.Show();
+                } else {
+                    address_error_label.Hide();
+                }
             };
 
             // Address
-            layout_address.PackStart (new Label () {
-                    Markup = "<b>" + "Address:" + "</b>",
-                    Xalign = 0
-                    }, true, true, 0);
-
-            layout_address.PackStart (address_entry, false, false, 0);
-            layout_address.PackStart (address_example, false, false, 0);
+            layout_address_help.PackStart(address_help_label, false, false, 0);
+            layout_address_help.PackStart(address_help_urlbox, false, false, 0);
+            layout_address.PackStart (address_label, true, true, 0);
+            layout_address.PackStart (address_entry, true, true, 0);
+            layout_address.PackStart (layout_address_help, true, true, 0);
+            layout_address.PackStart (address_error_label, true, true, 0);
 
             // User
             layout_user.PackStart (new Label () {
-                    Markup = "<b>" + "User:" + "</b>",
+                    Markup = "<b>" + CmisSync.Properties.Resources.ResourceManager.GetString("User", CultureInfo.CurrentCulture) + ":</b>",
                     Xalign = 0
                     }, true, true, 0);
             layout_user.PackStart (user_entry, false, false, 0);
-            layout_user.PackStart (user_example, false, false, 0);
 
             // Password
             layout_password.PackStart (new Label () {
-                    Markup = "<b>" + "password:" + "</b>",
+                    Markup = "<b>" + CmisSync.Properties.Resources.ResourceManager.GetString("Password", CultureInfo.CurrentCulture) + ":</b>",
                     Xalign = 0
                     }, true, true, 0);
             layout_password.PackStart (password_entry, false, false, 0);
-            layout_password.PackStart (password_example, false, false, 0);
 
-            layout_fields.PackStart (layout_address);
             layout_fields.PackStart (layout_user);
             layout_fields.PackStart (layout_password);
 
             layout_vertical.PackStart (new Label (""), false, false, 0);
+            layout_vertical.PackStart (layout_address, false, false, 0);
             layout_vertical.PackStart (layout_fields, false, false, 0);
 
             Add (layout_vertical);
@@ -237,35 +239,31 @@ namespace CmisSync {
 
             continue_button.Clicked += delegate {
                 // Show wait cursor
-                // TODO System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-
-                //Logger.Info("address:" + address_entry.Text + " user:" + user_entry.Text + " password:" + password_entry.Text);
+                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
                 // Try to find the CMIS server
-                /*
                 CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
-                        address_entry.Text, user_entry.Text, password_entry.Text);
+                   address_entry.Text, user_entry.Text, password_entry.Text);
                 Controller.repositories = cmisServer.repositories;
                 address_entry.Text = cmisServer.url;
-*/
+
                 // Hide wait cursor
-                // TODO System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
 
                 if (Controller.repositories == null)
                 {
                     // Show warning
-                    address_error_label.Text = "Sorry, CmisSync can not find a CMIS server at this address.\nPlease check again.\nIf you are sure about the address, open it in a browser and post\nthe resulting XML to the CmisSync forum.";
-                    // TODO address_error_label.Visibility = Visibility.Visible;
+                    address_error_label.Markup = "<span foreground=\"red\">" + CmisSync.Properties.Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture) + "</span>";
+                    address_error_label.Show();
                 }
                 else
                 {
-                    // Logger.Info("repositories[0]:" + Controller.repositories[0]);
+                    Console.WriteLine("Add1 successful");
                     // Continue to folder selection
                     Controller.Add1PageCompleted(
                             address_entry.Text, user_entry.Text, password_entry.Text);
                 }
             };
-
 
             Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
                 Application.Invoke (delegate {
@@ -275,9 +273,6 @@ namespace CmisSync {
 
             AddButton (cancel_button);
             AddButton (continue_button);
-
-            Controller.CheckAddPage (address_entry.Text);
-
         }
 
         private void ShowAdd2Page()
@@ -285,170 +280,106 @@ namespace CmisSync {
 
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Which", CultureInfo.CurrentCulture);
 
-            VBox layout_vertical   = new VBox (false, 12);
-            HBox layout_fields     = new HBox (true, 12);
-            VBox layout_repository = new VBox (true, 0);
-            VBox layout_path       = new VBox (true, 0);
-
-            Gtk.TreeView treeView = new Gtk.TreeView();
             Gtk.ListStore repoListStore = new Gtk.ListStore(typeof (string), typeof (string));
-
-            /*
-            // Repository
-            Entry repository_entry = new Entry () {
-                Text = Controller.repositories[0], // TODO put all elements in a tree
-                     //RM Sensitive = (Controller.SelectedPlugin.Repository == null),
-                     ActivatesDefault = true
+            foreach (KeyValuePair<String, String> repository in Controller.repositories)
+            {
+                repoListStore.AppendValues(repository.Key, repository.Value + " [" + repository.Key + "]");
+            }
+            Gtk.TreeView treeView = new Gtk.TreeView(repoListStore);
+            treeView.HeadersVisible = false;
+            treeView.Selection.Mode = SelectionMode.Single;
+            treeView.AppendColumn("Name", new CellRendererText(), "text", 1);
+            treeView.CursorChanged += delegate(object o, EventArgs args) {
+                TreeSelection selection = (o as TreeView).Selection;
+                TreeModel model;
+                TreeIter iter;
+                if (selection.GetSelected(out model, out iter)) {
+                    Console.WriteLine("sel '{0}'", model.GetPath(iter));
+                }
             };
 
-            Label repository_example = new Label () {
-                Xalign = 0,
-                       UseMarkup = true
-                           //RM       Markup = "<span size=\"small\" fgcolor=\"" +
-                           //RM           SecondaryTextColor + "\">" + Controller.SelectedPlugin.RepositoryExample + "</span>"
-            };
 
-            // Path
-            Entry path_entry = new Entry () {
-                Text = "/",
-                     //RM     Sensitive = (Controller.SelectedPlugin.Path == null),
-                     ActivatesDefault = true
-            };
+            ScrolledWindow sw = new ScrolledWindow();
+            sw.Add(treeView);
+            Add(sw);
 
-            Label path_example = new Label () {
-                Xalign = 0,
-                       UseMarkup = true
-                           //RM       Markup = "<span size=\"small\" fgcolor=\"" +
-                           //RM           SecondaryTextColor + "\">" + Controller.SelectedPlugin.PathExample + "</span>"
-            };
-
-            Controller.ChangeRepositoryFieldEvent += delegate (string text,
-                    string example_text, FieldState state) {
-
-                Application.Invoke (delegate {
-                        repository_entry.Text      = text;
-                        repository_entry.Sensitive = (state == FieldState.Enabled);
-                        repository_example.Markup  =  "<span size=\"small\" fgcolor=\"" +
-                        SecondaryTextColor + "\">" + example_text + "</span>";
-                        });
-            };
-
-            Controller.ChangePathFieldEvent += delegate (string text,
-                    string example_text, FieldState state) {
-
-                Application.Invoke (delegate {
-                        path_entry.Text      = text;
-                        path_entry.Sensitive = (state == FieldState.Enabled);
-                        path_example.Markup  =  "<span size=\"small\" fgcolor=\""
-                        + SecondaryTextColor + "\">" + example_text + "</span>";
-                        });
-            };
-
-            //Controller.CheckAddPage (address_entry.Text);
-
-            // Repository
-            layout_repository.PackStart (new Label () {
-                    Markup = "<b>" + "Repository:" + "</b>",
-                    Xalign = 0
-                    }, true, true, 0);
-            layout_repository.PackStart (repository_entry, false, false, 0);
-            layout_repository.PackStart (repository_example, false, false, 0);
-
-            // Path
-            layout_path.PackStart (new Label () {
-                    Markup = "<b>" + "Remote Path:" + "</b>",
-                    Xalign = 0
-                    }, true, true, 0);
-            layout_path.PackStart (path_entry, false, false, 0);
-            layout_path.PackStart (path_example, false, false, 0);
-
-            layout_fields.PackStart (layout_repository);
-            layout_fields.PackStart (layout_path);
-
-            layout_vertical.PackStart (new Label (""), false, false, 0);
-            layout_vertical.PackStart (layout_fields, false, false, 0);
-
-            Add (layout_vertical);
-
-            // Cancel button
             Button cancel_button = new Button (cancelText);
-
             cancel_button.Clicked += delegate {
                 Controller.PageCancelled ();
             };
 
-            Button add_button = new Button ("Add") {
-                //Sensitive = false
+            Button continue_button = new Button (continueText)
+            {
+                Sensitive = false
+            };
+            continue_button.Clicked += delegate (object o, EventArgs args) {
+                Controller.SetupPageCompleted ();
             };
 
-            add_button.Clicked += delegate {
-                Controller.Add2PageCompleted(repository_entry.Text, path_entry.Text);
+            Button back_button = new Button (backText)
+            {
+                Sensitive = true
+            };
+            back_button.Clicked += delegate (object o, EventArgs args) {
+                Controller.BackToPage1();
             };
 
-            Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
-                Application.Invoke (delegate {
-                        add_button.Sensitive = button_enabled;                            
-                        });
-            };
-            AddButton (cancel_button);
-            AddButton (add_button);
-*/
-
-            //Controller.CheckAddPage (address_entry.Text);
-
+            AddButton(back_button);
+            AddButton(continue_button);
+            AddButton(cancel_button);
         }
 
         private void ShowCustomizePage()
         {
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Customize", CultureInfo.CurrentCulture);
-/*
+            /*
             // Customize local folder name
             TextBlock localfolder_label = new TextBlock()
             {
-                Text = CmisSync.Properties.Resources.ResourceManager.GetString("EnterLocalFolderName", CultureInfo.CurrentCulture),
-                     FontWeight = FontWeights.Bold
+            Text = CmisSync.Properties.Resources.ResourceManager.GetString("EnterLocalFolderName", CultureInfo.CurrentCulture),
+            FontWeight = FontWeights.Bold
             };
 
             TextBox localfolder_box = new TextBox()
             {
-                Width = 420,
-                      Text = Controller.SyncingReponame
+            Width = 420,
+            Text = Controller.SyncingReponame
             };
 
             TextBlock localrepopath_label = new TextBlock()
             {
-                Text = CmisSync.Properties.Resources.ResourceManager.GetString("ChangeRepoPath", CultureInfo.CurrentCulture),
-                     FontWeight = FontWeights.Bold
+            Text = CmisSync.Properties.Resources.ResourceManager.GetString("ChangeRepoPath", CultureInfo.CurrentCulture),
+            FontWeight = FontWeights.Bold
             };
 
             TextBox localrepopath_box = new TextBox()
             {
-                Width = 420,
-                      Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text)
+            Width = 420,
+            Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text)
             };
 
             localfolder_box.TextChanged += delegate
             {
-                localrepopath_box.Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text);
+            localrepopath_box.Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text);
             };
 
             TextBlock localfolder_error_label = new TextBlock()
             {
-                FontSize = 11,
-                         Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
-                         Visibility = Visibility.Hidden
+            FontSize = 11,
+            Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
+            Visibility = Visibility.Hidden
             };
 
             Button cancel_button = new Button(cancelText);
 
             Button add_button = new Button()
             {
-                Content = CmisSync.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
+            Content = CmisSync.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
             };
 
             Button back_button = new Button()
             {
-                Content = CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture)
+            Content = CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture)
             };
 
             Buttons.Add(back_button);
@@ -663,15 +594,15 @@ namespace CmisSync {
         private void ShowFinishedPage()
         {
             UrgencyHint = true;
-//RM
-/*
-            if (!HasToplevelFocus) {
-                string title   = "Your documents are ready!";
-                string subtext = "You can find them in your CmisSync folder.";
+            //RM
+            /*
+               if (!HasToplevelFocus) {
+               string title   = "Your documents are ready!";
+               string subtext = "You can find them in your CmisSync folder.";
 
-                Program.UI.Bubbles.Controller.ShowBubble (title, subtext, null);
-            }
-            */
+               Program.UI.Bubbles.Controller.ShowBubble (title, subtext, null);
+               }
+               */
 
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Ready", CultureInfo.CurrentCulture);
             Description = CmisSync.Properties.Resources.ResourceManager.GetString("YouCanFind", CultureInfo.CurrentCulture);
@@ -690,31 +621,31 @@ namespace CmisSync {
                 Controller.FinishPageCompleted ();
             };
 
-//RM
-/*
-            if (warnings.Length > 0) {
-                Image warning_image = new Image (
-                        UIHelpers.GetIcon ("dialog-information", 24)
-                        );
+            //RM
+            /*
+               if (warnings.Length > 0) {
+               Image warning_image = new Image (
+               UIHelpers.GetIcon ("dialog-information", 24)
+               );
 
-                Label warning_label = new Label (warnings [0]) {
-                    Xalign = 0,
-                           Wrap   = true
-                };
+               Label warning_label = new Label (warnings [0]) {
+               Xalign = 0,
+               Wrap   = true
+               };
 
-                HBox warning_layout = new HBox (false, 0);
-                warning_layout.PackStart (warning_image, false, false, 15);
-                warning_layout.PackStart (warning_label, true, true, 0);
+               HBox warning_layout = new HBox (false, 0);
+               warning_layout.PackStart (warning_image, false, false, 15);
+               warning_layout.PackStart (warning_label, true, true, 0);
 
-                VBox warning_wrapper = new VBox (false, 0);
-                warning_wrapper.PackStart (warning_layout, false, false, 0);
+               VBox warning_wrapper = new VBox (false, 0);
+               warning_wrapper.PackStart (warning_layout, false, false, 0);
 
-                Add (warning_wrapper);
+               Add (warning_wrapper);
 
-            } else {
-                Add (null);
-            }
-*/
+               } else {
+               Add (null);
+               }
+               */
 
             AddButton (open_folder_button);
             AddButton (finish_button);

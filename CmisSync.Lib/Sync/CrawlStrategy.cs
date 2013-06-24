@@ -204,6 +204,18 @@ namespace CmisSync.Lib.Sync
                                 }
                                 else
                                 {
+                                    serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
+                                    // sqlite limitation for DateTime: http://www.sqlite.org/datatype3.html
+                                    DateTime databaseDate = (DateTime)lastDatabaseUpdate;
+                                    if (databaseDate.Kind == DateTimeKind.Unspecified)
+                                    {
+                                        lastDatabaseUpdate = DateTime.SpecifyKind(databaseDate, DateTimeKind.Local).ToUniversalTime();
+                                    }
+                                    else
+                                    {
+                                        lastDatabaseUpdate = databaseDate.ToUniversalTime();
+                                    }
+
                                     // If the file has been modified since last time we downloaded it, then download again.
                                     if (serverSideModificationDate > lastDatabaseUpdate)
                                     {
