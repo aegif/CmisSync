@@ -43,6 +43,8 @@ namespace CmisSync {
             CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture);
         private string continueText =
             CmisSync.Properties.Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture);
+        private string backText =
+            CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture);
 
         private void ShowSetupPage()
         {
@@ -278,117 +280,53 @@ namespace CmisSync {
 
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Which", CultureInfo.CurrentCulture);
 
-            VBox layout_vertical   = new VBox (false, 12);
-            HBox layout_fields     = new HBox (true, 12);
-            VBox layout_repository = new VBox (true, 0);
-            VBox layout_path       = new VBox (true, 0);
-
-            Gtk.TreeView treeView = new Gtk.TreeView();
             Gtk.ListStore repoListStore = new Gtk.ListStore(typeof (string), typeof (string));
-
-            /*
-            // Repository
-            Entry repository_entry = new Entry () {
-            Text = Controller.repositories[0], // TODO put all elements in a tree
-            //RM Sensitive = (Controller.SelectedPlugin.Repository == null),
-            ActivatesDefault = true
+            foreach (KeyValuePair<String, String> repository in Controller.repositories)
+            {
+                repoListStore.AppendValues(repository.Key, repository.Value + " [" + repository.Key + "]");
+            }
+            Gtk.TreeView treeView = new Gtk.TreeView(repoListStore);
+            treeView.HeadersVisible = false;
+            treeView.Selection.Mode = SelectionMode.Single;
+            treeView.AppendColumn("Name", new CellRendererText(), "text", 1);
+            treeView.CursorChanged += delegate(object o, EventArgs args) {
+                TreeSelection selection = (o as TreeView).Selection;
+                TreeModel model;
+                TreeIter iter;
+                if (selection.GetSelected(out model, out iter)) {
+                    Console.WriteLine("sel '{0}'", model.GetPath(iter));
+                }
             };
 
-            Label repository_example = new Label () {
-            Xalign = 0,
-            UseMarkup = true
-            //RM       Markup = "<span size=\"small\" fgcolor=\"" +
-            //RM           SecondaryTextColor + "\">" + Controller.SelectedPlugin.RepositoryExample + "</span>"
-            };
 
-            // Path
-            Entry path_entry = new Entry () {
-            Text = "/",
-            //RM     Sensitive = (Controller.SelectedPlugin.Path == null),
-            ActivatesDefault = true
-            };
+            ScrolledWindow sw = new ScrolledWindow();
+            sw.Add(treeView);
+            Add(sw);
 
-            Label path_example = new Label () {
-            Xalign = 0,
-            UseMarkup = true
-            //RM       Markup = "<span size=\"small\" fgcolor=\"" +
-            //RM           SecondaryTextColor + "\">" + Controller.SelectedPlugin.PathExample + "</span>"
-            };
-
-            Controller.ChangeRepositoryFieldEvent += delegate (string text,
-            string example_text, FieldState state) {
-
-            Application.Invoke (delegate {
-            repository_entry.Text      = text;
-            repository_entry.Sensitive = (state == FieldState.Enabled);
-            repository_example.Markup  =  "<span size=\"small\" fgcolor=\"" +
-            SecondaryTextColor + "\">" + example_text + "</span>";
-            });
-            };
-
-            Controller.ChangePathFieldEvent += delegate (string text,
-            string example_text, FieldState state) {
-
-            Application.Invoke (delegate {
-            path_entry.Text      = text;
-            path_entry.Sensitive = (state == FieldState.Enabled);
-            path_example.Markup  =  "<span size=\"small\" fgcolor=\""
-            + SecondaryTextColor + "\">" + example_text + "</span>";
-            });
-            };
-
-            //Controller.CheckAddPage (address_entry.Text);
-
-            // Repository
-            layout_repository.PackStart (new Label () {
-            Markup = "<b>" + "Repository:" + "</b>",
-            Xalign = 0
-            }, true, true, 0);
-            layout_repository.PackStart (repository_entry, false, false, 0);
-            layout_repository.PackStart (repository_example, false, false, 0);
-
-            // Path
-            layout_path.PackStart (new Label () {
-            Markup = "<b>" + "Remote Path:" + "</b>",
-            Xalign = 0
-            }, true, true, 0);
-            layout_path.PackStart (path_entry, false, false, 0);
-            layout_path.PackStart (path_example, false, false, 0);
-
-            layout_fields.PackStart (layout_repository);
-            layout_fields.PackStart (layout_path);
-
-            layout_vertical.PackStart (new Label (""), false, false, 0);
-            layout_vertical.PackStart (layout_fields, false, false, 0);
-
-            Add (layout_vertical);
-
-            // Cancel button
             Button cancel_button = new Button (cancelText);
-
             cancel_button.Clicked += delegate {
                 Controller.PageCancelled ();
             };
 
-            Button add_button = new Button ("Add") {
-                //Sensitive = false
+            Button continue_button = new Button (continueText)
+            {
+                Sensitive = false
+            };
+            continue_button.Clicked += delegate (object o, EventArgs args) {
+                Controller.SetupPageCompleted ();
             };
 
-            add_button.Clicked += delegate {
-                Controller.Add2PageCompleted(repository_entry.Text, path_entry.Text);
+            Button back_button = new Button (backText)
+            {
+                Sensitive = true
+            };
+            back_button.Clicked += delegate (object o, EventArgs args) {
+                Controller.BackToPage1();
             };
 
-            Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
-                Application.Invoke (delegate {
-                        add_button.Sensitive = button_enabled;                            
-                        });
-            };
-            AddButton (cancel_button);
-            AddButton (add_button);
-            */
-
-                //Controller.CheckAddPage (address_entry.Text);
-
+            AddButton(back_button);
+            AddButton(continue_button);
+            AddButton(cancel_button);
         }
 
         private void ShowCustomizePage()
