@@ -31,6 +31,21 @@ using CmisSync.Lib.Cmis;
 
 namespace CmisSync {
 
+    /**
+     * Stores the metadata of an item in the folder selection dialog.
+     */
+    public class SelectionTreeItem
+    {
+        public bool childrenLoaded = false;
+        public string repository; // Only necessary for repository root nodes.
+        public string fullPath;
+        public SelectionTreeItem(string repository, string fullPath)
+        {
+            this.repository = repository;
+            this.fullPath = fullPath;
+        }
+    }
+
     public class Setup : SetupWindow {
 
         public SetupController Controller = new SetupController ();
@@ -38,6 +53,8 @@ namespace CmisSync {
         private ProgressBar progress_bar = new ProgressBar ();
 
         private static Gdk.Cursor hand_cursor = new Gdk.Cursor(Gdk.CursorType.Hand2);
+        private static Gdk.Cursor wait_cursor = new Gdk.Cursor(Gdk.CursorType.Watch);
+        private static Gdk.Cursor default_cursor = new Gdk.Cursor(Gdk.CursorType.LeftPtr);
 
         private string cancelText =
             CmisSync.Properties.Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture);
@@ -239,7 +256,7 @@ namespace CmisSync {
 
             continue_button.Clicked += delegate {
                 // Show wait cursor
-                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+                this.GdkWindow.Cursor = wait_cursor;
 
                 // Try to find the CMIS server
                 CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
@@ -248,7 +265,7 @@ namespace CmisSync {
                 address_entry.Text = cmisServer.url;
 
                 // Hide wait cursor
-                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+                this.GdkWindow.Cursor = default_cursor;
 
                 if (Controller.repositories == null)
                 {
@@ -258,7 +275,6 @@ namespace CmisSync {
                 }
                 else
                 {
-                    Console.WriteLine("Add1 successful");
                     // Continue to folder selection
                     Controller.Add1PageCompleted(
                             address_entry.Text, user_entry.Text, password_entry.Text);
@@ -271,8 +287,8 @@ namespace CmisSync {
                         });
             };
 
-            AddButton (cancel_button);
             AddButton (continue_button);
+            AddButton (cancel_button);
         }
 
         private void ShowAdd2Page()
@@ -280,28 +296,7 @@ namespace CmisSync {
 
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Which", CultureInfo.CurrentCulture);
 
-            Gtk.ListStore repoListStore = new Gtk.ListStore(typeof (string), typeof (string));
-            foreach (KeyValuePair<String, String> repository in Controller.repositories)
-            {
-                repoListStore.AppendValues(repository.Key, repository.Value + " [" + repository.Key + "]");
-            }
-            Gtk.TreeView treeView = new Gtk.TreeView(repoListStore);
-            treeView.HeadersVisible = false;
-            treeView.Selection.Mode = SelectionMode.Single;
-            treeView.AppendColumn("Name", new CellRendererText(), "text", 1);
-            treeView.CursorChanged += delegate(object o, EventArgs args) {
-                TreeSelection selection = (o as TreeView).Selection;
-                TreeModel model;
-                TreeIter iter;
-                if (selection.GetSelected(out model, out iter)) {
-                    Console.WriteLine("sel '{0}'", model.GetPath(iter));
-                }
-            };
-
-
-            ScrolledWindow sw = new ScrolledWindow();
-            sw.Add(treeView);
-            Add(sw);
+            VBox layout_vertical   = new VBox (false, 12);
 
             Button cancel_button = new Button (cancelText);
             cancel_button.Clicked += delegate {
@@ -312,18 +307,85 @@ namespace CmisSync {
             {
                 Sensitive = false
             };
-            continue_button.Clicked += delegate (object o, EventArgs args) {
-                Controller.SetupPageCompleted ();
+            continue_button.Clicked += delegate {
+                Controller.Add2PageCompleted(
+                        Controller.saved_repository, Controller.saved_remote_path);
             };
 
             Button back_button = new Button (backText)
             {
                 Sensitive = true
             };
-            back_button.Clicked += delegate (object o, EventArgs args) {
+            back_button.Clicked += delegate {
                 Controller.BackToPage1();
             };
 
+            TreeStore repoStore = new Gtk.TreeStore(typeof (string), typeof (SelectionTreeItem));
+            TreeIter iter;
+            foreach (KeyValuePair<String, String> repository in Controller.repositories)
+            {
+                iter = repoStore.AppendNode();
+                repoStore.SetValues(iter, repository.Value + " [" + repository.Key + "]", new SelectionTreeItem(repository.Key, "/"));
+            }
+            Gtk.TreeView treeView = new Gtk.TreeView(repoStore);
+            treeView.HeadersVisible = false;
+            treeView.Selection.Mode = SelectionMode.Single;
+            treeView.AppendColumn("Name", new CellRendererText(), "text", 0);
+            treeView.CursorChanged += delegate(object o, EventArgs args) {
+                TreeSelection selection = (o as TreeView).Selection;
+                TreeModel model;
+                if (selection.GetSelected(out model, out iter)) {
+                    SelectionTreeItem sti = model.GetValue(iter, 1) as SelectionTreeItem;
+
+                    // Identify the selected remote path.
+                    Controller.saved_remote_path = sti.fullPath;
+
+                    // Identify the selected repository.
+                    TreeIter cnode = iter;
+                    TreeIter pnode = iter;
+                    while (model.IterParent(out pnode, cnode)) {
+                        cnode = pnode;
+                    }
+                    Controller.saved_repository = (model.GetValue(cnode, 1) as SelectionTreeItem).repository;
+
+                    // Load sub-folders if it has not been done already.
+                    // We use each item's Tag to store metadata: whether this item's subfolders have been loaded or not.
+                    if (sti.childrenLoaded == false)
+                    {
+                        this.GdkWindow.Cursor = wait_cursor;
+
+                        // Get list of subfolders
+                        string[] subfolders = CmisUtils.GetSubfolders(Controller.saved_repository, Controller.saved_remote_path,
+                                Controller.saved_address, Controller.saved_user, Controller.saved_password);
+
+                        TreePath tp = null;
+                        // Create a sub-item for each subfolder
+                        foreach (string subfolder in subfolders) {
+                            TreeIter newchild = repoStore.AppendNode(iter);
+                            repoStore.SetValues(newchild, subfolder, new SelectionTreeItem(null, subfolder));
+                            if (null == tp) {
+                                tp = repoStore.GetPath(newchild);
+                            }
+                        }
+                        sti.childrenLoaded = true;
+                        if (null != tp) {
+                            treeView.ExpandToPath(tp);
+                        }
+                        this.GdkWindow.Cursor = default_cursor;
+                    }
+                    continue_button.Sensitive = true;
+
+                }
+            };
+
+            ScrolledWindow sw = new ScrolledWindow() {
+                ShadowType = Gtk.ShadowType.In
+            };
+            sw.Add(treeView);
+
+            layout_vertical.PackStart (new Label(""), false, false, 0);
+            layout_vertical.PackStart (sw, true, true, 0);
+            Add(layout_vertical);
             AddButton(back_button);
             AddButton(continue_button);
             AddButton(cancel_button);
@@ -332,6 +394,7 @@ namespace CmisSync {
         private void ShowCustomizePage()
         {
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Customize", CultureInfo.CurrentCulture);
+
             /*
             // Customize local folder name
             TextBlock localfolder_label = new TextBlock()
