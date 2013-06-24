@@ -222,7 +222,7 @@ namespace CmisSync {
 
         public void LogClicked()
         {
-            Process.Start("notepad.exe", ConfigManager.CurrentConfig.GetLogFilePath());
+            Program.Controller.ShowLog(ConfigManager.CurrentConfig.GetLogFilePath());
         }
 
 

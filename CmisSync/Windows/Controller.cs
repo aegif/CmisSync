@@ -174,5 +174,11 @@ namespace CmisSync
         {
             base.Quit();
         }
+
+        public void ShowLog(string path)
+        {
+            Process.Start("notepad.exe", path);
+        }
+
     }
 }

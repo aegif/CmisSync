@@ -30,6 +30,14 @@ namespace CmisSync {
         {
         }
 
+        /// <summary>
+        /// Initialize the controller
+        /// </summary>
+        /// <param name="firstRun">Whether it is the first time that CmisSync is being run.</param>
+        public override void Initialize(Boolean firstRun)
+        {
+            base.Initialize(firstRun);
+        }
 
         // Creates a .desktop entry in autostart folder to
         // start CmisSync automatically at login
@@ -64,34 +72,6 @@ namespace CmisSync {
         }
         
         
-        public override void InstallProtocolHandler ()
-        {
-            // cmissync-invite-opener.desktop launches the handler on newer
-            // systems (like GNOME 3) that implement the last freedesktop.org specs.
-            // For GNOME 2 however we need to tell gconf about the protocol manually
-
-            try {
-                // Add the handler to gconf...
-                Process process = new Process ();
-                process.StartInfo.FileName  = "gconftool-2";
-                process.StartInfo.Arguments =
-                    "-s /desktop/gnome/url-handlers/cmissync/command 'cmissync open %s' --type String";
-
-                process.Start ();
-                process.WaitForExit ();
-
-                // ...and enable it
-                process.StartInfo.Arguments = "-s /desktop/gnome/url-handlers/cmissync/enabled --type Boolean true";
-
-                process.Start ();
-                process.WaitForExit ();
-
-            } catch {
-                // Pity...
-            }
-        }
-
-
         // Adds the CmisSync folder to the user's
         // list of bookmarked places
         public override void AddToBookmarks ()
@@ -149,65 +129,28 @@ namespace CmisSync {
             return false;
         }
         
-
-        public override string EventLogHTML {
-            get {
-                string html_path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/cmissync", "html", "event-log.html" }.Combine ();
-                string jquery_file_path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/cmissync", "html", "jquery.js" }.Combine ();
-
-                string html   = File.ReadAllText (html_path);
-                string jquery = File.ReadAllText (jquery_file_path);
-
-                return html.Replace ("<!-- $jquery -->", jquery);
-            }
-        }
-
-        
-        public override string DayEntryHTML {
-            get {
-                string path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/cmissync", "html", "day-entry.html" }.Combine ();
-                return File.ReadAllText (path);
-            }
-        }
-
-        
-        public override string EventEntryHTML {
-            get {
-                string path = new string [] { /*Defines.INSTALL_DIR*/"/usr/share/cmissync", "html", "event-entry.html" }.Combine ();
-                return File.ReadAllText (path);
-            }
-        }
-
-            
-        public override void OpenFolder (string path)
-        {
-            OpenFile (path);
-        }
-
-
-        public override void OpenFile (string path)
-        {
-            Process process             = new Process ();
-            process.StartInfo.FileName  = "xdg-open";
-            process.StartInfo.Arguments = "\"" + path + "\"";
-            process.Start ();
-        }
-
         public void OpenCmisSyncFolder()
         {
-            OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
+            Utils.OpenFolder(ConfigManager.CurrentConfig.FoldersPath);
         }
-
 
         public void OpenCmisSyncFolder(string name)
         {
-            OpenFolder(new Folder(name).FullPath);
+            Utils.OpenFolder(new Folder(name).FullPath);
         }
 
         public void OpenRemoteFolder(string name)
         {
             RepoInfo repo = ConfigManager.CurrentConfig.GetRepoInfo(name);
             Process.Start(CmisUtils.GetBrowsableURL(repo));
+        }
+
+        public void ShowLog(string path)
+        {
+            Process process = new Process();
+            process.StartInfo.FileName  = "xterm";
+            process.StartInfo.Arguments = "-title \"CmisSync Log\" -e tail -f \"" + path + "\"";
+            process.Start ();
         }
 
 

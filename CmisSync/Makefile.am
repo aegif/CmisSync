@@ -1,4 +1,4 @@
-SUBDIRS = Linux Common TestLibrary TestLibraryRunner
+SUBDIRS = Common TestLibrary TestLibraryRunner Linux
 
 EXTRA_DIST =  \
 	Program.cs \
