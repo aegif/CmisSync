@@ -17,7 +17,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Timers;
 using System.Collections.Generic;
@@ -395,151 +394,126 @@ namespace CmisSync {
         {
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Customize", CultureInfo.CurrentCulture);
 
-            /*
-            // Customize local folder name
-            TextBlock localfolder_label = new TextBlock()
-            {
-            Text = CmisSync.Properties.Resources.ResourceManager.GetString("EnterLocalFolderName", CultureInfo.CurrentCulture),
-            FontWeight = FontWeights.Bold
+            Label localfolder_label = new Label() {
+                Xalign = 0,
+                       UseMarkup = true,
+                       Markup = "<b>" + CmisSync.Properties.Resources.ResourceManager.GetString("EnterLocalFolderName", CultureInfo.CurrentCulture) + "</b>"
             };
 
-            TextBox localfolder_box = new TextBox()
-            {
-            Width = 420,
-            Text = Controller.SyncingReponame
+            Entry localfolder_entry = new Entry() {
+                Text = Controller.SyncingReponame,
+                     ActivatesDefault = false
             };
 
-            TextBlock localrepopath_label = new TextBlock()
-            {
-            Text = CmisSync.Properties.Resources.ResourceManager.GetString("ChangeRepoPath", CultureInfo.CurrentCulture),
-            FontWeight = FontWeights.Bold
+            Label localrepopath_label = new Label() {
+                Xalign = 0,
+                       UseMarkup = true,
+                       Markup = "<b>" + CmisSync.Properties.Resources.ResourceManager.GetString("ChangeRepoPath", CultureInfo.CurrentCulture) + "</b>"
             };
 
-            TextBox localrepopath_box = new TextBox()
-            {
-            Width = 420,
-            Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text)
+            Entry localrepopath_entry = new Entry() {
+                Text = System.IO.Path.Combine(Controller.DefaultRepoPath, localfolder_entry.Text)
             };
 
-            localfolder_box.TextChanged += delegate
-            {
-            localrepopath_box.Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text);
+            localfolder_entry.Changed += delegate {
+                localrepopath_entry.Text = System.IO.Path.Combine(Controller.DefaultRepoPath, localfolder_entry.Text);
             };
 
-            TextBlock localfolder_error_label = new TextBlock()
-            {
-            FontSize = 11,
-            Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
-            Visibility = Visibility.Hidden
+            Label localfolder_error_label = new Label() {
+                Xalign = 0,
+                       UseMarkup = true,
+                       Markup = ""
             };
 
             Button cancel_button = new Button(cancelText);
 
-            Button add_button = new Button()
-            {
-            Content = CmisSync.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
-            };
+            Button add_button = new Button(
+                    CmisSync.Properties.Resources.ResourceManager.GetString("Add", CultureInfo.CurrentCulture)
+                    );
 
-            Button back_button = new Button()
-            {
-            Content = CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture)
-            };
+            Button back_button = new Button(
+                    CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture)
+                    );
 
-            Buttons.Add(back_button);
-            Buttons.Add(add_button);
-            Buttons.Add(cancel_button);
-
-            add_button.Focus();
-
-            // Local Folder Name
-            ContentCanvas.Children.Add(localfolder_label);
-            Canvas.SetTop(localfolder_label, 160);
-            Canvas.SetLeft(localfolder_label, 185);
-
-            ContentCanvas.Children.Add(localfolder_box);
-            Canvas.SetTop(localfolder_box, 180);
-            Canvas.SetLeft(localfolder_box, 185);
-
-            ContentCanvas.Children.Add(localrepopath_label);
-            Canvas.SetTop(localrepopath_label, 200);
-            Canvas.SetLeft(localrepopath_label, 185);
-
-            ContentCanvas.Children.Add(localrepopath_box);
-            Canvas.SetTop(localrepopath_box, 220);
-            Canvas.SetLeft(localrepopath_box, 185);
-
-            ContentCanvas.Children.Add(localfolder_error_label);
-            Canvas.SetTop(localfolder_error_label, 275);
-            Canvas.SetLeft(localfolder_error_label, 185);
-
-            TaskbarItemInfo.ProgressValue = 0.0;
-            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
-
-            localfolder_box.Focus();
-            localfolder_box.Select(localfolder_box.Text.Length, 0);
-
-            Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
-            {
-                Dispatcher.BeginInvoke((Action)delegate
-                        {
-                        add_button.IsEnabled = button_enabled;
+            Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled) {
+                Gtk.Application.Invoke(delegate {
+                        add_button.Sensitive = button_enabled;
                         });
             };
 
-            string error = Controller.CheckRepoName(localfolder_box.Text);
-
-            if (!String.IsNullOrEmpty(error))
-            {
-                localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                localfolder_error_label.Visibility = Visibility.Visible;
+            string error = Controller.CheckRepoName(localfolder_entry.Text);
+            if (!String.IsNullOrEmpty(error)) {
+                localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
+                    CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                    "</span>";
+                localfolder_error_label.Show();
+            } else {
+                localfolder_error_label.Hide();
             }
-            else localfolder_error_label.Visibility = Visibility.Hidden;
 
-            localfolder_box.TextChanged += delegate
-            {
-                error = Controller.CheckRepoName(localfolder_box.Text);
-                if (!String.IsNullOrEmpty(error))
-                {
-                    localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                    localfolder_error_label.Visibility = Visibility.Visible;
+            localfolder_entry.Changed += delegate {
+                error = Controller.CheckRepoName(localfolder_entry.Text);
+                if (!String.IsNullOrEmpty(error)) {
+                    localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
+                        CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                        "</span>";
+                    localfolder_error_label.Show();
+                } else {
+                    localfolder_error_label.Hide();
                 }
-                else localfolder_error_label.Visibility = Visibility.Hidden;
             };
 
-            error = Controller.CheckRepoPath(localrepopath_box.Text);
-            if (!String.IsNullOrEmpty(error))
-            {
-                localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                localfolder_error_label.Visibility = Visibility.Visible;
+            error = Controller.CheckRepoPath(localrepopath_entry.Text);
+            if (!String.IsNullOrEmpty(error)) {
+                localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
+                    CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                "</span>";
+                localfolder_error_label.Show();
+            } else {
+                localfolder_error_label.Hide();
             }
-            else localfolder_error_label.Visibility = Visibility.Hidden;
 
-            localrepopath_box.TextChanged += delegate
-            {
-                error = Controller.CheckRepoPath(localrepopath_box.Text);
-                if (!String.IsNullOrEmpty(error))
-                {
-                    localfolder_error_label.Text = CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                    localfolder_error_label.Visibility = Visibility.Visible;
+            localrepopath_entry.Changed += delegate {
+                error = Controller.CheckRepoPath(localrepopath_entry.Text);
+                if (!String.IsNullOrEmpty(error)) {
+                    localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
+                        CmisSync.Properties.Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                        "</span>";
+                    localfolder_error_label.Show();
+                } else {
+                    localfolder_error_label.Hide();
                 }
-                else localfolder_error_label.Visibility = Visibility.Hidden;
             };
 
-            cancel_button.Click += delegate
-            {
+            cancel_button.Clicked += delegate {
                 Controller.PageCancelled();
             };
 
-            back_button.Click += delegate
-            {
+            back_button.Clicked += delegate {
                 Controller.BackToPage2();
             };
 
-            add_button.Click += delegate
-            {
-                Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text);
+            add_button.Clicked += delegate {
+                Controller.CustomizePageCompleted(localfolder_entry.Text, localrepopath_entry.Text);
             };
-            */
+
+            VBox layout_vertical   = new VBox (false, 12);
+
+            layout_vertical.PackStart (new Label(""), false, false, 0);
+            layout_vertical.PackStart (localfolder_label, true, true, 0);
+            layout_vertical.PackStart (localfolder_entry, true, true, 0);
+            layout_vertical.PackStart (localrepopath_label, true, true, 0);
+            layout_vertical.PackStart (localrepopath_entry, true, true, 0);
+            layout_vertical.PackStart (localfolder_error_label, true, true, 0);
+            Add(layout_vertical);
+            AddButton(back_button);
+            AddButton(add_button);
+            AddButton(cancel_button);
+
+            // add_button.GrabFocus();
+            localfolder_entry.GrabFocus();
+            localfolder_entry.SelectRegion(0, localfolder_entry.Text.Length);
+
         }
 
         private void ShowSyncingPage()
@@ -720,9 +694,8 @@ namespace CmisSync {
             switch (Controller.TutorialPageNumber) {
                 case 1:
                     {
-                        Header      = "What's happening next?";
-                        Description = "CmisSync creates a special folder on your computer " +
-                            "that will keep track of your folders.";
+                        Header = CmisSync.Properties.Resources.ResourceManager.GetString("WhatsNext", CultureInfo.CurrentCulture);
+                        Description = CmisSync.Properties.Resources.ResourceManager.GetString("CmisSyncCreates", CultureInfo.CurrentCulture);
 
                         Button skip_tutorial_button = new Button ("Skip Tutorial");
                         skip_tutorial_button.Clicked += delegate {
