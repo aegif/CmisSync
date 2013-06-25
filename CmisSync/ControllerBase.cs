@@ -420,8 +420,6 @@ namespace CmisSync
             if (announcements_url != null)
                 announcements_url = announcements_url.Trim();
 
-            string tmp_path = ConfigManager.CurrentConfig.TmpPath;
-
             repoInfo = new RepoInfo(local_path, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = new Uri(address);
             repoInfo.RemotePath = remote_path;
