@@ -83,7 +83,7 @@ namespace CmisSync.Lib.Cmis
         {
             #if __MonoCS__
                 // This macro prevents compilation errors on Unix where ProtectedData does not exist.
-                return "Should never be reached";
+                throw new ApplicationException("Should never be reached");
             #else
             try
                 {
@@ -117,6 +117,7 @@ namespace CmisSync.Lib.Cmis
         /// <returns>The obfuscated string</returns>
         private static string UnixObfuscate(string value)
         {
+#if __MonoCS__
             try
             {
                 AesManaged myAes = new AesManaged();
@@ -138,11 +139,15 @@ namespace CmisSync.Lib.Cmis
                 Console.WriteLine(e.ToString());
                 return null;
             }
+#else
+            throw new ApplicationException("Should never be reached");
+#endif
         }
 
 
         private static string UnixDeobfuscate(string value)
         {
+#if __MonoCS__
             try
             {
                 AesManaged myAes = new AesManaged();
@@ -171,6 +176,9 @@ namespace CmisSync.Lib.Cmis
                     throw;
                 }
             }
+#else
+            throw new ApplicationException("Should never be reached");
+#endif
         }
 
 
