@@ -152,6 +152,7 @@ if test "$OSNAME" = "Linux" ; then
 
     AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
+    AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
     AC_SUBST(JSONLIBS,[[-r:\$\(top_srcdir\)/Extras/Newtonsoft.Json.dll]])
     AC_SUBST(DOTCMISLIBS,[[-r:\$\(top_srcdir\)/Extras/DotCMIS.dll]])
 

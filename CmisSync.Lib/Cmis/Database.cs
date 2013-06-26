@@ -68,7 +68,7 @@ namespace CmisSync.Lib.Cmis
             {
                 try
                 {
-                    Logger.Info(String.Format("CmisDatabase | Checking whether database {0} exists", databaseFileName));
+                    Logger.Info(String.Format("Checking whether database {0} exists", databaseFileName));
                     bool createDatabase = !File.Exists(databaseFileName);
 
                     sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL;");
@@ -96,7 +96,7 @@ namespace CmisSync.Lib.Cmis
                                 key TEXT PRIMARY KEY,
                                 value TEXT);";    /* Other data such as ChangeLog token */
                             command.ExecuteNonQuery();
-                            Logger.Info("Database | Database created");
+                            Logger.Info("Database created");
                         }
                     }
                 }
@@ -170,23 +170,30 @@ namespace CmisSync.Lib.Cmis
         public void AddFile(string path, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata)
         {
-            Logger.Info("CmisDatabase | Start adding data in db for: " + path);
+            Logger.Debug("Start adding data in db for: " + path);
             string normalizedPath = Normalize(path);
             string checksum = String.Empty;
+
+            // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
+            // see: http://www.sqlite.org/datatype3.html
+            if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
+                throw new ArgumentException("serverSideModificationDate is not UTC");
+            }
+
             try
             {
                 checksum = Checksum(path);
             }
             catch (IOException e)
             {
-                Logger.Fatal("CmisDatabase | IOException while reading file checksum during addition: " + path);
+                Logger.Warn("IOException while reading file checksum during addition: " + path);
                 // The file was removed while reading. Just skip it, as it does not need to be added anymore.
                 return;
             }
 
             if (String.IsNullOrEmpty(checksum))
             {
-                Logger.Warn("CmisDatabase | Bad checksum for " + path);
+                Logger.Warn("Bad checksum for " + path);
                 return;
             }
 
@@ -208,15 +215,22 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Fatal("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
+                    throw e;
                 }
             }
-            Logger.Debug("CmisDatabase | Adding data in db for: " + path + " finished");
+            Logger.Debug("Adding data in db for: " + path + " finished");
         }
 
 
         public void AddFolder(string path, DateTime? serverSideModificationDate)
         {
+            // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
+            // see: http://www.sqlite.org/datatype3.html
+            if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
+                throw new ArgumentException("serverSideModificationDate is not UTC");
+            }
+
             path = Normalize(path);
             var connection = GetSQLiteConnection();
             using (var command = new SQLiteCommand(connection))
@@ -232,7 +246,8 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Info("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
+                    throw e;
                 }
             }
         }
@@ -253,7 +268,8 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Fatal("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
+                    throw e;
                 }
             }
         }
@@ -275,7 +291,8 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Info("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
+                    throw e;
                 }
             }
 
@@ -290,7 +307,8 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Info("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
+                    throw e;
                 }
             }
 
@@ -305,7 +323,8 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Fatal("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
+                    throw e;
                 }
             }
         }
@@ -323,11 +342,15 @@ namespace CmisSync.Lib.Cmis
                         "SELECT serverSideModificationDate FROM files WHERE path=@path";
                     command.Parameters.AddWithValue("path", path);
                     object obj = command.ExecuteScalar();
+                    // sqlite limitation for DateTime: http://www.sqlite.org/datatype3.html
+                    if (null != obj) {
+                        obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
+                    }
                     return (DateTime?)obj;
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Info("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
                     return null;
                 }
             }
@@ -337,6 +360,12 @@ namespace CmisSync.Lib.Cmis
         // TODO Combine this method and the next in a new method ModifyFile, and find out if GetServerSideModificationDate is really needed.
         public void SetFileServerSideModificationDate(string path, DateTime? serverSideModificationDate)
         {
+            // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
+            // see: http://www.sqlite.org/datatype3.html
+            if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
+                throw new ArgumentException("serverSideModificationDate is not UTC");
+            }
+
             path = Normalize(path);
             var connection = GetSQLiteConnection();
             using (var command = new SQLiteCommand(connection))
@@ -353,7 +382,8 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Fatal("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
+                    throw e;
                 }
             }
         }
@@ -378,7 +408,8 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Error("CmisDatabase | " + e.Message);
+                    Logger.Error(e.Message);
+                    throw e;
                 }
             }
         }
@@ -428,7 +459,7 @@ namespace CmisSync.Lib.Cmis
             }
             catch (IOException e)
             {
-                Logger.Fatal("CmisDatabase | IOException while reading file checksum: " + path);
+                Logger.Error("IOException while reading file checksum: " + path);
                 return true;
             }
 
@@ -445,7 +476,7 @@ namespace CmisSync.Lib.Cmis
             }
 
             if (!currentChecksum.Equals(previousChecksum))
-                Logger.Info("CmisDatabase | Checksum of " + path + " has changed from " + previousChecksum + " to " + currentChecksum);
+                Logger.Info("Checksum of " + path + " has changed from " + previousChecksum + " to " + currentChecksum);
             return !currentChecksum.Equals(previousChecksum);
         }
 

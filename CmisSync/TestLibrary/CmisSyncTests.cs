@@ -323,15 +323,6 @@ namespace TestLibrary
                     // Mock.
                     ActivityListener activityListener2 = new Mock<ActivityListener>().Object;
                     // Sync.
-                    RepoInfo repoInfo2 = new RepoInfo(
-                        canonical_name,
-                        ".",
-                        remoteFolderPath,
-                        url,
-                        user,
-                        password,
-                        repositoryId,
-                        5000);
                     CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
                         repoInfo,
                         activityListener,
@@ -369,7 +360,7 @@ namespace TestLibrary
                     {
                         file.Delete();
                     }
-                    catch (IOException e)
+                    catch (IOException)
                     {
                         Console.WriteLine("Exception on testing side, ignoring");
                     }
@@ -442,7 +433,7 @@ namespace TestLibrary
                     {
                         file.Delete();
                     }
-                    catch (IOException e)
+                    catch (IOException)
                     {
                         Console.WriteLine("Exception on testing side, ignoring");
                     }
@@ -453,7 +444,7 @@ namespace TestLibrary
                     {
                         directory.Delete();
                     }
-                    catch (IOException e)
+                    catch (IOException)
                     {
                         Console.WriteLine("Exception on testing side, ignoring");
                     }
