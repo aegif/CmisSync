@@ -18,6 +18,9 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+#if __MonoCS__
+using Mono.Unix.Native;
+#endif
 
 namespace CmisSync.Lib
 {
@@ -84,21 +87,34 @@ namespace CmisSync.Lib
         {
             var writeAllow = false;
             var writeDeny = false;
-            var accessControlList = Directory.GetAccessControl(path);
-            if (accessControlList == null)
-                return false;
-            var accessRules = accessControlList.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
-            if (accessRules == null)
-                return false;
+            try {
+                var accessControlList = Directory.GetAccessControl(path);
+                if (accessControlList == null)
+                    return false;
+                var accessRules = accessControlList.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+                if (accessRules == null)
+                    return false;
 
-            foreach (System.Security.AccessControl.FileSystemAccessRule rule in accessRules)
-            {
-                if ((System.Security.AccessControl.FileSystemRights.Write & rule.FileSystemRights) != System.Security.AccessControl.FileSystemRights.Write) continue;
-
-                if (rule.AccessControlType == System.Security.AccessControl.AccessControlType.Allow)
-                    writeAllow = true;
-                else if (rule.AccessControlType == System.Security.AccessControl.AccessControlType.Deny)
-                    writeDeny = true;
+                foreach (System.Security.AccessControl.FileSystemAccessRule rule in accessRules)
+                {
+                    if ((System.Security.AccessControl.FileSystemRights.Write & rule.FileSystemRights)
+                            != System.Security.AccessControl.FileSystemRights.Write)
+                    {
+                        continue;
+                    }
+                    if (rule.AccessControlType == System.Security.AccessControl.AccessControlType.Allow)
+                    {
+                        writeAllow = true;
+                    }
+                    else if (rule.AccessControlType == System.Security.AccessControl.AccessControlType.Deny)
+                    {
+                        writeDeny = true;
+                    }
+                }
+            } catch (System.PlatformNotSupportedException) {
+#if __MonoCS__
+                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
+#endif
             }
 
             return writeAllow && !writeDeny;

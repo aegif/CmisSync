@@ -83,7 +83,7 @@ namespace CmisSync.Lib.Cmis
         {
             #if __MonoCS__
                 // This macro prevents compilation errors on Unix where ProtectedData does not exist.
-                return "Should never be reached";
+                throw new ApplicationException("Should never be reached");
             #else
             try
                 {
@@ -117,13 +117,14 @@ namespace CmisSync.Lib.Cmis
         /// <returns>The obfuscated string</returns>
         private static string UnixObfuscate(string value)
         {
+#if __MonoCS__
             try
             {
                 AesManaged myAes = new AesManaged();
-                myAes.Mode = CipherMode.ECB;
-                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // CRB mode uses an empty IV
-                myAes.Key = GetCryptoKey();  // Byte array representing the key
-                myAes.Padding = PaddingMode.None;
+                myAes.Mode = CipherMode.CBC;
+                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                myAes.Key = GetCryptoKeyUnix();  // Byte array representing the key. Key MUST be 256 bits
+                myAes.Padding = PaddingMode.PKCS7;
 
                 ICryptoTransform encryptor = myAes.CreateEncryptor();
 
@@ -138,18 +139,22 @@ namespace CmisSync.Lib.Cmis
                 Console.WriteLine(e.ToString());
                 return null;
             }
+#else
+            throw new ApplicationException("Should never be reached");
+#endif
         }
 
 
         private static string UnixDeobfuscate(string value)
         {
+#if __MonoCS__
             try
             {
                 AesManaged myAes = new AesManaged();
-                myAes.Mode = CipherMode.ECB;
-                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // CRB mode uses an empty IV
-                myAes.Key = GetCryptoKey();  // Byte array representing the key
-                myAes.Padding = PaddingMode.None;
+                myAes.Mode = CipherMode.CBC;
+                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                myAes.Key = GetCryptoKeyUnix();  // Byte array representing the key. Key MUST be 256 bits
+                myAes.Padding = PaddingMode.PKCS7;
 
                 ICryptoTransform decryptor = myAes.CreateDecryptor();
 
@@ -171,6 +176,9 @@ namespace CmisSync.Lib.Cmis
                     throw;
                 }
             }
+#else
+            throw new ApplicationException("Should never be reached");
+#endif
         }
 
 
@@ -182,5 +190,17 @@ namespace CmisSync.Lib.Cmis
             return System.Text.Encoding.UTF8.GetBytes(
                 "Thou art so farth away, I miss you my dear files❥, with CmisSync be forever by my side!");
         }
+
+#if __MonoCS__
+        /// <summary>
+        /// Salt for the obfuscation. MUST be 256 bits.
+        /// </summary>
+        public static byte[] GetCryptoKeyUnix()
+        {
+            return System.Text.Encoding.UTF8.GetBytes("Thou art so farth away, I miss y");
+        }
+#endif
+
     }
+
 }

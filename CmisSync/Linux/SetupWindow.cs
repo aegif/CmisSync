@@ -191,8 +191,9 @@ namespace CmisSync {
                 Default = default_button;
             }
         
-            Present ();
             base.ShowAll ();
+            KeepAbove = true;
+            Present ();
         }
         
         

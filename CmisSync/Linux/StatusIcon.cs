@@ -33,7 +33,6 @@ namespace CmisSync {
         private Gdk.Pixbuf [] animation_frames;
 
         private Menu menu;
-        private MenuItem recent_events_item;
         private MenuItem quit_item;
         private MenuItem state_item;
 

@@ -122,10 +122,24 @@ namespace CmisSync
         private bool create_startup_item = true;
         private bool fetch_prior_history = false;
 
+        private Regex urlregex;
 
         public SetupController()
         {
             Logger.Info("Entering constructor.");
+            this.urlregex = new Regex(@"^" +
+                    "(https?)://" +                                                 // protocol
+                    "(([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+" +        // username
+                    "(:([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+)?" +     // password
+                    "@)?(?#" +                                                      // auth delimiter
+                    ")((([a-z\\d]\\.|[a-z\\d][a-z\\d-]*[a-z\\d]\\.)*" +             // domain segments AND
+                    "[a-z][a-z\\d-]*[a-z\\d]" +                                     // top level domain OR
+                    "|((\\d|\\d\\d|1\\d{2}|2[0-4]\\d|25[0-5])\\.){3}" +             // IP address
+                    "(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])" +                    //
+                    ")(:\\d+)?" +                                                   // port
+                    ")((/+([a-z\\d$_\\.\\+!\\*'\\(\\),;:@&=-]|%[\\da-f]{2})*)*?)" + // path
+                    "$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
             ChangePageEvent += delegate(PageType page_type, string[] warnings)
             {
                 this.current_page = page_type;
@@ -258,18 +272,20 @@ namespace CmisSync
         public string CheckAddPage(string address)
         {
             address = address.Trim();
-
             // Check that the first part of the URL (protocol and server name) are valid.
-            Regex regx = new Regex(@"(http|https)://[a-zA-Z0-9].*");
 
             this.saved_address = address;
 
-            bool fields_valid = ((!string.IsNullOrEmpty(address)) && (regx.IsMatch(address)));
+            bool fields_valid = ((!string.IsNullOrEmpty(address)) && (this.urlregex.IsMatch(address)));
 
             UpdateAddProjectButtonEvent(fields_valid);
 
-            if (String.IsNullOrEmpty(address)) return "EmptyURLNotAllowed";
-            if (!regx.IsMatch(address)) return "InvalidURL";
+            if (String.IsNullOrEmpty(address)) {
+                return "EmptyURLNotAllowed";
+            }
+            if (!this.urlregex.IsMatch(address)) {
+                return "InvalidURL";
+            }
             return String.Empty;
         }
 

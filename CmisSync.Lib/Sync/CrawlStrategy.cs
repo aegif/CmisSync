@@ -66,7 +66,7 @@ namespace CmisSync.Lib.Sync
             {
                 while (repo.Status == SyncStatus.Suspend)
                 {
-                    Logger.Info(String.Format("Sync | Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
+                    Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
                     System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                 }
 
@@ -97,7 +97,7 @@ namespace CmisSync.Lib.Sync
                 {
                     while (repo.Status == SyncStatus.Suspend)
                     {
-                        Logger.Info(String.Format("Sync | Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
+                        Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
 
@@ -144,7 +144,7 @@ namespace CmisSync.Lib.Sync
                                     // Skip if invalid folder name. See https://github.com/nicolas-raoul/CmisSync/issues/196
                                     if (Utils.IsInvalidFileName(remoteSubFolder.Name))
                                     {
-                                        Logger.Info("SynchronizedFolder | Skipping download of folder with illegal name: " + remoteSubFolder.Name);
+                                        Logger.Info("Skipping download of folder with illegal name: " + remoteSubFolder.Name);
                                     }
                                     else
                                     {
@@ -185,7 +185,7 @@ namespace CmisSync.Lib.Sync
                             // It sometimes happen on IBM P8 CMIS server, not sure why.
                             if (remoteDocumentFileName == null)
                             {
-                                Logger.Warn("Sync | Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
+                                Logger.Warn("Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
                                 continue;
                             }
 
@@ -194,34 +194,22 @@ namespace CmisSync.Lib.Sync
                             if (File.Exists(filePath))
                             {
                                 // Check modification date stored in database and download if remote modification date if different.
-                                DateTime? serverSideModificationDate = remoteDocument.LastModificationDate;
+                                DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
                                 DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
 
                                 if (lastDatabaseUpdate == null)
                                 {
-                                    Logger.Info("Sync | Downloading file absent from database: " + remoteDocumentFileName);
+                                    Logger.Info("Downloading file absent from database: " + remoteDocumentFileName);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                                 else
                                 {
-                                    serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
-                                    // sqlite limitation for DateTime: http://www.sqlite.org/datatype3.html
-                                    DateTime databaseDate = (DateTime)lastDatabaseUpdate;
-                                    if (databaseDate.Kind == DateTimeKind.Unspecified)
-                                    {
-                                        lastDatabaseUpdate = DateTime.SpecifyKind(databaseDate, DateTimeKind.Local).ToUniversalTime();
-                                    }
-                                    else
-                                    {
-                                        lastDatabaseUpdate = databaseDate.ToUniversalTime();
-                                    }
-
                                     // If the file has been modified since last time we downloaded it, then download again.
                                     if (serverSideModificationDate > lastDatabaseUpdate)
                                     {
                                         if (database.LocalFileHasChanged(filePath))
                                         {
-                                            Logger.Info("Sync | Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
+                                            Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
                                             // Rename locally modified file.
                                             String ext = Path.GetExtension(filePath);
                                             String filename = Path.GetFileNameWithoutExtension(filePath);
@@ -242,13 +230,11 @@ namespace CmisSync.Lib.Sync
                                         }
                                         else
                                         {
-                                            Logger.Info("Sync | Downloading modified file: " + remoteDocumentFileName);
+                                            Logger.Info("Downloading modified file: " + remoteDocumentFileName);
                                             DownloadFile(remoteDocument, localFolder);
                                         }
                                     }
 
-                                    // Change modification date in database
-                                    database.SetFileServerSideModificationDate(filePath, serverSideModificationDate);
                                 }
                             }
                             else
@@ -264,7 +250,7 @@ namespace CmisSync.Lib.Sync
                                 else
                                 {
                                     // New remote file, download it.
-                                    Logger.Info("Sync | Downloading new file: " + remoteDocumentFileName);
+                                    Logger.Info("Downloading new file: " + remoteDocumentFileName);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                             }
@@ -283,7 +269,7 @@ namespace CmisSync.Lib.Sync
                 {
                     while (repo.Status == SyncStatus.Suspend)
                     {
-                        Logger.Info(String.Format("Sync | Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
+                        Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
 
@@ -294,14 +280,14 @@ namespace CmisSync.Lib.Sync
                         if (!remoteFiles.Contains(fileName))
                         {
                             // This local file is not on the CMIS server now, so
-                            // check whether it used to exist on server or not.
+                            // check whether it used invalidFolderNameRegex to exist on server or not.
                             if (database.ContainsFile(filePath))
                             {
                                 // If file has changed locally, move to 'your_version' and warn about conflict
                                 // TODO
 
                                 // File has been deleted on server, so delete it locally.
-                                Logger.Info("Sync | Removing remotely deleted file: " + filePath);
+                                Logger.Info("Removing remotely deleted file: " + filePath);
                                 File.Delete(filePath);
 
                                 // Delete file from database.
@@ -312,7 +298,7 @@ namespace CmisSync.Lib.Sync
                                 if (BIDIRECTIONAL)
                                 {
                                     // New file, sync up.
-                                    Logger.Info("Sync | Uploading file absent on repository: " + filePath);
+                                    Logger.Info("Uploading file absent on repository: " + filePath);
                                     if (Utils.WorthSyncing(filePath))
                                     {
                                         UploadFile(filePath, remoteFolder);
@@ -328,7 +314,7 @@ namespace CmisSync.Lib.Sync
                                 if (BIDIRECTIONAL)
                                 {
                                     // Upload new version of file content.
-                                    Logger.Info("Sync | Uploading file update on repository: " + filePath);
+                                    Logger.Info("Uploading file update on repository: " + filePath);
                                     UpdateFile(filePath, remoteFolder);
                                 }
                             }
@@ -346,7 +332,7 @@ namespace CmisSync.Lib.Sync
                 {
                     while (repo.Status == SyncStatus.Suspend)
                     {
-                        Logger.Info(String.Format("Sync | Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
+                        Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
 
