@@ -344,7 +344,11 @@ namespace CmisSync.Lib.Cmis
                     object obj = command.ExecuteScalar();
                     // sqlite limitation for DateTime: http://www.sqlite.org/datatype3.html
                     if (null != obj) {
+#if __MonoCS__
                         obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
+#else
+                        obj = ((DateTime)obj).ToUniversalTime();
+#endif
                     }
                     return (DateTime?)obj;
                 }
