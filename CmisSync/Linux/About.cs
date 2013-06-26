@@ -56,42 +56,43 @@ namespace CmisSync {
 
             Controller.HideWindowEvent += delegate {
                 Application.Invoke (delegate {
-                    HideAll ();
-                });
+                        HideAll ();
+                        });
             };
 
             Controller.ShowWindowEvent += delegate {
                 Application.Invoke (delegate {
-                    ShowAll ();
-                    Present ();
-                });
+                        ShowAll ();
+                        KeepAbove = true;
+                        Present ();
+                        });
             };
 
             Controller.NewVersionEvent += delegate (string new_version) {
                 Application.Invoke (delegate {
-                    this.updates.Markup = String.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
-                        string.Format ("A newer version ({0}) is available!", new_version));
+                        this.updates.Markup = String.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
+                            string.Format ("A newer version ({0}) is available!", new_version));
 
-                    this.updates.ShowAll ();
-                });
+                        this.updates.ShowAll ();
+                        });
             };
 
             Controller.VersionUpToDateEvent += delegate {
                 Application.Invoke (delegate {
-                    this.updates.Markup = String.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
-                        "You are running the latest version.");
+                        this.updates.Markup = String.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
+                            "You are running the latest version.");
 
-                    this.updates.ShowAll ();
-                });
+                        this.updates.ShowAll ();
+                        });
             };
 
             Controller.CheckingForNewVersionEvent += delegate {
                 Application.Invoke (delegate {
-                    this.updates.Markup = String.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
-                        "Checking for updates...");
+                        // this.updates.Markup = String.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
+                        //    "Checking for updates...");
 
-                    this.updates.ShowAll ();
-                });
+                        this.updates.ShowAll ();
+                        });
             };
         }
 
@@ -99,52 +100,54 @@ namespace CmisSync {
         private void CreateAbout ()
         {
             Label version = new Label () {
-                Markup = string.Format ("<span font_size='small' fgcolor='white'>version {0}</span>",
-                    Controller.RunningVersion),
-                Xalign = 0,
-                Xpad = 300
+                Markup = string.Format ("<span font_size='small' fgcolor='#729fcf'>version {0}</span>",
+                        Controller.RunningVersion),
+                       Xalign = 0
             };
 
             this.updates = new Label () {
-                Markup = "<span font_size='small' fgcolor='#729fcf'>Checking for updates...</span>",
-                Xalign = 0,
-                Xpad = 300
+                Markup = "<span font_size='small' fgcolor='#729fcf'><b>Please check for updates at CmisSync.com</b></span>",
+                       Xalign = 0
             };
 
-            Label copyright = new Label () {
-                Markup = "<span font_size='small' fgcolor='white'>" +
-                         "Copyright © 2010–" + DateTime.Now.Year + " " +
-                         "Hylke Bons and others." +
-                         "</span>",
-                Xalign = 0,
-                Xpad   = 300
-            };
-
-            Label license = new Label () {
+            Label credits = new Label () {
                 LineWrap     = true,
-                LineWrapMode = Pango.WrapMode.Word,
-                Markup       = "<span font_size='small' fgcolor='white'>" +
-                               "CmisSync Open Source software. You are free to use, modify, " +
-                               "and redistribute it under the GNU General Public License version 3 or later." +
-                               "</span>",
-                WidthRequest = 330,
-                Wrap         = true,
-                Xalign       = 0,
-                Xpad         = 300,
+                             LineWrapMode = Pango.WrapMode.Word,
+                             Markup = "<span font_size='small' fgcolor='#729fcf'>" +
+                                 "Copyright © 2010–" + DateTime.Now.Year + " Aegif and others.\n" +
+                                 "\n" +
+                                 "CmisSync is Open Source software. You are free to use, modify, " +
+                                 "and redistribute it under the GNU General Public License version 3 or later." +
+                                 "</span>",
+                             WidthRequest = 330,
+                             Wrap         = true,
+                             Xalign = 0
             };
 
-            VBox layout_horizontal = new VBox (false, 0) {
+			LinkButton website_link = new LinkButton (Controller.WebsiteLinkAddress, "Website");
+			LinkButton credits_link = new LinkButton (Controller.CreditsLinkAddress, "Credits");
+			LinkButton report_problem_link = new LinkButton (Controller.ReportProblemLinkAddress, "Report a problem");
+
+            HBox layout_links = new HBox (false, 0);
+            layout_links.PackStart (website_link, false, false, 0);
+            layout_links.PackStart (credits_link, false, false, 0);
+            layout_links.PackStart (report_problem_link, false, false, 0);
+
+            VBox layout_vertical = new VBox (false, 0);
+            layout_vertical.PackStart (new Label (""), false, false, 42);
+            layout_vertical.PackStart (version, false, false, 0);
+            layout_vertical.PackStart (this.updates, false, false, 0);
+            layout_vertical.PackStart (credits, false, false, 9);
+            layout_vertical.PackStart (new Label (""), false, false, 0);
+            layout_vertical.PackStart (layout_links, false, false, 0);
+
+            HBox layout_horizontal = new HBox (false, 0) {
                 BorderWidth   = 0,
-                HeightRequest = 260,
-                WidthRequest  = 640
+                              HeightRequest = 260,
+                              WidthRequest  = 640
             };
-
-            layout_horizontal.PackStart (new Label (""), false, false, 42);
-            layout_horizontal.PackStart (version, false, false, 0);
-            layout_horizontal.PackStart (this.updates, false, false, 0);
-            layout_horizontal.PackStart (copyright, false, false, 9);
-            layout_horizontal.PackStart (license, false, false, 0);
-            layout_horizontal.PackStart (new Label (""), false, false, 0);
+            layout_horizontal.PackStart (new Label (""), false, false, 150);
+            layout_horizontal.PackStart (layout_vertical, false, false, 0);
 
             Add (layout_horizontal);
         }

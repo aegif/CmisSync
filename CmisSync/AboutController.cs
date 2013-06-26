@@ -99,7 +99,7 @@ namespace CmisSync {
                 if (UpdateRequired (RunningVersion, latest_version_string))
                     NewVersionEvent (latest_version_string);
                 else
-                    VersionUpToDateEvent ();                    
+                    VersionUpToDateEvent ();
             };
 
             web_client.DownloadStringAsync (uri);
