@@ -191,7 +191,8 @@ namespace CmisSync.Lib.Cmis
         {
             return System.Text.Encoding.UTF8.GetBytes("Thou art so farth away, I miss y");
         }
-    }
 #endif
+
+    }
 
 }
