@@ -15,11 +15,13 @@ using DotCMIS.Data.Impl;
 using System.Net;
 using CmisSync.Lib.Cmis;
 using DotCMIS.Data;
+using log4net;
 
 namespace CmisSync.Lib.Sync
 {
     public partial class CmisRepo : RepoBase
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisRepo));
         public enum RulesType { Folder, File };
 
         /**
@@ -27,6 +29,7 @@ namespace CmisSync.Lib.Sync
          */
         public partial class SynchronizedFolder
         {
+            private static readonly ILog Logger = LogManager.GetLogger(typeof(SynchronizedFolder));
             /**
              * Whether sync is bidirectional or only from server to client.
              * TODO make it a CMIS folder - specific setting
@@ -127,12 +130,12 @@ namespace CmisSync.Lib.Sync
                     // Detect whether the repository has the ChangeLog capability.
                     ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-                    Logger.Info("SynchronizedFolder | ChangeLog capability: " + ChangeLogCapability);
-                    Logger.Info("SynchronizedFolder | Created CMIS session: " + session.ToString());
+                    Logger.Info("ChangeLog capability: " + ChangeLogCapability);
+                    Logger.Info("Created CMIS session: " + session.ToString());
                 }
                 catch (CmisRuntimeException e)
                 {
-                    Logger.Error("SynchronizedFolder | Connection to repository failed: ", e);
+                    Logger.Error("Connection to repository failed: ", e);
                 }
             }
 
@@ -149,7 +152,7 @@ namespace CmisSync.Lib.Sync
                 }
                 if (session == null)
                 {
-                    Logger.Error("SynchronizedFolder | Could not connect to: " + cmisParameters[SessionParameter.AtomPubUrl]);
+                    Logger.Error("Could not connect to: " + cmisParameters[SessionParameter.AtomPubUrl]);
                     return; // Will try again at next sync. 
                 }
 
@@ -174,7 +177,7 @@ namespace CmisSync.Lib.Sync
             {
                 if (this.syncing)
                 {
-                    Logger.Info("SynchronizedFolder | Sync already running in background: " + repoinfo.TargetDirectory);
+                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
                     return;
                 }
                 this.syncing = true;
@@ -183,7 +186,7 @@ namespace CmisSync.Lib.Sync
                 bw.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
-                        Logger.Info("SynchronizedFolder | Launching sync: " + repoinfo.TargetDirectory);
+                        Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
 #if !DEBUG
                         try
                         {
@@ -193,7 +196,7 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (CmisBaseException e)
                         {
-                            Logger.Fatal("SynchronizedFolder | CMIS exception while syncing:", e);
+                            Logger.Error("CMIS exception while syncing:", e);
                         }
 #endif
                     }
@@ -228,7 +231,7 @@ namespace CmisSync.Lib.Sync
 
                             // Create database entry for this folder
                             // TODO - Yannick - Add metadata
-                            database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+                            database.AddFolder(localSubFolder, ((DateTime)remoteFolder.LastModificationDate).ToUniversalTime());
 
                             // Recurse into folder.
                             RecursiveFolderCopy(remoteSubFolder, localSubFolder);
@@ -251,11 +254,12 @@ namespace CmisSync.Lib.Sync
             private void DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 activityListener.ActivityStarted();
-                Logger.Info("SynchronizedFolder | Downloading: " + remoteDocument.ContentStreamFileName);
+                Logger.Info("Downloading: " + remoteDocument.ContentStreamFileName);
 
+                // TODO: Make this configurable.
                 if (remoteDocument.ContentStreamLength == 0)
                 {
-                    Logger.Info("SynchronizedFolder | Skipping download of file with content length zero: " + remoteDocument.ContentStreamFileName);
+                    Logger.Info("Skipping download of file with content length zero: " + remoteDocument.ContentStreamFileName);
                     activityListener.ActivityStopped();
                     return;
                 }
@@ -263,7 +267,7 @@ namespace CmisSync.Lib.Sync
                 // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
                 if(Utils.IsInvalidFileName(remoteDocument.ContentStreamFileName))
                 {
-                    Logger.Info("SynchronizedFolder | Skipping download of file with illegal filename: " + remoteDocument.ContentStreamFileName);
+                    Logger.Info("Skipping download of file with illegal filename: " + remoteDocument.ContentStreamFileName);
                     activityListener.ActivityStopped();
                     return;
                 }
@@ -294,7 +298,7 @@ namespace CmisSync.Lib.Sync
                     // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
                     if (contentStream == null)
                     {
-                        Logger.Warn("SynchronizedFolder | Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                        Logger.Warn("Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
                         activityListener.ActivityStopped();
                         return;
                     }
@@ -306,7 +310,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error("SynchronizedFolder | Download failed: " + remoteDocument.ContentStreamFileName + " " + ex);
+                    Logger.Error("Download failed: " + remoteDocument.ContentStreamFileName + " " + ex);
                     success = false;
                     File.Delete(tmpfilepath);
                     if (contentStream != null) contentStream.Stream.Close();
@@ -314,7 +318,7 @@ namespace CmisSync.Lib.Sync
 
                 if (success)
                 {
-                    Logger.Info("SynchronizedFolder | Downloaded: " + remoteDocument.ContentStreamFileName);
+                    Logger.Info("Downloaded: " + remoteDocument.ContentStreamFileName);
                     // TODO Control file integrity by using hash compare?
 
                     // Get metadata.
@@ -325,7 +329,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception e)
                     {
-                        Logger.Info("SynchronizedFolder | Exception while fetching metadata: " + remoteDocument.ContentStreamFileName + " " + Utils.ToLogString(e));
+                        Logger.Info("Exception while fetching metadata: " + remoteDocument.ContentStreamFileName + " " + Utils.ToLogString(e));
                         // Remove temporary local document to avoid it being considered a new document.
                         File.Delete(tmpfilepath);
                         activityListener.ActivityStopped();
@@ -336,9 +340,9 @@ namespace CmisSync.Lib.Sync
                     File.Move(tmpfilepath, filepath);
                     
                     // Create database entry for this file.
-                    database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+                    database.AddFile(filepath, ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime(), metadata);
 
-                    Logger.Info("SynchronizedFolder | Added to database: " + remoteDocument.ContentStreamFileName);
+                    Logger.Info("Added to database: " + remoteDocument.ContentStreamFileName);
                 }
                 activityListener.ActivityStopped();
             }
@@ -370,7 +374,7 @@ namespace CmisSync.Lib.Sync
                 Boolean success = false;
                 try
                 {
-                    Logger.Info("SynchronizedFolder | Uploading: " + filePath);
+                    Logger.Info("Uploading: " + filePath);
 
                     // Prepare properties
                     string fileName = Path.GetFileName(filePath);
@@ -400,8 +404,10 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception ex)
                     {
-                        Logger.Fatal("SynchronizedFolder | Upload failed: " + filePath + " " + ex);
-                        if (contentStream != null) contentStream.Stream.Close();
+                        Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                        if (contentStream != null) {
+                            contentStream.Stream.Close();
+                        }
                     }
 
                     // Close files.
@@ -417,7 +423,7 @@ namespace CmisSync.Lib.Sync
                     if (e is FileNotFoundException ||
                         e is IOException)
                     {
-                        Logger.Warn("SynchronizedFolder | File deleted while trying to upload it, reverting.");
+                        Logger.Warn("File deleted while trying to upload it, reverting.");
                         // File has been deleted while we were trying to upload/checksum/add.
                         // This can typically happen in Windows Explore when creating a new text file and giving it a name.
                         // In this case, revert the upload.
@@ -435,13 +441,13 @@ namespace CmisSync.Lib.Sync
                 // Metadata.
                 if (success)
                 {
-                    Logger.Info("SynchronizedFolder | Uploaded: " + filePath);
+                    Logger.Info("Uploaded: " + filePath);
 
                     // Get metadata. Some metadata has probably been automatically added by the server.
                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                     // Create database entry for this file.
-                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+                    database.AddFile(filePath, ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime(), metadata);
                 }
 
                 activityListener.ActivityStopped();
@@ -461,7 +467,7 @@ namespace CmisSync.Lib.Sync
 
                 // Create database entry for this folder
                 // TODO - Yannick - Add metadata
-                database.AddFolder(localFolder, folder.LastModificationDate);
+                database.AddFolder(localFolder, ((DateTime)folder.LastModificationDate).ToUniversalTime());
 
                 // Upload each file in this folder.
                 foreach (string file in Directory.GetFiles(localFolder))
@@ -480,11 +486,11 @@ namespace CmisSync.Lib.Sync
 
             private void UpdateFile(string filePath, IDocument remoteFile)
             {
-                Logger.Info("SynchronizedFolder | ## Updating " + filePath);
+                Logger.Info("## Updating " + filePath);
                 Stream localfile = File.OpenRead(filePath);
                 if ((localfile == null) && (localfile.Length == 0))
                 {
-                    Logger.Info("SynchronizedFolder | Skipping update of file with null or empty content stream: " + filePath);
+                    Logger.Info("Skipping update of file with null or empty content stream: " + filePath);
                     return;
                 }
 
@@ -495,18 +501,18 @@ namespace CmisSync.Lib.Sync
                 remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
                 remoteStream.Stream = localfile;
                 remoteStream.Stream.Flush();
-                Logger.Info("SynchronizedFolder | before SetContentStream");
+                Logger.Debug("before SetContentStream");
 
                 // CMIS do not have a Method to upload block by block. So upload file must be full.
                 // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
                 // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
                 // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
                 remoteFile.SetContentStream(remoteStream, true, true);
-                Logger.Info("SynchronizedFolder | after SetContentStream");
+                Logger.Debug("after SetContentStream");
                 localfile.Close();
                 localfile.Dispose();
                 remoteStream.Stream.Close();
-                Logger.Info("SynchronizedFolder | ## Updated " + filePath);
+                Logger.Info("## Updated " + filePath);
 
             }
 
@@ -515,7 +521,7 @@ namespace CmisSync.Lib.Sync
              */
             private void UpdateFile(string filePath, IFolder remoteFolder)
             {
-                Logger.Info("SynchronizedFolder | # Updating " + filePath);
+                Logger.Info("# Updating " + filePath);
                 activityListener.ActivityStarted();
                 string fileName = Path.GetFileName(filePath);
 
@@ -537,14 +543,14 @@ namespace CmisSync.Lib.Sync
                 // If not found, it means the document has been deleted, will be processed at the next sync cycle.
                 if (!found)
                 {
-                    Logger.Info("SynchronizedFolder |" + filePath + " not found on server, must be uploaded instead of updated");
+                    Logger.Info(filePath + " not found on server, must be uploaded instead of updated");
                     return;
                 }
 
                 UpdateFile(filePath, document);
 
                 // Update timestamp in database.
-                database.SetFileServerSideModificationDate(filePath, document.LastModificationDate);
+                database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
                 // Update checksum
                 database.RecalculateChecksum(filePath);
 
@@ -553,7 +559,7 @@ namespace CmisSync.Lib.Sync
                 activityListener.ActivityStopped();
 
                 this.syncing = false;
-                Logger.Info("SynchronizedFolder | # Updated " + filePath);
+                Logger.Info("# Updated " + filePath);
             }
 
             /**
@@ -562,7 +568,7 @@ namespace CmisSync.Lib.Sync
             private void RemoveFolderLocally(string folderPath)
             {
                 // Folder has been deleted on server, delete it locally too.
-                Logger.Info("SynchronizedFolder | Removing remotely deleted folder: " + folderPath);
+                Logger.Info("Removing remotely deleted folder: " + folderPath);
                 Directory.Delete(folderPath, true);
 
                 // Delete folder from database.
