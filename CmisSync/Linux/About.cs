@@ -63,7 +63,7 @@ namespace CmisSync {
             Controller.ShowWindowEvent += delegate {
                 Application.Invoke (delegate {
                         ShowAll ();
-                        KeepAbove = true;
+                        KeepAbove = true; // Present() appears not to raise the Window
                         Present ();
                         });
             };
