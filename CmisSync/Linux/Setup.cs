@@ -288,6 +288,8 @@ namespace CmisSync {
 
             AddButton (continue_button);
             AddButton (cancel_button);
+
+            address_entry.GrabFocus();
         }
 
         private void ShowAdd2Page()
@@ -534,9 +536,6 @@ namespace CmisSync {
                 Controller.SyncingCancelled ();
             };
 
-            AddButton (cancel_button);
-            AddButton (finish_button);
-
             Controller.UpdateProgressBarEvent += delegate (double percentage) {
                 Application.Invoke (delegate {
                         this.progress_bar.Fraction = percentage / 100;
@@ -551,6 +550,8 @@ namespace CmisSync {
             bar_wrapper.PackStart (this.progress_bar, false, false, 15);
 
             Add (bar_wrapper);
+            AddButton (cancel_button);
+            AddButton (finish_button);
 
         }
 
@@ -631,15 +632,6 @@ namespace CmisSync {
         private void ShowFinishedPage()
         {
             UrgencyHint = true;
-            //RM
-            /*
-               if (!HasToplevelFocus) {
-               string title   = "Your documents are ready!";
-               string subtext = "You can find them in your CmisSync folder.";
-
-               Program.UI.Bubbles.Controller.ShowBubble (title, subtext, null);
-               }
-               */
 
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Ready", CultureInfo.CurrentCulture);
             Description = CmisSync.Properties.Resources.ResourceManager.GetString("YouCanFind", CultureInfo.CurrentCulture);
@@ -658,35 +650,11 @@ namespace CmisSync {
                 Controller.FinishPageCompleted ();
             };
 
-            //RM
-            /*
-               if (warnings.Length > 0) {
-               Image warning_image = new Image (
-               UIHelpers.GetIcon ("dialog-information", 24)
-               );
-
-               Label warning_label = new Label (warnings [0]) {
-               Xalign = 0,
-               Wrap   = true
-               };
-
-               HBox warning_layout = new HBox (false, 0);
-               warning_layout.PackStart (warning_image, false, false, 15);
-               warning_layout.PackStart (warning_label, true, true, 0);
-
-               VBox warning_wrapper = new VBox (false, 0);
-               warning_wrapper.PackStart (warning_layout, false, false, 0);
-
-               Add (warning_wrapper);
-
-               } else {
-               Add (null);
-               }
-               */
-
+            Add(new Label(""));
             AddButton (open_folder_button);
             AddButton (finish_button);
 
+            System.Media.SystemSounds.Exclamation.Play();
         }
 
         private void ShowTutorialPage()
