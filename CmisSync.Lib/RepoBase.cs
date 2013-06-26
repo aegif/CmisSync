@@ -40,7 +40,7 @@ namespace CmisSync.Lib
 
     public abstract class RepoBase
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof(RepoBase));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RepoBase));
 
         public abstract void SyncInBackground();
         public abstract double Size { get; }
@@ -146,7 +146,7 @@ namespace CmisSync.Lib
         public void OnFileActivity(FileSystemEventArgs args)
         {
             ChangesDetected();
-            string relative_path = args.FullPath.Replace(LocalPath, "");
+            //string relative_path = args.FullPath.Replace(LocalPath, "");
 
             this.watcher.Disable();
             // TODO
