@@ -79,9 +79,8 @@ namespace TestLibraryRunner
             test(path == null ? "../../../TestLibrary/test-servers.json" : path);
             //testFuzzy();
 
-            // Let the console open.
-            Console.WriteLine("Press Enter to close...");
-            Console.ReadLine();
+            // Removed Console read - This should be handled by the caller. Otherwise
+            // tests cannot be run in an automated environment (Continuous Integration).
         }
     }
 }
