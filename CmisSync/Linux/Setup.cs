@@ -62,6 +62,11 @@ namespace CmisSync {
         private string backText =
             CmisSync.Properties.Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture);
 
+        delegate CmisServer GetRepositoriesFuzzyDelegate(string url, string user, string password);
+
+        delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
+            string address, string user, string password);
+
         private void ShowSetupPage()
         {
             Header = CmisSync.Properties.Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
@@ -257,9 +262,18 @@ namespace CmisSync {
                 // Show wait cursor
                 this.GdkWindow.Cursor = wait_cursor;
 
-                // Try to find the CMIS server
-                CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
-                   address_entry.Text, user_entry.Text, password_entry.Text);
+                // Try to find the CMIS server (asynchronous using a delegate)
+                GetRepositoriesFuzzyDelegate dlgt =
+                    new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
+                IAsyncResult ar = dlgt.BeginInvoke(address_entry.Text, user_entry.Text,
+                        password_entry.Text, null, null);
+                while (!ar.AsyncWaitHandle.WaitOne(100)) {
+                    while (Application.EventsPending()) {
+                        Application.RunIteration();
+                    }
+                }
+                CmisServer cmisServer = dlgt.EndInvoke(ar);
+
                 Controller.repositories = cmisServer.repositories;
                 address_entry.Text = cmisServer.url;
 
@@ -355,9 +369,17 @@ namespace CmisSync {
                     {
                         this.GdkWindow.Cursor = wait_cursor;
 
-                        // Get list of subfolders
-                        string[] subfolders = CmisUtils.GetSubfolders(Controller.saved_repository, Controller.saved_remote_path,
-                                Controller.saved_address, Controller.saved_user, Controller.saved_password);
+                        // Get list of subfolders asynchronously
+                        GetSubfoldersDelegate dlgt = new GetSubfoldersDelegate(CmisUtils.GetSubfolders);
+                        IAsyncResult ar = dlgt.BeginInvoke(Controller.saved_repository,
+                                Controller.saved_remote_path, Controller.saved_address,
+                                Controller.saved_user, Controller.saved_password, null, null);
+                        while (!ar.AsyncWaitHandle.WaitOne(100)) {
+                            while (Application.EventsPending()) {
+                                Application.RunIteration();
+                            }
+                        }
+                        string[] subfolders = dlgt.EndInvoke(ar);
 
                         TreePath tp = null;
                         // Create a sub-item for each subfolder

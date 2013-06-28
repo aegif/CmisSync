@@ -27,7 +27,7 @@ namespace CmisSync.Lib.Sync
             : base(repoInfo)
         {
             synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);
-            Logger.Info("CmisRepo | " + synchronizedFolder);
+            Logger.Info(synchronizedFolder);
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public void DoFirstSync()
         {
-            Logger.Info(String.Format("CmisRepo | First sync", this.Name));
+            Logger.Info(String.Format("First sync {0}", this.Name));
             if (synchronizedFolder != null)
                 synchronizedFolder.Sync();
         }

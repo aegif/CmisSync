@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if USE_MONO_SQLITE
+#if __MonoCS__
 using Mono.Data.Sqlite;
 #else
 using System.Data.SQLite;
@@ -14,7 +14,7 @@ using log4net;
 
 namespace CmisSync.Lib.Cmis
 {
-#if USE_MONO_SQLITE
+#if __MonoCS__
     // Mono's SQLite ADO implementation uses pure CamelCase (Sqlite vs. SQLite)
     // so we define some aliases here
     using SQLiteConnection = SqliteConnection;

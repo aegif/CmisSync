@@ -8,6 +8,7 @@ EXTRA_DIST =  \
 	Extensions.cs \
 	SetupController.cs \
 	StatusIconController.cs \
+	CertPolicyHandler.cs \
 	Properties
 
 install-data-hook:

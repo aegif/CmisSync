@@ -108,6 +108,7 @@ namespace CmisSync.Lib.Sync
                         IFolder remoteSubFolder = (IFolder)cmisObject;
                         if (Utils.WorthSyncing(remoteSubFolder.Name))
                         {
+                            Logger.Debug("crawlRemote dir: " + localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name);
                             remoteFolders.Add(remoteSubFolder.Name);
                             string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
 
@@ -148,7 +149,7 @@ namespace CmisSync.Lib.Sync
                                     }
                                     else
                                     {
-                                        // Create local folder.
+                                        // Create local folder.remoteDocument.Name
                                         Directory.CreateDirectory(localSubFolder);
 
                                         // Create database entry for this folder.
@@ -177,6 +178,7 @@ namespace CmisSync.Lib.Sync
                             // For instance in FileNet it is not usual to have a document where
                             // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
                             string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
+                            Logger.Debug("crawlRemote doc: " + localFolder + Path.DirectorySeparatorChar + remoteDocumentFileName);
 
                             // Check if file extension is allowed
 
@@ -199,7 +201,7 @@ namespace CmisSync.Lib.Sync
 
                                 if (lastDatabaseUpdate == null)
                                 {
-                                    Logger.Info("Downloading file absent from database: " + remoteDocumentFileName);
+                                    Logger.Info("Downloading file absent from database: " + filePath);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                                 else
@@ -242,15 +244,15 @@ namespace CmisSync.Lib.Sync
                                 if (database.ContainsFile(filePath))
                                 {
                                     // File has been recently removed locally, so remove it from server too.
+                                    Logger.Info("Removing locally deleted file on server: " + filePath);
                                     remoteDocument.DeleteAllVersions();
-
                                     // Remove it from database.
                                     database.RemoveFile(filePath);
                                 }
                                 else
                                 {
                                     // New remote file, download it.
-                                    Logger.Info("Downloading new file: " + remoteDocumentFileName);
+                                    Logger.Info("Downloading new file: " + filePath);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                             }

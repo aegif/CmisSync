@@ -156,8 +156,6 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(JSONLIBS,[[-r:\$\(top_srcdir\)/Extras/Newtonsoft.Json.dll]])
     AC_SUBST(DOTCMISLIBS,[[-r:\$\(top_srcdir\)/Extras/DotCMIS.dll]])
 
-    [BUILD_DEFINES="$BUILD_DEFINES -define:USE_MONO_SQLITE"]
-
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
 	GUISUBDIRS=CmisSync
     enable_gtkui=yes

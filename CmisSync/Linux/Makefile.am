@@ -15,6 +15,7 @@ SOURCES =  \
 	../Extensions.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
+	../CertPolicyHandler.cs \
 	About.cs \
 	Bubbles.cs \
 	Controller.cs \

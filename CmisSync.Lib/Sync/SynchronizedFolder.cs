@@ -177,7 +177,7 @@ namespace CmisSync.Lib.Sync
             {
                 if (this.syncing)
                 {
-                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
+                    //Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
                     return;
                 }
                 this.syncing = true;

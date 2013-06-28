@@ -129,7 +129,7 @@ namespace CmisSync.Lib
                 || filename[0] == '~' // Microsoft Office temporary files start with ~
                 || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
             {
-                //Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
+                Logger.Debug("Unworth syncing: " + filename);
                 return false;
             }
 
@@ -143,7 +143,11 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsInvalidFileName(string name)
         {
-            return invalidFileNameRegex.IsMatch(name);
+            bool ret = invalidFileNameRegex.IsMatch(name);
+            if (ret) {
+                Logger.Debug("Invalid filename: " + name);
+            }
+            return ret;
         }
 
 
@@ -159,7 +163,11 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsInvalidFolderName(string name)
         {
-            return invalidFolderNameRegex.IsMatch(name);
+            bool ret = invalidFolderNameRegex.IsMatch(name);
+            if (ret) {
+                Logger.Debug("Invalid dirname: " + name);
+            }
+            return ret;
         }
 
 

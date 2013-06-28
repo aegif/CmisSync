@@ -27,7 +27,6 @@ using System.Net;
 
 namespace CmisSync
 {
-
     // The CmisSync main class.
     public class Program
     {
@@ -39,84 +38,83 @@ namespace CmisSync
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
-
-
-
 #if !__MonoCS__
         [STAThread]
 #endif
-        public static void Main(string[] args)
-        {
-            bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
-
-            // Migrate config.xml from past versions, if necessary.
-            if ( ! firstRun )
-                ConfigMigration.Migrate();
-
-            // Clear log file.
-            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
-
-            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
-            Logger.Info("Starting.");
-
-            if (args.Length != 0 && !args[0].Equals("start") &&
-                Backend.Platform != PlatformID.MacOSX &&
-                Backend.Platform != PlatformID.Win32NT)
+            public static void Main(string[] args)
             {
+                bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
-                string n = Environment.NewLine;
+                ServicePointManager.CertificatePolicy = new CertPolicyHandler();
 
-                Console.WriteLine(n +
-                    "CmisSync is a collaboration and sharing tool that is" + n +
-                    "designed to keep things simple and to stay out of your way." + n +
-                    n +
-                    "Version: " + CmisSync.Lib.Backend.Version + n +
-                    "Copyright (C) 2010 Hylke Bons" + n +
-                    "This program comes with ABSOLUTELY NO WARRANTY." + n +
-                    n +
-                    "This is free software, and you are welcome to redistribute it" + n +
-                    "under certain conditions. Please read the GNU GPLv3 for details." + n +
-                    n +
-                    "Usage: CmisSync [start|stop|restart]");
-                Environment.Exit(-1);
-            }
+                // Migrate config.xml from past versions, if necessary.
+                if ( ! firstRun )
+                    ConfigMigration.Migrate();
 
-            // Only allow one instance of CmisSync (on Windows)
-            if (!program_mutex.WaitOne(0, false))
-            {
-                Logger.Error("CmisSync is already running.");
-                Environment.Exit(-1);
-            }
+                // Clear log file.
+                File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
 
-            // Increase the number of concurrent requests to each server,
-            // as an unsatisfying workaround until this DotCMIS bug 632 is solved.
-            // See https://github.com/nicolas-raoul/CmisSync/issues/140
-            ServicePointManager.DefaultConnectionLimit = 1000;
+                log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+                Logger.Info("Starting.");
 
-            //#if !DEBUG
-            try
-            {
-                //#endif
-                Controller = new Controller();
-                Controller.Initialize(firstRun);
+                if (args.Length != 0 && !args[0].Equals("start") &&
+                        Backend.Platform != PlatformID.MacOSX &&
+                        Backend.Platform != PlatformID.Win32NT)
+                {
 
-                UI = new UI();
-                UI.Run();
+                    string n = Environment.NewLine;
+
+                    Console.WriteLine(n +
+                            "CmisSync is a collaboration and sharing tool that is" + n +
+                            "designed to keep things simple and to stay out of your way." + n +
+                            n +
+                            "Version: " + CmisSync.Lib.Backend.Version + n +
+                            "Copyright (C) 2010 Hylke Bons" + n +
+                            "This program comes with ABSOLUTELY NO WARRANTY." + n +
+                            n +
+                            "This is free software, and you are welcome to redistribute it" + n +
+                            "under certain conditions. Please read the GNU GPLv3 for details." + n +
+                            n +
+                            "Usage: CmisSync [start|stop|restart]");
+                    Environment.Exit(-1);
+                }
+
+                // Only allow one instance of CmisSync (on Windows)
+                if (!program_mutex.WaitOne(0, false))
+                {
+                    Logger.Error("CmisSync is already running.");
+                    Environment.Exit(-1);
+                }
+
+                // Increase the number of concurrent requests to each server,
+                // as an unsatisfying workaround until this DotCMIS bug 632 is solved.
+                // See https://github.com/nicolas-raoul/CmisSync/issues/140
+                ServicePointManager.DefaultConnectionLimit = 1000;
 
                 //#if !DEBUG
-            }
-            catch (Exception e)
-            {
-                Logger.Fatal("Exception in Program.Main", e);
-                Environment.Exit(-1);
-            }
-            //#endif
+                try
+                {
+                    //#endif
+                    Controller = new Controller();
+                    Controller.Initialize(firstRun);
+
+                    UI = new UI();
+                    UI.Run();
+
+                    //#if !DEBUG
+                }
+                catch (Exception e)
+                {
+                    Logger.Fatal("Exception in Program.Main", e);
+                    Environment.Exit(-1);
+                }
+                //#endif
 
 #if !__MonoCS__
-            // Suppress assertion messages in debug mode
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            GC.WaitForPendingFinalizers();
+                // Suppress assertion messages in debug mode
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                GC.WaitForPendingFinalizers();
 #endif
-        }
+            }
     }
 }
