@@ -101,13 +101,13 @@ namespace CmisSync
 
                         if (syncitem.Tag == "pause")
                         {
-                            syncitem.Text = CmisSync.Properties.Resources.ResourceManager.GetString("ResumeSync", CultureInfo.CurrentCulture);
+                            syncitem.Text = CmisSync.Properties_Resources.ResourceManager.GetString("ResumeSync", CultureInfo.CurrentCulture);
                             syncitem.Tag = "resume";
                             syncitem.Image = UIHelpers.GetBitmap("media_playback_start");
                         }
                         else
                         {
-                            syncitem.Text = CmisSync.Properties.Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture);
+                            syncitem.Text = CmisSync.Properties_Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture);
                             syncitem.Tag = "pause";
                             syncitem.Image = UIHelpers.GetBitmap("media_playback_pause");
                         }
@@ -156,21 +156,21 @@ namespace CmisSync
 
                     ToolStripMenuItem open_localfolder_item = new ToolStripMenuItem()
                     {
-                        Text = CmisSync.Properties.Resources.ResourceManager.GetString("OpenLocalFolder", CultureInfo.CurrentCulture),
+                        Text = CmisSync.Properties_Resources.ResourceManager.GetString("OpenLocalFolder", CultureInfo.CurrentCulture),
                         Image = UIHelpers.GetBitmap("folder")
                     };
                     open_localfolder_item.Click += OpenFolderDelegate(folder_name);
 
                     ToolStripMenuItem open_remotefolder_item = new ToolStripMenuItem()
                     {
-                        Text = CmisSync.Properties.Resources.ResourceManager.GetString("BrowseRemoteFolder", CultureInfo.CurrentCulture),
+                        Text = CmisSync.Properties_Resources.ResourceManager.GetString("BrowseRemoteFolder", CultureInfo.CurrentCulture),
                         Image = UIHelpers.GetBitmap("classic_folder_web")
                     };
                     open_remotefolder_item.Click += OpenRemoteFolderDelegate(folder_name);
 
                     ToolStripMenuItem suspend_folder_item = new ToolStripMenuItem()
                     {
-                        Text = CmisSync.Properties.Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture),
+                        Text = CmisSync.Properties_Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture),
                         Tag="pause",
                         Image = UIHelpers.GetBitmap("media_playback_pause")
                     };
@@ -188,7 +188,7 @@ namespace CmisSync
             // Add Menu
             ToolStripMenuItem add_item = new ToolStripMenuItem()
             {
-                Text = CmisSync.Properties.Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture)
+                Text = CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture)
             };
 
             add_item.Click += delegate
@@ -201,7 +201,7 @@ namespace CmisSync
             // Log Menu
             ToolStripMenuItem log_item = new ToolStripMenuItem()
             {
-                Text = "View Log"
+                Text = CmisSync.Properties_Resources.ResourceManager.GetString("ViewLog", CultureInfo.CurrentCulture)
             };
             log_item.Click += delegate
             {
@@ -212,7 +212,7 @@ namespace CmisSync
             // About Menu
             ToolStripMenuItem about_item = new ToolStripMenuItem()
             {
-                Text = "About CmisSync"
+                Text = CmisSync.Properties_Resources.ResourceManager.GetString("About", CultureInfo.CurrentCulture)
             };
             about_item.Click += delegate
             {
@@ -223,7 +223,7 @@ namespace CmisSync
             // Exit Menu
             this.exit_item = new ToolStripMenuItem()
             {
-                Text = CmisSync.Properties.Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)
+                Text = CmisSync.Properties_Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)
             };
 
             this.exit_item.Click += delegate
