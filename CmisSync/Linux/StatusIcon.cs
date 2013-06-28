@@ -138,19 +138,19 @@ namespace CmisSync {
                     };
 
                     ImageMenuItem open_localfolder_item = new CmisSyncMenuItem(
-                            CmisSync.Properties.Resources.ResourceManager.GetString("OpenLocalFolder", CultureInfo.CurrentCulture)) {
+                            CmisSync.Properties_Resources.ResourceManager.GetString("OpenLocalFolder", CultureInfo.CurrentCulture)) {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
                     };
                     open_localfolder_item.Activated += OpenFolderDelegate(folder_name);
 
                     ImageMenuItem browse_remotefolder_item = new CmisSyncMenuItem(
-                            CmisSync.Properties.Resources.ResourceManager.GetString("BrowseRemoteFolder", CultureInfo.CurrentCulture)) {
+                            CmisSync.Properties_Resources.ResourceManager.GetString("BrowseRemoteFolder", CultureInfo.CurrentCulture)) {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
                     };
                     browse_remotefolder_item.Activated += OpenRemoteFolderDelegate(folder_name);
 
                     ImageMenuItem suspend_folder_item = new CmisSyncMenuItem(
-                            CmisSync.Properties.Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture)) {
+                            CmisSync.Properties_Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture)) {
                         Image = new Image (UIHelpers.GetIcon ("media_playback_pause", 16))
                     };
                     suspend_folder_item.Activated += SuspendSyncFolderDelegate(folder_name);
@@ -167,7 +167,7 @@ namespace CmisSync {
 
             // Add Menu
             MenuItem add_item = new MenuItem (
-                    CmisSync.Properties.Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture));
+                    CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture));
             add_item.Activated += delegate {
                 Controller.AddHostedProjectClicked ();
             };
@@ -191,7 +191,7 @@ namespace CmisSync {
             this.menu.Add (about_item);
 
             this.quit_item = new MenuItem (
-                    CmisSync.Properties.Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)) {
+                    CmisSync.Properties_Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)) {
                 Sensitive = Controller.QuitItemEnabled
             };
 
