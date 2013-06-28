@@ -272,4 +272,10 @@ the resulting XML to cmissync@aegif.jp</value>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>Open local folder</value>
   </data>
+  <data name="About" xml:space="preserve">
+    <value>About CmisSync</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>View Log</value>
+  </data>
 </root>
