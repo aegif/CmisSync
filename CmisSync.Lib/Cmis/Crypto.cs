@@ -121,10 +121,10 @@ namespace CmisSync.Lib.Cmis
             try
             {
                 AesManaged myAes = new AesManaged();
-                myAes.Mode = CipherMode.CBC;
+                myAes.Mode = CipherMode.CFB;
                 myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                 myAes.Key = GetCryptoKeyUnix();  // Byte array representing the key. Key MUST be 256 bits
-                myAes.Padding = PaddingMode.PKCS7;
+                myAes.Padding = PaddingMode.None;
 
                 ICryptoTransform encryptor = myAes.CreateEncryptor();
 
@@ -151,10 +151,10 @@ namespace CmisSync.Lib.Cmis
             try
             {
                 AesManaged myAes = new AesManaged();
-                myAes.Mode = CipherMode.CBC;
+                myAes.Mode = CipherMode.CFB;
                 myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                 myAes.Key = GetCryptoKeyUnix();  // Byte array representing the key. Key MUST be 256 bits
-                myAes.Padding = PaddingMode.PKCS7;
+                myAes.Padding = PaddingMode.None;
 
                 ICryptoTransform decryptor = myAes.CreateDecryptor();
 
