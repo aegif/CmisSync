@@ -28,7 +28,7 @@ using log4net.Config;
 #if __MonoCS__
 using Gtk;
 #else
-using System.Windows.Forms;
+using System.Windows;
 #endif
 
 namespace CmisSync
@@ -97,23 +97,21 @@ namespace CmisSync
                     ev.Set();
             });
 #else
-            Dispatcher.BeginInvoke((Action)delegate {
                     var r = MessageBox.Show(msg +
                         "\n\nDo you trust this certificate?\n(Yes == Always, Cancel = Just Now)",
-                        "Untrusted Certificate", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                        "Untrusted Certificate", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
                     switch (r) {
-                        case DialogResult.Yes:
+                        case MessageBoxResult.Yes:
                             ret = UserResponse.CertAcceptAlways;
                             break;
-                        case DialogResult.No:
+                        case MessageBoxResult.No:
                             ret = UserResponse.CertDeny;
                             break;
-                        case DialogResult.No:
+                        case MessageBoxResult.Cancel:
                             ret = UserResponse.CertAcceptSession;
                             break;
                     }
                     ev.Set();
-            });
 #endif
             ev.WaitOne();
             Logger.Debug("Cert Dialog return:" + ret);

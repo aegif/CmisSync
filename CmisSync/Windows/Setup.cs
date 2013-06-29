@@ -376,7 +376,7 @@ namespace CmisSync
                                     IAsyncResult ar = dlgt.BeginInvoke(address_box.Text, user_box.Text,
                                         password_box.Password, null, null);
                                     while (!ar.AsyncWaitHandle.WaitOne(100)) {
-                                        Application.DoEvents();
+                                        System.Windows.Forms.Application.DoEvents();
                                     }
                                     CmisServer cmisServer = dlgt.EndInvoke(ar);
 
@@ -454,7 +454,7 @@ namespace CmisSync
                                             Controller.saved_remote_path, Controller.saved_address,
                                             Controller.saved_user, Controller.saved_password, null, null);
                                         while (!ar.AsyncWaitHandle.WaitOne(100)) {
-                                            Application.DoEvents();
+                                            System.Windows.Forms.Application.DoEvents();
                                         }
                                         string[] subfolders = dlgt.EndInvoke(ar);
                                         
