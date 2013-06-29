@@ -154,7 +154,11 @@ namespace CmisSync.Lib.Sync
 
                                         // Create database entry for this folder.
                                         // TODO - Yannick - Add metadata
-                                        database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+                                        DateTime? serversideModificationDate = remoteFolder.LastModificationDate;
+                                        if (null != serversideModificationDate) {
+                                            serversideModificationDate = ((DateTime)serversideModificationDate).ToUniversalTime();
+                                        }
+                                        database.AddFolder(localSubFolder, serversideModificationDate);
 
                                         // Recursive copy of the whole folder.
                                         RecursiveFolderCopy(remoteSubFolder, localSubFolder);
@@ -252,7 +256,7 @@ namespace CmisSync.Lib.Sync
                                 else
                                 {
                                     // New remote file, download it.
-                                    Logger.Info("Downloading new file: " + filePath);
+                                    Logger.Info("New remote file: " + filePath);
                                     DownloadFile(remoteDocument, localFolder);
                                 }
                             }
