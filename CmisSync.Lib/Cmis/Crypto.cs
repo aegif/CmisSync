@@ -190,17 +190,6 @@ namespace CmisSync.Lib.Cmis
             return System.Text.Encoding.UTF8.GetBytes(
                 "Thou art so farth away, I miss you my dear files❥, with CmisSync be forever by my side!");
         }
-
-#if __MonoCS__
-        /// <summary>
-        /// Salt for the obfuscation. MUST be 256 bits.
-        /// </summary>
-        public static byte[] GetCryptoKeyUnix()
-        {
-            return System.Text.Encoding.UTF8.GetBytes("Thou art so farth away, I miss y");
-        }
-#endif
-
     }
 
 }
