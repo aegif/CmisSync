@@ -385,7 +385,8 @@ namespace CmisSync {
                         // Create a sub-item for each subfolder
                         foreach (string subfolder in subfolders) {
                             TreeIter newchild = repoStore.AppendNode(iter);
-                            repoStore.SetValues(newchild, subfolder, new SelectionTreeItem(null, subfolder));
+                            repoStore.SetValues(newchild, System.IO.Path.GetFileName(subfolder),
+                                    new SelectionTreeItem(null, subfolder));
                             if (null == tp) {
                                 tp = repoStore.GetPath(newchild);
                             }
