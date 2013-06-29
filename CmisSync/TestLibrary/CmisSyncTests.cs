@@ -130,7 +130,18 @@ namespace TestLibrary
             Assert.AreEqual(4, 2 + 2);
         }
 
-        [Test, TestCaseSource("TestServers")]
+        [Test]
+        public void TestCrypto()
+        {
+            String[] test_pws = { "", "test", "Whatever", "Something to try" };
+            foreach (String pass in test_pws) {
+                String crypted = Crypto.Obfuscate(pass);
+                Assert.AreEqual(Crypto.Deobfuscate(crypted), pass);
+            }
+        }
+
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -138,7 +149,8 @@ namespace TestLibrary
             Assert.NotNull(repos);
         }
 
-        [Test, TestCaseSource("TestServers")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void Sync(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -164,7 +176,8 @@ namespace TestLibrary
             synchronizedFolder.Sync();
         }
 
-        [Test, TestCaseSource("TestServers")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -205,7 +218,8 @@ namespace TestLibrary
             Clean(localDirectory, synchronizedFolder);
         }
 
-        [Test, TestCaseSource("TestServers")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -246,7 +260,8 @@ namespace TestLibrary
             Clean(localDirectory, synchronizedFolder);
         }
 
-        [Test, TestCaseSource("TestServers")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -285,7 +300,8 @@ namespace TestLibrary
         }
 
         // Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
-        [Test, TestCaseSource("TestServers")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void SyncWhileModifyingFile(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -372,7 +388,8 @@ namespace TestLibrary
         }
 
         // Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
-        [Test, TestCaseSource("TestServers")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void SyncWhileModifyingFolders(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -457,7 +474,8 @@ namespace TestLibrary
 
         // Write a file and immediately check whether it has been created.
         // Should help see whether CMIS servers are synchronous or not.
-        [Test, TestCaseSource("TestServers")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void WriteThenRead(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -506,7 +524,8 @@ namespace TestLibrary
             doc.DeleteAllVersions();
         }
 
-        [Test, TestCaseSource("TestServers")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void DotCmisToIBMConnections(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -542,7 +561,8 @@ namespace TestLibrary
             }
         }
 
-        [Test, TestCaseSource("TestServersFuzzy")]
+        // [Test, TestCaseSource("TestServers")]
+        [Test]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
             CmisServer server = CmisUtils.GetRepositoriesFuzzy(url, user, password);
