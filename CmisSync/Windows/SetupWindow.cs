@@ -24,6 +24,7 @@ using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Shell;
+using System.Globalization;
 
 namespace CmisSync {
 
@@ -42,7 +43,7 @@ namespace CmisSync {
 
         public SetupWindow ()
         {
-            Title      = "CmisSync Setup";
+            Title      = CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture);
             Width      = 640;
             Height     = 440;
             ResizeMode = ResizeMode.NoResize;

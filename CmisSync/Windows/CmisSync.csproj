@@ -93,7 +93,7 @@
     <Compile Include="..\Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>..\Properties\Properties.Resources.resx</DependentUpon>
+      <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
