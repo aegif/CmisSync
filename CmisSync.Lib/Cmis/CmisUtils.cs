@@ -56,6 +56,7 @@ namespace CmisSync.Lib.Cmis
             string[] suffixes = {
                 "/alfresco/cmisatom",
                 "/alfresco/service/cmis",
+                "/cmis/atom",
                 "/cmis/resources/",
                 "/emc-cmis-ea/resources/",
                 "/xcmis/rest/cmisatom",
