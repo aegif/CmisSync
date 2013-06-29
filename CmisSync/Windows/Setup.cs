@@ -63,6 +63,11 @@ namespace CmisSync
 
         public SetupController Controller = new SetupController();
 
+        delegate CmisServer GetRepositoriesFuzzyDelegate(string url, string user, string password);
+
+        delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
+            string address, string user, string password);
+
         public Setup()
         {
             Logger.Info("Entering constructor.");
@@ -365,9 +370,16 @@ namespace CmisSync
                                     // Show wait cursor
                                     System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
-                                    // Try to find the CMIS server
-                                    CmisServer cmisServer = CmisUtils.GetRepositoriesFuzzy(
-                                        address_box.Text, user_box.Text, password_box.Password);
+                                    // Try to find the CMIS server (asynchronously)
+                                    GetRepositoriesFuzzyDelegate dlgt =
+                                        new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
+                                    IAsyncResult ar = dlgt.BeginInvoke(address_box.Text, user_box.Text,
+                                        password_box.Password, null, null);
+                                    while (!ar.AsyncWaitHandle.WaitOne(100)) {
+                                        Application.DoEvents();
+                                    }
+                                    CmisServer cmisServer = dlgt.EndInvoke(ar);
+
                                     Controller.repositories = cmisServer.repositories;
                                     address_box.Text = cmisServer.url;
 
@@ -436,10 +448,16 @@ namespace CmisSync
                                     {
                                         System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
-                                        // Get list of subfolders
-                                        string[] subfolders = CmisUtils.GetSubfolders(Controller.saved_repository, Controller.saved_remote_path,
-                                            Controller.saved_address, Controller.saved_user, Controller.saved_password);
-
+                                        // Get list of subfolders (asynchronously)
+                                        GetSubfoldersDelegate dlgt = new GetSubfoldersDelegate(CmisUtils.GetSubfolders);
+                                        IAsyncResult ar = dlgt.BeginInvoke(Controller.saved_repository,
+                                            Controller.saved_remote_path, Controller.saved_address,
+                                            Controller.saved_user, Controller.saved_password, null, null);
+                                        while (!ar.AsyncWaitHandle.WaitOne(100)) {
+                                            Application.DoEvents();
+                                        }
+                                        string[] subfolders = dlgt.EndInvoke(ar);
+                                        
                                         // Create a sub-item for each subfolder
                                         foreach (string subfolder in subfolders)
                                         {

@@ -27,6 +27,8 @@ using log4net.Config;
 
 #if __MonoCS__
 using Gtk;
+#else
+using System.Windows.Forms;
 #endif
 
 namespace CmisSync
@@ -79,11 +81,12 @@ namespace CmisSync
         public UserResponse ShowCertDialog(String msg) {
             Logger.Debug("Showing Cert Dialog: " + msg);
             UserResponse ret = UserResponse.None;
-#if __MonoCS__
             ManualResetEvent ev = new ManualResetEvent(false);
+#if __MonoCS__
             Application.Invoke(delegate {
                     MessageDialog md = new MessageDialog (null, DialogFlags.Modal,
-                        MessageType.Warning, ButtonsType.None, msg) {
+                        MessageType.Warning, ButtonsType.None, msg +
+                        "\n\nDo you trust this certificate?") {
                         Title = "Untrusted Certificate"
                     };
                     md.AddButton("No", (int)UserResponse.CertDeny);
@@ -93,10 +96,26 @@ namespace CmisSync
                     md.Destroy();
                     ev.Set();
             });
-            ev.WaitOne();
 #else
-            this.Response = UserResponse.CertAcceptSession;
+            Dispatcher.BeginInvoke((Action)delegate {
+                    var r = MessageBox.Show(msg +
+                        "\n\nDo you trust this certificate?\n(Yes == Always, Cancel = Just Now)",
+                        "Untrusted Certificate", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                    switch (r) {
+                        case DialogResult.Yes:
+                            ret = UserResponse.CertAcceptAlways;
+                            break;
+                        case DialogResult.No:
+                            ret = UserResponse.CertDeny;
+                            break;
+                        case DialogResult.No:
+                            ret = UserResponse.CertAcceptSession;
+                            break;
+                    }
+                    ev.Set();
+            });
 #endif
+            ev.WaitOne();
             Logger.Debug("Cert Dialog return:" + ret);
             return ret;
         }
@@ -118,8 +137,7 @@ namespace CmisSync
             }
 
             string msg = GetCertificateHR(certificate) +
-                GetProblemMessage((CertificateProblem)error) +
-                "\n\nDo you trust this certificate?";
+                GetProblemMessage((CertificateProblem)error);
 
             switch (ShowCertDialog(msg)) {
                 case UserResponse.CertDeny:
