@@ -120,11 +120,11 @@ namespace CmisSync.Lib.Cmis
 #if __MonoCS__
             try
             {
+                PasswordDeriveBytes pdb = new PasswordDeriveBytes(GetCryptoKey(),
+                        new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
                 AesManaged myAes = new AesManaged();
-                myAes.Mode = CipherMode.CFB;
-                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                myAes.Key = GetCryptoKeyUnix();  // Byte array representing the key. Key MUST be 256 bits
-                myAes.Padding = PaddingMode.None;
+                myAes.Key = pdb.GetBytes(myAes.KeySize / 8);
+                myAes.IV = pdb.GetBytes(myAes.BlockSize / 8);
 
                 ICryptoTransform encryptor = myAes.CreateEncryptor();
 
@@ -150,11 +150,11 @@ namespace CmisSync.Lib.Cmis
 #if __MonoCS__
             try
             {
+                PasswordDeriveBytes pdb = new PasswordDeriveBytes(GetCryptoKey(),
+                        new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
                 AesManaged myAes = new AesManaged();
-                myAes.Mode = CipherMode.CFB;
-                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                myAes.Key = GetCryptoKeyUnix();  // Byte array representing the key. Key MUST be 256 bits
-                myAes.Padding = PaddingMode.None;
+                myAes.Key = pdb.GetBytes(myAes.KeySize / 8);
+                myAes.IV = pdb.GetBytes(myAes.BlockSize / 8);
 
                 ICryptoTransform decryptor = myAes.CreateDecryptor();
 
