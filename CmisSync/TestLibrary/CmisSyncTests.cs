@@ -53,6 +53,8 @@ namespace TestLibrary
         public CmisSyncTests()
         {
             // Config.DefaultConfig = new Config(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
+            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
         public static IEnumerable<object[]> TestServers
