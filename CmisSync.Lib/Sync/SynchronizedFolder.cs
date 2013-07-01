@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -91,10 +91,10 @@ namespace CmisSync.Lib.Sync
              * Constructor for Repo (at every launch of CmisSync)
              */
             public SynchronizedFolder(RepoInfo repoInfo,
-                ActivityListener activityListener, CmisRepo repo)
+                ActivityListener listener, CmisRepo repoCmis)
             {
-                this.repo = repo;
-                this.activityListener = activityListener;
+                this.repo = repoCmis;
+                this.activityListener = listener;
                 this.repoinfo = repoInfo;
 
                 // Database is the user's AppData/Roaming

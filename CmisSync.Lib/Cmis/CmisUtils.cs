@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,12 +13,12 @@ namespace CmisSync.Lib.Cmis
 {
     public class CmisServer
     {
-        public string url;
-        public Dictionary<string, string> repositories;
+        public string Url { get; private set; }
+        public Dictionary<string, string> Repositories { get; private set; }
         public CmisServer(string url, Dictionary<string, string> repositories)
         {
-            this.url = url;
-            this.repositories = repositories;
+            Url = url;
+            Repositories = repositories;
         }
     }
 

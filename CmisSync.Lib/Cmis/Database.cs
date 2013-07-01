@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -197,8 +197,7 @@ namespace CmisSync.Lib.Cmis
                 return;
             }
 
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -232,8 +231,7 @@ namespace CmisSync.Lib.Cmis
             }
 
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -256,8 +254,7 @@ namespace CmisSync.Lib.Cmis
         public void RemoveFile(string path)
         {
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -333,8 +330,7 @@ namespace CmisSync.Lib.Cmis
         public DateTime? GetServerSideModificationDate(string path)
         {
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -371,8 +367,7 @@ namespace CmisSync.Lib.Cmis
             }
 
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -397,8 +392,7 @@ namespace CmisSync.Lib.Cmis
         {
             string checksum = Checksum(path);
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -422,8 +416,7 @@ namespace CmisSync.Lib.Cmis
         public bool ContainsFile(string path)
         {
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
                     "SELECT serverSideModificationDate FROM files WHERE path=@path";
@@ -437,8 +430,7 @@ namespace CmisSync.Lib.Cmis
         public bool ContainsFolder(string path)
         {
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
                     "SELECT serverSideModificationDate FROM folders WHERE path=@path";
@@ -469,8 +461,7 @@ namespace CmisSync.Lib.Cmis
 
             // Read previous checksum from database.
             string previousChecksum = null;
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
                     "SELECT checksum FROM files WHERE path=@path";
@@ -486,8 +477,7 @@ namespace CmisSync.Lib.Cmis
 
         public string GetChangeLogToken()
         {
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
                     "SELECT value FROM general WHERE key=\"ChangeLogToken\"";
@@ -498,8 +488,7 @@ namespace CmisSync.Lib.Cmis
 
         public void SetChangeLogToken(string token)
         {
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 command.CommandText =
                     "INSERT OR REPLACE INTO general (key, value) VALUES (\"ChangeLogToken\", @token)";

@@ -380,8 +380,8 @@ namespace CmisSync
                                     }
                                     CmisServer cmisServer = dlgt.EndInvoke(ar);
 
-                                    Controller.repositories = cmisServer.repositories;
-                                    address_box.Text = cmisServer.url;
+                                    Controller.repositories = cmisServer.Repositories;
+                                    address_box.Text = cmisServer.Url;
 
                                     // Hide wait cursor
                                     System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;

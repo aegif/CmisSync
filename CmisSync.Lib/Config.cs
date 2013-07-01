@@ -26,12 +26,11 @@ namespace CmisSync.Lib
     public class Config
     {
         private XmlDocument configXml = new XmlDocument();
-        public string FullPath;
-        public string TmpPath;
-        // public string LogFilePath;
-        private string configpath;
+        public string FullPath { get; private set; }
+        //public string TmpPath;
+        //public string LogFilePath;
 
-        public string ConfigPath { get { return configpath; } }
+        public string ConfigPath { get; private set; }
 
         public string HomePath
         {
@@ -71,10 +70,10 @@ namespace CmisSync.Lib
             }
         }
 
-        public Config(string FullPath)
+        public Config(string fullPath)
         {
-            this.FullPath = FullPath;
-            configpath = Path.GetDirectoryName(FullPath);
+            FullPath = fullPath;
+            ConfigPath = Path.GetDirectoryName(FullPath);
             Console.WriteLine("FullPath:" + FullPath);
 
             //if (File.Exists(LogFilePath))
@@ -90,8 +89,8 @@ namespace CmisSync.Lib
             //    }
             //}
 
-            if (!Directory.Exists(configpath))
-                Directory.CreateDirectory(configpath);
+            if (!Directory.Exists(ConfigPath))
+                Directory.CreateDirectory(ConfigPath);
 
             if (!File.Exists(FullPath))
                 CreateInitialConfig();
@@ -440,7 +439,7 @@ namespace CmisSync.Lib
 
         public string GetLogFilePath()
         {
-            return Path.Combine(configpath, "debug_log.txt");
+            return Path.Combine(ConfigPath, "debug_log.txt");
         }
     }
 }
