@@ -215,7 +215,7 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Error(e.Message);
-                    throw e;
+                    throw;
                 }
             }
             Logger.Debug("Adding data in db for: " + path + " finished");
@@ -245,7 +245,7 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Error(e.Message);
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -266,7 +266,7 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Error(e.Message);
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -277,8 +277,7 @@ namespace CmisSync.Lib.Cmis
             path = Normalize(path);
 
             // Remove folder itself
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -289,12 +288,12 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Error(e.Message);
-                    throw e;
+                    throw;
                 }
             }
 
             // Remove all folders under this folder
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -305,12 +304,12 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Error(e.Message);
-                    throw e;
+                    throw;
                 }
             }
 
             // Remove all files under this folder
-            using (var command = new SQLiteCommand(connection))
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
                 try
                 {
@@ -321,7 +320,7 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Error(e.Message);
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -382,7 +381,7 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Error(e.Message);
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -407,7 +406,7 @@ namespace CmisSync.Lib.Cmis
                 catch (SQLiteException e)
                 {
                     Logger.Error(e.Message);
-                    throw e;
+                    throw;
                 }
             }
         }

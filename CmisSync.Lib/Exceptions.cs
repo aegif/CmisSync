@@ -16,23 +16,41 @@
 
 
 using System;
+using System.Runtime.Serialization;
+
 
 namespace CmisSync.Lib
 {
 
-    public class QuotaExceededException : Exception {
+    [Serializable]
+    public class QuotaExceededException : Exception
+    {
 
         public readonly int QuotaLimit = -1;
 
 
-        public QuotaExceededException ()
+        public QuotaExceededException()
         {
         }
 
 
-        public QuotaExceededException (string message, int quota_limit) : base (message)
+        public QuotaExceededException(string message, int quota_limit)
+            : base(message)
         {
             QuotaLimit = quota_limit;
         }
+
+
+        public QuotaExceededException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+
+
+        public QuotaExceededException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
     }
 }
