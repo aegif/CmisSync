@@ -28,6 +28,9 @@ using log4net;
 namespace CmisSync
 {
 
+    /// <summary>
+    /// Kind of pages that are used in the first-run and folder addition wizards.
+    /// </summary>
     public enum PageType
     {
         None,
@@ -40,6 +43,9 @@ namespace CmisSync
         Tutorial
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum FieldState
     {
         Enabled,
@@ -164,8 +170,7 @@ namespace CmisSync
                 {
                     if (WindowIsOpen)
                     {
-                        if (this.current_page == PageType.Error ||
-                            this.current_page == PageType.Finished ||
+                        if (this.current_page == PageType.Finished ||
                             this.current_page == PageType.None)
                         {
 
@@ -356,7 +361,6 @@ namespace CmisSync
             ChangePageEvent(PageType.Syncing, null);
 
             Program.Controller.FolderFetched += AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError += AddPageFetchErrorDelegate;
             Program.Controller.FolderFetching += SyncingPageFetchingDelegate;
 
             try
@@ -390,19 +394,6 @@ namespace CmisSync
             ChangePageEvent(PageType.Finished, warnings);
 
             Program.Controller.FolderFetched -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching -= SyncingPageFetchingDelegate;
-        }
-
-        private void AddPageFetchErrorDelegate(string remote_url, string[] errors)
-        {
-            SyncingReponame = "";
-            PreviousUrl = remote_url;
-
-            ChangePageEvent(PageType.Error, errors);
-
-            Program.Controller.FolderFetched -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
             Program.Controller.FolderFetching -= SyncingPageFetchingDelegate;
         }
 

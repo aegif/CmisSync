@@ -42,7 +42,7 @@ using log4net;
 namespace CmisSync
 {
     /// <summary>
-    /// Dialog for the first-time wizard and to create a new CmisSync synchronized folder.
+    /// Dialog for the two wizards: Wizard at first run, and wizard to create a new CmisSync synchronized folder.
     /// </summary>
     public class Setup : SetupWindow
     {
