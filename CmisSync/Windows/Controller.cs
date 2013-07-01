@@ -175,6 +175,10 @@ namespace CmisSync
             base.Quit();
         }
 
+        /// <summary>
+        /// Open the log file so that the user can check what is going on, and send it to developers.
+        /// </summary>
+        /// <param name="path">Path to the log file</param>
         public void ShowLog(string path)
         {
             Process.Start("notepad.exe", path);

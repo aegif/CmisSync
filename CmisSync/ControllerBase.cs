@@ -153,9 +153,24 @@ namespace CmisSync
         public abstract bool CreateCmisSyncFolder();
 
 
+        /// <summary>
+        /// Keeps track of whether a download or upload is going on, for display of the task bar animation.
+        /// </summary>
         private ActivityListener activityListenerAggregator;
+
+        /// <summary>
+        /// Component to create new CmisSync synchronized folders.
+        /// </summary>
         private Fetcher fetcher;
+
+        /// <summary>
+        /// Watches the local filesystem for modifications.
+        /// </summary>
         private FileSystemWatcher watcher;
+
+        /// <summary>
+        /// Concurrency locks.
+        /// </summary>
         private Object repo_lock = new Object();
         private Object check_repos_lock = new Object();
 
@@ -203,6 +218,9 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Once the UI has loaded, show setup window if it is the first run, or check the repositories.
+        /// </summary>
         public void UIHasLoaded()
         {
             if (firstRun)
@@ -223,10 +241,14 @@ namespace CmisSync
         }
 
 
-        private void AddRepository(string folder_path)
+        /// <summary>
+        /// Initialize an existing CmisSync synchronized folder.
+        /// </summary>
+        /// <param name="folderPath">Synchronized folder path</param>
+        private void AddRepository(string folderPath)
         {
             RepoBase repo = null;
-            string folder_name = Path.GetFileName(folder_path);
+            string folder_name = Path.GetFileName(folderPath);
 
             RepoInfo repositoryInfo = ConfigManager.CurrentConfig.GetRepoInfo(folder_name);
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
@@ -260,6 +282,12 @@ namespace CmisSync
         }
 
 
+        
+        /// <summary>
+        /// Remove a synchronized folder from the CmisSync configuration.
+        /// This happens after the user removes the folder.
+        /// </summary>
+        /// <param name="folder_path">The synchronized folder to remove</param>
         private void RemoveRepository(string folder_path)
         {
             if (this.repositories.Count > 0)
@@ -285,6 +313,22 @@ namespace CmisSync
             RemoveDatabase(folder_path);
         }
 
+
+        /// <summary>
+        /// Remove the local database associated with a CmisSync synchronized folder.
+        /// </summary>
+        /// <param name="folder_path">The synchronized folder whose database is to be removed</param>
+        private void RemoveDatabase(string folder_path)
+        {
+            string databasefile = Path.Combine(ConfigManager.CurrentConfig.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
+            if (File.Exists(databasefile)) File.Delete(databasefile);
+        }
+
+
+        /// <summary>
+        /// Pause or un-pause synchronization for a particular folder.
+        /// </summary>
+        /// <param name="repoName">the folder to pause/unpause</param>
         public void StartOrSuspendRepository(string repoName)
         {
             foreach (RepoBase aRepo in this.repositories)
@@ -298,12 +342,11 @@ namespace CmisSync
             }
         }
 
-        private void RemoveDatabase(string folder_path)
-        {
-            string databasefile = Path.Combine(ConfigManager.CurrentConfig.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
-            if (File.Exists(databasefile)) File.Delete(databasefile);
-        }
 
+        /// <summary>
+        /// Check the configured CmisSync synchronized folders.
+        /// Remove the ones whose folders have been deleted.
+        /// </summary>
         private void CheckRepositories()
         {
             lock (this.check_repos_lock)
@@ -317,6 +360,7 @@ namespace CmisSync
                     if (folder_name.Equals(".tmp"))
                         continue;
 
+                    // Folder has been renamed.
                     if (ConfigManager.CurrentConfig.GetIdentifierForFolder(folder_name) == null)
                     {
                         string identifier_file_path = Path.Combine(folder_path, ".CmisSync");
@@ -339,6 +383,7 @@ namespace CmisSync
                     }
                 }
 
+                // Folder has been deleted, so remove it from configuration too.
                 foreach (string folder_name in ConfigManager.CurrentConfig.Folders)
                 {
                     string folder_path = new Folder(folder_name).FullPath;
