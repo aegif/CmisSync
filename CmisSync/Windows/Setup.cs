@@ -854,7 +854,8 @@ namespace CmisSync
                             }
                         #endregion
 
-                        // Last page of the remote folder addition dialog: starting to sync.
+                        // Fourth page of the remote folder addition dialog: starting to sync.
+                        // TODO: This step should be removed. Now it appears just a brief instant, because sync is asynchronous.
                         #region Page Syncing
                         case PageType.Syncing:
                             {
@@ -911,82 +912,12 @@ namespace CmisSync
                             }
                         #endregion
 
-                        #region Page Error
-                        case PageType.Error:
-                            {
-                                Header = "Oops! Something went wrong…";
-                                Description = "Please check the following:";
-
-                                TextBlock help_block = new TextBlock()
-                                {
-                                    TextWrapping = TextWrapping.Wrap,
-                                    Width = 310
-                                };
-
-                                TextBlock bullets_block = new TextBlock()
-                                {
-                                    Text = "•\n\n\n•"
-                                };
-
-                                help_block.Inlines.Add(new Bold(new Run(Controller.PreviousUrl)));
-                                help_block.Inlines.Add(" is the address we've compiled. Does this look alright?\n\n");
-                                help_block.Inlines.Add("Do you have access rights to this remote project?");
-
-                                if (warnings.Length > 0)
-                                {
-                                    bullets_block.Text += "\n\n•";
-                                    help_block.Inlines.Add("\n\nHere's the raw error message:");
-
-                                    foreach (string warning in warnings)
-                                    {
-                                        help_block.Inlines.Add("\n");
-                                        help_block.Inlines.Add(new Bold(new Run(warning)));
-                                    }
-                                }
-
-                                Button cancel_button = new Button()
-                                {
-                                    Content = "Cancel"
-                                };
-
-                                Button try_again_button = new Button()
-                                {
-                                    Content = "Try again…"
-                                };
-
-
-                                ContentCanvas.Children.Add(bullets_block);
-                                Canvas.SetLeft(bullets_block, 195);
-                                Canvas.SetTop(bullets_block, 100);
-
-                                ContentCanvas.Children.Add(help_block);
-                                Canvas.SetLeft(help_block, 210);
-                                Canvas.SetTop(help_block, 100);
-
-                                TaskbarItemInfo.ProgressValue = 1.0;
-                                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
-
-                                Buttons.Add(try_again_button);
-                                Buttons.Add(cancel_button);
-
-
-                                cancel_button.Click += delegate
-                                {
-                                    Controller.PageCancelled();
-                                };
-
-                                try_again_button.Click += delegate
-                                {
-                                    Controller.ErrorPageCompleted();
-                                };
-
-                                break;
-                            }
-                        #endregion
-
+                        // Final page of the remote folder addition dialog: end of the addition wizard.
                         #region Page Finished
                         case PageType.Finished:
                             {
+                                // UI elements.
+
                                 Header = CmisSync.Properties_Resources.ResourceManager.GetString("Ready", CultureInfo.CurrentCulture);
                                 Description = CmisSync.Properties_Resources.ResourceManager.GetString("YouCanFind", CultureInfo.CurrentCulture);
 
@@ -1000,33 +931,13 @@ namespace CmisSync
                                     Content = CmisSync.Properties_Resources.ResourceManager.GetString("OpenFolder", CultureInfo.CurrentCulture)
                                 };
 
-                                /*if (warnings.Length > 0) {
-                                    Image warning_image = new Image () {
-                                        Source = Imaging.CreateBitmapSourceFromHIcon (Drawing.SystemIcons.Information.Handle,
-                                            Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions ())
-                                    };
-							
-                                    TextBlock warning_block = new TextBlock () {
-                                        Text         = warnings [0],
-                                        Width        = 310,
-                                        TextWrapping = TextWrapping.Wrap
-                                    };
-							                                                    
-                                    ContentCanvas.Children.Add (warning_image);
-                                    Canvas.SetLeft (warning_image, 193);
-                                    Canvas.SetTop (warning_image, 100);
-							                                                    
-                                    ContentCanvas.Children.Add (warning_block);
-                                    Canvas.SetLeft (warning_block, 240);
-                                    Canvas.SetTop (warning_block, 100);
-                                }*/
-
                                 TaskbarItemInfo.ProgressValue = 0.0;
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 
                                 Buttons.Add(open_folder_button);
                                 Buttons.Add(finish_button);
 
+                                // Actions.
 
                                 finish_button.Click += delegate
                                 {

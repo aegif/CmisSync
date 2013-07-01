@@ -36,7 +36,6 @@ namespace CmisSync
         Add2,
         Customize,
         Syncing,
-        Error,
         Finished,
         Tutorial
     }
