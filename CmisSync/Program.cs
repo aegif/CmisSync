@@ -31,22 +31,37 @@ namespace CmisSync
     // The CmisSync main class.
     public class Program
     {
-
-        public static Controller Controller;
+        /// <summary>
+        /// User interface for CmisSync.
+        /// </summary>
         public static UI UI;
 
+        /// <summary>
+        /// MVC controller.
+        /// </summary>
+        public static Controller Controller;
+
+        /// <summary>
+        /// Mutex checking whether CmisSync is already running or not.
+        /// </summary>
         private static Mutex program_mutex = new Mutex(false, "CmisSync");
 
+        /// <summary>
+        /// Logging.
+        /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
-
-
-
+        
+        // Single-threaded apartment on Windows.
 #if !__MonoCS__
         [STAThread]
 #endif
+        /// <summary>
+        /// Main method for CmisSync.
+        /// </summary>
         public static void Main(string[] args)
         {
+            // If config file does not exist yet, it is most probably the first time CmisSync runs.
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
             // Migrate config.xml from past versions, if necessary.
@@ -56,9 +71,11 @@ namespace CmisSync
             // Clear log file.
             File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
 
+            // Load logging from the CmisSync configuration file.
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             Logger.Info("Starting.");
 
+            // On Linux, CmisSync must be run with an argument.
             if (args.Length != 0 && !args[0].Equals("start") &&
                 Backend.Platform != PlatformID.MacOSX &&
                 Backend.Platform != PlatformID.Win32NT)
@@ -81,7 +98,7 @@ namespace CmisSync
                 Environment.Exit(-1);
             }
 
-            // Only allow one instance of CmisSync (on Windows)
+            // Only allow one instance of CmisSync
             if (!program_mutex.WaitOne(0, false))
             {
                 Logger.Error("CmisSync is already running.");
@@ -93,24 +110,22 @@ namespace CmisSync
             // See https://github.com/nicolas-raoul/CmisSync/issues/140
             ServicePointManager.DefaultConnectionLimit = 1000;
 
-            //#if !DEBUG
             try
             {
-                //#endif
+                // Run the controller.
                 Controller = new Controller();
                 Controller.Initialize(firstRun);
 
+                // Run the user interface.
                 UI = new UI();
                 UI.Run();
 
-                //#if !DEBUG
             }
             catch (Exception e)
             {
                 Logger.Fatal("Exception in Program.Main", e);
                 Environment.Exit(-1);
             }
-            //#endif
 
 #if !__MonoCS__
             // Suppress assertion messages in debug mode
