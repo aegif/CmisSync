@@ -45,14 +45,21 @@ namespace CmisSync.Lib
         public abstract void SyncInBackground();
         public abstract double Size { get; }
 
-        public event SyncStatusChangedEventHandler SyncStatusChanged = delegate { };
-        public delegate void SyncStatusChangedEventHandler(SyncStatus new_status);
+        /**
+         * <param>new <c>SyncStatus</c> value</param>
+         */
+        public event Action<SyncStatus> SyncStatusChanged = delegate { };
 
-        public event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public delegate void ProgressChangedEventHandler(double percentage, string speed);
+        /**
+         * <param>percentage</param>
+         * <param>speed</param>
+         */
+        public event Action<double,string> ProgressChanged = delegate { };
 
-        public event NewChangeSetEventHandler NewChangeSet = delegate { };
-        public delegate void NewChangeSetEventHandler(ChangeSet change_set);
+        /**
+         * <param><c>ChangeSet</c> value</param>
+         */
+        public event Action<ChangeSet> NewChangeSet = delegate { };
 
         public event Action ConflictResolved = delegate { };
         public event Action ChangesDetected = delegate { };

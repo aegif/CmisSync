@@ -298,7 +298,7 @@ namespace CmisSync.Lib
         public bool IdentifierExists(string identifier)
         {
             if (identifier == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("identifier");
 
             foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
             {
@@ -368,7 +368,7 @@ namespace CmisSync.Lib
             
             double pollinterval = 0;
             double.TryParse(GetFolderOptionalAttribute(FolderName, "pollinterval"), out pollinterval);
-            if (pollinterval == 0) pollinterval = 5000;
+            if (pollinterval < 1) pollinterval = 5000;
             repoInfo.PollInterval = pollinterval;
 
             if (String.IsNullOrEmpty(repoInfo.TargetDirectory))

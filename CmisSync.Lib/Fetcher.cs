@@ -37,11 +37,17 @@ namespace CmisSync.Lib
         public event Action Started = delegate { };
         public event Action Failed = delegate { };
 
-        public event FinishedEventHandler Finished = delegate { };
-        public delegate void FinishedEventHandler(bool repo_is_encrypted, bool repo_is_empty, string[] warnings);
+        /**
+         * <param>repo is encrypted</param>
+         * <param>repo is empty</param>
+         * <param>warnings</param>
+         */
+        public event Action<bool,bool,string[]> Finished = delegate { };
 
-        public event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public delegate void ProgressChangedEventHandler(double percentage);
+        /**
+         * <param>percentage</param>
+         */
+        public event Action<double> ProgressChanged = delegate { };
 
         public Uri RemoteUrl { get; protected set; }
         public string TargetFolder { get; protected set; }

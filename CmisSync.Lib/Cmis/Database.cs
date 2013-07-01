@@ -186,7 +186,7 @@ namespace CmisSync.Lib.Cmis
             }
             catch (IOException e)
             {
-                Logger.Warn("IOException while reading file checksum during addition: " + path);
+                Logger.Warn(String.Format("IOException while reading file {0} checksum during addition: {1}",path,e));
                 // The file was removed while reading. Just skip it, as it does not need to be added anymore.
                 return;
             }

@@ -23,8 +23,10 @@ namespace CmisSync.Lib
 
     public class Watcher : FileSystemWatcher {
 
-        public event ChangeEventEventHandler ChangeEvent = delegate { };
-        public delegate void ChangeEventEventHandler (FileSystemEventArgs args);
+        /**
+         * <param><code>FileSystemEventArgs</code> value</param>
+         */
+        public event Action<FileSystemEventArgs> ChangeEvent = delegate { };
 
         private Object thread_lock = new Object ();
 

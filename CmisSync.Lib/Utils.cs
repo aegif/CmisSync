@@ -197,7 +197,7 @@ namespace CmisSync.Lib
                 int index = 1;
                 do
                 {
-                    string ret = path + " (" + index + ")";
+                    string ret = path + " (" + index.ToString() + ")";
                     if (!File.Exists(ret))
                     {
                         return ret;

@@ -161,7 +161,7 @@ namespace CmisSync.Lib.Cmis
 
             IFolder folder = (IFolder)session.GetObjectByPath(path);
 
-            Logger.Info("Sync | folder.Properties.Count:" + folder.Properties.Count);
+            Logger.Info("Sync | folder.Properties.Count:" + folder.Properties.Count.ToString());
             IItemEnumerable<ICmisObject> children = folder.GetChildren();
             foreach (var subfolder in children.OfType<IFolder>())
             {
