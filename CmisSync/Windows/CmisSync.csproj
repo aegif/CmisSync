@@ -81,9 +81,6 @@
     <Compile Include="..\ControllerBase.cs">
       <Link>ControllerBase.cs</Link>
     </Compile>
-    <Compile Include="..\Extensions.cs">
-      <Link>Extensions.cs</Link>
-    </Compile>
     <Compile Include="..\SetupController.cs">
       <Link>SetupController.cs</Link>
     </Compile>
