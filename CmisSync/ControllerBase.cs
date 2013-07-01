@@ -357,9 +357,6 @@ namespace CmisSync
                 {
                     string folder_name = Path.GetFileName(folder_path);
 
-                    if (folder_name.Equals(".tmp"))
-                        continue;
-
                     // Folder has been renamed.
                     if (ConfigManager.CurrentConfig.GetIdentifierForFolder(folder_name) == null)
                     {
