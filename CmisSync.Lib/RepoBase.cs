@@ -71,13 +71,13 @@ namespace CmisSync.Lib
         public SyncStatus Status { get; private set; }
 
 
-        public virtual string[] UnsyncedFilePaths
-        {
-            get
-            {
-                return new string[0];
-            }
-        }
+        //public virtual string[] UnsyncedFilePaths
+        //{
+        //    get
+        //    {
+        //        return new string[0];
+        //    }
+        //}
 
         public void Resume()
         {
@@ -89,7 +89,7 @@ namespace CmisSync.Lib
             Status = SyncStatus.Suspend;
         }
 
-        protected RepoInfo local_repoInfo;
+        protected RepoInfo localRepoInfo;
 
 
         private Watcher watcher;
@@ -106,7 +106,7 @@ namespace CmisSync.Lib
 
         public RepoBase(RepoInfo repoInfo)
         {
-            this.local_repoInfo = repoInfo;
+            this.localRepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = Path.GetFileName(LocalPath);
             RemoteUrl = repoInfo.Address;

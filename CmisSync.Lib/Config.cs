@@ -312,9 +312,9 @@ namespace CmisSync.Lib
         }
 
 
-        public bool SetFolderOptionalAttribute(string folder_name, string key, string value)
+        public bool SetFolderOptionalAttribute(string folderName, string key, string value)
         {
-            XmlNode folder = GetFolder(folder_name);
+            XmlNode folder = GetFolder(folderName);
 
             if (folder == null)
                 return false;
@@ -337,9 +337,9 @@ namespace CmisSync.Lib
         }
 
 
-        public string GetFolderOptionalAttribute(string folder_name, string key)
+        public string GetFolderOptionalAttribute(string folderName, string key)
         {
-            XmlNode folder = GetFolder(folder_name);
+            XmlNode folder = GetFolder(folderName);
 
             if (folder != null)
             {
@@ -440,7 +440,7 @@ namespace CmisSync.Lib
 
         public string GetLogFilePath()
         {
-            return Path.Combine(configpath, "debug_log.txt").ToString();
+            return Path.Combine(configpath, "debug_log.txt");
         }
     }
 }

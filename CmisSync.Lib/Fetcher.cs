@@ -55,20 +55,14 @@ namespace CmisSync.Lib
         public string Identifier;
         public RepoInfo OriginalRepoInfo;
 
-        public string[] Warnings
+        public string[] GetWarnings()
         {
-            get
-            {
-                return this.warnings.ToArray();
-            }
+            return this.warnings.ToArray();
         }
 
-        public string[] Errors
+        public string[] GetErrors()
         {
-            get
-            {
-                return this.errors.ToArray();
-            }
+            return this.errors.ToArray();
         }
 
 
