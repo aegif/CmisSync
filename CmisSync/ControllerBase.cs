@@ -473,13 +473,9 @@ namespace CmisSync
         /// <summary>
         /// Create a new CmisSync synchronized folder.
         /// </summary>
-        public void StartFetcher(string address, string required_fingerprint,
-            string remote_path, string local_path, string announcements_url,
+        public void StartFetcher(string address, string remote_path, string local_path,
             string repository, string path, string user, string password, string localrepopath)
         {
-            if (announcements_url != null)
-                announcements_url = announcements_url.Trim();
-
             repoInfo = new RepoInfo(local_path, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = new Uri(address);
             repoInfo.RemotePath = remote_path;
@@ -490,6 +486,8 @@ namespace CmisSync
             repoInfo.PollInterval = 5000;
 
             fetcher = new Fetcher(repoInfo, activityListenerAggregator);
+
+            // Actions.
 
             this.fetcher.Finished += delegate(bool repo_is_encrypted, bool repo_is_empty, string[] warnings)
             {

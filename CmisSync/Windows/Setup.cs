@@ -42,7 +42,7 @@ using log4net;
 namespace CmisSync
 {
     /// <summary>
-    /// Dialog for the two wizards: Wizard at first run, and wizard to create a new CmisSync synchronized folder.
+    /// Dialog for the tutorial, and for the wizard to add a new remote folder.
     /// </summary>
     public class Setup : SetupWindow
     {
@@ -152,7 +152,7 @@ namespace CmisSync
                         #region Page Tutorial
                         case PageType.Tutorial:
                             {
-                                switch (Controller.FirstTimeWizardCurrentPage)
+                                switch (Controller.TutorialCurrentPage)
                                 {
                                     // First page of the tutorial.
                                     case 1:
@@ -867,11 +867,6 @@ namespace CmisSync
                                     IsEnabled = false
                                 };
 
-                                Button cancel_button = new Button()
-                                {
-                                    Content = CmisSync.Properties_Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture)
-                                };
-
                                 ProgressBar progress_bar = new ProgressBar()
                                 {
                                     Width = 414,
@@ -886,7 +881,6 @@ namespace CmisSync
 
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
 
-                                Buttons.Add(cancel_button);
                                 Buttons.Add(finish_button);
 
                                 // Actions.
@@ -898,11 +892,6 @@ namespace CmisSync
                                         progress_bar.Value = percentage;
                                         TaskbarItemInfo.ProgressValue = percentage / 100;
                                     });
-                                };
-
-                                cancel_button.Click += delegate
-                                {
-                                    Controller.SyncingCancelled();
                                 };
 
                                 break;
