@@ -489,34 +489,31 @@ namespace CmisSync
                                 // Actions.
 
                                 Controller.ChangeAddressFieldEvent += delegate(string text,
-                                    string example_text, FieldState state)
+                                    string example_text)
                                 {
                                     Dispatcher.BeginInvoke((Action)delegate
                                     {
                                         address_box.Text = text;
-                                        address_box.IsEnabled = (state == FieldState.Enabled);
                                         address_help_label.Text = example_text;
                                     });
                                 };
 
                                 Controller.ChangeUserFieldEvent += delegate(string text,
-                                    string example_text, FieldState state)
+                                    string example_text)
                                 {
                                     Dispatcher.BeginInvoke((Action)delegate
                                     {
                                         user_box.Text = text;
-                                        user_box.IsEnabled = (state == FieldState.Enabled);
                                         user_help_label.Text = example_text;
                                     });
                                 };
 
                                 Controller.ChangePasswordFieldEvent += delegate(string text,
-                                    string example_text, FieldState state)
+                                    string example_text)
                                 {
                                     Dispatcher.BeginInvoke((Action)delegate
                                     {
                                         password_box.Password = text;
-                                        password_box.IsEnabled = (state == FieldState.Enabled);
                                         password_help_label.Text = example_text;
                                     });
                                 };

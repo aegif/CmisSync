@@ -44,18 +44,13 @@ namespace CmisSync
     }
 
     /// <summary>
-    /// 
+    /// MVC controller for the two wizards: first-time wizard, wizard to add a new remote folder.
     /// </summary>
-    public enum FieldState
-    {
-        Enabled,
-        Disabled
-    }
-
-
     public class SetupController
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(SetupController));
+
+        // Delegates.
 
         public event Action ShowWindowEvent = delegate { };
         public event Action HideWindowEvent = delegate { };
@@ -73,20 +68,23 @@ namespace CmisSync
         public delegate void UpdateAddProjectButtonEventHandler(bool button_enabled);
 
         public event ChangeAddressFieldEventHandler ChangeAddressFieldEvent = delegate { };
-        public delegate void ChangeAddressFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangeAddressFieldEventHandler(string text, string example_text);
 
         public event ChangeRepositoryFieldEventHandler ChangeRepositoryFieldEvent = delegate { };
-        public delegate void ChangeRepositoryFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangeRepositoryFieldEventHandler(string text, string example_text);
 
         public event ChangePathFieldEventHandler ChangePathFieldEvent = delegate { };
-        public delegate void ChangePathFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangePathFieldEventHandler(string text, string example_text);
 
         public event ChangeUserFieldEventHandler ChangeUserFieldEvent = delegate { };
-        public delegate void ChangeUserFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangeUserFieldEventHandler(string text, string example_text);
 
         public event ChangePasswordFieldEventHandler ChangePasswordFieldEvent = delegate { };
-        public delegate void ChangePasswordFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangePasswordFieldEventHandler(string text, string example_text);
 
+        /// <summary>
+        /// Whether the window is currently open.
+        /// </summary>
         public bool WindowIsOpen { get; private set; }
         public int TutorialPageNumber { get; private set; }
         public string PreviousUrl { get; private set; }
