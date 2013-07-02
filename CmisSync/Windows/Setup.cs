@@ -84,7 +84,7 @@ namespace CmisSync
 
             // Defines what to do when changing page.
             // The remote folder addition wizard has several steps.
-            Controller.ChangePageEvent += delegate(PageType type, string[] warnings)
+            Controller.ChangePageEvent += delegate(PageType type)
             {
                 Dispatcher.BeginInvoke((Action)delegate
                 {
@@ -152,7 +152,7 @@ namespace CmisSync
                         #region Page Tutorial
                         case PageType.Tutorial:
                             {
-                                switch (Controller.FirstTimeWizardPageNumber)
+                                switch (Controller.FirstTimeWizardCurrentPage)
                                 {
                                     // First page of the tutorial.
                                     case 1:

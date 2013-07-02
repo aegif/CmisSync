@@ -56,7 +56,7 @@ namespace CmisSync
         public event Action HideWindowEvent = delegate { };
 
         public event ChangePageEventHandler ChangePageEvent = delegate { };
-        public delegate void ChangePageEventHandler(PageType page, string[] warnings);
+        public delegate void ChangePageEventHandler(PageType page);
 
         public event UpdateProgressBarEventHandler UpdateProgressBarEvent = delegate { };
         public delegate void UpdateProgressBarEventHandler(double percentage);
@@ -88,9 +88,14 @@ namespace CmisSync
         public bool WindowIsOpen { get; private set; }
 
         /// <summary>
-        /// Current first-time wizard step.
+        /// Current step of the first-time wizard.
         /// </summary>
-        public int FirstTimeWizardPageNumber { get; private set; }
+        public int FirstTimeWizardCurrentPage { get; private set; }
+
+        /// <summary>
+        /// Current step of the remote folder addition wizard.
+        /// </summary>
+        private PageType FolderAdditionWizardCurrentPage;
 
         public string PreviousAddress { get; private set; }
         public string PreviousPath { get; private set; }
@@ -99,7 +104,6 @@ namespace CmisSync
         public string DefaultRepoPath { get; private set; }
         public double ProgressBarPercentage { get; private set; }
 
-        private PageType current_page;
         public string saved_address = "";
         public string saved_remote_path = "";
         public string saved_user = "";
@@ -117,23 +121,29 @@ namespace CmisSync
         private bool create_startup_item = true;
 
 
+        /// <summary>
+        /// Load repositories information from a CMIS endpoint.
+        /// </summary>
         static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
         {
             return CmisUtils.GetRepositoriesFuzzy(url, user, password);
         }
 
+
+        /// <summary>
+        /// Get the list of subfolders contained in a CMIS folder.
+        /// </summary>
         static public string[] GetSubfolders(string repositoryId, string path,
             string address, string user, string password)
         {
             return CmisUtils.GetSubfolders(repositoryId, path, address, user, password);
         }
 
-        private Regex urlregex;
 
-        public SetupController()
-        {
-            Logger.Info("Entering constructor.");
-            this.urlregex = new Regex(@"^" +
+        /// <summary>
+        /// Regex to check an HTTP/HTTPS URL.
+        /// </summary>
+        private Regex urlregex = new Regex(@"^" +
                     "(https?)://" +                                                 // protocol
                     "(([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+" +        // username
                     "(:([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+)?" +     // password
@@ -146,21 +156,31 @@ namespace CmisSync
                     ")((/+([a-z\\d$_\\.\\+!\\*'\\(\\),;:@&=-]|%[\\da-f]{2})*)*?)" + // path
                     "$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-            ChangePageEvent += delegate(PageType page_type, string[] warnings)
-            {
-                this.current_page = page_type;
-            };
 
-            FirstTimeWizardPageNumber = 0;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public SetupController()
+        {
+            Logger.Info("Entering constructor.");
+
+            FirstTimeWizardCurrentPage = 0;
             PreviousAddress = "";
             PreviousPath = "";
             SyncingReponame = "";
             DefaultRepoPath = Program.Controller.FoldersPath;
 
+            // Actions.
+
+            ChangePageEvent += delegate(PageType page)
+            {
+                this.FolderAdditionWizardCurrentPage = page;
+            };
+
             Program.Controller.ShowSetupWindowEvent += delegate(PageType page_type)
             {
-                if (this.current_page == PageType.Syncing ||
-                    this.current_page == PageType.Finished)
+                if (this.FolderAdditionWizardCurrentPage == PageType.Syncing ||
+                    this.FolderAdditionWizardCurrentPage == PageType.Finished)
                 {
                     ShowWindowEvent();
                     return;
@@ -170,28 +190,27 @@ namespace CmisSync
                 {
                     if (WindowIsOpen)
                     {
-                        if (this.current_page == PageType.Finished ||
-                            this.current_page == PageType.None)
+                        if (this.FolderAdditionWizardCurrentPage == PageType.Finished ||
+                            this.FolderAdditionWizardCurrentPage == PageType.None)
                         {
 
-                            ChangePageEvent(PageType.Add1, null);
+                            ChangePageEvent(PageType.Add1);
                         }
 
                         ShowWindowEvent();
 
                     }
-                    else if (FirstTimeWizardPageNumber == 0)
+                    else if (FirstTimeWizardCurrentPage == 0)
                     {
                         WindowIsOpen = true;
-                        ChangePageEvent(PageType.Add1, null);
+                        ChangePageEvent(PageType.Add1);
                         ShowWindowEvent();
                     }
-
                     return;
                 }
 
                 WindowIsOpen = true;
-                ChangePageEvent(page_type, null);
+                ChangePageEvent(page_type);
                 ShowWindowEvent();
             };
             Logger.Info("Exiting constructor.");
@@ -223,26 +242,26 @@ namespace CmisSync
 
         public void SetupPageCompleted()
         {
-            FirstTimeWizardPageNumber = 1;
-            ChangePageEvent(PageType.Tutorial, null);
+            FirstTimeWizardCurrentPage = 1;
+            ChangePageEvent(PageType.Tutorial);
         }
 
 
         public void TutorialSkipped()
         {
-            FirstTimeWizardPageNumber = 4;
-            ChangePageEvent(PageType.Tutorial, null);
+            FirstTimeWizardCurrentPage = 4;
+            ChangePageEvent(PageType.Tutorial);
         }
 
 
         public void TutorialPageCompleted()
         {
-            FirstTimeWizardPageNumber++;
+            FirstTimeWizardCurrentPage++;
 
-            if (FirstTimeWizardPageNumber == 5)
+            if (FirstTimeWizardCurrentPage == 5)
             {
-                FirstTimeWizardPageNumber = 0;
-                this.current_page = PageType.None;
+                FirstTimeWizardCurrentPage = 0;
+                this.FolderAdditionWizardCurrentPage = PageType.None;
 
                 WindowIsOpen = false;
                 HideWindowEvent();
@@ -253,7 +272,7 @@ namespace CmisSync
             }
             else
             {
-                ChangePageEvent(PageType.Tutorial, null);
+                ChangePageEvent(PageType.Tutorial);
             }
         }
 
@@ -319,14 +338,14 @@ namespace CmisSync
             saved_user = user;
             saved_password = password;
 
-            ChangePageEvent(PageType.Add2, null);
+            ChangePageEvent(PageType.Add2);
         }
 
         public void BackToPage1()
         {
             PreviousAddress = saved_address;
             PreviousPath = saved_user;
-            ChangePageEvent(PageType.Add1, null);
+            ChangePageEvent(PageType.Add1);
         }
 
         public void Add2PageCompleted(string repository, string remote_path)
@@ -334,7 +353,7 @@ namespace CmisSync
             SyncingReponame = Path.GetFileName(remote_path);
             ProgressBarPercentage = 1.0;
 
-            ChangePageEvent(PageType.Customize, null);
+            ChangePageEvent(PageType.Customize);
 
             String address = saved_address.Trim();
             repository = repository.Trim();
@@ -349,7 +368,7 @@ namespace CmisSync
         {
             SyncingReponame = repoName;
 
-            ChangePageEvent(PageType.Syncing, null);
+            ChangePageEvent(PageType.Syncing);
 
             Program.Controller.FolderFetched += AddPageFetchedDelegate;
             Program.Controller.FolderFetching += SyncingPageFetchingDelegate;
@@ -374,15 +393,15 @@ namespace CmisSync
 
         public void BackToPage2()
         {
-            ChangePageEvent(PageType.Add2, null);
+            ChangePageEvent(PageType.Add2);
         }
 
         // The following private methods are
         // delegates used by the previous method
 
-        private void AddPageFetchedDelegate(string remote_url, string[] warnings)
+        private void AddPageFetchedDelegate(string remote_url)
         {
-            ChangePageEvent(PageType.Finished, warnings);
+            ChangePageEvent(PageType.Finished);
 
             Program.Controller.FolderFetched -= AddPageFetchedDelegate;
             Program.Controller.FolderFetching -= SyncingPageFetchingDelegate;
@@ -401,13 +420,13 @@ namespace CmisSync
         public void SyncingCancelled()
         {
             Program.Controller.StopFetcher();
-            ChangePageEvent(PageType.Add1, null);
+            ChangePageEvent(PageType.Add1);
         }
 
 
         public void ErrorPageCompleted()
         {
-            ChangePageEvent(PageType.Add1, null);
+            ChangePageEvent(PageType.Add1);
         }
 
 
@@ -424,7 +443,7 @@ namespace CmisSync
             PreviousAddress = "";
             PreviousPath = "";
 
-            this.current_page = PageType.None;
+            this.FolderAdditionWizardCurrentPage = PageType.None;
             HideWindowEvent();
         }
     }

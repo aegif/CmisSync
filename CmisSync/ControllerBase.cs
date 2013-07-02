@@ -61,7 +61,7 @@ namespace CmisSync
         public event Action ShowEventLogWindowEvent = delegate { };
 
         public event FolderFetchedEventHandler FolderFetched = delegate { };
-        public delegate void FolderFetchedEventHandler(string remote_url, string[] warnings);
+        public delegate void FolderFetchedEventHandler(string remote_url);
 
         public event FolderFetchErrorHandler FolderFetchError = delegate { };
         public delegate void FolderFetchErrorHandler(string remote_url, string[] errors);
@@ -543,7 +543,7 @@ namespace CmisSync
             // Add folder to XML config file.
             ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
-            FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.Warnings.ToArray());
+            FolderFetched(this.fetcher.RemoteUrl.ToString());
 
             // Initialize in the UI.
             AddRepository(repoInfo.TargetDirectory);
