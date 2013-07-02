@@ -91,7 +91,7 @@ namespace CmisSync.Lib.Sync
              * Constructor for Repo (at every launch of CmisSync)
              */
             public SynchronizedFolder(RepoInfo repoInfo,
-                ActivityListener listener, CmisRepo repoCmis)
+                ActivityListener listener, RepoBase repoCmis)
             {
                 this.repo = repoCmis;
                 this.activityListener = listener;
@@ -233,7 +233,7 @@ namespace CmisSync.Lib.Sync
 
                             // Create database entry for this folder
                             // TODO - Yannick - Add metadata
-                            database.AddFolder(localSubFolder, ((DateTime)remoteFolder.LastModificationDate).ToUniversalTime());
+                            database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                             // Recurse into folder.
                             RecursiveFolderCopy(remoteSubFolder, localSubFolder);
@@ -342,7 +342,7 @@ namespace CmisSync.Lib.Sync
                     File.Move(tmpfilepath, filepath);
                     
                     // Create database entry for this file.
-                    database.AddFile(filepath, ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime(), metadata);
+                    database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
 
                     Logger.Info("Added to database: " + remoteDocument.ContentStreamFileName);
                 }
@@ -449,7 +449,7 @@ namespace CmisSync.Lib.Sync
                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                     // Create database entry for this file.
-                    database.AddFile(filePath, ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime(), metadata);
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
                 }
 
                 activityListener.ActivityStopped();
@@ -469,7 +469,7 @@ namespace CmisSync.Lib.Sync
 
                 // Create database entry for this folder
                 // TODO - Yannick - Add metadata
-                database.AddFolder(localFolder, ((DateTime)folder.LastModificationDate).ToUniversalTime());
+                database.AddFolder(localFolder, folder.LastModificationDate);
 
                 // Upload each file in this folder.
                 foreach (string file in Directory.GetFiles(localFolder))

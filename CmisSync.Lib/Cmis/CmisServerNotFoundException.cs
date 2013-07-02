@@ -9,7 +9,7 @@ namespace CmisSync.Lib.Cmis
         public CmisServerNotFoundException() { }
         public CmisServerNotFoundException(string message) : base(message) { }
         public CmisServerNotFoundException(string message, Exception inner) : base(message, inner) { }
-        public CmisServerNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected CmisServerNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 
 }

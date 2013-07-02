@@ -1,4 +1,4 @@
-﻿//   CmisSync, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -34,20 +34,20 @@ namespace CmisSync.Lib
 
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(Fetcher));
 
-        public event Action Started = delegate { };
-        public event Action Failed = delegate { };
+        public Action Started = delegate { };
+        public Action Failed = delegate { };
 
         /**
          * <param>repo is encrypted</param>
          * <param>repo is empty</param>
          * <param>warnings</param>
          */
-        public event Action<bool,bool,string[]> Finished = delegate { };
+        public Action<bool,bool,string[]> Finished = delegate { };
 
         /**
          * <param>percentage</param>
          */
-        public event Action<double> ProgressChanged = delegate { };
+        public Action<double> ProgressChanged = delegate { };
 
         public Uri RemoteUrl { get; protected set; }
         public string TargetFolder { get; protected set; }

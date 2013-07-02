@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -146,7 +146,7 @@ namespace TestLibrary
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            Dictionary<string, string> repos = CmisUtils.GetRepositories(url, user, password);
+            Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
             Assert.NotNull(repos);
         }
 
@@ -557,7 +557,7 @@ namespace TestLibrary
         [Test, TestCaseSource("TestServersFuzzy")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
-            CmisServer server = CmisUtils.GetRepositoriesFuzzy(url, user, password);
+            CmisServer server = CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
             Assert.NotNull(server);
         }
     }

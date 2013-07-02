@@ -9,6 +9,6 @@ namespace CmisSync.Lib.Cmis
         public CmisPermissionDeniedException() { }
         public CmisPermissionDeniedException(string message) : base(message) { }
         public CmisPermissionDeniedException(string message, Exception inner) : base(message, inner) { }
-        public CmisPermissionDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected CmisPermissionDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

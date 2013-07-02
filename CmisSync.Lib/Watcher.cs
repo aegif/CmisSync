@@ -26,7 +26,7 @@ namespace CmisSync.Lib
         /**
          * <param><code>FileSystemEventArgs</code> value</param>
          */
-        public event Action<FileSystemEventArgs> ChangeEvent = delegate { };
+        public Action<FileSystemEventArgs> ChangeEvent = delegate { };
 
         private Object thread_lock = new Object ();
 

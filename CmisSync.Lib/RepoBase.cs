@@ -48,21 +48,21 @@ namespace CmisSync.Lib
         /**
          * <param>new <c>SyncStatus</c> value</param>
          */
-        public event Action<SyncStatus> SyncStatusChanged = delegate { };
+        public Action<SyncStatus> SyncStatusChanged;
 
         /**
          * <param>percentage</param>
          * <param>speed</param>
          */
-        public event Action<double,string> ProgressChanged = delegate { };
+        public Action<double,string> ProgressChanged;
 
         /**
          * <param><c>ChangeSet</c> value</param>
          */
-        public event Action<ChangeSet> NewChangeSet = delegate { };
+        public Action<ChangeSet> NewChangeSet;
 
-        public event Action ConflictResolved = delegate { };
-        public event Action ChangesDetected = delegate { };
+        public Action ConflictResolved;
+        public Action ChangesDetected;
 
 
         public readonly string LocalPath;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -154,11 +154,7 @@ namespace CmisSync.Lib.Sync
 
                                         // Create database entry for this folder.
                                         // TODO - Yannick - Add metadata
-                                        DateTime? serversideModificationDate = remoteFolder.LastModificationDate;
-                                        if (null != serversideModificationDate) {
-                                            serversideModificationDate = ((DateTime)serversideModificationDate).ToUniversalTime();
-                                        }
-                                        database.AddFolder(localSubFolder, serversideModificationDate);
+                                        database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                                         // Recursive copy of the whole folder.
                                         RecursiveFolderCopy(remoteSubFolder, localSubFolder);

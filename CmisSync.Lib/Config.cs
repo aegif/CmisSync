@@ -207,10 +207,10 @@ namespace CmisSync.Lib
 
         public void AddFolder(RepoInfo repoInfo)
         {
-            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address.ToString(), repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
+            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
         }
 
-        public void AddFolder(string name, string path, string url, string repository,
+        public void AddFolder(string name, string path, Uri url, string repository,
             string remoteFolder, string user, string password, double pollinterval)
         {
             XmlNode node_name = configXml.CreateElement("name");
@@ -224,7 +224,7 @@ namespace CmisSync.Lib
 
             node_name.InnerText = name;
             node_path.InnerText = path;
-            node_url.InnerText = url;
+            node_url.InnerText = url.ToString();
             node_repository.InnerText = repository;
             node_remoteFolder.InnerText = remoteFolder;
             node_user.InnerText = user;
@@ -288,9 +288,9 @@ namespace CmisSync.Lib
         }
 
 
-        public string GetUrlForFolder(string name)
+        public Uri GetUrlForFolder(string name)
         {
-            return GetFolderValue(name, "url");
+            return new Uri(GetFolderValue(name, "url"));
         }
 
 
@@ -354,25 +354,25 @@ namespace CmisSync.Lib
             }
         }
 
-        public RepoInfo GetRepoInfo(string FolderName)
+        public RepoInfo GetRepoInfo(string folderName)
         {
-            RepoInfo repoInfo = new RepoInfo(FolderName, ConfigPath);
+            RepoInfo repoInfo = new RepoInfo(folderName, ConfigPath);
 
-            repoInfo.User = GetFolderOptionalAttribute(FolderName, "user");
-            repoInfo.Password = GetFolderOptionalAttribute(FolderName, "password");
-            repoInfo.Address = new Uri(GetUrlForFolder(FolderName));
-            repoInfo.RepoID = GetFolderOptionalAttribute(FolderName, "repository");
-            repoInfo.RemotePath = GetFolderOptionalAttribute(FolderName, "remoteFolder");
-            repoInfo.TargetDirectory = GetFolderOptionalAttribute(FolderName, "path");
+            repoInfo.User = GetFolderOptionalAttribute(folderName, "user");
+            repoInfo.Password = GetFolderOptionalAttribute(folderName, "password");
+            repoInfo.Address = GetUrlForFolder(folderName);
+            repoInfo.RepoID = GetFolderOptionalAttribute(folderName, "repository");
+            repoInfo.RemotePath = GetFolderOptionalAttribute(folderName, "remoteFolder");
+            repoInfo.TargetDirectory = GetFolderOptionalAttribute(folderName, "path");
             
             double pollinterval = 0;
-            double.TryParse(GetFolderOptionalAttribute(FolderName, "pollinterval"), out pollinterval);
+            double.TryParse(GetFolderOptionalAttribute(folderName, "pollinterval"), out pollinterval);
             if (pollinterval < 1) pollinterval = 5000;
             repoInfo.PollInterval = pollinterval;
 
             if (String.IsNullOrEmpty(repoInfo.TargetDirectory))
             {
-                repoInfo.TargetDirectory = Path.Combine(FoldersPath, FolderName);
+                repoInfo.TargetDirectory = Path.Combine(FoldersPath, folderName);
             }
 
             return repoInfo;

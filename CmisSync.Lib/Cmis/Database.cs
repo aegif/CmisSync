@@ -176,8 +176,9 @@ namespace CmisSync.Lib.Cmis
 
             // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // see: http://www.sqlite.org/datatype3.html
-            if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
-                throw new ArgumentException("serverSideModificationDate is not UTC");
+            if (null != serverSideModificationDate)
+            {
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
             }
 
             try
@@ -214,8 +215,9 @@ namespace CmisSync.Lib.Cmis
         {
             // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // see: http://www.sqlite.org/datatype3.html
-            if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
-                throw new ArgumentException("serverSideModificationDate is not UTC");
+            if (null != serverSideModificationDate)
+            {
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
             }
             path = Normalize(path);
 

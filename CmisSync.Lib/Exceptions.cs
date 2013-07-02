@@ -47,7 +47,7 @@ namespace CmisSync.Lib
         }
 
 
-        public QuotaExceededException(SerializationInfo info, StreamingContext context)
+        protected QuotaExceededException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
