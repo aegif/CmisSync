@@ -1,4 +1,4 @@
-﻿//   CmisSync, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -34,14 +34,20 @@ namespace CmisSync.Lib
 
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(Fetcher));
 
-        public event Action Started = delegate { };
-        public event Action Failed = delegate { };
+        public Action Started = delegate { };
+        public Action Failed = delegate { };
 
-        public event FinishedEventHandler Finished = delegate { };
-        public delegate void FinishedEventHandler(bool repo_is_encrypted, bool repo_is_empty, string[] warnings);
+        /**
+         * <param>repo is encrypted</param>
+         * <param>repo is empty</param>
+         * <param>warnings</param>
+         */
+        public Action<bool,bool,string[]> Finished = delegate { };
 
-        public event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public delegate void ProgressChangedEventHandler(double percentage);
+        /**
+         * <param>percentage</param>
+         */
+        public Action<double> ProgressChanged = delegate { };
 
         public Uri RemoteUrl { get; protected set; }
         public string TargetFolder { get; protected set; }
@@ -49,20 +55,14 @@ namespace CmisSync.Lib
         public string Identifier;
         public RepoInfo OriginalRepoInfo;
 
-        public string[] Warnings
+        public string[] GetWarnings()
         {
-            get
-            {
-                return this.warnings.ToArray();
-            }
+            return this.warnings.ToArray();
         }
 
-        public string[] Errors
+        public string[] GetErrors()
         {
-            get
-            {
-                return this.errors.ToArray();
-            }
+            return this.errors.ToArray();
         }
 
 

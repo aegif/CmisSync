@@ -274,8 +274,8 @@ namespace CmisSync {
                 }
                 CmisServer cmisServer = dlgt.EndInvoke(ar);
 
-                Controller.repositories = cmisServer.repositories;
-                address_entry.Text = cmisServer.url;
+                Controller.repositories = cmisServer.Repositories;
+                address_entry.Text = cmisServer.Url;
 
                 // Hide wait cursor
                 this.GdkWindow.Cursor = default_cursor;

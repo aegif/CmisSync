@@ -438,7 +438,7 @@ namespace CmisSync
 
             this.fetcher.Failed += delegate
             {
-                FolderFetchError(this.fetcher.RemoteUrl.ToString(), this.fetcher.Errors);
+                FolderFetchError(this.fetcher.RemoteUrl.ToString(), this.fetcher.GetErrors());
                 StopFetcher();
             };
 
@@ -485,7 +485,7 @@ namespace CmisSync
         {
             ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
-            FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.Warnings.ToArray());
+            FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.GetWarnings());
 
             AddRepository(repoInfo.TargetDirectory);
 

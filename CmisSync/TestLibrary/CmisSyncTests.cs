@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,6 +53,8 @@ namespace TestLibrary
         public CmisSyncTests()
         {
             // Config.DefaultConfig = new Config(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
+            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
         public static IEnumerable<object[]> TestServers
@@ -144,7 +146,7 @@ namespace TestLibrary
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            Dictionary<string, string> repos = CmisUtils.GetRepositories(url, user, password);
+            Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
             Assert.NotNull(repos);
         }
 
@@ -555,7 +557,7 @@ namespace TestLibrary
         [Test, TestCaseSource("TestServersFuzzy")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
-            CmisServer server = CmisUtils.GetRepositoriesFuzzy(url, user, password);
+            CmisServer server = CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
             Assert.NotNull(server);
         }
     }

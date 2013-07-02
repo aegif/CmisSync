@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -176,8 +176,9 @@ namespace CmisSync.Lib.Cmis
 
             // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // see: http://www.sqlite.org/datatype3.html
-            if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
-                throw new ArgumentException("serverSideModificationDate is not UTC");
+            if (null != serverSideModificationDate)
+            {
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
             }
 
             try
@@ -186,7 +187,7 @@ namespace CmisSync.Lib.Cmis
             }
             catch (IOException e)
             {
-                Logger.Warn("IOException while reading file checksum during addition: " + path);
+                Logger.Warn(String.Format("IOException while reading file {0} checksum during addition: {1}",path,e));
                 // The file was removed while reading. Just skip it, as it does not need to be added anymore.
                 return;
             }
@@ -197,28 +198,15 @@ namespace CmisSync.Lib.Cmis
                 return;
             }
 
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                try
-                {
-                    command.CommandText =
-                        @"INSERT OR REPLACE INTO files (path, serverSideModificationDate, metadata, checksum)
-                            VALUES (@path, @serverSideModificationDate, @metadata, @checksum)";
-                    command.Parameters.AddWithValue("path", normalizedPath);
-                    command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                    command.Parameters.AddWithValue("metadata", Json(metadata));
-                    // Why re-checksum file ?
-                    // command.Parameters.AddWithValue("checksum", Checksum(path));
-                    command.Parameters.AddWithValue("checksum", checksum);
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    throw e;
-                }
-            }
+            string command =
+                @"INSERT OR REPLACE INTO files (path, serverSideModificationDate, metadata, checksum)
+                    VALUES (@path, @serverSideModificationDate, @metadata, @checksum)";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", normalizedPath);
+            parameters.Add("serverSideModificationDate", serverSideModificationDate);
+            parameters.Add("metadata", Json(metadata));
+            parameters.Add("checksum", checksum);
+            ExecuteSQLAction(command, parameters);
             Logger.Debug("Adding data in db for: " + path + " finished");
         }
 
@@ -227,51 +215,29 @@ namespace CmisSync.Lib.Cmis
         {
             // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // see: http://www.sqlite.org/datatype3.html
-            if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
-                throw new ArgumentException("serverSideModificationDate is not UTC");
-            }
-
-            path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            if (null != serverSideModificationDate)
             {
-                try
-                {
-                    command.CommandText =
-                        @"INSERT OR REPLACE INTO folders (path, serverSideModificationDate)
-                            VALUES (@path, @serverSideModificationDate)";
-                    command.Parameters.AddWithValue("path", path);
-                    command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    throw e;
-                }
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
             }
+            path = Normalize(path);
+
+            string command =
+                @"INSERT OR REPLACE INTO folders (path, serverSideModificationDate)
+                    VALUES (@path, @serverSideModificationDate)";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+            parameters.Add("serverSideModificationDate", serverSideModificationDate);
+            ExecuteSQLAction(command, parameters);
         }
 
 
         public void RemoveFile(string path)
         {
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                try
-                {
-                    command.CommandText =
-                        "DELETE FROM files WHERE path=@filePath";
-                    command.Parameters.AddWithValue("filePath", path);
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    throw e;
-                }
-            }
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+            ExecuteSQLAction("DELETE FROM files WHERE path=@path", parameters);
         }
 
 
@@ -280,84 +246,32 @@ namespace CmisSync.Lib.Cmis
             path = Normalize(path);
 
             // Remove folder itself
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                try
-                {
-                    command.CommandText =
-                        "DELETE FROM folders WHERE path='" + path + "'";
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    throw e;
-                }
-            }
+            ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
 
             // Remove all folders under this folder
-            using (var command = new SQLiteCommand(connection))
-            {
-                try
-                {
-                    command.CommandText =
-                        "DELETE FROM folders WHERE path LIKE '" + path + "/%'";
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    throw e;
-                }
-            }
+            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
 
             // Remove all files under this folder
-            using (var command = new SQLiteCommand(connection))
-            {
-                try
-                {
-                    command.CommandText =
-                        "DELETE FROM files WHERE path LIKE '" + path + "/%'";
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    throw e;
-                }
-            }
+            ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
         }
 
 
         public DateTime? GetServerSideModificationDate(string path)
         {
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+            object obj = ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE path=@path", parameters);
+            if (null != obj)
             {
-                try
-                {
-                    command.CommandText =
-                        "SELECT serverSideModificationDate FROM files WHERE path=@path";
-                    command.Parameters.AddWithValue("path", path);
-                    object obj = command.ExecuteScalar();
-                    // sqlite limitation for DateTime: http://www.sqlite.org/datatype3.html
-                    if (null != obj) {
 #if __MonoCS__
-                        obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
+                obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
 #else
-                        obj = ((DateTime)obj).ToUniversalTime();
+                obj = ((DateTime)obj).ToUniversalTime();
 #endif
-                    }
-                    return (DateTime?)obj;
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    return null;
-                }
             }
+            return (DateTime?)obj;
         }
 
 
@@ -369,27 +283,15 @@ namespace CmisSync.Lib.Cmis
             if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
                 throw new ArgumentException("serverSideModificationDate is not UTC");
             }
-
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                try
-                {
-                    command.CommandText =
-                        @"UPDATE files
-                            SET serverSideModificationDate=@serverSideModificationDate
-                            WHERE path=@path";
-                    command.Parameters.AddWithValue("serverSideModificationDate", serverSideModificationDate);
-                    command.Parameters.AddWithValue("path", path);
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    throw e;
-                }
-            }
+
+            string command = @"UPDATE files
+                    SET serverSideModificationDate=@serverSideModificationDate
+                    WHERE path=@path";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("serverSideModificationDate", serverSideModificationDate);
+            parameters.Add("path", path);
+            ExecuteSQLAction(command, parameters);
         }
 
 
@@ -397,56 +299,36 @@ namespace CmisSync.Lib.Cmis
         {
             string checksum = Checksum(path);
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                try
-                {
-                    command.CommandText =
-                        @"UPDATE files
-                            SET checksum=@checksum
-                            WHERE path=@path";
-                    command.Parameters.AddWithValue("checksum", checksum);
-                    command.Parameters.AddWithValue("path", path);
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException e)
-                {
-                    Logger.Error(e.Message);
-                    throw e;
-                }
-            }
+
+            string command = @"UPDATE files
+                    SET checksum=@checksum
+                    WHERE path=@path";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("checksum", checksum);
+            parameters.Add("path", path);
+            ExecuteSQLAction(command, parameters);
         }
 
 
         public bool ContainsFile(string path)
         {
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                command.CommandText =
-                    "SELECT serverSideModificationDate FROM files WHERE path=@path";
-                command.Parameters.AddWithValue("path", path);
-                object obj = command.ExecuteScalar();
-                return obj != null;
-            }
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+            return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE path=@path", parameters);
         }
 
 
         public bool ContainsFolder(string path)
         {
             path = Normalize(path);
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                command.CommandText =
-                    "SELECT serverSideModificationDate FROM folders WHERE path=@path";
-                command.Parameters.AddWithValue("path", path);
-                object obj = command.ExecuteScalar();
-                return obj != null;
-            }
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+            return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM folders WHERE path=@path", parameters);
         }
+
 
         /**
          * Check whether a file's content has changed since it was last synchronized.
@@ -469,42 +351,78 @@ namespace CmisSync.Lib.Cmis
 
             // Read previous checksum from database.
             string previousChecksum = null;
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                command.CommandText =
-                    "SELECT checksum FROM files WHERE path=@path";
-                command.Parameters.AddWithValue("path", normalizedPath);
-                object obj = command.ExecuteScalar();
-                previousChecksum = (string)obj;
-            }
+            string command = "SELECT checksum FROM files WHERE path=@path";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+            previousChecksum = (string)ExecuteSQLFunction(command, parameters);
 
             if (!currentChecksum.Equals(previousChecksum))
                 Logger.Info("Checksum of " + path + " has changed from " + previousChecksum + " to " + currentChecksum);
             return !currentChecksum.Equals(previousChecksum);
         }
 
+
         public string GetChangeLogToken()
         {
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
-            {
-                command.CommandText =
-                    "SELECT value FROM general WHERE key=\"ChangeLogToken\"";
-                object obj = command.ExecuteScalar();
-                return (string)obj;
-            }
+            return (string)ExecuteSQLFunction("SELECT value FROM general WHERE key=\"ChangeLogToken\"", null);
         }
+
 
         public void SetChangeLogToken(string token)
         {
-            var connection = GetSQLiteConnection();
-            using (var command = new SQLiteCommand(connection))
+            string command = "INSERT OR REPLACE INTO general (key, value) VALUES (\"ChangeLogToken\", @token)";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("token", token);
+            ExecuteSQLAction(command, parameters);
+        }
+
+
+        private void ExecuteSQLAction(string text, Dictionary<string, object> parameters)
+
+        {
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
-                command.CommandText =
-                    "INSERT OR REPLACE INTO general (key, value) VALUES (\"ChangeLogToken\", @token)";
-                command.Parameters.AddWithValue("token", token);
-                command.ExecuteNonQuery();
+                try
+                {
+                    ComposeSQLCommand(command, text, parameters);
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException e)
+                {
+                    Logger.Error(e.Message);
+                    throw;
+                }
+            }
+        }
+
+
+        private object ExecuteSQLFunction(string text, Dictionary<string, object> parameters)
+        {
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
+            {
+                try
+                {
+                    ComposeSQLCommand(command, text, parameters);
+                    return command.ExecuteScalar();
+                }
+                catch (SQLiteException e)
+                {
+                    Logger.Error(e.Message);
+                    throw;
+                }
+            }
+        }
+
+
+        private void ComposeSQLCommand(SQLiteCommand command, string text, Dictionary<string, object> parameters)
+        {
+            command.CommandText = text;
+            if (null != parameters)
+            {
+                foreach (KeyValuePair<string, object> pair in parameters)
+                {
+                    command.Parameters.AddWithValue(pair.Key, pair.Value);
+                }
             }
         }
     }

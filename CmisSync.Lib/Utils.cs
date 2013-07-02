@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,7 +54,7 @@ namespace CmisSync.Lib
                     {
                         msg.Append("StackTrace:");
                         msg.Append(Environment.NewLine);
-                        msg.Append(ex.StackTrace.ToString());
+                        msg.Append(ex.StackTrace);
                         msg.Append(Environment.NewLine);
                     }
  
@@ -197,7 +197,7 @@ namespace CmisSync.Lib
                 int index = 1;
                 do
                 {
-                    string ret = path + " (" + index + ")";
+                    string ret = path + " (" + index.ToString() + ")";
                     if (!File.Exists(ret))
                     {
                         return ret;
@@ -210,18 +210,18 @@ namespace CmisSync.Lib
 
         // Format a file size nicely with small caps.
         // Example: 1048576 becomes "1 ᴍʙ"
-        public static string FormatSize(double byte_count)
+        public static string FormatSize(double byteCount)
         {
-            if (byte_count >= 1099511627776)
-                return String.Format("{0:##.##} ᴛʙ", Math.Round(byte_count / 1099511627776, 1));
-            else if (byte_count >= 1073741824)
-                return String.Format("{0:##.##} ɢʙ", Math.Round(byte_count / 1073741824, 1));
-            else if (byte_count >= 1048576)
-                return String.Format("{0:##.##} ᴍʙ", Math.Round(byte_count / 1048576, 0));
-            else if (byte_count >= 1024)
-                return String.Format("{0:##.##} ᴋʙ", Math.Round(byte_count / 1024, 0));
+            if (byteCount >= 1099511627776)
+                return String.Format("{0:##.##} ᴛʙ", Math.Round(byteCount / 1099511627776, 1));
+            else if (byteCount >= 1073741824)
+                return String.Format("{0:##.##} ɢʙ", Math.Round(byteCount / 1073741824, 1));
+            else if (byteCount >= 1048576)
+                return String.Format("{0:##.##} ᴍʙ", Math.Round(byteCount / 1048576, 0));
+            else if (byteCount >= 1024)
+                return String.Format("{0:##.##} ᴋʙ", Math.Round(byteCount / 1024, 0));
             else
-                return byte_count.ToString() + " bytes";
+                return byteCount.ToString() + " bytes";
         }
     }
 }
