@@ -29,7 +29,7 @@ namespace CmisSync
 {
 
     /// <summary>
-    /// Kind of pages that are used in the first-run and folder addition wizards.
+    /// Kind of pages that are used in the folder addition wizards.
     /// </summary>
     public enum PageType
     {
@@ -88,17 +88,33 @@ namespace CmisSync
         public bool WindowIsOpen { get; private set; }
 
         /// <summary>
-        /// Current wizard step.
+        /// Current first-time wizard step.
         /// </summary>
-        public int TutorialPageNumber { get; private set; }
+        public int FirstTimeWizardPageNumber { get; private set; }
 
-        public string PreviousUrl { get; private set; }
         public string PreviousAddress { get; private set; }
         public string PreviousPath { get; private set; }
         public string PreviousRepository { get; private set; }
         public string SyncingReponame { get; private set; }
         public string DefaultRepoPath { get; private set; }
         public double ProgressBarPercentage { get; private set; }
+
+        private PageType current_page;
+        public string saved_address = "";
+        public string saved_remote_path = "";
+        public string saved_user = "";
+        public string saved_password = "";
+        public string saved_repository = "";
+
+        /// <summary>
+        /// List of the CMIS repositories at the chosen URL.
+        /// </summary>
+        public Dictionary<string, string> repositories;
+
+        /// <summary>
+        /// Whether CmisSync should be started automatically at login.
+        /// </summary>
+        private bool create_startup_item = true;
 
 
         static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
@@ -111,24 +127,6 @@ namespace CmisSync
         {
             return CmisUtils.GetSubfolders(repositoryId, path, address, user, password);
         }
-
-        public bool FetchPriorHistory
-        {
-            get
-            {
-                return this.fetch_prior_history;
-            }
-        }
-
-        private PageType current_page;
-        public string saved_address = "";
-        public string saved_remote_path = "";
-        public string saved_user = "";
-        public string saved_password = "";
-        public string saved_repository = "";
-        public Dictionary<string, string> repositories;
-        private bool create_startup_item = true;
-        private bool fetch_prior_history = false;
 
         private Regex urlregex;
 
@@ -153,10 +151,9 @@ namespace CmisSync
                 this.current_page = page_type;
             };
 
-            TutorialPageNumber = 0;
+            FirstTimeWizardPageNumber = 0;
             PreviousAddress = "";
             PreviousPath = "";
-            PreviousUrl = "";
             SyncingReponame = "";
             DefaultRepoPath = Program.Controller.FoldersPath;
 
@@ -183,7 +180,7 @@ namespace CmisSync
                         ShowWindowEvent();
 
                     }
-                    else if (TutorialPageNumber == 0)
+                    else if (FirstTimeWizardPageNumber == 0)
                     {
                         WindowIsOpen = true;
                         ChangePageEvent(PageType.Add1, null);
@@ -206,9 +203,6 @@ namespace CmisSync
             PreviousAddress = "";
             PreviousRepository = "";
             PreviousPath = "";
-            PreviousUrl = "";
-
-            this.fetch_prior_history = false;
 
             WindowIsOpen = false;
             HideWindowEvent();
@@ -229,31 +223,25 @@ namespace CmisSync
 
         public void SetupPageCompleted()
         {
-            TutorialPageNumber = 1;
+            FirstTimeWizardPageNumber = 1;
             ChangePageEvent(PageType.Tutorial, null);
         }
 
 
         public void TutorialSkipped()
         {
-            TutorialPageNumber = 4;
+            FirstTimeWizardPageNumber = 4;
             ChangePageEvent(PageType.Tutorial, null);
-        }
-
-
-        public void HistoryItemChanged(bool fetch_prior_history)
-        {
-            this.fetch_prior_history = fetch_prior_history;
         }
 
 
         public void TutorialPageCompleted()
         {
-            TutorialPageNumber++;
+            FirstTimeWizardPageNumber++;
 
-            if (TutorialPageNumber == 5)
+            if (FirstTimeWizardPageNumber == 5)
             {
-                TutorialPageNumber = 0;
+                FirstTimeWizardPageNumber = 0;
                 this.current_page = PageType.None;
 
                 WindowIsOpen = false;
@@ -371,7 +359,7 @@ namespace CmisSync
                 new Thread(() =>
                 {
                     Program.Controller.StartFetcher(PreviousAddress, "SelectedPlugin.Fingerprint", PreviousPath, repoName,
-                        "SelectedPlugin.AnnouncementsUrl", this.fetch_prior_history,
+                        "SelectedPlugin.AnnouncementsUrl",
                         PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), localrepopath);
 
                 }).Start();
@@ -433,10 +421,8 @@ namespace CmisSync
 
         public void FinishPageCompleted()
         {
-            PreviousUrl = "";
             PreviousAddress = "";
             PreviousPath = "";
-            this.fetch_prior_history = false;
 
             this.current_page = PageType.None;
             HideWindowEvent();

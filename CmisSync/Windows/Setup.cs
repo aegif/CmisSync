@@ -152,7 +152,7 @@ namespace CmisSync
                         #region Page Tutorial
                         case PageType.Tutorial:
                             {
-                                switch (Controller.TutorialPageNumber)
+                                switch (Controller.FirstTimeWizardPageNumber)
                                 {
                                     // First page of the tutorial.
                                     case 1:

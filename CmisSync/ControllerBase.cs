@@ -474,7 +474,7 @@ namespace CmisSync
         /// Create a new CmisSync synchronized folder.
         /// </summary>
         public void StartFetcher(string address, string required_fingerprint,
-            string remote_path, string local_path, string announcements_url, bool fetch_prior_history,
+            string remote_path, string local_path, string announcements_url,
             string repository, string path, string user, string password, string localrepopath)
         {
             if (announcements_url != null)
