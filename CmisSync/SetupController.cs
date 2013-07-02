@@ -86,7 +86,12 @@ namespace CmisSync
         /// Whether the window is currently open.
         /// </summary>
         public bool WindowIsOpen { get; private set; }
+
+        /// <summary>
+        /// Current wizard step.
+        /// </summary>
         public int TutorialPageNumber { get; private set; }
+
         public string PreviousUrl { get; private set; }
         public string PreviousAddress { get; private set; }
         public string PreviousPath { get; private set; }
