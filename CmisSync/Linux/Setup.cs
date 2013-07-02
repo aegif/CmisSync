@@ -62,7 +62,7 @@ namespace CmisSync {
         private string backText =
             CmisSync.Properties_Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture);
 
-        delegate CmisServer GetRepositoriesFuzzyDelegate(string url, string user, string password);
+        delegate CmisServer GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
 
         delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
             string address, string user, string password);
@@ -265,7 +265,7 @@ namespace CmisSync {
                 // Try to find the CMIS server (asynchronous using a delegate)
                 GetRepositoriesFuzzyDelegate dlgt =
                     new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
-                IAsyncResult ar = dlgt.BeginInvoke(address_entry.Text, user_entry.Text,
+                IAsyncResult ar = dlgt.BeginInvoke(new Uri(address_entry.Text), user_entry.Text,
                         password_entry.Text, null, null);
                 while (!ar.AsyncWaitHandle.WaitOne(100)) {
                     while (Application.EventsPending()) {
@@ -275,7 +275,7 @@ namespace CmisSync {
                 CmisServer cmisServer = dlgt.EndInvoke(ar);
 
                 Controller.repositories = cmisServer.Repositories;
-                address_entry.Text = cmisServer.Url;
+                address_entry.Text = cmisServer.Url.ToString();
 
                 // Hide wait cursor
                 this.GdkWindow.Cursor = default_cursor;
