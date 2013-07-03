@@ -40,11 +40,13 @@ namespace CmisSync
         Customize,
         Syncing,
         Finished,
-        Tutorial
+        Tutorial // This particular one contains sub-steps that are tracked via a number.
     }
 
     /// <summary>
-    /// MVC controller for the tutorial, and for the wizard to add a new remote folder.
+    /// MVC controller for the two wizards:
+    /// - CmisSync tutorial that appears at firt run,
+    /// - wizard to add a new remote folder.
     /// </summary>
     public class SetupController
     {
@@ -435,7 +437,6 @@ namespace CmisSync
             ChangePageEvent(PageType.Syncing);
 
             Program.Controller.FolderFetched += AddPageFetchedDelegate;
-            Program.Controller.FolderFetching += SyncingPageFetchingDelegate;
 
             // Add the remote folder to the configuration and start syncing.
             try
@@ -464,21 +465,14 @@ namespace CmisSync
             ChangePageEvent(PageType.Add2);
         }
 
-        // The following private methods are
-        // delegates used by the previous method
-
+        /// <summary>
+        /// Remote folder has been added, switch to the final step of the wizard.
+        /// </summary>
         private void AddPageFetchedDelegate(string remote_url)
         {
             ChangePageEvent(PageType.Finished);
 
             Program.Controller.FolderFetched -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetching -= SyncingPageFetchingDelegate;
-        }
-
-        private void SyncingPageFetchingDelegate(double percentage)
-        {
-            ProgressBarPercentage = percentage;
-            UpdateProgressBarEvent(ProgressBarPercentage);
         }
 
 
