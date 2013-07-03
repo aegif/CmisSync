@@ -42,6 +42,12 @@ if test "x$have_nunit" = "xno" ; then
 fi
 AC_SUBST(NUNIT_LIBS)
 
+PKG_CHECK_MODULES(JSON, [newtonsoft-json >= 4.5r6], have_newtonsoft_json=yes, have_newtonsoft_json=no)
+if test "x$have_newtonsoft_json" = "xno" ; then
+    AC_ERROR("newtonsoft-json is a required dependency: you need to install the appropriate devel package before you can compile")
+fi
+AC_SUBST(NUNIT_LIBS)
+
 CMISSYNC_CHECK_NOTIFY_SHARP
 CMISSYNC_CHECK_GTK_SHARP
 
@@ -49,6 +55,27 @@ AC_ARG_ENABLE(appindicator,
 	AS_HELP_STRING([--enable-appindicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
 	[enable_appindicator=$enableval],
 	[enable_appindicator="auto"])
+
+AC_ARG_WITH([dotcmis],
+            AS_HELP_STRING([--with-dotcmis=PATH],[Specify path to DotCMIS.dll]),
+            [dotcmis_dll=${withval}],[dotcmis_dll=no])
+if test "x$dotcmis_dll" = "xno" ; then
+    AC_ERROR([Please specify the path to DotCMIS.dll using --with-dotcmis (use --help for more information.)])
+fi
+if test -f ${dotcmis_dll} ; then
+    case ${dotcmis_dll} in
+        /*)
+        AC_SUBST(DOTCMISLIBS,[-r:${dotcmis_dll}])
+        AC_SUBST(DOTCMISPATH,[${dotcmis_dll}])
+        ;;
+        *)
+        AC_SUBST(DOTCMISLIBS,[[-r:\$\(top_srcdir\)/${dotcmis_dll}]])
+        AC_SUBST(DOTCMISPATH,[[\$\(top_srcdir\)/${dotcmis_dll}]])
+        ;;
+    esac
+else
+    AC_ERROR([${dotcmis_dll} not found])
+fi
 
 TEST_URL="https://devel.dataspace.cc/cmis/atom"
 AC_ARG_WITH([test-url],
@@ -92,19 +119,18 @@ if test "$OSNAME" = "Linux" ; then
 	dnl check for notify-sharp
 	PKG_CHECK_MODULES(NOTIFY_SHARP, notify-sharp, have_notify_sharp=yes, have_notify_sharp=no)
 	if test "x$have_notify_sharp" = "xno" ; then
-		AC_ERROR("notify-sharp is a required dependency: you need to install the appropriate devel package before you can compile")
+		AC_ERROR([notify-sharp is a required dependency: you need to install the appropriate devel package before you can compile])
 	fi
 	AC_SUBST(NOTIFY_SHARP_LIBS)
 
     dnl check for log4net
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
-		AC_ERROR("log4net is a required dependency: you need to install the appropriate devel package before you can compile")
+		AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
 	fi
 	AC_SUBST(LOG4NET_LIBS)
 
 	APPINDICATOR_REQUIRED=0.0.7
-
 	if test x$enable_appindicator = xauto ; then
 			PKG_CHECK_EXISTS([appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED],
 							 enable_appindicator="yes",
@@ -124,8 +150,6 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
-    AC_SUBST(JSONLIBS,[[-r:\$\(top_srcdir\)/Extras/Newtonsoft.Json.dll]])
-    AC_SUBST(DOTCMISLIBS,[[-r:\$\(top_srcdir\)/Extras/DotCMIS.dll]])
 
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
 	GUISUBDIRS=CmisSync

@@ -3,7 +3,7 @@ TARGET = exe
 
 ASSEMBLY_INFO_SOURCE = Properties/AssemblyInfo.cs
 
-LIBS = $(LOG4NET_LIBS) $(JSONLIBS) -r:$(DIR_BIN)/TestLibrary.dll \
+LIBS = $(LOG4NET_LIBS) $(JSON_LIBS) -r:$(DIR_BIN)/TestLibrary.dll \
 	   $(LIBS_CMISSYNCLIB_DEPS) \
 	   $(NUNIT_LIBS)
 

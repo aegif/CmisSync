@@ -61,7 +61,7 @@ $(ASSEMBLY_FILE): $(SOURCES_BUILD) $(RESOURCES_EXPANDED) $(DEP_LIBS)
 		-codepage:utf8 \
 		-nowarn:0278 -nowarn:0078 $$warn \
 		-define:HAVE_GTK_2_10 -define:NET_2_0 \
-		-debug -optimize- -target:$(TARGET) -out:$@ \
+		-debug -target:$(TARGET) -out:$@ \
 		$(BUILD_DEFINES) $(ENABLE_ATK_FLAG) \
 		$(FILTERED_LIBS) $(RESOURCES_BUILD) $(SOURCES_BUILD)
 	@if [ -e $(srcdir)/$(notdir $@.config) ]; then \
@@ -76,4 +76,3 @@ EXTRA_DIST += $(SOURCES_BUILD) $(RESOURCES_EXPANDED)
 CLEANFILES = $(OUTPUT_FILES) $(ASSEMBLY_FILE).config
 DISTCLEANFILES = *.pidb
 MAINTAINERCLEANFILES = Makefile.in
-
