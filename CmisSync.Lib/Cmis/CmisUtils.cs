@@ -92,8 +92,13 @@ namespace CmisSync.Lib.Cmis
          */
         static public Dictionary<string,string> GetRepositories(Uri url, string user, string password)
         {
+            Dictionary<string,string> result = new Dictionary<string,string>();
 
-
+            if (null == url)
+            {
+                return result;
+            }
+            
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
 
@@ -134,8 +139,6 @@ namespace CmisSync.Lib.Cmis
                 return null;
             }
 
-            Dictionary<string,string> result = new Dictionary<string,string>();
-
             for (int i = 0; i < repositories.Count; i++)
             {
                 result.Add(repositories.ElementAt(i).Id, repositories.ElementAt(i).Name);
@@ -174,6 +177,11 @@ namespace CmisSync.Lib.Cmis
         // Not bulletproof. It depends on the server, and there is no web UI at all.
         static public string GetBrowsableURL(RepoInfo repo)
         {
+            if (null == repo)
+            {
+                throw new ArgumentNullException("repo");
+            }
+
             if (repo.Address.AbsoluteUri.EndsWith("alfresco/cmisatom"))
             {
                 // Alfresco

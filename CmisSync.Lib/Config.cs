@@ -207,10 +207,15 @@ namespace CmisSync.Lib
 
         public void AddFolder(RepoInfo repoInfo)
         {
+            if (null == repoInfo)
+            {
+                return;
+            }
+
             this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
         }
 
-        public void AddFolder(string name, string path, Uri url, string repository,
+        private void AddFolder(string name, string path, Uri url, string repository,
             string remoteFolder, string user, string password, double pollinterval)
         {
             XmlNode node_name = configXml.CreateElement("name");

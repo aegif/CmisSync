@@ -118,6 +118,11 @@ namespace CmisSync.Lib
          * */
         public static Boolean WorthSyncing(string filename)
         {
+            if (null == filename)
+            {
+                return false;
+            }
+
             // TODO: Consider these ones as well:
             //    "*~", // gedit and emacs
             //    ".~lock.*", // LibreOffice

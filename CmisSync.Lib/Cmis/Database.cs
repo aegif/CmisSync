@@ -79,25 +79,22 @@ namespace CmisSync.Lib.Cmis
 
                     if (createDatabase)
                     {
-                        using (var command = new SQLiteCommand(sqliteConnection))
-                        {
-                            command.CommandText =
-                                @"CREATE TABLE files (
-                                path TEXT PRIMARY KEY,
-                                serverSideModificationDate DATE,
-                                metadata TEXT,
-                                checksum TEXT);   /* Checksum of both data and metadata */
-                            CREATE TABLE folders (
-                                path TEXT PRIMARY KEY,
-                                serverSideModificationDate DATE,
-                                metadata TEXT,
-                                checksum TEXT);   /* Checksum of metadata */
-                            CREATE TABLE general (
-                                key TEXT PRIMARY KEY,
-                                value TEXT);";    /* Other data such as ChangeLog token */
-                            command.ExecuteNonQuery();
-                            Logger.Info("Database created");
-                        }
+                        string command = 
+                            @"CREATE TABLE files (
+                            path TEXT PRIMARY KEY,
+                            serverSideModificationDate DATE,
+                            metadata TEXT,
+                            checksum TEXT);   /* Checksum of both data and metadata */
+                        CREATE TABLE folders (
+                            path TEXT PRIMARY KEY,
+                            serverSideModificationDate DATE,
+                            metadata TEXT,
+                            checksum TEXT);   /* Checksum of metadata */
+                        CREATE TABLE general (
+                            key TEXT PRIMARY KEY,
+                            value TEXT);";    /* Other data such as ChangeLog token */
+                        ExecuteSQLAction(command, null);
+                        Logger.Info("Database created");
                     }
                 }
                 catch (Exception e)
@@ -116,7 +113,7 @@ namespace CmisSync.Lib.Cmis
          * - Make data smaller in database
          * - Reduce OS-specific differences
          */
-        public string Normalize(string path)
+        private string Normalize(string path)
         {
             // Remove path prefix
             path = path.Substring(pathPrefixSize, path.Length - pathPrefixSize);

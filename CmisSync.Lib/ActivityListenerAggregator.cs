@@ -29,7 +29,7 @@ namespace CmisSync.Lib
          */
         private ActivityListener overall;
 
-        private int numberOfActiveProcesses = 0;
+        private int numberOfActiveProcesses;
 
         public ActivityListenerAggregator(ActivityListener overallListener)
         {

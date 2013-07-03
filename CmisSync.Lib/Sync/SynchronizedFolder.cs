@@ -60,7 +60,7 @@ namespace CmisSync.Lib.Sync
              * true if syncing is being performed right now.
              * TODO use is_syncing variable in parent
              */
-            private bool syncing = true;
+            private bool syncing;
 
             /**
              * Parameters to use for all CMIS requests.
@@ -93,6 +93,11 @@ namespace CmisSync.Lib.Sync
             public SynchronizedFolder(RepoInfo repoInfo,
                 ActivityListener listener, RepoBase repoCmis)
             {
+                if (null == repoInfo || null == repoCmis)
+                {
+                    throw new ArgumentNullException("repoInfo");
+                }
+
                 this.repo = repoCmis;
                 this.activityListener = listener;
                 this.repoinfo = repoInfo;
@@ -112,8 +117,6 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
 
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
-
-                syncing = false;
             }
 
 
@@ -577,7 +580,7 @@ namespace CmisSync.Lib.Sync
                 database.RemoveFolder(folderPath);
             }
 
-            public Dictionary<string, string[]> FetchMetadata(IDocument document)
+            private Dictionary<string, string[]> FetchMetadata(IDocument document)
             {
                 Dictionary<string, string[]> metadata = new Dictionary<string, string[]>();
 
