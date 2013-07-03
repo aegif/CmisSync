@@ -1,4 +1,4 @@
-SUBDIRS = Common TestLibrary TestLibraryRunner Linux
+SUBDIRS = Common Linux TestLibrary TestLibraryRunner
 
 EXTRA_DIST =  \
 	Program.cs \
@@ -14,3 +14,5 @@ EXTRA_DIST =  \
 install-data-hook:
 	test -f $(datadir)/applications/defaults.list && \
 	test -z $(DESTDIR) && update-desktop-database $(datadir)/applications || :
+
+MAINTAINERCLEAN_FILES = Makefile.in

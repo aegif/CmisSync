@@ -36,36 +36,13 @@ SHAMROCK_CHECK_MONO_4_0_GAC_ASSEMBLIES([
 ])]
 )
 
+PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+if test "x$have_nunit" = "xno" ; then
+    AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+fi
+AC_SUBST(NUNIT_LIBS)
+
 CMISSYNC_CHECK_NOTIFY_SHARP
-
-AC_ARG_ENABLE(debug,
-	AC_HELP_STRING([--enable-debug],
-		[Use 'DEBUG' Configuration [default=YES]]),
-		enable_debug=yes, enable_debug=no)
-AM_CONDITIONAL(ENABLE_DEBUG, test x$enable_debug = xyes)
-if test "x$enable_debug" = "xyes" ; then
-	CONFIG_REQUESTED="yes"
-fi
-AC_ARG_ENABLE(release,
-	AC_HELP_STRING([--enable-release],
-		[Use 'RELEASE' Configuration [default=NO]]),
-		enable_release=yes, enable_release=no)
-AM_CONDITIONAL(ENABLE_RELEASE, test x$enable_release = xyes)
-if test "x$enable_release" = "xyes" ; then
-	CONFIG_REQUESTED="yes"
-fi
-if test -z "$CONFIG_REQUESTED" ; then
-	AM_CONDITIONAL(ENABLE_DEBUG, true)
-	enable_debug=yes
-fi
-
-dnl package checks, common for all configs
-#PKG_CHECK_MODULES([NDESK_DBUS], [ndesk-dbus-1.0])
-#AC_SUBST(NDESK_DBUS_LIBS)
-#PKG_CHECK_MODULES([NDESK_DBUS_GLIB], [ndesk-dbus-glib-1.0])
-#AC_SUBST(NDESK_DBUS_GLIB_LIBS)
-
-
 CMISSYNC_CHECK_GTK_SHARP
 
 AC_ARG_ENABLE(appindicator,
@@ -73,7 +50,7 @@ AC_ARG_ENABLE(appindicator,
 	[enable_appindicator=$enableval],
 	[enable_appindicator="auto"])
 
-TEST_URL="https://development.deutsche-wolke.de/cmis/atom"
+TEST_URL="https://devel.dataspace.cc/cmis/atom"
 AC_ARG_WITH([test-url],
     AS_HELP_STRING([--with-test-url=URL],[Specify server URL for testing]),
     TEST_URL=${withval})
@@ -111,12 +88,6 @@ AC_SUBST(TEST_REPOID)
 
 OSNAME=`uname -s`
 if test "$OSNAME" = "Linux" ; then
-	dnl check for webkit-sharp
-	PKG_CHECK_MODULES(WEBKIT_SHARP, webkit-sharp-1.0, have_webkit_sharp=yes, have_webkit_sharp=no)
-	if test "x$have_webkit_sharp" = "xno" ; then
-		AC_ERROR("webkit-sharp is a required dependency: you need to install the appropriate devel package before you can compile")
-	fi
-	AC_SUBST(WEBKIT_SHARP_LIBS)
 
 	dnl check for notify-sharp
 	PKG_CHECK_MODULES(NOTIFY_SHARP, notify-sharp, have_notify_sharp=yes, have_notify_sharp=no)
@@ -166,8 +137,6 @@ fi
 
 AC_SUBST([GUISUBDIRS])
 
-SHAMROCK_CHECK_NUNIT
-
 AC_OUTPUT([
 build/cmissync.spec
 build/Makefile
@@ -200,4 +169,3 @@ Configuration:
        Build Gtk+ UI       : ${enable_gtkui}
 
 "
-
