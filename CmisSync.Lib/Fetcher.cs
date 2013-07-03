@@ -34,26 +34,26 @@ namespace CmisSync.Lib
 
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(Fetcher));
 
-        public Action Started = delegate { };
-        public Action Failed = delegate { };
+        public Action Started { get; set; }
+        public Action Failed { get; set; }
 
         /**
          * <param>repo is encrypted</param>
          * <param>repo is empty</param>
          * <param>warnings</param>
          */
-        public Action<bool,bool,string[]> Finished = delegate { };
+        public Action<bool,bool,string[]> Finished { get; set; }
 
         /**
          * <param>percentage</param>
          */
-        public Action<double> ProgressChanged = delegate { };
+        public Action<double> ProgressChanged { get; set; }
 
         public Uri RemoteUrl { get; protected set; }
         public string TargetFolder { get; protected set; }
         public bool IsActive { get; private set; }
-        public string Identifier;
-        public RepoInfo OriginalRepoInfo;
+        public string Identifier { get; set; }
+        public RepoInfo OriginalRepoInfo { get; set; }
 
         public string[] GetWarnings()
         {
@@ -66,8 +66,8 @@ namespace CmisSync.Lib
         }
 
 
-        protected List<string> warnings = new List<string>();
-        protected List<string> errors = new List<string>();
+        protected List<string> warnings { get; set; }
+        protected List<string> errors { get; set; }
 
 
         // Sets up a fetcher that can get remote folders
