@@ -63,7 +63,7 @@ namespace CmisSync.Lib
                     bool.TryParse(debugNode.InnerText, out debug);
                     return debug;
                 }
-                catch
+                catch (System.Xml.XPath.XPathException)
                 {
                     return false;
                 }
@@ -192,7 +192,7 @@ namespace CmisSync.Lib
             return (XmlElement)configXml.SelectSingleNode("/CmisSync/log4net");
         }
 
-        public List<string> Folders
+        public System.Collections.ObjectModel.Collection<string> Folders
         {
             get
             {
@@ -201,7 +201,7 @@ namespace CmisSync.Lib
                 foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
                     folders.Add(node_folder["name"].InnerText);
 
-                return folders;
+                return new System.Collections.ObjectModel.Collection<string>(folders);
             }
         }
 

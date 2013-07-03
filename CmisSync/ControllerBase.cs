@@ -114,7 +114,7 @@ namespace CmisSync
         {
             get
             {
-                List<string> folders = ConfigManager.CurrentConfig.Folders;
+                List<string> folders = new List<string>(ConfigManager.CurrentConfig.Folders);
                 folders.Sort();
 
                 return folders;

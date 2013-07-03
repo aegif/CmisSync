@@ -49,9 +49,26 @@ namespace CmisSync.Lib
             ChangeEvent(sender, args);
         }
 
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    base.Dispose(disposing);
+                }
+                disposed = true;
+            }
+        }
 
         public void Enable ()
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
             lock (this.thread_lock)
                 EnableRaisingEvents = true;
         }
@@ -59,6 +76,10 @@ namespace CmisSync.Lib
 
         public void Disable ()
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
             lock (this.thread_lock)
                 EnableRaisingEvents = false;
         }

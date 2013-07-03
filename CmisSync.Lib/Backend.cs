@@ -44,7 +44,8 @@ namespace CmisSync.Lib
                     if (uname (buf) == 0 && Marshal.PtrToStringAnsi (buf) == "Darwin")
                         return PlatformID.MacOSX;
 
-                } catch {
+                } catch (OutOfMemoryException) {
+                } catch (DllNotFoundException) {
                 } finally {
                     if (buf != IntPtr.Zero)
                         Marshal.FreeHGlobal (buf);

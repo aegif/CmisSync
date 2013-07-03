@@ -22,7 +22,7 @@ namespace CmisSync.Lib.Sync
     public partial class CmisRepo : RepoBase
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisRepo));
-        public enum RulesType { Folder, File };
+        //public enum RulesType { Folder, File };
 
         /**
          * Synchronization with a particular CMIS folder.

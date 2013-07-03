@@ -66,8 +66,8 @@ namespace CmisSync.Lib
         }
 
 
-        protected List<string> warnings { get; set; }
-        protected List<string> errors { get; set; }
+        private List<string> warnings = new List<string>();
+        private List<string> errors = new List<string>();
 
 
         // Sets up a fetcher that can get remote folders

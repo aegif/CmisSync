@@ -139,9 +139,9 @@ namespace CmisSync.Lib.Cmis
                 return null;
             }
 
-            for (int i = 0; i < repositories.Count; i++)
+            foreach (IRepository repo in repositories)
             {
-                result.Add(repositories.ElementAt(i).Id, repositories.ElementAt(i).Name);
+                result.Add(repo.Id, repo.Name);
             }
             
             return result;
@@ -200,7 +200,7 @@ namespace CmisSync.Lib.Cmis
                     string path = repo.RemotePath.Substring("/Sites/".Length);
                     if (path.Contains("documentLibrary"))
                     {
-                        int firstSlashPosition = path.IndexOf("/");
+                        int firstSlashPosition = path.IndexOf('/');
                         string siteName = path.Substring(0, firstSlashPosition);
                         string pathWithinSite = path.Substring(firstSlashPosition + "/documentLibrary".Length);
                         string escapedPathWithinSite = HttpUtility.UrlEncode(pathWithinSite);

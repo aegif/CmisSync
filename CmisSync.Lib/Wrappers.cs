@@ -43,7 +43,7 @@ namespace CmisSync.Lib
         public DateTime FirstTimestamp { get; set; }
         public Uri RemoteUrl { get; set; }
 
-        public List<Change> Changes { get; set; }
+        public System.Collections.ObjectModel.Collection<Change> Changes { get; private set; }
     }
 
 

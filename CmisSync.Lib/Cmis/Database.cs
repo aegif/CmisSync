@@ -58,12 +58,37 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        //private bool disposed;
+
+        //public void Dispose()
+        //{
+        //    Dispose(true);
+        //}
+
+        //protected virtual void Dispose(bool disposing)
+        //{
+        //    if (!disposed)
+        //    {
+        //        if (disposing)
+        //        {
+        //            sqliteConnection.Dispose();
+        //            disposed = true;
+        //        }
+        //    }
+        //}
+
+
         /**
          * Connection to the database.
          * The sqliteConnection must not be used directly, used this method instead.
          */
         public SQLiteConnection GetSQLiteConnection()
         {
+            //if (disposed)
+            //{
+            //    throw new ObjectDisposedException(sqliteConnection.GetType().Name);
+            //}
+
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
                 try
@@ -100,6 +125,7 @@ namespace CmisSync.Lib.Cmis
                 catch (Exception e)
                 {
                     Logger.Error("Error creating database: " + Utils.ToLogString(e));
+                    throw;
                 }
             }
             return sqliteConnection;
