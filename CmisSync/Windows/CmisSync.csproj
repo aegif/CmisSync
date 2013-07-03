@@ -105,7 +105,6 @@
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="Spinner.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ProjectExtensions>
