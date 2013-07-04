@@ -8,11 +8,11 @@ ASSEMBLY_INFO_SOURCE = Defines.cs
 LIBS = $(REF_CMISSYNC) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS) $(LOG4NET_LIBS)
 
 SOURCES =  \
-	../Program.cs \
 	../AboutController.cs \
 	../BubblesController.cs \
 	../ControllerBase.cs \
-	../Extensions.cs \
+	../Program.cs \
+	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
 	About.cs \
@@ -24,8 +24,7 @@ SOURCES =  \
 	StatusIcon.cs \
 	UI.cs \
 	UIHelpers.cs \
-	Utils.cs \
-	../Properties/Resources.Designer.cs
+	Utils.cs
 
 RESOURCES = $(RESOURCES_RESOURCES)
 

@@ -5,7 +5,6 @@ EXTRA_DIST =  \
 	AboutController.cs \
 	BubblesController.cs \
 	ControllerBase.cs \
-	Extensions.cs \
 	SetupController.cs \
 	StatusIconController.cs \
 	Properties
