@@ -79,22 +79,16 @@ namespace CmisSync.Lib.Sync
              */
             private void ApplyRemoteChange(IChangeEvent change)
             {
-                Logger.Info("Sync | Change type:" + change.ChangeType + " id:" + change.ObjectId + " properties:" + change.Properties);
+                Logger.Info("Sync | Change type:" + change.ChangeType.ToString() + " id:" + change.ObjectId + " properties:" + change.Properties);
+                IFolder remoteFolder;
+                IDocument remoteDocument;
                 switch (change.ChangeType)
                 {
                     case ChangeType.Created:
                     case ChangeType.Updated:
                         ICmisObject cmisObject = session.GetObject(change.ObjectId);
-                        if (cmisObject is DotCMIS.Client.Impl.Folder)
+                        if (null != (remoteDocument = cmisObject as IDocument))
                         {
-                            IFolder remoteFolder = (IFolder)cmisObject;
-                            // string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
-                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
-                            RecursiveFolderCopy(remoteFolder, localFolder);
-                        }
-                        else if (cmisObject is DotCMIS.Client.Impl.Document)
-                        {
-                            IDocument remoteDocument = (IDocument)cmisObject;
                             string remoteDocumentPath = remoteDocument.Paths.First();
                             if (!remoteDocumentPath.StartsWith(remoteFolderPath))
                             {
@@ -104,23 +98,19 @@ namespace CmisSync.Lib.Sync
                             string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
                             string relativeFolderPath = Path.GetDirectoryName(relativePath);
                             relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
-                            // string localFolderPath = Path.Combine(localRootFolder, relativeFolderPath);
                             string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
                             DownloadFile(remoteDocument, localFolderPath);
+                        }
+                        else if (null != (remoteFolder = cmisObject as IFolder))
+                        {
+                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
+                            RecursiveFolderCopy(remoteFolder, localFolder);
                         }
                         break;
                     case ChangeType.Deleted:
                         cmisObject = session.GetObject(change.ObjectId);
-                        if (cmisObject is DotCMIS.Client.Impl.Folder)
+                        if (null != (remoteDocument = cmisObject as IDocument))
                         {
-                            IFolder remoteFolder = (IFolder)cmisObject;
-                            // string localFolder = Path.Combine(localRootFolder, remoteFolder.Path);
-                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
-                            RemoveFolderLocally(localFolder); // Remove from filesystem and database.
-                        }
-                        else if (cmisObject is DotCMIS.Client.Impl.Document)
-                        {
-                            IDocument remoteDocument = (IDocument)cmisObject;
                             string remoteDocumentPath = remoteDocument.Paths.First();
                             if (!remoteDocumentPath.StartsWith(remoteFolderPath))
                             {
@@ -132,6 +122,11 @@ namespace CmisSync.Lib.Sync
                             relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
                             string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
                             // TODO DeleteFile(localFolderPath); // Delete on filesystem and in database
+                        }
+                        else if (null != (remoteFolder = cmisObject as IFolder))
+                        {
+                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
+                            RemoveFolderLocally(localFolder); // Remove from filesystem and database.
                         }
                         break;
                     case ChangeType.Security:

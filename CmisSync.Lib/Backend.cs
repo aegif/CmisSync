@@ -26,7 +26,7 @@ namespace CmisSync.Lib
 
         public static string Version {
             get {
-                string version = "" + Assembly.GetExecutingAssembly ().GetName ().Version;
+                string version = String.Empty + Assembly.GetExecutingAssembly ().GetName ().Version;
                 return version.Substring (0, version.Length - 2);
             }
         }
@@ -44,7 +44,8 @@ namespace CmisSync.Lib
                     if (uname (buf) == 0 && Marshal.PtrToStringAnsi (buf) == "Darwin")
                         return PlatformID.MacOSX;
 
-                } catch {
+                } catch (OutOfMemoryException) {
+                } catch (DllNotFoundException) {
                 } finally {
                     if (buf != IntPtr.Zero)
                         Marshal.FreeHGlobal (buf);

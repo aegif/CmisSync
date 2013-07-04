@@ -37,30 +37,30 @@ namespace CmisSync.Lib
     public class ChangeSet
     {
 
-        public Folder Folder;
-        public string Revision;
-        public DateTime Timestamp;
-        public DateTime FirstTimestamp;
-        public Uri RemoteUrl;
+        public Folder Folder { get; set; }
+        public string Revision { get; set; }
+        public DateTime Timestamp { get; set; }
+        public DateTime FirstTimestamp { get; set; }
+        public Uri RemoteUrl { get; set; }
 
-        public List<Change> Changes = new List<Change>();
+        public System.Collections.ObjectModel.Collection<Change> Changes { get; private set; }
     }
 
 
     public class Change
     {
-        public CmisChangeType Type;
-        public DateTime Timestamp;
+        public CmisChangeType Type { get; set; }
+        public DateTime Timestamp { get; set; }
 
-        public string Path;
-        public string MovedToPath;
+        public string Path { get; set; }
+        public string MovedToPath { get; set; }
     }
 
 
     public class Folder
     {
-        public string Name;
-        public Uri RemoteAddress;
+        public string Name { get; set; }
+        public Uri RemoteAddress { get; set; }
 
         public string FullPath
         {

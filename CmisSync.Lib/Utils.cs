@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using log4net;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
+[assembly: ComVisible (false)]
 namespace CmisSync.Lib
 {
     public static class Utils
@@ -29,14 +31,17 @@ namespace CmisSync.Lib
             {
                 try
                 {
+                    string newline = Environment.NewLine;
+
                     Exception orgEx = ex;
  
                     msg.Append("Exception:");
-                    msg.Append(Environment.NewLine);
+        
+                    msg.Append(newline);
                     while (orgEx != null)
                     {
                         msg.Append(orgEx.Message);
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         orgEx = orgEx.InnerException;
                     }
  
@@ -46,39 +51,39 @@ namespace CmisSync.Lib
                         {
                             msg.Append("Data :");
                             msg.Append(i.ToString());
-                            msg.Append(Environment.NewLine);
+                            msg.Append(newline);
                         }
                     }
  
                     if (ex.StackTrace != null)
                     {
                         msg.Append("StackTrace:");
-                        msg.Append(Environment.NewLine);
-                        msg.Append(ex.StackTrace.ToString());
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
+                        msg.Append(ex.StackTrace);
+                        msg.Append(newline);
                     }
  
                     if (ex.Source != null)
                     {
                         msg.Append("Source:");
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         msg.Append(ex.Source);
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                     }
  
                     if (ex.TargetSite != null)
                     {
                         msg.Append("TargetSite:");
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         msg.Append(ex.TargetSite.ToString());
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                     }
  
                     Exception baseException = ex.GetBaseException();
                     if (baseException != null)
                     {
                         msg.Append("BaseException:");
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         msg.Append(ex.GetBaseException());
                     }
                 }
@@ -116,6 +121,11 @@ namespace CmisSync.Lib
          * */
         public static Boolean WorthSyncing(string filename)
         {
+            if (null == filename)
+            {
+                return false;
+            }
+
             // TODO: Consider these ones as well:
             //    "*~", // gedit and emacs
             //    ".~lock.*", // LibreOffice
@@ -129,7 +139,7 @@ namespace CmisSync.Lib
                 || filename[0] == '~' // Microsoft Office temporary files start with ~
                 || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
             {
-                //Logger.Info("SynchronizedFolder | Unworth syncing:" + filename);
+                Logger.Debug("Unworth syncing: " + filename);
                 return false;
             }
 
@@ -143,7 +153,11 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsInvalidFileName(string name)
         {
-            return invalidFileNameRegex.IsMatch(name);
+            bool ret = invalidFileNameRegex.IsMatch(name);
+            if (ret) {
+                Logger.Debug("Invalid filename: " + name);
+            }
+            return ret;
         }
 
 
@@ -159,7 +173,11 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsInvalidFolderName(string name)
         {
-            return invalidFolderNameRegex.IsMatch(name);
+            bool ret = invalidFolderNameRegex.IsMatch(name);
+            if (ret) {
+                Logger.Debug("Invalid dirname: " + name);
+            }
+            return ret;
         }
 
 
@@ -189,7 +207,7 @@ namespace CmisSync.Lib
                 int index = 1;
                 do
                 {
-                    string ret = path + " (" + index + ")";
+                    string ret = path + " (" + index.ToString() + ")";
                     if (!File.Exists(ret))
                     {
                         return ret;
@@ -202,18 +220,18 @@ namespace CmisSync.Lib
 
         // Format a file size nicely with small caps.
         // Example: 1048576 becomes "1 ᴍʙ"
-        public static string FormatSize(double byte_count)
+        public static string FormatSize(double byteCount)
         {
-            if (byte_count >= 1099511627776)
-                return String.Format("{0:##.##} ᴛʙ", Math.Round(byte_count / 1099511627776, 1));
-            else if (byte_count >= 1073741824)
-                return String.Format("{0:##.##} ɢʙ", Math.Round(byte_count / 1073741824, 1));
-            else if (byte_count >= 1048576)
-                return String.Format("{0:##.##} ᴍʙ", Math.Round(byte_count / 1048576, 0));
-            else if (byte_count >= 1024)
-                return String.Format("{0:##.##} ᴋʙ", Math.Round(byte_count / 1024, 0));
+            if (byteCount >= 1099511627776)
+                return String.Format("{0:##.##} ᴛʙ", Math.Round(byteCount / 1099511627776, 1));
+            else if (byteCount >= 1073741824)
+                return String.Format("{0:##.##} ɢʙ", Math.Round(byteCount / 1073741824, 1));
+            else if (byteCount >= 1048576)
+                return String.Format("{0:##.##} ᴍʙ", Math.Round(byteCount / 1048576, 0));
+            else if (byteCount >= 1024)
+                return String.Format("{0:##.##} ᴋʙ", Math.Round(byteCount / 1024, 0));
             else
-                return byte_count.ToString() + " bytes";
+                return byteCount.ToString() + " bytes";
         }
     }
 }

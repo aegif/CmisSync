@@ -192,8 +192,7 @@ namespace CmisSync {
             }
         
             base.ShowAll ();
-            KeepAbove = true;
-            Present ();
+            base.Present ();
         }
         
         

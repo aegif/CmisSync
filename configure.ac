@@ -36,36 +36,19 @@ SHAMROCK_CHECK_MONO_4_0_GAC_ASSEMBLIES([
 ])]
 )
 
+PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+if test "x$have_nunit" = "xno" ; then
+    AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+fi
+AC_SUBST(NUNIT_LIBS)
+
+PKG_CHECK_MODULES(JSON, [newtonsoft-json >= 4.5r6], have_newtonsoft_json=yes, have_newtonsoft_json=no)
+if test "x$have_newtonsoft_json" = "xno" ; then
+    AC_ERROR("newtonsoft-json is a required dependency: you need to install the appropriate devel package before you can compile")
+fi
+AC_SUBST(NUNIT_LIBS)
+
 CMISSYNC_CHECK_NOTIFY_SHARP
-
-AC_ARG_ENABLE(debug,
-	AC_HELP_STRING([--enable-debug],
-		[Use 'DEBUG' Configuration [default=YES]]),
-		enable_debug=yes, enable_debug=no)
-AM_CONDITIONAL(ENABLE_DEBUG, test x$enable_debug = xyes)
-if test "x$enable_debug" = "xyes" ; then
-	CONFIG_REQUESTED="yes"
-fi
-AC_ARG_ENABLE(release,
-	AC_HELP_STRING([--enable-release],
-		[Use 'RELEASE' Configuration [default=NO]]),
-		enable_release=yes, enable_release=no)
-AM_CONDITIONAL(ENABLE_RELEASE, test x$enable_release = xyes)
-if test "x$enable_release" = "xyes" ; then
-	CONFIG_REQUESTED="yes"
-fi
-if test -z "$CONFIG_REQUESTED" ; then
-	AM_CONDITIONAL(ENABLE_DEBUG, true)
-	enable_debug=yes
-fi
-
-dnl package checks, common for all configs
-#PKG_CHECK_MODULES([NDESK_DBUS], [ndesk-dbus-1.0])
-#AC_SUBST(NDESK_DBUS_LIBS)
-#PKG_CHECK_MODULES([NDESK_DBUS_GLIB], [ndesk-dbus-glib-1.0])
-#AC_SUBST(NDESK_DBUS_GLIB_LIBS)
-
-
 CMISSYNC_CHECK_GTK_SHARP
 
 AC_ARG_ENABLE(appindicator,
@@ -73,7 +56,28 @@ AC_ARG_ENABLE(appindicator,
 	[enable_appindicator=$enableval],
 	[enable_appindicator="auto"])
 
-TEST_URL="https://development.deutsche-wolke.de/cmis/atom"
+AC_ARG_WITH([dotcmis],
+            AS_HELP_STRING([--with-dotcmis=PATH],[Specify path to DotCMIS.dll]),
+            [dotcmis_dll=${withval}],[dotcmis_dll=no])
+if test "x$dotcmis_dll" = "xno" ; then
+    AC_ERROR([Please specify the path to DotCMIS.dll using --with-dotcmis (use --help for more information.)])
+fi
+if test -f ${dotcmis_dll} ; then
+    case ${dotcmis_dll} in
+        /*)
+        AC_SUBST(DOTCMISLIBS,[-r:${dotcmis_dll}])
+        AC_SUBST(DOTCMISPATH,[${dotcmis_dll}])
+        ;;
+        *)
+        AC_SUBST(DOTCMISLIBS,[[-r:\$\(top_srcdir\)/${dotcmis_dll}]])
+        AC_SUBST(DOTCMISPATH,[[\$\(top_srcdir\)/${dotcmis_dll}]])
+        ;;
+    esac
+else
+    AC_ERROR([${dotcmis_dll} not found])
+fi
+
+TEST_URL="https://devel.dataspace.cc/cmis/atom"
 AC_ARG_WITH([test-url],
     AS_HELP_STRING([--with-test-url=URL],[Specify server URL for testing]),
     TEST_URL=${withval})
@@ -111,29 +115,22 @@ AC_SUBST(TEST_REPOID)
 
 OSNAME=`uname -s`
 if test "$OSNAME" = "Linux" ; then
-	dnl check for webkit-sharp
-	PKG_CHECK_MODULES(WEBKIT_SHARP, webkit-sharp-1.0, have_webkit_sharp=yes, have_webkit_sharp=no)
-	if test "x$have_webkit_sharp" = "xno" ; then
-		AC_ERROR("webkit-sharp is a required dependency: you need to install the appropriate devel package before you can compile")
-	fi
-	AC_SUBST(WEBKIT_SHARP_LIBS)
 
 	dnl check for notify-sharp
 	PKG_CHECK_MODULES(NOTIFY_SHARP, notify-sharp, have_notify_sharp=yes, have_notify_sharp=no)
 	if test "x$have_notify_sharp" = "xno" ; then
-		AC_ERROR("notify-sharp is a required dependency: you need to install the appropriate devel package before you can compile")
+		AC_ERROR([notify-sharp is a required dependency: you need to install the appropriate devel package before you can compile])
 	fi
 	AC_SUBST(NOTIFY_SHARP_LIBS)
 
     dnl check for log4net
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
-		AC_ERROR("log4net is a required dependency: you need to install the appropriate devel package before you can compile")
+		AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
 	fi
 	AC_SUBST(LOG4NET_LIBS)
 
 	APPINDICATOR_REQUIRED=0.0.7
-
 	if test x$enable_appindicator = xauto ; then
 			PKG_CHECK_EXISTS([appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED],
 							 enable_appindicator="yes",
@@ -153,10 +150,6 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
-    AC_SUBST(JSONLIBS,[[-r:\$\(top_srcdir\)/Extras/Newtonsoft.Json.dll]])
-    AC_SUBST(DOTCMISLIBS,[[-r:\$\(top_srcdir\)/Extras/DotCMIS.dll]])
-
-    [BUILD_DEFINES="$BUILD_DEFINES -define:USE_MONO_SQLITE"]
 
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
 	GUISUBDIRS=CmisSync
@@ -167,8 +160,6 @@ else
 fi
 
 AC_SUBST([GUISUBDIRS])
-
-SHAMROCK_CHECK_NUNIT
 
 AC_OUTPUT([
 build/cmissync.spec
@@ -202,4 +193,3 @@ Configuration:
        Build Gtk+ UI       : ${enable_gtkui}
 
 "
-

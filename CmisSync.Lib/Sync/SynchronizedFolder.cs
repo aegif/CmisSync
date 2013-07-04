@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +22,7 @@ namespace CmisSync.Lib.Sync
     public partial class CmisRepo : RepoBase
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisRepo));
-        public enum RulesType { Folder, File };
+        //public enum RulesType { Folder, File };
 
         /**
          * Synchronization with a particular CMIS folder.
@@ -60,7 +60,7 @@ namespace CmisSync.Lib.Sync
              * true if syncing is being performed right now.
              * TODO use is_syncing variable in parent
              */
-            private bool syncing = true;
+            private bool syncing;
 
             /**
              * Parameters to use for all CMIS requests.
@@ -91,10 +91,15 @@ namespace CmisSync.Lib.Sync
              * Constructor for Repo (at every launch of CmisSync)
              */
             public SynchronizedFolder(RepoInfo repoInfo,
-                ActivityListener activityListener, CmisRepo repo)
+                ActivityListener listener, RepoBase repoCmis)
             {
-                this.repo = repo;
-                this.activityListener = activityListener;
+                if (null == repoInfo || null == repoCmis)
+                {
+                    throw new ArgumentNullException("repoInfo");
+                }
+
+                this.repo = repoCmis;
+                this.activityListener = listener;
                 this.repoinfo = repoInfo;
 
                 // Database is the user's AppData/Roaming
@@ -112,8 +117,6 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
 
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
-
-                syncing = false;
             }
 
 
@@ -130,7 +133,7 @@ namespace CmisSync.Lib.Sync
                     // Detect whether the repository has the ChangeLog capability.
                     ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-                    Logger.Info("ChangeLog capability: " + ChangeLogCapability);
+                    Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Info("Created CMIS session: " + session.ToString());
                 }
                 catch (CmisRuntimeException e)
@@ -177,16 +180,17 @@ namespace CmisSync.Lib.Sync
             {
                 if (this.syncing)
                 {
-                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
+                    //Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
                     return;
                 }
                 this.syncing = true;
 
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.DoWork += new DoWorkEventHandler(
-                    delegate(Object o, DoWorkEventArgs args)
-                    {
-                        Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
+                using (BackgroundWorker bw = new BackgroundWorker())
+                {
+                    bw.DoWork += new DoWorkEventHandler(
+                        delegate(Object o, DoWorkEventArgs args)
+                        {
+                            Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
 #if !DEBUG
                         try
                         {
@@ -199,15 +203,16 @@ namespace CmisSync.Lib.Sync
                             Logger.Error("CMIS exception while syncing:", e);
                         }
 #endif
-                    }
-                );
-                bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                    delegate(object o, RunWorkerCompletedEventArgs args)
-                    {
-                        this.syncing = false;
-                    }
-                );
-                bw.RunWorkerAsync();
+                        }
+                    );
+                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                        delegate(object o, RunWorkerCompletedEventArgs args)
+                        {
+                            this.syncing = false;
+                        }
+                    );
+                    bw.RunWorkerAsync();
+                }
             }
 
 
@@ -223,7 +228,7 @@ namespace CmisSync.Lib.Sync
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
+                        string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
                         if (Utils.WorthSyncing(localSubFolder))
                         {
                             // Create local folder.
@@ -231,7 +236,7 @@ namespace CmisSync.Lib.Sync
 
                             // Create database entry for this folder
                             // TODO - Yannick - Add metadata
-                            database.AddFolder(localSubFolder, ((DateTime)remoteFolder.LastModificationDate).ToUniversalTime());
+                            database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                             // Recurse into folder.
                             RecursiveFolderCopy(remoteSubFolder, localSubFolder);
@@ -340,7 +345,7 @@ namespace CmisSync.Lib.Sync
                     File.Move(tmpfilepath, filepath);
                     
                     // Create database entry for this file.
-                    database.AddFile(filepath, ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime(), metadata);
+                    database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
 
                     Logger.Info("Added to database: " + remoteDocument.ContentStreamFileName);
                 }
@@ -447,7 +452,7 @@ namespace CmisSync.Lib.Sync
                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                     // Create database entry for this file.
-                    database.AddFile(filePath, ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime(), metadata);
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
                 }
 
                 activityListener.ActivityStopped();
@@ -467,7 +472,7 @@ namespace CmisSync.Lib.Sync
 
                 // Create database entry for this folder
                 // TODO - Yannick - Add metadata
-                database.AddFolder(localFolder, ((DateTime)folder.LastModificationDate).ToUniversalTime());
+                database.AddFolder(localFolder, folder.LastModificationDate);
 
                 // Upload each file in this folder.
                 foreach (string file in Directory.GetFiles(localFolder))
@@ -529,9 +534,8 @@ namespace CmisSync.Lib.Sync
                 bool found = false;
                 foreach (ICmisObject obj in remoteFolder.GetChildren())
                 {
-                    if (obj is IDocument)
+                    if (null != (document = obj as IDocument))
                     {
-                        document = (IDocument)obj;
                         if (document.Name == fileName)
                         {
                             found = true;
@@ -575,7 +579,7 @@ namespace CmisSync.Lib.Sync
                 database.RemoveFolder(folderPath);
             }
 
-            public Dictionary<string, string[]> FetchMetadata(IDocument document)
+            private Dictionary<string, string[]> FetchMetadata(IDocument document)
             {
                 Dictionary<string, string[]> metadata = new Dictionary<string, string[]>();
 

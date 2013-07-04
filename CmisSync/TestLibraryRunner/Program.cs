@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Sync;
+using CmisSync.Lib.Cmis;
 
 using log4net;
 using log4net.Config;
@@ -40,7 +41,7 @@ namespace TestLibraryRunner
             object[] server = servers.ElementAt(serverId);
 
             new CmisSyncTests().SyncWhileModifyingFile((string)server[0], (string)server[1],
-                (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
+                    (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
         }
 
         static void testFuzzy()
@@ -49,6 +50,11 @@ namespace TestLibraryRunner
                     File.ReadAllText("../../../TestLibrary/test-servers-fuzzy.json"));
             object[] server = servers.ElementAt(serverId);
             new CmisSyncTests().GetRepositoriesFuzzy((string)server[0], (string)server[1], (string)server[2]);
+        }
+
+        static void testCrypto()
+        {
+            new CmisSyncTests().TestCrypto();
         }
 
         static void Main(string[] args)
@@ -69,19 +75,19 @@ namespace TestLibraryRunner
 
             foreach (string arg in args)
             {
-                 if (File.Exists(arg))
-                 {
-                     path = arg;
-                     break;
-                 }
+                if (File.Exists(arg))
+                {
+                    path = arg;
+                    break;
+                }
             }
 
+            testCrypto();
             test(path == null ? "../../../TestLibrary/test-servers.json" : path);
             //testFuzzy();
 
-            // Let the console open.
-            Console.WriteLine("Press Enter to close...");
-            Console.ReadLine();
+            // Removed Console read - This should be handled by the caller. Otherwise
+            // tests cannot be run in an automated environment (Continuous Integration).
         }
     }
 }

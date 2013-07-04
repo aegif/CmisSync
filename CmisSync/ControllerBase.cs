@@ -58,7 +58,6 @@ namespace CmisSync
         public delegate void ShowSetupWindowEventHandler(PageType page_type);
 
         public event Action ShowAboutWindowEvent = delegate { };
-        public event Action ShowEventLogWindowEvent = delegate { };
 
         public event FolderFetchedEventHandler FolderFetched = delegate { };
         public delegate void FolderFetchedEventHandler(string remote_url);
@@ -114,7 +113,7 @@ namespace CmisSync
         {
             get
             {
-                List<string> folders = ConfigManager.CurrentConfig.Folders;
+                List<string> folders = new List<string>(ConfigManager.CurrentConfig.Folders);
                 folders.Sort();
 
                 return folders;
@@ -496,7 +495,7 @@ namespace CmisSync
 
             this.fetcher.Failed += delegate
             {
-                FolderFetchError(this.fetcher.RemoteUrl.ToString(), this.fetcher.Errors);
+                FolderFetchError(this.fetcher.RemoteUrl.ToString(), this.fetcher.GetErrors());
                 StopFetcher();
             };
 

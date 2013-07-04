@@ -44,7 +44,7 @@ namespace CmisSync {
             Title          = "About CmisSync";
             AppPaintable   = true;
 
-            string image_path = new string [] { UI.AssetsPath, "pixmaps", "about.png" }.Combine ();
+            string image_path = System.IO.Path.Combine(UI.AssetsPath, "pixmaps", "about.png");
 
             Realize ();
             Gdk.Pixbuf buf = new Gdk.Pixbuf (image_path);
@@ -63,7 +63,6 @@ namespace CmisSync {
             Controller.ShowWindowEvent += delegate {
                 Application.Invoke (delegate {
                         ShowAll ();
-                        KeepAbove = true; // Present() appears not to raise the Window
                         Present ();
                         });
             };
