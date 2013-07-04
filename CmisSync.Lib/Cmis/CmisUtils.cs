@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -164,8 +164,17 @@ namespace CmisSync.Lib.Cmis
 
             IFolder folder = (IFolder)session.GetObjectByPath(path);
 
-            Logger.Info("Sync | folder.Properties.Count:" + folder.Properties.Count.ToString());
+            Logger.Info("CmisUtils | folder.Properties.Count:" + folder.Properties.Count.ToString());
             IItemEnumerable<ICmisObject> children = folder.GetChildren();
+
+            // Debug that leads to crash on eXo Platform
+            //long num = children.TotalNumItems;
+            //Logger.Debug("CmisUtils | children number: " + num);
+            //foreach (var child in children)
+            //{
+            //    Logger.Debug("CmisUtils | child: " + child);
+            //}
+
             foreach (var subfolder in children.OfType<IFolder>())
             {
                 result.Add(subfolder.Path);

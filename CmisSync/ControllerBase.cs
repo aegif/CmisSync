@@ -58,7 +58,6 @@ namespace CmisSync
         public delegate void ShowSetupWindowEventHandler(PageType page_type);
 
         public event Action ShowAboutWindowEvent = delegate { };
-        public event Action ShowEventLogWindowEvent = delegate { };
 
         public event FolderFetchedEventHandler FolderFetched = delegate { };
         public delegate void FolderFetchedEventHandler(string remote_url);

@@ -25,6 +25,9 @@ using System.Windows.Forms;
 
 namespace CmisSync {
 
+    /// <summary>
+    /// Create a Windows shortcut for CmisSync.
+    /// </summary>
     public class Shortcut : IDisposable
     {
         private IShellLink link;
@@ -40,11 +43,11 @@ namespace CmisSync {
         {
             link = (IShellLink)new ShellLink();
 
-            // setup shortcut information
+            // Setup shortcut information.
             link.SetDescription(Description);
             link.SetPath(file_path);
 
-            // save it
+            // Save the shortcut information.
             IPersistFile file = (IPersistFile)link;
             file.Save(target_path, false);
         }
@@ -53,12 +56,12 @@ namespace CmisSync {
         {
             link = (IShellLink)new ShellLink();
 
-            // setup shortcut information
+            // Setup shortcut information.
             link.SetDescription(Description);
             link.SetPath(file_path);
             link.SetIconLocation(icofile, icoidx);
 
-            // save it
+            // Save the shortcut information.
             IPersistFile file = (IPersistFile)link;
             file.Save(target_path, false);
         }
@@ -72,12 +75,18 @@ namespace CmisSync {
             this.link = null;
         }
 
+        /// <summary>
+        /// Internal class for the link.
+        /// </summary>
         [ComImport]
         [Guid("00021401-0000-0000-C000-000000000046")]
         internal class ShellLink
         {
         }
 
+        /// <summary>
+        /// Internal interface for the link.
+        /// </summary>
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         [Guid("000214F9-0000-0000-C000-000000000046")]

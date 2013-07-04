@@ -29,7 +29,7 @@ You can use one of the commands listed below for the most used Linux distributio
 ```bash
 $ sudo apt-get install libappindicator0.1-cil-dev gtk-sharp2 mono-runtime mono-devel \
   monodevelop libndesk-dbus1.0-cil-dev nant libnotify-cil-dev libgtk2.0-cil-dev mono-mcs \
-  mono-gmcs libwebkit-cil-dev intltool libtool libndesk-dbus-glib1.0-cil-dev liblog4net-cil-dev
+  mono-gmcs libwebkit-cil-dev intltool libtool libndesk-dbus-glib1.0-cil-dev liblog4net-cil-dev libnewtonsoft-json-cil-dev
 ```
 
 #### Fedora
@@ -66,7 +66,7 @@ Download DotCMIS.dll from http://chemistry.apache.org/dotnet/dotcmis.html and co
 
 ```bash
 $ make -f Makefile.am
-$ ./configure
+$ ./configure --with-dotcmis=Extras/DotCMIS.dll
 $ make
 $ sudo make install
 $ sudo cp Extras/DotCMIS.dll /usr/local/lib/cmissync/
