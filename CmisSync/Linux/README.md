@@ -69,6 +69,7 @@ $ make -f Makefile.am
 $ ./configure
 $ make
 $ sudo make install
+$ sudo cp Extras/DotCMIS.dll /usr/local/lib/cmissync/
 ```
 
 ### Resetting CmisSync settings
