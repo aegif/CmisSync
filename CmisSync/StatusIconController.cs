@@ -28,6 +28,9 @@ using System.Diagnostics;
 
 namespace CmisSync {
 
+    /// <summary>
+    /// State of the CmisSync status icon.
+    /// </summary>
     public enum IconState {
         Idle,
         SyncingUp,
@@ -37,7 +40,12 @@ namespace CmisSync {
     }
 
 
+    /// <summary>
+    /// MVC controller for the CmisSync status icon.
+    /// </summary>
     public class StatusIconController {
+
+        // Event controller.
 
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
         public delegate void UpdateIconEventHandler (int icon_frame);
@@ -50,9 +58,6 @@ namespace CmisSync {
 
         public event UpdateQuitItemEventHandler UpdateQuitItemEvent = delegate { };
         public delegate void UpdateQuitItemEventHandler (bool quit_item_enabled);
-		
-		public event UpdateOpenRecentEventsItemEventHandler UpdateOpenRecentEventsItemEvent = delegate { };
-        public delegate void UpdateOpenRecentEventsItemEventHandler (bool open_recent_events_item_enabled);
 
         public event UpdateSuspendSyncFolderEventHandler UpdateSuspendSyncFolderEvent = delegate { };
         public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
