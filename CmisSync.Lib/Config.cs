@@ -125,8 +125,6 @@ namespace CmisSync.Lib
             finally
             {
                 configXml.Load(FullPath);
-                //TmpPath = Path.Combine (FoldersPath, ".tmp");
-                //Directory.CreateDirectory (TmpPath);
             }
         }
 

@@ -120,19 +120,4 @@ namespace CmisSync.Lib
             return writeAllow && !writeDeny;
         }
     }
-
-
-    public class Announcement
-    {
-
-        public readonly string FolderIdentifier;
-        public readonly string Message;
-
-
-        public Announcement(string folder_identifier, string message)
-        {
-            FolderIdentifier = folder_identifier;
-            Message = message;
-        }
-    }
 }

@@ -28,6 +28,9 @@ using CmisSync.Lib.Sync;
 namespace CmisSync.Lib
 {
 
+    /// <summary>
+    /// Creates a CmisSync synchronized folder.
+    /// </summary>
     public class Fetcher
     {
         CmisRepo CmisRepo;

@@ -213,12 +213,6 @@ namespace CmisSync {
         }
 
 
-        public void OpenRecentEventsClicked ()
-        {
-            new Threading.Thread (() => Program.Controller.ShowEventLogWindow ()).Start ();
-        }
-
-
         public void LogClicked()
         {
             Program.Controller.ShowLog(ConfigManager.CurrentConfig.GetLogFilePath());

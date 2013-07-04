@@ -30,85 +30,96 @@ namespace CmisSync
     // The CmisSync main class.
     public class Program
     {
-
-        public static Controller Controller;
+        /// <summary>
+        /// User interface for CmisSync.
+        /// </summary>
         public static UI UI;
 
+        /// <summary>
+        /// MVC controller.
+        /// </summary>
+        public static Controller Controller;
+
+        /// <summary>
+        /// Mutex checking whether CmisSync is already running or not.
+        /// </summary>
         private static Mutex program_mutex = new Mutex(false, "CmisSync");
 
+        /// <summary>
+        /// Logging.
+        /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
+        // Single-threaded apartment on Windows.
 #if !__MonoCS__
         [STAThread]
 #endif
-            public static void Main(string[] args)
+        /// <summary>
+        /// Main method for CmisSync.
+        /// </summary>
+        public static void Main(string[] args)
+        {
+            bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
+
+            ServicePointManager.CertificatePolicy = new CertPolicyHandler();
+
+            // Migrate config.xml from past versions, if necessary.
+            if ( ! firstRun )
+                ConfigMigration.Migrate();
+
+            // Clear log file.
+            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+
+            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            Logger.Info("Starting.");
+
+            if (args.Length != 0 && !args[0].Equals("start") &&
+                Backend.Platform != PlatformID.MacOSX &&
+                Backend.Platform != PlatformID.Win32NT)
             {
-                bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
-                ServicePointManager.CertificatePolicy = new CertPolicyHandler();
+                string n = Environment.NewLine;
 
-                // Migrate config.xml from past versions, if necessary.
-                if ( ! firstRun )
-                    ConfigMigration.Migrate();
+                Console.WriteLine(n +
+                    "CmisSync is a collaboration and sharing tool that is" + n +
+                    "designed to keep things simple and to stay out of your way." + n +
+                    n +
+                    "Version: " + CmisSync.Lib.Backend.Version + n +
+                    "Copyright (C) 2010 Hylke Bons" + n +
+                    "This program comes with ABSOLUTELY NO WARRANTY." + n +
+                    n +
+                    "This is free software, and you are welcome to redistribute it" + n +
+                    "under certain conditions. Please read the GNU GPLv3 for details." + n +
+                    n +
+                    "Usage: CmisSync [start|stop|restart]");
+                Environment.Exit(-1);
+            }
 
-                // Clear log file.
-                File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            // Only allow one instance of CmisSync (on Windows)
+            if (!program_mutex.WaitOne(0, false))
+            {
+                Logger.Error("CmisSync is already running.");
+                Environment.Exit(-1);
+            }
 
-                log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
-                Logger.Info("Starting.");
+            // Increase the number of concurrent requests to each server,
+            // as an unsatisfying workaround until this DotCMIS bug 632 is solved.
+            // See https://github.com/nicolas-raoul/CmisSync/issues/140
+            ServicePointManager.DefaultConnectionLimit = 1000;
 
-                if (args.Length != 0 && !args[0].Equals("start") &&
-                        Backend.Platform != PlatformID.MacOSX &&
-                        Backend.Platform != PlatformID.Win32NT)
-                {
+            try
+            {
+                Controller = new Controller();
+                Controller.Initialize(firstRun);
 
-                    string n = Environment.NewLine;
-
-                    Console.WriteLine(n +
-                            "CmisSync is a collaboration and sharing tool that is" + n +
-                            "designed to keep things simple and to stay out of your way." + n +
-                            n +
-                            "Version: " + CmisSync.Lib.Backend.Version + n +
-                            "Copyright (C) 2010 Hylke Bons" + n +
-                            "This program comes with ABSOLUTELY NO WARRANTY." + n +
-                            n +
-                            "This is free software, and you are welcome to redistribute it" + n +
-                            "under certain conditions. Please read the GNU GPLv3 for details." + n +
-                            n +
-                            "Usage: CmisSync [start|stop|restart]");
-                    Environment.Exit(-1);
-                }
-
-                // Only allow one instance of CmisSync (on Windows)
-                if (!program_mutex.WaitOne(0, false))
-                {
-                    Logger.Error("CmisSync is already running.");
-                    Environment.Exit(-1);
-                }
-
-                // Increase the number of concurrent requests to each server,
-                // as an unsatisfying workaround until this DotCMIS bug 632 is solved.
-                // See https://github.com/nicolas-raoul/CmisSync/issues/140
-                ServicePointManager.DefaultConnectionLimit = 1000;
-
-                //#if !DEBUG
-                try
-                {
-                    //#endif
-                    Controller = new Controller();
-                    Controller.Initialize(firstRun);
-
-                    UI = new UI();
-                    UI.Run();
-
-                    //#if !DEBUG
-                }
-                catch (Exception e)
-                {
-                    Logger.Fatal("Exception in Program.Main", e);
-                    Environment.Exit(-1);
-                }
-                //#endif
+                UI = new UI();
+                UI.Run();
+            }
+            catch (Exception e)
+            {
+                Logger.Fatal("Exception in Program.Main", e);
+                Environment.Exit(-1);
+            }
 
 #if !__MonoCS__
                 // Suppress assertion messages in debug mode

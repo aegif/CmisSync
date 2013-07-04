@@ -25,7 +25,6 @@ namespace CmisSync {
     public class UI {
 
         public StatusIcon StatusIcon;
-        public Bubbles Bubbles;
         public Setup Setup;
         public About About;
 
@@ -39,7 +38,6 @@ namespace CmisSync {
 
             Setup      = new Setup ();
             About      = new About ();
-            Bubbles    = new Bubbles ();
             StatusIcon = new StatusIcon ();
 
             Program.Controller.UIHasLoaded ();

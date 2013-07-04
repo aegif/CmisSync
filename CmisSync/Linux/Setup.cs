@@ -166,7 +166,6 @@ namespace CmisSync {
             // User
             Entry user_entry = new Entry () {
                 Text = Controller.PreviousPath,
-                     //RM Sensitive = (Controller.SelectedPlugin.User == null),
                      ActivatesDefault = false
             };
 
@@ -174,34 +173,30 @@ namespace CmisSync {
             Entry password_entry = new Entry () {
                 Text = Controller.PreviousPath,
                      Visibility = false,
-                     //RM Sensitive = (Controller.SelectedPlugin.Password == null),
                      ActivatesDefault = true
             };
 
             Controller.ChangeAddressFieldEvent += delegate (string text,
-                    string example_text, FieldState state) {
+                    string example_text) {
 
                 Application.Invoke (delegate {
                         address_entry.Text      = text;
-                        address_entry.Sensitive = (state == FieldState.Enabled);
                         });
             };
 
             Controller.ChangeUserFieldEvent += delegate (string text,
-                    string example_text, FieldState state) {
+                    string example_text) {
 
                 Application.Invoke (delegate {
                         user_entry.Text      = text;
-                        user_entry.Sensitive = (state == FieldState.Enabled);
                         });
             };
 
             Controller.ChangePasswordFieldEvent += delegate (string text,
-                    string example_text, FieldState state) {
+                    string example_text) {
 
                 Application.Invoke (delegate {
                         password_entry.Text      = text;
-                        password_entry.Sensitive = (state == FieldState.Enabled);
                         });
             };
 
@@ -554,11 +549,6 @@ namespace CmisSync {
                           Label = "Finish"
             };
 
-            Button cancel_button = new Button (cancelText);
-            cancel_button.Clicked += delegate {
-                Controller.SyncingCancelled ();
-            };
-
             Controller.UpdateProgressBarEvent += delegate (double percentage) {
                 Application.Invoke (delegate {
                         this.progress_bar.Fraction = percentage / 100;
@@ -573,82 +563,7 @@ namespace CmisSync {
             bar_wrapper.PackStart (this.progress_bar, false, false, 15);
 
             Add (bar_wrapper);
-            AddButton (cancel_button);
             AddButton (finish_button);
-
-        }
-
-        private void ShowErrorPage(string [] warnings)
-        {
-            Header = "Oops! Something went wrong" + "…";
-
-            VBox points = new VBox (false, 0);
-            Image list_point_one   = new Image (UIHelpers.GetIcon ("go-next", 16));
-            Image list_point_two   = new Image (UIHelpers.GetIcon ("go-next", 16));
-            Image list_point_three = new Image (UIHelpers.GetIcon ("go-next", 16));
-
-            Label label_one = new Label () {
-                Markup = "<b>" + Controller.PreviousUrl + "</b> is the address we've compiled. " +
-                    "Does this look alright?",
-                    Wrap   = true,
-                    Xalign = 0
-            };
-
-            Label label_two = new Label () {
-                Text   = "Do you have access rights to this remote project?",
-                       Wrap   = true,
-                       Xalign = 0
-            };
-
-            points.PackStart (new Label ("Please check the following:") { Xalign = 0 }, false, false, 6);
-
-            HBox point_one = new HBox (false, 0);
-            point_one.PackStart (list_point_one, false, false, 0);
-            point_one.PackStart (label_one, true, true, 12);
-            points.PackStart (point_one, false, false, 12);
-
-            HBox point_two = new HBox (false, 0);
-            point_two.PackStart (list_point_two, false, false, 0);
-            point_two.PackStart (label_two, true, true, 12);
-            points.PackStart (point_two, false, false, 12);
-
-            if (warnings.Length > 0) {
-                string warnings_markup = "";
-
-                foreach (string warning in warnings)
-                    warnings_markup += "\n<b>" + warning + "</b>";
-
-                Label label_three = new Label () {
-                    Markup = "Here's the raw error message:" + warnings_markup,
-                           Wrap   = true,
-                           Xalign = 0
-                };
-
-                HBox point_three = new HBox (false, 0);
-                point_three.PackStart (list_point_three, false, false, 0);
-                point_three.PackStart (label_three, true, true, 12);
-                points.PackStart (point_three, false, false, 12);
-            }
-
-            points.PackStart (new Label (""), true, true, 0);
-
-            Button cancel_button = new Button (cancelText);
-
-            cancel_button.Clicked += delegate {
-                Controller.PageCancelled ();
-            };
-
-            Button try_again_button = new Button ("Try Again…") {
-                Sensitive = true
-            };
-
-            try_again_button.Clicked += delegate {
-                Controller.ErrorPageCompleted ();
-            };
-
-            AddButton (cancel_button);
-            AddButton (try_again_button);
-            Add (points);
 
         }
 
@@ -682,7 +597,7 @@ namespace CmisSync {
 
         private void ShowTutorialPage()
         {
-            switch (Controller.TutorialPageNumber) {
+            switch (Controller.TutorialCurrentPage) {
                 case 1:
                     {
                         Header = CmisSync.Properties_Resources.ResourceManager.GetString("WhatsNext", CultureInfo.CurrentCulture);
@@ -793,7 +708,7 @@ namespace CmisSync {
                         });
             };
 
-            Controller.ChangePageEvent += delegate (PageType ptype, string [] warnings) {
+            Controller.ChangePageEvent += delegate (PageType ptype) {
                 Application.Invoke (delegate {
                         Reset ();
 
@@ -818,14 +733,9 @@ namespace CmisSync {
                         ShowSyncingPage();
                         break;
 
-                        case PageType.Error:
-                        ShowErrorPage(warnings);
-                        break;
-
                         case PageType.Finished:
                         ShowFinishedPage();
                         break;
-
 
                         case PageType.Tutorial:
                         ShowTutorialPage();

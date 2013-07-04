@@ -9,6 +9,12 @@ SOURCES =  \
 	ActivityListener.cs \
 	ActivityListenerAggregator.cs \
 	Backend.cs \
+	Cmis/CmisPermissionDeniedException.cs \
+	Cmis/CmisServerNotFoundException.cs \
+	Cmis/CmisUtils.cs \
+	Cmis/Crypto.cs \
+	Cmis/Database.cs \
+	Cmis/MimeType.cs \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
@@ -16,19 +22,13 @@ SOURCES =  \
 	Fetcher.cs \
 	RepoBase.cs \
 	RepoInfo.cs \
-	Utils.cs \
-	Watcher.cs \
-	Wrappers.cs \
 	Sync/ChangeLogStrategy.cs \
 	Sync/CmisRepo.cs \
 	Sync/CrawlStrategy.cs \
 	Sync/SynchronizedFolder.cs \
-	Cmis/CmisPermissionDeniedException.cs \
-	Cmis/CmisServerNotFoundException.cs \
-	Cmis/CmisUtils.cs \
-	Cmis/Crypto.cs \
-	Cmis/Database.cs \
-	Cmis/MimeType.cs
+	Utils.cs \
+	Watcher.cs \
+	Wrappers.cs
 
 EXTRA_DIST = CmisSync.Lib.csproj StaticDefines.cs
 
