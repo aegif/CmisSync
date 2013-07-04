@@ -215,7 +215,7 @@ namespace CmisSync
                         Text = CmisSync.Properties_Resources.ResourceManager.GetString("OpenLocalFolder", CultureInfo.CurrentCulture),
                         Image = UIHelpers.GetBitmap("folder")
                     };
-                    openLocalFolderItem.Click += OpenFolderDelegate(folderName);
+                    openLocalFolderItem.Click += OpenLocalFolderDelegate(folderName);
 
                     // Sub-item: open remotely.
                     ToolStripMenuItem openRemoteFolderItem = new ToolStripMenuItem()
@@ -258,7 +258,7 @@ namespace CmisSync
             this.traymenu.Items.Add(addFolderItem);
             this.traymenu.Items.Add(new ToolStripSeparator());
 
-            // Create the menu item that lets the userview the log.
+            // Create the menu item that lets the user view the log.
             ToolStripMenuItem log_item = new ToolStripMenuItem()
             {
                 Text = CmisSync.Properties_Resources.ResourceManager.GetString("ViewLog", CultureInfo.CurrentCulture)
@@ -269,7 +269,7 @@ namespace CmisSync
             };
             this.traymenu.Items.Add(log_item);
 
-            // About Menu
+            // Create the About menu.
             ToolStripMenuItem about_item = new ToolStripMenuItem()
             {
                 Text = CmisSync.Properties_Resources.ResourceManager.GetString("About", CultureInfo.CurrentCulture)
@@ -280,12 +280,11 @@ namespace CmisSync
             };
             this.traymenu.Items.Add(about_item);
 
-            // Exit Menu
+            // Create the exit menu.
             this.exitItem = new ToolStripMenuItem()
             {
                 Text = CmisSync.Properties_Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)
             };
-
             this.exitItem.Click += delegate
             {
                 this.trayicon.Dispose();
@@ -294,6 +293,10 @@ namespace CmisSync
             this.traymenu.Items.Add(this.exitItem);
         }
 
+
+        /// <summary>
+        /// Create the animation frames from image files.
+        /// </summary>
         private void CreateAnimationFrames()
         {
             this.animationFrames = new Icon[] {
@@ -305,12 +308,11 @@ namespace CmisSync
 			};
         }
 
-        public void ShowBalloon(string title, string subtext, ToolTipIcon tticon)
-        {
-            this.trayicon.ShowBalloonTip(5000, title, subtext, tticon);
-        }
 
-        private EventHandler OpenFolderDelegate(string reponame)
+        /// <summary>
+        /// Delegate for opening the local folder.
+        /// </summary>
+        private EventHandler OpenLocalFolderDelegate(string reponame)
         {
             return delegate
             {
@@ -318,6 +320,10 @@ namespace CmisSync
             };
         }
 
+
+        /// <summary>
+        /// Delegate for opening the remote folder.
+        /// </summary>
         private EventHandler OpenRemoteFolderDelegate(string reponame)
         {
             return delegate
@@ -326,6 +332,10 @@ namespace CmisSync
             };
         }
 
+
+        /// <summary>
+        /// Delegate for suspending sync.
+        /// </summary>
         private EventHandler SuspendSyncFolderDelegate(string reponame)
         {
             return delegate
