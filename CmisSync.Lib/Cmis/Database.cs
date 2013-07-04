@@ -144,7 +144,7 @@ namespace CmisSync.Lib.Cmis
             // Remove path prefix
             path = path.Substring(pathPrefixSize, path.Length - pathPrefixSize);
             // Normalize all slashes to forward slash
-            path = path.Replace(@"\", "/");
+            path = path.Replace('\\', '/');
             return path;
         }
 
