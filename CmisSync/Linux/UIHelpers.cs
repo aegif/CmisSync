@@ -45,7 +45,7 @@ namespace CmisSync {
 
         public static Image GetImage (string name)
         {
-            string image_path = new string [] { UI.AssetsPath, "pixmaps", name }.Combine ();
+            string image_path = Path.Combine (UI.AssetsPath, "pixmaps", name);
             return new Image (image_path);
         }
 

@@ -16,7 +16,6 @@ SOURCES =  \
 	../SetupController.cs \
 	../StatusIconController.cs \
 	About.cs \
-	Bubbles.cs \
 	Controller.cs \
 	Setup.cs \
 	SetupWindow.cs \
