@@ -27,7 +27,6 @@ using System.Net;
 
 namespace CmisSync
 {
-
     // The CmisSync main class.
     public class Program
     {
@@ -51,7 +50,6 @@ namespace CmisSync
         /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
-        
         // Single-threaded apartment on Windows.
 #if !__MonoCS__
         [STAThread]
@@ -61,8 +59,9 @@ namespace CmisSync
         /// </summary>
         public static void Main(string[] args)
         {
-            // If config file does not exist yet, it is most probably the first time CmisSync runs.
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
+
+            ServicePointManager.CertificatePolicy = new CertPolicyHandler();
 
             // Migrate config.xml from past versions, if necessary.
             if ( ! firstRun )
@@ -71,11 +70,9 @@ namespace CmisSync
             // Clear log file.
             File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
 
-            // Load logging from the CmisSync configuration file.
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             Logger.Info("Starting.");
 
-            // On Linux, CmisSync must be run with an argument.
             if (args.Length != 0 && !args[0].Equals("start") &&
                 Backend.Platform != PlatformID.MacOSX &&
                 Backend.Platform != PlatformID.Win32NT)
@@ -98,7 +95,7 @@ namespace CmisSync
                 Environment.Exit(-1);
             }
 
-            // Only allow one instance of CmisSync
+            // Only allow one instance of CmisSync (on Windows)
             if (!program_mutex.WaitOne(0, false))
             {
                 Logger.Error("CmisSync is already running.");
@@ -112,14 +109,11 @@ namespace CmisSync
 
             try
             {
-                // Run the controller.
                 Controller = new Controller();
                 Controller.Initialize(firstRun);
 
-                // Run the user interface.
                 UI = new UI();
                 UI.Run();
-
             }
             catch (Exception e)
             {
@@ -128,10 +122,10 @@ namespace CmisSync
             }
 
 #if !__MonoCS__
-            // Suppress assertion messages in debug mode
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            GC.WaitForPendingFinalizers();
+                // Suppress assertion messages in debug mode
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                GC.WaitForPendingFinalizers();
 #endif
-        }
+            }
     }
 }

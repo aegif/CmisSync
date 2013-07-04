@@ -26,12 +26,11 @@ namespace CmisSync.Lib
     public class Config
     {
         private XmlDocument configXml = new XmlDocument();
-        public string FullPath;
-        public string TmpPath;
-        // public string LogFilePath;
-        private string configpath;
+        public string FullPath { get; private set; }
+        //public string TmpPath;
+        //public string LogFilePath;
 
-        public string ConfigPath { get { return configpath; } }
+        public string ConfigPath { get; private set; }
 
         public string HomePath
         {
@@ -64,17 +63,17 @@ namespace CmisSync.Lib
                     bool.TryParse(debugNode.InnerText, out debug);
                     return debug;
                 }
-                catch
+                catch (System.Xml.XPath.XPathException)
                 {
                     return false;
                 }
             }
         }
 
-        public Config(string FullPath)
+        public Config(string fullPath)
         {
-            this.FullPath = FullPath;
-            configpath = Path.GetDirectoryName(FullPath);
+            FullPath = fullPath;
+            ConfigPath = Path.GetDirectoryName(FullPath);
             Console.WriteLine("FullPath:" + FullPath);
 
             //if (File.Exists(LogFilePath))
@@ -90,8 +89,8 @@ namespace CmisSync.Lib
             //    }
             //}
 
-            if (!Directory.Exists(configpath))
-                Directory.CreateDirectory(configpath);
+            if (!Directory.Exists(ConfigPath))
+                Directory.CreateDirectory(ConfigPath);
 
             if (!File.Exists(FullPath))
                 CreateInitialConfig();
@@ -140,7 +139,7 @@ namespace CmisSync.Lib
 
                 user_name = Environment.UserName;
                 if (string.IsNullOrEmpty(user_name))
-                    user_name = "";
+                    user_name = String.Empty;
                 else
                     user_name = user_name.TrimEnd(",".ToCharArray());
 
@@ -191,7 +190,7 @@ namespace CmisSync.Lib
             return (XmlElement)configXml.SelectSingleNode("/CmisSync/log4net");
         }
 
-        public List<string> Folders
+        public System.Collections.ObjectModel.Collection<string> Folders
         {
             get
             {
@@ -200,16 +199,21 @@ namespace CmisSync.Lib
                 foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
                     folders.Add(node_folder["name"].InnerText);
 
-                return folders;
+                return new System.Collections.ObjectModel.Collection<string>(folders);
             }
         }
 
         public void AddFolder(RepoInfo repoInfo)
         {
-            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address.ToString(), repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
+            if (null == repoInfo)
+            {
+                return;
+            }
+
+            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
         }
 
-        public void AddFolder(string name, string path, string url, string repository,
+        private void AddFolder(string name, string path, Uri url, string repository,
             string remoteFolder, string user, string password, double pollinterval)
         {
             XmlNode node_name = configXml.CreateElement("name");
@@ -223,7 +227,7 @@ namespace CmisSync.Lib
 
             node_name.InnerText = name;
             node_path.InnerText = path;
-            node_url.InnerText = url;
+            node_url.InnerText = url.ToString();
             node_repository.InnerText = repository;
             node_remoteFolder.InnerText = remoteFolder;
             node_user.InnerText = user;
@@ -287,16 +291,16 @@ namespace CmisSync.Lib
         }
 
 
-        public string GetUrlForFolder(string name)
+        public Uri GetUrlForFolder(string name)
         {
-            return GetFolderValue(name, "url");
+            return new Uri(GetFolderValue(name, "url"));
         }
 
 
         public bool IdentifierExists(string identifier)
         {
             if (identifier == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("identifier");
 
             foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
             {
@@ -310,9 +314,9 @@ namespace CmisSync.Lib
         }
 
 
-        public bool SetFolderOptionalAttribute(string folder_name, string key, string value)
+        public bool SetFolderOptionalAttribute(string folderName, string key, string value)
         {
-            XmlNode folder = GetFolder(folder_name);
+            XmlNode folder = GetFolder(folderName);
 
             if (folder == null)
                 return false;
@@ -335,9 +339,9 @@ namespace CmisSync.Lib
         }
 
 
-        public string GetFolderOptionalAttribute(string folder_name, string key)
+        public string GetFolderOptionalAttribute(string folderName, string key)
         {
-            XmlNode folder = GetFolder(folder_name);
+            XmlNode folder = GetFolder(folderName);
 
             if (folder != null)
             {
@@ -353,25 +357,25 @@ namespace CmisSync.Lib
             }
         }
 
-        public RepoInfo GetRepoInfo(string FolderName)
+        public RepoInfo GetRepoInfo(string folderName)
         {
-            RepoInfo repoInfo = new RepoInfo(FolderName, ConfigPath);
+            RepoInfo repoInfo = new RepoInfo(folderName, ConfigPath);
 
-            repoInfo.User = GetFolderOptionalAttribute(FolderName, "user");
-            repoInfo.Password = GetFolderOptionalAttribute(FolderName, "password");
-            repoInfo.Address = new Uri(GetUrlForFolder(FolderName));
-            repoInfo.RepoID = GetFolderOptionalAttribute(FolderName, "repository");
-            repoInfo.RemotePath = GetFolderOptionalAttribute(FolderName, "remoteFolder");
-            repoInfo.TargetDirectory = GetFolderOptionalAttribute(FolderName, "path");
+            repoInfo.User = GetFolderOptionalAttribute(folderName, "user");
+            repoInfo.Password = GetFolderOptionalAttribute(folderName, "password");
+            repoInfo.Address = GetUrlForFolder(folderName);
+            repoInfo.RepoID = GetFolderOptionalAttribute(folderName, "repository");
+            repoInfo.RemotePath = GetFolderOptionalAttribute(folderName, "remoteFolder");
+            repoInfo.TargetDirectory = GetFolderOptionalAttribute(folderName, "path");
             
             double pollinterval = 0;
-            double.TryParse(GetFolderOptionalAttribute(FolderName, "pollinterval"), out pollinterval);
-            if (pollinterval == 0) pollinterval = 5000;
+            double.TryParse(GetFolderOptionalAttribute(folderName, "pollinterval"), out pollinterval);
+            if (pollinterval < 1) pollinterval = 5000;
             repoInfo.PollInterval = pollinterval;
 
             if (String.IsNullOrEmpty(repoInfo.TargetDirectory))
             {
-                repoInfo.TargetDirectory = Path.Combine(FoldersPath, FolderName);
+                repoInfo.TargetDirectory = Path.Combine(FoldersPath, folderName);
             }
 
             return repoInfo;
@@ -438,7 +442,7 @@ namespace CmisSync.Lib
 
         public string GetLogFilePath()
         {
-            return Path.Combine(configpath, "debug_log.txt").ToString();
+            return Path.Combine(ConfigPath, "debug_log.txt");
         }
     }
 }

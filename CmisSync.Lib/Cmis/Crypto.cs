@@ -120,11 +120,11 @@ namespace CmisSync.Lib.Cmis
 #if __MonoCS__
             try
             {
+                PasswordDeriveBytes pdb = new PasswordDeriveBytes(GetCryptoKey(),
+                        new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
                 AesManaged myAes = new AesManaged();
-                myAes.Mode = CipherMode.CBC;
-                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                myAes.Key = GetCryptoKeyUnix();  // Byte array representing the key. Key MUST be 256 bits
-                myAes.Padding = PaddingMode.PKCS7;
+                myAes.Key = pdb.GetBytes(myAes.KeySize / 8);
+                myAes.IV = pdb.GetBytes(myAes.BlockSize / 8);
 
                 ICryptoTransform encryptor = myAes.CreateEncryptor();
 
@@ -150,11 +150,11 @@ namespace CmisSync.Lib.Cmis
 #if __MonoCS__
             try
             {
+                PasswordDeriveBytes pdb = new PasswordDeriveBytes(GetCryptoKey(),
+                        new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
                 AesManaged myAes = new AesManaged();
-                myAes.Mode = CipherMode.CBC;
-                myAes.IV = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                myAes.Key = GetCryptoKeyUnix();  // Byte array representing the key. Key MUST be 256 bits
-                myAes.Padding = PaddingMode.PKCS7;
+                myAes.Key = pdb.GetBytes(myAes.KeySize / 8);
+                myAes.IV = pdb.GetBytes(myAes.BlockSize / 8);
 
                 ICryptoTransform decryptor = myAes.CreateDecryptor();
 
@@ -190,17 +190,6 @@ namespace CmisSync.Lib.Cmis
             return System.Text.Encoding.UTF8.GetBytes(
                 "Thou art so farth away, I miss you my dear files❥, with CmisSync be forever by my side!");
         }
-
-#if __MonoCS__
-        /// <summary>
-        /// Salt for the obfuscation. MUST be 256 bits.
-        /// </summary>
-        public static byte[] GetCryptoKeyUnix()
-        {
-            return System.Text.Encoding.UTF8.GetBytes("Thou art so farth away, I miss y");
-        }
-#endif
-
     }
 
 }

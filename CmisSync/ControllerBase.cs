@@ -113,7 +113,7 @@ namespace CmisSync
         {
             get
             {
-                List<string> folders = ConfigManager.CurrentConfig.Folders;
+                List<string> folders = new List<string>(ConfigManager.CurrentConfig.Folders);
                 folders.Sort();
 
                 return folders;
@@ -495,7 +495,7 @@ namespace CmisSync
 
             this.fetcher.Failed += delegate
             {
-                FolderFetchError(this.fetcher.RemoteUrl.ToString(), this.fetcher.Errors);
+                FolderFetchError(this.fetcher.RemoteUrl.ToString(), this.fetcher.GetErrors());
                 StopFetcher();
             };
 

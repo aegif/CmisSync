@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,16 +13,16 @@ namespace CmisSync.Lib.Cmis
 {
     public class CmisServer
     {
-        public string url;
-        public Dictionary<string, string> repositories;
-        public CmisServer(string url, Dictionary<string, string> repositories)
+        public Uri Url { get; private set; }
+        public Dictionary<string, string> Repositories { get; private set; }
+        public CmisServer(Uri url, Dictionary<string, string> repositories)
         {
-            this.url = url;
-            this.repositories = repositories;
+            Url = url;
+            Repositories = repositories;
         }
     }
 
-    public class CmisUtils
+    public static class CmisUtils
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
@@ -31,7 +31,7 @@ namespace CmisSync.Lib.Cmis
          * Users can provide the URL of the web interface, and we have to return the CMIS URL
          * Returns the list of repositories as well.
          */
-        static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
+        static public CmisServer GetRepositoriesFuzzy(Uri url, string user, string password)
         {
             Dictionary<string, string> repositories = null;
 
@@ -50,12 +50,13 @@ namespace CmisSync.Lib.Cmis
             }
 
             // Extract protocol and server name or IP address
-            string prefix = new Uri(url).GetLeftPart(UriPartial.Authority);
+            string prefix = url.GetLeftPart(UriPartial.Authority);
 
             // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
             string[] suffixes = {
                 "/alfresco/cmisatom",
                 "/alfresco/service/cmis",
+                "/cmis/atom",
                 "/cmis/resources/",
                 "/emc-cmis-ea/resources/",
                 "/xcmis/rest/cmisatom",
@@ -73,14 +74,14 @@ namespace CmisSync.Lib.Cmis
                 Logger.Info("Sync | Trying with " + fuzzyUrl);
                 try
                 {
-                    repositories = GetRepositories(fuzzyUrl, user, password);
+                    repositories = GetRepositories(new Uri(fuzzyUrl), user, password);
                 }
                 catch (CmisPermissionDeniedException ex)
                 {
                     // Do nothing.
                 }
                 if (repositories != null)
-                    return new CmisServer(fuzzyUrl, repositories);
+                    return new CmisServer(new Uri(fuzzyUrl), repositories);
             }
             return new CmisServer(url, repositories);
         }
@@ -89,16 +90,21 @@ namespace CmisSync.Lib.Cmis
          * Get the list of repositories of a CMIS server
          * Each item contains id + 
          */
-        static public Dictionary<string,string> GetRepositories(string url, string user, string password)
+        static public Dictionary<string,string> GetRepositories(Uri url, string user, string password)
         {
+            Dictionary<string,string> result = new Dictionary<string,string>();
 
-
+            if (null == url)
+            {
+                return result;
+            }
+            
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
 
             Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = url;
+            cmisParameters[SessionParameter.AtomPubUrl] = url.ToString();
             cmisParameters[SessionParameter.User] = user;
             cmisParameters[SessionParameter.Password] =password;
 
@@ -133,11 +139,9 @@ namespace CmisSync.Lib.Cmis
                 return null;
             }
 
-            Dictionary<string,string> result = new Dictionary<string,string>();
-
-            for (int i = 0; i < repositories.Count; i++)
+            foreach (IRepository repo in repositories)
             {
-                result.Add(repositories.ElementAt(i).Id, repositories.ElementAt(i).Name);
+                result.Add(repo.Id, repo.Name);
             }
             
             return result;
@@ -160,7 +164,7 @@ namespace CmisSync.Lib.Cmis
 
             IFolder folder = (IFolder)session.GetObjectByPath(path);
 
-            Logger.Info("Sync | folder.Properties.Count:" + folder.Properties.Count);
+            Logger.Info("Sync | folder.Properties.Count:" + folder.Properties.Count.ToString());
             IItemEnumerable<ICmisObject> children = folder.GetChildren();
             foreach (var subfolder in children.OfType<IFolder>())
             {
@@ -173,6 +177,11 @@ namespace CmisSync.Lib.Cmis
         // Not bulletproof. It depends on the server, and there is no web UI at all.
         static public string GetBrowsableURL(RepoInfo repo)
         {
+            if (null == repo)
+            {
+                throw new ArgumentNullException("repo");
+            }
+
             if (repo.Address.AbsoluteUri.EndsWith("alfresco/cmisatom"))
             {
                 // Alfresco
@@ -191,7 +200,7 @@ namespace CmisSync.Lib.Cmis
                     string path = repo.RemotePath.Substring("/Sites/".Length);
                     if (path.Contains("documentLibrary"))
                     {
-                        int firstSlashPosition = path.IndexOf("/");
+                        int firstSlashPosition = path.IndexOf('/');
                         string siteName = path.Substring(0, firstSlashPosition);
                         string pathWithinSite = path.Substring(firstSlashPosition + "/documentLibrary".Length);
                         string escapedPathWithinSite = HttpUtility.UrlEncode(pathWithinSite);

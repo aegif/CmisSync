@@ -45,17 +45,24 @@ namespace CmisSync.Lib
         public abstract void SyncInBackground();
         public abstract double Size { get; }
 
-        public event SyncStatusChangedEventHandler SyncStatusChanged = delegate { };
-        public delegate void SyncStatusChangedEventHandler(SyncStatus new_status);
+        /**
+         * <param>new <c>SyncStatus</c> value</param>
+         */
+        public Action<SyncStatus> SyncStatusChanged { get; set; }
 
-        public event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public delegate void ProgressChangedEventHandler(double percentage, string speed);
+        /**
+         * <param>percentage</param>
+         * <param>speed</param>
+         */
+        public Action<double, string> ProgressChanged { get; set; }
 
-        public event NewChangeSetEventHandler NewChangeSet = delegate { };
-        public delegate void NewChangeSetEventHandler(ChangeSet change_set);
+        /**
+         * <param><c>ChangeSet</c> value</param>
+         */
+        public Action<ChangeSet> NewChangeSet { get; set; }
 
-        public event Action ConflictResolved = delegate { };
-        public event Action ChangesDetected = delegate { };
+        public Action ConflictResolved { get; set; }
+        public Action ChangesDetected { get; set; }
 
 
         public readonly string LocalPath;
@@ -64,13 +71,13 @@ namespace CmisSync.Lib
         public SyncStatus Status { get; private set; }
 
 
-        public virtual string[] UnsyncedFilePaths
-        {
-            get
-            {
-                return new string[0];
-            }
-        }
+        //public virtual string[] UnsyncedFilePaths
+        //{
+        //    get
+        //    {
+        //        return new string[0];
+        //    }
+        //}
 
         public void Resume()
         {
@@ -82,7 +89,7 @@ namespace CmisSync.Lib
             Status = SyncStatus.Suspend;
         }
 
-        protected RepoInfo local_repoInfo;
+        protected RepoInfo RepoInfo { get; set; }
 
 
         private Watcher watcher;
@@ -99,7 +106,7 @@ namespace CmisSync.Lib
 
         public RepoBase(RepoInfo repoInfo)
         {
-            this.local_repoInfo = repoInfo;
+            RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = Path.GetFileName(LocalPath);
             RemoteUrl = repoInfo.Address;
@@ -143,7 +150,7 @@ namespace CmisSync.Lib
         }
 
 
-        public void OnFileActivity(FileSystemEventArgs args)
+        public void OnFileActivity(object sender, FileSystemEventArgs args)
         {
             ChangesDetected();
             //string relative_path = args.FullPath.Replace(LocalPath, "");

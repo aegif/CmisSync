@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,11 +29,11 @@ namespace CmisSync.Lib
          */
         private ActivityListener overall;
 
-        private int numberOfActiveProcesses = 0;
+        private int numberOfActiveProcesses;
 
-        public ActivityListenerAggregator(ActivityListener overall)
+        public ActivityListenerAggregator(ActivityListener overallListener)
         {
-            this.overall = overall;
+            this.overall = overallListener;
         }
 
         public void ActivityStarted()

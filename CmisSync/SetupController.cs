@@ -128,7 +128,7 @@ namespace CmisSync
         /// </summary>
         static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
         {
-            return CmisUtils.GetRepositoriesFuzzy(url, user, password);
+            return CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
         }
 
 

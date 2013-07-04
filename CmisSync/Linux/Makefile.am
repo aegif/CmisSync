@@ -5,7 +5,7 @@ TARGET = exe
 
 ASSEMBLY_INFO_SOURCE = Defines.cs
 
-LIBS = $(REF_CMISSYNC) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS) $(LOG4NET_LIBS)
+LIBS = $(REF_CMISSYNC) $(LOG4NET_LIBS) $(NOTIFY_SHARP_LIBS)
 
 SOURCES =  \
 	../AboutController.cs \
@@ -15,6 +15,7 @@ SOURCES =  \
 	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
+	../CertPolicyHandler.cs \
 	About.cs \
 	Controller.cs \
 	Setup.cs \

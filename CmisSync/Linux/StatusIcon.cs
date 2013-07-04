@@ -176,7 +176,8 @@ namespace CmisSync {
             this.menu.Add (new SeparatorMenuItem ());
 
             // Log Menu
-            MenuItem log_item = new MenuItem("View Log");
+            MenuItem log_item = new MenuItem(
+                    CmisSync.Properties_Resources.ResourceManager.GetString("ViewLog", CultureInfo.CurrentCulture));
             log_item.Activated += delegate
             {
                 Controller.LogClicked();
@@ -184,7 +185,8 @@ namespace CmisSync {
             this.menu.Add(log_item);
 
             // About Menu
-            MenuItem about_item = new MenuItem ("About CmisSync");
+            MenuItem about_item = new MenuItem (
+                    CmisSync.Properties_Resources.ResourceManager.GetString("About", CultureInfo.CurrentCulture));
             about_item.Activated += delegate {
                 Controller.AboutClicked ();
             };

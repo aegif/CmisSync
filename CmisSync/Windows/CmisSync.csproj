@@ -78,6 +78,9 @@
     <Compile Include="..\AboutController.cs">
       <Link>AboutController.cs</Link>
     </Compile>
+    <Compile Include="..\CertPolicyHandler.cs">
+      <Link>CertPolicyHandler.cs</Link>
+    </Compile>
     <Compile Include="..\ControllerBase.cs">
       <Link>ControllerBase.cs</Link>
     </Compile>

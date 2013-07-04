@@ -34,7 +34,7 @@ namespace CmisSync {
 
             } catch {
                 try {
-                    return icon_theme.LoadIcon ("gtk-missing-image", size, IconLookupFlags.GenericFallback);
+                    return icon_theme.LoadIcon ("gtk-image-missing", size, IconLookupFlags.GenericFallback);
 
                 } catch {
                     return null;
