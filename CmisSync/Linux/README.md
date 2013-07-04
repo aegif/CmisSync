@@ -66,7 +66,7 @@ Download DotCMIS.dll from http://chemistry.apache.org/dotnet/dotcmis.html and co
 
 ```bash
 $ make -f Makefile.am
-$ ./configure
+$ ./configure --with-dotcmis=Extras/DotCMIS.dll
 $ make
 $ sudo make install
 $ sudo cp Extras/DotCMIS.dll /usr/local/lib/cmissync/
