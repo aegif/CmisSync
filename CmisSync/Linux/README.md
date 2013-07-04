@@ -55,7 +55,7 @@ $ sudo apt-get install gtk-sharp2 mono-runtime mono-devel monodevelop \
 ```bash
 $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
   ndesk-dbus-glib-devel nant desktop-file-utils \
-  notify-sharp-devel webkit-sharp libwebkitgtk-devel libtool intltool
+  notify-sharp-devel webkit-sharp libwebkitgtk-devel libtool intltool make log4net
 ```
 
 ### Starting the build
