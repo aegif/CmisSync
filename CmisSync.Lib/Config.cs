@@ -141,7 +141,7 @@ namespace CmisSync.Lib
 
                 user_name = Environment.UserName;
                 if (string.IsNullOrEmpty(user_name))
-                    user_name = "";
+                    user_name = String.Empty;
                 else
                     user_name = user_name.TrimEnd(",".ToCharArray());
 

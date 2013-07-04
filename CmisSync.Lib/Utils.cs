@@ -31,14 +31,17 @@ namespace CmisSync.Lib
             {
                 try
                 {
+                    string newline = Environment.NewLine;
+
                     Exception orgEx = ex;
  
                     msg.Append("Exception:");
-                    msg.Append(Environment.NewLine);
+        
+                    msg.Append(newline);
                     while (orgEx != null)
                     {
                         msg.Append(orgEx.Message);
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         orgEx = orgEx.InnerException;
                     }
  
@@ -48,39 +51,39 @@ namespace CmisSync.Lib
                         {
                             msg.Append("Data :");
                             msg.Append(i.ToString());
-                            msg.Append(Environment.NewLine);
+                            msg.Append(newline);
                         }
                     }
  
                     if (ex.StackTrace != null)
                     {
                         msg.Append("StackTrace:");
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         msg.Append(ex.StackTrace);
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                     }
  
                     if (ex.Source != null)
                     {
                         msg.Append("Source:");
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         msg.Append(ex.Source);
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                     }
  
                     if (ex.TargetSite != null)
                     {
                         msg.Append("TargetSite:");
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         msg.Append(ex.TargetSite.ToString());
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                     }
  
                     Exception baseException = ex.GetBaseException();
                     if (baseException != null)
                     {
                         msg.Append("BaseException:");
-                        msg.Append(Environment.NewLine);
+                        msg.Append(newline);
                         msg.Append(ex.GetBaseException());
                     }
                 }

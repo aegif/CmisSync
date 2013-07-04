@@ -228,7 +228,7 @@ namespace CmisSync.Lib.Sync
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        string localSubFolder = localFolder + Path.DirectorySeparatorChar + cmisObject.Name;
+                        string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
                         if (Utils.WorthSyncing(localSubFolder))
                         {
                             // Create local folder.
@@ -534,9 +534,8 @@ namespace CmisSync.Lib.Sync
                 bool found = false;
                 foreach (ICmisObject obj in remoteFolder.GetChildren())
                 {
-                    if (obj is IDocument)
+                    if (null != (document = obj as IDocument))
                     {
-                        document = (IDocument)obj;
                         if (document.Name == fileName)
                         {
                             found = true;

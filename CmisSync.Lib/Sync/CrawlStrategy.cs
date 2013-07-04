@@ -76,22 +76,22 @@ namespace CmisSync.Lib.Sync
 
                 // Crawl remote children.
                 // Logger.LogInfo("Sync", String.Format("Crawl remote folder {0}", this.remoteFolderPath));
-                crawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
+                CrawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
 
                 // Crawl local files.
                 // Logger.LogInfo("Sync", String.Format("Crawl local files in the local folder {0}", localFolder));
-                crawlLocalFiles(localFolder, remoteFolder, remoteFiles);
+                CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
 
                 // Crawl local folders.
                 // Logger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
-                crawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
+                CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
             }
 
             /**
              * Crawl remote content, syncing down if needed.
-             * Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in crawlLocalFiles/crawlLocalFolders
+             * Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
              */
-            private void crawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
+            private void CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
             {
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
@@ -108,9 +108,9 @@ namespace CmisSync.Lib.Sync
                         IFolder remoteSubFolder = (IFolder)cmisObject;
                         if (Utils.WorthSyncing(remoteSubFolder.Name))
                         {
-                            Logger.Debug("crawlRemote dir: " + localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name);
+                            Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
                             remoteFolders.Add(remoteSubFolder.Name);
-                            string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
+                            string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name;
 
                             // Check whether local folder exists.
                             if (Directory.Exists(localSubFolder))
@@ -178,7 +178,7 @@ namespace CmisSync.Lib.Sync
                             // For instance in FileNet it is not usual to have a document where
                             // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
                             string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
-                            Logger.Debug("crawlRemote doc: " + localFolder + Path.DirectorySeparatorChar + remoteDocumentFileName);
+                            Logger.Debug("CrawlRemote doc: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName);
 
                             // Check if file extension is allowed
 
@@ -191,7 +191,7 @@ namespace CmisSync.Lib.Sync
                                 continue;
                             }
 
-                            string filePath = localFolder + Path.DirectorySeparatorChar + remoteDocumentFileName;
+                            string filePath = localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName;
 
                             if (File.Exists(filePath))
                             {
@@ -265,7 +265,7 @@ namespace CmisSync.Lib.Sync
             /**
              * Crawl local files in a given directory (not recursive).
              */
-            private void crawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
+            private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
             {
                 foreach (string filePath in Directory.GetFiles(localFolder))
                 {
@@ -328,7 +328,7 @@ namespace CmisSync.Lib.Sync
             /**
              * Crawl local folders in a given directory (not recursive).
              */
-            private void crawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
+            private void CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
             {
                 foreach (string localSubFolder in Directory.GetDirectories(localFolder))
                 {
