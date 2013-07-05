@@ -1,4 +1,4 @@
-### Install required packages
+### 1) Install required packages
 
 According to your Linux distributions, run one of the following commands to install required packages:
 
@@ -38,7 +38,7 @@ $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
 ```
 
 
-### Make sure you have a recent Mono
+### 2) Make sure you have a recent Mono
 
 Run the following command: `mono --version`
 
@@ -46,7 +46,7 @@ If the output says something like `Mono [...] version 3.x.y` then proceed to the
 
 If it says `Mono [...] version 2.x.y` the you must first install a newer version of Mono.
 
-### Build
+### 3) Build
 
 Run the following commands:
 
