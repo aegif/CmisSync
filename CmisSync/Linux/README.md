@@ -5,7 +5,7 @@ To run CmisSync, you'll need the following packages:
 ```
 curl
 gtk-sharp2
-mono-core >= 2.8
+mono-core >= 3.0
 notify-sharp
 webkit-sharp
 ```
