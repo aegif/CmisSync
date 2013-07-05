@@ -40,11 +40,7 @@ $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
 
 ### Make sure you have a recent Mono
 
-Run the following command:
-
-```bash
-$ mono --version
-```
+Run the following command: `mono --version`
 
 If the output says something like `Mono [...] version 3.x.y` then proceed to the next paragraph.
 
@@ -63,7 +59,7 @@ $ sudo cp Extras/DotCMIS.dll /usr/local/lib/cmissync/
 $ sudo cp Extras/Newtonsoft.Json.dll /usr/local/lib/cmissync/
 ```
 
-Done! You can now run CmisSync like this: `cmissync start`
+Done! You can now run CmisSync with this command: `cmissync start`
 
 ### Uninstall
 
