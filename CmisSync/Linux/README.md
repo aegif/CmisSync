@@ -1,41 +1,20 @@
-## Building on Linux distributions
+### 1) Install required packages
 
-To run CmisSync, you'll need the following packages:
-
-```
-curl
-gtk-sharp2
-mono-core >= 2.8
-notify-sharp
-webkit-sharp
-```
-
-**Note:** These packages may not overlap with the packages required to perform a build, so please make sure that at least the above packages are installed.
-
-Optional packages:
-
-```
-gvfs (to change file/folder icons)
-libappindicator (for Ubuntu integration)
-```
-
-### Installing build requirements
-
-You can use one of the commands listed below for the most used Linux distributions:
-
+According to your Linux distributions, run one of the following commands to install required packages:
 
 #### Ubuntu
 
 ```bash
 $ sudo apt-get install libappindicator0.1-cil-dev gtk-sharp2 mono-runtime mono-devel \
   monodevelop libndesk-dbus1.0-cil-dev nant libnotify-cil-dev libgtk2.0-cil-dev mono-mcs \
-  mono-gmcs libwebkit-cil-dev intltool libtool libndesk-dbus-glib1.0-cil-dev liblog4net-cil-dev libnewtonsoft-json-cil-dev
+  mono-gmcs libwebkit-cil-dev intltool libtool libndesk-dbus-glib1.0-cil-dev \
+  liblog4net-cil-dev libnewtonsoft-json-cil-dev gvfs
 ```
 
 #### Fedora
 
 ```bash
-$ sudo yum install gtk-sharp2-devel mono-core mono-devel monodevelop \
+$ sudo yum install gtk-sharp2 gtk-sharp2-devel mono-core mono-devel monodevelop \
   ndesk-dbus-devel ndesk-dbus-glib-devel nant \
   notify-sharp-devel webkit-sharp-devel webkitgtk-devel libtool intltool \
   desktop-file-utils
@@ -58,11 +37,18 @@ $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
   notify-sharp-devel webkit-sharp libwebkitgtk-devel libtool intltool make log4net
 ```
 
-### Starting the build
 
-You can build and install CmisSync like this:
+### 2) Make sure you have a recent Mono
 
-Download DotCMIS.dll from http://chemistry.apache.org/dotnet/dotcmis.html and copy it to Extras/
+Run the following command: `mono --version`
+
+If the output says something like `Mono [...] version 3.x.y` then proceed to the next paragraph.
+
+If it says `Mono [...] version 2.x.y` the you must first install a newer version of Mono.
+
+### 3) Build
+
+Run the following commands:
 
 ```bash
 $ make -f Makefile.am
@@ -70,16 +56,14 @@ $ ./configure --with-dotcmis=Extras/DotCMIS.dll
 $ make
 $ sudo make install
 $ sudo cp Extras/DotCMIS.dll /usr/local/lib/cmissync/
+$ sudo cp Extras/Newtonsoft.Json.dll /usr/local/lib/cmissync/
 ```
 
-### Resetting CmisSync settings
+Done! You can now run CmisSync with this command: `cmissync start`
 
-```
-rm -rf ~/CmisSync
-rm -rf ~/.config/cmissync
-```
+### Uninstall
 
-### Uninstalling
+If you want to uninstall CmisSync:
 
 ```
 sudo make uninstall
