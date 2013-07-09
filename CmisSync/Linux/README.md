@@ -60,12 +60,3 @@ $ sudo cp Extras/Newtonsoft.Json.dll /usr/local/lib/cmissync/
 ```
 
 Done! You can now run CmisSync with this command: `cmissync start`
-
-### Uninstall
-
-If you want to uninstall CmisSync:
-
-```
-sudo make uninstall
-```
-
