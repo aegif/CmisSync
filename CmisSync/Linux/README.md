@@ -54,6 +54,11 @@ Run the following commands:
 $ make -f Makefile.am
 $ ./configure --with-dotcmis=Extras/DotCMIS.dll
 $ make
+```
+
+### 4) Install
+
+```
 $ sudo make install
 $ sudo cp Extras/DotCMIS.dll /usr/local/lib/cmissync/
 $ sudo cp Extras/Newtonsoft.Json.dll /usr/local/lib/cmissync/
