@@ -41,6 +41,8 @@ namespace CmisSync.Lib
             Created += OnChanged;
             Deleted += OnChanged;
             Renamed += OnChanged;
+
+            ChangeEvent += delegate { };
         }
 
 

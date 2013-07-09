@@ -119,6 +119,11 @@ namespace CmisSync.Lib
             Directory.CreateDirectory(repoInfo.TargetDirectory);
 
             CmisRepo = new CmisRepo(repoInfo, activityListener);
+
+            Started += delegate { };
+            Failed += delegate { };
+            Finished += delegate { };
+            ProgressChanged += delegate { };
         }
 
 

@@ -135,6 +135,11 @@ namespace CmisSync.Lib
                 // changes or the server was down, sync up again
                 SyncInBackground();
             };
+
+            ProgressChanged += delegate { };
+            NewChangeSet += delegate { };
+            ConflictResolved += delegate { };
+            ChangesDetected += delegate { };
         }
 
 
