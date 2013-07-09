@@ -357,14 +357,15 @@ namespace CmisSync.Lib.Sync
              */
             private void DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
             {
-                Stream file = File.OpenWrite(filePath);
-                byte[] buffer = new byte[8 * 1024];
-                int len;
-                while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                using (Stream file = File.OpenWrite(filePath))
                 {
-                    file.Write(buffer, 0, len);
+                    byte[] buffer = new byte[8 * 1024];
+                    int len;
+                    while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        file.Write(buffer, 0, len);
+                    }
                 }
-                file.Close();
                 contentStream.Stream.Close();
             }
 
@@ -388,40 +389,33 @@ namespace CmisSync.Lib.Sync
                     properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
 
                     // Prepare content stream
-                    Stream file = File.OpenRead(filePath);
-                    ContentStream contentStream = new ContentStream();
-                    contentStream.FileName = fileName;
-                    contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                    contentStream.Length = file.Length;
-                    contentStream.Stream = file;
-                    //contentStream.Stream.Flush();
-
-                    // Upload
-                    try
+                    using (Stream file = File.OpenRead(filePath))
                     {
-                        VersioningState? state = null;
-                        if (true != session.RepositoryInfo.Capabilities.IsAllVersionsSearchableSupported)
+                        ContentStream contentStream = new ContentStream();
+                        contentStream.FileName = fileName;
+                        contentStream.MimeType = MimeType.GetMIMEType(fileName);
+                        contentStream.Length = file.Length;
+                        contentStream.Stream = file;
+
+                        // Upload
+                        try
                         {
-                            state = VersioningState.None;
+                            VersioningState? state = null;
+                            if (true != session.RepositoryInfo.Capabilities.IsAllVersionsSearchableSupported)
+                            {
+                                state = VersioningState.None;
+                            }
+                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, state);
+                            success = true;
                         }
-                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, state);
-                        success = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Fatal("Upload failed: " + filePath + " " + ex);
-                        if (contentStream != null) {
-                            contentStream.Stream.Close();
+                        catch (Exception ex)
+                        {
+                            Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                            if (contentStream != null) {
+                                contentStream.Stream.Close();
+                            }
                         }
                     }
-
-                    // Close files.
-                    if (contentStream != null)
-                    {
-                        contentStream.Stream.Close();
-                        contentStream.Stream.Dispose();
-                    }
-                    file.Close();
                 }
                 catch (Exception e)
                 {
@@ -492,33 +486,31 @@ namespace CmisSync.Lib.Sync
             private void UpdateFile(string filePath, IDocument remoteFile)
             {
                 Logger.Info("## Updating " + filePath);
-                Stream localfile = File.OpenRead(filePath);
-                if ((localfile == null) && (localfile.Length == 0))
+                using (Stream localfile = File.OpenRead(filePath))
                 {
-                    Logger.Info("Skipping update of file with null or empty content stream: " + filePath);
-                    return;
+                    if ((localfile == null) && (localfile.Length == 0))
+                    {
+                        Logger.Info("Skipping update of file with null or empty content stream: " + filePath);
+                        return;
+                    }
+
+                    // Prepare content stream
+                    ContentStream remoteStream = new ContentStream();
+                    remoteStream.FileName = remoteFile.ContentStreamFileName;
+                    remoteStream.Length = localfile.Length;
+                    remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
+                    remoteStream.Stream = localfile;
+                    remoteStream.Stream.Flush();
+                    Logger.Debug("before SetContentStream");
+
+                    // CMIS do not have a Method to upload block by block. So upload file must be full.
+                    // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
+                    // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
+                    // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
+                    remoteFile.SetContentStream(remoteStream, true, true);
+                    Logger.Debug("after SetContentStream");
+                    Logger.Info("## Updated " + filePath);
                 }
-
-                // Prepare content stream
-                ContentStream remoteStream = new ContentStream();
-                remoteStream.FileName = remoteFile.ContentStreamFileName;
-                remoteStream.Length = localfile.Length;
-                remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
-                remoteStream.Stream = localfile;
-                remoteStream.Stream.Flush();
-                Logger.Debug("before SetContentStream");
-
-                // CMIS do not have a Method to upload block by block. So upload file must be full.
-                // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
-                // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
-                // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
-                remoteFile.SetContentStream(remoteStream, true, true);
-                Logger.Debug("after SetContentStream");
-                localfile.Close();
-                localfile.Dispose();
-                remoteStream.Stream.Close();
-                Logger.Info("## Updated " + filePath);
-
             }
 
             /**

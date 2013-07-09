@@ -38,13 +38,37 @@ SHAMROCK_CHECK_MONO_4_0_GAC_ASSEMBLIES([
 
 PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
 if test "x$have_nunit" = "xno" ; then
-    AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+    dnl On som distro's the package is named mono-nunit
+    PKG_CHECK_MODULES(NUNIT, mono-nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+    if test "x$have_nunit" = "xno" ; then
+        AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+    fi
 fi
 AC_SUBST(NUNIT_LIBS)
 
-PKG_CHECK_MODULES(JSON, [newtonsoft-json >= 4.5r6], have_newtonsoft_json=yes, have_newtonsoft_json=no)
-if test "x$have_newtonsoft_json" = "xno" ; then
-    AC_ERROR("newtonsoft-json is a required dependency: you need to install the appropriate devel package before you can compile")
+AC_ARG_WITH([newtonsoft-json],
+            AS_HELP_STRING([--with-newtonsoft-json=PATH],[Specify path to NewtonSoft.Json.dll]),
+            [newtonsoft_json_dll=${withval}],[newtonsoft_json_dll=no])
+if test "x$newtonsoft_json_dll" = "xno" ; then
+    PKG_CHECK_MODULES(JSON, [newtonsoft-json >= 4.5r6], have_newtonsoft_json=yes, have_newtonsoft_json=no)
+    if test "x$have_newtonsoft_json" = "xno" ; then
+        AC_ERROR("newtonsoft-json is a required dependency: you need to install the appropriate devel package before you can compile")
+    fi
+else
+    if test -f ${newtonsoft_json_dll} ; then
+        case ${newtonsoft_json_dll} in
+            /*)
+            AC_SUBST(JSON_LIBS,[-r:${newtonsoft_json_dll}])
+            AC_SUBST(JSON_PATH,[${newtonsoft_json_dll}])
+            ;;
+            *)
+            AC_SUBST(JSON_LIBS,[[-r:\$\(top_srcdir\)/${newtonsoft_json_dll}]])
+            AC_SUBST(JSON_PATH,[[\$\(top_srcdir\)/${newtonsoft_json_dll}]])
+            ;;
+        esac
+    else
+        AC_ERROR([${newtonsoft_json_dll} not found])
+    fi
 fi
 AC_SUBST(NUNIT_LIBS)
 
