@@ -52,14 +52,6 @@ cp /Library/Frameworks/Mono.framework/Versions/Current/lib/libintl.dylib CmisSyn
 
 Now you have a working bundle that you can run by double-clicking.
 
-
-### Resetting CmisSync settings
-
-```
-rm -Rf ~/CmisSync
-rm -Rf ~/.config/CmisSync
-```
-
 ### Uninstalling
 
 Simple remove the CmisSync bundle.
