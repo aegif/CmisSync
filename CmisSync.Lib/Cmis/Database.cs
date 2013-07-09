@@ -376,7 +376,7 @@ namespace CmisSync.Lib.Cmis
             string previousChecksum = null;
             string command = "SELECT checksum FROM files WHERE path=@path";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", path);
+            parameters.Add("path", normalizedPath);
             previousChecksum = (string)ExecuteSQLFunction(command, parameters);
 
             if (!currentChecksum.Equals(previousChecksum))
