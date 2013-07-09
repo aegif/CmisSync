@@ -1,7 +1,6 @@
-1. Install Microsoft Visual C# (Express version is free)
-2. Open it
-3. Import CmisSync/Windows/CmisSync.sln
-4. Debug > Start debugging
+1. Install Microsoft Visual C# (Express version is free), open it
+2. Import CmisSync/Windows/CmisSync.sln
+3. Debug > Start debugging
 
 
 ### Uninstalling
