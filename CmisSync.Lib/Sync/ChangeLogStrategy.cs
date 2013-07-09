@@ -97,7 +97,7 @@ namespace CmisSync.Lib.Sync
                             }
                             string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
                             string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
+                            relativeFolderPath = relativeFolderPath.Replace('/', '\\'); // TODO OS-specific separator
                             string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
                             DownloadFile(remoteDocument, localFolderPath);
                         }
@@ -119,7 +119,7 @@ namespace CmisSync.Lib.Sync
                             }
                             string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
                             string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            relativeFolderPath = relativeFolderPath.Replace("/", "\\"); // TODO OS-specific separator
+                            relativeFolderPath = relativeFolderPath.Replace('/', '\\'); // TODO OS-specific separator
                             string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
                             // TODO DeleteFile(localFolderPath); // Delete on filesystem and in database
                         }
