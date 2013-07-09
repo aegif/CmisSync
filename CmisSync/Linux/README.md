@@ -58,6 +58,8 @@ $ make
 
 ### 4) Install
 
+Run the following commands:
+
 ```
 $ sudo make install
 $ sudo cp Extras/DotCMIS.dll /usr/local/lib/cmissync/
