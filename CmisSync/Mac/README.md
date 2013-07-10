@@ -34,33 +34,3 @@ $ make
 
 Now that you have compiled the libraries, open `SparkleShare/Mac/CmisSync.sln` in
 MonoDevelop and start the build (Build > Build All).
-
-
-### Creating a Mac bundle
-
-To create the <tt>CmisSync.app</tt>, make sure the project is focused, select <tt>Project</tt> from the menu bar 
-and click <tt>"Create Mac Installer..."</tt>. Make sure to select <tt>Don't link assemblies</tt>. 
-
-Save the <tt>CmisSync.app</tt> somewhere. We need to copy some files over:
-
-```
-cp CmisSync/Mac/config CmisSync.app/Contents/MonoBundle/config
-cp /Library/Frameworks/Mono.framework/Versions/Current/lib/libintl.dylib CmisSync.app/Contents/Resources
-```
-
-**Note:** Adjust `CmisSync.app/Contents/Resources` to where you saved the bundle.
-
-Now you have a working bundle that you can run by double-clicking.
-
-
-### Resetting CmisSync settings
-
-```
-rm -Rf ~/CmisSync
-rm -Rf ~/.config/CmisSync
-```
-
-### Uninstalling
-
-Simple remove the CmisSync bundle.
-
