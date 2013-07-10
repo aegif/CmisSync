@@ -6,7 +6,7 @@ ASSEMBLY_INFO_SOURCE = Defines.cs
 LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) $(WEBLIBS) $(MONOPOSIX)
 
 SOURCES =  \
-	ActivityListener.cs \
+	IActivityListener.cs \
 	ActivityListenerAggregator.cs \
 	Backend.cs \
 	Cmis/CmisPermissionDeniedException.cs \

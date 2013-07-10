@@ -75,7 +75,7 @@ namespace CmisSync.Lib.Sync
             /**
              * Listener we inform about activity (used by spinner)
              */
-            private ActivityListener activityListener;
+            private IActivityListener activityListener;
 
             /**
              * Config 
@@ -91,7 +91,7 @@ namespace CmisSync.Lib.Sync
              * Constructor for Repo (at every launch of CmisSync)
              */
             public SynchronizedFolder(RepoInfo repoInfo,
-                ActivityListener listener, RepoBase repoCmis)
+                IActivityListener listener, RepoBase repoCmis)
             {
                 if (null == repoInfo || null == repoCmis)
                 {

@@ -157,7 +157,7 @@ namespace TestLibrary
             // Clean.
             CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
             // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo =  new RepoInfo(
                     canonical_name,
@@ -184,7 +184,7 @@ namespace TestLibrary
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
             // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
@@ -225,7 +225,7 @@ namespace TestLibrary
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
             // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
@@ -266,7 +266,7 @@ namespace TestLibrary
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
             // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
@@ -305,7 +305,7 @@ namespace TestLibrary
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
             // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
@@ -333,7 +333,7 @@ namespace TestLibrary
                     //// Clean.
                     //CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
                     // Mock.
-                    ActivityListener activityListener2 = new Mock<ActivityListener>().Object;
+                    IActivityListener activityListener2 = new Mock<IActivityListener>().Object;
                     // Sync.
                     CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
                         repoInfo,
@@ -395,7 +395,7 @@ namespace TestLibrary
             //Console.WriteLine("Synced to clean state.");
             
             // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,

@@ -11,7 +11,7 @@ namespace CmisSync.Lib
      * - Start spinning when activity starts
      * - Stop spinning when activity stops
      */
-    public interface ActivityListener
+    public interface IActivityListener
     {
         void ActivityStarted();
         void ActivityStopped();

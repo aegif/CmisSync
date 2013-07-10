@@ -22,16 +22,16 @@ namespace CmisSync.Lib
      * DOWN     STOPPED  STOPPED
      * DOWN     DOWN     DOWN
      */
-    public class ActivityListenerAggregator : ActivityListener
+    public class ActivityListenerAggregator : IActivityListener
     {
         /**
          * The listener to which overall activity messages are sent.
          */
-        private ActivityListener overall;
+        private IActivityListener overall;
 
         private int numberOfActiveProcesses;
 
-        public ActivityListenerAggregator(ActivityListener overallListener)
+        public ActivityListenerAggregator(IActivityListener overallListener)
         {
             this.overall = overallListener;
         }

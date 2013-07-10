@@ -32,7 +32,7 @@ namespace CmisSync
     /// <summary>
     /// Platform-independant part of the main CmisSync controller.
     /// </summary>
-    public abstract class ControllerBase : ActivityListener
+    public abstract class ControllerBase : IActivityListener
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(ControllerBase));
 
@@ -155,7 +155,7 @@ namespace CmisSync
         /// <summary>
         /// Keeps track of whether a download or upload is going on, for display of the task bar animation.
         /// </summary>
-        private ActivityListener activityListenerAggregator;
+        private IActivityListener activityListenerAggregator;
 
         /// <summary>
         /// Component to create new CmisSync synchronized folders.

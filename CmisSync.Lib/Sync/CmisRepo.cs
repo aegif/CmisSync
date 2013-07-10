@@ -23,7 +23,7 @@ namespace CmisSync.Lib.Sync
     {
         private SynchronizedFolder synchronizedFolder;
 
-        public CmisRepo(RepoInfo repoInfo, ActivityListener activityListener)
+        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
             : base(repoInfo)
         {
             synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);

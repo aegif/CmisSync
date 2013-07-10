@@ -74,7 +74,7 @@ namespace CmisSync.Lib
 
 
         // Sets up a fetcher that can get remote folders
-        public Fetcher(RepoInfo repoInfo, ActivityListener activityListener)
+        public Fetcher(RepoInfo repoInfo, IActivityListener activityListener)
         {
             OriginalRepoInfo = repoInfo;
             string remote_path = repoInfo.RemotePath.Trim("/".ToCharArray());
