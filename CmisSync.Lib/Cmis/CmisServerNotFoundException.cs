@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace CmisSync.Lib.Cmis
 {
+    /// <summary>
+    /// Exception launched when the CMIS server can not be found.
+    /// </summary>
     [Serializable]
     public class CmisServerNotFoundException : Exception
     {

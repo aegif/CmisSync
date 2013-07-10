@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace CmisSync.Lib.Cmis
 {
+    /// <summary>
+    /// Exception launched when the CMIS repository denies an action.
+    /// </summary>
     [Serializable]
     public class CmisPermissionDeniedException : Exception
     {
