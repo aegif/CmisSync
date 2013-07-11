@@ -6,15 +6,33 @@ using System.IO;
 
 namespace CmisSync.Lib.Cmis
 {
-    /**
-     * Utility to find a file's MIME type.
-     * The current implementation relies on file extension.
-     */
+    /// <summary>
+    /// Utility to find a file's MIME type.
+    /// The current implementation relies on file extension.
+    /// </summary>
     public static class MimeType
     {
-        /**
-         * List found at http://stackoverflow.com/q/58510
-         */
+        /// <summary>
+        /// Guess the MIME type of a file.
+        /// </summary>
+        /// <param name="fileName">Relative filename, for instance mydoc.odt</param>
+        /// <returns>MIME type, for instance </returns>
+        public static string GetMIMEType(string fileName)
+        {
+            if (Path.GetExtension(fileName).Length > 1 && /* File with an extension */
+                MIMETypesDictionary.ContainsKey(Path.GetExtension(fileName).Remove(0, 1)))
+            {
+                return MIMETypesDictionary[Path.GetExtension(fileName).Remove(0, 1).ToLower()];
+            }
+            return "application/octet-stream";
+        }
+
+
+        /// <summary>
+        /// Dictionary of the most common filename extensions and associated MIME types.
+        /// Found at http://stackoverflow.com/q/58510
+        /// TODO: Use http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types which contains more types, like odt
+        /// </summary>
         private static readonly Dictionary<string, string> MIMETypesDictionary = 
             new Dictionary<string, string>
             {
@@ -207,16 +225,5 @@ namespace CmisSync.Lib.Cmis
                 {"xyz", "chemical/x-xyz"},
                 {"zip", "application/zip"}
             };
-
-
-        public static string GetMIMEType(string fileName)
-        {
-            if (Path.GetExtension(fileName).Length > 1 && /* File with an extension */
-                MIMETypesDictionary.ContainsKey(Path.GetExtension(fileName).Remove(0, 1)))
-            {
-                return MIMETypesDictionary[Path.GetExtension(fileName).Remove(0, 1)];
-            }
-            return "application/octet-stream";
-        }
     }
 }

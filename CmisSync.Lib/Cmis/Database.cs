@@ -239,6 +239,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Remove a file from the database.
+        /// </summary>
         public void RemoveFile(string path)
         {
             path = Normalize(path);
@@ -249,6 +252,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Remove a folder from the database.
+        /// </summary>
         public void RemoveFolder(string path)
         {
             path = Normalize(path);
@@ -264,6 +270,10 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Get the time at which the file was last modified.
+        /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
+        /// </summary>
         public DateTime? GetServerSideModificationDate(string path)
         {
             path = Normalize(path);
@@ -283,11 +293,18 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        // TODO Combine this method and the next in a new method ModifyFile, and find out if GetServerSideModificationDate is really needed.
+        // 
+
+        /// <summary>
+        /// Set the last modification date of a file.
+        /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
+        /// 
+        /// TODO Combine this method and the next in a new method ModifyFile, and find out if GetServerSideModificationDate is really needed.
+        /// </summary>
         public void SetFileServerSideModificationDate(string path, DateTime? serverSideModificationDate)
         {
-            // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
-            // see: http://www.sqlite.org/datatype3.html
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones.
+            // See http://www.sqlite.org/datatype3.html
             if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
                 throw new ArgumentException("serverSideModificationDate is not UTC");
             }
@@ -303,6 +320,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Recalculate the checksum of a file and save it to database.
+        /// </summary>
         public void RecalculateChecksum(string path)
         {
             string checksum = Checksum(path);
@@ -318,6 +338,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Checks whether the database contains a given file.
+        /// </summary>
         public bool ContainsFile(string path)
         {
             path = Normalize(path);
@@ -328,6 +351,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Checks whether the database contains a given folder.
+        /// </summary>
         public bool ContainsFolder(string path)
         {
             path = Normalize(path);
@@ -338,9 +364,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        /**
-         * Check whether a file's content has changed since it was last synchronized.
-         */
+        /// <summary>
+        /// Check whether a file's content has changed locally since it was last synchronized.
+        /// This happens when the user edits a file on the local computer.
+        /// This method does not communicate with the CMIS server, it just checks whether the checksum has changed.
+        /// </summary>
         public bool LocalFileHasChanged(string path)
         {
             string normalizedPath = Normalize(path);
@@ -370,12 +398,19 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Get the ChangeLog token that was stored at the end of the last successful CmisSync synchronization.
+        /// </summary>
         public string GetChangeLogToken()
         {
             return (string)ExecuteSQLFunction("SELECT value FROM general WHERE key=\"ChangeLogToken\"", null);
         }
 
 
+        /// <summary>
+        /// Set the stored ChangeLog token.
+        /// This should be called after each successful CmisSync synchronization.
+        /// </summary>
         public void SetChangeLogToken(string token)
         {
             string command = "INSERT OR REPLACE INTO general (key, value) VALUES (\"ChangeLogToken\", @token)";
@@ -385,6 +420,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Helper method to execute an SQL command that does not return anything.
+        /// </summary>
+        /// <param name="text">SQL query, optionnally with @something parameters.</param>
+        /// <param name="parameters">Parameters to replace in the SQL query.</param>
         private void ExecuteSQLAction(string text, Dictionary<string, object> parameters)
 
         {
@@ -404,6 +444,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Helper method to execute an SQL command that returns something.
+        /// </summary>
+        /// <param name="text">SQL query, optionnally with @something parameters.</param>
+        /// <param name="parameters">Parameters to replace in the SQL query.</param>
         private object ExecuteSQLFunction(string text, Dictionary<string, object> parameters)
         {
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
@@ -422,6 +467,12 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Helper method to fill the parameters inside an SQL command.
+        /// </summary>
+        /// <param name="command">The SQL command object to fill. This method modifies it.</param>
+        /// <param name="text">SQL query, optionnally with @something parameters.</param>
+        /// <param name="parameters">Parameters to replace in the SQL query.</param>
         private void ComposeSQLCommand(SQLiteCommand command, string text, Dictionary<string, object> parameters)
         {
             command.CommandText = text;
