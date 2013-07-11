@@ -22,16 +22,34 @@ using System.Xml;
 
 namespace CmisSync.Lib
 {
-
+    /// <summary>
+    /// Configuration of a CmisSync synchronized folder.
+    /// It can be found in the XML configuration file.
+    /// </summary>
     public class Config
     {
+        /// <summary>
+        /// XML document storing the configuration.
+        /// </summary>
         private XmlDocument configXml = new XmlDocument();
-        public string FullPath { get; private set; }
-        //public string TmpPath;
-        //public string LogFilePath;
 
+
+        /// <summary>
+        /// Full path to the XML configuration file.
+        /// </summary>
+        public string FullPath { get; private set; }
+
+
+        /// <summary>
+        /// Path of the folder where configuration files are.
+        /// These files are in particular the XML configuration file, the database files, and the log file.
+        /// </summary>
         public string ConfigPath { get; private set; }
 
+
+        /// <summary>
+        /// Path to the user's home folder.
+        /// </summary>
         public string HomePath
         {
             get
@@ -44,6 +62,9 @@ namespace CmisSync.Lib
         }
 
 
+        /// <summary>
+        /// Path where the synchronized folders are stored by default.
+        /// </summary>
         public string FoldersPath
         {
             get
@@ -52,49 +73,25 @@ namespace CmisSync.Lib
             }
         }
 
-        public bool DebugMode
-        {
-            get
-            {
-                try
-                {
-                    XmlNode debugNode = configXml.SelectSingleNode(@"/CmisSync/debug");
-                    bool debug = false;
-                    bool.TryParse(debugNode.InnerText, out debug);
-                    return debug;
-                }
-                catch (System.Xml.XPath.XPathException)
-                {
-                    return false;
-                }
-            }
-        }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Config(string fullPath)
         {
             FullPath = fullPath;
             ConfigPath = Path.GetDirectoryName(FullPath);
             Console.WriteLine("FullPath:" + FullPath);
 
-            //if (File.Exists(LogFilePath))
-            //{
-            //    try
-            //    {
-            //        File.Delete(LogFilePath);
-
-            //    }
-            //    catch (Exception)
-            //    {
-            //        // Don't delete the debug.log if, for example, 'tail' is reading it
-            //    }
-            //}
-
+            // Create configuration folder if it does not exist yet.
             if (!Directory.Exists(ConfigPath))
                 Directory.CreateDirectory(ConfigPath);
 
+            // Create an empty XML configuration file if none is present yet.
             if (!File.Exists(FullPath))
                 CreateInitialConfig();
 
+            // Load the XML configuration.
             try
             {
                 configXml.Load(FullPath);
@@ -111,6 +108,7 @@ namespace CmisSync.Lib
             {
                 FileInfo file = new FileInfo(FullPath);
 
+                // If the XML configuration file exists but with file size zero, then recreate it.
                 if (file.Length == 0)
                 {
                     File.Delete(FullPath);
@@ -129,35 +127,41 @@ namespace CmisSync.Lib
         }
 
 
+        /// <summary>
+        /// Create an initial XML configuration file with default settings and zero remote folders.
+        /// </summary>
         private void CreateInitialConfig()
         {
-            string user_name = "Unknown";
-
+            // Get the user name.
+            string userName = "Unknown";
             if (Backend.Platform == PlatformID.Unix ||
                 Backend.Platform == PlatformID.MacOSX)
             {
-
-                user_name = Environment.UserName;
-                if (string.IsNullOrEmpty(user_name))
-                    user_name = String.Empty;
+                userName = Environment.UserName;
+                if (string.IsNullOrEmpty(userName))
+                {
+                    userName = String.Empty;
+                }
                 else
-                    user_name = user_name.TrimEnd(",".ToCharArray());
-
+                {
+                    userName = userName.TrimEnd(",".ToCharArray());
+                }
             }
             else
             {
-                user_name = Environment.UserName;
+                userName = Environment.UserName;
             }
 
-            if (string.IsNullOrEmpty(user_name))
+            if (string.IsNullOrEmpty(userName))
             {
-                user_name = "Unknown";
+                userName = "Unknown";
             }
 
+            // Define the default XML configuration file.
             configXml.LoadXml(@"<?xml version=""1.0"" encoding=""UTF-8""?>
 <CmisSync>
   <user>
-    <name>" + user_name + @"</name>
+    <name>" + userName + @"</name>
     <email>Unknown</email>
   </user>
   <log4net>
@@ -182,14 +186,23 @@ namespace CmisSync.Lib
   <notifications>True</notifications>
 </CmisSync>");
 
+            // Save it as an XML file.
             Save();
         }
 
+
+        /// <summary>
+        /// Log4net configuration, as an XML tree readily usable by Log4net.
+        /// </summary>
+        /// <returns></returns>
         public XmlElement GetLog4NetConfig()
         {
             return (XmlElement)configXml.SelectSingleNode("/CmisSync/log4net");
         }
 
+        /// <summary>
+        /// List of the CmisSync synchronized folders.
+        /// </summary>
         public System.Collections.ObjectModel.Collection<string> Folders
         {
             get

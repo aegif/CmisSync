@@ -18,16 +18,15 @@ namespace CmisSync.Lib.Sync
 {
     public partial class CmisRepo : RepoBase
     {
-        /**
-         * Synchronization with a particular CMIS folder.
-         */
+        /// <summary>
+        /// Synchronization with a particular CMIS folder.
+        /// </summary>
         public partial class SynchronizedFolder
         {
-
-            /**
-             * Synchronize using the ChangeLog feature of CMIS.
-             * Not all CMIS servers support this feature, so sometimes CrawlStrategy is used instead.
-             */
+            /// <summary>
+            /// Synchronize using the ChangeLog feature of CMIS.
+            /// Not all CMIS servers support this feature, so sometimes CrawlStrategy is used instead.
+            /// </summary>
             private void ChangeLogSync(IFolder remoteFolder)
             {
                 // Get last change log token on server side.
@@ -74,9 +73,9 @@ namespace CmisSync.Lib.Sync
             }
 
 
-            /**
-             * Apply a remote change.
-             */
+            /// <summary>
+            /// Apply a remote change.
+            /// </summary>
             private void ApplyRemoteChange(IChangeEvent change)
             {
                 Logger.Info("Sync | Change type:" + change.ChangeType.ToString() + " id:" + change.ObjectId + " properties:" + change.Properties);
@@ -84,6 +83,7 @@ namespace CmisSync.Lib.Sync
                 IDocument remoteDocument;
                 switch (change.ChangeType)
                 {
+                    // Case when an object has been created or updated.
                     case ChangeType.Created:
                     case ChangeType.Updated:
                         ICmisObject cmisObject = session.GetObject(change.ObjectId);
@@ -107,6 +107,8 @@ namespace CmisSync.Lib.Sync
                             RecursiveFolderCopy(remoteFolder, localFolder);
                         }
                         break;
+
+                    // Case when an object has been deleted.
                     case ChangeType.Deleted:
                         cmisObject = session.GetObject(change.ObjectId);
                         if (null != (remoteDocument = cmisObject as IDocument))
@@ -129,7 +131,10 @@ namespace CmisSync.Lib.Sync
                             RemoveFolderLocally(localFolder); // Remove from filesystem and database.
                         }
                         break;
+
+                    /// Case when access control or security policy has changed.
                     case ChangeType.Security:
+                        // TODO
                         break;
                 }
             }

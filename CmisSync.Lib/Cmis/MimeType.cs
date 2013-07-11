@@ -24,6 +24,8 @@ namespace CmisSync.Lib.Cmis
             {
                 return MIMETypesDictionary[Path.GetExtension(fileName).Remove(0, 1)];
             }
+
+            // If no match, return generic MIME type.
             return "application/octet-stream";
         }
 

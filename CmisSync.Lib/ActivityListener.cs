@@ -5,15 +5,23 @@ using System.Text;
 
 namespace CmisSync.Lib
 {
-    /**
-     * Listen to activity/inactivity.
-     * Typically used by a status spinner:
-     * - Start spinning when activity starts
-     * - Stop spinning when activity stops
-     */
+    /// <summary>
+    /// Listen to activity/inactivity.
+    /// Typically used by a status spinner:
+    /// - Start spinning when activity starts
+    /// - Stop spinning when activity stops
+    /// </summary>
     public interface ActivityListener
     {
+        /// <summary>
+        /// Call this method to indicate that activity has started.
+        /// </summary>
         void ActivityStarted();
+
+
+        /// <summary>
+        /// Call this method to indicate that activity has stopped.
+        /// </summary>
         void ActivityStopped();
     }
 }

@@ -18,50 +18,50 @@ namespace CmisSync.Lib.Sync
 {
     public partial class CmisRepo : RepoBase
     {
-        /**
-         * Synchronization with a particular CMIS folder.
-         */
+        /// <summary>
+        /// Synchronization with a particular CMIS folder.
+        /// </summary>
         public partial class SynchronizedFolder
         {
-            /**
-             * Synchronize by checking all folders/files one-by-one.
-             * This strategy is used if the CMIS server does not support the ChangeLog feature.
-             * 
-             * for all remote folders:
-             *     if exists locally:
-             *       recurse
-             *     else
-             *       if in database:
-             *         delete recursively from server // if BIDIRECTIONAL
-             *       else
-             *         download recursively
-             * for all remote files:
-             *     if exists locally:
-             *       if remote is more recent than local:
-             *         download
-             *       else
-             *         upload                         // if BIDIRECTIONAL
-             *     else:
-             *       if in database:
-             *         delete from server             // if BIDIRECTIONAL
-             *       else
-             *         download
-             * for all local files:
-             *   if not present remotely:
-             *     if in database:
-             *       delete
-             *     else:
-             *       upload                           // if BIDIRECTIONAL
-             *   else:
-             *     if has changed locally:
-             *       upload                           // if BIDIRECTIONAL
-             * for all local folders:
-             *   if not present remotely:
-             *     if in database:
-             *       delete recursively from local
-             *     else:
-             *       upload recursively               // if BIDIRECTIONAL
-             */
+            /// <summary>
+            /// Synchronize by checking all folders/files one-by-one.
+            /// This strategy is used if the CMIS server does not support the ChangeLog feature.
+            /// 
+            /// for all remote folders:
+            ///     if exists locally:
+            ///       recurse
+            ///     else
+            ///       if in database:
+            ///         delete recursively from server // if BIDIRECTIONAL
+            ///       else
+            ///         download recursively
+            /// for all remote files:
+            ///     if exists locally:
+            ///       if remote is more recent than local:
+            ///         download
+            ///       else
+            ///         upload                         // if BIDIRECTIONAL
+            ///     else:
+            ///       if in database:
+            ///         delete from server             // if BIDIRECTIONAL
+            ///       else
+            ///         download
+            /// for all local files:
+            ///   if not present remotely:
+            ///     if in database:
+            ///       delete
+            ///     else:
+            ///       upload                           // if BIDIRECTIONAL
+            ///   else:
+            ///     if has changed locally:
+            ///       upload                           // if BIDIRECTIONAL
+            /// for all local folders:
+            ///   if not present remotely:
+            ///     if in database:
+            ///       delete recursively from local
+            ///     else:
+            ///       upload recursively               // if BIDIRECTIONAL
+            /// </summary>
             private void CrawlSync(IFolder remoteFolder, string localFolder)
             {
                 while (repo.Status == SyncStatus.Suspend)
@@ -87,10 +87,11 @@ namespace CmisSync.Lib.Sync
                 CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
             }
 
-            /**
-             * Crawl remote content, syncing down if needed.
-             * Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
-             */
+
+            /// <summary>
+            /// Crawl remote content, syncing down if needed.
+            /// Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
+            /// </summary>
             private void CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
             {
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
@@ -262,9 +263,10 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
-            /**
-             * Crawl local files in a given directory (not recursive).
-             */
+
+            /// <summary>
+            /// Crawl local files in a given directory (not recursive).
+            /// </summary>
             private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
             {
                 foreach (string filePath in Directory.GetFiles(localFolder))
@@ -325,9 +327,10 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
-            /**
-             * Crawl local folders in a given directory (not recursive).
-             */
+
+            /// <summary>
+            /// Crawl local folders in a given directory (not recursive).
+            /// </summary>
             private void CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
             {
                 foreach (string localSubFolder in Directory.GetDirectories(localFolder))
