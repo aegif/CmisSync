@@ -22,7 +22,7 @@ namespace CmisSync.Lib.Cmis
             if (Path.GetExtension(fileName).Length > 1 && /* File with an extension */
                 MIMETypesDictionary.ContainsKey(Path.GetExtension(fileName).Remove(0, 1)))
             {
-                return MIMETypesDictionary[Path.GetExtension(fileName).Remove(0, 1).ToLower()];
+                return MIMETypesDictionary[Path.GetExtension(fileName).Remove(0, 1)];
             }
             return "application/octet-stream";
         }
@@ -33,8 +33,8 @@ namespace CmisSync.Lib.Cmis
         /// Found at http://stackoverflow.com/q/58510
         /// TODO: Use http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types which contains more types, like odt
         /// </summary>
-        private static readonly Dictionary<string, string> MIMETypesDictionary = 
-            new Dictionary<string, string>
+        private static readonly Dictionary<string, string> MIMETypesDictionary =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
                 {"ai", "application/postscript"},
                 {"aif", "audio/x-aiff"},
