@@ -48,11 +48,15 @@ namespace CmisSync
         /// </summary>
         public bool RepositoriesLoaded { get; private set; }
 
+        /// <summary>
+        /// List of the CmisSync synchronized folders.
+        /// </summary>
         private List<RepoBase> repositories = new List<RepoBase>();
-        public string FoldersPath { get; private set; }
 
-        public double ProgressPercentage = 0.0;
-        public string ProgressSpeed = "";
+        /// <summary>
+        /// Path where the CmisSync synchronized folders are by default.
+        /// </summary>
+        public string FoldersPath { get; private set; }
 
         public event ShowSetupWindowEventHandler ShowSetupWindowEvent = delegate { };
         public delegate void ShowSetupWindowEventHandler(PageType page_type);
@@ -61,9 +65,6 @@ namespace CmisSync
 
         public event FolderFetchedEventHandler FolderFetched = delegate { };
         public delegate void FolderFetchedEventHandler(string remote_url);
-
-        public event FolderFetchErrorHandler FolderFetchError = delegate { };
-        public delegate void FolderFetchErrorHandler(string remote_url, string[] errors);
 
         public event FolderFetchingHandler FolderFetching = delegate { };
         public delegate void FolderFetchingHandler(double percentage);
@@ -259,20 +260,6 @@ namespace CmisSync
 
             repo.SyncStatusChanged += delegate(SyncStatus status)
             {
-                if (status == SyncStatus.Idle)
-                {
-                    ProgressPercentage = 0.0;
-                    ProgressSpeed = "";
-                }
-
-                UpdateState();
-            };
-
-            repo.ProgressChanged += delegate(double percentage, string speed)
-            {
-                ProgressPercentage = percentage;
-                ProgressSpeed = speed;
-
                 UpdateState();
             };
 
@@ -459,22 +446,10 @@ namespace CmisSync
 
             fetcher = new Fetcher(repoInfo, activityListenerAggregator);
 
-            // Actions.
-
-            this.fetcher.Finished += delegate(bool repo_is_encrypted, bool repo_is_empty, string[] warnings)
+            // Finish action.
+            this.fetcher.Finished += delegate()
             {
                 FinishFetcher();
-            };
-
-            this.fetcher.Failed += delegate
-            {
-                FolderFetchError(this.fetcher.RemoteUrl.ToString(), this.fetcher.GetErrors());
-                StopFetcher();
-            };
-
-            this.fetcher.ProgressChanged += delegate(double percentage)
-            {
-                FolderFetching(percentage);
             };
 
             this.FinishFetcher();
