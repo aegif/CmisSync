@@ -352,33 +352,6 @@ namespace CmisSync
             {
                 string path = ConfigManager.CurrentConfig.FoldersPath;
 
-                // If folder has been renamed, rename it in configuration too.
-                foreach (string folder_path in Directory.GetDirectories(path))
-                {
-                    string folder_name = Path.GetFileName(folder_path);
-
-                    if (ConfigManager.CurrentConfig.GetIdentifierForFolder(folder_name) == null)
-                    {
-                        string identifier_file_path = Path.Combine(folder_path, ".CmisSync");
-
-                        if (!File.Exists(identifier_file_path))
-                            continue;
-
-                        string identifier = File.ReadAllText(identifier_file_path).Trim();
-
-                        if (ConfigManager.CurrentConfig.IdentifierExists(identifier))
-                        {
-                            RemoveRepository(folder_path);
-                            ConfigManager.CurrentConfig.RenameFolder(identifier, folder_name);
-
-                            string new_folder_path = Path.Combine(path, folder_name);
-                            AddRepository(new_folder_path);
-
-                            Logger.Info("Controller | Renamed folder with identifier " + identifier + " to '" + folder_name + "'");
-                        }
-                    }
-                }
-
                 // If folder has been deleted, remove it from configuration too.
                 foreach (string folder_name in ConfigManager.CurrentConfig.Folders)
                 {

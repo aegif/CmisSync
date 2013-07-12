@@ -200,6 +200,7 @@ namespace CmisSync.Lib
             return (XmlElement)configXml.SelectSingleNode("/CmisSync/log4net");
         }
 
+
         /// <summary>
         /// List of the CmisSync synchronized folders.
         /// </summary>
@@ -216,6 +217,10 @@ namespace CmisSync.Lib
             }
         }
 
+
+        /// <summary>
+        /// Add a synchronized folder to the configuration.
+        /// </summary>
         public void AddFolder(RepoInfo repoInfo)
         {
             if (null == repoInfo)
@@ -226,6 +231,10 @@ namespace CmisSync.Lib
             this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
         }
 
+
+        /// <summary>
+        /// Add a synchronized folder to the configuration.
+        /// </summary>
         private void AddFolder(string name, string path, Uri url, string repository,
             string remoteFolder, string user, string password, double pollinterval)
         {
@@ -270,6 +279,9 @@ namespace CmisSync.Lib
         }
 
 
+        /// <summary>
+        /// Remove a synchronized folder from the configuration.
+        /// </summary>
         public void RemoveFolder(string name)
         {
             foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
@@ -282,6 +294,10 @@ namespace CmisSync.Lib
         }
 
 
+
+        /// <summary>
+        /// Rename a synchronized folder in the configuration.
+        /// </summary>
         public void RenameFolder(string identifier, string name)
         {
             XmlNode node_folder = configXml.SelectSingleNode(
@@ -289,18 +305,6 @@ namespace CmisSync.Lib
 
             node_folder["name"].InnerText = name;
             Save();
-        }
-
-
-        public string GetBackendForFolder(string name)
-        {
-            return "Cmis"; // TODO GetFolderValue (name, "backend");
-        }
-
-
-        public string GetIdentifierForFolder(string name)
-        {
-            return GetFolderValue(name, "identifier");
         }
 
 
