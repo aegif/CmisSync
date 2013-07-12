@@ -46,7 +46,7 @@ namespace CmisSync.Lib
 
         private void OnChanged (object sender, FileSystemEventArgs args)
         {
-            ChangeEvent(sender, args);
+            // Disabled for now. ChangeEvent(sender, args);
         }
 
         private bool disposed;
