@@ -294,76 +294,26 @@ namespace CmisSync.Lib
         }
 
 
-
         /// <summary>
-        /// Rename a synchronized folder in the configuration.
+        /// Get the remote CMIS endpoint URL for a particular synchronized folder.
         /// </summary>
-        public void RenameFolder(string identifier, string name)
-        {
-            XmlNode node_folder = configXml.SelectSingleNode(
-                string.Format("/CmisSync/folders/folder[identifier=\"{0}\"]", identifier));
-
-            node_folder["name"].InnerText = name;
-            Save();
-        }
-
-
         public Uri GetUrlForFolder(string name)
         {
-            return new Uri(GetFolderValue(name, "url"));
+            return new Uri(GetFolderAttribute(name, "url"));
         }
 
 
-        public bool IdentifierExists(string identifier)
-        {
-            if (identifier == null)
-                throw new ArgumentNullException("identifier");
-
-            foreach (XmlNode node_folder in configXml.SelectNodes("/CmisSync/folders/folder"))
-            {
-                XmlElement folder_id = node_folder["identifier"];
-
-                if (folder_id != null && identifier.Equals(folder_id.InnerText))
-                    return true;
-            }
-
-            return false;
-        }
-
-
-        public bool SetFolderOptionalAttribute(string folderName, string key, string value)
-        {
-            XmlNode folder = GetFolder(folderName);
-
-            if (folder == null)
-                return false;
-
-            if (folder[key] != null)
-            {
-                folder[key].InnerText = value;
-
-            }
-            else
-            {
-                XmlNode new_node = configXml.CreateElement(key);
-                new_node.InnerText = value;
-                folder.AppendChild(new_node);
-            }
-
-            Save();
-
-            return true;
-        }
-
-
-        public string GetFolderOptionalAttribute(string folderName, string key)
+        /// <summary>
+        /// Get an attribute of a particular synchronized folder.
+        /// </summary>
+        public string GetFolderAttribute(string folderName, string attribute)
         {
             XmlNode folder = GetFolder(folderName);
 
             if (folder != null)
             {
-                if (folder[key] != null)
-                    return folder[key].InnerText;
+                if (folder[attribute] != null)
+                    return folder[attribute].InnerText;
                 else
                     return null;
 
@@ -374,19 +324,23 @@ namespace CmisSync.Lib
             }
         }
 
+
+        /// <summary>
+        /// Get all the configured info about a synchronized folder.
+        /// </summary>
         public RepoInfo GetRepoInfo(string folderName)
         {
             RepoInfo repoInfo = new RepoInfo(folderName, ConfigPath);
 
-            repoInfo.User = GetFolderOptionalAttribute(folderName, "user");
-            repoInfo.Password = GetFolderOptionalAttribute(folderName, "password");
+            repoInfo.User = GetFolderAttribute(folderName, "user");
+            repoInfo.Password = GetFolderAttribute(folderName, "password");
             repoInfo.Address = GetUrlForFolder(folderName);
-            repoInfo.RepoID = GetFolderOptionalAttribute(folderName, "repository");
-            repoInfo.RemotePath = GetFolderOptionalAttribute(folderName, "remoteFolder");
-            repoInfo.TargetDirectory = GetFolderOptionalAttribute(folderName, "path");
+            repoInfo.RepoID = GetFolderAttribute(folderName, "repository");
+            repoInfo.RemotePath = GetFolderAttribute(folderName, "remoteFolder");
+            repoInfo.TargetDirectory = GetFolderAttribute(folderName, "path");
             
             double pollinterval = 0;
-            double.TryParse(GetFolderOptionalAttribute(folderName, "pollinterval"), out pollinterval);
+            double.TryParse(GetFolderAttribute(folderName, "pollinterval"), out pollinterval);
             if (pollinterval < 1) pollinterval = 5000;
             repoInfo.PollInterval = pollinterval;
 
@@ -398,23 +352,19 @@ namespace CmisSync.Lib
             return repoInfo;
         }
 
+
+        /// <summary>
+        /// Get the XML node containing the configuration of a particular synchronized folder.
+        /// </summary>
         private XmlNode GetFolder(string name)
         {
             return configXml.SelectSingleNode(string.Format("/CmisSync/folders/folder[name=\"{0}\"]", name));
         }
 
 
-        private string GetFolderValue(string name, string key)
-        {
-            XmlNode folder = GetFolder(name);
-
-            if ((folder != null) && (folder[key] != null))
-                return folder[key].InnerText;
-            else
-                return null;
-        }
-
-
+        /// <summary>
+        /// Get a general configuration option (not about a particular synchronized folder), per its name.
+        /// </summary>
         public string GetConfigOption(string name)
         {
             XmlNode node = configXml.SelectSingleNode("/CmisSync/" + name);
@@ -426,6 +376,9 @@ namespace CmisSync.Lib
         }
 
 
+        /// <summary>
+        /// Set a general configuration option (not about a particular synchronized folder), per its name.
+        /// </summary>
         public void SetConfigOption(string name, string content)
         {
             XmlNode node = configXml.SelectSingleNode("/CmisSync/" + name);
@@ -448,18 +401,21 @@ namespace CmisSync.Lib
         }
 
 
-        private void Save()
-        {
-            //if (!File.Exists(FullPath))
-            //    throw new FileNotFoundException(FullPath + " does not exist");
-
-            configXml.Save(FullPath);
-        }
-
-
+        /// <summary>
+        /// Get the configured path to the log file.
+        /// </summary>
         public string GetLogFilePath()
         {
             return Path.Combine(ConfigPath, "debug_log.txt");
+        }
+
+
+        /// <summary>
+        /// Save the currently loaded (in memory) configuration back to the XML file.
+        /// </summary>
+        private void Save()
+        {
+            configXml.Save(FullPath);
         }
     }
 }
