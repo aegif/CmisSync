@@ -61,8 +61,15 @@ namespace TestLibrary
         {
             get
             {
+                string path = "../../test-servers.json";
+                bool exists = File.Exists(path);
+
+                if (!exists) {
+                    path= "../CmisSync/TestLibrary/test-servers.json";
+                }
+
                 return JsonConvert.DeserializeObject<List<object[]>>(
-                    File.ReadAllText("../../test-servers.json"));
+                    File.ReadAllText(path));
             }
         }
 
@@ -70,8 +77,15 @@ namespace TestLibrary
         {
             get
             {
+                string path = "../../test-servers-fuzzy.json";
+                bool exists = File.Exists(path);
+
+                if (!exists) {
+                    path= "../CmisSync/TestLibrary/test-servers-fuzzy.json";
+                }
+
                 return JsonConvert.DeserializeObject<List<object[]>>(
-                    File.ReadAllText("../../test-servers-fuzzy.json"));
+                    File.ReadAllText(path));
             }
         }
 
