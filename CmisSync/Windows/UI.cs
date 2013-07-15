@@ -30,16 +30,19 @@ namespace CmisSync {
         /// </summary>
         public Setup Setup;
 
+
         /// <summary>
         /// CmisSync icon in the task bar.
         /// It contains the main CmisSync menu.
         /// </summary>
         public StatusIcon StatusIcon;
 
+
         /// <summary>
         /// Small dialog showing some information about CmisSync.
         /// </summary>
         public About About;
+
 
         /// <summary>
         /// Constructor.

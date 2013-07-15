@@ -19,13 +19,23 @@
 using System;
 using System.Reflection;
 
+// Name of the CmisSync library.
 [assembly:AssemblyTitle ("CmisSync.Lib")]
+
+// Version of the CmisSync library. It is used as the CmisSync version.
 [assembly:AssemblyVersion ("@VERSION@")]
+
+// Copyright.
 [assembly:AssemblyCopyright ("Copyright (c) 2010 Hylke Bons, Aegif and others")]
+
+// Trademark.
 [assembly:AssemblyTrademark ("CmisSync is a trademark of CmisSync Ltd.")]
 
 namespace CmisSync.Lib {
 
+    /// <summary>
+    /// CmisSync Constants.
+    /// </summary>
     public class Defines {
         public const string INSTALL_DIR = "@expanded_datadir@/CmisSync";
     }

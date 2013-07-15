@@ -66,7 +66,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                string custom_path = ConfigManager.CurrentConfig.GetFolderOptionalAttribute(Name, "path");
+                string custom_path = ConfigManager.CurrentConfig.GetFolderAttribute(Name, "path");
                 // if (String.IsNullOrEmpty(custom_path)) custom_path = Config.DefaultConfig.FoldersPath;
 
                 if (custom_path != null)

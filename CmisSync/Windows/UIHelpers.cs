@@ -27,21 +27,25 @@ using Drawing = System.Drawing;
 
 namespace CmisSync {
 
+    /// <summary>
+    /// Convenient methods for retrieving images from files.
+    /// </summary>
     public static class UIHelpers {
         
-        public static string ToHex (this Drawing.Color color)
-        {
-            return string.Format ("#{0:X2}{1:X2}{2:X2}", color.R, color.G, color.B);
-        }
-
-
+        /// <summary>
+        /// Get the image frame associated with given identifier.
+        /// </summary>
         public static BitmapFrame GetImageSource (string name)
         {
             return GetImageSource (name, "png");
         }
 
 
-        public static BitmapFrame GetImageSource (string name, string type)
+        /// <summary>
+        /// Get the image frame associated with given identifier and file type.
+        /// </summary>
+        /// <param name="type">Filename extension, for instance "png" or "ico".</param>
+        public static BitmapFrame GetImageSource(string name, string type)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             Stream image_stream = assembly.GetManifestResourceStream("CmisSync.Pixmaps." + name + "." + type);
@@ -49,6 +53,9 @@ namespace CmisSync {
         }
         
 
+        /// <summary>
+        /// Get the image associated with given identifier.
+        /// </summary>
         public static Drawing.Bitmap GetBitmap (string name)
         {                                          
             Assembly assembly   = Assembly.GetExecutingAssembly ();
@@ -56,18 +63,12 @@ namespace CmisSync {
             return (Drawing.Bitmap) Drawing.Bitmap.FromStream (image_stream);
         }
 
+        /// <summary>
+        /// Get the icon associated with given identifier.
+        /// </summary>
         public static Drawing.Icon GetIcon(string name)
         {
             return Drawing.Icon.FromHandle(GetBitmap(name).GetHicon());
-        }
-		
-		public static string GetHTML (string name)
-        {                                          
-            Assembly assembly        = Assembly.GetExecutingAssembly ();
-            StreamReader html_reader = new StreamReader (
-				assembly.GetManifestResourceStream ("CmisSync.HTML." + name));
-            
-			return html_reader.ReadToEnd ();
         }
     }
 }

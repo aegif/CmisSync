@@ -123,18 +123,6 @@ namespace CmisSync
                 }
             };
 
-            // Exit item.
-            Controller.UpdateQuitItemEvent += delegate(bool item_enabled)
-            {
-                if (IsHandleCreated)
-                {
-                    BeginInvoke((Action)delegate
-                    {
-                        this.exitItem.Enabled = item_enabled;
-                    });
-                }
-            };
-
             // Repo Submenu.
             Controller.UpdateSuspendSyncFolderEvent += delegate(string reponame)
             {
@@ -253,7 +241,7 @@ namespace CmisSync
             };
             addFolderItem.Click += delegate
             {
-                Controller.AddHostedProjectClicked();
+                Controller.AddRemoteFolderClicked();
             };
             this.traymenu.Items.Add(addFolderItem);
             this.traymenu.Items.Add(new ToolStripSeparator());

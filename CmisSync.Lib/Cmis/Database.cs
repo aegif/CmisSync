@@ -22,73 +22,52 @@ namespace CmisSync.Lib.Cmis
     using SQLiteException = SqliteException;
 #endif
 
-    /**
-     * Database to cache remote information from the CMIS server.
-     * Implemented with SQLite.
-     */
+    /// <summary>
+    /// Database to cache remote information from the CMIS server.
+    /// Implemented with SQLite.
+    /// </summary>
     public class Database
     {
+        /// <summary>
+        /// Log.
+        /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Database));
 
-        /**
-         * Name of the SQLite database file.
-         */
+
+        /// <summary>
+        /// Name of the SQLite database file.
+        /// </summary>
         private string databaseFileName;
 
-        /**
-         * SQLite connection to the underlying database.
-         */
+
+        /// <summary>
+        ///  SQLite connection to the underlying database.
+        /// </summary>
         private SQLiteConnection sqliteConnection;
 
-        /**
-         * Length of the prefix to remove before storing paths.
-         */
+
+        /// <summary>
+        /// Length of the prefix to remove before storing paths.
+        /// </summary>
         private int pathPrefixSize;
 
 
-        /**
-         * Constructor.
-         */
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Database(string dataPath)
         {
             this.databaseFileName = dataPath;
-            // pathPrefixSize = dataPath.Length + 1; // +1 for the slash
-            // pathPrefixSize = Folder.ROOT_FOLDER.Length + 1;
             pathPrefixSize = ConfigManager.CurrentConfig.FoldersPath.Length + 1;
         }
 
 
-        //private bool disposed;
-
-        //public void Dispose()
-        //{
-        //    Dispose(true);
-        //}
-
-        //protected virtual void Dispose(bool disposing)
-        //{
-        //    if (!disposed)
-        //    {
-        //        if (disposing)
-        //        {
-        //            sqliteConnection.Dispose();
-        //            disposed = true;
-        //        }
-        //    }
-        //}
-
-
-        /**
-         * Connection to the database.
-         * The sqliteConnection must not be used directly, used this method instead.
-         */
+        /// <summary>
+        ///  Connection to the database.
+        /// The sqliteConnection must not be used directly, used this method instead.
+        /// </summary>
         public SQLiteConnection GetSQLiteConnection()
         {
-            //if (disposed)
-            //{
-            //    throw new ObjectDisposedException(sqliteConnection.GetType().Name);
-            //}
-
             if (sqliteConnection == null || sqliteConnection.State == System.Data.ConnectionState.Broken)
             {
                 try
@@ -98,9 +77,6 @@ namespace CmisSync.Lib.Cmis
 
                     sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL;");
                     sqliteConnection.Open();
-
-                    // Hidden database file - No more necessary because file is moved on a system folder
-                    // File.SetAttributes(databaseFileName, FileAttributes.Hidden);
 
                     if (createDatabase)
                     {
@@ -132,13 +108,13 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        /**
-         * Normalize a path.
-         * All paths stored in database must be normalized.
-         * Goals:
-         * - Make data smaller in database
-         * - Reduce OS-specific differences
-         */
+        /// <summary>
+        /// Normalize a path.
+        /// All paths stored in database must be normalized.
+        /// Goals:
+        /// - Make data smaller in database
+        /// - Reduce OS-specific differences
+        /// </summary>
         private string Normalize(string path)
         {
             // Remove path prefix
@@ -149,10 +125,10 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        /**
-         * Calculate the SHA1 checksum of a file.
-         * Code from http://stackoverflow.com/a/1993919/226958
-         */
+        /// <summary>
+        /// Calculate the SHA1 checksum of a file.
+        /// Code from http://stackoverflow.com/a/1993919/226958
+        /// </summary>
         private string Checksum(string filePath)
         {
             using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
@@ -171,47 +147,52 @@ namespace CmisSync.Lib.Cmis
             }
         }
 
-        /**
-         * Put all the values of a dictionary into a JSON string.
-         */
+        /// <summary>
+        /// Put all the values of a dictionary into a JSON string.
+        /// </summary>
         private string Json(Dictionary<string, string[]> dictionary)
         {
             return JsonConvert.SerializeObject(dictionary);
         }
 
 
-        /*
-         *
-         * 
-         *
-         * Database operations
-         * 
-         * 
-         * 
-         */
+        //
+        //
+        // 
+        //
+        // Database operations.
+        // 
+        // 
+        // 
+        //
 
+        /// <summary>
+        /// Add a file to the database.
+        /// </summary>
         public void AddFile(string path, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata)
         {
-            Logger.Debug("Start adding data in db for: " + path);
+            Logger.Debug("Starting database file addition for file: " + path);
             string normalizedPath = Normalize(path);
             string checksum = String.Empty;
 
-            // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
-            // see: http://www.sqlite.org/datatype3.html
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
+            // See http://www.sqlite.org/datatype3.html
             if (null != serverSideModificationDate)
             {
                 serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
             }
 
+            // Calculate file checksum.
             try
             {
                 checksum = Checksum(path);
             }
             catch (IOException e)
             {
-                Logger.Warn(String.Format("IOException while reading file {0} checksum during addition: {1}",path,e));
-                // The file was removed while reading. Just skip it, as it does not need to be added anymore.
+                Logger.Warn("IOException while calculating checksum of " + path
+                    + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. "
+                    + Utils.ToLogString(e));
                 return;
             }
 
@@ -221,6 +202,7 @@ namespace CmisSync.Lib.Cmis
                 return;
             }
 
+            // Insert into database.
             string command =
                 @"INSERT OR REPLACE INTO files (path, serverSideModificationDate, metadata, checksum)
                     VALUES (@path, @serverSideModificationDate, @metadata, @checksum)";
@@ -230,14 +212,17 @@ namespace CmisSync.Lib.Cmis
             parameters.Add("metadata", Json(metadata));
             parameters.Add("checksum", checksum);
             ExecuteSQLAction(command, parameters);
-            Logger.Debug("Adding data in db for: " + path + " finished");
+            Logger.Debug("Completed database file addition for file: " + path);
         }
 
 
+        /// <summary>
+        /// Add a folder to the database.
+        /// </summary>
         public void AddFolder(string path, DateTime? serverSideModificationDate)
         {
-            // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
-            // see: http://www.sqlite.org/datatype3.html
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
+            // See http://www.sqlite.org/datatype3.html
             if (null != serverSideModificationDate)
             {
                 serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
@@ -254,6 +239,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Remove a file from the database.
+        /// </summary>
         public void RemoveFile(string path)
         {
             path = Normalize(path);
@@ -264,6 +252,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Remove a folder from the database.
+        /// </summary>
         public void RemoveFolder(string path)
         {
             path = Normalize(path);
@@ -279,6 +270,10 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Get the time at which the file was last modified.
+        /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
+        /// </summary>
         public DateTime? GetServerSideModificationDate(string path)
         {
             path = Normalize(path);
@@ -298,11 +293,18 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        // TODO Combine this method and the next in a new method ModifyFile, and find out if GetServerSideModificationDate is really needed.
+        // 
+
+        /// <summary>
+        /// Set the last modification date of a file.
+        /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
+        /// 
+        /// TODO Combine this method and the next in a new method ModifyFile, and find out if GetServerSideModificationDate is really needed.
+        /// </summary>
         public void SetFileServerSideModificationDate(string path, DateTime? serverSideModificationDate)
         {
-            // Make shure, that the modification date is always UTC, because sqlite has no concept of Time-Zones
-            // see: http://www.sqlite.org/datatype3.html
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones.
+            // See http://www.sqlite.org/datatype3.html
             if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
                 throw new ArgumentException("serverSideModificationDate is not UTC");
             }
@@ -318,6 +320,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Recalculate the checksum of a file and save it to database.
+        /// </summary>
         public void RecalculateChecksum(string path)
         {
             string checksum = Checksum(path);
@@ -333,6 +338,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Checks whether the database contains a given file.
+        /// </summary>
         public bool ContainsFile(string path)
         {
             path = Normalize(path);
@@ -343,6 +351,9 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Checks whether the database contains a given folder.
+        /// </summary>
         public bool ContainsFolder(string path)
         {
             path = Normalize(path);
@@ -353,9 +364,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        /**
-         * Check whether a file's content has changed since it was last synchronized.
-         */
+        /// <summary>
+        /// Check whether a file's content has changed locally since it was last synchronized.
+        /// This happens when the user edits a file on the local computer.
+        /// This method does not communicate with the CMIS server, it just checks whether the checksum has changed.
+        /// </summary>
         public bool LocalFileHasChanged(string path)
         {
             string normalizedPath = Normalize(path);
@@ -385,12 +398,19 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Get the ChangeLog token that was stored at the end of the last successful CmisSync synchronization.
+        /// </summary>
         public string GetChangeLogToken()
         {
             return (string)ExecuteSQLFunction("SELECT value FROM general WHERE key=\"ChangeLogToken\"", null);
         }
 
 
+        /// <summary>
+        /// Set the stored ChangeLog token.
+        /// This should be called after each successful CmisSync synchronization.
+        /// </summary>
         public void SetChangeLogToken(string token)
         {
             string command = "INSERT OR REPLACE INTO general (key, value) VALUES (\"ChangeLogToken\", @token)";
@@ -400,6 +420,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Helper method to execute an SQL command that does not return anything.
+        /// </summary>
+        /// <param name="text">SQL query, optionnally with @something parameters.</param>
+        /// <param name="parameters">Parameters to replace in the SQL query.</param>
         private void ExecuteSQLAction(string text, Dictionary<string, object> parameters)
 
         {
@@ -419,6 +444,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Helper method to execute an SQL command that returns something.
+        /// </summary>
+        /// <param name="text">SQL query, optionnally with @something parameters.</param>
+        /// <param name="parameters">Parameters to replace in the SQL query.</param>
         private object ExecuteSQLFunction(string text, Dictionary<string, object> parameters)
         {
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
@@ -437,6 +467,12 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Helper method to fill the parameters inside an SQL command.
+        /// </summary>
+        /// <param name="command">The SQL command object to fill. This method modifies it.</param>
+        /// <param name="text">SQL query, optionnally with @something parameters.</param>
+        /// <param name="parameters">Parameters to replace in the SQL query.</param>
         private void ComposeSQLCommand(SQLiteCommand command, string text, Dictionary<string, object> parameters)
         {
             command.CommandText = text;

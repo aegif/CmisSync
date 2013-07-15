@@ -79,6 +79,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Deobfuscate a string on Windows.
+        /// </summary>
+        /// <param name="value">The string to deobfuscate</param>
+        /// <returns>The clear string</returns>
         private static string WindowsDeobfuscate(string value)
         {
             #if __MonoCS__
@@ -147,6 +152,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Deobfuscate a string on UNIX.
+        /// </summary>
+        /// <param name="value">The string to deobfuscate</param>
+        /// <returns>The clear string</returns>
         private static string UnixDeobfuscate(string value)
         {
 #if __MonoCS__
@@ -194,5 +204,4 @@ namespace CmisSync.Lib.Cmis
                 "Thou art so farth away, I miss you my dear files❥, with CmisSync be forever by my side!");
         }
     }
-
 }

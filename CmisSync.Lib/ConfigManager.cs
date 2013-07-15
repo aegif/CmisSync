@@ -5,24 +5,47 @@ using System.Text;
 
 namespace CmisSync.Lib
 {
+    /// <summary>
+    /// A static class that allows easy access to the configuration of CmisSync.
+    /// </summary>
     public static class ConfigManager
     {
+        /// <summary>
+        /// The CmisSync configuration.
+        /// Following the singleton design pattern.
+        /// </summary>
         private static Config config;
 
+
+        /// <summary>
+        /// The CmisSync configuration.
+        /// Following the singleton design pattern.
+        /// </summary>
+        public static Config CurrentConfig
+        {
+            get
+            {
+                // Load the configuration if it has not been done yet.
+                // If no configuration file exists, it will create a default one.
+                if (config == null)
+                {
+                    config = new Config(CurrentConfigFile);
+                }
+
+                // return the loaded configuration.
+                return config;
+            }
+        }
+
+
+        /// <summary>
+        /// Get the filesystem path to the XML configuration file.
+        /// </summary>
         public static string CurrentConfigFile
         {
             get
             {
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cmissync", "config.xml");
-            }
-        }
-
-        public static Config CurrentConfig
-        {
-            get
-            {
-                if (config == null) config = new Config(CurrentConfigFile);
-                return config;
             }
         }
     }

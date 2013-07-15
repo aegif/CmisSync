@@ -21,9 +21,15 @@ using System.Runtime.InteropServices;
 
 namespace CmisSync.Lib
 {
-
+    /// <summary>
+    /// Information about the version of CmisSync.Lib and the version of the operating system.
+    /// </summary>
     public static class Backend {
 
+        /// <summary>
+        /// Version of CmisSync.Lib
+        /// It is also used as the CmisSync version.
+        /// </summary>
         public static string Version {
             get {
                 string version = String.Empty + Assembly.GetExecutingAssembly ().GetName ().Version;
@@ -32,8 +38,10 @@ namespace CmisSync.Lib
         }
 
 
-        // This fixes the PlatformID enumeration for MacOSX in Environment.OSVersion.Platform,
-        // which is intentionally broken in Mono for historical reasons
+        /// <summary>
+        /// This fixes the PlatformID enumeration for MacOSX in Environment.OSVersion.Platform,
+        /// which is intentionally broken in Mono for historical reasons
+        /// </summary>
         public static PlatformID Platform {
             get {
                 IntPtr buf = IntPtr.Zero;
@@ -56,6 +64,11 @@ namespace CmisSync.Lib
         }
 
 
+        /// <summary>
+        /// Import uname from libc for use in the previous method.
+        /// </summary>
+        /// <param name="buf"></param>
+        /// <returns></returns>
         [DllImport ("libc")]
         private static extern int uname (IntPtr buf);
     }
