@@ -131,7 +131,6 @@ namespace CmisSync.Lib
                 SyncInBackground();
             };
 
-            ProgressChanged += delegate { };
             NewChangeSet += delegate { };
             ConflictResolved += delegate { };
             ChangesDetected += delegate { };
