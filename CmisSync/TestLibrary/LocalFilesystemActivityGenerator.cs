@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,14 +18,20 @@ namespace TestLibrary
             CreateRandomFile(path, 3);
             CreateRandomFile(path, 3);
             string path1 = Path.Combine(path, "dir1");
-            Directory.CreateDirectory(path1);
+            if (!Directory.Exists(path1))
+            {
+                Directory.CreateDirectory(path1);
+            }
             CreateRandomFile(path1, 3);
             CreateRandomFile(path1, 3);
             CreateRandomFile(path1, 3);
             CreateRandomFile(path1, 3);
             CreateRandomFile(path1, 3);
             string path2 = Path.Combine(path1, "dir2");
-            Directory.CreateDirectory(path2);
+            if (!Directory.Exists(path2))
+            {
+                Directory.CreateDirectory(path2);
+            }
             CreateRandomFile(path2, 3);
         }
 
