@@ -269,7 +269,18 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
             {
-                foreach (string filePath in Directory.GetFiles(localFolder))
+                string[] files;
+                try
+                {
+                    files = Directory.GetFiles(localFolder);
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(String.Format("Exception while get the file list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
+                    return;
+                }
+
+                foreach (string filePath in files)
                 {
                     while (repo.Status == SyncStatus.Suspend)
                     {
@@ -333,7 +344,18 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
             {
-                foreach (string localSubFolder in Directory.GetDirectories(localFolder))
+                string[] folders;
+                try
+                {
+                    folders = Directory.GetDirectories(localFolder);
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(String.Format("Exception while get the folder list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
+                    return;
+                }
+
+                foreach (string localSubFolder in folders)
                 {
                     while (repo.Status == SyncStatus.Suspend)
                     {

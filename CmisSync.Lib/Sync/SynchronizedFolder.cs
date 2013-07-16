@@ -286,78 +286,86 @@ namespace CmisSync.Lib.Sync
                     return;
                 }
 
-                DotCMIS.Data.IContentStream contentStream = null;
-                string filepath = Path.Combine(localFolder, remoteDocument.ContentStreamFileName);
-                string tmpfilepath = filepath + ".sync";
-
-                // If there was previously a directory with this name, delete it.
-                // TODO warn if local changes inside the folder.
-                if (Directory.Exists(filepath))
-                {
-                    Directory.Delete(filepath);
-                }
-
-                // If file exists, delete it.
-                File.Delete(filepath);
-                File.Delete(tmpfilepath);
-
-                // Download file.
-                Boolean success = false;
                 try
                 {
-                    contentStream = remoteDocument.GetContentStream();
+                    DotCMIS.Data.IContentStream contentStream = null;
+                    string filepath = Path.Combine(localFolder, remoteDocument.ContentStreamFileName);
+                    string tmpfilepath = filepath + ".sync";
 
-                    // If this file does not have a content stream, ignore it.
-                    // Even 0 bytes files have a contentStream.
-                    // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-                    if (contentStream == null)
+                    // If there was previously a directory with this name, delete it.
+                    // TODO warn if local changes inside the folder.
+                    if (Directory.Exists(filepath))
                     {
-                        Logger.Warn("Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
-                        activityListener.ActivityStopped();
-                        return;
+                        Directory.Delete(filepath);
                     }
 
-                    DownloadStream(contentStream, tmpfilepath);
-
-                    contentStream.Stream.Close();
-                    success = true;
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("Download failed: " + remoteDocument.ContentStreamFileName + " " + ex);
-                    success = false;
+                    // If file exists, delete it.
+                    File.Delete(filepath);
                     File.Delete(tmpfilepath);
-                    if (contentStream != null) contentStream.Stream.Close();
-                }
 
-                if (success)
-                {
-                    Logger.Info("Downloaded: " + remoteDocument.ContentStreamFileName);
-                    // TODO Control file integrity by using hash compare?
-
-                    // Get metadata.
-                    Dictionary<string, string[]> metadata = null;
+                    // Download file.
+                    Boolean success = false;
                     try
                     {
-                        metadata = FetchMetadata(remoteDocument);
+                        contentStream = remoteDocument.GetContentStream();
+
+                        // If this file does not have a content stream, ignore it.
+                        // Even 0 bytes files have a contentStream.
+                        // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                        if (contentStream == null)
+                        {
+                            Logger.Warn("Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                            activityListener.ActivityStopped();
+                            return;
+                        }
+
+                        DownloadStream(contentStream, tmpfilepath);
+
+                        contentStream.Stream.Close();
+                        success = true;
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Logger.Info("Exception while fetching metadata: " + remoteDocument.ContentStreamFileName + " " + Utils.ToLogString(e));
-                        // Remove temporary local document to avoid it being considered a new document.
+                        Logger.Error("Download failed: " + remoteDocument.ContentStreamFileName + " " + ex);
+                        if (contentStream != null) contentStream.Stream.Close();
+                        success = false;
                         File.Delete(tmpfilepath);
-                        activityListener.ActivityStopped();
-                        return;
                     }
 
-                    // Remove the ".sync" suffix.
-                    File.Move(tmpfilepath, filepath);
-                    
-                    // Create database entry for this file.
-                    database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+                    if (success)
+                    {
+                        Logger.Info("Downloaded: " + remoteDocument.ContentStreamFileName);
+                        // TODO Control file integrity by using hash compare?
 
-                    Logger.Info("Added to database: " + remoteDocument.ContentStreamFileName);
+                        // Get metadata.
+                        Dictionary<string, string[]> metadata = null;
+                        try
+                        {
+                            metadata = FetchMetadata(remoteDocument);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Info("Exception while fetching metadata: " + remoteDocument.ContentStreamFileName + " " + Utils.ToLogString(e));
+                            // Remove temporary local document to avoid it being considered a new document.
+                            File.Delete(tmpfilepath);
+                            activityListener.ActivityStopped();
+                            return;
+                        }
+
+                        // Remove the ".sync" suffix.
+                        File.Move(tmpfilepath, filepath);
+
+                        // Create database entry for this file.
+                        database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+
+                        Logger.Info("Added to database: " + remoteDocument.ContentStreamFileName);
+                    }
                 }
+                catch (IOException e)
+                {
+                    Logger.Warn("Exception while file operation: " + Utils.ToLogString(e));
+                }
+
                 activityListener.ActivityStopped();
             }
 
@@ -479,19 +487,38 @@ namespace CmisSync.Lib.Sync
                 // TODO Add metadata
                 database.AddFolder(localFolder, folder.LastModificationDate);
 
-                // Upload each file in this folder.
-                foreach (string file in Directory.GetFiles(localFolder))
+                try
                 {
-                    if (Utils.WorthSyncing(file))
-                        UploadFile(file, folder);
+                    // Upload each file in this folder.
+                    foreach (string file in Directory.GetFiles(localFolder))
+                    {
+                        if (Utils.WorthSyncing(file))
+                            UploadFile(file, folder);
+                    }
+
+                    // Recurse for each subfolder in this folder.
+                    foreach (string subfolder in Directory.GetDirectories(localFolder))
+                    {
+                        if (Utils.WorthSyncing(subfolder))
+                            UploadFolderRecursively(folder, subfolder);
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (e is System.IO.DirectoryNotFoundException ||
+                        e is IOException)
+                    {
+                        Logger.Warn("Folder deleted while trying to upload it, reverting.");
+                        // Folder has been deleted while we were trying to upload/checksum/add.
+                        // In this case, revert the upload.
+                        folder.DeleteTree(true, null, true);
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
 
-                // Recurse for each subfolder in this folder.
-                foreach (string subfolder in Directory.GetDirectories(localFolder))
-                {
-                    if (Utils.WorthSyncing(subfolder))
-                        UploadFolderRecursively(folder, subfolder);
-                }
             }
 
 
@@ -500,32 +527,39 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void UpdateFile(string filePath, IDocument remoteFile)
             {
-                Logger.Info("## Updating " + filePath);
-                using (Stream localfile = File.OpenRead(filePath))
+                try
                 {
-                    // Ignore files with null or empty content stream.
-                    if ((localfile == null) && (localfile.Length == 0))
+                    Logger.Info("## Updating " + filePath);
+                    using (Stream localfile = File.OpenRead(filePath))
                     {
-                        Logger.Info("Skipping update of file with null or empty content stream: " + filePath);
-                        return;
+                        // Ignore files with null or empty content stream.
+                        if ((localfile == null) && (localfile.Length == 0))
+                        {
+                            Logger.Info("Skipping update of file with null or empty content stream: " + filePath);
+                            return;
+                        }
+
+                        // Prepare content stream
+                        ContentStream remoteStream = new ContentStream();
+                        remoteStream.FileName = remoteFile.ContentStreamFileName;
+                        remoteStream.Length = localfile.Length;
+                        remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
+                        remoteStream.Stream = localfile;
+                        remoteStream.Stream.Flush();
+                        Logger.Debug("before SetContentStream");
+
+                        // CMIS do not have a Method to upload block by block. So upload file must be full.
+                        // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
+                        // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
+                        // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
+                        remoteFile.SetContentStream(remoteStream, true, true);
+                        Logger.Debug("after SetContentStream");
+                        Logger.Info("## Updated " + filePath);
                     }
-
-                    // Prepare content stream
-                    ContentStream remoteStream = new ContentStream();
-                    remoteStream.FileName = remoteFile.ContentStreamFileName;
-                    remoteStream.Length = localfile.Length;
-                    remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
-                    remoteStream.Stream = localfile;
-                    remoteStream.Stream.Flush();
-                    Logger.Debug("before SetContentStream");
-
-                    // CMIS do not have a Method to upload block by block. So upload file must be full.
-                    // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
-                    // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
-                    // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
-                    remoteFile.SetContentStream(remoteStream, true, true);
-                    Logger.Debug("after SetContentStream");
-                    Logger.Info("## Updated " + filePath);
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(String.Format("Exception while update file {0}: {1}", filePath, e));
                 }
             }
 
@@ -587,11 +621,21 @@ namespace CmisSync.Lib.Sync
             private void RemoveFolderLocally(string folderPath)
             {
                 // Folder has been deleted on server, delete it locally too.
-                Logger.Info("Removing remotely deleted folder: " + folderPath);
-                Directory.Delete(folderPath, true);
+                try
+                {
+                    Logger.Info("Removing remotely deleted folder: " + folderPath);
+                    Directory.Delete(folderPath, true);
+                }
+                catch (IOException e)
+                {
+                    Logger.Warn(String.Format("Exception while delete tree {0}: {1}", folderPath, Utils.ToLogString(e)));
+                }
 
                 // Delete folder from database.
-                database.RemoveFolder(folderPath);
+                if (!Directory.Exists(folderPath))
+                {
+                    database.RemoveFolder(folderPath);
+                }
             }
 
             /// <summary>
