@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -71,6 +71,9 @@ namespace TestLibraryRunner
                     break;
                 }
             }
+
+            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
 
             //new CmisSyncTests().TestCrypto();
             test(path == null ? "../../../TestLibrary/test-servers.json" : path);

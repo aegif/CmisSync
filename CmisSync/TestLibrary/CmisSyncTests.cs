@@ -49,14 +49,21 @@ namespace TestLibrary
     [TestFixture]
     public class CmisSyncTests
     {
-        private string CMISSYNCDIR = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "CmisSync");
+        private readonly string CMISSYNCDIR = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "CmisSync");
 
+        
         public CmisSyncTests()
         {
-            // Config.DefaultConfig = new Config(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
+        }
+
+
+        [TestFixtureSetUp]
+        public void ClassInit()
+        {
             File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
+
 
         public static IEnumerable<object[]> TestServers
         {
@@ -74,6 +81,7 @@ namespace TestLibrary
             }
         }
 
+
         public static IEnumerable<object[]> TestServersFuzzy
         {
             get
@@ -90,10 +98,7 @@ namespace TestLibrary
             }
         }
 
-        public void Dispose()
-        {
-        }
-        
+
         private void Clean(string localDirectory, CmisRepo.SynchronizedFolder synchronizedFolder)
         {
 
@@ -106,6 +111,7 @@ namespace TestLibrary
             Directory.Delete(localDirectory);
         }
 
+
         private void DeleteDirectoryIfExists(string path)
         {
             if (Directory.Exists(path))
@@ -113,6 +119,7 @@ namespace TestLibrary
                 Directory.Delete(path, true);
             }
         }
+
 
         private void CleanDirectory(string path)
         {
@@ -136,6 +143,7 @@ namespace TestLibrary
             // Prepare empty directory.
             Directory.CreateDirectory(path);
         }
+
 
         private void CleanAll(string path)
         {
@@ -174,6 +182,7 @@ namespace TestLibrary
             }
         }
 
+
         // /////////////////////////// TESTS ///////////////////////////
 
 
@@ -182,6 +191,7 @@ namespace TestLibrary
         {
             Assert.AreEqual(4, 2 + 2);
         }
+
 
         [Test]
         public void TestCrypto()
@@ -193,6 +203,7 @@ namespace TestLibrary
             }
         }
 
+
         [Test, TestCaseSource("TestServers")]
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -200,6 +211,7 @@ namespace TestLibrary
             Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
             Assert.NotNull(repos);
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void Sync(string canonical_name, string localPath, string remoteFolderPath,
@@ -234,6 +246,7 @@ namespace TestLibrary
             Clean(localDirectory, synchronizedFolder);
             cmis.Dispose();
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
@@ -275,8 +288,11 @@ namespace TestLibrary
             // TODO
 
             // Clean.
+            Console.WriteLine("Clean all.");
             Clean(localDirectory, synchronizedFolder);
+            cmis.Dispose();
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
@@ -323,6 +339,7 @@ namespace TestLibrary
             cmis.Dispose();
         }
 
+
         [Test, TestCaseSource("TestServers")]
         public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -360,12 +377,15 @@ namespace TestLibrary
             Console.WriteLine("Post sync done.");
 
             // Clean.
+            Console.WriteLine("Clean all.");
             Clean(localDirectory, synchronizedFolder);
+            cmis.Dispose();
         }
+
 
         // Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
         [Test, TestCaseSource("TestServers")]
-        public void SyncWhileModifyingFile(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncWhileModifyingFiles(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare checkout directory.
@@ -427,6 +447,7 @@ namespace TestLibrary
             Clean(localDirectory, synchronizedFolder);
             cmis.Dispose();
         }
+
 
         // Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
         [Test, TestCaseSource("TestServers")]
@@ -495,6 +516,7 @@ namespace TestLibrary
             cmis.Dispose();
         }
 
+
         // Write a file and immediately check whether it has been created.
         // Should help see whether CMIS servers are synchronous or not.
         [Test, TestCaseSource("TestServers")]
@@ -547,9 +569,10 @@ namespace TestLibrary
             Assert.True(found);
 
             // Clean.
-            IDocument doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + fileName);
+            IDocument doc = (IDocument)session.GetObjectByPath((remoteFolderPath + "/" + fileName).Replace("//","/"));
             doc.DeleteAllVersions();
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void DotCmisToIBMConnections(string canonical_name, string localPath, string remoteFolderPath,
@@ -586,6 +609,7 @@ namespace TestLibrary
                 }
             }
         }
+
 
         [Test, TestCaseSource("TestServersFuzzy")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
