@@ -98,8 +98,8 @@ namespace CmisSync.Lib.Sync
                 {
                     while (repo.Status == SyncStatus.Suspend)
                     {
-                        Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
-                        System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
+                        Logger.Info("Sync of " + repoinfo.Name + " is suspended, will retry in " + repoinfo.PollInterval + "ms");
+                        System.Threading.Thread.Sleep((int)repoinfo.PollInterval); // TODO Should not sleep, but skip instead.
                     }
 
                     #region Cmis Folder

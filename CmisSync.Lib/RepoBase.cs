@@ -28,35 +28,35 @@ using Timers = System.Timers;
 namespace CmisSync.Lib
 {
 
-    public enum SyncStatus
-    {
-        Idle,
-        SyncUp,
-        SyncDown,
-        Error,
-        Suspend
-    }
-
-
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class RepoBase
     {
+        /// <summary>
+        /// Log.
+        /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(RepoBase));
 
+
+        /// <summary>
+        /// Perform a synchronization if one is not running already.
+        /// </summary>
         public abstract void SyncInBackground();
+
+
+        /// <summary>
+        /// Local disk size taken by the repository.
+        /// </summary>
         public abstract double Size { get; }
 
-        /**
-         * <param>new <c>SyncStatus</c> value</param>
-         */
+
+        /// <summary>
+        /// Affect a new <c>SyncStatus</c> value.
+        /// </summary>
         public Action<SyncStatus> SyncStatusChanged { get; set; }
 
 
-        /**
-         * <param><c>ChangeSet</c> value</param>
-         */
-        public Action<ChangeSet> NewChangeSet { get; set; }
-
-        public Action ConflictResolved { get; set; }
         public Action ChangesDetected { get; set; }
 
 
@@ -131,8 +131,6 @@ namespace CmisSync.Lib
                 SyncInBackground();
             };
 
-            NewChangeSet += delegate { };
-            ConflictResolved += delegate { };
             ChangesDetected += delegate { };
         }
 
@@ -162,7 +160,7 @@ namespace CmisSync.Lib
 
         protected internal void OnConflictResolved()
         {
-            ConflictResolved();
+            // ConflictResolved(); TODO
         }
 
 
@@ -204,5 +202,16 @@ namespace CmisSync.Lib
 
             this.watcher.Dispose();
         }
+    }
+
+
+    /// <summary>
+    /// Current status of the synchronization.
+    /// TODO: It was used in SparkleShare for up/down/error but is not useful anymore, should be removed.
+    /// </summary>
+    public enum SyncStatus
+    {
+        Idle,
+        Suspend // TODO this should be written in XML configuration instead.
     }
 }
