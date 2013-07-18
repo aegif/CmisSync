@@ -268,20 +268,22 @@ namespace CmisSync.Lib.Sync
             private void DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 activityListener.ActivityStarted();
-                Logger.Info("Downloading: " + remoteDocument.ContentStreamFileName);
+
+                string fileName = remoteDocument.ContentStreamFileName;
+                Logger.Info("Downloading: " + fileName);
 
                 // TODO: Make this configurable.
                 if (remoteDocument.ContentStreamLength == 0)
                 {
-                    Logger.Info("Skipping download of file with content length zero: " + remoteDocument.ContentStreamFileName);
+                    Logger.Info("Skipping download of file with content length zero: " + fileName);
                     activityListener.ActivityStopped();
                     return;
                 }
 
                 // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
-                if(Utils.IsInvalidFileName(remoteDocument.ContentStreamFileName))
+                if (Utils.IsInvalidFileName(fileName))
                 {
-                    Logger.Info("Skipping download of file with illegal filename: " + remoteDocument.ContentStreamFileName);
+                    Logger.Info("Skipping download of file with illegal filename: " + fileName);
                     activityListener.ActivityStopped();
                     return;
                 }
@@ -289,7 +291,7 @@ namespace CmisSync.Lib.Sync
                 try
                 {
                     DotCMIS.Data.IContentStream contentStream = null;
-                    string filepath = Path.Combine(localFolder, remoteDocument.ContentStreamFileName);
+                    string filepath = Path.Combine(localFolder, fileName);
                     string tmpfilepath = filepath + ".sync";
 
                     // If there was previously a directory with this name, delete it.
@@ -314,7 +316,7 @@ namespace CmisSync.Lib.Sync
                         // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
                         if (contentStream == null)
                         {
-                            Logger.Warn("Skipping download of file with null content stream: " + remoteDocument.ContentStreamFileName);
+                            Logger.Warn("Skipping download of file with null content stream: " + fileName);
                             activityListener.ActivityStopped();
                             return;
                         }
@@ -326,7 +328,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error("Download failed: " + remoteDocument.ContentStreamFileName + " " + ex);
+                        Logger.Error("Download failed: " + fileName + " " + ex);
                         if (contentStream != null) contentStream.Stream.Close();
                         success = false;
                         File.Delete(tmpfilepath);
@@ -334,7 +336,7 @@ namespace CmisSync.Lib.Sync
 
                     if (success)
                     {
-                        Logger.Info("Downloaded: " + remoteDocument.ContentStreamFileName);
+                        Logger.Info("Downloaded: " + fileName);
                         // TODO Control file integrity by using hash compare?
 
                         // Get metadata.
@@ -345,7 +347,7 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (Exception e)
                         {
-                            Logger.Info("Exception while fetching metadata: " + remoteDocument.ContentStreamFileName + " " + Utils.ToLogString(e));
+                            Logger.Info("Exception while fetching metadata: " + fileName + " " + Utils.ToLogString(e));
                             // Remove temporary local document to avoid it being considered a new document.
                             File.Delete(tmpfilepath);
                             activityListener.ActivityStopped();
@@ -358,7 +360,7 @@ namespace CmisSync.Lib.Sync
                         // Create database entry for this file.
                         database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
 
-                        Logger.Info("Added to database: " + remoteDocument.ContentStreamFileName);
+                        Logger.Info("Added to database: " + fileName);
                     }
                 }
                 catch (IOException e)
