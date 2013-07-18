@@ -48,5 +48,18 @@ namespace CmisSync.Lib
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cmissync", "config.xml");
             }
         }
+
+
+        public static string GetFullPath(string name)
+        {
+                string custom_path = ConfigManager.CurrentConfig.GetFolderAttribute(name, "path");
+                // if (String.IsNullOrEmpty(custom_path)) custom_path = Config.DefaultConfig.FoldersPath;
+
+                if (custom_path != null)
+                    return custom_path;
+                else
+                    return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
+                // return Path.Combine(ROOT_FOLDER, Name);
+            }
     }
 }

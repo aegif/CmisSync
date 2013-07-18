@@ -88,7 +88,7 @@ namespace CmisSync.Lib
             }
 
             // Check that the folder is writable.
-            if (!Folder.HasWritePermissionOnDir(ConfigManager.CurrentConfig.FoldersPath))
+            if (!Utils.HasWritePermissionOnDir(ConfigManager.CurrentConfig.FoldersPath))
             {
                 Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", ConfigManager.CurrentConfig.FoldersPath));
                 throw new UnauthorizedAccessException("Root folder is not writable!");

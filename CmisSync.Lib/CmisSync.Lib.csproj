@@ -65,7 +65,6 @@
     <Compile Include="RepoBase.cs" />
     <Compile Include="RepoInfo.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="Wrappers.cs" />
     <Compile Include="Backend.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Watcher.cs">
