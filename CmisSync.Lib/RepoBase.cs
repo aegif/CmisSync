@@ -179,7 +179,7 @@ namespace CmisSync.Lib
                 // Synchronize.
                 SyncInBackground();
             };
-
+            
             ChangesDetected += delegate { };
         }
 
@@ -275,7 +275,15 @@ namespace CmisSync.Lib
     /// </summary>
     public enum SyncStatus
     {
+        /// <summary>
+        /// Normal operation.
+        /// </summary>
         Idle,
-        Suspend // TODO this should be written in XML configuration instead.
+
+        /// <summary>
+        /// Synchronization is suspended.
+        /// TODO this should be written in XML configuration instead.
+        /// </summary>
+        Suspend
     }
 }

@@ -54,9 +54,11 @@ namespace CmisSync
 #if !__MonoCS__
         [STAThread]
 #endif
-        /// <summary>
-        /// Main method for CmisSync.
-        /// </summary>
+
+
+        //
+        // Main method for CmisSync.
+        //
         public static void Main(string[] args)
         {
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);

@@ -9,9 +9,27 @@ namespace CmisSync.Lib.Cmis
     [Serializable]
     public class CmisServerNotFoundException : Exception
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public CmisServerNotFoundException() { }
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public CmisServerNotFoundException(string message) : base(message) { }
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public CmisServerNotFoundException(string message, Exception inner) : base(message, inner) { }
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         protected CmisServerNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 
