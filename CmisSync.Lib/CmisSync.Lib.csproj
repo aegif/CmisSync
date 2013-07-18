@@ -73,7 +73,7 @@
     </Compile>
     <Compile Include="Exceptions.cs" />
     <Compile Include="Defines.cs" />
-    <Compile Include="ActivityListener.cs" />
+    <Compile Include="IActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />
   </ItemGroup>
   <ItemGroup>
