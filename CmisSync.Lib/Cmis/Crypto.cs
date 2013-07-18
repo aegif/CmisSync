@@ -79,6 +79,11 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Deobfuscate a string on Windows.
+        /// </summary>
+        /// <param name="value">The string to deobfuscate</param>
+        /// <returns>The clear string</returns>
         private static string WindowsDeobfuscate(string value)
         {
             #if __MonoCS__
@@ -120,17 +125,19 @@ namespace CmisSync.Lib.Cmis
 #if __MonoCS__
             try
             {
-                PasswordDeriveBytes pdb = new PasswordDeriveBytes(GetCryptoKey(),
-                        new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-                AesManaged myAes = new AesManaged();
-                myAes.Key = pdb.GetBytes(myAes.KeySize / 8);
-                myAes.IV = pdb.GetBytes(myAes.BlockSize / 8);
-
-                ICryptoTransform encryptor = myAes.CreateEncryptor();
-
-                byte[] data = System.Text.Encoding.UTF8.GetBytes(value);
-                byte[] crypt = encryptor.TransformFinalBlock(data, 0, data.Length);
-                return Convert.ToBase64String(crypt, Base64FormattingOptions.None);
+                using (PasswordDeriveBytes pdb = new PasswordDeriveBytes(
+                    GetCryptoKey(), new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }))
+                using (AesManaged myAes = new AesManaged())
+                {
+                    myAes.Key = pdb.GetBytes(myAes.KeySize / 8);
+                    myAes.IV = pdb.GetBytes(myAes.BlockSize / 8);
+                    using (ICryptoTransform encryptor = myAes.CreateEncryptor())
+                    {
+                        byte[] data = System.Text.Encoding.UTF8.GetBytes(value);
+                        byte[] crypt = encryptor.TransformFinalBlock(data, 0, data.Length);
+                        return Convert.ToBase64String(crypt, Base64FormattingOptions.None);
+                    }
+                }
             }
 
             catch (CryptographicException e)
@@ -145,23 +152,29 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Deobfuscate a string on UNIX.
+        /// </summary>
+        /// <param name="value">The string to deobfuscate</param>
+        /// <returns>The clear string</returns>
         private static string UnixDeobfuscate(string value)
         {
 #if __MonoCS__
             try
             {
-                PasswordDeriveBytes pdb = new PasswordDeriveBytes(GetCryptoKey(),
-                        new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-                AesManaged myAes = new AesManaged();
-                myAes.Key = pdb.GetBytes(myAes.KeySize / 8);
-                myAes.IV = pdb.GetBytes(myAes.BlockSize / 8);
-
-                ICryptoTransform decryptor = myAes.CreateDecryptor();
-
-                byte[] data = Convert.FromBase64String(value);
-
-                byte[] uncrypt = decryptor.TransformFinalBlock(data, 0, data.Length);
-                return System.Text.Encoding.UTF8.GetString(uncrypt);
+                using (PasswordDeriveBytes pdb = new PasswordDeriveBytes(
+                    GetCryptoKey(), new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }))
+                using (AesManaged myAes = new AesManaged())
+                {
+                    myAes.Key = pdb.GetBytes(myAes.KeySize / 8);
+                    myAes.IV = pdb.GetBytes(myAes.BlockSize / 8);
+                    using (ICryptoTransform decryptor = myAes.CreateDecryptor())
+                    {
+                        byte[] data = Convert.FromBase64String(value);
+                        byte[] uncrypt = decryptor.TransformFinalBlock(data, 0, data.Length);
+                        return System.Text.Encoding.UTF8.GetString(uncrypt);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -191,5 +204,4 @@ namespace CmisSync.Lib.Cmis
                 "Thou art so farth away, I miss you my dear files❥, with CmisSync be forever by my side!");
         }
     }
-
 }

@@ -50,12 +50,6 @@ namespace CmisSync
         }
 
 
-        public void BubbleClicked()
-        {
-            Program.Controller.ShowEventLogWindow();
-        }
-
-
         private string FormatMessage(ChangeSet change_set)
         {
             string message = "added ‘{0}’";

@@ -1,4 +1,4 @@
-﻿//   CmisSync, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -28,102 +28,84 @@ using CmisSync.Lib.Sync;
 namespace CmisSync.Lib
 {
 
+    /// <summary>
+    /// Creates a CmisSync synchronized folder.
+    /// TODO: This class should probably be removed, together with the last step of the folder addition wizard.
+    /// </summary>
     public class Fetcher
     {
-        CmisRepo CmisRepo;
-
+        /// <summary>
+        /// Log.
+        /// </summary>
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(Fetcher));
 
-        public event Action Started = delegate { };
-        public event Action Failed = delegate { };
 
-        public event FinishedEventHandler Finished = delegate { };
-        public delegate void FinishedEventHandler(bool repo_is_encrypted, bool repo_is_empty, string[] warnings);
+        /// <summary>
+        /// Configuration details of the CmisSync synchronized folder.
+        /// </summary>
+        private CmisRepo cmisRepo;
 
-        public event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public delegate void ProgressChangedEventHandler(double percentage);
 
+        /// <summary>
+        /// Indicates that the synchronized folder has been set up.
+        /// </summary>
+        public Action Finished { get; set; }
+
+
+        /// <summary>
+        /// URL of the CMIS enpoint.
+        /// </summary>
         public Uri RemoteUrl { get; protected set; }
+
+
+        /// <summary>
+        /// Local folder for the synchronization.
+        /// </summary>
         public string TargetFolder { get; protected set; }
-        public bool IsActive { get; private set; }
-        public string Identifier;
-        public RepoInfo OriginalRepoInfo;
 
-        public string[] Warnings
+
+        /// <summary>
+        /// Sets up a fetcher that can get remote CMIS folders.
+        /// </summary>
+        public Fetcher(RepoInfo repoInfo, IActivityListener activityListener)
         {
-            get
-            {
-                return this.warnings.ToArray();
-            }
-        }
-
-        public string[] Errors
-        {
-            get
-            {
-                return this.errors.ToArray();
-            }
-        }
-
-
-        protected List<string> warnings = new List<string>();
-        protected List<string> errors = new List<string>();
-
-
-        // Sets up a fetcher that can get remote folders
-        public Fetcher(RepoInfo repoInfo, ActivityListener activityListener)
-        {
-            OriginalRepoInfo = repoInfo;
             string remote_path = repoInfo.RemotePath.Trim("/".ToCharArray());
             string address = repoInfo.Address.ToString();
-
-            if (address.EndsWith("/"))
-                address = address.Substring(0, address.Length - 1);
-
-            if (!remote_path.StartsWith("/"))
-                remote_path = "/" + remote_path;
-
-            if (!address.Contains("://"))
-                address = "ssh://" + address;
 
             TargetFolder = repoInfo.TargetDirectory;
 
             RemoteUrl = new Uri(address + remote_path);
-            IsActive = false;
 
             Logger.Info("Fetcher | Cmis Fetcher constructor");
             TargetFolder = repoInfo.TargetDirectory;
             RemoteUrl = repoInfo.Address;
 
+            // Check that the CmisSync root folder exists.
             if (!Directory.Exists(ConfigManager.CurrentConfig.FoldersPath))
             {
-                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} do not exist", ConfigManager.CurrentConfig.FoldersPath));
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} does not exist", ConfigManager.CurrentConfig.FoldersPath));
                 throw new DirectoryNotFoundException("Root folder don't exist !");
             }
 
+            // Check that the folder is writable.
             if (!Folder.HasWritePermissionOnDir(ConfigManager.CurrentConfig.FoldersPath))
             {
                 Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", ConfigManager.CurrentConfig.FoldersPath));
                 throw new UnauthorizedAccessException("Root folder is not writable!");
             }
 
+            // Check that the folder exists.
             if (Directory.Exists(repoInfo.TargetDirectory))
             {
                 Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
                 throw new UnauthorizedAccessException("Repository folder already exists!");
             }
 
+            // Create the local folder.
             Directory.CreateDirectory(repoInfo.TargetDirectory);
 
-            CmisRepo = new CmisRepo(repoInfo, activityListener);
-        }
-
-
-        public bool Fetch()
-        {
-            Logger.Info("Fetch");
-            CmisRepo.DoFirstSync();
-            return true; // TODO
+            // Use this folder configuration.
+            cmisRepo = new CmisRepo(repoInfo, activityListener);
         }
     }
 }

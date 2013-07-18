@@ -23,8 +23,10 @@ namespace CmisSync.Lib
 
     public class Watcher : FileSystemWatcher {
 
-        public event ChangeEventEventHandler ChangeEvent = delegate { };
-        public delegate void ChangeEventEventHandler (FileSystemEventArgs args);
+        /**
+         * <param><code>FileSystemEventArgs</code> value</param>
+         */
+        public EventHandler<FileSystemEventArgs> ChangeEvent { get; set; }
 
         private Object thread_lock = new Object ();
 
@@ -39,17 +41,36 @@ namespace CmisSync.Lib
             Created += OnChanged;
             Deleted += OnChanged;
             Renamed += OnChanged;
+
+            ChangeEvent += delegate { };
         }
 
 
         private void OnChanged (object sender, FileSystemEventArgs args)
         {
-            ChangeEvent (args);
+            // Disabled for now. ChangeEvent(sender, args);
         }
 
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    base.Dispose(disposing);
+                }
+                disposed = true;
+            }
+        }
 
         public void Enable ()
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
             lock (this.thread_lock)
                 EnableRaisingEvents = true;
         }
@@ -57,6 +78,10 @@ namespace CmisSync.Lib
 
         public void Disable ()
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
             lock (this.thread_lock)
                 EnableRaisingEvents = false;
         }

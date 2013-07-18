@@ -51,7 +51,6 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <Compile Include="Bubbles.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SetupWindow.cs" />

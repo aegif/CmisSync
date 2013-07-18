@@ -28,34 +28,36 @@ using Timers = System.Timers;
 namespace CmisSync.Lib
 {
 
-    public enum SyncStatus
-    {
-        Idle,
-        SyncUp,
-        SyncDown,
-        Error,
-        Suspend
-    }
-
-
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class RepoBase
     {
+        /// <summary>
+        /// Log.
+        /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(RepoBase));
 
+
+        /// <summary>
+        /// Perform a synchronization if one is not running already.
+        /// </summary>
         public abstract void SyncInBackground();
+
+
+        /// <summary>
+        /// Local disk size taken by the repository.
+        /// </summary>
         public abstract double Size { get; }
 
-        public event SyncStatusChangedEventHandler SyncStatusChanged = delegate { };
-        public delegate void SyncStatusChangedEventHandler(SyncStatus new_status);
 
-        public event ProgressChangedEventHandler ProgressChanged = delegate { };
-        public delegate void ProgressChangedEventHandler(double percentage, string speed);
+        /// <summary>
+        /// Affect a new <c>SyncStatus</c> value.
+        /// </summary>
+        public Action<SyncStatus> SyncStatusChanged { get; set; }
 
-        public event NewChangeSetEventHandler NewChangeSet = delegate { };
-        public delegate void NewChangeSetEventHandler(ChangeSet change_set);
 
-        public event Action ConflictResolved = delegate { };
-        public event Action ChangesDetected = delegate { };
+        public Action ChangesDetected { get; set; }
 
 
         public readonly string LocalPath;
@@ -64,13 +66,13 @@ namespace CmisSync.Lib
         public SyncStatus Status { get; private set; }
 
 
-        public virtual string[] UnsyncedFilePaths
-        {
-            get
-            {
-                return new string[0];
-            }
-        }
+        //public virtual string[] UnsyncedFilePaths
+        //{
+        //    get
+        //    {
+        //        return new string[0];
+        //    }
+        //}
 
         public void Resume()
         {
@@ -82,7 +84,7 @@ namespace CmisSync.Lib
             Status = SyncStatus.Suspend;
         }
 
-        protected RepoInfo local_repoInfo;
+        protected RepoInfo RepoInfo { get; set; }
 
 
         private Watcher watcher;
@@ -99,7 +101,7 @@ namespace CmisSync.Lib
 
         public RepoBase(RepoInfo repoInfo)
         {
-            this.local_repoInfo = repoInfo;
+            RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = Path.GetFileName(LocalPath);
             RemoteUrl = repoInfo.Address;
@@ -128,6 +130,8 @@ namespace CmisSync.Lib
                 // changes or the server was down, sync up again
                 SyncInBackground();
             };
+
+            ChangesDetected += delegate { };
         }
 
 
@@ -143,7 +147,7 @@ namespace CmisSync.Lib
         }
 
 
-        public void OnFileActivity(FileSystemEventArgs args)
+        public void OnFileActivity(object sender, FileSystemEventArgs args)
         {
             ChangesDetected();
             //string relative_path = args.FullPath.Replace(LocalPath, "");
@@ -156,7 +160,7 @@ namespace CmisSync.Lib
 
         protected internal void OnConflictResolved()
         {
-            ConflictResolved();
+            // ConflictResolved(); TODO
         }
 
 
@@ -198,5 +202,16 @@ namespace CmisSync.Lib
 
             this.watcher.Dispose();
         }
+    }
+
+
+    /// <summary>
+    /// Current status of the synchronization.
+    /// TODO: It was used in SparkleShare for up/down/error but is not useful anymore, should be removed.
+    /// </summary>
+    public enum SyncStatus
+    {
+        Idle,
+        Suspend // TODO this should be written in XML configuration instead.
     }
 }

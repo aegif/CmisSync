@@ -11,27 +11,46 @@ using System.Web;
 
 namespace CmisSync.Lib.Cmis
 {
+    /// <summary>
+    /// Data object representing a CMIS server.
+    /// </summary>
     public class CmisServer
     {
-        public string url;
-        public Dictionary<string, string> repositories;
-        public CmisServer(string url, Dictionary<string, string> repositories)
+        /// <summary>
+        /// URL of the CMIS server.
+        /// </summary>
+        public Uri Url { get; private set; }
+
+        /// <summary>
+        /// Repositories contained in the CMIS server.
+        /// </summary>
+        public Dictionary<string, string> Repositories { get; private set; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public CmisServer(Uri url, Dictionary<string, string> repositories)
         {
-            this.url = url;
-            this.repositories = repositories;
+            Url = url;
+            Repositories = repositories;
         }
     }
 
-    public class CmisUtils
+
+    /// <summary>
+    /// Useful CMIS methods.
+    /// </summary>
+    public static class CmisUtils
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
-        /**
-         * Try to find the CMIS server associated to any URL.
-         * Users can provide the URL of the web interface, and we have to return the CMIS URL
-         * Returns the list of repositories as well.
-         */
-        static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
+        
+        /// <summary>
+        /// Try to find the CMIS server associated to any URL.
+        /// Users can provide the URL of the web interface, and we have to return the CMIS URL
+        /// Returns the list of repositories as well.
+        /// </summary>
+        static public CmisServer GetRepositoriesFuzzy(Uri url, string user, string password)
         {
             Dictionary<string, string> repositories = null;
 
@@ -42,17 +61,19 @@ namespace CmisSync.Lib.Cmis
             }
             catch (CmisPermissionDeniedException ex)
             {
-                // Do nothing.
+                // Do nothing, try other possibilities.
             }
             if (repositories != null)
             {
+                // Found!
                 return new CmisServer(url, repositories);
             }
 
             // Extract protocol and server name or IP address
-            string prefix = new Uri(url).GetLeftPart(UriPartial.Authority);
+            string prefix = url.GetLeftPart(UriPartial.Authority);
 
             // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
+            // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
             string[] suffixes = {
                 "/alfresco/cmisatom",
                 "/alfresco/service/cmis",
@@ -74,32 +95,45 @@ namespace CmisSync.Lib.Cmis
                 Logger.Info("Sync | Trying with " + fuzzyUrl);
                 try
                 {
-                    repositories = GetRepositories(fuzzyUrl, user, password);
+                    repositories = GetRepositories(new Uri(fuzzyUrl), user, password);
                 }
                 catch (CmisPermissionDeniedException ex)
                 {
-                    // Do nothing.
+                    // Do nothing, try other possibilities.
                 }
                 if (repositories != null)
-                    return new CmisServer(fuzzyUrl, repositories);
+                {
+                    // Found!
+                    return new CmisServer(new Uri(fuzzyUrl), repositories);
+                }
             }
-            return new CmisServer(url, repositories);
+
+            // Not found.
+            return new CmisServer(url, null);
         }
 
-        /**
-         * Get the list of repositories of a CMIS server
-         * Each item contains id + 
-         */
-        static public Dictionary<string,string> GetRepositories(string url, string user, string password)
+
+        /// <summary>
+        /// Get the list of repositories of a CMIS server
+        /// Each item contains id + 
+        /// </summary>
+        /// <returns>The list of repositories. Each item contains the identifier and the human-readable name of the repository.</returns>
+        static public Dictionary<string,string> GetRepositories(Uri url, string user, string password)
         {
+            Dictionary<string,string> result = new Dictionary<string,string>();
 
-
+            // If no URL was provided, return empty result.
+            if (null == url)
+            {
+                return result;
+            }
+            
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
 
             Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = url;
+            cmisParameters[SessionParameter.AtomPubUrl] = url.ToString();
             cmisParameters[SessionParameter.User] = user;
             cmisParameters[SessionParameter.Password] =password;
 
@@ -134,35 +168,46 @@ namespace CmisSync.Lib.Cmis
                 return null;
             }
 
-            Dictionary<string,string> result = new Dictionary<string,string>();
-
-            for (int i = 0; i < repositories.Count; i++)
+            // Populate the result list with identifier and name of each repository.
+            foreach (IRepository repo in repositories)
             {
-                result.Add(repositories.ElementAt(i).Id, repositories.ElementAt(i).Name);
+                result.Add(repo.Id, repo.Name);
             }
             
             return result;
         }
 
+
+        /// <summary>
+        /// Get the sub-folders of a particular CMIS folder.
+        /// </summary>
+        /// <returns>Full path of each sub-folder, including leading slash.</returns>
         static public string[] GetSubfolders(string repositoryId, string path,
             string address, string user, string password)
         {
             List<string> result = new List<string>();
 
+            // Connect to the CMIS repository.
             Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = address;
             cmisParameters[SessionParameter.User] = user;
             cmisParameters[SessionParameter.Password] = password;
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
-
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.CreateSession(cmisParameters);
 
+            // Get the folder.
             IFolder folder = (IFolder)session.GetObjectByPath(path);
 
-            Logger.Info("Sync | folder.Properties.Count:" + folder.Properties.Count);
+            // Debug the properties count, which allows to check whether a particular CMIS implementation is compliant or not.
+            // For instance, IBM Connections is known to send an illegal count.
+            Logger.Info("CmisUtils | folder.Properties.Count:" + folder.Properties.Count.ToString());
+
+            // Get the folder's sub-folders.
             IItemEnumerable<ICmisObject> children = folder.GetChildren();
+
+            // Return the full path of each of the sub-folders.
             foreach (var subfolder in children.OfType<IFolder>())
             {
                 result.Add(subfolder.Path);
@@ -170,17 +215,26 @@ namespace CmisSync.Lib.Cmis
             return result.ToArray();
         }
 
-        // Guess the web address where files can be seen using a browser.
-        // Not bulletproof. It depends on the server, and there is no web UI at all.
+
+        /// <summary>
+        /// Guess the web address where files can be seen using a browser.
+        /// Not bulletproof. It depends on the server, and there is no web UI at all.
+        /// </summary>
         static public string GetBrowsableURL(RepoInfo repo)
         {
+            if (null == repo)
+            {
+                throw new ArgumentNullException("repo");
+            }
+
+            // Case of Alfresco.
             if (repo.Address.AbsoluteUri.EndsWith("alfresco/cmisatom"))
             {
-                // Alfresco
                 string root = repo.Address.AbsoluteUri.Substring(0, repo.Address.AbsoluteUri.Length - "alfresco/cmisatom".Length);
                 if (repo.RemotePath.StartsWith("/Sites"))
                 {
-                    // Alfresco Share
+                    // Case of Alfresco Share.
+
                     // Example RemotePath: /Sites/thesite
                     // Result: http://server/share/page/site/thesite/documentlibrary
                     // Example RemotePath: /Sites/thesite/documentLibrary/somefolder/anotherfolder
@@ -189,10 +243,11 @@ namespace CmisSync.Lib.Cmis
                     // Result: http://server/share/page/site/s1/documentlibrary#filter=path|%2F%25E9%25DF%25u548C%25u1EC7
                     // Example RemotePath: /Sites/s1/documentLibrary/a#bc/éß和ệ
                     // Result: http://server/share/page/site/thesite/documentlibrary#filter=path%7C%2Fa%2523bc%2F%25E9%25DF%25u548C%25u1EC7%7C
+
                     string path = repo.RemotePath.Substring("/Sites/".Length);
                     if (path.Contains("documentLibrary"))
                     {
-                        int firstSlashPosition = path.IndexOf("/");
+                        int firstSlashPosition = path.IndexOf('/');
                         string siteName = path.Substring(0, firstSlashPosition);
                         string pathWithinSite = path.Substring(firstSlashPosition + "/documentLibrary".Length);
                         string escapedPathWithinSite = HttpUtility.UrlEncode(pathWithinSite);
@@ -208,12 +263,13 @@ namespace CmisSync.Lib.Cmis
                 }
                 else
                 {
-                    // Alfresco Web Client
+                    // Case of Alfresco Web Client.
                     return root;
                 }
             }
             else
             {
+                // If no particular server was detected, concatenate and hope it will hit close, maybe to a page that allows to access the folder with a few clicks.
                 return repo.Address.AbsoluteUri + repo.RemotePath;
             }
         }

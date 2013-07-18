@@ -19,11 +19,6 @@ ASSEMBLY_FILE = $(top_builddir)/bin/$(ASSEMBLY).$(ASSEMBLY_EXTENSION)
 
 INSTALL_DIR_RESOLVED = $(firstword $(subst , $(DEFAULT_INSTALL_DIR), $(INSTALL_DIR)))
 
-if ENABLE_TESTS
-    LIBS += " $(NUNIT_LIBS)"
-    ENABLE_TESTS_FLAG = -define:ENABLE_TESTS
-endif
-
 if ENABLE_ATK
     ENABLE_ATK_FLAG = -define:ENABLE_ATK
 endif
@@ -67,7 +62,7 @@ $(ASSEMBLY_FILE): $(SOURCES_BUILD) $(RESOURCES_EXPANDED) $(DEP_LIBS)
 		-nowarn:0278 -nowarn:0078 $$warn \
 		-define:HAVE_GTK_2_10 -define:NET_2_0 \
 		-debug -target:$(TARGET) -out:$@ \
-		$(BUILD_DEFINES) $(ENABLE_TESTS_FLAG) $(ENABLE_ATK_FLAG) \
+		$(BUILD_DEFINES) $(ENABLE_ATK_FLAG) \
 		$(FILTERED_LIBS) $(RESOURCES_BUILD) $(SOURCES_BUILD)
 	@if [ -e $(srcdir)/$(notdir $@.config) ]; then \
 		cp $(srcdir)/$(notdir $@.config) $(top_builddir)/bin; \
@@ -81,4 +76,3 @@ EXTRA_DIST += $(SOURCES_BUILD) $(RESOURCES_EXPANDED)
 CLEANFILES = $(OUTPUT_FILES) $(ASSEMBLY_FILE).config
 DISTCLEANFILES = *.pidb
 MAINTAINERCLEANFILES = Makefile.in
-

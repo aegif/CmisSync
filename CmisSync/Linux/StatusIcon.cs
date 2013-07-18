@@ -101,13 +101,6 @@ namespace CmisSync {
                         });
             };
 
-            Controller.UpdateQuitItemEvent += delegate (bool item_enabled) {
-                Application.Invoke (delegate {
-                        this.quit_item.Sensitive = item_enabled;
-                        this.quit_item.ShowAll ();
-                        });
-            };
-
             Controller.UpdateMenuEvent += delegate (IconState state) {
                 Application.Invoke (delegate {
                         CreateMenu ();
@@ -169,7 +162,7 @@ namespace CmisSync {
             MenuItem add_item = new MenuItem (
                     CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture));
             add_item.Activated += delegate {
-                Controller.AddHostedProjectClicked ();
+                Controller.AddRemoteFolderClicked ();
             };
             this.menu.Add(add_item);
 
@@ -194,7 +187,7 @@ namespace CmisSync {
 
             this.quit_item = new MenuItem (
                     CmisSync.Properties_Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)) {
-                Sensitive = Controller.QuitItemEnabled
+                Sensitive = true
             };
 
             this.quit_item.Activated += delegate {

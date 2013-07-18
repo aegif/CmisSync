@@ -7,17 +7,24 @@ using System.IO;
 
 namespace CmisSync.Lib.Sync
 {
-    // Migrate config.xml from past versions.
+    /// <summary>
+    /// Migrate config.xml from past versions.
+    /// </summary>
     public static class ConfigMigration
     {
-
-        // Migrate from the config.xml format of CmisSync 0.3.9 to the current format, if necessary.
+        /// <summary>
+        /// Migrate from the config.xml format of CmisSync 0.3.9 to the current format, if necessary.
+        /// </summary>
         public static void Migrate()
         {
             // Replace XML root element from <sparkleshare> to <CmisSync>
             ReplaceXMLRootElement();
         }
 
+
+        /// <summary>
+        /// Replace XML root element from <sparkleshare> to <CmisSync>
+        /// </summary>
         private static void ReplaceXMLRootElement()
         {
             // If file does not exist yet, no need for migration.

@@ -28,6 +28,9 @@ using log4net;
 namespace CmisSync
 {
 
+    /// <summary>
+    /// Kind of pages that are used in the folder addition wizards.
+    /// </summary>
     public enum PageType
     {
         None,
@@ -36,27 +39,26 @@ namespace CmisSync
         Add2,
         Customize,
         Syncing,
-        Error,
         Finished,
-        Tutorial
+        Tutorial // This particular one contains sub-steps that are tracked via a number.
     }
 
-    public enum FieldState
-    {
-        Enabled,
-        Disabled
-    }
-
-
+    /// <summary>
+    /// MVC controller for the two wizards:
+    /// - CmisSync tutorial that appears at firt run,
+    /// - wizard to add a new remote folder.
+    /// </summary>
     public class SetupController
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(SetupController));
+
+        // Delegates.
 
         public event Action ShowWindowEvent = delegate { };
         public event Action HideWindowEvent = delegate { };
 
         public event ChangePageEventHandler ChangePageEvent = delegate { };
-        public delegate void ChangePageEventHandler(PageType page, string[] warnings);
+        public delegate void ChangePageEventHandler(PageType page);
 
         public event UpdateProgressBarEventHandler UpdateProgressBarEvent = delegate { };
         public delegate void UpdateProgressBarEventHandler(double percentage);
@@ -68,23 +70,35 @@ namespace CmisSync
         public delegate void UpdateAddProjectButtonEventHandler(bool button_enabled);
 
         public event ChangeAddressFieldEventHandler ChangeAddressFieldEvent = delegate { };
-        public delegate void ChangeAddressFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangeAddressFieldEventHandler(string text, string example_text);
 
         public event ChangeRepositoryFieldEventHandler ChangeRepositoryFieldEvent = delegate { };
-        public delegate void ChangeRepositoryFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangeRepositoryFieldEventHandler(string text, string example_text);
 
         public event ChangePathFieldEventHandler ChangePathFieldEvent = delegate { };
-        public delegate void ChangePathFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangePathFieldEventHandler(string text, string example_text);
 
         public event ChangeUserFieldEventHandler ChangeUserFieldEvent = delegate { };
-        public delegate void ChangeUserFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangeUserFieldEventHandler(string text, string example_text);
 
         public event ChangePasswordFieldEventHandler ChangePasswordFieldEvent = delegate { };
-        public delegate void ChangePasswordFieldEventHandler(string text, string example_text, FieldState state);
+        public delegate void ChangePasswordFieldEventHandler(string text, string example_text);
 
+        /// <summary>
+        /// Whether the window is currently open.
+        /// </summary>
         public bool WindowIsOpen { get; private set; }
-        public int TutorialPageNumber { get; private set; }
-        public string PreviousUrl { get; private set; }
+
+        /// <summary>
+        /// Current step of the tutorial.
+        /// </summary>
+        public int TutorialCurrentPage { get; private set; }
+
+        /// <summary>
+        /// Current step of the remote folder addition wizard.
+        /// </summary>
+        private PageType FolderAdditionWizardCurrentPage;
+
         public string PreviousAddress { get; private set; }
         public string PreviousPath { get; private set; }
         public string PreviousRepository { get; private set; }
@@ -92,42 +106,46 @@ namespace CmisSync
         public string DefaultRepoPath { get; private set; }
         public double ProgressBarPercentage { get; private set; }
 
+        public string saved_address = "";
+        public string saved_remote_path = "";
+        public string saved_user = "";
+        public string saved_password = "";
+        public string saved_repository = "";
 
+        /// <summary>
+        /// List of the CMIS repositories at the chosen URL.
+        /// </summary>
+        public Dictionary<string, string> repositories;
+
+        /// <summary>
+        /// Whether CmisSync should be started automatically at login.
+        /// </summary>
+        private bool create_startup_item = true;
+
+
+        /// <summary>
+        /// Load repositories information from a CMIS endpoint.
+        /// </summary>
         static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
         {
-            return CmisUtils.GetRepositoriesFuzzy(url, user, password);
+            return CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
         }
 
+
+        /// <summary>
+        /// Get the list of subfolders contained in a CMIS folder.
+        /// </summary>
         static public string[] GetSubfolders(string repositoryId, string path,
             string address, string user, string password)
         {
             return CmisUtils.GetSubfolders(repositoryId, path, address, user, password);
         }
 
-        public bool FetchPriorHistory
-        {
-            get
-            {
-                return this.fetch_prior_history;
-            }
-        }
 
-        private PageType current_page;
-        public string saved_address = "";
-        public string saved_remote_path = "";
-        public string saved_user = "";
-        public string saved_password = "";
-        public string saved_repository = "";
-        public Dictionary<string, string> repositories;
-        private bool create_startup_item = true;
-        private bool fetch_prior_history = false;
-
-        private Regex urlregex;
-
-        public SetupController()
-        {
-            Logger.Info("Entering constructor.");
-            this.urlregex = new Regex(@"^" +
+        /// <summary>
+        /// Regex to check an HTTP/HTTPS URL.
+        /// </summary>
+        private Regex UrlRegex = new Regex(@"^" +
                     "(https?)://" +                                                 // protocol
                     "(([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+" +        // username
                     "(:([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+)?" +     // password
@@ -140,68 +158,82 @@ namespace CmisSync
                     ")((/+([a-z\\d$_\\.\\+!\\*'\\(\\),;:@&=-]|%[\\da-f]{2})*)*?)" + // path
                     "$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-            ChangePageEvent += delegate(PageType page_type, string[] warnings)
-            {
-                this.current_page = page_type;
-            };
 
-            TutorialPageNumber = 0;
+        /// <summary>
+        /// Regex to check a CmisSync repository local folder name.
+        /// Basically, it should be a valid local filesystem folder name.
+        /// </summary>
+        Regex RepositoryRegex = new Regex(@"^([a-zA-Z0-9][^*/><?\|:]*)$");
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public SetupController()
+        {
+            Logger.Info("Entering constructor.");
+
+            TutorialCurrentPage = 0;
             PreviousAddress = "";
             PreviousPath = "";
-            PreviousUrl = "";
             SyncingReponame = "";
             DefaultRepoPath = Program.Controller.FoldersPath;
 
-            Program.Controller.ShowSetupWindowEvent += delegate(PageType page_type)
+            // Actions.
+
+            ChangePageEvent += delegate(PageType page)
             {
-                if (this.current_page == PageType.Syncing ||
-                    this.current_page == PageType.Finished)
+                this.FolderAdditionWizardCurrentPage = page;
+            };
+
+            Program.Controller.ShowSetupWindowEvent += delegate(PageType page)
+            {
+                if (this.FolderAdditionWizardCurrentPage == PageType.Syncing ||
+                    this.FolderAdditionWizardCurrentPage == PageType.Finished)
                 {
                     ShowWindowEvent();
                     return;
                 }
 
-                if (page_type == PageType.Add1)
+                if (page == PageType.Add1)
                 {
                     if (WindowIsOpen)
                     {
-                        if (this.current_page == PageType.Error ||
-                            this.current_page == PageType.Finished ||
-                            this.current_page == PageType.None)
+                        if (this.FolderAdditionWizardCurrentPage == PageType.Finished ||
+                            this.FolderAdditionWizardCurrentPage == PageType.None)
                         {
 
-                            ChangePageEvent(PageType.Add1, null);
+                            ChangePageEvent(PageType.Add1);
                         }
 
                         ShowWindowEvent();
 
                     }
-                    else if (TutorialPageNumber == 0)
+                    else if (TutorialCurrentPage == 0)
                     {
                         WindowIsOpen = true;
-                        ChangePageEvent(PageType.Add1, null);
+                        ChangePageEvent(PageType.Add1);
                         ShowWindowEvent();
                     }
-
                     return;
                 }
 
                 WindowIsOpen = true;
-                ChangePageEvent(page_type, null);
+                ChangePageEvent(page);
                 ShowWindowEvent();
             };
             Logger.Info("Exiting constructor.");
         }
 
 
+        /// <summary>
+        /// User pressed the "Cancel" button, hide window.
+        /// </summary>
         public void PageCancelled()
         {
             PreviousAddress = "";
             PreviousRepository = "";
             PreviousPath = "";
-            PreviousUrl = "";
-
-            this.fetch_prior_history = false;
 
             WindowIsOpen = false;
             HideWindowEvent();
@@ -214,132 +246,176 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// First-time wizard has been cancelled, so quit CmisSync.
+        /// </summary>
         public void SetupPageCancelled()
         {
             Program.Controller.Quit();
         }
 
 
+        /// <summary>
+        /// Move to second page of the tutorial.
+        /// </summary>
         public void SetupPageCompleted()
         {
-            TutorialPageNumber = 1;
-            ChangePageEvent(PageType.Tutorial, null);
+            TutorialCurrentPage = 1;
+            ChangePageEvent(PageType.Tutorial);
         }
 
 
+        /// <summary>
+        /// Tutorial has been skipped, go to last step of wizard.
+        /// </summary>
         public void TutorialSkipped()
         {
-            TutorialPageNumber = 4;
-            ChangePageEvent(PageType.Tutorial, null);
+            TutorialCurrentPage = 4;
+            ChangePageEvent(PageType.Tutorial);
         }
 
 
-        public void HistoryItemChanged(bool fetch_prior_history)
-        {
-            this.fetch_prior_history = fetch_prior_history;
-        }
-
-
+        /// <summary>
+        /// Go to next step of the tutorial.
+        /// </summary>
         public void TutorialPageCompleted()
         {
-            TutorialPageNumber++;
+            TutorialCurrentPage++;
 
-            if (TutorialPageNumber == 5)
+            // If last page reached, close tutorial.
+            if (TutorialCurrentPage == 5)
             {
-                TutorialPageNumber = 0;
-                this.current_page = PageType.None;
+                TutorialCurrentPage = 0;
+                this.FolderAdditionWizardCurrentPage = PageType.None;
 
                 WindowIsOpen = false;
                 HideWindowEvent();
 
+                // If requested, add CmisSync to the list of programs to be started up when the user logs into Windows.
                 if (this.create_startup_item)
                     new Thread(() => Program.Controller.CreateStartupItem()).Start();
-
             }
             else
             {
-                ChangePageEvent(PageType.Tutorial, null);
+                // Go to next step of tutorial.
+                ChangePageEvent(PageType.Tutorial);
             }
         }
 
 
+        /// <summary>
+        /// Checkbox to add CmisSync to the list of programs to be started up when the user logs into Windows.
+        /// </summary>
         public void StartupItemChanged(bool create_startup_item)
         {
             this.create_startup_item = create_startup_item;
         }
 
 
+        /// <summary>
+        /// Check whether the address is syntaxically valid.
+        /// If OK, enable button to next step.
+        /// </summary>
+        /// <param name="address">URL to check</param>
+        /// <returns>validity error, or empty string if valid</returns>
         public string CheckAddPage(string address)
         {
             address = address.Trim();
-            // Check that the first part of the URL (protocol and server name) are valid.
-
             this.saved_address = address;
 
-            bool fields_valid = ((!string.IsNullOrEmpty(address)) && (this.urlregex.IsMatch(address)));
+            // Check address validity.
+            bool fields_valid = ((!string.IsNullOrEmpty(address)) && (this.UrlRegex.IsMatch(address)));
 
+            // Enable button to next step.
             UpdateAddProjectButtonEvent(fields_valid);
 
+            // Return validity error, or empty string if valid.
             if (String.IsNullOrEmpty(address)) {
                 return "EmptyURLNotAllowed";
             }
-            if (!this.urlregex.IsMatch(address)) {
+            if (!this.UrlRegex.IsMatch(address)) {
                 return "InvalidURL";
             }
             return String.Empty;
         }
 
+
+        /// <summary>
+        /// Check the repository name.
+        /// </summary>
+        /// <param name="reponame"></param>
+        /// <returns>validity error, or empty string if valid</returns>
         public string CheckRepoName(string reponame)
         {
-            // Check if foldername do not contains invalid car
-            Regex regx = new Regex(@"^([a-zA-Z0-9][^*/><?\|:]*)$");
+            // Check whether foldername is already in use
+            bool folderAlreadyExists = (Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase)) != -1);
 
-            // Check if foldername is already in use
-            bool folder_already_exist = (Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase)) != -1);
+            // Check whether folde rname contains invalid characters.
+            bool valid = (RepositoryRegex.IsMatch(reponame) && (!folderAlreadyExists));
 
-            bool fields_valid = (regx.IsMatch(reponame) && (!folder_already_exist));
+            // Enable button to next step.
+            UpdateAddProjectButtonEvent(valid);
 
-            UpdateAddProjectButtonEvent(fields_valid);
-
-            if (folder_already_exist) return "FolderAlreadyExist";
-            if (!regx.IsMatch(reponame)) return "InvalidFolderName";
+            // Return validity error, or empty string if valid.
+            if (folderAlreadyExists) return "FolderAlreadyExist";
+            if (!RepositoryRegex.IsMatch(reponame)) return "InvalidFolderName";
             return String.Empty;
         }
 
+
+        /// <summary>
+        /// Check local repository path.
+        /// </summary>
+        /// <param name="localpath"></param>
+        /// <returns>validity error, or empty string if valid</returns>
         public string CheckRepoPath(string localpath)
         {
-            bool folder_exist = Directory.Exists(localpath);
+            bool folderAlreadyExists = Directory.Exists(localpath);
+            bool valid = !folderAlreadyExists;
 
-            bool fields_valid = !folder_exist;
-            UpdateAddProjectButtonEvent(fields_valid);
+            // Enable button to next step.
+            UpdateAddProjectButtonEvent(valid);
 
-            if (folder_exist) return "LocalDirectoryExist";
+            // Return validity error, or empty string if valid.
+            if (folderAlreadyExists) return "LocalDirectoryExist";
             return String.Empty;
 
         }
 
+
+        /// <summary>
+        /// First step of remote folder addition wizard is complete, switch to second step
+        /// </summary>
         public void Add1PageCompleted(string address, string user, string password)
         {
             saved_address = address;
             saved_user = user;
             saved_password = password;
 
-            ChangePageEvent(PageType.Add2, null);
+            ChangePageEvent(PageType.Add2);
         }
 
+
+        /// <summary>
+        /// Switch back from second to first step, presumably to change server or user.
+        /// </summary>
         public void BackToPage1()
         {
             PreviousAddress = saved_address;
             PreviousPath = saved_user;
-            ChangePageEvent(PageType.Add1, null);
+            ChangePageEvent(PageType.Add1);
         }
 
+
+        /// <summary>
+        /// Second step of remote folder addition wizard is complete, switch to customization step.
+        /// </summary>
         public void Add2PageCompleted(string repository, string remote_path)
         {
             SyncingReponame = Path.GetFileName(remote_path);
             ProgressBarPercentage = 1.0;
 
-            ChangePageEvent(PageType.Customize, null);
+            ChangePageEvent(PageType.Customize);
 
             String address = saved_address.Trim();
             repository = repository.Trim();
@@ -350,22 +426,24 @@ namespace CmisSync
             PreviousPath = remote_path;
         }
 
+
+        /// <summary>
+        /// Customization step of remote folder addition wizard is complete, start CmisSync.
+        /// </summary>
         public void CustomizePageCompleted(String repoName, String localrepopath)
         {
             SyncingReponame = repoName;
 
-            ChangePageEvent(PageType.Syncing, null);
+            ChangePageEvent(PageType.Syncing);
 
             Program.Controller.FolderFetched += AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError += AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching += SyncingPageFetchingDelegate;
 
+            // Add the remote folder to the configuration and start syncing.
             try
             {
                 new Thread(() =>
                 {
-                    Program.Controller.StartFetcher(PreviousAddress, "SelectedPlugin.Fingerprint", PreviousPath, repoName,
-                        "SelectedPlugin.AnnouncementsUrl", this.fetch_prior_history,
+                    Program.Controller.StartFetcher(PreviousAddress, PreviousPath, repoName,
                         PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), localrepopath);
 
                 }).Start();
@@ -378,58 +456,29 @@ namespace CmisSync
 
         }
 
+
+        /// <summary>
+        /// Switch back from customization to step 2 of the remote folder addition wizard.
+        /// </summary>
         public void BackToPage2()
         {
-            ChangePageEvent(PageType.Add2, null);
+            ChangePageEvent(PageType.Add2);
         }
 
-        // The following private methods are
-        // delegates used by the previous method
-
-        private void AddPageFetchedDelegate(string remote_url, string[] warnings)
+        /// <summary>
+        /// Remote folder has been added, switch to the final step of the wizard.
+        /// </summary>
+        private void AddPageFetchedDelegate(string remote_url)
         {
-            ChangePageEvent(PageType.Finished, warnings);
+            ChangePageEvent(PageType.Finished);
 
             Program.Controller.FolderFetched -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching -= SyncingPageFetchingDelegate;
-        }
-
-        private void AddPageFetchErrorDelegate(string remote_url, string[] errors)
-        {
-            SyncingReponame = "";
-            PreviousUrl = remote_url;
-
-            ChangePageEvent(PageType.Error, errors);
-
-            Program.Controller.FolderFetched -= AddPageFetchedDelegate;
-            Program.Controller.FolderFetchError -= AddPageFetchErrorDelegate;
-            Program.Controller.FolderFetching -= SyncingPageFetchingDelegate;
-        }
-
-        private void SyncingPageFetchingDelegate(double percentage)
-        {
-            ProgressBarPercentage = percentage;
-            UpdateProgressBarEvent(ProgressBarPercentage);
         }
 
 
-        // The following private methods are
-        // delegates used by the previous method
-
-        public void SyncingCancelled()
-        {
-            Program.Controller.StopFetcher();
-            ChangePageEvent(PageType.Add1, null);
-        }
-
-
-        public void ErrorPageCompleted()
-        {
-            ChangePageEvent(PageType.Add1, null);
-        }
-
-
+        /// <summary>
+        /// User clicked on the button to open the newly-created synchronized folder in the local file explorer.
+        /// </summary>
         public void OpenFolderClicked()
         {
             Program.Controller.OpenCmisSyncFolder(SyncingReponame);
@@ -438,14 +487,15 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Folder addition wizard is over, reset it for next use.
+        /// </summary>
         public void FinishPageCompleted()
         {
-            PreviousUrl = "";
             PreviousAddress = "";
             PreviousPath = "";
-            this.fetch_prior_history = false;
 
-            this.current_page = PageType.None;
+            this.FolderAdditionWizardCurrentPage = PageType.None;
             HideWindowEvent();
         }
     }

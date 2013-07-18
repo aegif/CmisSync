@@ -5,19 +5,18 @@ TARGET = exe
 
 ASSEMBLY_INFO_SOURCE = Defines.cs
 
-LIBS = $(REF_CMISSYNC) $(NOTIFY_SHARP_LIBS) $(WEBKIT_SHARP_LIBS) $(LOG4NET_LIBS)
+LIBS = $(REF_CMISSYNC) $(LOG4NET_LIBS) $(NOTIFY_SHARP_LIBS)
 
 SOURCES =  \
-	../Program.cs \
 	../AboutController.cs \
 	../BubblesController.cs \
 	../ControllerBase.cs \
-	../Extensions.cs \
+	../Program.cs \
+	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
 	../CertPolicyHandler.cs \
 	About.cs \
-	Bubbles.cs \
 	Controller.cs \
 	Setup.cs \
 	SetupWindow.cs \
@@ -25,8 +24,7 @@ SOURCES =  \
 	StatusIcon.cs \
 	UI.cs \
 	UIHelpers.cs \
-	Utils.cs \
-	../Properties/Resources.Designer.cs
+	Utils.cs
 
 RESOURCES = $(RESOURCES_RESOURCES)
 

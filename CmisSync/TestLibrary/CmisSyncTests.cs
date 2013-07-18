@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,54 +46,71 @@ namespace TestLibrary
     using CmisSync.Lib;
     using CmisSync.Lib.Sync;
 
+    [TestFixture]
     public class CmisSyncTests
     {
-        private string CMISSYNCDIR = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "CmisSync");
+        private readonly string CMISSYNCDIR = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "CmisSync");
 
+        
         public CmisSyncTests()
         {
-            // Config.DefaultConfig = new Config(@"C:\Users\win7pro32bit\AppData\Roaming\cmissync", "config.xml"); // TODO relative path
         }
+
+
+        [TestFixtureSetUp]
+        public void ClassInit()
+        {
+            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+        }
+
 
         public static IEnumerable<object[]> TestServers
         {
             get
             {
+                string path = "../../test-servers.json";
+                bool exists = File.Exists(path);
+
+                if (!exists) {
+                    path= "../CmisSync/TestLibrary/test-servers.json";
+                }
+
                 return JsonConvert.DeserializeObject<List<object[]>>(
-                    File.ReadAllText("../../test-servers.json"));
+                    File.ReadAllText(path));
             }
         }
+
 
         public static IEnumerable<object[]> TestServersFuzzy
         {
             get
             {
+                string path = "../../test-servers-fuzzy.json";
+                bool exists = File.Exists(path);
+
+                if (!exists) {
+                    path= "../CmisSync/TestLibrary/test-servers-fuzzy.json";
+                }
+
                 return JsonConvert.DeserializeObject<List<object[]>>(
-                    File.ReadAllText("../../test-servers-fuzzy.json"));
+                    File.ReadAllText(path));
             }
         }
 
-        public void Dispose()
-        {
-        }
-        
+
         private void Clean(string localDirectory, CmisRepo.SynchronizedFolder synchronizedFolder)
         {
-            DirectoryInfo directory = new DirectoryInfo(localDirectory);
-            // Delete all local files/folders.
-            foreach (FileInfo file in directory.GetFiles())
-            {
-                file.Delete();
-            }
-            foreach (DirectoryInfo dir in directory.GetDirectories())
-            {
-                dir.Delete(true);
-            }
+
             // Sync deletions to server.
             synchronizedFolder.Sync();
+            CleanAll(localDirectory);
+            synchronizedFolder.Sync();
+
             // Remove checkout folder.
-            directory.Delete(false); // Not recursive, should not contain anything at this point.
+            Directory.Delete(localDirectory);
         }
+
 
         private void DeleteDirectoryIfExists(string path)
         {
@@ -103,6 +120,7 @@ namespace TestLibrary
             }
         }
 
+
         private void CleanDirectory(string path)
         {
             // Delete recursively.
@@ -110,14 +128,58 @@ namespace TestLibrary
 
             // Delete database.
             string database = path + ".cmissync";
-            File.Delete(database);
             if (File.Exists(database))
             {
-                File.Delete(database);
+                try
+                {
+                    File.Delete(database);
+                }
+                catch (IOException ex)
+                {
+                    Console.WriteLine("Exception on testing side, ignoring " + database + ":" + ex);
+                }
             }
 
             // Prepare empty directory.
             Directory.CreateDirectory(path);
+        }
+
+
+        private void CleanAll(string path)
+        {
+            DirectoryInfo directory = new DirectoryInfo(path);
+
+            // Delete all local files/folders.
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                if (file.Name.EndsWith(".sync"))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    file.Delete();
+                }
+                catch (IOException ex)
+                {
+                    Console.WriteLine("Exception on testing side, ignoring " + file.FullName + ":" + ex);
+                }
+            }
+
+            foreach (DirectoryInfo dir in directory.GetDirectories())
+            {
+                CleanAll(dir.FullName);
+
+                try
+                {
+                    dir.Delete();
+                }
+                catch (IOException ex)
+                {
+                    Console.WriteLine("Exception on testing side, ignoring " + dir.FullName + ":" + ex);
+                }
+            }
         }
 
 
@@ -130,6 +192,7 @@ namespace TestLibrary
             Assert.AreEqual(4, 2 + 2);
         }
 
+
         [Test]
         public void TestCrypto()
         {
@@ -140,39 +203,50 @@ namespace TestLibrary
             }
         }
 
+
         [Test, TestCaseSource("TestServers")]
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            Dictionary<string, string> repos = CmisUtils.GetRepositories(url, user, password);
+            Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
             Assert.NotNull(repos);
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void Sync(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Clean.
-            CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
-            RepoInfo repoInfo =  new RepoInfo(
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
+            Console.WriteLine("Synced to clean state.");
+
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
-                    ".",
+                    CMISSYNCDIR,
                     remoteFolderPath,
                     url,
                     user,
                     password,
                     repositoryId,
                     5000);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
+
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                 repoInfo,
                 activityListener,
-                new CmisRepo(repoInfo, activityListener)
+                cmis
             );
             synchronizedFolder.Sync();
+
+            // Clean.
+            Console.WriteLine("Clean all.");
+            Clean(localDirectory, synchronizedFolder);
+            cmis.Dispose();
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
@@ -181,22 +255,24 @@ namespace TestLibrary
             // Prepare checkout directory.
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
+            Console.WriteLine("Synced to clean state.");
+
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
-                    ".",
+                    CMISSYNCDIR,
                     remoteFolderPath,
                     url,
                     user,
                     password,
                     repositoryId,
                     5000);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
+
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                 repoInfo,
                 activityListener,
-                new CmisRepo(repoInfo, activityListener)
+                cmis
             );
             synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
@@ -212,8 +288,11 @@ namespace TestLibrary
             // TODO
 
             // Clean.
+            Console.WriteLine("Clean all.");
             Clean(localDirectory, synchronizedFolder);
+            cmis.Dispose();
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
@@ -222,9 +301,9 @@ namespace TestLibrary
             // Prepare checkout directory.
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
+            Console.WriteLine("Synced to clean state.");
+
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
                     ".",
@@ -234,10 +313,12 @@ namespace TestLibrary
                     password,
                     repositoryId,
                     5000);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
+
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                 repoInfo,
                 activityListener,
-                new CmisRepo(repoInfo, activityListener)
+                cmis
             );
             synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
@@ -253,8 +334,11 @@ namespace TestLibrary
             // TODO
 
             // Clean.
+            Console.WriteLine("Clean all.");
             Clean(localDirectory, synchronizedFolder);
+            cmis.Dispose();
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
@@ -263,22 +347,24 @@ namespace TestLibrary
             // Prepare checkout directory.
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
+            Console.WriteLine("Synced to clean state.");
+
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
-                    ".",
+                    CMISSYNCDIR,
                     remoteFolderPath,
                     url,
                     user,
                     password,
                     repositoryId,
                     5000);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
+
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                 repoInfo,
                 activityListener,
-                new CmisRepo(repoInfo, activityListener)
+                cmis
             );
             synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
@@ -291,33 +377,38 @@ namespace TestLibrary
             Console.WriteLine("Post sync done.");
 
             // Clean.
+            Console.WriteLine("Clean all.");
             Clean(localDirectory, synchronizedFolder);
+            cmis.Dispose();
         }
+
 
         // Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
         [Test, TestCaseSource("TestServers")]
-        public void SyncWhileModifyingFile(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncWhileModifyingFiles(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare checkout directory.
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
-            // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
-            // Sync.
+            Console.WriteLine("Synced to clean state.");
+
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
-                    ".",
+                    CMISSYNCDIR,
                     remoteFolderPath,
                     url,
                     user,
                     password,
                     repositoryId,
                     5000);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
+
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                 repoInfo,
                 activityListener,
-                new CmisRepo(repoInfo, activityListener)
+                cmis
             );
             synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
@@ -328,20 +419,10 @@ namespace TestLibrary
             bw.DoWork += new DoWorkEventHandler(
                 delegate(Object o, DoWorkEventArgs args)
                 {
-                    //// Clean.
-                    //CleanDirectory(Path.Combine(CMISSYNCDIR, canonical_name));
-                    // Mock.
-                    ActivityListener activityListener2 = new Mock<ActivityListener>().Object;
-                    // Sync.
-                    CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
-                        repoInfo,
-                        activityListener,
-                        new CmisRepo(repoInfo, activityListener)
-                    );
                     for (int i = 0; i < 10; i++)
                     {
-                        Console.WriteLine("Sync n" + i);
-                        synchronizedFolder2.Sync();
+                        Console.WriteLine("Sync F" + i);
+                        synchronizedFolder.Sync();
                     }
                 }
             );
@@ -358,28 +439,15 @@ namespace TestLibrary
             {
                 //Console.WriteLine("Create/remove " + LocalFilesystemActivityGenerator.id);
                 LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
-                DirectoryInfo localDirectoryInfo = new DirectoryInfo(localDirectory);
-                foreach (FileInfo file in localDirectoryInfo.GetFiles())
-                {
-                    if (file.Name.EndsWith(".sync"))
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        file.Delete();
-                    }
-                    catch (IOException)
-                    {
-                        Console.WriteLine("Exception on testing side, ignoring");
-                    }
-                }
+                CleanAll(localDirectory);
             }
 
             // Clean.
+            Console.WriteLine("Clean all.");
             Clean(localDirectory, synchronizedFolder);
+            cmis.Dispose();
         }
+
 
         // Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
         [Test, TestCaseSource("TestServers")]
@@ -388,27 +456,30 @@ namespace TestLibrary
         {
             // Prepare checkout directory.
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            
-            //CleanDirectory(localDirectory);
-            //Console.WriteLine("Synced to clean state.");
+            CleanDirectory(localDirectory);
+            Console.WriteLine("Synced to clean state.");
             
             // Mock.
-            ActivityListener activityListener = new Mock<ActivityListener>().Object;
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
-                    ".",
+                    CMISSYNCDIR,
                     remoteFolderPath,
                     url,
                     user,
                     password,
                     repositoryId,
                     5000);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
+
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                 repoInfo,
                 activityListener,
-                new CmisRepo(repoInfo, activityListener)
+                cmis
             );
+            synchronizedFolder.Sync();
+            Console.WriteLine("Synced to clean state.");
             
             // Sync a few times in a different thread.
             bool syncing = true;
@@ -418,7 +489,7 @@ namespace TestLibrary
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        Console.WriteLine("Sync.");
+                        Console.WriteLine("Sync D" + i);
                         synchronizedFolder.Sync();
                     }
                 }
@@ -434,36 +505,17 @@ namespace TestLibrary
             // Keep creating/removing a file as long as sync is going on.
             while (syncing)
             {
-                Console.WriteLine("Create/remove.");
+                //Console.WriteLine("Create/remove.");
                 LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
-                DirectoryInfo localDirectoryInfo = new DirectoryInfo(localDirectory);
-                foreach (FileInfo file in localDirectoryInfo.GetFiles())
-                {
-                    try
-                    {
-                        file.Delete();
-                    }
-                    catch (IOException)
-                    {
-                        Console.WriteLine("Exception on testing side, ignoring");
-                    }
-                }
-                foreach (DirectoryInfo directory in localDirectoryInfo.GetDirectories())
-                {
-                    try
-                    {
-                        directory.Delete();
-                    }
-                    catch (IOException)
-                    {
-                        Console.WriteLine("Exception on testing side, ignoring");
-                    }
-                }
+                CleanAll(localDirectory);
             }
 
             // Clean.
+            Console.WriteLine("Clean all.");
             Clean(localDirectory, synchronizedFolder);
+            cmis.Dispose();
         }
+
 
         // Write a file and immediately check whether it has been created.
         // Should help see whether CMIS servers are synchronous or not.
@@ -495,7 +547,12 @@ namespace TestLibrary
             contentStream.Stream = File.OpenRead("../../../TestLibraryRunner/Program.cs");
 
             // Create file.
-            session.CreateDocument(properties, root, contentStream, null);
+            DotCMIS.Enums.VersioningState? state = null;
+            if (true != session.RepositoryInfo.Capabilities.IsAllVersionsSearchableSupported)
+            {
+                state = DotCMIS.Enums.VersioningState.None;
+            }
+            session.CreateDocument(properties, root, contentStream, state);
 
             // Check whether file is present.
             IItemEnumerable<ICmisObject> children = root.GetChildren();
@@ -512,9 +569,10 @@ namespace TestLibrary
             Assert.True(found);
 
             // Clean.
-            IDocument doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + fileName);
+            IDocument doc = (IDocument)session.GetObjectByPath((remoteFolderPath + "/" + fileName).Replace("//","/"));
             doc.DeleteAllVersions();
         }
+
 
         [Test, TestCaseSource("TestServers")]
         public void DotCmisToIBMConnections(string canonical_name, string localPath, string remoteFolderPath,
@@ -552,10 +610,11 @@ namespace TestLibrary
             }
         }
 
+
         [Test, TestCaseSource("TestServersFuzzy")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
-            CmisServer server = CmisUtils.GetRepositoriesFuzzy(url, user, password);
+            CmisServer server = CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
             Assert.NotNull(server);
         }
     }

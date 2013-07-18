@@ -99,8 +99,8 @@ namespace CmisSync {
                 Directory.CreateDirectory (FoldersPath);
                 Logger.Info ("Created '" + FoldersPath + "'");
 
-                string gvfs_command_path = new string [] { Path.VolumeSeparatorChar.ToString (),
-                        "usr", "bin", "gvfs-set-attribute" }.Combine ();
+                string gvfs_command_path = Path.Combine (
+                    Path.VolumeSeparatorChar.ToString (), "usr", "bin", "gvfs-set-attribute");
 
                 // Add a special icon to the CmisSync folder
                 if (File.Exists (gvfs_command_path)) {

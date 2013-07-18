@@ -6,6 +6,9 @@ using System.Diagnostics;
 
 namespace CmisSync
 {
+    /// <summary>
+    /// Useful Windows-specific methods.
+    /// </summary>
     public static class Utils
     {
         /// <summary>
@@ -20,8 +23,5 @@ namespace CmisSync
 
             process.Start();
         }
-
-
-
     }
 }

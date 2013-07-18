@@ -32,7 +32,7 @@ namespace CmisSync
     /// <summary>
     /// Platform-independant part of the main CmisSync controller.
     /// </summary>
-    public abstract class ControllerBase : ActivityListener
+    public abstract class ControllerBase : IActivityListener
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(ControllerBase));
 
@@ -48,23 +48,23 @@ namespace CmisSync
         /// </summary>
         public bool RepositoriesLoaded { get; private set; }
 
+        /// <summary>
+        /// List of the CmisSync synchronized folders.
+        /// </summary>
         private List<RepoBase> repositories = new List<RepoBase>();
-        public string FoldersPath { get; private set; }
 
-        public double ProgressPercentage = 0.0;
-        public string ProgressSpeed = "";
+        /// <summary>
+        /// Path where the CmisSync synchronized folders are by default.
+        /// </summary>
+        public string FoldersPath { get; private set; }
 
         public event ShowSetupWindowEventHandler ShowSetupWindowEvent = delegate { };
         public delegate void ShowSetupWindowEventHandler(PageType page_type);
 
         public event Action ShowAboutWindowEvent = delegate { };
-        public event Action ShowEventLogWindowEvent = delegate { };
 
         public event FolderFetchedEventHandler FolderFetched = delegate { };
-        public delegate void FolderFetchedEventHandler(string remote_url, string[] warnings);
-
-        public event FolderFetchErrorHandler FolderFetchError = delegate { };
-        public delegate void FolderFetchErrorHandler(string remote_url, string[] errors);
+        public delegate void FolderFetchedEventHandler(string remote_url);
 
         public event FolderFetchingHandler FolderFetching = delegate { };
         public delegate void FolderFetchingHandler(double percentage);
@@ -114,7 +114,7 @@ namespace CmisSync
         {
             get
             {
-                List<string> folders = ConfigManager.CurrentConfig.Folders;
+                List<string> folders = new List<string>(ConfigManager.CurrentConfig.Folders);
                 folders.Sort();
 
                 return folders;
@@ -153,9 +153,24 @@ namespace CmisSync
         public abstract bool CreateCmisSyncFolder();
 
 
-        private ActivityListener activityListenerAggregator;
+        /// <summary>
+        /// Keeps track of whether a download or upload is going on, for display of the task bar animation.
+        /// </summary>
+        private IActivityListener activityListenerAggregator;
+
+        /// <summary>
+        /// Component to create new CmisSync synchronized folders.
+        /// </summary>
         private Fetcher fetcher;
+
+        /// <summary>
+        /// Watches the local filesystem for modifications.
+        /// </summary>
         private FileSystemWatcher watcher;
+
+        /// <summary>
+        /// Concurrency locks.
+        /// </summary>
         private Object repo_lock = new Object();
         private Object check_repos_lock = new Object();
 
@@ -203,6 +218,9 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Once the UI has loaded, show setup window if it is the first run, or check the repositories.
+        /// </summary>
         public void UIHasLoaded()
         {
             if (firstRun)
@@ -223,10 +241,14 @@ namespace CmisSync
         }
 
 
-        private void AddRepository(string folder_path)
+        /// <summary>
+        /// Initialize (in the UI and syncing mechanism) an existing CmisSync synchronized folder.
+        /// </summary>
+        /// <param name="folderPath">Synchronized folder path</param>
+        private void AddRepository(string folderPath)
         {
             RepoBase repo = null;
-            string folder_name = Path.GetFileName(folder_path);
+            string folder_name = Path.GetFileName(folderPath);
 
             RepoInfo repositoryInfo = ConfigManager.CurrentConfig.GetRepoInfo(folder_name);
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
@@ -238,20 +260,6 @@ namespace CmisSync
 
             repo.SyncStatusChanged += delegate(SyncStatus status)
             {
-                if (status == SyncStatus.Idle)
-                {
-                    ProgressPercentage = 0.0;
-                    ProgressSpeed = "";
-                }
-
-                UpdateState();
-            };
-
-            repo.ProgressChanged += delegate(double percentage, string speed)
-            {
-                ProgressPercentage = percentage;
-                ProgressSpeed = speed;
-
                 UpdateState();
             };
 
@@ -260,6 +268,12 @@ namespace CmisSync
         }
 
 
+        
+        /// <summary>
+        /// Remove a synchronized folder from the CmisSync configuration.
+        /// This happens after the user removes the folder.
+        /// </summary>
+        /// <param name="folder_path">The synchronized folder to remove</param>
         private void RemoveRepository(string folder_path)
         {
             if (this.repositories.Count > 0)
@@ -285,6 +299,22 @@ namespace CmisSync
             RemoveDatabase(folder_path);
         }
 
+
+        /// <summary>
+        /// Remove the local database associated with a CmisSync synchronized folder.
+        /// </summary>
+        /// <param name="folder_path">The synchronized folder whose database is to be removed</param>
+        private void RemoveDatabase(string folder_path)
+        {
+            string databasefile = Path.Combine(ConfigManager.CurrentConfig.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
+            if (File.Exists(databasefile)) File.Delete(databasefile);
+        }
+
+
+        /// <summary>
+        /// Pause or un-pause synchronization for a particular folder.
+        /// </summary>
+        /// <param name="repoName">the folder to pause/unpause</param>
         public void StartOrSuspendRepository(string repoName)
         {
             foreach (RepoBase aRepo in this.repositories)
@@ -298,47 +328,18 @@ namespace CmisSync
             }
         }
 
-        private void RemoveDatabase(string folder_path)
-        {
-            string databasefile = Path.Combine(ConfigManager.CurrentConfig.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
-            if (File.Exists(databasefile)) File.Delete(databasefile);
-        }
 
+        /// <summary>
+        /// Check the configured CmisSync synchronized folders.
+        /// Remove the ones whose folders have been deleted.
+        /// </summary>
         private void CheckRepositories()
         {
             lock (this.check_repos_lock)
             {
                 string path = ConfigManager.CurrentConfig.FoldersPath;
 
-                foreach (string folder_path in Directory.GetDirectories(path))
-                {
-                    string folder_name = Path.GetFileName(folder_path);
-
-                    if (folder_name.Equals(".tmp"))
-                        continue;
-
-                    if (ConfigManager.CurrentConfig.GetIdentifierForFolder(folder_name) == null)
-                    {
-                        string identifier_file_path = Path.Combine(folder_path, ".CmisSync");
-
-                        if (!File.Exists(identifier_file_path))
-                            continue;
-
-                        string identifier = File.ReadAllText(identifier_file_path).Trim();
-
-                        if (ConfigManager.CurrentConfig.IdentifierExists(identifier))
-                        {
-                            RemoveRepository(folder_path);
-                            ConfigManager.CurrentConfig.RenameFolder(identifier, folder_name);
-
-                            string new_folder_path = Path.Combine(path, folder_name);
-                            AddRepository(new_folder_path);
-
-                            Logger.Info("Controller | Renamed folder with identifier " + identifier + " to '" + folder_name + "'");
-                        }
-                    }
-                }
-
+                // If folder has been deleted, remove it from configuration too.
                 foreach (string folder_name in ConfigManager.CurrentConfig.Folders)
                 {
                     string folder_path = new Folder(folder_name).FullPath;
@@ -357,12 +358,15 @@ namespace CmisSync
                     }
                 }
 
+                // Update UI.
                 FolderListChanged();
             }
         }
 
 
-        // Fires events for the current syncing state
+        /// <summary>
+        /// Fires events for the current syncing state.
+        /// </summary>
         private void UpdateState()
         {
             bool has_unsynced_repos = false;
@@ -379,6 +383,10 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Fix the file attributes of a folder, recursively.
+        /// </summary>
+        /// <param name="path">Folder to fix</param>
         private void ClearFolderAttributes(string path)
         {
             if (!Directory.Exists(path))
@@ -397,6 +405,9 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Whether a file is a symbolic link.
+        /// </summary>
         private bool IsSymlink(string file)
         {
             FileAttributes attributes = File.GetAttributes(file);
@@ -404,22 +415,26 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Reacts when a local change occurs.
+        /// Not implemented yet, see https://github.com/nicolas-raoul/CmisSync/issues/122
+        /// </summary>
+        /// <param name="o">File that has changed</param>
+        /// <param name="args">Nature of the change</param>
         public void OnFolderActivity(object o, FileSystemEventArgs args)
         {
+            // TODO
             if (Directory.Exists(args.FullPath) && args.ChangeType == WatcherChangeTypes.Created)
                 return;
-
-            // CheckRepositories (); // NR Disabled because was creating tons of Cmis objects
         }
 
 
-        public void StartFetcher(string address, string required_fingerprint,
-            string remote_path, string local_path, string announcements_url, bool fetch_prior_history,
+        /// <summary>
+        /// Create a new CmisSync synchronized folder.
+        /// </summary>
+        public void StartFetcher(string address, string remote_path, string local_path,
             string repository, string path, string user, string password, string localrepopath)
         {
-            if (announcements_url != null)
-                announcements_url = announcements_url.Trim();
-
             repoInfo = new RepoInfo(local_path, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = new Uri(address);
             repoInfo.RemotePath = remote_path;
@@ -431,30 +446,22 @@ namespace CmisSync
 
             fetcher = new Fetcher(repoInfo, activityListenerAggregator);
 
-            this.fetcher.Finished += delegate(bool repo_is_encrypted, bool repo_is_empty, string[] warnings)
+            // Finish action.
+            this.fetcher.Finished += delegate()
             {
                 FinishFetcher();
-            };
-
-            this.fetcher.Failed += delegate
-            {
-                FolderFetchError(this.fetcher.RemoteUrl.ToString(), this.fetcher.Errors);
-                StopFetcher();
-            };
-
-            this.fetcher.ProgressChanged += delegate(double percentage)
-            {
-                FolderFetching(percentage);
             };
 
             this.FinishFetcher();
         }
 
 
+        /// <summary>
+        /// Stop fetching if failed
+        /// TODO: necessary?
+        /// </summary>
         public void StopFetcher()
         {
-            //this.fetcher.Stop();
-
             if (Directory.Exists(this.fetcher.TargetFolder))
             {
                 try
@@ -473,53 +480,45 @@ namespace CmisSync
         }
 
 
-        public void FinishFetcher(string password)
-        {
-            this.watcher.EnableRaisingEvents = false;
-            FinishFetcher();
-            this.watcher.EnableRaisingEvents = true;
-        }
-
-
+        /// <summary>
+        /// Finalize the creation of a new CmisSync synchronized folder.
+        /// </summary>
         public void FinishFetcher()
         {
+            // Add folder to XML config file.
             ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
-            FolderFetched(this.fetcher.RemoteUrl.ToString(), this.fetcher.Warnings.ToArray());
+            FolderFetched(this.fetcher.RemoteUrl.ToString());
 
+            // Initialize in the UI.
             AddRepository(repoInfo.TargetDirectory);
-
             FolderListChanged();
 
             this.fetcher = null;
         }
 
 
+        /// <summary>
+        /// Show first-time wizard.
+        /// </summary>
         public void ShowSetupWindow(PageType page_type)
         {
             ShowSetupWindowEvent(page_type);
         }
 
 
+        /// <summary>
+        /// Show info about CmisSync
+        /// </summary>
         public void ShowAboutWindow()
         {
             ShowAboutWindowEvent();
         }
 
 
-        public void ShowEventLogWindow()
-        {
-            ShowEventLogWindowEvent();
-        }
-
-
-        public void ToggleNotifications()
-        {
-            bool notifications_enabled = ConfigManager.CurrentConfig.GetConfigOption("notifications").Equals(bool.TrueString);
-            ConfigManager.CurrentConfig.SetConfigOption("notifications", (!notifications_enabled).ToString());
-        }
-
-
+        /// <summary>
+        /// Quit CmisSync.
+        /// </summary>
         public virtual void Quit()
         {
             foreach (RepoBase repo in Repositories)
@@ -528,11 +527,18 @@ namespace CmisSync
             Environment.Exit(0);
         }
 
+
+        /// <summary>
+        /// A download or upload has started, so run task icon animation.
+        /// </summary>
         public void ActivityStarted()
         {
             OnSyncing();
         }
 
+        /// <summary>
+        /// No download nor upload, so no task icon animation.
+        /// </summary>
         public void ActivityStopped()
         {
             OnIdle();

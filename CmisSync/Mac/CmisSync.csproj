@@ -75,9 +75,6 @@
     <Compile Include="..\AboutController.cs">
       <Link>AboutController.cs</Link>
     </Compile>
-    <Compile Include="..\Extensions.cs">
-      <Link>Extensions.cs</Link>
-    </Compile>
     <Compile Include="Controller.cs" />
     <Compile Include="About.cs" />
   </ItemGroup>

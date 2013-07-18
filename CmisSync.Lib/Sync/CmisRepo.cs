@@ -21,9 +21,15 @@ namespace CmisSync.Lib.Sync
 
     public partial class CmisRepo : RepoBase
     {
+        /// <summary>
+        /// Remote folder to synchronize.
+        /// </summary>
         private SynchronizedFolder synchronizedFolder;
 
-        public CmisRepo(RepoInfo repoInfo, ActivityListener activityListener)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
             : base(repoInfo)
         {
             synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);
@@ -36,9 +42,11 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public void DoFirstSync()
         {
-            Logger.Info(String.Format("First sync {0}", this.Name));
+            Logger.Info("First sync of " + this.Name);
             if (synchronizedFolder != null)
+            {
                 synchronizedFolder.Sync();
+            }
         }
 
         /// <summary>
@@ -52,8 +60,8 @@ namespace CmisSync.Lib.Sync
         }
 
         /// <summary>
-        /// Size of the repository in bytes.
-        /// Obtained by adding the individual sizes of all files.
+        /// Size of the synchronized folder in bytes.
+        /// Obtained by adding the individual sizes of all files, recursively.
         /// </summary>
         public override double Size
         {

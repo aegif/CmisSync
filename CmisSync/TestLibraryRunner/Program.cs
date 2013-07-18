@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,7 +40,7 @@ namespace TestLibraryRunner
                     File.ReadAllText(path));
             object[] server = servers.ElementAt(serverId);
 
-            new CmisSyncTests().SyncWhileModifyingFile((string)server[0], (string)server[1],
+            new CmisSyncTests().SyncWhileModifyingFolders((string)server[0], (string)server[1],
                     (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
         }
 
@@ -52,11 +52,6 @@ namespace TestLibraryRunner
             new CmisSyncTests().GetRepositoriesFuzzy((string)server[0], (string)server[1], (string)server[2]);
         }
 
-        static void testCrypto()
-        {
-            new CmisSyncTests().TestCrypto();
-        }
-
         static void Main(string[] args)
         {
             ServicePointManager.CertificatePolicy = new TrustAlways();
@@ -66,11 +61,6 @@ namespace TestLibraryRunner
             if ( ! firstRun )
                 ConfigMigration.Migrate();
 
-            // Clear log file.
-            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
-
-            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
-            Logger.Info("Starting.");
             string path = null;
 
             foreach (string arg in args)
@@ -82,12 +72,12 @@ namespace TestLibraryRunner
                 }
             }
 
-            testCrypto();
+            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+
+            //new CmisSyncTests().TestCrypto();
             test(path == null ? "../../../TestLibrary/test-servers.json" : path);
             //testFuzzy();
-
-            // Removed Console read - This should be handled by the caller. Otherwise
-            // tests cannot be run in an automated environment (Continuous Integration).
         }
     }
 }

@@ -34,7 +34,7 @@ namespace CmisSync {
 
             } catch {
                 try {
-                    return icon_theme.LoadIcon ("gtk-missing-image", size, IconLookupFlags.GenericFallback);
+                    return icon_theme.LoadIcon ("gtk-image-missing", size, IconLookupFlags.GenericFallback);
 
                 } catch {
                     return null;
@@ -45,7 +45,7 @@ namespace CmisSync {
 
         public static Image GetImage (string name)
         {
-            string image_path = new string [] { UI.AssetsPath, "pixmaps", name }.Combine ();
+            string image_path = Path.Combine (UI.AssetsPath, "pixmaps", name);
             return new Image (image_path);
         }
 
