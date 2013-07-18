@@ -5,9 +5,7 @@ using System.Text;
 using log4net;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;
 
-[assembly: ComVisible (false)]
 namespace CmisSync.Lib
 {
     public static class Utils

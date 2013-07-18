@@ -122,10 +122,10 @@ namespace CmisSync
             }
 
 #if !__MonoCS__
-                // Suppress assertion messages in debug mode
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-                GC.WaitForPendingFinalizers();
+            //// Suppress assertion messages in debug mode
+            //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            //GC.WaitForPendingFinalizers();
 #endif
-            }
+        }
     }
 }
