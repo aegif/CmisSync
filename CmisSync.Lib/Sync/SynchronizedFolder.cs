@@ -418,12 +418,7 @@ namespace CmisSync.Lib.Sync
                         // Upload
                         try
                         {
-                            VersioningState? state = null;
-                            if (true != session.RepositoryInfo.Capabilities.IsAllVersionsSearchableSupported)
-                            {
-                                state = VersioningState.None;
-                            }
-                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, state);
+                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                             success = true;
                         }
                         catch (Exception ex)
