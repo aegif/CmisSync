@@ -20,7 +20,9 @@ using System.IO;
 
 namespace CmisSync.Lib
 {
-
+    /// <summary>
+    /// Watches the local filesystem for changes.
+    /// </summary>
     public class Watcher : FileSystemWatcher {
 
         /**

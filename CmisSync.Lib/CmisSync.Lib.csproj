@@ -71,7 +71,6 @@
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Exceptions.cs" />
     <Compile Include="Defines.cs" />
     <Compile Include="IActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />

@@ -10,9 +10,14 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible (false)]
 namespace CmisSync.Lib
 {
+    /// <summary>
+    /// Static methods that are useful in the context of synchronization.
+    /// </summary>
     public static class Utils
     {
-
+        /// <summary>
+        /// Log.
+        /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Utils));
 
         /// <summary>
@@ -95,6 +100,9 @@ namespace CmisSync.Lib
         }
 
 
+        /// <summary>
+        /// Names of files that must be excluded from synchronization.
+        /// </summary>
         private static HashSet<String> ignoredFilenames = new HashSet<String>{
             "~", // gedit and emacs
             "thumbs.db", "desktop.ini", // Windows
@@ -105,6 +113,10 @@ namespace CmisSync.Lib
             "$~"
         };
 
+
+        /// <summary>
+        /// Extensions of files that must be excluded from synchronization.
+        /// </summary>
         private static HashSet<String> ignoredExtensions = new HashSet<String>{
             ".autosave", // Various autosaving apps
             ".~lock", // LibreOffice
@@ -115,10 +127,11 @@ namespace CmisSync.Lib
             ".cmissync" // CmisSync database
         };
 
-         /**
-         * Check whether the file is worth syncing or not.
-         * Files that are not worth syncing include temp files, locks, etc.
-         * */
+
+        /// <summary>
+        /// Check whether the file is worth syncing or not.
+        /// Files that are not worth syncing include temp files, locks, etc.
+        /// </summary>
         public static Boolean WorthSyncing(string filename)
         {
             if (null == filename)
@@ -188,14 +201,16 @@ namespace CmisSync.Lib
             "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
 
 
-        /**
-         * Find an available name (potentially suffixed) for this file.
-         * For instance:
-         * - if /dir/file does not exist, return the same path
-         * - if /dir/file exists, return /dir/file (1)
-         * - if /dir/file (1) also exists, return /dir/file (2)
-         * - etc
-         */
+        /// <summary>
+        /// Find an available name (potentially suffixed) for this file.
+        /// For instance:
+        /// - if /dir/file does not exist, return the same path
+        /// - if /dir/file exists, return /dir/file (1)
+        /// - if /dir/file (1) also exists, return /dir/file (2)
+        /// - etc
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string SuffixIfExists(String path)
         {
             if (!File.Exists(path))
@@ -218,8 +233,10 @@ namespace CmisSync.Lib
             }
         }
 
-        // Format a file size nicely with small caps.
-        // Example: 1048576 becomes "1 ᴍʙ"
+        /// <summary>
+        /// Format a file size nicely with small caps.
+        /// Example: 1048576 becomes "1 ᴍʙ"
+        /// </summary>
         public static string FormatSize(double byteCount)
         {
             if (byteCount >= 1099511627776)
