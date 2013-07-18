@@ -25,14 +25,27 @@ namespace CmisSync.Lib
     /// </summary>
     public class Watcher : FileSystemWatcher {
 
-        /**
-         * <param><code>FileSystemEventArgs</code> value</param>
-         */
+        /// <summary>
+        /// Event when a local file has changed.
+        /// </summary>
         public EventHandler<FileSystemEventArgs> ChangeEvent { get; set; }
 
+
+        /// <summary>
+        /// Lock used when modifying EnableRaisingEvents.
+        /// </summary>
         private Object thread_lock = new Object ();
 
 
+        /// <summary>
+        /// Whether this object has been disposed or not.
+        /// </summary>
+        private bool disposed;
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Watcher (string path) : base (path)
         {
             IncludeSubdirectories = true;
@@ -48,13 +61,19 @@ namespace CmisSync.Lib
         }
 
 
+        /// <summary>
+        /// A local modification has happened.
+        /// </summary>
         private void OnChanged (object sender, FileSystemEventArgs args)
         {
             // Disabled for now. ChangeEvent(sender, args);
         }
 
-        private bool disposed;
 
+        /// <summary>
+        /// Dispose of the watcher.
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (!disposed)
@@ -67,6 +86,10 @@ namespace CmisSync.Lib
             }
         }
 
+
+        /// <summary>
+        /// Enable the watcher.
+        /// </summary>
         public void Enable ()
         {
             if (disposed)
@@ -78,6 +101,9 @@ namespace CmisSync.Lib
         }
 
 
+        /// <summary>
+        /// Disable the watcher.
+        /// </summary>
         public void Disable ()
         {
             if (disposed)

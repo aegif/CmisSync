@@ -24,19 +24,8 @@ using Mono.Unix.Native;
 
 namespace CmisSync.Lib
 {
-
-    public enum CmisChangeType
-    {
-        Added,
-        Edited,
-        Deleted,
-        Moved
-    }
-
-
     public class ChangeSet
     {
-
         public Folder Folder { get; set; }
         public string Revision { get; set; }
         public DateTime Timestamp { get; set; }
@@ -49,7 +38,6 @@ namespace CmisSync.Lib
 
     public class Change
     {
-        public CmisChangeType Type { get; set; }
         public DateTime Timestamp { get; set; }
 
         public string Path { get; set; }
