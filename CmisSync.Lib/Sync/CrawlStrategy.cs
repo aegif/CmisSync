@@ -110,7 +110,7 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        if (Utils.WorthSyncing(remoteSubFolder.Name))
+                        if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isRemotePathIgnored(remoteSubFolder.Path))
                         {
                             //Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
                             remoteFolders.Add(remoteSubFolder.Name);
@@ -366,7 +366,7 @@ namespace CmisSync.Lib.Sync
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
 
-                    if (Utils.WorthSyncing(localSubFolder))
+                    if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isLocalPathIgnored(Path.Combine(localFolder, localSubFolder).ToString()))
                     {
                         string folderName = Path.GetFileName(localSubFolder);
                         if (!remoteFolders.Contains(folderName))

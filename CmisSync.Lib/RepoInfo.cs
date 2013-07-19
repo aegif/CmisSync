@@ -73,6 +73,8 @@ namespace CmisSync.Lib
         public double PollInterval { get; set; }
 
 
+        private LinkedList<string> ignoredPaths = new LinkedList<string>();
+
         /// <summary>
         /// Simple constructor.
         /// </summary>
@@ -97,6 +99,41 @@ namespace CmisSync.Lib
             RepoID = repoID;
             TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
             PollInterval = pollInterval;
+        }
+
+        public void addIgnorePath(string path)
+        {
+            if(!this.ignoredPaths.Contains(path))
+            this.ignoredPaths.AddFirst(path);
+        }
+
+        public string[] getIgnoredPaths()
+        {
+            string[] result = new string[this.ignoredPaths.Count];
+            ignoredPaths.CopyTo(result, 0);
+            return result;
+        }
+
+        public bool isLocalPathIgnored(string path)
+        {
+            if(ignoredPaths.Contains(path))
+            {
+            //TODO Check if path is ignored
+                return false;
+            }else{
+                return false;
+            }
+        }
+
+        public bool isRemotePathIgnored(string path)
+        {
+            if(ignoredPaths.Contains(path))
+            {
+            //TODO Check if path is ignored
+                return false;
+            }else{
+                return false;
+            }
         }
     }
 }

@@ -228,7 +228,7 @@ namespace CmisSync.Lib
                 return;
             }
 
-            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval);
+            this.AddFolder(repoInfo.Name, repoInfo.TargetDirectory, repoInfo.Address, repoInfo.RepoID, repoInfo.RemotePath, repoInfo.User, repoInfo.Password, repoInfo.PollInterval, repoInfo.getIgnoredPaths());
         }
 
 
@@ -236,7 +236,7 @@ namespace CmisSync.Lib
         /// Add a synchronized folder to the configuration.
         /// </summary>
         private void AddFolder(string name, string path, Uri url, string repository,
-            string remoteFolder, string user, string password, double pollinterval)
+            string remoteFolder, string user, string password, double pollinterval, string[] ignoredPaths)
         {
             XmlNode node_name = configXml.CreateElement("name");
             XmlNode node_path = configXml.CreateElement("path");
@@ -266,6 +266,15 @@ namespace CmisSync.Lib
             node_folder.AppendChild(node_user);
             node_folder.AppendChild(node_password);
             node_folder.AppendChild(node_pollinterval);
+            foreach(string ignoredPath in ignoredPaths)
+            {
+                XmlNode ignoreNode = configXml.CreateElement("ignoreFolder");
+                XmlNode attr = configXml.CreateAttribute("path");
+                attr.Value = ignoredPath;
+                ignoreNode.Attributes.SetNamedItem(attr);
+                node_folder.AppendChild(ignoreNode);
+            }
+
 
             XmlNode node_root = configXml.SelectSingleNode("/CmisSync/folders");
             if (node_root == null)
@@ -324,6 +333,27 @@ namespace CmisSync.Lib
             }
         }
 
+        public LinkedList<string> getIgnoredFolders(string folderName)
+        {
+            LinkedList<string> result = new LinkedList<string>();
+            XmlNode folder = GetFolder(folderName);
+            if( folder != null)
+            {
+                if(folder.HasChildNodes)
+                {
+                    foreach (XmlNode node in folder.ChildNodes) {
+                        if(node.Name.Equals("ignoredFolder"))
+                        {
+                            if(node.Attributes["path"]!=null)
+                            {
+                                result.AddLast(node.Attributes["path"].InnerText);
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
 
         /// <summary>
         /// Get all the configured info about a synchronized folder.
@@ -348,7 +378,11 @@ namespace CmisSync.Lib
             {
                 repoInfo.TargetDirectory = Path.Combine(FoldersPath, folderName);
             }
-
+            LinkedList<string> ignoredFolders = getIgnoredFolders(folderName);
+            foreach (string ignoredFolder in ignoredFolders)
+            {
+                repoInfo.addIgnorePath(ignoredFolder);
+            }
             return repoInfo;
         }
 
