@@ -9,13 +9,12 @@ LIBS = $(REF_CMISSYNC) $(LOG4NET_LIBS) $(NOTIFY_SHARP_LIBS)
 
 SOURCES =  \
 	../AboutController.cs \
-	../BubblesController.cs \
+	../CertPolicyHandler.cs \
 	../ControllerBase.cs \
 	../Program.cs \
 	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
-	../CertPolicyHandler.cs \
 	About.cs \
 	Controller.cs \
 	Setup.cs \
