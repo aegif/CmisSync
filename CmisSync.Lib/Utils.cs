@@ -5,9 +5,10 @@ using System.Text;
 using log4net;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;
+#if __MonoCS__
+using Mono.Unix.Native;
+#endif
 
-[assembly: ComVisible (false)]
 namespace CmisSync.Lib
 {
     /// <summary>

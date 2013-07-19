@@ -38,8 +38,8 @@
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
-        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="true" RelativeMakefileName="Makefile.am">
-          <BuildFilesVar Sync="true" Name="SOURCES" />
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am">
+          <BuildFilesVar Sync="True" Name="SOURCES" />
           <DeployFilesVar />
           <ResourcesVar />
           <OthersVar />
@@ -61,11 +61,12 @@
     <Compile Include="About.cs" />
     <Compile Include="..\Program.cs" />
     <Compile Include="..\AboutController.cs" />
-    <Compile Include="..\BubblesController.cs" />
     <Compile Include="..\ControllerBase.cs" />
-    <Compile Include="..\Extensions.cs" />
     <Compile Include="..\SetupController.cs" />
     <Compile Include="..\StatusIconController.cs" />
+    <Compile Include="..\CertPolicyHandler.cs" />
+    <Compile Include="..\Properties\Resources.Designer.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">

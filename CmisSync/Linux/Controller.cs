@@ -136,7 +136,7 @@ namespace CmisSync {
 
         public void OpenCmisSyncFolder(string name)
         {
-            Utils.OpenFolder(new Folder(name).FullPath);
+            Utils.OpenFolder(ConfigManager.GetFullPath(name));
         }
 
         public void OpenRemoteFolder(string name)

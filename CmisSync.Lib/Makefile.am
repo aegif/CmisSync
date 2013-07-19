@@ -18,7 +18,6 @@ SOURCES =  \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
-	Exceptions.cs \
 	Fetcher.cs \
 	RepoBase.cs \
 	RepoInfo.cs \
@@ -27,8 +26,7 @@ SOURCES =  \
 	Sync/CrawlStrategy.cs \
 	Sync/SynchronizedFolder.cs \
 	Utils.cs \
-	Watcher.cs \
-	Wrappers.cs
+	Watcher.cs
 
 EXTRA_DIST = CmisSync.Lib.csproj StaticDefines.cs
 
