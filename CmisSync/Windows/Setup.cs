@@ -732,13 +732,19 @@ namespace CmisSync
 
                                 TextBox localrepopath_box = new TextBox()
                                 {
-                                    Width = 420,
+                                    Width = 375,
                                     Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text)
                                 };
 
                                 localfolder_box.TextChanged += delegate
                                 {
                                     localrepopath_box.Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text);
+                                };
+
+                                Button choose_folder_button = new Button()
+                                {
+                                    Width = 40,
+                                    Content = "..."
                                 };
 
                                 TextBlock localfolder_error_label = new TextBlock()
@@ -785,6 +791,10 @@ namespace CmisSync
                                 ContentCanvas.Children.Add(localrepopath_box);
                                 Canvas.SetTop(localrepopath_box, 220);
                                 Canvas.SetLeft(localrepopath_box, 185);
+
+                                ContentCanvas.Children.Add(choose_folder_button);
+                                Canvas.SetTop(choose_folder_button, 220);
+                                Canvas.SetLeft(choose_folder_button, 565);
 
                                 ContentCanvas.Children.Add(localfolder_error_label);
                                 Canvas.SetTop(localfolder_error_label, 275);
@@ -847,6 +857,16 @@ namespace CmisSync
                                         localfolder_error_label.Visibility = Visibility.Visible;
                                     }
                                     else localfolder_error_label.Visibility = Visibility.Hidden;
+                                };
+
+                                // Choose a folder.
+                                choose_folder_button.Click += delegate
+                                {
+                                    System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+                                    if (folderBrowserDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                                    {
+                                        localrepopath_box.Text = folderBrowserDialog1.SelectedPath;
+                                    }
                                 };
 
                                 // Other actions.

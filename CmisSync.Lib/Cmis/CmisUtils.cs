@@ -97,7 +97,7 @@ namespace CmisSync.Lib.Cmis
                 {
                     repositories = GetRepositories(new Uri(fuzzyUrl), user, password);
                 }
-                catch (CmisPermissionDeniedException ex)
+                catch (CmisPermissionDeniedException)
                 {
                     // Do nothing, try other possibilities.
                 }
