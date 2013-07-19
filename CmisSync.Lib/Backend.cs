@@ -32,8 +32,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static string Version {
             get {
-                string version = String.Empty + Assembly.GetExecutingAssembly ().GetName ().Version;
-                return version.Substring (0, version.Length - 2);
+                return String.Empty + Assembly.GetExecutingAssembly ().GetName ().Version;
             }
         }
 
