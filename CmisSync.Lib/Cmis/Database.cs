@@ -379,7 +379,7 @@ namespace CmisSync.Lib.Cmis
             {
                 currentChecksum = Checksum(path);
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 Logger.Error("IOException while reading file checksum: " + path);
                 return true;

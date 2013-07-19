@@ -77,9 +77,6 @@ namespace CmisSync
         public event Action OnError = delegate { };
 
 
-        public event NotificationRaisedEventHandler NotificationRaised = delegate { };
-        public delegate void NotificationRaisedEventHandler(ChangeSet change_set);
-
         public event AlertNotificationRaisedEventHandler AlertNotificationRaised = delegate { };
         public delegate void AlertNotificationRaisedEventHandler(string title, string message);
 
@@ -342,7 +339,7 @@ namespace CmisSync
                 // If folder has been deleted, remove it from configuration too.
                 foreach (string folder_name in ConfigManager.CurrentConfig.Folders)
                 {
-                    string folder_path = new Folder(folder_name).FullPath;
+                    string folder_path = ConfigManager.GetFullPath(folder_name);
 
                     if (!Directory.Exists(folder_path))
                     {

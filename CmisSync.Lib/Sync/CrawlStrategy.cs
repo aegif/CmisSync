@@ -16,6 +16,9 @@ using System.Net;
 
 namespace CmisSync.Lib.Sync
 {
+    /// <summary>
+    /// Part of CmisRepo.
+    /// </summary>
     public partial class CmisRepo : RepoBase
     {
         /// <summary>

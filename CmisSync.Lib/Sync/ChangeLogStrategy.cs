@@ -132,7 +132,7 @@ namespace CmisSync.Lib.Sync
                         }
                         break;
 
-                    /// Case when access control or security policy has changed.
+                    // Case when access control or security policy has changed.
                     case ChangeType.Security:
                         // TODO
                         break;

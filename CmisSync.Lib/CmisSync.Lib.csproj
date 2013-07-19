@@ -65,13 +65,11 @@
     <Compile Include="RepoBase.cs" />
     <Compile Include="RepoInfo.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="Wrappers.cs" />
     <Compile Include="Backend.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Exceptions.cs" />
     <Compile Include="Defines.cs" />
     <Compile Include="IActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />
