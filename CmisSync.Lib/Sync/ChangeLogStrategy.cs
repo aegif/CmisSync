@@ -104,7 +104,8 @@ namespace CmisSync.Lib.Sync
                         else if (null != (remoteFolder = cmisObject as IFolder))
                         {
                             string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
-                            RecursiveFolderCopy(remoteFolder, localFolder);
+                            if(!this.repoinfo.isPathIgnored(remoteFolder.Path))
+                                RecursiveFolderCopy(remoteFolder, localFolder);
                         }
                         break;
 
@@ -128,7 +129,8 @@ namespace CmisSync.Lib.Sync
                         else if (null != (remoteFolder = cmisObject as IFolder))
                         {
                             string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
-                            RemoveFolderLocally(localFolder); // Remove from filesystem and database.
+                            if(!this.repoinfo.isPathIgnored(remoteFolder.Path))
+                                RemoveFolderLocally(localFolder); // Remove from filesystem and database.
                         }
                         break;
 

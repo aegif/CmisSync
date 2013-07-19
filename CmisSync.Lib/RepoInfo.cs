@@ -72,7 +72,9 @@ namespace CmisSync.Lib
         /// </summary>
         public double PollInterval { get; set; }
 
-
+        /// <summary>
+        /// All folders, which should be ignored on synchronization.
+        /// </summary>
         private LinkedList<string> ignoredPaths = new LinkedList<string>();
 
         /// <summary>
@@ -101,12 +103,23 @@ namespace CmisSync.Lib
             PollInterval = pollInterval;
         }
 
+        /// <summary>
+        /// Adds a new path to the list of paths, which should be ignored.
+        /// It has to be a absolute path from the repoID on with a leading
+        /// slash. Path separator must also be a slash.
+        /// </summary>
+        /// <param name="path"></param>
         public void addIgnorePath(string path)
         {
             if(!this.ignoredPaths.Contains(path))
-            this.ignoredPaths.AddFirst(path);
+                this.ignoredPaths.AddFirst(path);
         }
 
+        /// <summary>
+        /// All folders, which should be ignored on synchronization
+        /// will be returned.
+        /// </summary>
+        /// <returns>all ignored folders</returns>
         public string[] getIgnoredPaths()
         {
             string[] result = new string[this.ignoredPaths.Count];
@@ -114,26 +127,16 @@ namespace CmisSync.Lib
             return result;
         }
 
-        public bool isLocalPathIgnored(string path)
+        /// <summary>
+        /// If the given path should be ignored, TRUE will be returned,
+        /// otherwise FALSE.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public bool isPathIgnored(string path)
         {
-            if(ignoredPaths.Contains(path))
-            {
-            //TODO Check if path is ignored
-                return false;
-            }else{
-                return false;
-            }
+            return ignoredPaths.Contains(path);
         }
 
-        public bool isRemotePathIgnored(string path)
-        {
-            if(ignoredPaths.Contains(path))
-            {
-            //TODO Check if path is ignored
-                return false;
-            }else{
-                return false;
-            }
-        }
     }
 }

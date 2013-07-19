@@ -110,7 +110,7 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isRemotePathIgnored(remoteSubFolder.Path))
+                        if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                         {
                             //Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
                             remoteFolders.Add(remoteSubFolder.Name);
@@ -150,6 +150,10 @@ namespace CmisSync.Lib.Sync
                                     if (Utils.IsInvalidFileName(remoteSubFolder.Name))
                                     {
                                         Logger.Info("Skipping download of folder with illegal name: " + remoteSubFolder.Name);
+                                    }
+                                    else if (repoinfo.isPathIgnored(remoteSubFolder.Path))
+                                    {
+                                        Logger.Info("Skipping dowload of ignored folder: " + remoteSubFolder.Name);
                                     }
                                     else
                                     {
@@ -365,8 +369,9 @@ namespace CmisSync.Lib.Sync
                         Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
-
-                    if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isLocalPathIgnored(Path.Combine(localFolder, localSubFolder).ToString()))
+                    string path = Path.Combine(localFolder, localSubFolder).ToString().Substring(repoinfo.TargetDirectory.Length);
+                    path = path.Replace("\\", "/");
+                    if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(path))
                     {
                         string folderName = Path.GetFileName(localSubFolder);
                         if (!remoteFolders.Contains(folderName))

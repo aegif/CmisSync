@@ -243,7 +243,7 @@ namespace CmisSync.Lib.Sync
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
                         string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
-                        if (Utils.WorthSyncing(localSubFolder))
+                        if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                         {
                             // Create local folder.
                             Directory.CreateDirectory(localSubFolder);
@@ -501,7 +501,9 @@ namespace CmisSync.Lib.Sync
                     // Recurse for each subfolder in this folder.
                     foreach (string subfolder in Directory.GetDirectories(localFolder))
                     {
-                        if (Utils.WorthSyncing(subfolder))
+                        string path = subfolder.Substring(repoinfo.TargetDirectory.Length);
+                        path = path.Replace("\\\\","/");
+                        if (Utils.WorthSyncing(subfolder) && !repoinfo.isPathIgnored(path))
                             UploadFolderRecursively(folder, subfolder);
                     }
                 }
