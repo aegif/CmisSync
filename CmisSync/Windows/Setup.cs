@@ -605,7 +605,7 @@ namespace CmisSync
                                 {
                                     System.Windows.Controls.TreeViewItem item = new System.Windows.Controls.TreeViewItem();
                                     item.Tag = new SelectionTreeItem(repository.Key, "/");
-                                    item.Header = repository.Value + " [" + repository.Key + "]";
+                                    item.Header = repository.Value;
                                     treeView.Items.Add(item);
                                 }
 
