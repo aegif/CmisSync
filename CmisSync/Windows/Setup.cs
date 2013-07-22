@@ -707,6 +707,8 @@ namespace CmisSync
                         #region Page Customize
                         case PageType.Customize:
                             {
+                                string parentFolder = Controller.DefaultRepoPath;
+
                                 // UI elements.
 
                                 Header = CmisSync.Properties_Resources.ResourceManager.GetString("Customize", CultureInfo.CurrentCulture);
@@ -733,12 +735,12 @@ namespace CmisSync
                                 TextBox localrepopath_box = new TextBox()
                                 {
                                     Width = 375,
-                                    Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text)
+                                    Text = Path.Combine(parentFolder, localfolder_box.Text)
                                 };
 
                                 localfolder_box.TextChanged += delegate
                                 {
-                                    localrepopath_box.Text = Path.Combine(Controller.DefaultRepoPath, localfolder_box.Text);
+                                    localrepopath_box.Text = Path.Combine(parentFolder, localfolder_box.Text);
                                 };
 
                                 Button choose_folder_button = new Button()
@@ -865,7 +867,8 @@ namespace CmisSync
                                     System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
                                     if (folderBrowserDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                                     {
-                                        localrepopath_box.Text = folderBrowserDialog1.SelectedPath;
+                                        parentFolder = folderBrowserDialog1.SelectedPath;
+                                        localrepopath_box.Text = Path.Combine(parentFolder, localfolder_box.Text);
                                     }
                                 };
 
