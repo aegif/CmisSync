@@ -23,7 +23,7 @@ namespace CmisSync.Lib.Sync
 
 
         /// <summary>
-        /// Replace XML root element from <sparkleshare> to <CmisSync>
+        /// Replace XML root element name from sparkleshare to CmisSync
         /// </summary>
         private static void ReplaceXMLRootElement()
         {

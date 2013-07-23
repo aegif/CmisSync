@@ -34,29 +34,41 @@ namespace CmisSync
     /// </summary>
     public abstract class ControllerBase : IActivityListener
     {
+        /// <summary>
+        /// Log.
+        /// </summary>
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(ControllerBase));
+
 
         /// <summary>
         /// Whether it is the first time that CmisSync is being run.
         /// </summary>
         private bool firstRun;
 
+
+        /// <summary>
+        /// All the info about the CmisSync synchronized folder being created.
+        /// </summary>
         private RepoInfo repoInfo;
+
 
         /// <summary>
         /// Whether the reporsitories have finished loading.
         /// </summary>
         public bool RepositoriesLoaded { get; private set; }
 
+
         /// <summary>
         /// List of the CmisSync synchronized folders.
         /// </summary>
         private List<RepoBase> repositories = new List<RepoBase>();
 
+
         /// <summary>
         /// Path where the CmisSync synchronized folders are by default.
         /// </summary>
         public string FoldersPath { get; private set; }
+
 
         public event ShowSetupWindowEventHandler ShowSetupWindowEvent = delegate { };
         public delegate void ShowSetupWindowEventHandler(PageType page_type);
@@ -93,6 +105,7 @@ namespace CmisSync
             }
         }
 
+
         /// <summary>
         /// Whether it is the first time that CmisSync is being run.
         /// </summary>
@@ -103,6 +116,7 @@ namespace CmisSync
                 return firstRun;
             }
         }
+
 
         /// <summary>
         /// The list of synchronized folders.
@@ -118,25 +132,12 @@ namespace CmisSync
             }
         }
 
-        public List<string> UnsyncedFolders
-        {
-            get
-            {
-                List<string> unsynced_folders = new List<string>();
-
-                foreach (RepoBase repo in Repositories)
-                {
-                    repo.SyncInBackground();
-                }
-
-                return unsynced_folders;
-            }
-        }
 
         /// <summary>
         /// Add CmisSync to the list of programs to be started up when the user logs into Windows.
         /// </summary>
         public abstract void CreateStartupItem();
+
 
         /// <summary>
         /// Add CmisSync to the user's Windows Explorer bookmarks.
@@ -155,15 +156,18 @@ namespace CmisSync
         /// </summary>
         private IActivityListener activityListenerAggregator;
 
+
         /// <summary>
         /// Component to create new CmisSync synchronized folders.
         /// </summary>
         private Fetcher fetcher;
 
+
         /// <summary>
         /// Watches the local filesystem for modifications.
         /// </summary>
         private FileSystemWatcher watcher;
+
 
         /// <summary>
         /// Concurrency locks.
@@ -263,7 +267,6 @@ namespace CmisSync
             this.repositories.Add(repo);
             repo.Initialize();
         }
-
 
         
         /// <summary>
