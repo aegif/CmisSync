@@ -106,7 +106,7 @@
     </Feature>
 
     <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
-
+    <WixVariable Id="WixUIBannerBmp" Value="Pixmaps/install-banner.bmp" />
     <UI>
       <UIRef Id="WixUI_InstallDir" />
     </UI>
