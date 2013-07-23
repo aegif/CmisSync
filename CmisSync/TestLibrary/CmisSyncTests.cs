@@ -149,36 +149,42 @@ namespace TestLibrary
         {
             DirectoryInfo directory = new DirectoryInfo(path);
 
-            // Delete all local files/folders.
-            foreach (FileInfo file in directory.GetFiles())
+            try
             {
-                if (file.Name.EndsWith(".sync"))
+                // Delete all local files/folders.
+                foreach (FileInfo file in directory.GetFiles())
                 {
-                    continue;
-                }
+                    if (file.Name.EndsWith(".sync"))
+                    {
+                        continue;
+                    }
 
-                try
-                {
-                    file.Delete();
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch (IOException ex)
+                    {
+                        Console.WriteLine("Exception on testing side, ignoring " + file.FullName + ":" + ex);
+                    }
                 }
-                catch (IOException ex)
+                foreach (DirectoryInfo dir in directory.GetDirectories())
                 {
-                    Console.WriteLine("Exception on testing side, ignoring " + file.FullName + ":" + ex);
+                    CleanAll(dir.FullName);
+
+                    try
+                    {
+                        dir.Delete();
+                    }
+                    catch (IOException ex)
+                    {
+                        Console.WriteLine("Exception on testing side, ignoring " + dir.FullName + ":" + ex);
+                    }
                 }
             }
-
-            foreach (DirectoryInfo dir in directory.GetDirectories())
+            catch (IOException ex)
             {
-                CleanAll(dir.FullName);
-
-                try
-                {
-                    dir.Delete();
-                }
-                catch (IOException ex)
-                {
-                    Console.WriteLine("Exception on testing side, ignoring " + dir.FullName + ":" + ex);
-                }
+                Console.WriteLine("Exception on testing side, ignoring " + ex);
             }
         }
 
@@ -209,6 +215,10 @@ namespace TestLibrary
             string url, string user, string password, string repositoryId)
         {
             Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
+            foreach (KeyValuePair<string,string> pair in repos)
+            {
+                Console.WriteLine(pair.Key + " : " + pair.Value);
+            }
             Assert.NotNull(repos);
         }
 

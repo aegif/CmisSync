@@ -12,27 +12,34 @@ namespace TestLibrary
 
         public static void CreateDirectoriesAndFiles(string path)
         {
-            CreateRandomFile(path, 3);
-            CreateRandomFile(path, 3);
-            CreateRandomFile(path, 3);
-            CreateRandomFile(path, 3);
-            CreateRandomFile(path, 3);
-            string path1 = Path.Combine(path, "dir1");
-            if (!Directory.Exists(path1))
+            try
             {
-                Directory.CreateDirectory(path1);
+                CreateRandomFile(path, 3);
+                CreateRandomFile(path, 3);
+                CreateRandomFile(path, 3);
+                CreateRandomFile(path, 3);
+                CreateRandomFile(path, 3);
+                string path1 = Path.Combine(path, "dir1");
+                if (!Directory.Exists(path1))
+                {
+                    Directory.CreateDirectory(path1);
+                }
+                CreateRandomFile(path1, 3);
+                CreateRandomFile(path1, 3);
+                CreateRandomFile(path1, 3);
+                CreateRandomFile(path1, 3);
+                CreateRandomFile(path1, 3);
+                string path2 = Path.Combine(path1, "dir2");
+                if (!Directory.Exists(path2))
+                {
+                    Directory.CreateDirectory(path2);
+                }
+                CreateRandomFile(path2, 3);
             }
-            CreateRandomFile(path1, 3);
-            CreateRandomFile(path1, 3);
-            CreateRandomFile(path1, 3);
-            CreateRandomFile(path1, 3);
-            CreateRandomFile(path1, 3);
-            string path2 = Path.Combine(path1, "dir2");
-            if (!Directory.Exists(path2))
+            catch (IOException ex)
             {
-                Directory.CreateDirectory(path2);
+                Console.WriteLine("Exception on testing side, ignoring " + ex);
             }
-            CreateRandomFile(path2, 3);
         }
 
         public static void CreateRandomFile(string path, int maxSizeInKb)
