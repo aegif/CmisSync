@@ -124,7 +124,7 @@
     <value>Fügen Sie einen Remote Ordner ein...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Hinzufügen von syncronisierten Ordnern zu CmisSync</value>
+    <value>Hinzufügen von synchronisierten Ordnern zu CmisSync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Ordner hinzufügen</value>
@@ -214,7 +214,7 @@
     <value>CmisSync im Autostart hinzufügen</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>Das Symbol ist hier zu helfen</value>
+    <value>Das Symbol ist in der Statusleiste zu finden</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
     <value>Das CmisSync Status-Symbol zeigt den Fortschritt der Synchronisierung und bietet einfachen Zugriff auf Ihre Ordner.</value>
