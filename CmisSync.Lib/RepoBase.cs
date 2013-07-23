@@ -32,7 +32,7 @@ namespace CmisSync.Lib
     /// Synchronizes a remote folder.
     /// This class contains the loop that synchronizes every X seconds.
     /// </summary>
-    public abstract class RepoBase
+    public abstract class RepoBase : IDisposable
     {
         /// <summary>
         /// Log.
@@ -146,6 +146,12 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Track whether <c>Dispose</c> has been called.
+        /// </summary>
+        private bool disposed = false;
+
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         public RepoBase(RepoInfo repoInfo)
@@ -181,6 +187,43 @@ namespace CmisSync.Lib
             };
             
             ChangesDetected += delegate { };
+        }
+
+
+        /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~RepoBase()
+        {
+            Dispose(false);
+        }
+
+
+        /// <summary>
+        /// Implement IDisposable interface. 
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        /// <summary>
+        /// Dispose pattern implementation.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    this.remote_timer.Stop();
+                    this.remote_timer.Dispose();
+                    this.watcher.Dispose();
+                }
+                disposed = true;
+            }
         }
 
 
@@ -253,18 +296,6 @@ namespace CmisSync.Lib
             }
 
             return size;
-        }
-
-
-        /// <summary>
-        /// Destroy this object, especially the timer.
-        /// </summary>
-        public void Dispose()
-        {
-            this.remote_timer.Stop();
-            this.remote_timer.Dispose();
-
-            this.watcher.Dispose();
         }
     }
 

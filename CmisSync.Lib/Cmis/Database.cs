@@ -26,7 +26,7 @@ namespace CmisSync.Lib.Cmis
     /// Database to cache remote information from the CMIS server.
     /// Implemented with SQLite.
     /// </summary>
-    public class Database
+    public class Database : IDisposable
     {
         /// <summary>
         /// Log.
@@ -47,6 +47,12 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// Track whether <c>Dispose</c> has been called.
+        /// </summary>
+        private bool disposed = false;
+
+
+        /// <summary>
         /// Length of the prefix to remove before storing paths.
         /// </summary>
         private int pathPrefixSize;
@@ -59,6 +65,44 @@ namespace CmisSync.Lib.Cmis
         {
             this.databaseFileName = dataPath;
             pathPrefixSize = ConfigManager.CurrentConfig.FoldersPath.Length + 1;
+        }
+
+
+        /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~Database()
+        {
+            Dispose(false);
+        }
+
+
+        /// <summary>
+        /// Implement IDisposable interface. 
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        /// <summary>
+        /// Dispose pattern implementation.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    if (this.sqliteConnection != null)
+                    {
+                        this.sqliteConnection.Dispose();
+                    }
+                }
+                disposed = true;
+            }
         }
 
 

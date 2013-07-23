@@ -28,7 +28,7 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Synchronization with a particular CMIS folder.
         /// </summary>
-        public partial class SynchronizedFolder
+        public partial class SynchronizedFolder : IDisposable
         {
             /// <summary>
             /// Whether sync is bidirectional or only from server to client.
@@ -71,6 +71,12 @@ namespace CmisSync.Lib.Sync
             /// Parameters to use for all CMIS requests.
             /// </summary>
             private Dictionary<string, string> cmisParameters;
+
+
+            /// <summary>
+            /// Track whether <c>Dispose</c> has been called.
+            /// </summary>
+            private bool disposed = false;
 
 
             /// <summary>
@@ -130,6 +136,41 @@ namespace CmisSync.Lib.Sync
 				{
 					Logger.Info("The folder \""+ignoredFolder+"\" will be ignored");
 				}
+            }
+
+
+            /// <summary>
+            /// Destructor.
+            /// </summary>
+            ~SynchronizedFolder()
+            {
+                Dispose(false);
+            }
+
+
+            /// <summary>
+            /// Implement IDisposable interface. 
+            /// </summary>
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+
+            /// <summary>
+            /// Dispose pattern implementation.
+            /// </summary>
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!this.disposed)
+                {
+                    if (disposing)
+                    {
+                        this.database.Dispose();
+                    }
+                    disposed = true;
+                }
             }
 
 

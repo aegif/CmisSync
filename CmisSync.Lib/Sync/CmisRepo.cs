@@ -26,15 +26,40 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private SynchronizedFolder synchronizedFolder;
 
+
+        /// <summary>
+        /// Track whether <c>Dispose</c> has been called.
+        /// </summary>
+        private bool disposed = false;
+
+
         /// <summary>
         /// Constructor.
         /// </summary>
         public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
             : base(repoInfo)
         {
-            synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);
+            this.synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);
             Logger.Info(synchronizedFolder);
         }
+
+
+        /// <summary>
+        /// Dispose pattern implementation.
+        /// </summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    this.synchronizedFolder.Dispose();
+                }
+                disposed = true;
+            }
+            base.Dispose(disposing);
+        }
+
 
         /// <summary>
         /// Sync for the first time.
@@ -43,9 +68,9 @@ namespace CmisSync.Lib.Sync
         public void DoFirstSync()
         {
             Logger.Info("First sync of " + this.Name);
-            if (synchronizedFolder != null)
+            if (this.synchronizedFolder != null)
             {
-                synchronizedFolder.Sync();
+                this.synchronizedFolder.Sync();
             }
         }
 
@@ -55,8 +80,8 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public override void SyncInBackground()
         {
-            if (synchronizedFolder != null) // Because it is sometimes called before the object's constructor has completed.
-                synchronizedFolder.SyncInBackground();
+            if (this.synchronizedFolder != null) // Because it is sometimes called before the object's constructor has completed.
+                this.synchronizedFolder.SyncInBackground();
         }
 
         /// <summary>
