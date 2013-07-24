@@ -101,7 +101,7 @@ namespace CmisSync.Lib.Cmis
                         this.sqliteConnection.Dispose();
                     }
                 }
-                disposed = true;
+                this.disposed = true;
             }
         }
 

@@ -55,7 +55,7 @@ namespace CmisSync.Lib.Sync
                 {
                     this.synchronizedFolder.Dispose();
                 }
-                disposed = true;
+                this.disposed = true;
             }
             base.Dispose(disposing);
         }

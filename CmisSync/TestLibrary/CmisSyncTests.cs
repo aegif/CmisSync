@@ -242,19 +242,22 @@ namespace TestLibrary
                     password,
                     repositoryId,
                     5000);
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
 
-            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis
-            );
-            synchronizedFolder.Sync();
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            {
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                {
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-            // Clean.
-            Console.WriteLine("Clean all.");
-            Clean(localDirectory, synchronizedFolder);
-            cmis.Dispose();
+                    // Clean.
+                    Console.WriteLine("Clean all.");
+                    Clean(localDirectory, synchronizedFolder);
+                }
+            }
         }
 
 
@@ -277,30 +280,32 @@ namespace TestLibrary
                     password,
                     repositoryId,
                     5000);
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
 
-            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis
-            );
-            synchronizedFolder.Sync();
-            Console.WriteLine("Synced to clean state.");
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            {
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                {
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-            // Create random small file.
-            LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
+                    // Create random small file.
+                    LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
 
-            // Sync again.
-            synchronizedFolder.Sync();
-            Console.WriteLine("Second sync done.");
+                    // Sync again.
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Second sync done.");
 
-            // Check that file is present server-side.
-            // TODO
+                    // Check that file is present server-side.
+                    // TODO
 
-            // Clean.
-            Console.WriteLine("Clean all.");
-            Clean(localDirectory, synchronizedFolder);
-            cmis.Dispose();
+                    // Clean.
+                    Console.WriteLine("Clean all.");
+                    Clean(localDirectory, synchronizedFolder);
+                }
+            }
         }
 
 
@@ -323,30 +328,32 @@ namespace TestLibrary
                     password,
                     repositoryId,
                     5000);
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
 
-            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis
-            );
-            synchronizedFolder.Sync();
-            Console.WriteLine("Synced to clean state.");
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            {
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                {
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-            // Create random big file.
-            LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000); // 1 MB ... no that big to not load servers too much.
+                    // Create random big file.
+                    LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000); // 1 MB ... no that big to not load servers too much.
 
-            // Sync again.
-            synchronizedFolder.Sync();
-            Console.WriteLine("Second sync done.");
+                    // Sync again.
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Second sync done.");
 
-            // Check that file is present server-side.
-            // TODO
+                    // Check that file is present server-side.
+                    // TODO
 
-            // Clean.
-            Console.WriteLine("Clean all.");
-            Clean(localDirectory, synchronizedFolder);
-            cmis.Dispose();
+                    // Clean.
+                    Console.WriteLine("Clean all.");
+                    Clean(localDirectory, synchronizedFolder);
+                }
+            }
         }
 
 
@@ -369,27 +376,29 @@ namespace TestLibrary
                     password,
                     repositoryId,
                     5000);
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
 
-            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis
-            );
-            synchronizedFolder.Sync();
-            Console.WriteLine("Synced to clean state.");
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            {
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                {
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-            // Create directory and small files.
-            LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
+                    // Create directory and small files.
+                    LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
 
-            // Sync again.
-            synchronizedFolder.Sync();
-            Console.WriteLine("Post sync done.");
+                    // Sync again.
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Second sync done.");
 
-            // Clean.
-            Console.WriteLine("Clean all.");
-            Clean(localDirectory, synchronizedFolder);
-            cmis.Dispose();
+                    // Clean.
+                    Console.WriteLine("Clean all.");
+                    Clean(localDirectory, synchronizedFolder);
+                }
+            }
         }
 
 
@@ -413,49 +422,51 @@ namespace TestLibrary
                     password,
                     repositoryId,
                     5000);
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
 
-            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis
-            );
-            synchronizedFolder.Sync();
-            Console.WriteLine("Synced to clean state.");
-
-            // Sync a few times in a different thread.
-            bool syncing = true;
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += new DoWorkEventHandler(
-                delegate(Object o, DoWorkEventArgs args)
-                {
-                    for (int i = 0; i < 10; i++)
-                    {
-                        Console.WriteLine("Sync F" + i);
-                        synchronizedFolder.Sync();
-                    }
-                }
-            );
-            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                delegate(object o, RunWorkerCompletedEventArgs args)
-                {
-                    syncing = false;
-                }
-            );
-            bw.RunWorkerAsync();
-
-            // Keep creating/removing a file as long as sync is going on.
-            while (syncing)
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
-                //Console.WriteLine("Create/remove " + LocalFilesystemActivityGenerator.id);
-                LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
-                CleanAll(localDirectory);
-            }
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                {
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-            // Clean.
-            Console.WriteLine("Clean all.");
-            Clean(localDirectory, synchronizedFolder);
-            cmis.Dispose();
+                    // Sync a few times in a different thread.
+                    bool syncing = true;
+                    BackgroundWorker bw = new BackgroundWorker();
+                    bw.DoWork += new DoWorkEventHandler(
+                        delegate(Object o, DoWorkEventArgs args)
+                        {
+                            for (int i = 0; i < 10; i++)
+                            {
+                                Console.WriteLine("Sync F" + i);
+                                synchronizedFolder.Sync();
+                            }
+                        }
+                    );
+                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                        delegate(object o, RunWorkerCompletedEventArgs args)
+                        {
+                            syncing = false;
+                        }
+                    );
+                    bw.RunWorkerAsync();
+
+                    // Keep creating/removing a file as long as sync is going on.
+                    while (syncing)
+                    {
+                        //Console.WriteLine("Create/remove " + LocalFilesystemActivityGenerator.id);
+                        LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
+                        CleanAll(localDirectory);
+                    }
+
+                    // Clean.
+                    Console.WriteLine("Clean all.");
+                    Clean(localDirectory, synchronizedFolder);
+                }
+            }
         }
 
 
@@ -481,49 +492,51 @@ namespace TestLibrary
                     password,
                     repositoryId,
                     5000);
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener);
 
-            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis
-            );
-            synchronizedFolder.Sync();
-            Console.WriteLine("Synced to clean state.");
-            
-            // Sync a few times in a different thread.
-            bool syncing = true;
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += new DoWorkEventHandler(
-                delegate(Object o, DoWorkEventArgs args)
-                {
-                    for (int i = 0; i < 10; i++)
-                    {
-                        Console.WriteLine("Sync D" + i);
-                        synchronizedFolder.Sync();
-                    }
-                }
-            );
-            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                delegate(object o, RunWorkerCompletedEventArgs args)
-                {
-                    syncing = false;
-                }
-            );
-            bw.RunWorkerAsync();
-
-            // Keep creating/removing a file as long as sync is going on.
-            while (syncing)
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
-                //Console.WriteLine("Create/remove.");
-                LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
-                CleanAll(localDirectory);
-            }
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                {
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Synced to clean state.");
 
-            // Clean.
-            Console.WriteLine("Clean all.");
-            Clean(localDirectory, synchronizedFolder);
-            cmis.Dispose();
+                    // Sync a few times in a different thread.
+                    bool syncing = true;
+                    BackgroundWorker bw = new BackgroundWorker();
+                    bw.DoWork += new DoWorkEventHandler(
+                        delegate(Object o, DoWorkEventArgs args)
+                        {
+                            for (int i = 0; i < 10; i++)
+                            {
+                                Console.WriteLine("Sync D" + i);
+                                synchronizedFolder.Sync();
+                            }
+                        }
+                    );
+                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                        delegate(object o, RunWorkerCompletedEventArgs args)
+                        {
+                            syncing = false;
+                        }
+                    );
+                    bw.RunWorkerAsync();
+
+                    // Keep creating/removing a file as long as sync is going on.
+                    while (syncing)
+                    {
+                        //Console.WriteLine("Create/remove.");
+                        LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
+                        CleanAll(localDirectory);
+                    }
+
+                    // Clean.
+                    Console.WriteLine("Clean all.");
+                    Clean(localDirectory, synchronizedFolder);
+                }
+            }
         }
 
 

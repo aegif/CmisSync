@@ -28,7 +28,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Event when a local file has changed.
         /// </summary>
-        public EventHandler<FileSystemEventArgs> ChangeEvent { get; set; }
+        public event EventHandler<FileSystemEventArgs> ChangeEvent;
 
 
         /// <summary>
@@ -56,8 +56,6 @@ namespace CmisSync.Lib
             Created += OnChanged;
             Deleted += OnChanged;
             Renamed += OnChanged;
-
-            ChangeEvent += delegate { };
         }
 
 

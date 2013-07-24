@@ -476,6 +476,7 @@ namespace CmisSync
                 }
             }
 
+            this.fetcher.Dispose();
             this.fetcher = null;
         }
 
@@ -494,6 +495,7 @@ namespace CmisSync
             AddRepository(repoInfo.TargetDirectory);
             FolderListChanged();
 
+            this.fetcher.Dispose();
             this.fetcher = null;
         }
 

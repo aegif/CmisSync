@@ -222,7 +222,7 @@ namespace CmisSync.Lib
                     this.remote_timer.Dispose();
                     this.watcher.Dispose();
                 }
-                disposed = true;
+                this.disposed = true;
             }
         }
 

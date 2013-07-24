@@ -169,7 +169,7 @@ namespace CmisSync.Lib.Sync
                     {
                         this.database.Dispose();
                     }
-                    disposed = true;
+                    this.disposed = true;
                 }
             }
 

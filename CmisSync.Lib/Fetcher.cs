@@ -32,7 +32,7 @@ namespace CmisSync.Lib
     /// Creates a CmisSync synchronized folder.
     /// TODO: This class should probably be removed, together with the last step of the folder addition wizard.
     /// </summary>
-    public class Fetcher
+    public class Fetcher : IDisposable
     {
         /// <summary>
         /// Log.
@@ -44,6 +44,12 @@ namespace CmisSync.Lib
         /// Configuration details of the CmisSync synchronized folder.
         /// </summary>
         private CmisRepo cmisRepo;
+
+
+        /// <summary>
+        /// Track whether <c>Dispose</c> has been called.
+        /// </summary>
+        private bool disposed = false;
 
 
         /// <summary>
@@ -105,7 +111,44 @@ namespace CmisSync.Lib
             Directory.CreateDirectory(repoInfo.TargetDirectory);
 
             // Use this folder configuration.
-            cmisRepo = new CmisRepo(repoInfo, activityListener);
+            this.cmisRepo = new CmisRepo(repoInfo, activityListener);
+        }
+
+        /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~Fetcher()
+        {
+            Dispose(false);
+        }
+
+
+        /// <summary>
+        /// Implement IDisposable interface. 
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        /// <summary>
+        /// Dispose pattern implementation.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    if (this.cmisRepo != null)
+                    {
+                        this.cmisRepo.Dispose();
+                    }
+                }
+                this.disposed = true;
+            }
         }
     }
 }

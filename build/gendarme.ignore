@@ -1,3 +1,8 @@
 R: Gendarme.Rules.Design.MarkAssemblyWithAssemblyVersionRule
 A: CmisSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 
+R: Gendarme.Rules.BadPractice.AvoidVisibleConstantFieldRule
+T: CmisSync.Lib.Defines
+
+R: Gendarme.Rules.Correctness.DisposableFieldsShouldBeDisposedRule
+T: CmisSync.Lib.Sync.CmisRepo/SynchronizedFolder
