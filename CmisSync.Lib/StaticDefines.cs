@@ -18,14 +18,32 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
+// Name of the CmisSync library.
 [assembly:AssemblyTitle ("CmisSync.Lib")]
+
+// Version of the CmisSync library. It is used as the CmisSync version.
 [assembly:AssemblyVersion ("0.9.1")]
+
+// Copyright.
 [assembly:AssemblyCopyright ("Copyright (c) 2010 Hylke Bons, Aegif and others")]
+
+// Trademark.
 [assembly:AssemblyTrademark ("CmisSync is a trademark of CmisSync Ltd.")]
+
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible(false)]
+
+[assembly: CLSCompliant(true)]
 
 namespace CmisSync.Lib {
 
+    /// <summary>
+    /// CmisSync Constants.
+    /// </summary>
     public class Defines {
         public const string INSTALL_DIR = "/usr/local/share/CmisSync";
     }
