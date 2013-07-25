@@ -119,7 +119,6 @@ namespace CmisSync
 
                 try
                 {
-                    File.Create(ini_file_path).Close();
                     File.WriteAllText(ini_file_path, ini_file);
 
                     File.SetAttributes(ini_file_path,

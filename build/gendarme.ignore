@@ -1,6 +1,7 @@
 R: Gendarme.Rules.Design.MarkAssemblyWithAssemblyVersionRule
 A: CmisSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 
+#Configure setting
 R: Gendarme.Rules.BadPractice.AvoidVisibleConstantFieldRule
 T: CmisSync.Defines
 T: CmisSync.Lib.Defines
@@ -24,13 +25,15 @@ R: Gendarme.Rules.Correctness.TypesWithDisposableFieldsShouldBeDisposableRule
 T: CmisSync.UI
 T: CmisSync.StatusIcon
 
+#Configure setting
 R: Gendarme.Rules.Portability.DoNotHardcodePathsRule
 #Configure setting
 M: System.Void CmisSync.UI::.cctor()
 
+#Required to be type long for error code
 R: Gendarme.Rules.Design.EnumsShouldUseInt32Rule
 T: CmisSync.CertPolicyHandler/CertificateProblem
 
-R: Gendarme.Rules.Correctness.TypesWithDisposableFieldsShouldBeDisposableRule
 #Top level widget does not need dispose pattern (Linux)
+R: Gendarme.Rules.Correctness.TypesWithDisposableFieldsShouldBeDisposableRule
 T: CmisSync.ControllerBase
