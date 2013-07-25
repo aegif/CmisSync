@@ -380,11 +380,15 @@ namespace CmisSync
                                         System.Diagnostics.Process.Start(e.Uri.ToString());
                                     };
 
-                                TextBlock address_error_label = new TextBlock()
+                                // Rather than a TextBlock, we use a textBox so that users can copy/paste the error message and Google it.
+                                TextBox address_error_label = new TextBox()
                                 {
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
-                                    Visibility = Visibility.Hidden
+                                    Visibility = Visibility.Hidden,
+                                    IsReadOnly = true,
+                                    //Background = "Transparent", TODO How to make the TextBox's background transparent?
+                                    BorderThickness = new Thickness(0)
                                 };
 
                                 // User input UI.
