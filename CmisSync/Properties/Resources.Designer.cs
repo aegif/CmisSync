@@ -397,7 +397,7 @@ namespace CmisSync {
         
         /// <summary>
         ///   Looks up a localized string similar to Sorry, CmisSync can not find a CMIS server at this address.
-        ///Please check again.
+        ///Please ask your server administrator for the CMIS endpoint URL.
         ///If you are sure about the address, open it in a browser and send
         ///the resulting XML to cmissync@aegif.jp.
         /// </summary>
