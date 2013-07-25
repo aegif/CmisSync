@@ -112,5 +112,7 @@
     </UI>
     
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <Icon Id="CmisSync.exe_Icon" SourceFile='!(wix.root)\CmisSync\Windows\Pixmaps\cmissync-app.ico' />
+    <Property Id="ARPPRODUCTICON" Value="CmisSync.exe_Icon" />
   </Product>
 </Wix>
