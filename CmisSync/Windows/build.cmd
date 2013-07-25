@@ -10,7 +10,7 @@ set wixBinDir=%WIX%\bin
 if not exist ..\..\bin mkdir ..\..\bin
 copy Pixmaps\cmissync-app.ico ..\..\bin\
 
-%msbuild% /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" "%~dp0\CmisSync.sln"
+%msbuild% /t:Clean,Build /p:Configuration=Debug /p:Platform="Any CPU" "%~dp0\CmisSync.sln"
 
 if "%1"=="installer" (
 	if exist "%wixBinDir%" (
