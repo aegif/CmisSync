@@ -113,7 +113,7 @@ namespace CmisSync {
                 LineWrap     = true,
                              LineWrapMode = Pango.WrapMode.Word,
                              Markup = "<span font_size='small' fgcolor='#729fcf'>" +
-                                 "Copyright © 2010–" + DateTime.Now.Year + " Aegif and others.\n" +
+                                 "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
                                  "\n" +
                                  "CmisSync is Open Source software. You are free to use, modify, " +
                                  "and redistribute it under the GNU General Public License version 3 or later." +

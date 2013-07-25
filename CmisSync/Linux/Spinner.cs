@@ -60,7 +60,7 @@ namespace CmisSync {
             }
 
             Timer = new Timer () {
-                Interval = CycleDuration / NumSteps
+                Interval = (double)CycleDuration / NumSteps
             };
 
             Timer.Elapsed += delegate {

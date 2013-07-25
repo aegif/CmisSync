@@ -441,7 +441,7 @@ namespace TestLibrary
                         {
                             for (int i = 0; i < 10; i++)
                             {
-                                Console.WriteLine("Sync F" + i);
+                                Console.WriteLine("Sync F" + i.ToString());
                                 synchronizedFolder.Sync();
                             }
                         }
@@ -511,7 +511,7 @@ namespace TestLibrary
                         {
                             for (int i = 0; i < 10; i++)
                             {
-                                Console.WriteLine("Sync D" + i);
+                                Console.WriteLine("Sync D" + i.ToString());
                                 synchronizedFolder.Sync();
                             }
                         }

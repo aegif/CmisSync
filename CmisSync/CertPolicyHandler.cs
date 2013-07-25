@@ -114,7 +114,7 @@ namespace CmisSync
                     ev.Set();
 #endif
             ev.WaitOne();
-            Logger.Debug("Cert Dialog return:" + ret);
+            Logger.Debug("Cert Dialog return:" + ret.ToString());
             return ret;
         }
 

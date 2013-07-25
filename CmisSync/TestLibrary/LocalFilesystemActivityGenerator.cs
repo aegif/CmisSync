@@ -52,7 +52,8 @@ namespace TestLibrary
         public static void CreateFile(string path, int sizeInKb)
         {
             Random rng = new Random();
-            string filename = "file_" + id++ + ".bin";
+            string filename = "file_" + id.ToString() + ".bin";
+            ++ id;
             byte[] data = new byte[1024];
 
             try

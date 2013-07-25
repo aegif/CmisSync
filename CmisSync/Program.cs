@@ -50,15 +50,10 @@ namespace CmisSync
         /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
-        // Single-threaded apartment on Windows.
-#if !__MonoCS__
-        [STAThread]
-#endif
-
-
         //
         // Main method for CmisSync.
         //
+        [STAThread]
         public static void Main(string[] args)
         {
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);

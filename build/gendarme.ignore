@@ -2,7 +2,35 @@ R: Gendarme.Rules.Design.MarkAssemblyWithAssemblyVersionRule
 A: CmisSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 
 R: Gendarme.Rules.BadPractice.AvoidVisibleConstantFieldRule
+T: CmisSync.Defines
 T: CmisSync.Lib.Defines
 
+#Cross reference between CmisSync.Lib.Sync.CmisRepo and CmisSync.Lib.Sync.CmisRepo/SynchronizedFolder
 R: Gendarme.Rules.Correctness.DisposableFieldsShouldBeDisposedRule
 T: CmisSync.Lib.Sync.CmisRepo/SynchronizedFolder
+
+#Ignore dispose pattern for UI widget (Linux)
+R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
+M: System.Void CmisSync.CertPolicyHandler/<ShowCertDialog>c__AnonStorey0::<>m__7(System.Object,System.EventArgs)
+M: System.Void CmisSync.Setup::ShowSetupPage()
+M: System.Void CmisSync.Setup::ShowAdd2Page()
+M: System.Void CmisSync.Setup::ShowFinishedPage()
+M: System.Void CmisSync.SetupWindow::.ctor()
+M: System.Void CmisSync.StatusIcon::CreateMenu()
+M: System.Void CmisSync.CmisSyncMenuItem::.ctor(System.String)
+
+#Ignore dispose pattern for UI widget (Linux)
+R: Gendarme.Rules.Correctness.TypesWithDisposableFieldsShouldBeDisposableRule
+T: CmisSync.UI
+T: CmisSync.StatusIcon
+
+R: Gendarme.Rules.Portability.DoNotHardcodePathsRule
+#Configure setting
+M: System.Void CmisSync.UI::.cctor()
+
+R: Gendarme.Rules.Design.EnumsShouldUseInt32Rule
+T: CmisSync.CertPolicyHandler/CertificateProblem
+
+R: Gendarme.Rules.Correctness.TypesWithDisposableFieldsShouldBeDisposableRule
+#Top level widget does not need dispose pattern (Linux)
+T: CmisSync.ControllerBase
