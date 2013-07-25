@@ -339,13 +339,13 @@ namespace CmisSync
             return String.Empty;
         }
 
-
         /// <summary>
-        /// Check the repository name.
+        /// Check local repository path and repo name.
         /// </summary>
+        /// <param name="localpath"></param>
         /// <param name="reponame"></param>
         /// <returns>validity error, or empty string if valid</returns>
-        public string CheckRepoName(string reponame)
+        public string CheckRepoPathAndName(string localpath, string reponame)
         {
             // Check whether foldername is already in use
             bool folderAlreadyExists = (Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase)) != -1);
@@ -353,25 +353,19 @@ namespace CmisSync
             // Check whether folde rname contains invalid characters.
             bool valid = (RepositoryRegex.IsMatch(reponame) && (!folderAlreadyExists));
 
-            // Enable button to next step.
-            UpdateAddProjectButtonEvent(valid);
-
-            // Return validity error, or empty string if valid.
+            if (!valid)
+            {
+                // Disable button to next step.
+                UpdateAddProjectButtonEvent(false);
+            }
+            // Return validity error, or continue validating.
             if (folderAlreadyExists) return "FolderAlreadyExist";
             if (!RepositoryRegex.IsMatch(reponame)) return "InvalidFolderName";
-            return String.Empty;
-        }
 
+            // Validate localpath
+            folderAlreadyExists = Directory.Exists(localpath);
 
-        /// <summary>
-        /// Check local repository path.
-        /// </summary>
-        /// <param name="localpath"></param>
-        /// <returns>validity error, or empty string if valid</returns>
-        public string CheckRepoPath(string localpath)
-        {
-            bool folderAlreadyExists = Directory.Exists(localpath);
-            bool valid = !folderAlreadyExists;
+            valid = !folderAlreadyExists;
 
             // Enable button to next step.
             UpdateAddProjectButtonEvent(valid);
@@ -379,7 +373,6 @@ namespace CmisSync
             // Return validity error, or empty string if valid.
             if (folderAlreadyExists) return "LocalDirectoryExist";
             return String.Empty;
-
         }
 
 

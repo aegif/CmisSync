@@ -757,7 +757,8 @@ namespace CmisSync
                                 {
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
-                                    Visibility = Visibility.Hidden
+                                    Visibility = Visibility.Hidden,
+                                    TextWrapping = TextWrapping.Wrap
                                 };
 
                                 Button cancel_button = new Button()
@@ -824,7 +825,7 @@ namespace CmisSync
 
                                 // Repo name validity.
 
-                                string error = Controller.CheckRepoName(localfolder_box.Text);
+                                string error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
 
                                 if (!String.IsNullOrEmpty(error))
                                 {
@@ -835,7 +836,7 @@ namespace CmisSync
 
                                 localfolder_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckRepoName(localfolder_box.Text);
+                                    error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
                                     if (!String.IsNullOrEmpty(error))
                                     {
                                         localfolder_error_label.Text = CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
@@ -846,7 +847,7 @@ namespace CmisSync
 
                                 // Repo path validity.
 
-                                error = Controller.CheckRepoPath(localrepopath_box.Text);
+                                error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
                                 if (!String.IsNullOrEmpty(error))
                                 {
                                     localfolder_error_label.Text = CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
@@ -856,11 +857,12 @@ namespace CmisSync
 
                                 localrepopath_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckRepoPath(localrepopath_box.Text);
+                                    error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
                                     if (!String.IsNullOrEmpty(error))
                                     {
                                         localfolder_error_label.Text = CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
                                         localfolder_error_label.Visibility = Visibility.Visible;
+                                       
                                     }
                                     else localfolder_error_label.Visibility = Visibility.Hidden;
                                 };
