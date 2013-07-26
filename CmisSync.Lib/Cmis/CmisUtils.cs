@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -135,7 +135,7 @@ namespace CmisSync.Lib.Cmis
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url.ToString();
             cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] =password;
+            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
 
             IList<IRepository> repositories;
             try
