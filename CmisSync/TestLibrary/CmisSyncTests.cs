@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using DotCMIS.Data.Impl;
 using System.ComponentModel;
 using NUnit.Framework;
+using System.Security.Cryptography.X509Certificates;
+using System.Net;
 
 /**
  * Unit Tests for CmisSync.
@@ -56,10 +58,19 @@ namespace TestLibrary
         {
         }
 
+        class TrustAlways : ICertificatePolicy
+        {
+            public bool CheckValidationResult (ServicePoint sp, X509Certificate certificate, WebRequest request, int error)
+            {
+                // For testing, always accept any certificate
+                return true;
+            }
+        }
 
         [TestFixtureSetUp]
         public void ClassInit()
         {
+            ServicePointManager.CertificatePolicy = new TrustAlways();
             File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
