@@ -24,8 +24,6 @@ using System.Reflection;
 [assembly:AssemblyCopyright ("Copyright (c) 2010 Hylke Bons, Aegif, GRAUDATA AG and others")]
 [assembly:AssemblyTrademark ("CmisSync is a trademark of CmisSync Ltd.")]
 
-[assembly: CLSCompliant(true)]
-
 namespace CmisSync {
 
     public class Defines {

@@ -25,6 +25,8 @@ using log4net.Config;
 using CmisSync.Lib.Sync;
 using System.Net;
 
+[assembly: CLSCompliant(true)]
+
 namespace CmisSync
 {
     // The CmisSync main class.
