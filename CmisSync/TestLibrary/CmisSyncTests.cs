@@ -578,7 +578,9 @@ namespace TestLibrary
             ContentStream contentStream = new ContentStream();
             contentStream.FileName = fileName;
             contentStream.MimeType = MimeType.GetMIMEType(fileName); // Should CmisSync try to guess?
-            contentStream.Stream = File.OpenRead("../../../TestLibraryRunner/Program.cs");
+            byte[] bytes = Encoding.UTF8.GetBytes("Hello,world!");
+            contentStream.Stream = new MemoryStream(bytes);
+            contentStream.Length = bytes.Length;
 
             // Create file.
             DotCMIS.Enums.VersioningState? state = null;
