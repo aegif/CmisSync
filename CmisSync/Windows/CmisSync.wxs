@@ -1,20 +1,20 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
 
-  <Product Name='CmisSync' Id='bf90eec1-6415-4825-a03b-b76bdf5102ac' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
-    Language='1033' Codepage='1252' Version='1.0.0' Manufacturer='CmisSync'>
+  <Product Name='DataSpace Sync' Id='*' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
+    Language='1033' Codepage='1252' Version='1.0.0' Manufacturer='GRAU DATA AG'>
 
-    <Package Id='*' Keywords='Installer' Description="CmisSync Setup" Manufacturer='CmisSync'
+    <Package Id='*' Keywords='Installer' Description="DataSpace Sync Setup" Manufacturer='GRAU DATA AG'
       InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
 
-    <Media Id='1' Cabinet='CmisSync.cab' EmbedCab='yes' DiskPrompt='CmisSync CAB' />
-    <Property Id='DiskPrompt' Value="CmisSync Bundle CAB Installation" />
+    <Media Id='1' Cabinet='DataSpaceSync.cab' EmbedCab='yes' DiskPrompt='DataSpaceSyncCAB' />
+    <Property Id='DiskPrompt' Value="DataSpace Sync Bundle CAB Installation" />
 
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
-          <Directory Id='INSTALLDIR' Name='CmisSync'>
-            <Component Id='CmisSync.exe' Guid='bab5a922-b5c4-4958-ab79-5e303b767a61'>
-              <File Id='CmisSync.exe' Name='CmisSync.exe' Source='!(wix.root)\CmisSync\Windows\bin\Debug\CmisSync.exe' KeyPath='yes' DiskId='1' />
+          <Directory Id='INSTALLDIR' Name='DataSpace Sync'>
+            <Component Id='DataSpaceSync.exe' Guid='bab5a922-b5c4-4958-ab79-5e303b767a61'>
+              <File Id='DataSpaceSync.exe' Name='DataSpaceSync.exe' Source='!(wix.root)\CmisSync\Windows\bin\Debug\DataSpaceSync.exe' KeyPath='yes' DiskId='1' />
             </Component>
             <Component Id='Libraries' Guid='f982a0bb-824d-4835-921d-e51b47b8598b'>
               <File Id='CmisSync.Lib.dll' Name='CmisSync.Lib.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\CmisSync.Lib.dll' DiskId='1' />
@@ -23,7 +23,7 @@
               <File Id='Newtonsoft.Json.dll' Name='Newtonsoft.Json.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\Newtonsoft.Json.dll' DiskId='1' />
               <!--<File Id='SQLite.Interop.dll' Name='SQLite.Interop.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\SQLite.Interop.dll' DiskId='1' />-->
               <File Id='System.Data.SQLite.dll' Name='System.Data.SQLite.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\System.Data.SQLite.dll' DiskId='1' />
-              <File Id='cmissync_app.ico' Name='cmissync.ico' Source='!(wix.root)\CmisSync\Windows\Pixmaps\cmissync-app.ico' DiskId='1' />
+              <File Id='dataspacesync_app.ico' Name='app.ico' Source='!(wix.root)\CmisSync\Windows\Pixmaps\app.ico' DiskId='1' />
             </Component>
             <Directory Id='DIR_x86' Name='x86'>
               <Component Id='COMP_x86' Guid='5623a717-035d-45fd-904c-4ed38a3955f1'>
@@ -40,38 +40,38 @@
             <Directory Id='localeDirectoryDE' Name='de'>
               <Component Id='localeComponentDE' Guid='2ee0c16c-f4b8-4a8c-8d07-b3a73fc27f59'>
                 <CreateFolder />
-                <File Id='localeFileDE' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\de\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileDE' Name='DataSpaceSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\de\DataSpaceSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <Directory Id='localeDirectoryES' Name='es-ES'>
               <Component Id='localeComponentES' Guid='7f2303c0-a119-49d1-be73-17acb9637c76'>
                 <CreateFolder />
-                <File Id='localeFileES' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\es-ES\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileES' Name='DataSpaceSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\es-ES\DataSpaceSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <Directory Id='localeDirectoryFR' Name='fr'>
               <Component Id='localeComponentFR' Guid='01612d5d-6c9d-46e9-96c5-7105bbbea7db'>
                 <CreateFolder />
-                <File Id='localeFileFR' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\fr\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileFR' Name='DataSpaceSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\fr\DataSpaceSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <Directory Id='localeDirectoryJA' Name='ja'>
               <Component Id='localeComponentJA' Guid='8d77c457-54b0-41d6-9f1c-c91338b25505'>
                 <CreateFolder />
-                <File Id='localeFileJA' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\ja\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileJA' Name='DataSpaceSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\ja\DataSpaceSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <Directory Id='localeDirectoryUK' Name='uk'>
               <Component Id='localeComponentUK' Guid='6de4a765-0904-421b-b71c-8c7bef136a92'>
                 <CreateFolder />
-                <File Id='localeFileUK' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\uk\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileUK' Name='DataSpaceSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\uk\DataSpaceSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             <!-- TODO Somehow the following is not generated by Visual C#
             <Directory Id='localeDirectoryTLH' Name='tlh-KX'>
               <Component Id='localeComponentTLH' Guid='340e5758-5420-4fe4-a291-5d920a63ca70'>
                 <CreateFolder />
-                <File Id='localeFileTLH' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\tlh-KX\CmisSync.resources.dll' DiskId='1' />
+                <File Id='localeFileTLH' Name='CmisSync.resources.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\tlh-KX\DataSpaceSync.resources.dll' DiskId='1' />
               </Component>
             </Directory>
             -->
@@ -82,17 +82,17 @@
       <Directory Id="ProgramMenuFolder">
           <Component Id="ApplicationShortcut" Guid="15cef5f2-2f02-4b60-868a-78cfc35823db">
             <Shortcut Id="ApplicationStartMenuShortcut"
-                      Name="CmisSync"
-                      Target="[INSTALLDIR]CmisSync.exe"
+                      Name="DataSpace Sync"
+                      Target="[INSTALLDIR]DataSpaceSync.exe"
                       WorkingDirectory="INSTALLDIR"/>
             <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
-            <RegistryValue Root="HKCU" Key="Software\Microsoft\CmisSync" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            <RegistryValue Root="HKCU" Key="Software\Microsoft\DataSpaceSync" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
           </Component>
       </Directory>
     </Directory>
 
-    <Feature Id='CmisSyncFeature' Title='CmisSync' Description='CmisSync' Level='1' AllowAdvertise='no'>
-      <ComponentRef Id="CmisSync.exe" />
+    <Feature Id='DataSpaceSyncFeature' Title='DataSpace Sync' Description='DataSpace Sync' Level='1' AllowAdvertise='no'>
+      <ComponentRef Id="DataSpaceSync.exe" />
       <ComponentRef Id="Libraries" />
       <ComponentRef Id="COMP_x86" />
       <ComponentRef Id="COMP_x64" />
@@ -106,13 +106,62 @@
     </Feature>
 
     <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
-    <WixVariable Id="WixUIBannerBmp" Value="Pixmaps/install-banner.bmp" />
-    <UI>
-      <UIRef Id="WixUI_InstallDir" />
+    <WixVariable Id="WixUIBannerBmp" Value="Pixmaps\install-banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="Pixmaps\InstallWelcomeBanner.bmp" />
+    <UI Id="WixUI_InstallDir">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="InstallDir" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="DiskCostDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+            
+      <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="3">1</Publish>
+      <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">NOT Installed</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">Installed AND PATCH</Publish>
+
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+            
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1">NOT Installed</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed AND NOT PATCH</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">Installed AND PATCH</Publish>
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+      <Property Id="ARPNOMODIFY" Value="1" />
     </UI>
+    <UIRef Id="WixUI_Common" />
     
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-    <Icon Id="CmisSync.exe_Icon" SourceFile='!(wix.root)\CmisSync\Windows\Pixmaps\cmissync-app.ico' />
-    <Property Id="ARPPRODUCTICON" Value="CmisSync.exe_Icon" />
+    <Icon Id="DataSpaceSync.exe_Icon" SourceFile='!(wix.root)\CmisSync\Windows\Pixmaps\app.ico' />
+    <Property Id="ARPPRODUCTICON" Value="DataSpaceSync.exe_Icon" />
+    <MajorUpgrade
+      Schedule="afterInstallInitialize"
+      DowngradeErrorMessage="A later version of DataSpace Sync is already installed. Setup will now exit." />
   </Product>
 </Wix>

@@ -56,7 +56,7 @@ namespace CmisSync
 
             // Setup the status icon.
             this.trayicon.Icon = animationFrames[0];
-            this.trayicon.Text = "CmisSync";
+            this.trayicon.Text = "DataSpace Sync";
             this.trayicon.ContextMenuStrip = this.traymenu;
             this.trayicon.Visible = true;
         }
@@ -106,7 +106,7 @@ namespace CmisSync
                     BeginInvoke((Action)delegate
                     {
                         this.stateItem.Text = state_text;
-                        this.trayicon.Text = "CmisSync\n" + state_text;
+                        this.trayicon.Text = "DataSpace Sync\n" + state_text;
                     });
                 }
             };
@@ -182,7 +182,7 @@ namespace CmisSync
                 Enabled = false
             };
             this.traymenu.Items.Add(stateItem);
-            this.trayicon.Text = "CmisSync\n" + Controller.StateText;
+            this.trayicon.Text = "DataSpace Sync\n" + Controller.StateText;
 
             // Create a menu item per synchronized folder.
             if (Controller.Folders.Length > 0)

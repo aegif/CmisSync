@@ -45,7 +45,7 @@ namespace CmisSync
         /// <summary>
         /// Mutex checking whether CmisSync is already running or not.
         /// </summary>
-        private static Mutex program_mutex = new Mutex(false, "CmisSync");
+        private static Mutex program_mutex = new Mutex(false, "DataSpaceSync");
 
         /// <summary>
         /// Logging.
@@ -53,7 +53,7 @@ namespace CmisSync
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
         //
-        // Main method for CmisSync.
+        // Main method for DataSpace Sync.
         //
         [STAThread]
         public static void Main(string[] args)
