@@ -1,5 +1,5 @@
 R: Gendarme.Rules.Design.MarkAssemblyWithAssemblyVersionRule
-A: CmisSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+A: DataSpaceSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 
 #Configure setting
 R: Gendarme.Rules.BadPractice.AvoidVisibleConstantFieldRule
