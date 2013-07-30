@@ -62,7 +62,7 @@ namespace CmisSync {
         private string backText =
             CmisSync.Properties_Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture);
 
-        delegate CmisServer GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
 
         delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
             string address, string user, string password);
@@ -267,18 +267,24 @@ namespace CmisSync {
                         Application.RunIteration();
                     }
                 }
-                CmisServer cmisServer = dlgt.EndInvoke(ar);
-
-                Controller.repositories = cmisServer.Repositories;
-                address_entry.Text = cmisServer.Url.ToString();
-
+                Tuple<CmisServer, Exception> result = dlgt.EndInvoke(ar);
+                CmisServer cmisServer = result.Item1;
+                if(cmisServer != null)
+                {
+                    Controller.repositories = cmisServer.Repositories;
+                    address_entry.Text = cmisServer.Url.ToString();
+                }
+                else
+                {
+                    Controller.repositories = null;
+                }
                 // Hide wait cursor
                 this.GdkWindow.Cursor = default_cursor;
 
                 if (Controller.repositories == null)
                 {
                     // Show warning
-                    address_error_label.Markup = "<span foreground=\"red\">" + CmisSync.Properties_Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture) + "</span>";
+                    address_error_label.Markup = "<span foreground=\"red\">" + result.Item2.Message +": "+ CmisSync.Properties_Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture) + "</span>";
                     address_error_label.Show();
                 }
                 else
