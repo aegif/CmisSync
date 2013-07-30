@@ -126,9 +126,18 @@ namespace CmisSync
         /// <summary>
         /// Load repositories information from a CMIS endpoint.
         /// </summary>
-        static public CmisServer GetRepositoriesFuzzy(string url, string user, string password)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(string url, string user, string password)
         {
-            return CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
+            Uri uri;
+            try
+            {
+                uri = new Uri(url);
+                return CmisUtils.GetRepositoriesFuzzy(uri, user, password);
+            }
+            catch(Exception e) {
+                return new Tuple<CmisServer,Exception>(null,e);
+            }
+            
         }
 
 
