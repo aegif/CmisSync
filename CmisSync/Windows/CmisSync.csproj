@@ -6,7 +6,7 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <ProjectGuid>{728483AA-E34B-4441-BF2C-C8BC2901E4E0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>CmisSync</AssemblyName>
+    <AssemblyName>DataSpaceSync</AssemblyName>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace>CmisSync</RootNamespace>
     <FileUpgradeFlags>
@@ -15,7 +15,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <ApplicationIcon>Pixmaps\cmissync-app.ico</ApplicationIcon>
+    <ApplicationIcon>Pixmaps\app.ico</ApplicationIcon>
     <ReleaseVersion />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -56,7 +56,7 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\Debug\CmisSync.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\DataSpaceSync.xml</DocumentationFile>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -129,7 +129,7 @@
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
@@ -243,7 +243,7 @@
     <EmbeddedResource Include="Pixmaps\process-syncing-iii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiiii.png" />
-    <EmbeddedResource Include="Pixmaps\cmissync-app.ico" />
+    <EmbeddedResource Include="Pixmaps\app.ico" />
     <EmbeddedResource Include="Pixmaps\cmissync-folder.png" />
   </ItemGroup>
   <ItemGroup>

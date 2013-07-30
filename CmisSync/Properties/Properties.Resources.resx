@@ -124,7 +124,7 @@
     <value>Add a remote folder…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Adding synchronized folders to CmisSync</value>
+    <value>Adding synchronized folders to DataSpace Sync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Adding Folder</value>
@@ -136,7 +136,7 @@
     <value>Cancel</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync creates a special folder on your computer where the documents are synchronized.</value>
+    <value>DataSpace Sync creates a special folder on your computer where the documents are synchronized.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Continue</value>
@@ -169,13 +169,13 @@
     <value>Finish</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>A folder already in the CmisSync root folder</value>
+    <value>A folder already in the DataSpace Sync root folder</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+    <value>DataSpace Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
 
 It is like Dropbox for Enterprise Content Management!</value>
   </data>
@@ -210,19 +210,19 @@ It is like Dropbox for Enterprise Content Management!</value>
     <value>Skip Tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
+    <value>Sorry, DataSpace Sync can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
 If you are sure about the address, open it in a browser and send
 the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Add CmisSync to startup items</value>
+    <value>Add DataSpace Sync to startup items</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>The status icon is here to help</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>CmisSync's status icon shows the syncing progress, and provides easy access to your folders.</value>
+    <value>DataSpace Sync's status icon shows the syncing progress, and provides easy access to your folders.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronization</value>
@@ -234,7 +234,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>User</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Welcome to CmisSync!</value>
+    <value>Welcome to DataSpace Sync!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>What's happening next?</value>
@@ -252,7 +252,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>You can easily add a new CMIS folder at any time.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>You can find them in your CmisSync folder.</value>
+    <value>You can find them in your DataSpace Sync folder.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Change the local path of this repository:</value>
@@ -273,7 +273,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Open local folder</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>About CmisSync</value>
+    <value>About DataSpace Sync</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>View Log</value>
