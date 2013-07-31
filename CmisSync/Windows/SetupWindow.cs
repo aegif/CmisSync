@@ -82,14 +82,14 @@ namespace CmisSync {
             Height     = 440;
             ResizeMode = ResizeMode.NoResize;
             Background = new SolidColorBrush (Colors.WhiteSmoke);
-            Icon       = UIHelpers.GetImageSource("app", "ico");
+            Icon       = UIHelpers.GetImageSource("cmissync-app", "ico");
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Content    = ContentCanvas;
             Closing += Close;
 			
             // Taskbar
 			TaskbarItemInfo = new TaskbarItemInfo () {
-				Description = "DataSpace Sync"
+				Description = "CmisSync"
 			};
 
             // Separation and background for the line of buttons.

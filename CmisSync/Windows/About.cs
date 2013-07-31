@@ -48,11 +48,11 @@ namespace CmisSync {
         /// </summary>
         public About ()
         {
-            Title      = "About DataSpace Sync";
+            Title      = "About CmisSync";
             ResizeMode = ResizeMode.NoResize;
             Height     = 288;
             Width      = 640;
-            Icon = UIHelpers.GetImageSource("app", "ico");
+            Icon = UIHelpers.GetImageSource("cmissync-app", "ico");
             
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Closing += Close;
@@ -111,21 +111,21 @@ namespace CmisSync {
             Label version = new Label () {
                 Content    = "version " + Controller.RunningVersion,
                 FontSize   = 11,
-                Foreground = new SolidColorBrush (Color.FromRgb (15, 133, 203))
+                Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
 
             this.updates = new Label () {
-                Content    = "", //"Checking for updates...",
+                Content    = "Please check for updates at CmisSync.com", //"Checking for updates...",
                 FontSize   = 11,
-                Foreground = new SolidColorBrush (Color.FromRgb (15, 133, 203))
+                Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
             
             TextBlock credits = new TextBlock () {
                 FontSize     = 11,
-                Foreground = new SolidColorBrush (Color.FromRgb (15, 133, 203)),
-                Text         = "Copyright © 2013–" + DateTime.Now.Year.ToString() + " GRAU DATA AG, Aegif and others.\n" +
+                Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227)),
+                Text         = "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
                     "\n" +
-                    "DataSpace Sync is Open Source software. You are free to use, modify, " +
+                    "CmisSync is Open Source software. You are free to use, modify, " +
                     "and redistribute it under the GNU General Public License version 3 or later.",
                 TextWrapping = TextWrapping.Wrap,
                 Width        = 318
