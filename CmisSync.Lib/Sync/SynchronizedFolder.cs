@@ -311,7 +311,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download a single file from the CMIS server.
             /// </summary>
-            private void DownloadFile(IDocument remoteDocument, string localFolder)
+            private bool DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 activityListener.ActivityStarted();
 
@@ -323,7 +323,7 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info("Skipping download of file with content length zero: " + fileName);
                     activityListener.ActivityStopped();
-                    return;
+                    return true;
                 }
 
                 // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
@@ -331,7 +331,7 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info("Skipping download of file with illegal filename: " + fileName);
                     activityListener.ActivityStopped();
-                    return;
+                    return true;
                 }
 
                 try
@@ -364,7 +364,7 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Warn("Skipping download of file with null content stream: " + fileName);
                             activityListener.ActivityStopped();
-                            return;
+                            return true;
                         }
 
                         DownloadStream(contentStream, tmpfilepath);
@@ -397,7 +397,7 @@ namespace CmisSync.Lib.Sync
                             // Remove temporary local document to avoid it being considered a new document.
                             File.Delete(tmpfilepath);
                             activityListener.ActivityStopped();
-                            return;
+                            return false;
                         }
 
                         // Remove the ".sync" suffix.
@@ -408,13 +408,16 @@ namespace CmisSync.Lib.Sync
 
                         Logger.Info("Added to database: " + fileName);
                     }
+
+                    activityListener.ActivityStopped();
+                    return success;
                 }
                 catch (IOException e)
                 {
                     Logger.Warn("Exception while file operation: " + Utils.ToLogString(e));
+                    activityListener.ActivityStopped();
+                    return false;
                 }
-
-                activityListener.ActivityStopped();
             }
 
 
@@ -439,9 +442,10 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Upload a single file to the CMIS server.
             /// </summary>
-            private void UploadFile(string filePath, IFolder remoteFolder)
+            private bool UploadFile(string filePath, IFolder remoteFolder)
             {
                 activityListener.ActivityStarted();
+
                 IDocument remoteDocument = null;
                 Boolean success = false;
                 try
@@ -472,9 +476,6 @@ namespace CmisSync.Lib.Sync
                         catch (Exception ex)
                         {
                             Logger.Fatal("Upload failed: " + filePath + " " + ex);
-                            if (contentStream != null) {
-                                contentStream.Stream.Close();
-                            }
                         }
                     }
                 }
@@ -494,7 +495,7 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        throw;
+                        //throw;
                     }
                 }
                     
@@ -511,6 +512,7 @@ namespace CmisSync.Lib.Sync
                 }
 
                 activityListener.ActivityStopped();
+                return success;
             }
 
 
@@ -570,7 +572,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Upload new version of file.
             /// </summary>
-            private void UpdateFile(string filePath, IDocument remoteFile)
+            private bool UpdateFile(string filePath, IDocument remoteFile)
             {
                 try
                 {
@@ -581,7 +583,7 @@ namespace CmisSync.Lib.Sync
                         if ((localfile == null) && (localfile.Length == 0))
                         {
                             Logger.Info("Skipping update of file with null or empty content stream: " + filePath);
-                            return;
+                            return true;
                         }
 
                         // Prepare content stream
@@ -598,13 +600,16 @@ namespace CmisSync.Lib.Sync
                         // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
                         // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
                         remoteFile.SetContentStream(remoteStream, true, true);
+
                         Logger.Debug("after SetContentStream");
                         Logger.Info("## Updated " + filePath);
+                        return true;
                     }
                 }
                 catch (Exception e)
                 {
                     Logger.Warn(String.Format("Exception while update file {0}: {1}", filePath, e));
+                    return false;
                 }
             }
 
