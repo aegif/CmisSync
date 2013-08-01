@@ -164,7 +164,14 @@ namespace TestLibrary
                 for (int i = 0; i < NormalNumber; ++i)
                 {
                     Assert.AreEqual(NormalNumber - i, watcher.GetChangeList().Count);
-                    watcher.RemoveChange(names[i]);
+                    if (i % 2 == 0)
+                    {
+                        watcher.RemoveChange(names[i]);
+                    }
+                    else
+                    {
+                        watcher.RemoveChange(names[i],Watcher.ChangeTypes.Created);
+                    }
                 }
                 names.Clear();
 

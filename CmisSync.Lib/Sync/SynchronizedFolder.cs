@@ -198,6 +198,11 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
+            /// Track whether a full sync is done
+            /// </summary>
+            private bool syncFull = false;
+
+            /// <summary>
             /// Synchronize between CMIS folder and local folder.
             /// </summary>
             public void Sync()
@@ -214,6 +219,7 @@ namespace CmisSync.Lib.Sync
                 }
 
                 IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                string localFolder = repoinfo.TargetDirectory;
 
                 //            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
                 //            {
@@ -222,9 +228,23 @@ namespace CmisSync.Lib.Sync
                 //            else
                 //            {
                 // No ChangeLog capability, so we have to crawl remote and local folders.
-                // CrawlSync(remoteFolder, localRootFolder);
-                CrawlSync(remoteFolder, repoinfo.TargetDirectory);
-                //            }
+                // CrawlSync(remoteFolder, localFolder);
+
+                if (!repo.Watcher.EnableRaisingEvents)
+                {
+                    repo.Watcher.EnableRaisingEvents = true;
+                    syncFull = false;
+                }
+
+                if (!syncFull)
+                {
+                    syncFull = CrawlSync(remoteFolder, localFolder);
+                }
+
+                if (syncFull)
+                {
+                    WatcherSync(remoteFolderPath, localFolder);
+                }
             }
 
 

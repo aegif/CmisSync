@@ -85,7 +85,7 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// <returns><c>ChangeTypes</c> for the file/folder <param>name</param></returns>
+        /// <returns><c>ChangeTypes</c> for <param name="name">the file/folder</param></returns>
         /// </summary>
         public ChangeTypes GetChangeType(string name)
         {
@@ -105,7 +105,7 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// remove the file/folder from changes
+        /// remove <param name="name">the file/folder</param> from changes
         /// </summary>
         public void RemoveChange(string name)
         {
@@ -114,6 +114,26 @@ namespace CmisSync.Lib
                 if (changes.Remove(name))
                 {
                     changeList.Remove(name);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// remove <param name="name">the file/folder</param> from changes for <param name="change"/>
+        /// </summary>
+        public void RemoveChange(string name, ChangeTypes change)
+        {
+            lock (changeLock)
+            {
+                ChangeTypes type;
+                if (changes.TryGetValue(name, out type))
+                {
+                    if (type == change)
+                    {
+                        changes.Remove(name);
+                        changeList.Remove(name);
+                    }
                 }
             }
         }
