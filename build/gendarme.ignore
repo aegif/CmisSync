@@ -1,7 +1,4 @@
 R: Gendarme.Rules.Design.MarkAssemblyWithAssemblyVersionRule
-A: DataSpaceSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-
-R: Gendarme.Rules.Design.MarkAssemblyWithAssemblyVersionRule
 A: CmisSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 
 #Configure setting

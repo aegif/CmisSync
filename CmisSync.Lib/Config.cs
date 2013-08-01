@@ -69,7 +69,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(HomePath, "DataSpace Sync");
+                return Path.Combine(HomePath, "CmisSync");
             }
         }
 
