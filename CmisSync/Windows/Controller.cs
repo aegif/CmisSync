@@ -105,35 +105,33 @@ namespace CmisSync
 
             if (!File.Exists(icon_file_path))
             {
-                string ini_file_path = Path.Combine(FoldersPath, "desktop.ini");
+                icon_file_path = Assembly.GetExecutingAssembly().Location;
+            }
+            string ini_file_path = Path.Combine(FoldersPath, "desktop.ini");
 
-                string ini_file = "[.ShellClassInfo]\r\n" +
-                    "IconFile=" + Assembly.GetExecutingAssembly().Location + "\r\n" +
+            string ini_file = "[.ShellClassInfo]\r\n" +
+                    "IconFile=" + icon_file_path + "\r\n" +
                     "IconIndex=0\r\n" +
                     "InfoTip=DataSpace Sync\r\n" +
-                    "IconResource=" + Assembly.GetExecutingAssembly().Location + ",0\r\n" +
+                    "IconResource=" + icon_file_path + ",0\r\n" +
                     "[ViewState]\r\n" +
                     "Mode=\r\n" +
                     "Vid=\r\n" +
                     "FolderType=Generic\r\n";
 
-                try
-                {
-                    File.WriteAllText(ini_file_path, ini_file);
+            try
+            {
+                File.WriteAllText(ini_file_path, ini_file);
 
-                    File.SetAttributes(ini_file_path,
-                        File.GetAttributes(ini_file_path) | FileAttributes.Hidden | FileAttributes.System);
+                File.SetAttributes(ini_file_path,
+                    File.GetAttributes(ini_file_path) | FileAttributes.Hidden | FileAttributes.System);
 
-                }
-                catch (IOException e)
-                {
-                    Logger.Info("Config | Failed setting icon for '" + FoldersPath + "': " + e.Message);
-                }
-
-                return true;
             }
-
-            return false;
+            catch (IOException e)
+            {
+                Logger.Info("Config | Failed setting icon for '" + FoldersPath + "': " + e.Message);
+            }
+            return true;
         }
 
 
