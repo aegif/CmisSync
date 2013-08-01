@@ -274,9 +274,11 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download all content from a CMIS folder.
             /// </summary>
-            private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
+            private bool RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
             {
                 activityListener.ActivityStarted();
+
+                bool success = true;
                 // List all children.
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
@@ -294,17 +296,20 @@ namespace CmisSync.Lib.Sync
                             database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                             // Recurse into folder.
-                            RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                            success = success && RecursiveFolderCopy(remoteSubFolder, localSubFolder);
                         }
                     }
                     else
                     {
                         if (Utils.WorthSyncing(cmisObject.Name))
                             // It is a file, just download it.
-                            DownloadFile((IDocument)cmisObject, localFolder);
+                            success = success && DownloadFile((IDocument)cmisObject, localFolder);
                     }
                 }
+
                 activityListener.ActivityStopped();
+
+                return success;
             }
 
 
@@ -520,7 +525,7 @@ namespace CmisSync.Lib.Sync
             /// Upload folder recursively.
             /// After execution, the hierarchy on server will be: .../remoteBaseFolder/localFolder/...
             /// </summary>
-            private void UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
+            private bool UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
             {
                 // Create remote folder.
                 Dictionary<string, object> properties = new Dictionary<string, object>();
@@ -532,13 +537,16 @@ namespace CmisSync.Lib.Sync
                 // TODO Add metadata
                 database.AddFolder(localFolder, folder.LastModificationDate);
 
+                bool success = true;
                 try
                 {
                     // Upload each file in this folder.
                     foreach (string file in Directory.GetFiles(localFolder))
                     {
                         if (Utils.WorthSyncing(file))
-                            UploadFile(file, folder);
+                        {
+                            success = success && UploadFile(file, folder);
+                        }
                     }
 
                     // Recurse for each subfolder in this folder.
@@ -547,7 +555,9 @@ namespace CmisSync.Lib.Sync
                         string path = subfolder.Substring(repoinfo.TargetDirectory.Length);
                         path = path.Replace("\\\\","/");
                         if (Utils.WorthSyncing(subfolder) && !repoinfo.isPathIgnored(path))
-                            UploadFolderRecursively(folder, subfolder);
+                        {
+                            success = success && UploadFolderRecursively(folder, subfolder);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -562,10 +572,11 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        throw;
+                        return false;
                     }
                 }
 
+                return success;
             }
 
 
@@ -616,7 +627,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Upload new version of file content.
             /// </summary>
-            private void UpdateFile(string filePath, IFolder remoteFolder)
+            private bool UpdateFile(string filePath, IFolder remoteFolder)
             {
                 Logger.Info("# Updating " + filePath);
 
@@ -639,36 +650,40 @@ namespace CmisSync.Lib.Sync
                     }
                 }
 
-                // If not found, it means the document has been deleted, will be processed at the next sync cycle.
+                // If not found, it means the document has been deleted.
                 if (!found)
                 {
                     Logger.Info(filePath + " not found on server, must be uploaded instead of updated");
-                    return;
+                    return UploadFile(filePath, remoteFolder);
                 }
 
                 // Update the document itself.
-                UpdateFile(filePath, document);
+                bool success = UpdateFile(filePath, document);
 
-                // Update timestamp in database.
-                database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
+                if (success)
+                {
+                    // Update timestamp in database.
+                    database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
 
-                // Update checksum
-                database.RecalculateChecksum(filePath);
+                    // Update checksum
+                    database.RecalculateChecksum(filePath);
 
-                // TODO Update metadata?
+                    // TODO Update metadata?
+                }
 
                 // Tell the tray icon to stop spinning.
                 activityListener.ActivityStopped();
 
-                this.syncing = false;
                 Logger.Info("# Updated " + filePath);
+
+                return success;
             }
 
 
             /// <summary>
             /// Remove folder from local filesystem and database.
             /// </summary>
-            private void RemoveFolderLocally(string folderPath)
+            private bool RemoveFolderLocally(string folderPath)
             {
                 // Folder has been deleted on server, delete it locally too.
                 try
@@ -679,6 +694,7 @@ namespace CmisSync.Lib.Sync
                 catch (IOException e)
                 {
                     Logger.Warn(String.Format("Exception while delete tree {0}: {1}", folderPath, Utils.ToLogString(e)));
+                    return false;
                 }
 
                 // Delete folder from database.
@@ -686,6 +702,8 @@ namespace CmisSync.Lib.Sync
                 {
                     database.RemoveFolder(folderPath);
                 }
+
+                return true;
             }
 
             /// <summary>
