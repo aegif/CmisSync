@@ -59,6 +59,7 @@ namespace CmisSync
             this.trayicon.Text = "DataSpace Sync";
             this.trayicon.ContextMenuStrip = this.traymenu;
             this.trayicon.Visible = true;
+            this.trayicon.MouseClick += NotifyIcon1_MouseClick;
         }
 
 
@@ -307,6 +308,16 @@ namespace CmisSync
                 Controller.LocalFolderClicked(reponame);
             };
         }
+
+        /// <summary>
+        /// MouseEventListener function for opening the local folder.
+        /// </summary>
+        private void NotifyIcon1_MouseClick(Object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Left)
+                Controller.LocalFolderClicked("");
+        }
+
 
 
         /// <summary>
