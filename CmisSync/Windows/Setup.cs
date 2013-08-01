@@ -387,8 +387,10 @@ namespace CmisSync
                                     Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
                                     Visibility = Visibility.Hidden,
                                     IsReadOnly = true,
-                                    //Background = "Transparent", TODO How to make the TextBox's background transparent?
-                                    BorderThickness = new Thickness(0)
+                                    Background = Brushes.Transparent,
+                                    BorderThickness = new Thickness(0),
+                                    TextWrapping = TextWrapping.Wrap,
+                                    MaxWidth = 420
                                 };
 
                                 // User input UI.
@@ -587,7 +589,27 @@ namespace CmisSync
                                     if (Controller.repositories == null)
                                     {
                                         // Could not retrieve repositories list from server, show warning.
-                                        address_error_label.Text = result.Item2.Message +": "+ CmisSync.Properties_Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture);
+                                        string warning = "";
+                                        string message = result.Item2.Message;
+                                        switch (message)
+                                        {
+                                            case "Forbidden":
+                                                warning = CmisSync.Properties_Resources.ResourceManager.GetString("LoginFailedForbidden", CultureInfo.CurrentCulture);
+                                                break;
+                                            case "ConnectFailure":
+                                                warning = CmisSync.Properties_Resources.ResourceManager.GetString("ConnectFailure", CultureInfo.CurrentCulture);
+                                                break;
+                                            case "SendFailure":
+                                                if (cmisServer.Url.Scheme.StartsWith("https"))
+                                                    warning = CmisSync.Properties_Resources.ResourceManager.GetString("SendFailureHttps", CultureInfo.CurrentCulture);
+                                                else
+                                                    goto default;
+                                                break;
+                                            default:
+                                                warning = message + Environment.NewLine + CmisSync.Properties_Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture);
+                                                break;
+                                        }
+                                        address_error_label.Text = warning;
                                         address_error_label.Visibility = Visibility.Visible;
                                     }
                                     else
