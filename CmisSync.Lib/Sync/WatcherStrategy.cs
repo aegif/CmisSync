@@ -56,11 +56,18 @@ namespace CmisSync.Lib.Sync
                 string name = pathname.Substring(localFolder.Length);
                 string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
 
-                IFolder remoteBase;
+                IFolder remoteBase = null;
                 if (File.Exists(pathname) || Directory.Exists(pathname))
                 {
                     string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/');
-                    remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
+                    try
+                    {
+                        remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(String.Format("Exception when query remote {0}: {1}", remoteBaseName, Utils.ToLogString(ex)));
+                    }
                     if (null == remoteBase)
                     {
                         Logger.Warn(String.Format("The remote base folder {0} for local {1} does not exist, ignore for the update action", remoteBaseName, pathname));
@@ -157,20 +164,34 @@ namespace CmisSync.Lib.Sync
                 if (database.ContainsFile(pathname))
                 {
                     Logger.Info("Removing locally deleted file on server: " + pathname);
-                    IDocument remote = (IDocument)session.GetObjectByPath(remoteName);
-                    if (remote != null)
+                    try
                     {
-                        remote.DeleteAllVersions();
+                        IDocument remote = (IDocument)session.GetObjectByPath(remoteName);
+                        if (remote != null)
+                        {
+                            remote.DeleteAllVersions();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(String.Format("Exception when operate remote {0}: {1}", remoteName, Utils.ToLogString(ex)));
                     }
                     database.RemoveFile(pathname);
                 }
                 else if (database.ContainsFolder(pathname))
                 {
                     Logger.Info("Removing locally deleted folder on server: " + pathname);
-                    IFolder remote = (IFolder)session.GetObjectByPath(remoteName);
-                    if (remote != null)
+                    try
                     {
-                        remote.DeleteTree(true, null, true);
+                        IFolder remote = (IFolder)session.GetObjectByPath(remoteName);
+                        if (remote != null)
+                        {
+                            remote.DeleteTree(true, null, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(String.Format("Exception when operate remote {0}: {1}", remoteName, Utils.ToLogString(ex)));
                     }
                     database.RemoveFolder(pathname);
                 }

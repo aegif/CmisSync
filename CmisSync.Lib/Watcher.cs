@@ -20,6 +20,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 
+using log4net;
+
 
 namespace CmisSync.Lib
 {
@@ -28,6 +30,8 @@ namespace CmisSync.Lib
     /// </summary>
     public class Watcher : FileSystemWatcher
     {
+        // Log.
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Watcher));
 
         /// <summary>
         /// thread lock for <c>changeList</c> and <c>changes</c>
@@ -174,12 +178,6 @@ namespace CmisSync.Lib
         }
 
 
-        public void IgnoreChangeType(string name, ChangeTypes type)
-        {
-            //TODO
-        }
-
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -273,8 +271,8 @@ namespace CmisSync.Lib
         
         private void OnError(object source, ErrorEventArgs e)
         {
-            Debug.Assert(false);
-            //TODO
+            Logger.Warn("Error occurred for FileSystemWatcher");
+            EnableRaisingEvents = false;
         }
 
         
