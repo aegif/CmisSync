@@ -64,7 +64,7 @@ namespace CmisSync
             string shortcut_target = Forms.Application.ExecutablePath;
 
             Shortcut shortcut = new Shortcut();
-            shortcut.Create(shortcut_path, shortcut_target);
+            shortcut.Create(shortcut_target, shortcut_path);
         }
 
 
@@ -123,8 +123,8 @@ namespace CmisSync
             {
                 File.WriteAllText(ini_file_path, ini_file);
 
-                File.SetAttributes(ini_file_path,
-                    File.GetAttributes(ini_file_path) | FileAttributes.Hidden | FileAttributes.System);
+                    File.SetAttributes(ini_file_path,
+                        File.GetAttributes(ini_file_path) | FileAttributes.Hidden | FileAttributes.System);
 
             }
             catch (IOException e)
