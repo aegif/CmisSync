@@ -53,7 +53,7 @@ namespace CmisSync
         /// </summary>
         public SetupController Controller = new SetupController();
 
-        delegate CmisServer GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
 
         delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
             string address, string user, string password);
@@ -387,8 +387,10 @@ namespace CmisSync
                                     Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
                                     Visibility = Visibility.Hidden,
                                     IsReadOnly = true,
-                                    //Background = "Transparent", TODO How to make the TextBox's background transparent?
-                                    BorderThickness = new Thickness(0)
+                                    Background = Brushes.Transparent,
+                                    BorderThickness = new Thickness(0),
+                                    TextWrapping = TextWrapping.Wrap,
+                                    MaxWidth = 420
                                 };
 
                                 // User input UI.
@@ -401,9 +403,16 @@ namespace CmisSync
 
                                 TextBox user_box = new TextBox()
                                 {
-                                    Width = 200,
-                                    Text = Controller.PreviousPath
+                                    Width = 200
                                 };
+                                if (Controller.saved_user == String.Empty || Controller.saved_user == null)
+                                {
+                                    user_box.Text = Environment.UserName;
+                                }
+                                else
+                                {
+                                    user_box.Text = Controller.saved_user;
+                                }
 
                                 TextBlock user_help_label = new TextBlock()
                                 {
@@ -491,7 +500,8 @@ namespace CmisSync
 
                                 TaskbarItemInfo.ProgressValue = 0.0;
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
-
+                                
+                                address_box.Text = "https://";
                                 address_box.Focus();
                                 address_box.Select(address_box.Text.Length, 0);
 
@@ -566,9 +576,11 @@ namespace CmisSync
                                     while (!ar.AsyncWaitHandle.WaitOne(100)) {
                                         System.Windows.Forms.Application.DoEvents();
                                     }
-                                    CmisServer cmisServer = dlgt.EndInvoke(ar);
+                                    Tuple<CmisServer, Exception> result = dlgt.EndInvoke(ar);
+                                    CmisServer cmisServer = result.Item1;
+                                    
+                                    Controller.repositories = cmisServer != null ? cmisServer.Repositories : null;
 
-                                    Controller.repositories = cmisServer.Repositories;
                                     address_box.Text = cmisServer.Url.ToString();
 
                                     // Hide wait cursor
@@ -577,7 +589,27 @@ namespace CmisSync
                                     if (Controller.repositories == null)
                                     {
                                         // Could not retrieve repositories list from server, show warning.
-                                        address_error_label.Text = CmisSync.Properties_Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture);
+                                        string warning = "";
+                                        string message = result.Item2.Message;
+                                        switch (message)
+                                        {
+                                            case "Forbidden":
+                                                warning = CmisSync.Properties_Resources.ResourceManager.GetString("LoginFailedForbidden", CultureInfo.CurrentCulture);
+                                                break;
+                                            case "ConnectFailure":
+                                                warning = CmisSync.Properties_Resources.ResourceManager.GetString("ConnectFailure", CultureInfo.CurrentCulture);
+                                                break;
+                                            case "SendFailure":
+                                                if (cmisServer.Url.Scheme.StartsWith("https"))
+                                                    warning = CmisSync.Properties_Resources.ResourceManager.GetString("SendFailureHttps", CultureInfo.CurrentCulture);
+                                                else
+                                                    goto default;
+                                                break;
+                                            default:
+                                                warning = message + Environment.NewLine + CmisSync.Properties_Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture);
+                                                break;
+                                        }
+                                        address_error_label.Text = warning;
                                         address_error_label.Visibility = Visibility.Visible;
                                     }
                                     else

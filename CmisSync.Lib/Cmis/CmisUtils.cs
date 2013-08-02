@@ -50,23 +50,32 @@ namespace CmisSync.Lib.Cmis
         /// Users can provide the URL of the web interface, and we have to return the CMIS URL
         /// Returns the list of repositories as well.
         /// </summary>
-        static public CmisServer GetRepositoriesFuzzy(Uri url, string user, string password)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(Uri url, string user, string password)
         {
             Dictionary<string, string> repositories = null;
+            Exception firstException = null;
 
             // Try the given URL, maybe user directly entered the CMIS AtomPub endpoint URL.
             try
             {
                 repositories = GetRepositories(url, user, password);
             }
-            catch (CmisPermissionDeniedException)
+            catch (DotCMIS.Exceptions.CmisRuntimeException e)
             {
-                // Do nothing, try other possibilities.
+                if (e.Message == "ConnectFailure")
+                    return new Tuple<CmisServer, Exception>(new CmisServer(url, null),e);
+                firstException = e;
+
+            }
+            catch (Exception e)
+            {
+                // Save first Exception and try other possibilities.
+                firstException = e;
             }
             if (repositories != null)
             {
                 // Found!
-                return new CmisServer(url, repositories);
+                return new Tuple<CmisServer, Exception>(new CmisServer(url, repositories), null);
             }
 
             // Extract protocol and server name or IP address
@@ -87,7 +96,7 @@ namespace CmisSync.Lib.Cmis
                 "/Nemaki/atom/bedroom",
                 "/nuxeo/atom/cmis"
             };
-
+            string bestUrl = null;
             // Try all suffixes
             for (int i=0; i < suffixes.Length; i++)
             {
@@ -97,19 +106,25 @@ namespace CmisSync.Lib.Cmis
                 {
                     repositories = GetRepositories(new Uri(fuzzyUrl), user, password);
                 }
-                catch (CmisPermissionDeniedException)
+                catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
+                {
+                    firstException = e;
+                    bestUrl = fuzzyUrl;
+                }
+                catch (Exception e)
                 {
                     // Do nothing, try other possibilities.
+                    Logger.Info(e.Message);
                 }
                 if (repositories != null)
                 {
                     // Found!
-                    return new CmisServer(new Uri(fuzzyUrl), repositories);
+                    return new Tuple<CmisServer, Exception>( new CmisServer(new Uri(fuzzyUrl), repositories), null);
                 }
             }
 
-            // Not found.
-            return new CmisServer(url, null);
+            // Not found. Return also the first exception to inform the user correctly
+            return new Tuple<CmisServer,Exception>(new CmisServer(bestUrl==null?url:new Uri(bestUrl), null), firstException);
         }
 
 
@@ -145,27 +160,27 @@ namespace CmisSync.Lib.Cmis
             catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
                 Logger.Error("CMIS server found, but permission denied. Please check username/password. " + Utils.ToLogString(e));
-                throw new CmisSync.Lib.Cmis.CmisPermissionDeniedException("PermissionDenied");
+                throw;
             }
             catch (CmisRuntimeException e)
             {
                 Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
-                return null;
+                throw;
             }
             catch (CmisObjectNotFoundException e)
             {
                 Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
-                return null;
+                throw;
             }
             catch (CmisConnectionException e)
             {
                 Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
-                return null;
+                throw;
             }
             catch (CmisInvalidArgumentException e)
             {
                 Logger.Error("Invalid URL, maybe Alfresco Cloud? " + Utils.ToLogString(e));
-                return null;
+                throw;
             }
 
             // Populate the result list with identifier and name of each repository.

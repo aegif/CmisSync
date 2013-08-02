@@ -278,4 +278,17 @@ the resulting XML to cmissync@aegif.jp</value>
   <data name="ViewLog" xml:space="preserve">
     <value>View Log</value>
   </data>
+  <data name="ConnectFailure" xml:space="preserve">
+    <value>Failed to connect to server!
+Please check the given URL for misspelled host name.
+If the URL is correct, please contact your server administrator!</value>
+  </data>
+  <data name="LoginFailedForbidden" xml:space="preserve">
+    <value>Login failed!
+Please check your user credentials and potentially the server URL.</value>
+  </data>
+  <data name="SendFailureHttps" xml:space="preserve">
+    <value>Failed to communicate with the given server!
+Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https</value>
+  </data>
 </root>

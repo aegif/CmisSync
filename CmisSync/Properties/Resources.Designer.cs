@@ -151,6 +151,17 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to connect to server!
+        ///Please check the given URL for misspelled host name.
+        ///If the URL is correct, please contact your server administrator!.
+        /// </summary>
+        internal static string ConnectFailure {
+            get {
+                return ResourceManager.GetString("ConnectFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Continue.
         /// </summary>
         internal static string Continue {
@@ -297,6 +308,16 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Login failed!
+        ///Please check your user credentials and potentially the server URL..
+        /// </summary>
+        internal static string LoginFailedForbidden {
+            get {
+                return ResourceManager.GetString("LoginFailedForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This may either take a short or a long time depending on the folder&apos;s size..
         /// </summary>
         internal static string MayTakeTime {
@@ -374,6 +395,16 @@ namespace CmisSync {
         internal static string ResumeSync {
             get {
                 return ResourceManager.GetString("ResumeSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to communicate with the given server!
+        ///Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https.
+        /// </summary>
+        internal static string SendFailureHttps {
+            get {
+                return ResourceManager.GetString("SendFailureHttps", resourceCulture);
             }
         }
         

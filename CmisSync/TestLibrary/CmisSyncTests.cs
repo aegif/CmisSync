@@ -650,8 +650,8 @@ namespace TestLibrary
         [Test, TestCaseSource("TestServersFuzzy")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
-            CmisServer server = CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
-            Assert.NotNull(server);
+            Tuple<CmisServer, Exception> server = CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
+            Assert.NotNull(server.Item1);
         }
     }
 }
