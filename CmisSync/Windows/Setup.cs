@@ -500,8 +500,11 @@ namespace CmisSync
 
                                 TaskbarItemInfo.ProgressValue = 0.0;
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
-                                
-                                address_box.Text = "https://";
+
+                                if (Controller.PreviousAddress == null || Controller.PreviousAddress == String.Empty)
+                                    address_box.Text = "https://";
+                                else
+                                    address_box.Text = Controller.PreviousAddress;
                                 address_box.Focus();
                                 address_box.Select(address_box.Text.Length, 0);
 
@@ -1026,6 +1029,12 @@ namespace CmisSync
                     Logger.Info("Exiting ChangePageEvent.");
                 });
             };
+            this.Closing += delegate
+            {
+                Controller.PageCancelled();
+            };
+
+            Controller.PageCancelled();
             Logger.Info("Exiting constructor.");
         }
     }
