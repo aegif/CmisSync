@@ -187,6 +187,58 @@ namespace TestLibrary
         }
 
         [Test, Category("Fast")]
+        public void TestRemoveInsert()
+        {
+            using (Watcher watcher = new Watcher(TestFolder))
+            {
+                for (int i = 0; i < NormalNumber; ++i)
+                {
+                    watcher.InsertChange(i.ToString(), Watcher.ChangeTypes.None);
+                }
+                Assert.AreEqual(0, watcher.GetChangeList().Count);
+
+                for (int i = 0; i < NormalNumber; ++i)
+                {
+                    watcher.InsertChange(i.ToString(), Watcher.ChangeTypes.Created);
+                }
+                Assert.AreEqual(NormalNumber, watcher.GetChangeList().Count);
+                for (int i = 0; i < NormalNumber; ++i)
+                {
+                    Assert.AreEqual(i.ToString(), watcher.GetChangeList()[i]);
+                    Assert.AreEqual(Watcher.ChangeTypes.Created, watcher.GetChangeType(i.ToString()));
+                }
+
+                for (int i = 0; i < NormalNumber; ++i)
+                {
+                    watcher.InsertChange(i.ToString(), Watcher.ChangeTypes.Deleted);
+                }
+                Assert.AreEqual(NormalNumber, watcher.GetChangeList().Count);
+                for (int i = 0; i < NormalNumber; ++i)
+                {
+                    Assert.AreEqual(i.ToString(), watcher.GetChangeList()[i]);
+                    Assert.AreEqual(Watcher.ChangeTypes.Created, watcher.GetChangeType(i.ToString()));
+                }
+
+                for (int i = 0; i < NormalNumber; ++i)
+                {
+                    watcher.RemoveChange(i.ToString(), Watcher.ChangeTypes.Deleted);
+                }
+                Assert.AreEqual(NormalNumber, watcher.GetChangeList().Count);
+                for (int i = 0; i < NormalNumber; ++i)
+                {
+                    Assert.AreEqual(i.ToString(), watcher.GetChangeList()[i]);
+                    Assert.AreEqual(Watcher.ChangeTypes.Created, watcher.GetChangeType(i.ToString()));
+                }
+
+                for (int i = 0; i < NormalNumber; ++i)
+                {
+                    watcher.RemoveChange(i.ToString(), Watcher.ChangeTypes.Created);
+                }
+                Assert.AreEqual(0, watcher.GetChangeList().Count);
+            }
+        }
+
+        [Test, Category("Fast")]
         public void TestIgnore()
         {
             Assert.Fail("TODO");

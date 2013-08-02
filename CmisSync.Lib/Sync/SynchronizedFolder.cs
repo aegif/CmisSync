@@ -232,18 +232,20 @@ namespace CmisSync.Lib.Sync
 
                 if (!repo.Watcher.EnableRaisingEvents)
                 {
+                    repo.Watcher.RemoveAll();
                     repo.Watcher.EnableRaisingEvents = true;
                     syncFull = false;
                 }
 
-                if (!syncFull)
-                {
-                    syncFull = CrawlSync(remoteFolder, localFolder);
-                }
+                syncFull = CrawlSync(remoteFolder, localFolder);
 
                 if (syncFull)
                 {
                     WatcherSync(remoteFolderPath, localFolder);
+                    foreach (string name in repo.Watcher.GetChangeList())
+                    {
+                        Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
+                    }
                 }
             }
 

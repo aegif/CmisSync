@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
+using DotCMIS;
 using DotCMIS.Client;
 
 
@@ -52,11 +53,89 @@ namespace CmisSync.Lib.Sync
 
             private void WatchSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
-                bool isFile = Directory.Exists(pathname) ? false : true;
-
                 string name = pathname.Substring(localFolder.Length);
-                //IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
 
+                IFolder remoteBase;
+                if (File.Exists(pathname) || Directory.Exists(pathname))
+                {
+                    string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/');
+                    remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
+                    if (null == remoteBase)
+                    {
+                        Logger.Warn(String.Format("The remote base folder {0} for local {1} does not exist, ignore for the update action", remoteBaseName, pathname));
+                        return;
+                    }
+                }
+                else
+                {
+                    Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
+                    return;
+                }
+
+                if (File.Exists(pathname))
+                {
+                    bool success = false;
+                    repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Created);
+                    repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Changed);
+                    if (database.ContainsFile(pathname))
+                    {
+                        if (database.LocalFileHasChanged(pathname))
+                        {
+                            success = UpdateFile(pathname, remoteBase);
+                            Logger.Info(String.Format("Update {0}: {1}", pathname, success));
+                        }
+                        else
+                        {
+                            success = true;
+                            Logger.Info(String.Format("File {0} remains unchanged, ignore for the update action", pathname));
+                        }
+                    }
+                    else
+                    {
+                        success = UploadFile(pathname, remoteBase);
+                        Logger.Info(String.Format("Upload {0}: {1}", pathname, success));
+                    }
+                    if (!success)
+                    {
+                        Logger.Warn("Failure to update: " + pathname);
+                        repo.Watcher.InsertChange(pathname, Watcher.ChangeTypes.Changed);
+                    }
+                    return;
+                }
+
+                if (Directory.Exists(pathname))
+                {
+                    if (repoinfo.isPathIgnored(remoteName))
+                    {
+                        repo.Watcher.RemoveChange(pathname);
+                        return;
+                    }
+
+                    if (database.ContainsFolder(pathname))
+                    {
+                        Logger.Info(String.Format("Database exists for {0}, ignore for the update action", pathname));
+                        repo.Watcher.RemoveChange(pathname);
+                    }
+                    else
+                    {
+                        Dictionary<string, object> properties = new Dictionary<string, object>();
+                        properties.Add(PropertyIds.Name, Path.GetFileName(pathname));
+                        properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
+                        if (null != remoteBase.CreateFolder(properties))
+                        {
+                            Logger.Info("Create locally created folder on server: " + pathname);
+                            repo.Watcher.RemoveChange(pathname);
+                        }
+                        else
+                        {
+                            Logger.Warn("Failure to create locally created folder on server: " + pathname);
+                        }
+                    }
+                    return;
+                }
+
+                Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
             }
 
             private void WatchSyncDelete(string remoteFolder, string localFolder, string pathname)
