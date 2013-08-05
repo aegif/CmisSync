@@ -369,7 +369,17 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public void RecalculateChecksum(string path)
         {
-            string checksum = Checksum(path);
+            string checksum;
+            try
+            {
+                checksum = Checksum(path);
+            }
+            catch (IOException)
+            {
+                Logger.Error("IOException while reading file checksum: " + path);
+                return;
+            }
+
             path = Normalize(path);
 
             string command = @"UPDATE files

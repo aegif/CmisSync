@@ -65,7 +65,7 @@ namespace CmisSync.Lib.Sync
             ///     else:
             ///       upload recursively               // if BIDIRECTIONAL
             /// </summary>
-            private void CrawlSync(IFolder remoteFolder, string localFolder)
+            private bool CrawlSync(IFolder remoteFolder, string localFolder)
             {
                 while (repo.Status == SyncStatus.Suspend)
                 {
@@ -79,15 +79,17 @@ namespace CmisSync.Lib.Sync
 
                 // Crawl remote children.
                 // Logger.LogInfo("Sync", String.Format("Crawl remote folder {0}", this.remoteFolderPath));
-                CrawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
+                bool success = CrawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
 
                 // Crawl local files.
                 // Logger.LogInfo("Sync", String.Format("Crawl local files in the local folder {0}", localFolder));
-                CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
+                success = success && CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
 
                 // Crawl local folders.
                 // Logger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
-                CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
+                success = success && CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
+
+                return success;
             }
 
 
@@ -95,8 +97,10 @@ namespace CmisSync.Lib.Sync
             /// Crawl remote content, syncing down if needed.
             /// Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
             /// </summary>
-            private void CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
+            private bool CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
             {
+                bool success = true;
+
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
                     while (repo.Status == SyncStatus.Suspend)
@@ -120,7 +124,7 @@ namespace CmisSync.Lib.Sync
                             if (Directory.Exists(localSubFolder))
                             {
                                 // Recurse into folder.
-                                CrawlSync(remoteSubFolder, localSubFolder);
+                                success = success && CrawlSync(remoteSubFolder, localSubFolder);
                             }
                             else
                             {
@@ -165,7 +169,7 @@ namespace CmisSync.Lib.Sync
                                         database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
                                         // Recursive copy of the whole folder.
-                                        RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                        success = success && RecursiveFolderCopy(remoteSubFolder, localSubFolder);
                                     }
                                 }
                             }
@@ -210,7 +214,7 @@ namespace CmisSync.Lib.Sync
                                 if (lastDatabaseUpdate == null)
                                 {
                                     Logger.Info("Downloading file absent from database: " + filePath);
-                                    DownloadFile(remoteDocument, localFolder);
+                                    success = success && DownloadFile(remoteDocument, localFolder);
                                 }
                                 else
                                 {
@@ -230,7 +234,7 @@ namespace CmisSync.Lib.Sync
                                             File.Move(filePath, newFilePath);
 
                                             // Download server version
-                                            DownloadFile(remoteDocument, localFolder);
+                                            success = success && DownloadFile(remoteDocument, localFolder);
                                             repo.OnConflictResolved();
 
                                             // TODO move to OS-dependant layer
@@ -241,7 +245,7 @@ namespace CmisSync.Lib.Sync
                                         else
                                         {
                                             Logger.Info("Downloading modified file: " + remoteDocumentFileName);
-                                            DownloadFile(remoteDocument, localFolder);
+                                            success = success && DownloadFile(remoteDocument, localFolder);
                                         }
                                     }
 
@@ -261,20 +265,22 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // New remote file, download it.
                                     Logger.Info("New remote file: " + filePath);
-                                    DownloadFile(remoteDocument, localFolder);
+                                    success = success && DownloadFile(remoteDocument, localFolder);
                                 }
                             }
                         }
                     }
                     #endregion
                 }
+
+                return success;
             }
 
 
             /// <summary>
             /// Crawl local files in a given directory (not recursive).
             /// </summary>
-            private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
+            private bool CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
             {
                 string[] files;
                 try
@@ -284,9 +290,10 @@ namespace CmisSync.Lib.Sync
                 catch (Exception e)
                 {
                     Logger.Warn(String.Format("Exception while get the file list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
-                    return;
+                    return false;
                 }
 
+                bool success = true;
                 foreach (string filePath in files)
                 {
                     while (repo.Status == SyncStatus.Suspend)
@@ -323,7 +330,7 @@ namespace CmisSync.Lib.Sync
                                     Logger.Info("Uploading file absent on repository: " + filePath);
                                     if (Utils.WorthSyncing(filePath))
                                     {
-                                        UploadFile(filePath, remoteFolder);
+                                        success = success && UploadFile(filePath, remoteFolder);
                                     }
                                 }
                             }
@@ -331,25 +338,30 @@ namespace CmisSync.Lib.Sync
                         else
                         {
                             // The file exists both on server and locally.
-                            if (database.LocalFileHasChanged(filePath))
+                            if (!syncFull)
                             {
-                                if (BIDIRECTIONAL)
+                                if (database.LocalFileHasChanged(filePath))
                                 {
-                                    // Upload new version of file content.
-                                    Logger.Info("Uploading file update on repository: " + filePath);
-                                    UpdateFile(filePath, remoteFolder);
+                                    if (BIDIRECTIONAL)
+                                    {
+                                        // Upload new version of file content.
+                                        Logger.Info("Uploading file update on repository: " + filePath);
+                                        success = success && UpdateFile(filePath, remoteFolder);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                return success;
             }
 
 
             /// <summary>
             /// Crawl local folders in a given directory (not recursive).
             /// </summary>
-            private void CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
+            private bool CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
             {
                 string[] folders;
                 try
@@ -359,9 +371,10 @@ namespace CmisSync.Lib.Sync
                 catch (Exception e)
                 {
                     Logger.Warn(String.Format("Exception while get the folder list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
-                    return;
+                    return false;
                 }
 
+                bool success = true;
                 foreach (string localSubFolder in folders)
                 {
                     while (repo.Status == SyncStatus.Suspend)
@@ -380,19 +393,20 @@ namespace CmisSync.Lib.Sync
                             // check whether it used to exist on server or not.
                             if (database.ContainsFolder(localSubFolder))
                             {
-                                RemoveFolderLocally(localSubFolder);
+                                success = success && RemoveFolderLocally(localSubFolder);
                             }
                             else
                             {
                                 if (BIDIRECTIONAL)
                                 {
                                     // New local folder, upload recursively.
-                                    UploadFolderRecursively(remoteFolder, localSubFolder);
+                                    success = success && UploadFolderRecursively(remoteFolder, localSubFolder);
                                 }
                             }
                         }
                     }
                 }
+                return success;
             }
         }
     }
