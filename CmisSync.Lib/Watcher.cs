@@ -183,6 +183,11 @@ namespace CmisSync.Lib
         /// </summary>
         public Watcher(string folder)
         {
+#if __MonoCS__
+            //  http://stackoverflow.com/questions/16859372/why-doesnt-the-servicestack-razor-filesystemwatcher-work-on-mono-mac-os-x
+            Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
+#endif
+
             Path = System.IO.Path.GetFullPath(folder);
             IncludeSubdirectories = true;
             Filter                = "*";
