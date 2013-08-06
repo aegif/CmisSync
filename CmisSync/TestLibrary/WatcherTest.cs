@@ -270,10 +270,13 @@ namespace TestLibrary
             {
                 watcher.EnableRaisingEvents = true;
 
+                List<string> names = new List<string>();
                 for (int i = 0; i < HeavyNumber; ++i)
                 {
                     CreateTestFile(0, i / FileInFolderNumber);
+                    names.Add(GetPathname(i / FileInFolderNumber));
                 }
+                Assert.IsTrue(watcher.EnableRaisingEvents);
                 for (int i = 0; i < 10; ++i)
                 {
                     WaitWatcher();
@@ -281,17 +284,13 @@ namespace TestLibrary
                 int totalNumber = HeavyNumber + (HeavyNumber - 1) / FileInFolderNumber;
                 Assert.AreEqual(totalNumber, watcher.GetChangeList().Count);
                 int fileNumber = 0;
-                for (int i = 0; i < watcher.GetChangeList().Count; ++i)
+                for (int i = 0; i < HeavyNumber; ++i)
                 {
-                    if (File.Exists(watcher.GetChangeList()[i]))
-                    {
-                        Assert.AreEqual(
-                            watcher.GetChangeType((string)watcher.GetChangeList()[i]),
-                            Watcher.ChangeTypes.Created);
-                        ++fileNumber;
-                    }
+                    Assert.AreEqual(
+                        watcher.GetChangeType(names[i]),
+                        Watcher.ChangeTypes.Created,
+                        names[i]);
                 }
-                Assert.AreEqual(HeavyNumber, fileNumber);
             }
         }
 
@@ -525,7 +524,7 @@ namespace TestLibrary
         private void WaitWatcher()
         {
 #if __MonoCS__
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 #else
             Thread.Sleep(10);
 #endif

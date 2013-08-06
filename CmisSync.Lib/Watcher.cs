@@ -297,10 +297,10 @@ namespace CmisSync.Lib
             {
                 if (disposing)
                 {
-                    base.Dispose(disposing);
                 }
                 disposed = true;
             }
+            base.Dispose(disposing);
         }
 
 
