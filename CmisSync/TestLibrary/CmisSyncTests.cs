@@ -51,7 +51,7 @@ namespace TestLibrary
     [TestFixture]
     public class CmisSyncTests
     {
-        private readonly string CMISSYNCDIR = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "DataSpace Sync");
+        private readonly string CMISSYNCDIR = ConfigManager.CurrentConfig.FoldersPath;
 
         
         public CmisSyncTests()
