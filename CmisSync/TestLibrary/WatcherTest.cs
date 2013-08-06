@@ -274,11 +274,10 @@ namespace TestLibrary
                 {
                     CreateTestFile(0, i / FileInFolderNumber);
                 }
-                WaitWatcher();
-                WaitWatcher();
-                WaitWatcher();
-                WaitWatcher();
-                WaitWatcher();
+                for (int i = 0; i < 10; ++i)
+                {
+                    WaitWatcher();
+                }
                 int totalNumber = HeavyNumber + (HeavyNumber - 1) / FileInFolderNumber;
                 Assert.AreEqual(totalNumber, watcher.GetChangeList().Count);
                 int fileNumber = 0;
@@ -288,8 +287,7 @@ namespace TestLibrary
                     {
                         Assert.AreEqual(
                             watcher.GetChangeType((string)watcher.GetChangeList()[i]),
-                            Watcher.ChangeTypes.Created,
-                            watcher.GetChangeList()[i]);
+                            Watcher.ChangeTypes.Created);
                         ++fileNumber;
                     }
                 }
@@ -313,16 +311,24 @@ namespace TestLibrary
                 for (int i = 0; i < NormalNumber; ++i)
                 {
                     CreateTestFile(names[i], i + 1);
-                    names.Add(GetPathname());
                 }
                 WaitWatcher();
-                Assert.AreEqual(NormalNumber, watcher.GetChangeList().Count);
+                List<string> changeList = watcher.GetChangeList();
+                Assert.AreEqual(NormalNumber, changeList.Count);
                 for (int i = 0; i < NormalNumber; ++i)
                 {
-                    Assert.AreEqual(names[i], watcher.GetChangeList()[i]);
+                    Assert.Contains(names[i], changeList);
+#if __MonoCS__
+                    List<Watcher.ChangeTypes> types = new List<Watcher.ChangeTypes>();
+                    types.Add(Watcher.ChangeTypes.Created);
+                    types.Add(Watcher.ChangeTypes.Changed);
+                    Assert.Contains(
+                        watcher.GetChangeType(names[i]), types);
+#else
                     Assert.AreEqual(
-                        watcher.GetChangeType((string)watcher.GetChangeList()[i]),
+                        watcher.GetChangeType(names[i]),
                         Watcher.ChangeTypes.Changed);
+#endif
                 }
             }
         }
@@ -345,15 +351,20 @@ namespace TestLibrary
                 {
                     CreateTestFile();
                     names.Add(GetPathname());
+                }
+                WaitWatcher();
+                for (int i = 0; i < NormalNumber; ++i)
+                {
                     File.Delete(names[i]);
                 }
                 WaitWatcher();
-                Assert.AreEqual(NormalNumber, watcher.GetChangeList().Count);
+                List<string> changeList = watcher.GetChangeList();
+                Assert.AreEqual(NormalNumber, changeList.Count);
                 for (int i = 0; i < NormalNumber; ++i)
                 {
-                    Assert.AreEqual(names[i], watcher.GetChangeList()[i]);
+                    Assert.Contains(names[i], changeList);
                     Assert.AreEqual(
-                        watcher.GetChangeType((string)watcher.GetChangeList()[i]),
+                        watcher.GetChangeType(names[i]),
                         Watcher.ChangeTypes.Deleted);
                 }
             }
@@ -387,12 +398,13 @@ namespace TestLibrary
             {
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldname, 1);
-                File.Delete(newname);
+                WaitWatcher();
                 File.Move(oldname, newname);
                 WaitWatcher();
-                Assert.AreEqual(2, watcher.GetChangeList().Count);
-                Assert.AreEqual(oldname, watcher.GetChangeList()[0]);
-                Assert.AreEqual(newname, watcher.GetChangeList()[1]);
+                List<string> changeList = watcher.GetChangeList();
+                Assert.AreEqual(2, changeList.Count);
+                Assert.Contains(oldname, changeList);
+                Assert.Contains(newname, changeList);
                 Assert.AreEqual(Watcher.ChangeTypes.Deleted, watcher.GetChangeType(oldname));
                 Assert.AreEqual(Watcher.ChangeTypes.Created, watcher.GetChangeType(newname));
                 File.Delete(newname);
@@ -402,7 +414,7 @@ namespace TestLibrary
             {
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldnameOut, 1);
-                File.Delete(newname);
+                WaitWatcher();
                 File.Move(oldnameOut, newname);
                 WaitWatcher();
                 Assert.AreEqual(1, watcher.GetChangeList().Count);
@@ -415,14 +427,11 @@ namespace TestLibrary
             {
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldname, 1);
-                File.Delete(newnameOut);
+                WaitWatcher();
                 File.Move(oldname, newnameOut);
                 WaitWatcher();
-#if __MonoCS__
-#else
                 Assert.AreEqual(1, watcher.GetChangeList().Count);
                 Assert.AreEqual(oldname, watcher.GetChangeList()[0]);
-#endif
                 Assert.AreEqual(Watcher.ChangeTypes.Deleted, watcher.GetChangeType(oldname));
                 File.Delete(newnameOut);
             }
@@ -431,7 +440,7 @@ namespace TestLibrary
             {
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldnameOut, 1);
-                File.Delete(newnameOut);
+                WaitWatcher();
                 File.Move(oldnameOut, newnameOut);
                 WaitWatcher();
                 Assert.AreEqual(0, watcher.GetChangeList().Count);
@@ -516,7 +525,7 @@ namespace TestLibrary
         private void WaitWatcher()
         {
 #if __MonoCS__
-            Thread.Sleep(100);
+            Thread.Sleep(2000);
 #else
             Thread.Sleep(10);
 #endif

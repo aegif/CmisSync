@@ -466,19 +466,8 @@ namespace TestLibrary
                     bw.RunWorkerAsync();
 
                     // Keep creating/removing a file as long as sync is going on.
-                    int count = 1000;
                     while (syncing)
                     {
-#if __MonoCS__
-                        //  During heavy file system IO, it will block the MONO CLR Finalizer
-                        count --;
-#endif
-                        if (count <= 0 )
-                        {
-                            System.Threading.Thread.Sleep(1000);
-                            continue;
-                        }
-
                         //Console.WriteLine("Create/remove " + LocalFilesystemActivityGenerator.id);
                         LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
                         CleanAll(localDirectory);
@@ -547,18 +536,8 @@ namespace TestLibrary
                     bw.RunWorkerAsync();
 
                     // Keep creating/removing a file as long as sync is going on.
-                    int count = 100;
                     while (syncing)
                     {
-#if __MonoCS__
-                        //  During heavy file system IO, it will block the MONO CLR Finalizer
-                        count --;
-#endif
-                        if (count <= 0 )
-                        {
-                            System.Threading.Thread.Sleep(1000);
-                            continue;
-                        }
                         //Console.WriteLine("Create/remove.");
                         LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
                         CleanAll(localDirectory);
