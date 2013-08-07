@@ -20,6 +20,7 @@ namespace CmisSync.Lib.Sync
         {
             private void WatcherSync(string remoteFolder, string localFolder)
             {
+                Logger.Debug(remoteFolder + " : " + localFolder);
                 foreach (string pathname in repo.Watcher.GetChangeList())
                 {
                     if (!Utils.WorthSyncing(pathname))
@@ -31,6 +32,12 @@ namespace CmisSync.Lib.Sync
                     if (!pathname.StartsWith(localFolder))
                     {
                         Debug.Assert(false, String.Format("Invalid pathname {0} for target {1}.", pathname, localFolder));
+                    }
+
+                    if (pathname == localFolder)
+                    {
+                        repo.Watcher.RemoveChange(pathname);
+                        continue;
                     }
 
                     Watcher.ChangeTypes change = repo.Watcher.GetChangeType(pathname);
@@ -53,7 +60,7 @@ namespace CmisSync.Lib.Sync
 
             private void WatchSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
-                string name = pathname.Substring(localFolder.Length);
+                string name = pathname.Substring(localFolder.Length + 1);
                 string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
 
                 IFolder remoteBase = null;
@@ -158,7 +165,7 @@ namespace CmisSync.Lib.Sync
                     return;
                 }
 
-                string name = pathname.Substring(localFolder.Length);
+                string name = pathname.Substring(localFolder.Length + 1);
                 string remoteName = Path.Combine(remoteFolder,name).Replace('\\','/');
 
                 if (database.ContainsFile(pathname))
