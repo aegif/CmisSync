@@ -193,7 +193,7 @@ namespace TestLibrary
                     }
                 }
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Exception on testing side, ignoring " + ex);
             }
