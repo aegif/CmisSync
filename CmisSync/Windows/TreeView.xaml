@@ -1,0 +1,30 @@
+﻿<TreeView
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CmisSync;assembly=DataSpaceSync"
+        Margin="10" ItemsSource="{Binding}"
+        Width="410" Height="267" >
+    <TreeView.Resources>
+        <local:LoadingStatusToBrushConverter x:Key="LoadingStatus" />
+        <local:LoadingStatusToImageConverter x:Key="StatusImage" />
+        <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
+            <StackPanel Orientation="Horizontal">
+                <Image Width="16" Height="16" Source="{Binding Path=Status ,Converter={StaticResource StatusImage}}" />
+                <CheckBox IsChecked="{Binding Mode=TwoWay, Path=SelectAll}" Content="" IsThreeState="True" />
+                <TextBlock Text="{Binding Name}" />
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding SubFolder}" >
+            <StackPanel Orientation="Horizontal">
+                <Image Width="16" Height="16" Source="{Binding Path=Status ,Converter={StaticResource StatusImage}}" />
+                <CheckBox IsChecked="{Binding Mode=TwoWay, Path=Selected}" Content="" IsThreeState="True" />
+                <TextBlock Text="{Binding Name}" />
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <DataTemplate DataType="{x:Type local:StatusItem}">
+            <TextBlock Foreground="{Binding Converter={StaticResource LoadingStatus}}" Text="{Binding Message}" />
+        </DataTemplate>
+        </TreeView.Resources>
+    </TreeView>
