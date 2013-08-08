@@ -85,8 +85,8 @@ namespace CmisSync
                                 Repo = this,
                                 Path = f,
                                 Name = f.Split('/')[f.Split('/').Length - 1],
-                                Parent = this
-
+                                Parent = this,
+                                Type = CmisTree.Folder.FolderType.REMOTE
                             };
                             this.Folder.Add(folder);
                             this.queue.Enqueue(folder);
