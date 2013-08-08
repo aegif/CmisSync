@@ -111,6 +111,7 @@ namespace CmisSync
         public string saved_user = "";
         public string saved_password = "";
         public string saved_repository = "";
+        public List<string> ignoredPaths = new List<string>();
 
         /// <summary>
         /// List of the CMIS repositories at the chosen URL.
@@ -243,6 +244,7 @@ namespace CmisSync
             PreviousAddress = "";
             PreviousRepository = "";
             PreviousPath = "";
+            ignoredPaths.Clear();
 
             WindowIsOpen = false;
             HideWindowEvent();
@@ -412,7 +414,7 @@ namespace CmisSync
         /// <summary>
         /// Second step of remote folder addition wizard is complete, switch to customization step.
         /// </summary>
-        public void Add2PageCompleted(string repository, string remote_path)
+        public void Add2PageCompleted(string repository, string remote_path, string[] ignoredPaths)
         {
             SyncingReponame = Path.GetFileName(remote_path);
             ProgressBarPercentage = 1.0;
@@ -426,6 +428,17 @@ namespace CmisSync
             PreviousAddress = address;
             PreviousRepository = repository;
             PreviousPath = remote_path;
+
+            foreach (string ignore in ignoredPaths)
+                this.ignoredPaths.Add(ignore);
+        }
+
+        /// <summary>
+        /// Second step of remote folder addition wizard is complete, switch to customization step.
+        /// </summary>
+        public void Add2PageCompleted(string repository, string remote_path)
+        {
+            Add2PageCompleted(repository, remote_path, new string[] { });
         }
 
 
@@ -446,7 +459,8 @@ namespace CmisSync
                 new Thread(() =>
                 {
                     Program.Controller.StartFetcher(PreviousAddress, PreviousPath, repoName,
-                        PreviousRepository, PreviousPath, saved_user.TrimEnd(), saved_password.TrimEnd(), localrepopath);
+                        PreviousRepository, PreviousPath, saved_user.TrimEnd(),
+                        saved_password.TrimEnd(), localrepopath, ignoredPaths);
 
                 }).Start();
             }
@@ -464,6 +478,7 @@ namespace CmisSync
         /// </summary>
         public void BackToPage2()
         {
+            ignoredPaths.Clear();
             ChangePageEvent(PageType.Add2);
         }
 

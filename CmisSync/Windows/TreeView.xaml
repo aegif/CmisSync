@@ -9,10 +9,10 @@
     <TreeView.Resources>
         <local:LoadingStatusToBrushConverter x:Key="LoadingStatus" />
         <local:LoadingStatusToTextConverter x:Key="StatusText" />
-        <local:IgnoreToTextDecoration x:Key="IgnoreText" />
+        <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
+        <local:IgnoreToTextDecoration x:Key="IgnoreTextDecoration" />
         <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
             <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
-<!--                <CheckBox IsChecked="{Binding Mode=TwoWay, Path=SelectAll}" Content="" IsThreeState="True" /> -->
                 <TextBlock Text="{Binding Name}" />
                 <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
             </StackPanel>
@@ -21,18 +21,14 @@
             <StackPanel Orientation="Horizontal">
                 <StackPanel.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Ignore">
+                        <MenuItem Header="{Binding Converter={StaticResource IgnoreText}, Path=IsIgnored}" IsCheckable="True" IsChecked="{Binding IsIgnored}">
                             
                         </MenuItem>
                     </ContextMenu>
                 </StackPanel.ContextMenu>
-<!--                <CheckBox IsChecked="{Binding Mode=TwoWay, Path=Selected}" Content="" IsThreeState="True" /> -->
-                <TextBlock Text="{Binding Name}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreText}}" />
+                <TextBlock Text="{Binding Name}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
                 <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
             </StackPanel>
         </HierarchicalDataTemplate>
-        <DataTemplate DataType="{x:Type local:StatusItem}">
-            <TextBlock Foreground="{Binding Converter={StaticResource LoadingStatus}}" Text="{Binding Message}" />
-        </DataTemplate>
         </TreeView.Resources>
     </TreeView>

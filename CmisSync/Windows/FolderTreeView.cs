@@ -9,14 +9,17 @@ using System.Linq;
 using System.Text;
 using System.Windows.Data;
 using System.Windows;
+using System.Windows.Input;
 
 namespace CmisSync
 {
-    namespace CmisTree {
+    namespace CmisTree
+    {
 
         public class CmisRepo : INotifyPropertyChanged
         {
             private BackgroundWorker worker = new BackgroundWorker();
+            private BackgroundWorker folderworker = new BackgroundWorker();
             private ObservableCollection<Folder> _folder = new ObservableCollection<Folder>();
             private string name;
             public string Name { get { return name; } set { SetField(ref name, value, "Name"); } }
@@ -27,7 +30,7 @@ namespace CmisSync
             private string password;
             private string address;
 
-            private object currentWorkingObject;
+            private Folder currentWorkingObject;
             private Queue<Folder> queue = new Queue<Folder>();
 
             private LoadingStatus status = LoadingStatus.START;
@@ -44,7 +47,8 @@ namespace CmisSync
                 this.address = address;
                 worker.DoWork += new DoWorkEventHandler(DoWork);
                 worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Finished);
-                currentWorkingObject = this;
+                folderworker.DoWork += new DoWorkEventHandler(SubFolderWork);
+                folderworker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(SubfolderFinished);
             }
 
             public void asyncSubFolderLoading()
@@ -60,7 +64,48 @@ namespace CmisSync
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
                 e.Result = CmisUtils.GetSubfolders(Id, Path, address, username, password);
+            }
 
+            private void SubFolderWork(object sender, DoWorkEventArgs e)
+            {
+                BackgroundWorker worker = sender as BackgroundWorker;
+                Folder f = queue.Dequeue();
+                currentWorkingObject = f;
+                currentWorkingObject.Status = LoadingStatus.LOADING;
+                e.Result = CmisUtils.GetSubfolders(Id, f.Path, address, username, password);
+            }
+
+            private void SubfolderFinished(object sender, RunWorkerCompletedEventArgs e)
+            {
+                if (e.Error != null)
+                {
+                    currentWorkingObject.Status = LoadingStatus.REQUEST_FAILURE;
+                }
+                else if (e.Cancelled)
+                    currentWorkingObject.Status = LoadingStatus.ABORTED;
+                else
+                {
+                    string[] subfolder = (string[])e.Result;
+                    foreach (string f in subfolder)
+                    {
+                        Folder folder = new Folder()
+                            {
+                                Repo = this,
+                                Path = f,
+                                Name = f.Split('/')[f.Split('/').Length - 1],
+                                Parent = currentWorkingObject,
+                                Type = CmisTree.Folder.FolderType.REMOTE,
+                                IsIgnored = currentWorkingObject.IsIgnored
+                            };
+                        currentWorkingObject.SubFolder.Add(folder);
+                        this.queue.Enqueue(folder);
+                    }
+                    currentWorkingObject.Status = LoadingStatus.DONE;
+                }
+                if (queue.Count > 0)
+                {
+                    folderworker.RunWorkerAsync();
+                }
             }
 
             private void Finished(object sender, RunWorkerCompletedEventArgs e)
@@ -75,38 +120,22 @@ namespace CmisSync
                 }
                 else
                 {
-                    if (currentWorkingObject == this)
+                    string[] subfolder = (string[])e.Result;
+                    foreach (string f in subfolder)
                     {
-                        string[] subfolder = (string[])e.Result;
-                        foreach (string f in subfolder)
+                        Folder folder = new Folder()
                         {
-                            Folder folder = new Folder()
-                            {
-                                Repo = this,
-                                Path = f,
-                                Name = f.Split('/')[f.Split('/').Length - 1],
-                                Parent = this,
-                                Type = CmisTree.Folder.FolderType.REMOTE
-                            };
-                            this.Folder.Add(folder);
-                            this.queue.Enqueue(folder);
-                            while (queue.Count > 0)
-                            {
-                                Folder node = queue.Dequeue();
-                                if (node.SubFolder.Count == 0)
-                                    if (node.Status == LoadingStatus.START)
-                                    {
-                                        //node
-                                    }
-                            }
-                        }
-
-                        Status = LoadingStatus.DONE;
+                            Repo = this,
+                            Path = f,
+                            Name = f.Split('/')[f.Split('/').Length - 1],
+                            Parent = this,
+                            Type = CmisTree.Folder.FolderType.REMOTE
+                        };
+                        this.Folder.Add(folder);
+                        this.queue.Enqueue(folder);
                     }
-                    else
-                    {
-
-                    }
+                    Status = LoadingStatus.DONE;
+                    this.folderworker.RunWorkerAsync();
                 }
 
             }
@@ -130,8 +159,28 @@ namespace CmisSync
 
         public class Folder : INotifyPropertyChanged
         {
-            private CmisRepo repo;
+            public class IgnoreToggleCommand : ICommand
+            {
+                public event EventHandler CanExecuteChanged;
+                public bool CanExecute(Object parameter)
+                {
+                    Folder f = parameter as Folder;
+                    if (f != null)
+                        return true;
+                    else
+                        return false;
+                }
 
+                public void Execute(Object parameter)
+                {
+                    Folder f = parameter as Folder;
+                    if (f != null)
+                        f.IsIgnored = !f.ignored;
+                }
+            }
+
+            private CmisRepo repo;
+            public ICommand ToggleIgnoreCommand { get; set; }
             public object Parent { get; set; }
             public CmisRepo Repo { get { return repo; } set { SetField(ref repo, value, "Repo"); } }
             private bool selected = false;
@@ -141,7 +190,15 @@ namespace CmisSync
             private string path;
             public string Path { get { return path; } set { SetField(ref path, value, "Path"); } }
             private bool ignored = false;
-            public bool IsIgnored { get { return ignored; } set { if (SetField(ref ignored, value, "IsIgnored") && ignored) _subfolder.Clear(); } }
+            public bool IsIgnored { get { return ignored; }
+                set {
+                    if (SetField(ref ignored, value, "IsIgnored"))
+                    {
+                        foreach (Folder subfolder in _subfolder)
+                            subfolder.IsIgnored = ignored;
+                    }
+                }
+            }
             private LoadingStatus status = LoadingStatus.START;
             public LoadingStatus Status { get { return status; } set { SetField(ref status, value, "Status"); } }
             private ObservableCollection<Folder> _subfolder = new ObservableCollection<Folder>();
@@ -198,7 +255,19 @@ namespace CmisSync
             }
         }
 
-        [ValueConversion(typeof(bool) ,typeof(TextDecorations))]
+        [ValueConversion(typeof(bool), typeof(string))]
+        public class IgnoreStatusToTextConverter : IValueConverter
+        {
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                return ((bool)value) ? Properties_Resources.DoNotIgnoreFolder : Properties_Resources.IgnoreFolder;
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            { throw new NotSupportedException(); }
+        }
+
+        [ValueConversion(typeof(bool), typeof(TextDecorations))]
         public class IgnoreToTextDecoration : IValueConverter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

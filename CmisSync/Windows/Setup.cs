@@ -40,6 +40,7 @@ using System.Globalization;
 using log4net;
 using System.Collections.ObjectModel;
 using CmisSync.CmisTree;
+using System.Windows.Input;
 
 namespace CmisSync
 {
@@ -621,9 +622,6 @@ namespace CmisSync
                                             address_box.Text, user_box.Text, password_box.Password);
                                     }
                                 };
-                                user_box.Text = "ittest";
-                                password_box.Password = "jxPpZyVGFa436KHW";
-                                address_box.Text = "http://192.168.122.41/cmis/atom";
                                 break;
                             }
                         #endregion
@@ -687,11 +685,20 @@ namespace CmisSync
                                     {
                                         Controller.saved_remote_path = folder.Path;
                                         Controller.saved_repository = folder.Repo.Id;
-                                        continue_button.IsEnabled = true;
+                                        if (folder.IsIgnored)
+                                        {
+                                            continue_button.IsEnabled = false;
+                                        }
+                                        else
+                                        {
+                                            continue_button.IsEnabled = true;
+                                        }
                                         return;
                                     }
                                     continue_button.IsEnabled = false;
                                 };
+
+                                
 
                                 Button cancel_button = new Button()
                                 {
@@ -718,8 +725,21 @@ namespace CmisSync
 
                                 continue_button.Click += delegate
                                 {
+                                    List<string> ignored = new List<string>();
+                                    CmisRepo repo = treeView.SelectedItem as CmisRepo;
+                                    if (repo != null)
+                                    {
+                                        foreach (Folder child in repo.Folder)
+                                            ignored.AddRange(getIgnoredFolder(child));
+                                    }
+                                    else
+                                    {
+                                        Folder folder = treeView.SelectedItem as Folder;
+                                        if (folder != null)
+                                            ignored.AddRange(getIgnoredFolder(folder));
+                                    }
                                     Controller.Add2PageCompleted(
-                                        Controller.saved_repository, Controller.saved_remote_path);
+                                        Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray());
                                 };
 
                                 back_button.Click += delegate
@@ -1025,6 +1045,21 @@ namespace CmisSync
             Controller.PageCancelled();
             Logger.Info("Exiting constructor.");
         }
+
+        private List<string> getIgnoredFolder(Folder f)
+        {
+            List<string> result = new List<string>();
+            if (f.IsIgnored)
+            {
+                result.Add(f.Path);
+            }
+            else
+            {
+                foreach (Folder child in f.SubFolder)
+                    result.AddRange(getIgnoredFolder(child));
+            }
+            return result;
+        }
     }
 
     /// <summary>
@@ -1057,7 +1092,5 @@ namespace CmisSync
             this.fullPath = fullPath;
         }
     }
-    #region TreeView
-
-    #endregion
+    
 }

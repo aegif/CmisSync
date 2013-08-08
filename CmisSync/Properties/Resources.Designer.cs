@@ -189,6 +189,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enable folder for synchronization.
+        /// </summary>
+        internal static string DoNotIgnoreFolder {
+            get {
+                return ResourceManager.GetString("DoNotIgnoreFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty URL.
         /// </summary>
         internal static string EmptyURLNotAllowed {
@@ -266,6 +275,15 @@ namespace CmisSync {
         internal static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore folder on synchronization.
+        /// </summary>
+        internal static string IgnoreFolder {
+            get {
+                return ResourceManager.GetString("IgnoreFolder", resourceCulture);
             }
         }
         

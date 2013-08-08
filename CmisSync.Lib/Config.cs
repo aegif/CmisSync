@@ -268,7 +268,7 @@ namespace CmisSync.Lib
             node_folder.AppendChild(node_pollinterval);
             foreach(string ignoredPath in ignoredPaths)
             {
-                XmlNode ignoreNode = configXml.CreateElement("ignoreFolder");
+                XmlNode ignoreNode = configXml.CreateElement("ignoredFolder");
                 XmlNode attr = configXml.CreateAttribute("path");
                 attr.Value = ignoredPath;
                 ignoreNode.Attributes.SetNamedItem(attr);

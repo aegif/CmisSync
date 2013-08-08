@@ -440,7 +440,8 @@ namespace CmisSync
         /// Create a new CmisSync synchronized folder.
         /// </summary>
         public void StartFetcher(string address, string remote_path, string local_path,
-            string repository, string path, string user, string password, string localrepopath)
+            string repository, string path, string user, string password, string localrepopath,
+            List<string> ignoredPaths)
         {
             repoInfo = new RepoInfo(local_path, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = new Uri(address);
@@ -450,6 +451,8 @@ namespace CmisSync
             repoInfo.Password = Crypto.Obfuscate(password);
             repoInfo.TargetDirectory = localrepopath;
             repoInfo.PollInterval = 5000;
+            foreach (string ignore in ignoredPaths)
+                repoInfo.addIgnorePath(ignore);
 
             fetcher = new Fetcher(repoInfo, activityListenerAggregator);
 
