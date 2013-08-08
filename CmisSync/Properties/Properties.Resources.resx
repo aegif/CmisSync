@@ -291,4 +291,19 @@ Please check your user credentials and potentially the server URL.</value>
     <value>Failed to communicate with the given server!
 Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https</value>
   </data>
+  <data name="DoNotIgnoreFolder" xml:space="preserve">
+    <value>Enable folder for synchronization</value>
+  </data>
+  <data name="IgnoreFolder" xml:space="preserve">
+    <value>Ignore folder on synchronization</value>
+  </data>
+  <data name="LoadingStatusLOADING" xml:space="preserve">
+    <value>loading ...</value>
+  </data>
+  <data name="LoadingStatusSTART" xml:space="preserve">
+    <value>pending ...</value>
+  </data>
+  <data name="RemoveFolderFromSync" xml:space="preserve">
+    <value>Remove the folder from synchronization</value>
+  </data>
 </root>
