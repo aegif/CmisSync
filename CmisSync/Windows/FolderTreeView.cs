@@ -16,7 +16,7 @@ namespace CmisSync
     namespace CmisTree
     {
 
-        public class CmisRepo : INotifyPropertyChanged, IDisposable
+        public class CmisRepo : INotifyPropertyChanged
         {
             private BackgroundWorker worker = new BackgroundWorker();
             private BackgroundWorker folderworker = new BackgroundWorker();
@@ -156,12 +156,6 @@ namespace CmisSync
                 OnPropertyChanged(propertyName);
                 return true;
             }
-
-            public void Dispose()
-            {
-                this.worker.Dispose();
-                this.folderworker.Dispose();
-            }
         }
 
         public class Folder : INotifyPropertyChanged
@@ -204,8 +198,23 @@ namespace CmisSync
                 {
                     if (SetField(ref ignored, value, "IsIgnored"))
                     {
-                        foreach (Folder subfolder in _subfolder)
-                            subfolder.IsIgnored = ignored;
+                        if (ignored)
+                        {
+                            foreach (Folder subfolder in _subfolder)
+                                subfolder.IsIgnored = ignored;
+                        }
+                        else
+                        {
+                            Folder parent = Parent as Folder;
+                            while (parent != null)
+                            {
+                                if (parent.ignored)
+                                    parent.IsIgnored = false;
+                                else
+                                    break;
+                                parent = parent.Parent as Folder;
+                            }
+                        }
                     }
                 }
             }
