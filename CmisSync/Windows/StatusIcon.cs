@@ -223,12 +223,23 @@ namespace CmisSync
                     };
                     suspendFolderItem.Click += SuspendSyncFolderDelegate(folderName);
 
+                    // Sub-item: remove folder from sync
+                    ToolStripMenuItem removeFolderFromSyncItem = new ToolStripMenuItem()
+                    {
+                        Text = Properties_Resources.RemoveFolderFromSync,
+                        Tag = "remove",
+                        // TODO if remove folder from sync is supported, enable this entry
+                        Enabled = false
+                    };
+                    removeFolderFromSyncItem.Click += RemoveFolderFromSyncDelegate(folderName);
+
                     // Add the sub-items.
                     subfolderItem.DropDownItems.Add(openLocalFolderItem);
                     subfolderItem.DropDownItems.Add(openRemoteFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
-
+                    subfolderItem.DropDownItems.Add(new ToolStripSeparator());
+                    subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
                     // Add the main item.
                     this.traymenu.Items.Add(subfolderItem);
                 }
@@ -340,6 +351,14 @@ namespace CmisSync
             return delegate
             {
                 Controller.SuspendSyncClicked(reponame);
+            };
+        }
+
+        private EventHandler RemoveFolderFromSyncDelegate(string reponame)
+        {
+            return delegate
+            {
+                Controller.RemoveFolderFromSyncClicked(reponame);
             };
         }
     }

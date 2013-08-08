@@ -268,6 +268,13 @@ namespace CmisSync
             repo.Initialize();
         }
 
+        public void RemoveRepositoryFromSync(string reponame)
+        {
+            string folder_path = ConfigManager.GetFullPath(reponame);
+            // TODO Abort every action and Database connection and remove configs
+            //RemoveRepository(folder_path);
+        }
+
         
         /// <summary>
         /// Remove a synchronized folder from the CmisSync configuration.
@@ -284,9 +291,9 @@ namespace CmisSync
 
                     if (repo.LocalPath.Equals(folder_path))
                     {
+                        
                         // Remove Cmis Database File
                         RemoveDatabase(folder_path);
-
                         repo.Dispose();
                         this.repositories.Remove(repo);
                         repo = null;

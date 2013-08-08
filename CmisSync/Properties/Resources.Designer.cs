@@ -299,6 +299,24 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to loading ....
+        /// </summary>
+        internal static string LoadingStatusLOADING {
+            get {
+                return ResourceManager.GetString("LoadingStatusLOADING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to pending ....
+        /// </summary>
+        internal static string LoadingStatusSTART {
+            get {
+                return ResourceManager.GetString("LoadingStatusSTART", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A local folder with the same name already exist, please use a different name..
         /// </summary>
         internal static string LocalDirectoryExist {
@@ -386,6 +404,15 @@ namespace CmisSync {
         internal static string ReceivingChanges {
             get {
                 return ResourceManager.GetString("ReceivingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove the folder from synchronization.
+        /// </summary>
+        internal static string RemoveFolderFromSync {
+            get {
+                return ResourceManager.GetString("RemoveFolderFromSync", resourceCulture);
             }
         }
         
