@@ -25,6 +25,7 @@ SOURCES =  \
 	Sync/CmisRepo.cs \
 	Sync/CrawlStrategy.cs \
 	Sync/SynchronizedFolder.cs \
+	Sync/WatcherStrategy.cs \
 	Utils.cs \
 	Watcher.cs
 

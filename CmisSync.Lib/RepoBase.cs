@@ -114,7 +114,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Watches the local filesystem for changes.
         /// </summary>
-        private Watcher watcher;
+        public Watcher Watcher { get; private set; }
 
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace CmisSync.Lib
                 Status = status;
             };
 
-            this.watcher = new Watcher(LocalPath);
+            this.Watcher = new Watcher(LocalPath);
 
             // Main loop syncing every X seconds.
             this.remote_timer.Elapsed += delegate
@@ -220,7 +220,7 @@ namespace CmisSync.Lib
                 {
                     this.remote_timer.Stop();
                     this.remote_timer.Dispose();
-                    this.watcher.Dispose();
+                    this.Watcher.Dispose();
                 }
                 this.disposed = true;
             }
@@ -232,7 +232,7 @@ namespace CmisSync.Lib
         /// </summary>
         public void Initialize()
         {
-            this.watcher.ChangeEvent += OnFileActivity;
+            this.Watcher.ChangeEvent += OnFileActivity;
 
             // Sync up everything that changed
             // since we've been offline
@@ -249,9 +249,9 @@ namespace CmisSync.Lib
         {
             ChangesDetected();
 
-            this.watcher.Disable();
+            this.Watcher.EnableEvent = false;
             // TODO
-            this.watcher.Enable();
+            this.Watcher.EnableEvent = true;
         }
 
 

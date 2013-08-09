@@ -114,7 +114,7 @@ AC_ARG_WITH([test-localpath],
 AC_SUBST(TEST_LOCALPATH)
 
 TEST_REMOTEPATH="/remotepath"
-AC_ARG_WITH([test-localpath],
+AC_ARG_WITH([test-remotepath],
     AS_HELP_STRING([--with-test-remotepath=PATH],[Specify remote path for testing]),
     TEST_REMOTEPATH=${withval})
 AC_SUBST(TEST_REMOTEPATH)

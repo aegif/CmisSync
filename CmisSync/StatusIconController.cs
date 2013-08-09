@@ -262,6 +262,11 @@ namespace CmisSync {
             UpdateSuspendSyncFolderEvent(reponame);
         }
 
+        public void RemoveFolderFromSyncClicked(string reponame)
+        {
+            Program.Controller.RemoveRepositoryFromSync(reponame);
+        }
+
 
         /// <summary>
         /// Start the tray icon animation.

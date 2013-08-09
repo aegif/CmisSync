@@ -1,0 +1,34 @@
+﻿<TreeView
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CmisSync.CmisTree;assembly=DataSpaceSync"
+        Margin="10" ItemsSource="{Binding}"
+        Width="410" Height="267" >
+    <TreeView.Resources>
+        <local:LoadingStatusToBrushConverter x:Key="LoadingStatus" />
+        <local:LoadingStatusToTextConverter x:Key="StatusText" />
+        <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
+        <local:IgnoreToTextDecoration x:Key="IgnoreTextDecoration" />
+        <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                <TextBlock Text="{Binding Name}" />
+                <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding SubFolder}" >
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{Binding Converter={StaticResource IgnoreText}, Path=IsIgnored}" IsCheckable="True" IsChecked="{Binding IsIgnored}">
+                            
+                        </MenuItem>
+                    </ContextMenu>
+                </StackPanel.ContextMenu>
+                <TextBlock Text="{Binding Name}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
+                <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        </TreeView.Resources>
+    </TreeView>
