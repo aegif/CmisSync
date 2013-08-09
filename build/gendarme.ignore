@@ -23,10 +23,6 @@ M: System.Void CmisSync.SetupWindow::.ctor()
 M: System.Void CmisSync.StatusIcon::CreateMenu()
 M: System.Void CmisSync.CmisSyncMenuItem::.ctor(System.String)
 
-#Ignore dispose pattern for UI TreeView (Windows)
-R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
-T: CmisSync.CmisTree.Folder
-
 #Configure setting
 R: Gendarme.Rules.Portability.DoNotHardcodePathsRule
 #Configure setting
@@ -47,6 +43,7 @@ R: Gendarme.Rules.Design.TypesWithDisposableFieldsShouldBeDisposableRule
 T: CmisSync.ControllerBase
 T: CmisSync.StatusIconController
 T: CmisSync.UI
+T: CmisSync.CmisTree.Folder
 
 #Windows Gendarme bug? XmlNodeList is not an IDisposal object at all
 R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
