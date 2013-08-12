@@ -117,7 +117,10 @@ namespace CmisSync.Lib.Sync
                         if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                         {
                             //Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
-                            remoteFolders.Add(remoteSubFolder.Name);
+                            if (null != remoteFolders)
+                            {
+                                remoteFolders.Add(remoteSubFolder.Name);
+                            }
                             string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name;
 
                             // Check whether local folder exists.
@@ -183,92 +186,7 @@ namespace CmisSync.Lib.Sync
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)cmisObject;
 
-                        if (Utils.WorthSyncing(remoteDocument.Name))
-                        {
-                            // We use the filename of the document's content stream.
-                            // This can be different from the name of the document.
-                            // For instance in FileNet it is not usual to have a document where
-                            // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
-                            string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
-                            //Logger.Debug("CrawlRemote doc: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName);
-
-                            // Check if file extension is allowed
-
-                            remoteFiles.Add(remoteDocumentFileName);
-                            // If this file does not have a filename, ignore it.
-                            // It sometimes happen on IBM P8 CMIS server, not sure why.
-                            if (remoteDocumentFileName == null)
-                            {
-                                Logger.Warn("Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
-                                continue;
-                            }
-
-                            string filePath = localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName;
-
-                            if (File.Exists(filePath))
-                            {
-                                // Check modification date stored in database and download if remote modification date if different.
-                                DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
-                                DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
-
-                                if (lastDatabaseUpdate == null)
-                                {
-                                    Logger.Info("Downloading file absent from database: " + filePath);
-                                    success = success && DownloadFile(remoteDocument, localFolder);
-                                }
-                                else
-                                {
-                                    // If the file has been modified since last time we downloaded it, then download again.
-                                    if (serverSideModificationDate > lastDatabaseUpdate)
-                                    {
-                                        if (database.LocalFileHasChanged(filePath))
-                                        {
-                                            Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
-                                            // Rename locally modified file.
-                                            String ext = Path.GetExtension(filePath);
-                                            String filename = Path.GetFileNameWithoutExtension(filePath);
-                                            String path = Path.GetDirectoryName(filePath);
-
-                                            String NewFileName = Utils.SuffixIfExists(filename + "_" + repoinfo.User + "-version");
-                                            String newFilePath = Path.Combine(path, NewFileName);
-                                            File.Move(filePath, newFilePath);
-
-                                            // Download server version
-                                            success = success && DownloadFile(remoteDocument, localFolder);
-                                            repo.OnConflictResolved();
-
-                                            // TODO move to OS-dependant layer
-                                            //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                            //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
-                                            // TODO show CMIS property lastModifiedBy
-                                        }
-                                        else
-                                        {
-                                            Logger.Info("Downloading modified file: " + remoteDocumentFileName);
-                                            success = success && DownloadFile(remoteDocument, localFolder);
-                                        }
-                                    }
-
-                                }
-                            }
-                            else
-                            {
-                                if (database.ContainsFile(filePath))
-                                {
-                                    // File has been recently removed locally, so remove it from server too.
-                                    Logger.Info("Removing locally deleted file on server: " + filePath);
-                                    remoteDocument.DeleteAllVersions();
-                                    // Remove it from database.
-                                    database.RemoveFile(filePath);
-                                }
-                                else
-                                {
-                                    // New remote file, download it.
-                                    Logger.Info("New remote file: " + filePath);
-                                    success = success && DownloadFile(remoteDocument, localFolder);
-                                }
-                            }
-                        }
+                        success = success && SyncDownloadFile(remoteDocument, localFolder, remoteFiles);
                     }
                     #endregion
                 }
@@ -382,11 +300,10 @@ namespace CmisSync.Lib.Sync
                         Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
-                    string path = Path.Combine(localFolder, localSubFolder).ToString().Substring(repoinfo.TargetDirectory.Length);
-                    path = path.Replace("\\", "/");
-                    if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(path))
+                    string path = localSubFolder.Substring(repoinfo.TargetDirectory.Length).Replace("\\", "/");
+                    string folderName = Path.GetFileName(localSubFolder);
+                    if (Utils.WorthSyncing(folderName) && !repoinfo.isPathIgnored(path))
                     {
-                        string folderName = Path.GetFileName(localSubFolder);
                         if (!remoteFolders.Contains(folderName))
                         {
                             // This local folder is not on the CMIS server now, so

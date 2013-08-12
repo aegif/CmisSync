@@ -247,6 +247,45 @@ namespace CmisSync.Lib.Sync
                         Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
                     }
                 }
+
+                {
+                    IDocument remoteDocument = session.GetObject("957") as IDocument;
+                    if (remoteDocument != null)
+                    {
+                        string remoteDocumentPath = Path.Combine(remoteDocument.Paths.ToArray());
+                        remoteDocumentPath.Replace("\\", "/");
+                        if (remoteDocumentPath.StartsWith(remoteFolderPath))
+                        {
+                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length);
+                            if (relativePath[0] == '/')
+                            {
+                                relativePath = relativePath.Substring(1);
+                            }
+                            string relativeFolderPath = Path.GetDirectoryName(relativePath);
+                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
+                        }
+                    }
+                }
+
+                {
+                    IDocument remoteDocument = session.GetObject("955") as IDocument;
+                    if (remoteDocument != null)
+                    {
+                        string remoteDocumentPath = Path.Combine(remoteDocument.Paths.ToArray());
+                        remoteDocumentPath.Replace("\\", "/");
+                        if (remoteDocumentPath.StartsWith(remoteFolderPath))
+                        {
+                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length);
+                            if (relativePath[0] == '/')
+                            {
+                                relativePath = relativePath.Substring(1);
+                            }
+                            string relativeFolderPath = Path.GetDirectoryName(relativePath);
+                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
+                        }
+                    }
+                }
+
             }
 
 
@@ -330,6 +369,110 @@ namespace CmisSync.Lib.Sync
                 }
 
                 activityListener.ActivityStopped();
+
+                return success;
+            }
+
+
+            /// <summary>
+            /// Download a single file from the CMIS server for sync.
+            /// </summary>
+            private bool SyncDownloadFile(IDocument remoteDocument, string localFolder, IList remoteFiles = null)
+            {
+                string name = remoteDocument.Name;
+                // We use the filename of the document's content stream.
+                // This can be different from the name of the document.
+                // For instance in FileNet it is not usual to have a document where
+                // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
+                string fileName = remoteDocument.ContentStreamFileName;
+                string filePath = Path.Combine(localFolder, fileName);
+
+                // If this file does not have a filename, ignore it.
+                // It sometimes happen on IBM P8 CMIS server, not sure why.
+                if (fileName == null)
+                {
+                    Logger.Warn("Skipping download of '" + name + "' with null content stream in " + localFolder);
+                    return true;
+                }
+
+                if (!Utils.WorthSyncing(fileName))
+                {
+                    Logger.Info("Ignore the unworth syncing remote file: " + fileName);
+                    return true;
+                }
+
+                // Check if file extension is allowed
+
+                if (null != remoteFiles)
+                {
+                    remoteFiles.Add(fileName);
+                }
+
+                bool success = true;
+
+                if (File.Exists(filePath))
+                {
+                    // Check modification date stored in database and download if remote modification date if different.
+                    DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
+                    DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
+
+                    if (lastDatabaseUpdate == null)
+                    {
+                        Logger.Info("Downloading file absent from database: " + filePath);
+                        success = DownloadFile(remoteDocument, localFolder);
+                    }
+                    else
+                    {
+                        // If the file has been modified since last time we downloaded it, then download again.
+                        if (serverSideModificationDate > lastDatabaseUpdate)
+                        {
+                            if (database.LocalFileHasChanged(filePath))
+                            {
+                                Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
+                                // Rename locally modified file.
+                                String ext = Path.GetExtension(filePath);
+                                String filename = Path.GetFileNameWithoutExtension(filePath);
+                                String dir = Path.GetDirectoryName(filePath);
+
+                                String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filePath) + "_" + repoinfo.User + "-version");
+                                String newFilePath = Path.Combine(dir, newFileName);
+                                File.Move(filePath, newFilePath);
+
+                                // Download server version
+                                success = DownloadFile(remoteDocument, localFolder);
+                                repo.OnConflictResolved();
+
+                                // TODO move to OS-dependant layer
+                                //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
+                                //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
+                                // TODO show CMIS property lastModifiedBy
+                            }
+                            else
+                            {
+                                Logger.Info("Downloading modified file: " + fileName);
+                                success = DownloadFile(remoteDocument, localFolder);
+                            }
+                        }
+
+                    }
+                }
+                else
+                {
+                    if (database.ContainsFile(filePath))
+                    {
+                        // File has been recently removed locally, so remove it from server too.
+                        Logger.Info("Removing locally deleted file on server: " + filePath);
+                        remoteDocument.DeleteAllVersions();
+                        // Remove it from database.
+                        database.RemoveFile(filePath);
+                    }
+                    else
+                    {
+                        // New remote file, download it.
+                        Logger.Info("New remote file: " + filePath);
+                        success = DownloadFile(remoteDocument, localFolder);
+                    }
+                }
 
                 return success;
             }

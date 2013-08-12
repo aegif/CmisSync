@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,45 +38,46 @@ namespace CmisSync.Lib.Sync
 
                 if (lastTokenOnClient == null)
                 {
-                    // Token is null, which means no sync has ever happened yet, so just copy everything.
-                    // RecursiveFolderCopy(remoteFolder, localRootFolder);
-                    RecursiveFolderCopy(remoteFolder, repoinfo.TargetDirectory);
-                }
-                else
-                {
-                    // If there are remote changes, apply them.
-                    if (lastTokenOnServer.Equals(lastTokenOnClient))
+                    // Token is null, which means no sync has ever happened yet, so just sync everything from remote.
+                    if (CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null))
                     {
-                        Logger.Info("Sync | No changes on server, ChangeLog token: " + lastTokenOnServer);
+                        Logger.Info("Success to sync from remote, update ChangeLog token: " + lastTokenOnServer);
+                        database.SetChangeLogToken(lastTokenOnServer);
                     }
                     else
                     {
-                        // Check which files/folders have changed.
-                        int maxNumItems = 1000;
-                        IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
+                        Logger.Warn("Failure to sync from remote, wait for the next time.");
+                    }
+                    return;
+                }
 
-                        // Replicate each change to the local side.
-                        foreach (IChangeEvent change in changes.ChangeEventList)
-                        {
-                            ApplyRemoteChange(change);
-                        }
+                do
+                {
+                    // Check which files/folders have changed.
+                    int maxNumItems = 100;
+                    IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
 
-                        // Save change log token locally.
-                        // TODO only if successful
-                        Logger.Info("Sync | Updating ChangeLog token: " + lastTokenOnServer);
-                        database.SetChangeLogToken(lastTokenOnServer);
+                    // Replicate each change to the local side.
+                    foreach (IChangeEvent change in changes.ChangeEventList)
+                    {
+                        ApplyRemoteChange(change);
                     }
 
-                    // Upload local changes by comparing with database.
-                    // TODO
+                    // Save change log token locally.
+                    // TODO only if successful
+                    lastTokenOnClient = changes.LatestChangeLogToken;
+                    Logger.Info("Sync the changes on server, update ChangeLog token: " + lastTokenOnClient);
+                    database.SetChangeLogToken(lastTokenOnClient);
+                    lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
                 }
+                while (!lastTokenOnServer.Equals(lastTokenOnClient));
             }
 
 
             /// <summary>
             /// Apply a remote change.
             /// </summary>
-            private void ApplyRemoteChange(IChangeEvent change)
+            private bool ApplyRemoteChange(IChangeEvent change)
             {
                 Logger.Info("Sync | Change type:" + change.ChangeType.ToString() + " id:" + change.ObjectId + " properties:" + change.Properties);
                 IFolder remoteFolder;
@@ -89,23 +90,35 @@ namespace CmisSync.Lib.Sync
                         ICmisObject cmisObject = session.GetObject(change.ObjectId);
                         if (null != (remoteDocument = cmisObject as IDocument))
                         {
-                            string remoteDocumentPath = remoteDocument.Paths.First();
+                            string remoteDocumentPath = Path.Combine(remoteDocument.Paths.ToArray());
+                            remoteDocumentPath.Replace("\\", "/");
                             if (!remoteDocumentPath.StartsWith(remoteFolderPath))
                             {
-                                Logger.Info("Sync | Change in unrelated document: " + remoteDocumentPath);
-                                break; // The change is not under the folder we care about.
+                                Logger.Info("Change in unrelated document: " + remoteDocumentPath);
+                                return true;    // The change is not under the folder we care about.
                             }
-                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
+                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length);
+                            if (relativePath[0] == '/')
+                            {
+                                relativePath = relativePath.Substring(1);
+                            }
+                            foreach (string name in relativePath.Split('/'))
+                            {
+                                if (!Utils.WorthSyncing(name))
+                                {
+                                    Logger.Info("Change in unworth syncing document: " + remoteDocumentPath);
+                                    return true;
+                                }
+                            }
                             string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            relativeFolderPath = relativeFolderPath.Replace('/', '\\'); // TODO OS-specific separator
                             string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
-                            DownloadFile(remoteDocument, localFolderPath);
+                            return SyncDownloadFile(remoteDocument, localFolderPath);
                         }
                         else if (null != (remoteFolder = cmisObject as IFolder))
                         {
                             string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
                             if(!this.repoinfo.isPathIgnored(remoteFolder.Path))
-                                RecursiveFolderCopy(remoteFolder, localFolder);
+                                return RecursiveFolderCopy(remoteFolder, localFolder);
                         }
                         break;
 
@@ -139,6 +152,8 @@ namespace CmisSync.Lib.Sync
                         // TODO
                         break;
                 }
+
+                return true;
             }
         }
     }
