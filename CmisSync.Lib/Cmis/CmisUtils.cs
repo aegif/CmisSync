@@ -213,7 +213,16 @@ namespace CmisSync.Lib.Cmis
             ISession session = factory.CreateSession(cmisParameters);
 
             // Get the folder.
-            IFolder folder = (IFolder)session.GetObjectByPath(path);
+            IFolder folder;
+            try
+            {
+                folder = (IFolder)session.GetObjectByPath(path);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}: {1}", path, Utils.ToLogString(ex)));
+                return result.ToArray();
+            }
 
             // Debug the properties count, which allows to check whether a particular CMIS implementation is compliant or not.
             // For instance, IBM Connections is known to send an illegal count.

@@ -382,11 +382,10 @@ namespace CmisSync.Lib.Sync
                         Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
                         System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                     }
-                    string path = Path.Combine(localFolder, localSubFolder).ToString().Substring(repoinfo.TargetDirectory.Length);
-                    path = path.Replace("\\", "/");
-                    if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(path))
+                    string path = localSubFolder.Substring(repoinfo.TargetDirectory.Length).Replace("\\", "/");
+                    string folderName = Path.GetFileName(localSubFolder);
+                    if (Utils.WorthSyncing(folderName) && !repoinfo.isPathIgnored(path))
                     {
-                        string folderName = Path.GetFileName(localSubFolder);
                         if (!remoteFolders.Contains(folderName))
                         {
                             // This local folder is not on the CMIS server now, so
