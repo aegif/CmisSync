@@ -164,7 +164,7 @@
       Schedule="afterInstallInitialize"
       DowngradeErrorMessage="A later version of DataSpace Sync is already installed. Setup will now exit." />
     <PropertyRef Id="NETFRAMEWORK40FULL" />
-    <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again.">
+    <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again. Download: https://www.microsoft.com/en-us/download/details.aspx?id=17718">
       <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
     </Condition>
   </Product>
