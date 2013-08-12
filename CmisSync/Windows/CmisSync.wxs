@@ -163,7 +163,7 @@
     <MajorUpgrade
       Schedule="afterInstallInitialize"
       DowngradeErrorMessage="A later version of DataSpace Sync is already installed. Setup will now exit." />
-    <PropertyRef Id="NETFRAMEWORK40" />
+    <PropertyRef Id="NETFRAMEWORK40FULL" />
     <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again.">
       <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
     </Condition>
