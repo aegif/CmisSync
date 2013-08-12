@@ -63,7 +63,7 @@ namespace CmisSync.Lib.Cmis
             catch (DotCMIS.Exceptions.CmisRuntimeException e)
             {
                 if (e.Message == "ConnectFailure")
-                    return new Tuple<CmisServer, Exception>(new CmisServer(url, null),e);
+                    return new Tuple<CmisServer, Exception>(new CmisServer(url, null), new CmisServerNotFoundException(e.Message, e));
                 firstException = e;
 
             }
@@ -84,9 +84,9 @@ namespace CmisSync.Lib.Cmis
             // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
             // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
             string[] suffixes = {
+                "/cmis/atom",
                 "/alfresco/cmisatom",
                 "/alfresco/service/cmis",
-                "/cmis/atom",
                 "/cmis/resources/",
                 "/emc-cmis-ea/resources/",
                 "/xcmis/rest/cmisatom",
@@ -108,7 +108,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
                 {
-                    firstException = e;
+                    firstException = new CmisPermissionDeniedException(e.Message, e);
                     bestUrl = fuzzyUrl;
                 }
                 catch (Exception e)
