@@ -221,15 +221,6 @@ namespace CmisSync.Lib.Sync
                 IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
                 string localFolder = repoinfo.TargetDirectory;
 
-                //            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
-                //            {
-                //                ChangeLogSync(remoteFolder);
-                //            }
-                //            else
-                //            {
-                // No ChangeLog capability, so we have to crawl remote and local folders.
-                // CrawlSync(remoteFolder, localFolder);
-
                 if (!repo.Watcher.EnableRaisingEvents)
                 {
                     repo.Watcher.RemoveAll();
@@ -237,53 +228,30 @@ namespace CmisSync.Lib.Sync
                     syncFull = false;
                 }
 
-                syncFull = CrawlSync(remoteFolder, localFolder);
-
-                if (syncFull)
+                if (!syncFull)
                 {
-                    WatcherSync(remoteFolderPath, localFolder);
-                    foreach (string name in repo.Watcher.GetChangeList())
-                    {
-                        Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
-                    }
+                    Logger.Info("Invoke a full crawl sync");
+                    syncFull = CrawlSync(remoteFolder, localFolder);
+                    return;
                 }
 
+                if (ChangeLogCapability)
                 {
-                    IDocument remoteDocument = session.GetObject("957") as IDocument;
-                    if (remoteDocument != null)
-                    {
-                        string remoteDocumentPath = Path.Combine(remoteDocument.Paths.ToArray());
-                        remoteDocumentPath.Replace("\\", "/");
-                        if (remoteDocumentPath.StartsWith(remoteFolderPath))
-                        {
-                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length);
-                            if (relativePath[0] == '/')
-                            {
-                                relativePath = relativePath.Substring(1);
-                            }
-                            string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
-                        }
-                    }
+                    Logger.Info("Invoke a remote change log sync");
+                    ChangeLogSync(remoteFolder);
+                }
+                else
+                {
+                    //  have to crawl remote
+                    Logger.Info("Invoke a remote crawl sync");
+                    CrawlSync(remoteFolder, localFolder);
                 }
 
+                Logger.Info("Invoke a file system watcher sync");
+                WatcherSync(remoteFolderPath, localFolder);
+                foreach (string name in repo.Watcher.GetChangeList())
                 {
-                    IDocument remoteDocument = session.GetObject("955") as IDocument;
-                    if (remoteDocument != null)
-                    {
-                        string remoteDocumentPath = Path.Combine(remoteDocument.Paths.ToArray());
-                        remoteDocumentPath.Replace("\\", "/");
-                        if (remoteDocumentPath.StartsWith(remoteFolderPath))
-                        {
-                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length);
-                            if (relativePath[0] == '/')
-                            {
-                                relativePath = relativePath.Substring(1);
-                            }
-                            string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
-                        }
-                    }
+                    Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
                 }
 
             }
