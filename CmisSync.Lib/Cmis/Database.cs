@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 #if __MonoCS__
 using Mono.Data.Sqlite;
 #else
@@ -305,13 +304,13 @@ namespace CmisSync.Lib.Cmis
             path = Normalize(path);
 
             // Remove folder itself
-            ExecuteSQLAction("DELETE FROM folders WHERE path='" + SQLEscape(path) + "'", null);
+            ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
 
             // Remove all folders under this folder
-            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + SQLEscape(path) + "/%'", null);
+            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
 
             // Remove all files under this folder
-            ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + SQLEscape(path) + "/%'", null);
+            ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
         }
 
 
@@ -535,16 +534,9 @@ namespace CmisSync.Lib.Cmis
             {
                 foreach (KeyValuePair<string, object> pair in parameters)
                 {
-                    string value = SQLEscape(pair.Value as string);
-                    command.Parameters.AddWithValue(pair.Key, (value==null) ? (object)DBNull.Value : (object)value);
+                    command.Parameters.AddWithValue(pair.Key, pair.Value);
                 }
             }
-        }
-
-        private static string SQLEscape(string sValue)
-        {
-            if(sValue == null) return null;
-            else return Regex.Replace(sValue,@"[rnx00x1a\'""]", @"$0");
         }
     }
 }
