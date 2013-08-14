@@ -63,7 +63,7 @@ namespace CmisSync.Lib.Cmis
             catch (DotCMIS.Exceptions.CmisRuntimeException e)
             {
                 if (e.Message == "ConnectFailure")
-                    return new Tuple<CmisServer, Exception>(new CmisServer(url, null),e);
+                    return new Tuple<CmisServer, Exception>(new CmisServer(url, null), new CmisServerNotFoundException(e.Message, e));
                 firstException = e;
 
             }
@@ -84,9 +84,9 @@ namespace CmisSync.Lib.Cmis
             // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
             // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
             string[] suffixes = {
+                "/cmis/atom",
                 "/alfresco/cmisatom",
                 "/alfresco/service/cmis",
-                "/cmis/atom",
                 "/cmis/resources/",
                 "/emc-cmis-ea/resources/",
                 "/xcmis/rest/cmisatom",
@@ -108,7 +108,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
                 {
-                    firstException = e;
+                    firstException = new CmisPermissionDeniedException(e.Message, e);
                     bestUrl = fuzzyUrl;
                 }
                 catch (Exception e)
@@ -213,7 +213,16 @@ namespace CmisSync.Lib.Cmis
             ISession session = factory.CreateSession(cmisParameters);
 
             // Get the folder.
-            IFolder folder = (IFolder)session.GetObjectByPath(path);
+            IFolder folder;
+            try
+            {
+                folder = (IFolder)session.GetObjectByPath(path);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}: {1}", path, Utils.ToLogString(ex)));
+                return result.ToArray();
+            }
 
             // Debug the properties count, which allows to check whether a particular CMIS implementation is compliant or not.
             // For instance, IBM Connections is known to send an illegal count.
@@ -228,6 +237,72 @@ namespace CmisSync.Lib.Cmis
                 result.Add(subfolder.Path);
             }
             return result.ToArray();
+        }
+
+
+        public class FolderTree
+        {
+            public List<FolderTree> children = new List<FolderTree>();
+            public string path;
+            public string Name { get; set; }
+
+            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder)
+            {
+                this.path = folder.Path;
+                this.Name = folder.Name;
+                if(trees != null)
+                    foreach (ITree<IFileableCmisObject> tree in trees)
+                    {
+                        Folder f = tree.Item as Folder;
+                        if(f!=null)
+                            this.children.Add(new FolderTree(tree.Children, f));
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Get the sub-folders of a particular CMIS folder.
+        /// </summary>
+        /// <returns>Full path of each sub-folder, including leading slash.</returns>
+        static public FolderTree GetSubfolderTree(string repositoryId, string path,
+            string address, string user, string password, int depth)
+        {
+
+            // Connect to the CMIS repository.
+            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = address;
+            cmisParameters[SessionParameter.User] = user;
+            cmisParameters[SessionParameter.Password] = password;
+            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+            SessionFactory factory = SessionFactory.NewInstance();
+            ISession session = factory.CreateSession(cmisParameters);
+
+            // Get the folder.
+            IFolder folder;
+            try
+            {
+                folder = (IFolder)session.GetObjectByPath(path);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}: {1}", path, Utils.ToLogString(ex)));
+                throw;
+            }
+
+            // Debug the properties count, which allows to check whether a particular CMIS implementation is compliant or not.
+            // For instance, IBM Connections is known to send an illegal count.
+            Logger.Info("CmisUtils | folder.Properties.Count:" + folder.Properties.Count.ToString());
+            try
+            {
+                IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
+                return new FolderTree(trees, folder);
+            }
+            catch (Exception e)
+            {
+                Logger.Info("CmisUtils getSubFolderTree | Exception " + e.Message, e);
+                throw;
+            }
         }
 
 

@@ -43,6 +43,8 @@ R: Gendarme.Rules.Design.TypesWithDisposableFieldsShouldBeDisposableRule
 T: CmisSync.ControllerBase
 T: CmisSync.StatusIconController
 T: CmisSync.UI
+T: CmisSync.CmisTree.Folder
+T: CmisSync.CmisTree.CmisRepo
 
 #Windows Gendarme bug? XmlNodeList is not an IDisposal object at all
 R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule

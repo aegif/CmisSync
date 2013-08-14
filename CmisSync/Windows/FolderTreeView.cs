@@ -145,8 +145,9 @@ namespace CmisSync
             public event PropertyChangedEventHandler PropertyChanged;
             protected virtual void OnPropertyChanged(string propertyName)
             {
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChangedEventHandler handler = PropertyChanged;
+                if (handler != null)
+                    handler(this, new PropertyChangedEventArgs(propertyName));
             }
             protected bool SetField<T>(ref T field, T value, string propertyName)
             {
@@ -190,12 +191,30 @@ namespace CmisSync
             private string path;
             public string Path { get { return path; } set { SetField(ref path, value, "Path"); } }
             private bool ignored = false;
-            public bool IsIgnored { get { return ignored; }
-                set {
+            public bool IsIgnored
+            {
+                get { return ignored; }
+                set
+                {
                     if (SetField(ref ignored, value, "IsIgnored"))
                     {
-                        foreach (Folder subfolder in _subfolder)
-                            subfolder.IsIgnored = ignored;
+                        if (ignored)
+                        {
+                            foreach (Folder subfolder in _subfolder)
+                                subfolder.IsIgnored = ignored;
+                        }
+                        else
+                        {
+                            Folder parent = Parent as Folder;
+                            while (parent != null)
+                            {
+                                if (parent.ignored)
+                                    parent.IsIgnored = false;
+                                else
+                                    break;
+                                parent = parent.Parent as Folder;
+                            }
+                        }
                     }
                 }
             }
@@ -215,8 +234,9 @@ namespace CmisSync
             public event PropertyChangedEventHandler PropertyChanged;
             protected virtual void OnPropertyChanged(string propertyName)
             {
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChangedEventHandler handler = PropertyChanged;
+                if (handler != null)
+                    handler(this, new PropertyChangedEventArgs(propertyName));
             }
             protected bool SetField<T>(ref T field, T value, string propertyName)
             {
@@ -243,8 +263,9 @@ namespace CmisSync
             public event PropertyChangedEventHandler PropertyChanged;
             protected virtual void OnPropertyChanged(string propertyName)
             {
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChangedEventHandler handler = PropertyChanged;
+                if (handler != null)
+                    handler(this, new PropertyChangedEventArgs(propertyName));
             }
             protected bool SetField<T>(ref T field, T value, string propertyName)
             {

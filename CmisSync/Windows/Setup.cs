@@ -594,23 +594,22 @@ namespace CmisSync
                                         // Could not retrieve repositories list from server, show warning.
                                         string warning = "";
                                         string message = result.Item2.Message;
-                                        switch (message)
+                                        Exception e = result.Item2;
+                                        if (e is CmisPermissionDeniedException)
                                         {
-                                            case "Forbidden":
-                                                warning = Properties_Resources.LoginFailedForbidden;
-                                                break;
-                                            case "ConnectFailure":
-                                                warning = Properties_Resources.ConnectFailure;
-                                                break;
-                                            case "SendFailure":
-                                                if (cmisServer.Url.Scheme.StartsWith("https"))
-                                                    warning = Properties_Resources.SendFailureHttps;
-                                                else
-                                                    goto default;
-                                                break;
-                                            default:
-                                                warning = message + Environment.NewLine + Properties_Resources.Sorry;
-                                                break;
+                                            warning = Properties_Resources.LoginFailedForbidden;
+                                        }
+                                        else if (e is CmisServerNotFoundException)
+                                        {
+                                            warning = Properties_Resources.ConnectFailure;
+                                        }
+                                        else if (e.Message == "SendFailure" && cmisServer.Url.Scheme.StartsWith("https"))
+                                        {
+                                            warning = Properties_Resources.SendFailureHttps;
+                                        }
+                                        else
+                                        {
+                                            warning = message + Environment.NewLine + Properties_Resources.Sorry;
                                         }
                                         address_error_label.Text = warning;
                                         address_error_label.Visibility = Visibility.Visible;

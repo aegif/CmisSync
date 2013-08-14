@@ -190,9 +190,18 @@ namespace CmisSync.Lib.Sync
                     Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Info("Created CMIS session: " + session.ToString());
                 }
+                //TODO Implement error handling -> informing user about connection problems by showing status
                 catch (CmisRuntimeException e)
                 {
                     Logger.Error("Connection to repository failed: ", e);
+                }
+                catch (CmisObjectNotFoundException e)
+                {
+                    Logger.Error("Failed to find cmis object: ", e);
+                }
+                catch (CmisBaseException e)
+                {
+                    Logger.Error("Failed to create session to remote " + this.repoinfo.Address.ToString() + ": ", e);
                 }
             }
 
