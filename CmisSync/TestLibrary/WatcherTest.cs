@@ -322,9 +322,18 @@ namespace TestLibrary
                 WaitWatcher(40000,watcher,NormalNumber);
                 WaitWatcher(40000,watcher,(w)=>
                 {
+#if __MonoCS__
+                    List<Watcher.ChangeTypes> types = new List<Watcher.ChangeTypes>();
+                    types.Add(Watcher.ChangeTypes.Created);
+                    types.Add(Watcher.ChangeTypes.Changed);
+#endif
                     for (int i = 0; i < NormalNumber; ++i)
                     {
+#if __MonoCS__
+                        if (!types.Contains(w.GetChangeType(names[i])))
+#else
                         if (w.GetChangeType(names[i]) != Watcher.ChangeTypes.Changed)
+#endif
                         {
                             return false;
                         }
@@ -557,11 +566,17 @@ namespace TestLibrary
 
         private void WaitWatcher(int milliseconds = 10)
         {
+#if __MonoCS__
+            milliseconds = milliseconds * 10;
+#endif
             Thread.Sleep(milliseconds);
         }
 
         private void WaitWatcher(int milliseconds,Watcher watcher,int expect)
         {
+#if __MonoCS__
+            milliseconds = milliseconds * 10;
+#endif
             while (milliseconds >= 0)
             {
                 if (watcher.GetChangeList().Count >= expect)
@@ -576,6 +591,9 @@ namespace TestLibrary
 
         private void WaitWatcher(int milliseconds,Watcher watcher,Func<Watcher,bool> checkStop)
         {
+#if __MonoCS__
+            milliseconds = milliseconds * 10;
+#endif
             while (milliseconds >= 0)
             {
                 if (checkStop(watcher))
@@ -590,6 +608,9 @@ namespace TestLibrary
 
         private void WaitWatcher(int milliseconds,FileSystemEventCount count,Func<FileSystemEventCount,bool> checkStop)
         {
+#if __MonoCS__
+            milliseconds = milliseconds * 10;
+#endif
             while (milliseconds >= 0)
             {
                 if (checkStop(count))
