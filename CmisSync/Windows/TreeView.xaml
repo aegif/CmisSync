@@ -2,6 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CmisSync.CmisTree;assembly=DataSpaceSync"
         Margin="10" ItemsSource="{Binding}"
@@ -12,23 +14,40 @@
         <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
         <local:IgnoreToTextDecoration x:Key="IgnoreTextDecoration" />
         <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
-                <TextBlock Text="{Binding Name}" />
-                <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
-            </StackPanel>
+            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" Padding="5,0,0,0" >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                    <TextBlock Text="{Binding Name, Mode=OneTime}" />
+                    <TextBlock Text="{Binding Address, Mode=OneTime}" Foreground="Gray" Margin="20,0"/>
+                    <!--<CheckBox Content="Automatically synchronize all new folder in future" IsChecked="{Binding SyncAllSubFolder,Mode=TwoWay}" />-->
+                    <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
+                </StackPanel>
+            </CheckBox>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding SubFolder}" >
-            <StackPanel Orientation="Horizontal">
-                <StackPanel.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="{Binding Converter={StaticResource IgnoreText}, Path=IsIgnored}" IsCheckable="True" IsChecked="{Binding IsIgnored}">
-                            
-                        </MenuItem>
-                    </ContextMenu>
-                </StackPanel.ContextMenu>
-                <TextBlock Text="{Binding Name}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
-                <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
-            </StackPanel>
+            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
+                <StackPanel Orientation="Horizontal">
+<!--
+                    <StackPanel.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{Binding Converter={StaticResource IgnoreText}, Path=IsIgnored}" IsCheckable="True" IsChecked="{Binding IsIgnored}">
+
+                            </MenuItem>
+                        </ContextMenu>
+                    </StackPanel.ContextMenu>
+-->
+                    <TextBlock Text="{Binding Name, Mode=OneTime}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
+                    <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
+                </StackPanel>
+            </CheckBox>
         </HierarchicalDataTemplate>
         </TreeView.Resources>
+    <TreeView.ItemContainerStyle>
+        <Style TargetType="TreeViewItem">
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </TreeView.ItemContainerStyle>
     </TreeView>

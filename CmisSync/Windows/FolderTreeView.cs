@@ -26,15 +26,62 @@ namespace CmisSync
             public string Id { get; set; }
             public string Path { get { return "/"; } }
 
+
             private string username;
             private string password;
             private string address;
+
+            public string Address { get { return address; } }
 
             private Folder currentWorkingObject;
             private Queue<Folder> queue = new Queue<Folder>();
 
             private LoadingStatus status = LoadingStatus.START;
             public LoadingStatus Status { get { return status; } set { SetField(ref status, value, "Status"); } }
+            private bool threestate = false;
+            public bool ThreeState { get { return threestate; } set { SetField(ref threestate, value, "ThreeState"); } }
+            private bool selected = false;
+            public bool Selected
+            {
+                get { return selected; }
+                set
+                {
+                    if (SetField(ref selected, value, "Selected"))
+                    {
+                        foreach (Folder child in Folder)
+                        {
+                            child.Enabled = selected;
+                        }
+                    }
+                }
+            }
+            private bool automaticSyncAllNewSubfolder = true;
+            public bool SyncAllSubFolder { get { return automaticSyncAllNewSubfolder; } set {
+                if (SetField(ref automaticSyncAllNewSubfolder, value, "SyncAllSubFolder"))
+                {
+                    if (automaticSyncAllNewSubfolder)
+                    {
+                        foreach (Folder subfolder in Folder)
+                        {
+                            if (subfolder.Selected == false)
+                            {
+                                subfolder.IsIgnored = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (Folder subfolder in Folder)
+                        {
+                            if (subfolder.IsIgnored)
+                            {
+                                subfolder.IsIgnored = false;
+                                subfolder.Selected = false;
+                            }
+                        }
+                    }
+                }
+            } }
             public ObservableCollection<Folder> Folder
             {
                 get { return _folder; }
@@ -63,7 +110,12 @@ namespace CmisSync
             private void DoWork(object sender, DoWorkEventArgs e)
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
-                e.Result = CmisUtils.GetSubfolders(Id, Path, address, username, password);
+                try
+                {
+                    e.Result = CmisUtils.GetSubfolderTree(Id,Path,address,username,password,-1);
+                } catch(Exception) {
+                    e.Result = CmisUtils.GetSubfolders(Id, Path, address, username, password);
+                }
             }
 
             private void SubFolderWork(object sender, DoWorkEventArgs e)
@@ -95,7 +147,9 @@ namespace CmisSync
                                 Name = f.Split('/')[f.Split('/').Length - 1],
                                 Parent = currentWorkingObject,
                                 Type = CmisTree.Folder.FolderType.REMOTE,
-                                IsIgnored = currentWorkingObject.IsIgnored
+                                IsIgnored = currentWorkingObject.IsIgnored,
+                                Selected = currentWorkingObject.Selected,
+                                Enabled = currentWorkingObject.Enabled
                             };
                         currentWorkingObject.SubFolder.Add(folder);
                         this.queue.Enqueue(folder);
@@ -120,24 +174,41 @@ namespace CmisSync
                 }
                 else
                 {
-                    string[] subfolder = (string[])e.Result;
-                    foreach (string f in subfolder)
+                    if (e.Result is CmisSync.Lib.Cmis.CmisUtils.FolderTree)
                     {
-                        Folder folder = new Folder()
+                        CmisUtils.FolderTree repotree = e.Result as CmisUtils.FolderTree;
+                        foreach (CmisUtils.FolderTree repofolder in repotree.children)
                         {
-                            Repo = this,
-                            Path = f,
-                            Name = f.Split('/')[f.Split('/').Length - 1],
-                            Parent = this,
-                            Type = CmisTree.Folder.FolderType.REMOTE
-                        };
-                        this.Folder.Add(folder);
-                        this.queue.Enqueue(folder);
+                            Folder folder = new Folder(repofolder, this);
+                            this.Folder.Add(folder);
+                        }
+                        Status = LoadingStatus.DONE;
                     }
-                    Status = LoadingStatus.DONE;
-                    this.folderworker.RunWorkerAsync();
+                    else
+                    {
+                        if (e.Result == null) return;
+                        string[] subfolder = (string[])e.Result;
+                        foreach (string f in subfolder)
+                        {
+                            Folder folder = new Folder()
+                            {
+                                Repo = this,
+                                Path = f,
+                                Name = f.Split('/')[f.Split('/').Length - 1],
+                                Parent = this,
+                                Type = CmisTree.Folder.FolderType.REMOTE,
+                                Enabled = this.selected
+                            };
+                            this.Folder.Add(folder);
+                            this.queue.Enqueue(folder);
+                        }
+                        Status = LoadingStatus.DONE;
+                        if (this.queue.Count > 0)
+                        {
+                            this.folderworker.RunWorkerAsync();
+                        }
+                    }
                 }
-
             }
 
 
@@ -180,12 +251,102 @@ namespace CmisSync
                 }
             }
 
+            public Folder(CmisUtils.FolderTree tree, CmisRepo repo)
+            {
+                this.Path = path;
+                this.Repo = repo;
+                this.Name = tree.Name;
+                this.Type = FolderType.REMOTE;
+                this.Status = LoadingStatus.DONE;
+                this.Enabled = repo.Selected;
+                foreach (CmisUtils.FolderTree t in tree.children)
+                {
+                    this.SubFolder.Add(new Folder(t, Repo));
+                }
+            }
+            public Folder() { }
+
             private CmisRepo repo;
-            public ICommand ToggleIgnoreCommand { get; set; }
             public object Parent { get; set; }
             public CmisRepo Repo { get { return repo; } set { SetField(ref repo, value, "Repo"); } }
-            private bool selected = false;
-            public bool Selected { get { return selected; } set { SetField(ref selected, value, "Selected"); } }
+            private bool threestates = false;
+            public bool ThreeStates { get { return threestates; } set { SetField(ref threestates, value, "ThreeStates"); } }
+            private bool? selected = true;
+            public bool? Selected { get { return selected; } set {
+                if (SetField(ref selected, value, "Selected"))
+                {
+                    if (selected == null)
+                    {
+                        this.ThreeStates = true;
+                    }
+                    else if (selected == true)
+                    {
+                        this.IsIgnored = false;
+                        this.ThreeStates = false;
+                        foreach (Folder subfolder in SubFolder)
+                        {
+                            subfolder.Selected = true;
+                            subfolder.ThreeStates = false;
+                        }
+                        Folder p = this.Parent as Folder;
+                        bool found = false;
+                        while (p != null)
+                        {
+                            if (p.Selected == null)
+                            {
+                                bool allSelected = true;
+                                foreach (Folder childOfParent in p.SubFolder)
+                                {
+                                    if (childOfParent.selected != true)
+                                    {
+                                        allSelected = false;
+                                        break;
+                                    }
+                                }
+                                if (allSelected)
+                                {
+                                    p.Selected = true;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            p = p.Parent as Folder;
+                        }
+                        if (!found)
+                        {
+                            if (this.Repo.SyncAllSubFolder)
+                            {
+                                this.IsIgnored = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        this.ThreeStates = false;
+                        Folder p = this.Parent as Folder;
+                        bool found = false;
+                        while (p != null)
+                        {
+                            if (p.Selected == true)
+                            {
+                                this.IsIgnored = true;
+                                found = true;
+                                p.Selected = null;
+                            }
+                            p = p.Parent as Folder;
+                        }
+                        if (!found)
+                        {
+                            if (this.Repo.SyncAllSubFolder)
+                            {
+                                this.IsIgnored = true;
+                            }
+                        }
+                    }
+                }
+            } }
             private string name;
             public string Name { get { return name; } set { SetField(ref name, value, "Name"); } }
             private string path;
@@ -201,7 +362,10 @@ namespace CmisSync
                         if (ignored)
                         {
                             foreach (Folder subfolder in _subfolder)
+                            {
                                 subfolder.IsIgnored = ignored;
+                                subfolder.Selected = false;
+                            }
                         }
                         else
                         {
@@ -214,6 +378,21 @@ namespace CmisSync
                                     break;
                                 parent = parent.Parent as Folder;
                             }
+                        }
+                    }
+                }
+            }
+            private bool enabled = true;
+            public bool Enabled
+            {
+                get { return enabled; }
+                set
+                {
+                    if (SetField(ref enabled, value, "Enabled"))
+                    {
+                        foreach (Folder child in SubFolder)
+                        {
+                            child.Enabled = enabled;
                         }
                     }
                 }
@@ -392,6 +571,5 @@ namespace CmisSync
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             { throw new NotSupportedException(); }
         }
-
     }
 }

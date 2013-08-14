@@ -414,7 +414,7 @@ namespace CmisSync
         /// <summary>
         /// Second step of remote folder addition wizard is complete, switch to customization step.
         /// </summary>
-        public void Add2PageCompleted(string repository, string remote_path, string[] ignoredPaths)
+        public void Add2PageCompleted(string repository, string remote_path, string[] ignoredPaths, string[] selectedFolder)
         {
             SyncingReponame = Path.GetFileName(remote_path);
             ProgressBarPercentage = 1.0;
@@ -438,7 +438,7 @@ namespace CmisSync
         /// </summary>
         public void Add2PageCompleted(string repository, string remote_path)
         {
-            Add2PageCompleted(repository, remote_path, new string[] { });
+            Add2PageCompleted(repository, remote_path, new string[] { }, new string[] { });
         }
 
 
