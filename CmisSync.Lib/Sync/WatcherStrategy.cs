@@ -62,12 +62,12 @@ namespace CmisSync.Lib.Sync
             private void WatchSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
                 string name = pathname.Substring(localFolder.Length + 1);
-                string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
+                string remotePathname = Path.Combine(remoteFolder, name).Replace('\\', '/');
 
                 IFolder remoteBase = null;
                 if (File.Exists(pathname) || Directory.Exists(pathname))
                 {
-                    string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/');
+                    string remoteBaseName = Path.GetDirectoryName(remotePathname).Replace('\\', '/');
                     try
                     {
                         remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
@@ -121,7 +121,7 @@ namespace CmisSync.Lib.Sync
 
                 if (Directory.Exists(pathname))
                 {
-                    if (repoinfo.isPathIgnored(remoteName))
+                    if (repoinfo.isPathIgnored(remotePathname))
                     {
                         repo.Watcher.RemoveChange(pathname);
                         return;
