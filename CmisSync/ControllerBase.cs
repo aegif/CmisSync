@@ -439,17 +439,16 @@ namespace CmisSync
         /// <summary>
         /// Create a new CmisSync synchronized folder.
         /// </summary>
-        public void StartFetcher(string address, string remote_path, string local_path,
-            string repository, string path, string user, string password, string localrepopath,
+        public void StartFetcher(string name, Uri address, string user, string password, string repository, string remote_path, string local_path,
             List<string> ignoredPaths)
         {
-            repoInfo = new RepoInfo(local_path, ConfigManager.CurrentConfig.ConfigPath);
-            repoInfo.Address = new Uri(address);
-            repoInfo.RemotePath = remote_path;
-            repoInfo.RepoID = repository;
+            repoInfo = new RepoInfo(name, ConfigManager.CurrentConfig.ConfigPath);
+            repoInfo.Address = address;
             repoInfo.User = user;
             repoInfo.Password = Crypto.Obfuscate(password);
-            repoInfo.TargetDirectory = localrepopath;
+            repoInfo.RepoID = repository;
+            repoInfo.RemotePath = remote_path;
+            repoInfo.TargetDirectory = local_path;
             repoInfo.PollInterval = 5000;
             foreach (string ignore in ignoredPaths)
                 repoInfo.addIgnorePath(ignore);

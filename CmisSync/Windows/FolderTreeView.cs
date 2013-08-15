@@ -40,6 +40,7 @@ namespace CmisSync
             public LoadingStatus Status { get { return status; } set { SetField(ref status, value, "Status"); } }
             private bool threestate = false;
             public bool ThreeState { get { return threestate; } set { SetField(ref threestate, value, "ThreeState"); } }
+            public string ToolTip { get { return "URL: \"" + address + "\"\r\nRepository ID: \"" + Id + "\""; } }
             private bool selected = false;
             public bool Selected
             {
@@ -286,10 +287,8 @@ namespace CmisSync
                         foreach (Folder subfolder in SubFolder)
                         {
                             subfolder.Selected = true;
-                            subfolder.ThreeStates = false;
                         }
                         Folder p = this.Parent as Folder;
-                        bool found = false;
                         while (p != null)
                         {
                             if (p.Selected == null)
@@ -313,13 +312,6 @@ namespace CmisSync
                                 }
                             }
                             p = p.Parent as Folder;
-                        }
-                        if (!found)
-                        {
-                            if (this.Repo.SyncAllSubFolder)
-                            {
-                                this.IsIgnored = true;
-                            }
                         }
                     }
                     else
@@ -352,36 +344,18 @@ namespace CmisSync
             private string path;
             public string Path { get { return path; } set { SetField(ref path, value, "Path"); } }
             private bool ignored = false;
-            public bool IsIgnored
-            {
-                get { return ignored; }
-                set
+            public bool IsIgnored { get { return ignored; } set {
+                if (SetField(ref ignored, value, "IsIgnored"))
                 {
-                    if (SetField(ref ignored, value, "IsIgnored"))
+                    if (ignored)
                     {
-                        if (ignored)
+                        foreach (Folder child in SubFolder)
                         {
-                            foreach (Folder subfolder in _subfolder)
-                            {
-                                subfolder.IsIgnored = ignored;
-                                subfolder.Selected = false;
-                            }
-                        }
-                        else
-                        {
-                            Folder parent = Parent as Folder;
-                            while (parent != null)
-                            {
-                                if (parent.ignored)
-                                    parent.IsIgnored = false;
-                                else
-                                    break;
-                                parent = parent.Parent as Folder;
-                            }
+                            child.Selected = false;
                         }
                     }
                 }
-            }
+            } }
             private bool enabled = true;
             public bool Enabled
             {

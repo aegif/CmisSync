@@ -458,10 +458,15 @@ namespace CmisSync
             {
                 new Thread(() =>
                 {
-                    Program.Controller.StartFetcher(PreviousAddress, PreviousPath, repoName,
-                        PreviousRepository, PreviousPath, saved_user.TrimEnd(),
-                        saved_password.TrimEnd(), localrepopath, ignoredPaths);
-
+                    Program.Controller.StartFetcher(
+                        repoName,
+                        new Uri(PreviousAddress),
+                        saved_user.TrimEnd(),
+                        saved_password.TrimEnd(),
+                        PreviousRepository,
+                        PreviousPath,
+                        localrepopath,
+                        ignoredPaths);
                 }).Start();
             }
             catch (Exception ex)
