@@ -31,13 +31,17 @@ namespace CmisSync.Lib.Sync
             if( ! File.Exists(ConfigManager.CurrentConfigFile))
                 return;
 
+            var fileContents = System.IO.File.ReadAllText(ConfigManager.CurrentConfigFile);
+            if ( fileContents.Contains("<notifications>True</notifications>") ) {
+                fileContents = fileContents.Replace("<notifications>True</notifications>", "<notifications>true</notifications>");
+                System.IO.File.WriteAllText(ConfigManager.CurrentConfigFile, fileContents);
+            }
             // If log4net element is found, it means that the root element is already correct.
             XmlElement element = (XmlElement)ConfigManager.CurrentConfig.GetLog4NetConfig();
             if (element != null)
                 return;
             
             // Replace root XML element from <sparkleshare> to <CmisSync>
-            var fileContents = System.IO.File.ReadAllText(ConfigManager.CurrentConfigFile);
 
             fileContents = fileContents.Replace("<sparkleshare>", "<CmisSync>");
             fileContents = fileContents.Replace("</sparkleshare>", "</CmisSync>");
