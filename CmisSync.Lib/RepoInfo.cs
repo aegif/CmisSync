@@ -84,6 +84,8 @@ namespace CmisSync.Lib
         public RepoInfo(string name, string cmisDatabaseFolder)
         {
             Name = name;
+            name = name.Replace("\\", "_");
+            name = name.Replace("/", "_");
             CmisDatabase = Path.Combine(cmisDatabaseFolder, name + ".cmissync");
         }
 
@@ -94,6 +96,8 @@ namespace CmisSync.Lib
         public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval)
         {
             Name = name;
+            name = name.Replace("\\", "_");
+            name = name.Replace("/", "_");
             CmisDatabase = Path.Combine(cmisDatabaseFolder, name + ".cmissync");
             RemotePath = remotePath;
             Address = new Uri(address);

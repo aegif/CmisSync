@@ -292,19 +292,18 @@ namespace CmisSync
 
                     if (repo.LocalPath.Equals(folder.LocalPath))
                     {
-                        
-                        // Remove Cmis Database File
-                        RemoveDatabase(folder.LocalPath);
                         repo.Dispose();
                         this.repositories.Remove(repo);
                         repo = null;
-
-                        return;
+                        break;
                     }
                 }
             }
-
-            RemoveDatabase(folder.DisplayName);
+            // Remove Cmis Database File
+            string dbfilename = folder.DisplayName;
+            dbfilename = dbfilename.Replace("\\", "_");
+            dbfilename = dbfilename.Replace("/", "_");
+            RemoveDatabase(dbfilename);
         }
 
 
@@ -357,6 +356,7 @@ namespace CmisSync
                     if (!Directory.Exists(folder_path))
                     {
                         RemoveRepository(f);
+                        toBeDeleted.Add(f);
 
                         Logger.Info("Controller | Removed folder '" + folder_name + "' from config");
 
@@ -370,7 +370,8 @@ namespace CmisSync
                 foreach(Config.SyncConfig.Folder f in toBeDeleted){
                     ConfigManager.CurrentConfig.Folder.Remove(f);
                 }
-
+                if(toBeDeleted.Count>0)
+                    ConfigManager.CurrentConfig.Save();
                 // Update UI.
                 FolderListChanged();
             }
