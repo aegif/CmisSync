@@ -152,9 +152,11 @@ namespace CmisSync
         {
             Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
             if (folder != null)
-                Utils.OpenFolder(ConfigManager.CurrentConfig.getFolder(name).LocalPath);
+                Utils.OpenFolder(folder.LocalPath);
+            else if (String.IsNullOrWhiteSpace(name))
+                OpenCmisSyncFolder();
             else
-                Logger.Warn("Could not find requested config for \""+name+"\"");
+                Logger.Warn("Could not find requested config for \"" + name + "\"");
         }
 
         /// <summary>
