@@ -36,17 +36,23 @@ namespace CmisSync.Lib.Sync
                 fileContents = fileContents.Replace("<notifications>True</notifications>", "<notifications>true</notifications>");
                 System.IO.File.WriteAllText(ConfigManager.CurrentConfigFile, fileContents);
             }
-            // If log4net element is found, it means that the root element is already correct.
-            XmlElement element = (XmlElement)ConfigManager.CurrentConfig.GetLog4NetConfig();
-            if (element != null)
-                return;
-            
-            // Replace root XML element from <sparkleshare> to <CmisSync>
+            try
+            {
+                // If log4net element is found, it means that the root element is already correct.
+                XmlElement element = (XmlElement)ConfigManager.CurrentConfig.GetLog4NetConfig();
+                if (element != null)
+                    return;
+            }
+            catch (Exception)
+            {
+                // Replace root XML element from <sparkleshare> to <CmisSync>
 
-            fileContents = fileContents.Replace("<sparkleshare>", "<CmisSync>");
-            fileContents = fileContents.Replace("</sparkleshare>", "</CmisSync>");
+                fileContents = fileContents.Replace("<sparkleshare>", "<CmisSync>");
+                fileContents = fileContents.Replace("</sparkleshare>", "</CmisSync>");
 
-            System.IO.File.WriteAllText(ConfigManager.CurrentConfigFile, fileContents);
+                System.IO.File.WriteAllText(ConfigManager.CurrentConfigFile, fileContents);
+                ReplaceXMLRootElement();
+            }
         }
     }
 }
