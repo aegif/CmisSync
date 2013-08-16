@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -330,6 +331,27 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// Remove a folder from the database.
+        /// </summary>
+        public void RemoveFolder(string path)
+        {
+            path = Normalize(path);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+
+            // Remove folder itself
+            ExecuteSQLAction("DELETE FROM folders WHERE path=@path", parameters);
+
+            // Remove all folders under this folder
+            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
+
+            // Remove all files under this folder
+            ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
+        }
+
+
+        /// <summary>
         /// move a folder from the database.
         /// </summary>
         public void MoveFolder(string oldPath, string newPath)
@@ -341,24 +363,36 @@ namespace CmisSync.Lib.Cmis
             parameters.Add("oldpath", oldPath);
             parameters.Add("newpath", newPath);
             ExecuteSQLAction("UPDATE folders SET path=@newpath WHERE path=@oldpath", parameters);
-        }
 
+            string path = null;
 
-        /// <summary>
-        /// Remove a folder from the database.
-        /// </summary>
-        public void RemoveFolder(string path)
-        {
-            path = Normalize(path);
-
-            // Remove folder itself
-            ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
-
-            // Remove all folders under this folder
-            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
-
-            // Remove all files under this folder
-            ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
+            while(null != (path = (string)ExecuteSQLFunction("SELECT path FROM files WHERE path LIKE '" + oldPath + "/%'", null)))
+            {
+                string newFilePath = Path.Combine(newPath, path.Substring(oldPath.Length + 1)).Replace('\\', '/');
+                Logger.Info("File Move");
+                Logger.Info(oldPath);
+                Logger.Info(newPath);
+                Logger.Info(path);
+                Logger.Info(newFilePath);
+                Dictionary<string, object> parametersSub = new Dictionary<string, object>();
+                parametersSub.Add("oldpath", path);
+                parametersSub.Add("newpath", newFilePath);
+                ExecuteSQLAction("UPDATE files SET path=@newpath WHERE path=@oldpath", parametersSub);
+            }
+            
+            while (null != (path = (string)ExecuteSQLFunction("SELECT path FROM folders WHERE path LIKE '" + oldPath + "/%'", null)))
+            {
+                string newFolderPath = Path.Combine(newPath, path.Substring(oldPath.Length + 1)).Replace('\\', '/');
+                Logger.Info("Folder Move");
+                Logger.Info(oldPath);
+                Logger.Info(newPath);
+                Logger.Info(path);
+                Logger.Info(newFolderPath);
+                Dictionary<string, object> parametersSub = new Dictionary<string, object>();
+                parametersSub.Add("oldpath", path);
+                parametersSub.Add("newpath", newFolderPath);
+                ExecuteSQLAction("UPDATE folders SET path=@newpath WHERE path=@oldpath", parametersSub);
+            }
         }
 
 

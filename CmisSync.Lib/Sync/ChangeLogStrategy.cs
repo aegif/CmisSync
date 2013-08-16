@@ -96,6 +96,7 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
+                        Logger.Warn("Failure to sync the changes on server, force crawl sync from remote");
                         if (CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null))
                         {
                             Logger.Info("Success to sync from remote, update ChangeLog token: " + lastTokenOnServer);
@@ -232,8 +233,8 @@ namespace CmisSync.Lib.Sync
                     string savedFolderPath = database.GetFolderPath(change.ObjectId);
                     if ((null != savedFolderPath) && (savedFolderPath != localPath))
                     {
-                        //TODO
-                        Debug.Assert(false, "TODO");
+                        MoveFolderLocally(savedFolderPath, localPath);
+                        return CrawlSync(remoteFolder, localPath);
                     }
                     else
                     {
@@ -250,6 +251,24 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool ApplyRemoteChangeDelete(IChangeEvent change)
             {
+                try
+                {
+                    ICmisObject remoteObject = session.GetObject(change.ObjectId);
+                    if (null != remoteObject)
+                    {
+                        //  should be moveObject
+                        Logger.Info("Ignore moveObject for id " + change.ObjectId);
+                        return true;
+                    }
+                }
+                catch (CmisObjectNotFoundException)
+                {
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " : " + Utils.ToLogString(ex));
+                }
+
                 string savedDocumentPath = database.GetFilePath(change.ObjectId);
                 if (null != savedDocumentPath)
                 {

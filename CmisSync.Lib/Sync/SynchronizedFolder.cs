@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -870,6 +871,48 @@ namespace CmisSync.Lib.Sync
                 Logger.Info("# Updated " + filePath);
 
                 return success;
+            }
+
+
+            /// <summary>
+            /// Move folder from local filesystem and database.
+            /// </summary>
+            private void MoveFolderLocally(string oldFolderPath, string newFolderPath)
+            {
+                if (!Directory.Exists(oldFolderPath))
+                {
+                    return;
+                }
+
+                if (!Directory.Exists(newFolderPath))
+                {
+                    Directory.Move(oldFolderPath, newFolderPath);
+                    database.MoveFolder(oldFolderPath, newFolderPath);
+                    return;
+                }
+
+                foreach (FileInfo file in new DirectoryInfo(oldFolderPath).GetFiles())
+                {
+                    string oldFilePath = Path.Combine(oldFolderPath, file.Name);
+                    string newFilePath = Path.Combine(newFolderPath, file.Name);
+                    if (File.Exists(newFilePath))
+                    {
+                        File.Delete(oldFilePath);
+                        database.RemoveFile(oldFilePath);
+                    }
+                    else
+                    {
+                        File.Move(oldFilePath, newFilePath);
+                        database.MoveFile(oldFilePath, newFilePath);
+                    }
+                }
+
+                foreach (DirectoryInfo folder in new DirectoryInfo(oldFolderPath).GetDirectories())
+                {
+                    MoveFolderLocally(Path.Combine(oldFolderPath, folder.Name), Path.Combine(newFolderPath, folder.Name));
+                }
+
+                return;
             }
 
 
