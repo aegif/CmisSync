@@ -50,3 +50,7 @@ T: CmisSync.CmisTree.CmisRepo
 R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
 M: System.Collections.ObjectModel.Collection`1<System.String> CmisSync.Lib.Config::get_Folders()
 M: System.Void CmisSync.Lib.Config::RemoveFolder(System.String)
+
+#Ignore DotCMIS based rule
+R: Gendarme.Rules.Design.Generic.DoNotExposeNestedGenericSignaturesRule
+T: CmisSync.Lib.Cmis.CmisUtils.FolderTree
