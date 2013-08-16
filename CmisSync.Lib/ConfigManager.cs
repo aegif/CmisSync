@@ -16,6 +16,10 @@ namespace CmisSync.Lib
         /// </summary>
         private static Config config;
 
+        /// <summary>
+        /// Lock to provide threadsafe singleton creation
+        /// </summary>
+        private static Object configlock = new Object();
 
         /// <summary>
         /// The CmisSync configuration.
@@ -25,13 +29,18 @@ namespace CmisSync.Lib
         {
             get
             {
-                // Load the configuration if it has not been done yet.
-                // If no configuration file exists, it will create a default one.
-                if (config == null)
+                if( config == null)
                 {
-                    config = new Config(CurrentConfigFile);
+                    lock (configlock)
+                    {
+                        // Load the configuration if it has not been done yet.
+                        // If no configuration file exists, it will create a default one.
+                        if (config == null)
+                        {
+                            config = new Config(CurrentConfigFile);
+                        }
+                    }
                 }
-
                 // return the loaded configuration.
                 return config;
             }
@@ -48,18 +57,5 @@ namespace CmisSync.Lib
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "dataSpaceSync", "config.xml");
             }
         }
-
-
-        public static string GetFullPath(string name)
-        {
-                string custom_path = ConfigManager.CurrentConfig.GetFolderAttribute(name, "path");
-                // if (String.IsNullOrEmpty(custom_path)) custom_path = Config.DefaultConfig.FoldersPath;
-
-                if (custom_path != null)
-                    return custom_path;
-                else
-                    return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
-                // return Path.Combine(ROOT_FOLDER, Name);
-            }
     }
 }

@@ -128,7 +128,7 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
                 cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
                 cmisParameters[SessionParameter.User] = repoInfo.User;
-                cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(repoInfo.Password); // Deobfuscate password.
+                cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
 

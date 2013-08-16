@@ -99,14 +99,14 @@ namespace CmisSync
         /// </summary>
         private PageType FolderAdditionWizardCurrentPage;
 
-        public string PreviousAddress { get; private set; }
+        public Uri PreviousAddress { get; private set; }
         public string PreviousPath { get; private set; }
         public string PreviousRepository { get; private set; }
         public string SyncingReponame { get; private set; }
         public string DefaultRepoPath { get; private set; }
         public double ProgressBarPercentage { get; private set; }
 
-        public string saved_address = "";
+        public Uri saved_address = null;
         public string saved_remote_path = "";
         public string saved_user = "";
         public string saved_password = "";
@@ -184,7 +184,7 @@ namespace CmisSync
             Logger.Info("Entering constructor.");
 
             TutorialCurrentPage = 0;
-            PreviousAddress = "";
+            PreviousAddress = null;
             PreviousPath = "";
             SyncingReponame = "";
             DefaultRepoPath = Program.Controller.FoldersPath;
@@ -241,7 +241,7 @@ namespace CmisSync
         /// </summary>
         public void PageCancelled()
         {
-            PreviousAddress = "";
+            PreviousAddress = null;
             PreviousRepository = "";
             PreviousPath = "";
             ignoredPaths.Clear();
@@ -332,11 +332,14 @@ namespace CmisSync
         public string CheckAddPage(string address)
         {
             address = address.Trim();
-            this.saved_address = address;
+ 
 
             // Check address validity.
             bool fields_valid = ((!string.IsNullOrEmpty(address)) && (this.UrlRegex.IsMatch(address)));
-
+            if (fields_valid)
+            {
+                this.saved_address = new Uri(address);
+            }
             // Enable button to next step.
             UpdateAddProjectButtonEvent(fields_valid);
 
@@ -390,7 +393,7 @@ namespace CmisSync
         /// <summary>
         /// First step of remote folder addition wizard is complete, switch to second step
         /// </summary>
-        public void Add1PageCompleted(string address, string user, string password)
+        public void Add1PageCompleted(Uri address, string user, string password)
         {
             saved_address = address;
             saved_user = user;
@@ -421,7 +424,7 @@ namespace CmisSync
 
             ChangePageEvent(PageType.Customize);
 
-            String address = saved_address.Trim();
+            Uri address = saved_address;
             repository = repository.Trim();
             remote_path = remote_path.Trim();
 
@@ -460,7 +463,7 @@ namespace CmisSync
                 {
                     Program.Controller.StartFetcher(
                         repoName,
-                        new Uri(PreviousAddress),
+                        saved_address,
                         saved_user.TrimEnd(),
                         saved_password.TrimEnd(),
                         PreviousRepository,
@@ -514,7 +517,7 @@ namespace CmisSync
         /// </summary>
         public void FinishPageCompleted()
         {
-            PreviousAddress = "";
+            PreviousAddress = null;
             PreviousPath = "";
 
             this.FolderAdditionWizardCurrentPage = PageType.None;

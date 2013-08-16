@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using CmisSync.Lib.Cmis;
 
 namespace CmisSync.Lib
 {
@@ -50,7 +51,7 @@ namespace CmisSync.Lib
         /// CMIS password, hashed.
         /// For instance: AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAtiSvUCYn...
         /// </summary>
-        public string Password { get; set; }
+        public CmisPassword Password { get; set; }
 
 
         /// <summary>
@@ -136,5 +137,29 @@ namespace CmisSync.Lib
             return ignoredPaths.Contains(path);
         }
 
+        public class CmisPassword
+        {
+            private string password = null;
+            public CmisPassword(string password)
+            {
+                this.password = Crypto.Obfuscate(password);
+            }
+
+            public CmisPassword(){}
+
+            public static implicit operator CmisPassword(string value)
+            {
+                return new CmisPassword(value);
+            }
+            override
+            public string ToString()
+            {
+                if(password == null)
+                    return null;
+                return Crypto.Deobfuscate(password);
+            }
+
+            public string ObfuscatedPassword { get { return password; } set { password = value; } }
+        }
     }
 }

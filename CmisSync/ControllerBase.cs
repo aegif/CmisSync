@@ -125,7 +125,9 @@ namespace CmisSync
         {
             get
             {
-                List<string> folders = new List<string>(ConfigManager.CurrentConfig.Folders);
+                List<string> folders = new List<string>();
+                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
+                    folders.Add(f.DisplayName);
                 folders.Sort();
 
                 return folders;
@@ -200,7 +202,7 @@ namespace CmisSync
 
             if (firstRun)
             {
-                ConfigManager.CurrentConfig.SetConfigOption("notifications", bool.TrueString);
+                ConfigManager.CurrentConfig.Notifications = true;
             }
 
             // Watch the CmisSync folder
@@ -246,12 +248,9 @@ namespace CmisSync
         /// Initialize (in the UI and syncing mechanism) an existing CmisSync synchronized folder.
         /// </summary>
         /// <param name="folderPath">Synchronized folder path</param>
-        private void AddRepository(string folderPath)
+        private void AddRepository(RepoInfo repositoryInfo)
         {
             RepoBase repo = null;
-            string folder_name = Path.GetFileName(folderPath);
-
-            RepoInfo repositoryInfo = ConfigManager.CurrentConfig.GetRepoInfo(folder_name);
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
 
             repo.ChangesDetected += delegate
@@ -270,9 +269,11 @@ namespace CmisSync
 
         public void RemoveRepositoryFromSync(string reponame)
         {
-            string folder_path = ConfigManager.GetFullPath(reponame);
-            // TODO Abort every action and Database connection and remove configs
-            //RemoveRepository(folder_path);
+            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
+            if (f != null)
+                RemoveRepository(f);
+            else
+                Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
         }
 
         
@@ -281,7 +282,7 @@ namespace CmisSync
         /// This happens after the user removes the folder.
         /// </summary>
         /// <param name="folder_path">The synchronized folder to remove</param>
-        private void RemoveRepository(string folder_path)
+        private void RemoveRepository(Config.SyncConfig.Folder folder)
         {
             if (this.repositories.Count > 0)
             {
@@ -289,11 +290,11 @@ namespace CmisSync
                 {
                     RepoBase repo = this.repositories[i];
 
-                    if (repo.LocalPath.Equals(folder_path))
+                    if (repo.LocalPath.Equals(folder.LocalPath))
                     {
                         
                         // Remove Cmis Database File
-                        RemoveDatabase(folder_path);
+                        RemoveDatabase(folder.LocalPath);
                         repo.Dispose();
                         this.repositories.Remove(repo);
                         repo = null;
@@ -303,7 +304,7 @@ namespace CmisSync
                 }
             }
 
-            RemoveDatabase(folder_path);
+            RemoveDatabase(folder.DisplayName);
         }
 
 
@@ -346,23 +347,28 @@ namespace CmisSync
             {
                 string path = ConfigManager.CurrentConfig.FoldersPath;
 
+                List<Config.SyncConfig.Folder> toBeDeleted = new List<Config.SyncConfig.Folder>();
                 // If folder has been deleted, remove it from configuration too.
-                foreach (string folder_name in ConfigManager.CurrentConfig.Folders)
+                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
                 {
-                    string folder_path = ConfigManager.GetFullPath(folder_name);
+                    string folder_name = f.DisplayName;
+                    string folder_path = f.LocalPath;
 
                     if (!Directory.Exists(folder_path))
                     {
-                        RemoveRepository(folder_path);
-                        ConfigManager.CurrentConfig.RemoveFolder(folder_name);
+                        RemoveRepository(f);
 
                         Logger.Info("Controller | Removed folder '" + folder_name + "' from config");
 
                     }
                     else
                     {
-                        AddRepository(folder_path);
+                        AddRepository(f.GetRepoInfo());
                     }
+                }
+
+                foreach(Config.SyncConfig.Folder f in toBeDeleted){
+                    ConfigManager.CurrentConfig.Folder.Remove(f);
                 }
 
                 // Update UI.
@@ -445,7 +451,7 @@ namespace CmisSync
             repoInfo = new RepoInfo(name, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = address;
             repoInfo.User = user;
-            repoInfo.Password = Crypto.Obfuscate(password);
+            repoInfo.Password = password;
             repoInfo.RepoID = repository;
             repoInfo.RemotePath = remote_path;
             repoInfo.TargetDirectory = local_path;
@@ -501,7 +507,7 @@ namespace CmisSync
             FolderFetched(this.fetcher.RemoteUrl.ToString());
 
             // Initialize in the UI.
-            AddRepository(repoInfo.TargetDirectory);
+            AddRepository(repoInfo);
             FolderListChanged();
 
             this.fetcher.Dispose();

@@ -362,7 +362,7 @@ namespace CmisSync
                                 TextBox address_box = new TextBox()
                                 {
                                     Width = 420,
-                                    Text = Controller.PreviousAddress
+                                    Text = (Controller.PreviousAddress!=null)?Controller.PreviousAddress.ToString():""
                                 };
 
                                 TextBlock address_help_label = new TextBlock()
@@ -501,10 +501,10 @@ namespace CmisSync
                                 TaskbarItemInfo.ProgressValue = 0.0;
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 
-                                if (Controller.PreviousAddress == null || Controller.PreviousAddress == String.Empty)
+                                if (Controller.PreviousAddress == null || Controller.PreviousAddress.ToString() == String.Empty)
                                     address_box.Text = "https://";
                                 else
-                                    address_box.Text = Controller.PreviousAddress;
+                                    address_box.Text = Controller.PreviousAddress.ToString();
                                 address_box.Focus();
                                 address_box.Select(address_box.Text.Length, 0);
 
@@ -618,7 +618,7 @@ namespace CmisSync
                                     {
                                         // Continue to next step, which is choosing a particular folder.
                                         Controller.Add1PageCompleted(
-                                            address_box.Text, user_box.Text, password_box.Password);
+                                            new Uri(address_box.Text), user_box.Text, password_box.Password);
                                     }
                                 };
                                 break;
@@ -643,7 +643,7 @@ namespace CmisSync
                                 bool firstRepo = true;
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
-                                    CmisRepo repo = new CmisRepo(Controller.saved_user, Controller.saved_password, Controller.saved_address)
+                                    CmisRepo repo = new CmisRepo(Controller.saved_user, Controller.saved_password, Controller.saved_address.ToString())
                                     {
                                         Name = repository.Value,
                                         Id = repository.Key
@@ -752,11 +752,19 @@ namespace CmisSync
                                     Text = Properties_Resources.EnterLocalFolderName,
                                     FontWeight = FontWeights.Bold
                                 };
-
+                                string localfoldername = Controller.saved_address.Host.ToString();
+                                foreach (KeyValuePair<String, String> repository in Controller.repositories)
+                                {
+                                    if (repository.Key == Controller.saved_repository)
+                                    {
+                                        localfoldername += "\\" + repository.Value;
+                                        break;
+                                    }
+                                }
                                 TextBox localfolder_box = new TextBox()
                                 {
                                     Width = 420,
-                                    Text = Controller.SyncingReponame
+                                    Text = localfoldername
                                 };
 
                                 TextBlock localrepopath_label = new TextBlock()
