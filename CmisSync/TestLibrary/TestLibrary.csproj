@@ -58,6 +58,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CmisDatabaseTest.cs" />
     <Compile Include="CmisSyncTests.cs" />
     <Compile Include="LocalFilesystemActivityGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
