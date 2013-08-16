@@ -53,4 +53,4 @@ M: System.Void CmisSync.Lib.Config::RemoveFolder(System.String)
 
 #Ignore DotCMIS based rule
 R: Gendarme.Rules.Design.Generic.DoNotExposeNestedGenericSignaturesRule
-M: CmisSync.Lib.Cmis.CmisUtils/FolderTree::.ctor(System.Collections.Generic.IList<DotCMIS.Client.ITree<DotCMIS.Client.IFileableCmisObject>>,DotCMIS.Client.IFolder)
+M: System.Void CmisSync.Lib.Cmis.CmisUtils/FolderTree::.ctor(System.Collections.Generic.IList<DotCMIS.Client.ITree<DotCMIS.Client.IFileableCmisObject>>,DotCMIS.Client.IFolder)
