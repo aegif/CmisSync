@@ -291,7 +291,7 @@ namespace CmisSync.Lib
         public class SyncConfig {
             [XmlElement("notifications")]
             public Boolean Notifications { get; set; }
-            [XmlElement("log4Net")]
+            [XmlElement("log4net")]
             public XmlElement Log4Net { get; set; }
             /// <summary>
             /// List of the CmisSync synchronized folders.
