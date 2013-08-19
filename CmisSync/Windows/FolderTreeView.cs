@@ -262,7 +262,7 @@ namespace CmisSync
                 this.Enabled = repo.Selected;
                 foreach (CmisUtils.FolderTree t in tree.children)
                 {
-                    this.SubFolder.Add(new Folder(t, Repo));
+                    this.SubFolder.Add(new Folder(t, Repo) { Parent = this});
                 }
             }
             public Folder() { }
@@ -291,7 +291,7 @@ namespace CmisSync
                         Folder p = this.Parent as Folder;
                         while (p != null)
                         {
-                            if (p.Selected == null)
+                            if (p.Selected == null || p.Selected == false)
                             {
                                 bool allSelected = true;
                                 foreach (Folder childOfParent in p.SubFolder)
@@ -305,6 +305,11 @@ namespace CmisSync
                                 if (allSelected)
                                 {
                                     p.Selected = true;
+                                }
+                                else if (p.SubFolder.Count > 1) {
+                                    p.ThreeStates = true;
+                                    p.Selected = null;
+                                    p.IsIgnored = false;
                                 }
                                 else
                                 {

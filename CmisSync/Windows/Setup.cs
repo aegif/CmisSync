@@ -750,7 +750,9 @@ namespace CmisSync
                                 TextBlock localfolder_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.EnterLocalFolderName,
-                                    FontWeight = FontWeights.Bold
+                                    FontWeight = FontWeights.Bold,
+                                    TextWrapping = TextWrapping.Wrap,
+                                    Width = 420
                                 };
                                 string localfoldername = Controller.saved_address.Host.ToString();
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
