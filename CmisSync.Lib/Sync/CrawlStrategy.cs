@@ -73,6 +73,15 @@ namespace CmisSync.Lib.Sync
                     System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
                 }
 
+                if (IsGetDescendantsSupported)
+                {
+                    return CrawlDescendants(remoteFolder, localFolder);
+                }
+                else if (IsGetFolderTreeSupported)
+                {
+                    return CrawlRemoteFolderTree(remoteFolder, localFolder);
+                }
+
                 // Lists of files/folders, to delete those that have been removed on the server.
                 IList remoteFiles = new ArrayList();
                 IList remoteSubfolders = new ArrayList();
@@ -89,6 +98,64 @@ namespace CmisSync.Lib.Sync
                 // Logger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
                 success = success && CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
 
+                return success;
+            }
+
+            private bool CrawlRemoteFolderTree(IFolder remoteFolder, string localFolder)
+            {
+                throw new NotImplementedException();
+            }
+
+            private bool CrawlRemoteFolderTree(ITree<IFileableCmisObject> node, string localFolder)
+            {
+                if (node.Item is Folder)
+                {
+                    IFolder folder = node.Item as Folder;
+                    foreach (ITree<IFileableCmisObject> tree in node.Children)
+                    {
+                        CrawlRemoteFolderTree(tree, localFolder + Path.DirectorySeparatorChar.ToString() + folder.Name);
+                    }
+
+                }
+                else if (node.Item is Document)
+                {
+
+                }
+                throw new NotImplementedException();
+            }
+
+            private bool CrawlDescendants(IFolder remoteFolder, string localFolder)
+            {
+                bool success = true;
+                IList<ITree<IFileableCmisObject>> children = remoteFolder.GetDescendants(-1);
+                foreach (ITree<IFileableCmisObject> node in children)
+                {
+                    success = success && CrawlDescendants(node, localFolder);
+                    if (!success)
+                        return success;
+                }
+                return success;
+            }
+
+            private bool CrawlDescendants(ITree<IFileableCmisObject> node, string localFolder)
+            {
+                bool success = true;
+                if (node.Item is Folder)
+                {
+                    IFolder folder = node.Item as Folder;
+                    foreach (ITree<IFileableCmisObject> tree in node.Children)
+                    {
+                        success = success && CrawlDescendants(tree, localFolder + Path.DirectorySeparatorChar.ToString() + folder.Name);
+                        if (!success)
+                        {
+                            return success;
+                        }
+                    }
+                }
+                else if (node.Item is Document)
+                {
+
+                }
                 return success;
             }
 

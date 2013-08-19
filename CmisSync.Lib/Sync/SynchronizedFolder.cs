@@ -45,6 +45,18 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool ChangeLogCapability;
 
+            /// <summary>
+            /// If the repository is able send a folder tree in one request, this is true,
+            /// Otherwise the default behaviour is false
+            /// </summary>
+            private bool IsGetFolderTreeSupported = false;
+
+            /// <summary>
+            /// If the repository allows to request all Descendants of a folder or file,
+            /// this is set to true, otherwise the default behaviour is false
+            /// </summary>
+            private bool IsGetDescendantsSupported = false;
+
 
             /// <summary>
             /// Session to the CMIS repository.
@@ -189,6 +201,10 @@ namespace CmisSync.Lib.Sync
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
                     Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Info("Created CMIS session: " + session.ToString());
+                    IsGetDescendantsSupported = session.RepositoryInfo.Capabilities.IsGetDescendantsSupported == true;
+                    IsGetFolderTreeSupported = session.RepositoryInfo.Capabilities.IsGetFolderTreeSupported == true;
+                    Logger.Info("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
+                    Logger.Info("Get descendants support: " + IsGetDescendantsSupported.ToString());
                 }
                 //TODO Implement error handling -> informing user about connection problems by showing status
                 catch (CmisRuntimeException e)
@@ -277,18 +293,14 @@ namespace CmisSync.Lib.Sync
                         delegate(Object o, DoWorkEventArgs args)
                         {
                             Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
-#if !DEBUG
-                        try
-                        {
-#endif
-                            Sync();
-#if !DEBUG
-                        }
-                        catch (CmisBaseException e)
-                        {
-                            Logger.Error("CMIS exception while syncing:", e);
-                        }
-#endif
+                            try
+                            {
+                                Sync();
+                            }
+                            catch (CmisBaseException e)
+                            {
+                                Logger.Error("CMIS exception while syncing:", e);
+                           }
                         }
                     );
                     bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
