@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files (x86)\NUnit 2.5.9\bin\net-2.0\nunit-console.exe</StartProgram>
+    <StartArguments>C:\projects\chemistry\dotcmis\trunk\DotCMISUnitTest\bin\Debug\DotCMISUnitTest.dll</StartArguments>
+    <StartWorkingDirectory>C:\projects\chemistry\dotcmis\trunk\DotCMISUnitTest\bin\Debug\</StartWorkingDirectory>
+  </PropertyGroup>
+</Project>
