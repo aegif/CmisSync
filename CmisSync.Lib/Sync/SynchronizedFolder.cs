@@ -246,7 +246,10 @@ namespace CmisSync.Lib.Sync
                     syncFull = false;
                 }
 
-                syncFull = CrawlSync(remoteFolder, localFolder);
+                if (!syncFull)
+                {
+                    syncFull = CrawlSync(remoteFolder, localFolder);
+                }
 
                 if (syncFull)
                 {
@@ -562,7 +565,31 @@ namespace CmisSync.Lib.Sync
                 Dictionary<string, object> properties = new Dictionary<string, object>();
                 properties.Add(PropertyIds.Name, Path.GetFileName(localFolder));
                 properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
-                IFolder folder = remoteBaseFolder.CreateFolder(properties);
+                IFolder folder = null;
+                try
+                {
+                    folder = remoteBaseFolder.CreateFolder(properties);
+                }
+                catch (CmisNameConstraintViolationException)
+                {
+                    foreach (ICmisObject cmisObject in remoteBaseFolder.GetChildren())
+                    {
+                        if (cmisObject.Name == Path.GetFileName(localFolder))
+                        {
+                            folder = cmisObject as IFolder;
+                        }
+                    }
+                    if (folder == null)
+                    {
+                        Logger.Warn("Remote file conflict with local folder " + Path.GetFileName(localFolder));
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(String.Format("Exception when create remote folder for local folder {0}: {1}", localFolder, Utils.ToLogString(ex)));
+                    return false;
+                }
 
                 // Create database entry for this folder
                 // TODO Add metadata
