@@ -155,7 +155,7 @@ namespace CmisSync
                     "|((\\d|\\d\\d|1\\d{2}|2[0-4]\\d|25[0-5])\\.){3}" +             // IP address
                     "(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])" +                    //
                     ")(:\\d+)?" +                                                   // port
-                    ")((/+([a-z\\d$_\\.\\+!\\*'\\(\\),;:@&=-]|%[\\da-f]{2})*)*?)" + // path
+                    ")(.*)" +                                                       // path
                     "$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 
