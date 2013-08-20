@@ -24,7 +24,7 @@ namespace CmisSync.Lib.Sync
                 foreach (string pathname in repo.Watcher.GetChangeList())
                 {
                     string name = Path.GetFileName(pathname);
-                    if (!Utils.WorthSyncing(name))
+                    if (!Utils.WorthSyncing(name) || repoinfo.isPathIgnored(pathname))
                     {
                         repo.Watcher.RemoveChange(pathname);
                         continue;
