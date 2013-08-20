@@ -1,18 +1,17 @@
 <?xml version='1.0' encoding='windows-1252'?>
-<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
-	xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
-	
-	<PropertyRef Id="NETFRAMEWORK45"/>
-	
-	<Condition Message="This application requires .NET Framework 4.5. Please install the .NET Framework then run this installer again.">
-    <![CDATA[Installed OR NETFRAMEWORK45]]>
-    </Condition>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <Product Name='CmisSync' Id='bf91eec1-6415-4835-a03b-b76bdf5102ac' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
-    Language='1033' Codepage='1252' Version='1.0.2' Manufacturer='CmisSync'>
+  <Product Name='CmisSync' Id='bf91fec1-6415-4835-a03b-b76bdf5102ac' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
+    Language='1033' Codepage='1252' Version='1.0.3' Manufacturer='CmisSync'>
 
     <Package Id='*' Keywords='Installer' Description="CmisSync Setup" Manufacturer='CmisSync'
       InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+
+    <!-- Check for .NET 4.5 -->
+    <PropertyRef Id="NETFRAMEWORK45"/>
+    <Condition Message="CmisSync requires .NET Framework 4.5. Please install Microsoft .NET Framework 4.5, then run this installer again.">
+      <![CDATA[Installed OR NETFRAMEWORK45]]>
+    </Condition>
 
     <Media Id='1' Cabinet='CmisSync.cab' EmbedCab='yes' DiskPrompt='CmisSync CAB' />
     <Property Id='DiskPrompt' Value="CmisSync Bundle CAB Installation" />
