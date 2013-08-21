@@ -211,7 +211,7 @@ namespace CmisSync.Lib
             SyncConfig.Folder folder = new SyncConfig.Folder() {
                 DisplayName = repoInfo.Name,
                 LocalPath = repoInfo.TargetDirectory,
-                IgnoredFolders = new List<string>(),
+                IgnoredFolders = new List<IgnoredFolder>(),
                 RemoteUrl = repoInfo.Address,
                 RepositoryId = repoInfo.RepoID,
                 RemotePath = repoInfo.RemotePath,
@@ -221,7 +221,7 @@ namespace CmisSync.Lib
             };
             foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
             {
-                folder.IgnoredFolders.Add(ignoredFolder);
+                folder.IgnoredFolders.Add(new IgnoredFolder(){Path = ignoredFolder});
             }
             this.configXml.Folders.Add(folder);
 
@@ -336,8 +336,8 @@ namespace CmisSync.Lib
                         }
                 } }
 
-                [XmlArray("ignoredFolders")]
-                public List<string> IgnoredFolders { get; set; }
+                [XmlElement("ignoreFolder",IsNullable=true)]
+                public List<IgnoredFolder> IgnoredFolders { get; set; }
 
                 /// <summary>
                 /// Get all the configured info about a synchronized folder.
@@ -355,13 +355,19 @@ namespace CmisSync.Lib
                     if (PollInterval < 1) PollInterval = 5000;
                     repoInfo.PollInterval = PollInterval;
 
-                    foreach (string ignoredFolder in IgnoredFolders)
+                    foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
                     {
-                        repoInfo.addIgnorePath(ignoredFolder);
+                        repoInfo.addIgnorePath(ignoredFolder.Path);
                     }
                     return repoInfo;
                 }
             }
+        }
+
+        public class IgnoredFolder
+        {
+            [XmlAttribute("path")]
+            public string Path { get; set; }
         }
 
         public class User {
