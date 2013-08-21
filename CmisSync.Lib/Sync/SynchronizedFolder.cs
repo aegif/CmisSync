@@ -262,10 +262,7 @@ namespace CmisSync.Lib.Sync
                     syncFull = false;
                 }
 
-                if (!syncFull)
-                {
-                    syncFull = CrawlSync(remoteFolder, localFolder);
-                }
+                syncFull = CrawlSync(remoteFolder, localFolder);
 
                 if (syncFull)
                 {
