@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Windows;
 using System.Globalization;
+using CmisSync.Lib;
 
 namespace CmisSync
 {
@@ -134,15 +135,15 @@ namespace CmisSync
                         ToolStripMenuItem repoitem = (ToolStripMenuItem)this.traymenu.Items["tsmi" + reponame];
                         ToolStripMenuItem syncitem = (ToolStripMenuItem)repoitem.DropDownItems[3];
 
-                        if (syncitem.Tag == "pause")
+                        if (syncitem.Tag.Equals(@"pause"))
                         {
-                            syncitem.Text = CmisSync.Properties_Resources.ResourceManager.GetString("ResumeSync", CultureInfo.CurrentCulture);
+                            syncitem.Text = CmisSync.Properties_Resources.ResumeSync;
                             syncitem.Tag = "resume";
                             syncitem.Image = UIHelpers.GetBitmap("media_playback_start");
                         }
                         else
                         {
-                            syncitem.Text = CmisSync.Properties_Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture);
+                            syncitem.Text = CmisSync.Properties_Resources.PauseSync;
                             syncitem.Tag = "pause";
                             syncitem.Image = UIHelpers.GetBitmap("media_playback_pause");
                         }
