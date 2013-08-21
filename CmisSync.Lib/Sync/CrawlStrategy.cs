@@ -122,7 +122,7 @@ namespace CmisSync.Lib.Sync
                         remoteSubfolders.Add(remoteSubFolder.Name);
                         if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                         {
-                            string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
+                            string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name;
 
                             //Check whether local folder exists.
                             if (Directory.Exists(localSubFolder))
@@ -184,7 +184,7 @@ namespace CmisSync.Lib.Sync
                         {
                             //Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
                             remoteFolders.Add(remoteSubFolder.Name);
-                            string localSubFolder = localFolder + Path.DirectorySeparatorChar + remoteSubFolder.Name;
+                            string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name;
 
                             // Check whether local folder exists.
                             if (Directory.Exists(localSubFolder))
