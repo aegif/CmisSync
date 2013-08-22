@@ -649,7 +649,7 @@ namespace CmisSync
                                         Id = repository.Key
                                     };
                                     repos.Add(repo);
-                                    repo.asyncSubFolderLoading();
+                                    repo.LoadingSubfolderAsync();
                                     if (firstRepo)
                                     {
                                         repo.Selected = true;
@@ -720,7 +720,8 @@ namespace CmisSync
                                         Controller.saved_remote_path = selectedRepo.Path;
                                         Controller.Add2PageCompleted(
                                             Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray(), selectedFolder.ToArray());
-
+                                        foreach (CmisRepo repo in repos)
+                                            repo.cancelLoadingAsync();
                                     }
                                     else
                                     {
@@ -731,6 +732,14 @@ namespace CmisSync
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
+                                    foreach (CmisRepo repo in repos)
+                                        repo.cancelLoadingAsync();
+                                };
+
+                                Controller.HideWindowEvent += delegate
+                                {
+                                    foreach (CmisRepo repo in repos)
+                                        repo.cancelLoadingAsync();
                                 };
                                 break;
                             }

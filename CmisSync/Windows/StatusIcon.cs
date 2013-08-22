@@ -134,25 +134,34 @@ namespace CmisSync
                     {
                         ToolStripMenuItem repoitem = (ToolStripMenuItem)this.traymenu.Items["tsmi" + reponame];
                         ToolStripMenuItem syncitem = (ToolStripMenuItem)repoitem.DropDownItems[3];
-
-                        if (syncitem.Tag.Equals(@"pause"))
+                        foreach (RepoBase aRepo in Program.Controller.Repositories)
                         {
-                            syncitem.Text = CmisSync.Properties_Resources.ResumeSync;
-                            syncitem.Tag = "resume";
-                            syncitem.Image = UIHelpers.GetBitmap("media_playback_start");
-                        }
-                        else
-                        {
-                            syncitem.Text = CmisSync.Properties_Resources.PauseSync;
-                            syncitem.Tag = "pause";
-                            syncitem.Image = UIHelpers.GetBitmap("media_playback_pause");
+                            if (aRepo.Name == reponame)
+                            {
+                                setSyncItemState(syncitem, aRepo.Status);
+                                break;
+                            }
                         }
                     });
                 }
-
             };
         }
 
+
+        private void setSyncItemState(ToolStripMenuItem syncitem, SyncStatus status)
+        {
+            switch (status)
+            {
+                case SyncStatus.Idle:
+                    syncitem.Text = CmisSync.Properties_Resources.PauseSync;
+                    syncitem.Image = UIHelpers.GetBitmap("media_playback_pause");
+                    break;
+                case SyncStatus.Suspend:
+                    syncitem.Text = CmisSync.Properties_Resources.ResumeSync;
+                    syncitem.Image = UIHelpers.GetBitmap("media_playback_start");
+                    break;
+            }
+        }
 
         /// <summary>
         /// Dispose of the status icon UI elements.
@@ -202,7 +211,7 @@ namespace CmisSync
                     // Sub-item: open locally.
                     ToolStripMenuItem openLocalFolderItem = new ToolStripMenuItem()
                     {
-                        Text = CmisSync.Properties_Resources.ResourceManager.GetString("OpenLocalFolder", CultureInfo.CurrentCulture),
+                        Text = CmisSync.Properties_Resources.OpenLocalFolder,
                         Image = UIHelpers.GetBitmap("folder")
                     };
                     openLocalFolderItem.Click += OpenLocalFolderDelegate(folderName);
@@ -210,18 +219,22 @@ namespace CmisSync
                     // Sub-item: open remotely.
                     ToolStripMenuItem openRemoteFolderItem = new ToolStripMenuItem()
                     {
-                        Text = CmisSync.Properties_Resources.ResourceManager.GetString("BrowseRemoteFolder", CultureInfo.CurrentCulture),
+                        Text = CmisSync.Properties_Resources.BrowseRemoteFolder,
                         Image = UIHelpers.GetBitmap("classic_folder_web")
                     };
                     openRemoteFolderItem.Click += OpenRemoteFolderDelegate(folderName);
 
                     // Sub-item: suspend sync.
-                    ToolStripMenuItem suspendFolderItem = new ToolStripMenuItem()
+                    ToolStripMenuItem suspendFolderItem = new ToolStripMenuItem();
+                    setSyncItemState(suspendFolderItem, SyncStatus.Idle);
+                    foreach (RepoBase aRepo in Program.Controller.Repositories)
                     {
-                        Text = CmisSync.Properties_Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture),
-                        Tag="pause",
-                        Image = UIHelpers.GetBitmap("media_playback_pause")
-                    };
+                        if (aRepo.Name.Equals(folderName))
+                        {
+                            setSyncItemState(suspendFolderItem, aRepo.Status);
+                            break;
+                        }
+                    }
                     suspendFolderItem.Click += SuspendSyncFolderDelegate(folderName);
 
                     // Sub-item: remove folder from sync
