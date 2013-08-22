@@ -398,7 +398,10 @@ namespace CmisSync.Lib.Sync
                         if (remoteDocument.ContentStreamLength == 0)
                         {
                             Logger.Info("Skipping download of file with content length zero: " + fileName);
-                            File.Create(tmpfilepath).Close();
+                            using (FileStream s = File.Create(tmpfilepath))
+                            {
+                                s.Close();
+                            }
                         }
                         else
                         {
