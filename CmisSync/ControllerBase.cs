@@ -461,39 +461,7 @@ namespace CmisSync
                 repoInfo.addIgnorePath(ignore);
 
             fetcher = new Fetcher(repoInfo, activityListenerAggregator);
-
-            // Finish action.
-            this.fetcher.Finished += delegate()
-            {
-                FinishFetcher();
-            };
-
             this.FinishFetcher();
-        }
-
-
-        /// <summary>
-        /// Stop fetching if failed
-        /// TODO: necessary?
-        /// </summary>
-        public void StopFetcher()
-        {
-            if (Directory.Exists(this.fetcher.TargetFolder))
-            {
-                try
-                {
-                    Directory.Delete(this.fetcher.TargetFolder, true);
-                    Logger.Info("Deleted " + this.fetcher.TargetFolder);
-
-                }
-                catch (Exception e)
-                {
-                    Logger.Info("Failed to delete " + this.fetcher.TargetFolder + ": " + e.Message);
-                }
-            }
-
-            this.fetcher.Dispose();
-            this.fetcher = null;
         }
 
 
