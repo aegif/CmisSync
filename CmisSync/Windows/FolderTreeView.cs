@@ -95,17 +95,25 @@ namespace CmisSync
                 this.address = address;
                 worker.DoWork += new DoWorkEventHandler(DoWork);
                 worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Finished);
+                worker.WorkerSupportsCancellation = true;
                 folderworker.DoWork += new DoWorkEventHandler(SubFolderWork);
                 folderworker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(SubfolderFinished);
+                folderworker.WorkerSupportsCancellation = true;
             }
 
-            public void asyncSubFolderLoading()
+            public void LoadingSubfolderAsync()
             {
                 if (status == LoadingStatus.START)
                 {
                     status = LoadingStatus.LOADING;
                     this.worker.RunWorkerAsync();
                 }
+            }
+
+            public void cancelLoadingAsync()
+            {
+                this.worker.CancelAsync();
+                this.folderworker.CancelAsync();
             }
 
             private void DoWork(object sender, DoWorkEventArgs e)
@@ -117,6 +125,8 @@ namespace CmisSync
                 } catch(Exception) {
                     e.Result = CmisUtils.GetSubfolders(Id, Path, address, username, password);
                 }
+                if (worker.CancellationPending)
+                    e.Cancel = true;
             }
 
             private void SubFolderWork(object sender, DoWorkEventArgs e)
@@ -126,6 +136,8 @@ namespace CmisSync
                 currentWorkingObject = f;
                 currentWorkingObject.Status = LoadingStatus.LOADING;
                 e.Result = CmisUtils.GetSubfolders(Id, f.Path, address, username, password);
+                if (worker.CancellationPending)
+                    e.Cancel = true;
             }
 
             private void SubfolderFinished(object sender, RunWorkerCompletedEventArgs e)
@@ -135,7 +147,9 @@ namespace CmisSync
                     currentWorkingObject.Status = LoadingStatus.REQUEST_FAILURE;
                 }
                 else if (e.Cancelled)
+                {
                     currentWorkingObject.Status = LoadingStatus.ABORTED;
+                }
                 else
                 {
                     string[] subfolder = (string[])e.Result;
@@ -157,7 +171,7 @@ namespace CmisSync
                     }
                     currentWorkingObject.Status = LoadingStatus.DONE;
                 }
-                if (queue.Count > 0)
+                if (queue.Count > 0 && !e.Cancelled && !folderworker.CancellationPending)
                 {
                     folderworker.RunWorkerAsync();
                 }
@@ -204,7 +218,7 @@ namespace CmisSync
                             this.queue.Enqueue(folder);
                         }
                         Status = LoadingStatus.DONE;
-                        if (this.queue.Count > 0)
+                        if (this.queue.Count > 0 && !this.worker.CancellationPending)
                         {
                             this.folderworker.RunWorkerAsync();
                         }
