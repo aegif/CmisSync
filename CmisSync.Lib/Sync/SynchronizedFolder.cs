@@ -366,14 +366,6 @@ namespace CmisSync.Lib.Sync
                 string fileName = remoteDocument.ContentStreamFileName;
                 Logger.Info("Downloading: " + fileName);
 
-                // TODO: Make this configurable.
-                if (remoteDocument.ContentStreamLength == 0)
-                {
-                    Logger.Info("Skipping download of file with content length zero: " + fileName);
-                    activityListener.ActivityStopped();
-                    return true;
-                }
-
                 // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
                 if (Utils.IsInvalidFileName(fileName))
                 {
@@ -414,10 +406,17 @@ namespace CmisSync.Lib.Sync
                             activityListener.ActivityStopped();
                             return true;
                         }
-
-                        DownloadStream(contentStream, tmpfilepath);
-
-                        contentStream.Stream.Close();
+                        // Skip downloading the content, just go on with an empty file
+                        if (remoteDocument.ContentStreamLength == 0)
+                        {
+                            Logger.Info("Skipping download of file with content length zero: " + fileName);
+                            File.Create(tmpfilepath).Close();
+                        }
+                        else
+                        {
+                            DownloadStream(contentStream, tmpfilepath);
+                            contentStream.Stream.Close();
+                        }
                         success = true;
                     }
                     catch (Exception ex)
