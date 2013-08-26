@@ -329,8 +329,15 @@ namespace CmisSync
                 if (aRepo.Name == repoName)
                 {
                     if (aRepo.Status != SyncStatus.Suspend)
+                    {
                         aRepo.Suspend();
-                    else aRepo.Resume();
+                        Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
+                    }
+                    else
+                    {
+                        aRepo.Resume();
+                        Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                    }
                 }
             }
         }

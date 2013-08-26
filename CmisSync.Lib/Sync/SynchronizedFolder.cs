@@ -30,6 +30,9 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder : IDisposable
         {
+            // Log
+            private static readonly ILog Logger = LogManager.GetLogger(typeof(SynchronizedFolder));
+            
             /// <summary>
             /// Whether sync is bidirectional or only from server to client.
             /// TODO make it a CMIS folder - specific setting
