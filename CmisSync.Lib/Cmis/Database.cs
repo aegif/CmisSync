@@ -222,6 +222,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Add a file to the database. And calculate the checksum of the file
         /// </summary>
+        [Obsolete("Adding a file without a filehash could produce wrong behaviour, please use AddFile(string path, DateTime? serverSideModificationDate, Dictionary<string, string[]> metadata, byte[] filehash) instead")]
         public void AddFile(string path, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata)
         {
