@@ -317,7 +317,7 @@ namespace CmisSync
             /// <param name="repo"></param>
             public Folder(CmisUtils.FolderTree tree, CmisRepo repo)
             {
-                this.Path = path;
+                this.Path = tree.path;
                 this.Repo = repo;
                 this.Name = tree.Name;
                 this.Type = FolderType.REMOTE;
