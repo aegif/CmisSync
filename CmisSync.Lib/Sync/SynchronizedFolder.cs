@@ -497,6 +497,7 @@ namespace CmisSync.Lib.Sync
 
                 IDocument remoteDocument = null;
                 Boolean success = false;
+                byte[] filehash = { };
                 try
                 {
                     Logger.Info("Uploading: " + filePath);
@@ -509,17 +510,20 @@ namespace CmisSync.Lib.Sync
 
                     // Prepare content stream
                     using (Stream file = File.OpenRead(filePath))
+                    using (SHA1 hashAlg = new SHA1Managed())
+                    using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                     {
                         ContentStream contentStream = new ContentStream();
                         contentStream.FileName = fileName;
                         contentStream.MimeType = MimeType.GetMIMEType(fileName);
                         contentStream.Length = file.Length;
-                        contentStream.Stream = file;
+                        contentStream.Stream = hashstream;
 
                         // Upload
                         try
                         {
                             remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                            filehash = hashAlg.Hash;
                             success = true;
                         }
                         catch (Exception ex)
@@ -557,7 +561,7 @@ namespace CmisSync.Lib.Sync
                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                     // Create database entry for this file.
-                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata, filehash);
                 }
 
                 activityListener.ActivityStopped();
