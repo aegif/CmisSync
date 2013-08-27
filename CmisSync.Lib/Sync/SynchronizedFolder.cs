@@ -16,6 +16,7 @@ using System.Net;
 using CmisSync.Lib.Cmis;
 using DotCMIS.Data;
 using log4net;
+using System.Security.Cryptography;
 
 namespace CmisSync.Lib.Sync
 {
@@ -384,6 +385,7 @@ namespace CmisSync.Lib.Sync
 
                     // Download file.
                     Boolean success = false;
+                    byte[] filehash = { };
                     try
                     {
                         contentStream = remoteDocument.GetContentStream();
@@ -408,7 +410,7 @@ namespace CmisSync.Lib.Sync
                         }
                         else
                         {
-                            DownloadStream(contentStream, tmpfilepath);
+                            filehash = DownloadStream(contentStream, tmpfilepath);
                             contentStream.Stream.Close();
                         }
                         success = true;
@@ -445,7 +447,7 @@ namespace CmisSync.Lib.Sync
                         File.Move(tmpfilepath, filepath);
 
                         // Create database entry for this file.
-                        database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+                        database.AddFile(filepath, remoteDocument.LastModificationDate, metadata, filehash);
 
                         Logger.Info("Added to database: " + fileName);
                     }
@@ -465,18 +467,24 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download a file, without retrying.
             /// </summary>
-            private void DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
+            private byte[] DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
             {
+                byte[] hash = {};
                 using (Stream file = File.OpenWrite(filePath))
+                using (SHA1 hashAlg = new SHA1Managed())
+                using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                 {
                     byte[] buffer = new byte[8 * 1024];
                     int len;
                     while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        file.Write(buffer, 0, len);
+                        hashstream.Write(buffer, 0, len);
                     }
+                    hashstream.FlushFinalBlock();
+                    hash = hashAlg.Hash;
                 }
                 contentStream.Stream.Close();
+                return hash;
             }
 
 
