@@ -182,7 +182,7 @@ namespace CmisSync.Lib.Cmis
                 return null;
             }
             // Insert path prefix
-            return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, path);
+            return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, path).Replace('/', Path.DirectorySeparatorChar);
         }
 
 

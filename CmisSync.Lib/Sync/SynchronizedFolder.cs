@@ -912,6 +912,9 @@ namespace CmisSync.Lib.Sync
                     MoveFolderLocally(Path.Combine(oldFolderPath, folder.Name), Path.Combine(newFolderPath, folder.Name));
                 }
 
+                Directory.Delete(oldFolderPath, true);
+                database.RemoveFolder(oldFolderPath);
+
                 return;
             }
 

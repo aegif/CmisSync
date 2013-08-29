@@ -214,7 +214,7 @@ namespace CmisSync.Lib.Sync
                     return true;
                 }
 
-                string localPath = Path.Combine(repoinfo.TargetDirectory, relativePath);
+                string localPath = Path.Combine(repoinfo.TargetDirectory, relativePath).Replace('/', Path.DirectorySeparatorChar);
 
                 if (null != remoteDocument)
                 {
@@ -231,6 +231,10 @@ namespace CmisSync.Lib.Sync
                         {
                             if (File.Exists(savedDocumentPath))
                             {
+                                if (!Directory.Exists(Path.GetDirectoryName(localPath)))
+                                {
+                                    Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+                                }
                                 File.Move(savedDocumentPath, localPath);
                             }
                             database.MoveFile(savedDocumentPath, localPath);
