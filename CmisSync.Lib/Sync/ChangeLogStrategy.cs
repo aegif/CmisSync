@@ -32,11 +32,18 @@ namespace CmisSync.Lib.Sync
             private void ChangeLogSync(IFolder remoteFolder)
             {
                 // Get last change log token on server side.
+                session.Binding.GetRepositoryService().GetRepositoryInfos(null);    //  refresh
                 string lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
 
                 // Get last change token that had been saved on client side.
                 // TODO catch exception invalidArgument which means that changelog has been truncated and this token is not found anymore.
                 string lastTokenOnClient = database.GetChangeLogToken();
+
+                if (lastTokenOnClient == lastTokenOnServer)
+                {
+                    Logger.Info("No change from remote, wait for the next time.");
+                    return;
+                }
 
                 if (lastTokenOnClient == null)
                 {
@@ -92,6 +99,7 @@ namespace CmisSync.Lib.Sync
                         lastTokenOnClient = changes.LatestChangeLogToken;
                         Logger.Info("Sync the changes on server, update ChangeLog token: " + lastTokenOnClient);
                         database.SetChangeLogToken(lastTokenOnClient);
+                        session.Binding.GetRepositoryService().GetRepositoryInfos(null);    //  refresh
                         lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
                     }
                     else
@@ -167,6 +175,11 @@ namespace CmisSync.Lib.Sync
                 }
 
                 string relativePath = remotePath.Substring(remoteFolderPath.Length);
+                if (relativePath.Length <= 0)
+                {
+                    Logger.Info("Ignore change in root path: " + remotePath);
+                    return true;
+                }
                 if (relativePath[0] == '/')
                 {
                     relativePath = relativePath.Substring(1);
