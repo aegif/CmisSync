@@ -181,14 +181,23 @@ namespace CmisSync.Lib.Cmis
                 using (var sha1 = new SHA1Managed())
                 {
                     byte[] hash = sha1.ComputeHash(bs);
-                    StringBuilder formatted = new StringBuilder(2 * hash.Length);
-                    foreach (byte b in hash)
-                    {
-                        formatted.AppendFormat("{0:X2}", b);
-                    }
-                    return formatted.ToString();
+                    return ChecksumToString(hash);
                 }
             }
+        }
+
+        /// <summary>
+        /// Transforms a given hash into a string
+        /// </summary>
+        private string ChecksumToString(byte[] hash)
+        {
+            if(hash == null || hash.Length == 0) return String.Empty;
+            StringBuilder formatted = new StringBuilder(2 * hash.Length);
+            foreach (byte b in hash)
+            {
+                formatted.AppendFormat("{0:X2}", b);
+            }
+            return formatted.ToString();
         }
 
         /// <summary>
@@ -211,15 +220,25 @@ namespace CmisSync.Lib.Cmis
         //
 
         /// <summary>
-        /// Add a file to the database.
+        /// Add a file to the database. And calculate the checksum of the file
         /// </summary>
+        [Obsolete("Adding a file without a filehash could produce wrong behaviour, please use AddFile(string path, DateTime? serverSideModificationDate, Dictionary<string, string[]> metadata, byte[] filehash) instead")]
         public void AddFile(string path, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata)
         {
+            AddFile(path, serverSideModificationDate, metadata, null);
+        }
+
+        /// <summary>
+        /// Add a file to the database.
+        /// If checksum is not null, it will be used for the database entry
+        /// </summary>
+        public void AddFile(string path, DateTime? serverSideModificationDate,
+            Dictionary<string, string[]> metadata, byte[] filehash)
+        {
             Logger.Debug("Starting database file addition for file: " + path);
             string normalizedPath = Normalize(path);
-            string checksum = String.Empty;
-
+            string checksum = ChecksumToString(filehash);
             // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // See http://www.sqlite.org/datatype3.html
             if (null != serverSideModificationDate)
@@ -227,16 +246,19 @@ namespace CmisSync.Lib.Cmis
                 serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
             }
 
+            if(String.IsNullOrEmpty(checksum))
+            {
             // Calculate file checksum.
-            try
-            {
-                checksum = Checksum(path);
-            }
-            catch (IOException e)
-            {
-                Logger.Warn("IOException while calculating checksum of " + path
-                    + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. "
-                    + Utils.ToLogString(e));
+                try
+                {
+                    checksum = Checksum(path);
+                }
+                catch (IOException e)
+                {
+                    Logger.Warn("IOException while calculating checksum of " + path
+                        + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. "
+                        + Utils.ToLogString(e));
+                }
             }
 
             if (String.IsNullOrEmpty(checksum))
