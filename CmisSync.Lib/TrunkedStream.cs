@@ -4,7 +4,7 @@ using System.IO;
 
 namespace CmisSync.Lib
 {
-    class TrunkedStream : Stream
+    public class TrunkedStream : Stream
     {
         private Stream source;
         private string sourceName;
@@ -29,12 +29,40 @@ namespace CmisSync.Lib
         public override bool CanSeek { get { return source.CanSeek; } }
         public override void Flush() { source.Flush(); }
 
+        private long trunkPosition;
+        public long TrunkPosition
+        {
+            get
+            {
+                return trunkPosition;
+            }
+
+            set
+            {
+                source.Position = value;
+                trunkPosition = value;
+            }
+        }
+
         public override long Length
         {
             get
             {
-                Debug.Assert(false, "TODO");
-                return source.Length;
+                long lengthSource = source.Length;
+                if (lengthSource <= TrunkPosition)
+                {
+                    return 0;
+                }
+
+                long length = lengthSource - TrunkPosition;
+                if (length >= trunkSize)
+                {
+                    return trunkSize;
+                }
+                else
+                {
+                    return length;
+                }
             }
         }
 
@@ -42,26 +70,57 @@ namespace CmisSync.Lib
         {
             get
             {
-                Debug.Assert(false, "TODO");
-                return source.Position;
+                long position = source.Position - TrunkPosition;
+                if (position < 0 || position > trunkSize)
+                {
+                    Debug.Assert(false, String.Format("Position {0} not in [0,{1}]", position, trunkSize));
+                }
+                return position;
             }
 
             set
             {
-                Debug.Assert(false, "TODO");
-                source.Position = value;
+                if (value < 0 || value > trunkSize)
+                {
+                    throw new System.ArgumentOutOfRangeException(String.Format("Position {0} not in [0,{1}]", value, trunkSize));
+                }
+                source.Position = TrunkPosition + value;
             }
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            Debug.Assert(false, "TODO");
+            if (offset < 0)
+            {
+                throw new System.ArgumentOutOfRangeException("offset", offset, "offset is negative");
+            }
+            if (count < 0)
+            {
+                throw new System.ArgumentOutOfRangeException("count", count, "count is negative");
+            }
+
+            if (count > trunkSize - Position)
+            {
+                count = (int)(trunkSize - Position);
+            }
             return source.Read(buffer, offset, count);
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Debug.Assert(false, "TODO");
+            if (offset < 0)
+            {
+                throw new System.ArgumentOutOfRangeException("offset", offset, "offset is negative");
+            }
+            if (count < 0)
+            {
+                throw new System.ArgumentOutOfRangeException("count", count, "count is negative");
+            }
+
+            if (count > trunkSize - Position)
+            {
+                throw new System.ArgumentOutOfRangeException("count", count, "count is overflow");
+            }
             source.Write(buffer, offset, count);
         }
 
