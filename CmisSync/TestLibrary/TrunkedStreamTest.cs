@@ -59,9 +59,9 @@ namespace TestLibrary
         [Test]
         public void TestWrite()
         {
-            using (Database database = new Database(DatabasePath))
+            //using (Database database = new Database(DatabasePath))
             using (Stream file = new FileStream(TestFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
-            using (TrunkedStream trunked = new TrunkedStream(file, TestFilePath, database, TrunkSize))
+            using (TrunkedStream trunked = new TrunkedStream(file, TrunkSize))
             {
                 byte[] buffer = new byte[2 * TrunkSize];
                 FillArray<byte>(buffer, (byte)'a');
@@ -150,7 +150,7 @@ namespace TestLibrary
         [Test]
         public void TestRead()
         {
-            using (Database database = new Database(DatabasePath))
+            //using (Database database = new Database(DatabasePath))
             {
                 using (Stream file = File.OpenWrite(TestFilePath))
                 {
@@ -167,7 +167,7 @@ namespace TestLibrary
                 }
 
                 using (Stream file = new FileStream(TestFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
-                using (TrunkedStream trunked = new TrunkedStream(file, TestFilePath, database, TrunkSize))
+                using (TrunkedStream trunked = new TrunkedStream(file, TrunkSize))
                 {
                     byte[] buffer = new byte[TrunkSize];
                     byte[] result = new byte[TrunkSize];

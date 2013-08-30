@@ -40,6 +40,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool BIDIRECTIONAL = true;
 
+            private long TrunkSize = 1024 * 1024;
 
             /// <summary>
             /// At which degree the repository supports Change Logs.
@@ -525,22 +526,68 @@ namespace CmisSync.Lib.Sync
                     using (SHA1 hashAlg = new SHA1Managed())
                     using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                     {
-                        ContentStream contentStream = new ContentStream();
-                        contentStream.FileName = fileName;
-                        contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                        contentStream.Length = file.Length;
-                        contentStream.Stream = hashstream;
-
-                        // Upload
-                        try
+                        if (TrunkSize == 0)
                         {
-                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                            ContentStream contentStream = new ContentStream();
+                            contentStream.FileName = fileName;
+                            contentStream.MimeType = MimeType.GetMIMEType(fileName);
+                            contentStream.Length = file.Length;
+                            contentStream.Stream = hashstream;
+
+                            // Upload
+                            try
+                            {
+                                remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                filehash = hashAlg.Hash;
+                                success = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                            }
+                        }
+                        else
+                        {
+                            for (long offset = 0; offset < file.Length; offset += TrunkSize)
+                            {
+                                bool isLastTrunk = false;
+                                if (offset + TrunkSize >= file.Length)
+                                {
+                                    isLastTrunk = true;
+                                }
+                                using (TrunkedStream trunkstream = new TrunkedStream(hashstream, TrunkSize))
+                                {
+                                    ContentStream contentStream = new ContentStream();
+                                    contentStream.FileName = fileName;
+                                    contentStream.MimeType = MimeType.GetMIMEType(fileName);
+                                    contentStream.Length = TrunkSize;
+                                    if (isLastTrunk)
+                                    {
+                                        contentStream.Length = file.Length - offset;
+                                    }
+                                    contentStream.Stream = trunkstream;
+
+                                    // Upload
+                                    try
+                                    {
+                                        if (offset == 0)
+                                        {
+                                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                        }
+                                        else
+                                        {
+                                            remoteDocument.AppendContentStream(contentStream, isLastTrunk);
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                                        throw;
+                                    }
+                                }
+                            }
                             filehash = hashAlg.Hash;
                             success = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Fatal("Upload failed: " + filePath + " " + ex);
                         }
                     }
                 }
@@ -681,24 +728,60 @@ namespace CmisSync.Lib.Sync
                             return true;
                         }
 
-                        // Prepare content stream
-                        ContentStream remoteStream = new ContentStream();
-                        remoteStream.FileName = remoteFile.ContentStreamFileName;
-                        remoteStream.Length = localfile.Length;
-                        remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
-                        remoteStream.Stream = localfile;
-                        remoteStream.Stream.Flush();
-                        Logger.Debug("before SetContentStream");
+                        if (TrunkSize == 0)
+                        {
+                            ContentStream contentStream = new ContentStream();
+                            contentStream.FileName = remoteFile.ContentStreamFileName;
+                            contentStream.Length = localfile.Length;
+                            contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
+                            contentStream.Stream = localfile;
+                            Logger.Debug("before SetContentStream");
 
-                        // CMIS do not have a Method to upload block by block. So upload file must be full.
-                        // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
-                        // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
-                        // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
-                        remoteFile.SetContentStream(remoteStream, true, true);
+                            remoteFile.SetContentStream(contentStream, true, true);
 
-                        Logger.Debug("after SetContentStream");
-                        Logger.Info("## Updated " + filePath);
-                        return true;
+                            Logger.Debug("after SetContentStream");
+                            Logger.Info("## Updated " + filePath);
+                            return true;
+                        }
+                        else
+                        {
+                            Logger.Debug("before SetContentStream");
+
+                            for (long offset = 0; offset < localfile.Length; offset += TrunkSize)
+                            {
+                                bool isLastTrunk = false;
+                                if (offset + TrunkSize >= localfile.Length)
+                                {
+                                    isLastTrunk = true;
+                                }
+                                using (TrunkedStream trunkstream = new TrunkedStream(localfile, TrunkSize))
+                                {
+                                    ContentStream contentStream = new ContentStream();
+                                    contentStream.FileName = remoteFile.ContentStreamFileName;
+                                    contentStream.Length = TrunkSize;
+                                    if (isLastTrunk)
+                                    {
+                                        contentStream.Length = localfile.Length - offset;
+                                    }
+                                    contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
+                                    contentStream.Stream = trunkstream;
+
+                                    // Upload
+                                    if (offset == 0)
+                                    {
+                                        remoteFile.SetContentStream(contentStream, true);
+                                    }
+                                    else
+                                    {
+                                        remoteFile.AppendContentStream(contentStream, isLastTrunk);
+                                    }
+                                }
+                            }
+
+                            Logger.Debug("after SetContentStream");
+                            Logger.Info("## Updated " + filePath);
+                            return true;
+                        }
                     }
                 }
                 catch (Exception e)

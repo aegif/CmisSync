@@ -7,15 +7,11 @@ namespace CmisSync.Lib
     public class TrunkedStream : Stream
     {
         private Stream source;
-        private string sourceName;
-        private Cmis.Database sourceDatabase;
         private long trunkSize;
 
-        public TrunkedStream(Stream stream, string name, Cmis.Database database, long trunk)
+        public TrunkedStream(Stream stream, long trunk)
         {
             source = stream;
-            sourceName = name;
-            sourceDatabase = database;
             trunkSize = trunk;
 
             if (!source.CanRead)
@@ -66,16 +62,22 @@ namespace CmisSync.Lib
             }
         }
 
+        private long position;
         public override long Position
         {
             get
             {
-                long position = source.Position - TrunkPosition;
-                if (position < 0 || position > trunkSize)
+                if (!CanSeek)
                 {
-                    Debug.Assert(false, String.Format("Position {0} not in [0,{1}]", position, trunkSize));
+                    return position;
                 }
-                return position;
+
+                long offset = source.Position - TrunkPosition;
+                if (offset < 0 || offset > trunkSize)
+                {
+                    Debug.Assert(false, String.Format("Position {0} not in [0,{1}]", offset, trunkSize));
+                }
+                return offset;
             }
 
             set
@@ -103,7 +105,9 @@ namespace CmisSync.Lib
             {
                 count = (int)(trunkSize - Position);
             }
-            return source.Read(buffer, offset, count);
+            count = source.Read(buffer, offset, count);
+            position += count;
+            return count;
         }
 
         public override void Write(byte[] buffer, int offset, int count)
@@ -122,6 +126,7 @@ namespace CmisSync.Lib
                 throw new System.ArgumentOutOfRangeException("count", count, "count is overflow");
             }
             source.Write(buffer, offset, count);
+            position += count;
         }
 
         public override long Seek(long offset, SeekOrigin origin)
