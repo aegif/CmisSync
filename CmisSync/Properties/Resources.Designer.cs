@@ -189,6 +189,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enable folder for synchronization.
+        /// </summary>
+        internal static string DoNotIgnoreFolder {
+            get {
+                return ResourceManager.GetString("DoNotIgnoreFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty URL.
         /// </summary>
         internal static string EmptyURLNotAllowed {
@@ -270,6 +279,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ignore folder on synchronization.
+        /// </summary>
+        internal static string IgnoreFolder {
+            get {
+                return ResourceManager.GetString("IgnoreFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DataSpace Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
         ///
         ///It is like Dropbox for Enterprise Content Management!.
@@ -295,6 +313,24 @@ namespace CmisSync {
         internal static string InvalidURL {
             get {
                 return ResourceManager.GetString("InvalidURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to loading ....
+        /// </summary>
+        internal static string LoadingStatusLOADING {
+            get {
+                return ResourceManager.GetString("LoadingStatusLOADING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to pending ....
+        /// </summary>
+        internal static string LoadingStatusSTART {
+            get {
+                return ResourceManager.GetString("LoadingStatusSTART", resourceCulture);
             }
         }
         
@@ -386,6 +422,15 @@ namespace CmisSync {
         internal static string ReceivingChanges {
             get {
                 return ResourceManager.GetString("ReceivingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove the folder from synchronization.
+        /// </summary>
+        internal static string RemoveFolderFromSync {
+            get {
+                return ResourceManager.GetString("RemoveFolderFromSync", resourceCulture);
             }
         }
         

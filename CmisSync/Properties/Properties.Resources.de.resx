@@ -151,7 +151,7 @@
     <value>Leere URL</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Geben Sie einen Namen für den lokalen Ordner ein, wo die Dokumente synchronisiert werden</value>
+    <value>Geben Sie dem zu synchronisierenden Ordner einen Namen:</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
     <value>Geben Sie eine CMIS Server Adresse ein:</value>
@@ -250,7 +250,7 @@
     <value>Sie finden den im Ordner DataSpace Sync.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Ändern Sie den lokalen Pfad dieses Archivs:</value>
+    <value>Ändern Sie den lokalen Pfad dieses Ordners:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
     <value>Ein lokaler Ordner mit demselben Namen ist bereits vorhanden, bitte benutzen Sie einen anderen Namen.</value>

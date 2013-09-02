@@ -136,13 +136,25 @@ namespace CmisSync {
 
         public void OpenCmisSyncFolder(string name)
         {
-            Utils.OpenFolder(ConfigManager.GetFullPath(name));
+            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(name);
+            if(f!=null)
+                Utils.OpenFolder(f.LocalPath);
+            else if(String.IsNullOrWhiteSpace(name)){
+                OpenCmisSyncFolder();
+            }else{
+                Logger.Warn("Folder not found: "+name);
+            }
         }
 
         public void OpenRemoteFolder(string name)
         {
-            RepoInfo repo = ConfigManager.CurrentConfig.GetRepoInfo(name);
-            Process.Start(CmisUtils.GetBrowsableURL(repo));
+            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(name);
+            if(f!=null){
+                RepoInfo repo = f.GetRepoInfo();
+                Process.Start(CmisUtils.GetBrowsableURL(repo));
+            } else {
+                Logger.Warn("Repo not found: "+name);
+            }
         }
 
         public void ShowLog(string path)

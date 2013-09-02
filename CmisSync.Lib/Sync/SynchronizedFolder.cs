@@ -17,6 +17,7 @@ using System.Net;
 using CmisSync.Lib.Cmis;
 using DotCMIS.Data;
 using log4net;
+using System.Security.Cryptography;
 
 namespace CmisSync.Lib.Sync
 {
@@ -31,12 +32,14 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder : IDisposable
         {
+            // Log
+            private static readonly ILog Logger = LogManager.GetLogger(typeof(SynchronizedFolder));
+            
             /// <summary>
             /// Whether sync is bidirectional or only from server to client.
             /// TODO make it a CMIS folder - specific setting
             /// </summary>
             private bool BIDIRECTIONAL = true;
-
 
             /// <summary>
             /// At which degree the repository supports Change Logs.
@@ -45,6 +48,18 @@ namespace CmisSync.Lib.Sync
             /// But for now we only distinguish between none (false) and the rest (true)
             /// </summary>
             private bool ChangeLogCapability;
+
+            /// <summary>
+            /// If the repository is able send a folder tree in one request, this is true,
+            /// Otherwise the default behaviour is false
+            /// </summary>
+            private bool IsGetFolderTreeSupported = false;
+
+            /// <summary>
+            /// If the repository allows to request all Descendants of a folder or file,
+            /// this is set to true, otherwise the default behaviour is false
+            /// </summary>
+            private bool IsGetDescendantsSupported = false;
 
 
             /// <summary>
@@ -129,7 +144,7 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
                 cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
                 cmisParameters[SessionParameter.User] = repoInfo.User;
-                cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(repoInfo.Password); // Deobfuscate password.
+                cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
 
@@ -190,10 +205,23 @@ namespace CmisSync.Lib.Sync
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
                     Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Info("Created CMIS session: " + session.ToString());
+                    IsGetDescendantsSupported = session.RepositoryInfo.Capabilities.IsGetDescendantsSupported == true;
+                    IsGetFolderTreeSupported = session.RepositoryInfo.Capabilities.IsGetFolderTreeSupported == true;
+                    Logger.Info("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
+                    Logger.Info("Get descendants support: " + IsGetDescendantsSupported.ToString());
                 }
+                //TODO Implement error handling -> informing user about connection problems by showing status
                 catch (CmisRuntimeException e)
                 {
                     Logger.Error("Connection to repository failed: ", e);
+                }
+                catch (CmisObjectNotFoundException e)
+                {
+                    Logger.Error("Failed to find cmis object: ", e);
+                }
+                catch (CmisBaseException e)
+                {
+                    Logger.Error("Failed to create session to remote " + this.repoinfo.Address.ToString() + ": ", e);
                 }
             }
 
@@ -228,7 +256,6 @@ namespace CmisSync.Lib.Sync
                     repo.Watcher.EnableRaisingEvents = true;
                     syncFull = false;
                 }
-
                 if (!syncFull)
                 {
                     Logger.Info("Invoke a full crawl sync");
@@ -240,6 +267,12 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info("Invoke a remote change log sync");
                     ChangeLogSync(remoteFolder);
+                    Logger.Info("Invoke a file system watcher sync");
+                    WatcherSync(remoteFolderPath, localFolder);
+                    foreach (string name in repo.Watcher.GetChangeList())
+                    {
+                        Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
+                    }
                 }
                 else
                 {
@@ -247,14 +280,6 @@ namespace CmisSync.Lib.Sync
                     Logger.Info("Invoke a remote crawl sync");
                     CrawlSync(remoteFolder, localFolder);
                 }
-
-                Logger.Info("Invoke a file system watcher sync");
-                WatcherSync(remoteFolderPath, localFolder);
-                foreach (string name in repo.Watcher.GetChangeList())
-                {
-                    Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
-                }
-
             }
 
 
@@ -276,18 +301,14 @@ namespace CmisSync.Lib.Sync
                         delegate(Object o, DoWorkEventArgs args)
                         {
                             Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
-#if !DEBUG
                         try
                         {
-#endif
                             Sync();
-#if !DEBUG
                         }
                         catch (CmisBaseException e)
                         {
                             Logger.Error("CMIS exception while syncing:", e);
                         }
-#endif
                         }
                     );
                     bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -517,14 +538,6 @@ namespace CmisSync.Lib.Sync
                 string fileName = remoteDocument.ContentStreamFileName;
                 Logger.Info("Downloading: " + fileName);
 
-                // TODO: Make this configurable.
-                if (remoteDocument.ContentStreamLength == 0)
-                {
-                    Logger.Info("Skipping download of file with content length zero: " + fileName);
-                    activityListener.ActivityStopped();
-                    return true;
-                }
-
                 // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
                 if (Utils.IsInvalidFileName(fileName))
                 {
@@ -552,24 +565,92 @@ namespace CmisSync.Lib.Sync
 
                     // Download file.
                     Boolean success = false;
+                    byte[] filehash = { };
                     try
                     {
-                        contentStream = remoteDocument.GetContentStream();
+                        long? fileLength = remoteDocument.ContentStreamLength;
 
-                        // If this file does not have a content stream, ignore it.
-                        // Even 0 bytes files have a contentStream.
-                        // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-                        if (contentStream == null)
+                        if (null == fileLength)
                         {
                             Logger.Warn("Skipping download of file with null content stream: " + fileName);
                             activityListener.ActivityStopped();
                             return true;
                         }
 
-                        DownloadStream(contentStream, tmpfilepath);
+                        // Skip downloading the content, just go on with an empty file
+                        if (0 == fileLength)
+                        {
+                            Logger.Info("Skipping download of file with content length zero: " + fileName);
+                            using (FileStream s = File.Create(tmpfilepath))
+                            {
+                                s.Close();
+                            }
+                            using (SHA1 sha = new SHA1CryptoServiceProvider())
+                            {
+                                filehash = sha.ComputeHash(new byte[0]);
+                            }
+                            success = true;
+                        }
+                        else
+                        {
+                            using (Stream file = new FileStream(tmpfilepath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+                            using (SHA1 hashAlg = new SHA1Managed())
+                            using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
+                            {
+                                if (repoinfo.TrunkSize <= 0)
+                                {
+                                    contentStream = remoteDocument.GetContentStream();
+                                    // If this file does not have a content stream, ignore it.
+                                    // Even 0 bytes files have a contentStream.
+                                    // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                                    if (contentStream == null)
+                                    {
+                                        Logger.Warn("Skipping download of file with null content stream: " + fileName);
+                                        activityListener.ActivityStopped();
+                                        return true;
+                                    }
 
-                        contentStream.Stream.Close();
-                        success = true;
+                                    byte[] buffer = new byte[8 * 1024];
+                                    int len;
+                                    while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                                    {
+                                        hashstream.Write(buffer, 0, len);
+                                    }
+                                }
+                                else
+                                {
+                                    for (long offset = 0; offset < fileLength; offset += repoinfo.TrunkSize)
+                                    {
+                                        contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.TrunkSize);
+                                        // If this file does not have a content stream, ignore it.
+                                        // Even 0 bytes files have a contentStream.
+                                        // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                                        if (contentStream == null)
+                                        {
+                                            Logger.Warn("Skipping download of file with null content stream: " + fileName);
+                                            activityListener.ActivityStopped();
+                                            return true;
+                                        }
+
+                                        using (TrunkedStream trunkstream = new TrunkedStream(hashstream, repoinfo.TrunkSize))
+                                        {
+                                            // Download
+                                            byte[] buffer = new byte[8 * 1024];
+                                            int len;
+                                            while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                                            {
+                                                trunkstream.Write(buffer, 0, len);
+                                            }
+                                        }
+                                        contentStream.Stream.Close();
+                                    }
+                                }
+                                hashstream.FlushFinalBlock();
+                                filehash = hashAlg.Hash;
+                                contentStream.Stream.Close();
+                                success = true;
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -603,7 +684,7 @@ namespace CmisSync.Lib.Sync
                         File.Move(tmpfilepath, filepath);
 
                         // Create database entry for this file.
-                        database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata);
+                        database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
 
                         Logger.Info("Added to database: " + fileName);
                     }
@@ -621,24 +702,6 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
-            /// Download a file, without retrying.
-            /// </summary>
-            private void DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
-            {
-                using (Stream file = File.OpenWrite(filePath))
-                {
-                    byte[] buffer = new byte[8 * 1024];
-                    int len;
-                    while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        file.Write(buffer, 0, len);
-                    }
-                }
-                contentStream.Stream.Close();
-            }
-
-
-            /// <summary>
             /// Upload a single file to the CMIS server.
             /// </summary>
             private bool UploadFile(string filePath, IFolder remoteFolder)
@@ -647,6 +710,7 @@ namespace CmisSync.Lib.Sync
 
                 IDocument remoteDocument = null;
                 Boolean success = false;
+                byte[] filehash = { };
                 try
                 {
                     Logger.Info("Uploading: " + filePath);
@@ -659,22 +723,71 @@ namespace CmisSync.Lib.Sync
 
                     // Prepare content stream
                     using (Stream file = File.OpenRead(filePath))
+                    using (SHA1 hashAlg = new SHA1Managed())
+                    using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                     {
-                        ContentStream contentStream = new ContentStream();
-                        contentStream.FileName = fileName;
-                        contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                        contentStream.Length = file.Length;
-                        contentStream.Stream = file;
+                        if (repoinfo.TrunkSize <= 0)
+                        {
+                            ContentStream contentStream = new ContentStream();
+                            contentStream.FileName = fileName;
+                            contentStream.MimeType = MimeType.GetMIMEType(fileName);
+                            contentStream.Length = file.Length;
+                            contentStream.Stream = hashstream;
 
-                        // Upload
-                        try
-                        {
-                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                            success = true;
+                            // Upload
+                            try
+                            {
+                                remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                filehash = hashAlg.Hash;
+                                success = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                            }
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                            for (long offset = 0; offset < file.Length; offset += repoinfo.TrunkSize)
+                            {
+                                bool isLastTrunk = false;
+                                if (offset + repoinfo.TrunkSize >= file.Length)
+                                {
+                                    isLastTrunk = true;
+                                }
+                                using (TrunkedStream trunkstream = new TrunkedStream(hashstream, repoinfo.TrunkSize))
+                                {
+                                    ContentStream contentStream = new ContentStream();
+                                    contentStream.FileName = fileName;
+                                    contentStream.MimeType = MimeType.GetMIMEType(fileName);
+                                    contentStream.Length = repoinfo.TrunkSize;
+                                    if (isLastTrunk)
+                                    {
+                                        contentStream.Length = file.Length - offset;
+                                    }
+                                    contentStream.Stream = trunkstream;
+
+                                    // Upload
+                                    try
+                                    {
+                                        if (offset == 0)
+                                        {
+                                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                        }
+                                        else
+                                        {
+                                            remoteDocument.AppendContentStream(contentStream, isLastTrunk);
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                                        throw;
+                                    }
+                                }
+                            }
+                            filehash = hashAlg.Hash;
+                            success = true;
                         }
                     }
                 }
@@ -707,7 +820,7 @@ namespace CmisSync.Lib.Sync
                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                     // Create database entry for this file.
-                    database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata);
+                    database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                 }
 
                 activityListener.ActivityStopped();
@@ -725,7 +838,31 @@ namespace CmisSync.Lib.Sync
                 Dictionary<string, object> properties = new Dictionary<string, object>();
                 properties.Add(PropertyIds.Name, Path.GetFileName(localFolder));
                 properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
-                IFolder folder = remoteBaseFolder.CreateFolder(properties);
+                IFolder folder = null;
+                try
+                {
+                    folder = remoteBaseFolder.CreateFolder(properties);
+                }
+                catch (CmisNameConstraintViolationException)
+                {
+                    foreach (ICmisObject cmisObject in remoteBaseFolder.GetChildren())
+                    {
+                        if (cmisObject.Name == Path.GetFileName(localFolder))
+                        {
+                            folder = cmisObject as IFolder;
+                        }
+                    }
+                    if (folder == null)
+                    {
+                        Logger.Warn("Remote file conflict with local folder " + Path.GetFileName(localFolder));
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(String.Format("Exception when create remote folder for local folder {0}: {1}", localFolder, Utils.ToLogString(ex)));
+                    return false;
+                }
 
                 // Create database entry for this folder
                 // TODO Add metadata
@@ -791,24 +928,60 @@ namespace CmisSync.Lib.Sync
                             return true;
                         }
 
-                        // Prepare content stream
-                        ContentStream remoteStream = new ContentStream();
-                        remoteStream.FileName = remoteFile.ContentStreamFileName;
-                        remoteStream.Length = localfile.Length;
-                        remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
-                        remoteStream.Stream = localfile;
-                        remoteStream.Stream.Flush();
-                        Logger.Debug("before SetContentStream");
+                        if (repoinfo.TrunkSize <= 0)
+                        {
+                            ContentStream contentStream = new ContentStream();
+                            contentStream.FileName = remoteFile.ContentStreamFileName;
+                            contentStream.Length = localfile.Length;
+                            contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
+                            contentStream.Stream = localfile;
+                            Logger.Debug("before SetContentStream");
 
-                        // CMIS do not have a Method to upload block by block. So upload file must be full.
-                        // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
-                        // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
-                        // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
-                        remoteFile.SetContentStream(remoteStream, true, true);
+                            remoteFile.SetContentStream(contentStream, true, true);
 
-                        Logger.Debug("after SetContentStream");
-                        Logger.Info("## Updated " + filePath);
-                        return true;
+                            Logger.Debug("after SetContentStream");
+                            Logger.Info("## Updated " + filePath);
+                            return true;
+                        }
+                        else
+                        {
+                            Logger.Debug("before SetContentStream");
+
+                            for (long offset = 0; offset < localfile.Length; offset += repoinfo.TrunkSize)
+                            {
+                                bool isLastTrunk = false;
+                                if (offset + repoinfo.TrunkSize >= localfile.Length)
+                                {
+                                    isLastTrunk = true;
+                                }
+                                using (TrunkedStream trunkstream = new TrunkedStream(localfile, repoinfo.TrunkSize))
+                                {
+                                    ContentStream contentStream = new ContentStream();
+                                    contentStream.FileName = remoteFile.ContentStreamFileName;
+                                    contentStream.Length = repoinfo.TrunkSize;
+                                    if (isLastTrunk)
+                                    {
+                                        contentStream.Length = localfile.Length - offset;
+                                    }
+                                    contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
+                                    contentStream.Stream = trunkstream;
+
+                                    // Upload
+                                    if (offset == 0)
+                                    {
+                                        remoteFile.SetContentStream(contentStream, true);
+                                    }
+                                    else
+                                    {
+                                        remoteFile.AppendContentStream(contentStream, isLastTrunk);
+                                    }
+                                }
+                            }
+
+                            Logger.Debug("after SetContentStream");
+                            Logger.Info("## Updated " + filePath);
+                            return true;
+                        }
                     }
                 }
                 catch (Exception e)

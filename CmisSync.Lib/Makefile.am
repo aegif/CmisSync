@@ -26,6 +26,7 @@ SOURCES =  \
 	Sync/CrawlStrategy.cs \
 	Sync/SynchronizedFolder.cs \
 	Sync/WatcherStrategy.cs \
+	TrunkedStream.cs \
 	Utils.cs \
 	Watcher.cs
 

@@ -12,8 +12,9 @@ LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) \
 
 SOURCES =  \
 	CmisSyncTests.cs \
-    WatcherTest.cs \
-    CmisDatabaseTest.cs \
+	WatcherTest.cs \
+	CmisDatabaseTest.cs \
+	TrunkedStreamTest.cs \
 	LocalFilesystemActivityGenerator.cs
 
 EXTRA_DIST = TestLibrary.csproj \

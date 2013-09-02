@@ -68,6 +68,7 @@
     <Compile Include="Utils.cs" />
     <Compile Include="Backend.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="TrunkedStream.cs" />
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
