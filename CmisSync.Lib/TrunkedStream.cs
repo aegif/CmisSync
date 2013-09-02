@@ -14,10 +14,10 @@ namespace CmisSync.Lib
             source = stream;
             trunkSize = trunk;
 
-            if (!source.CanRead)
-            {
-                throw new System.NotSupportedException("Read access is needed for TrunkedStream");
-            }
+            //if (!source.CanRead)
+            //{
+            //    throw new System.NotSupportedException("Read access is needed for TrunkedStream");
+            //}
         }
 
         public override bool CanRead { get { return source.CanRead; } }

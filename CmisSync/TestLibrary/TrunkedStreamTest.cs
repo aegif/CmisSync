@@ -19,8 +19,8 @@ namespace TestLibrary
         [TestFixtureSetUp]
         public void ClassInit()
         {
-            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
-            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            //File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            //log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
         [SetUp]

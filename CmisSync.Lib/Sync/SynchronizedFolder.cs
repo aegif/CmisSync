@@ -401,32 +401,89 @@ namespace CmisSync.Lib.Sync
                     byte[] filehash = { };
                     try
                     {
-                        contentStream = remoteDocument.GetContentStream();
+                        long? fileLength = remoteDocument.ContentStreamLength;
 
-                        // If this file does not have a content stream, ignore it.
-                        // Even 0 bytes files have a contentStream.
-                        // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-                        if (contentStream == null)
+                        if (null == fileLength)
                         {
                             Logger.Warn("Skipping download of file with null content stream: " + fileName);
                             activityListener.ActivityStopped();
                             return true;
                         }
+
                         // Skip downloading the content, just go on with an empty file
-                        if (remoteDocument.ContentStreamLength == 0)
+                        if (0 == fileLength)
                         {
                             Logger.Info("Skipping download of file with content length zero: " + fileName);
                             using (FileStream s = File.Create(tmpfilepath))
                             {
                                 s.Close();
                             }
+                            using (SHA1 sha = new SHA1CryptoServiceProvider())
+                            {
+                                filehash = sha.ComputeHash(new byte[0]);
+                            }
+                            success = true;
                         }
                         else
                         {
-                            filehash = DownloadStream(contentStream, tmpfilepath);
-                            contentStream.Stream.Close();
+                            using (Stream file = new FileStream(tmpfilepath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+                            using (SHA1 hashAlg = new SHA1Managed())
+                            using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
+                            {
+                                if (TrunkSize <= 0)
+                                {
+                                    contentStream = remoteDocument.GetContentStream();
+                                    // If this file does not have a content stream, ignore it.
+                                    // Even 0 bytes files have a contentStream.
+                                    // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                                    if (contentStream == null)
+                                    {
+                                        Logger.Warn("Skipping download of file with null content stream: " + fileName);
+                                        activityListener.ActivityStopped();
+                                        return true;
+                                    }
+
+                                    byte[] buffer = new byte[8 * 1024];
+                                    int len;
+                                    while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                                    {
+                                        hashstream.Write(buffer, 0, len);
+                                    }
+                                }
+                                else
+                                {
+                                    for (long offset = 0; offset < fileLength; offset += TrunkSize)
+                                    {
+                                        contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId,offset,TrunkSize);
+                                        // If this file does not have a content stream, ignore it.
+                                        // Even 0 bytes files have a contentStream.
+                                        // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                                        if (contentStream == null)
+                                        {
+                                            Logger.Warn("Skipping download of file with null content stream: " + fileName);
+                                            activityListener.ActivityStopped();
+                                            return true;
+                                        }
+
+                                        using (TrunkedStream trunkstream = new TrunkedStream(hashstream, TrunkSize))
+                                        {
+                                            // Download
+                                            byte[] buffer = new byte[8 * 1024];
+                                            int len;
+                                            while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                                            {
+                                                trunkstream.Write(buffer, 0, len);
+                                            }
+                                        }
+                                        contentStream.Stream.Close();
+                                    }
+                                }
+                                hashstream.FlushFinalBlock();
+                                filehash = hashAlg.Hash;
+                                contentStream.Stream.Close();
+                                success = true;
+                            }
                         }
-                        success = true;
                     }
                     catch (Exception ex)
                     {
@@ -478,30 +535,6 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
-            /// Download a file, without retrying.
-            /// </summary>
-            private byte[] DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
-            {
-                byte[] hash = {};
-                using (Stream file = File.OpenWrite(filePath))
-                using (SHA1 hashAlg = new SHA1Managed())
-                using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
-                {
-                    byte[] buffer = new byte[8 * 1024];
-                    int len;
-                    while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        hashstream.Write(buffer, 0, len);
-                    }
-                    hashstream.FlushFinalBlock();
-                    hash = hashAlg.Hash;
-                }
-                contentStream.Stream.Close();
-                return hash;
-            }
-
-
-            /// <summary>
             /// Upload a single file to the CMIS server.
             /// </summary>
             private bool UploadFile(string filePath, IFolder remoteFolder)
@@ -526,7 +559,7 @@ namespace CmisSync.Lib.Sync
                     using (SHA1 hashAlg = new SHA1Managed())
                     using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                     {
-                        if (TrunkSize == 0)
+                        if (TrunkSize <= 0)
                         {
                             ContentStream contentStream = new ContentStream();
                             contentStream.FileName = fileName;
@@ -728,7 +761,7 @@ namespace CmisSync.Lib.Sync
                             return true;
                         }
 
-                        if (TrunkSize == 0)
+                        if (TrunkSize <= 0)
                         {
                             ContentStream contentStream = new ContentStream();
                             contentStream.FileName = remoteFile.ContentStreamFileName;
