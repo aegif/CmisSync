@@ -327,17 +327,40 @@ namespace CmisSync.Lib
 
                 private double pollInterval = 5000;
                 [XmlElement("pollinterval"), System.ComponentModel.DefaultValue(5000)]
-                public double PollInterval {
+                public double PollInterval
+                {
                     get { return pollInterval; }
                     set {
                         if (value <= 0)
                         {
                             pollInterval = 5000;
                         }
+                        else
+                        {
+                            pollInterval = value;
+                        }
                 } }
 
                 [XmlElement("ignoreFolder",IsNullable=true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
+
+                private long trunkSize = 1024 * 1024;
+                [XmlElement("trunkSize"), System.ComponentModel.DefaultValue(1024 * 1024)]
+                public long TrunkSize
+                {
+                    get { return trunkSize; }
+                    set
+                    {
+                        if (value < 0)
+                        {
+                            trunkSize = 0;
+                        }
+                        else
+                        {
+                            trunkSize = value;
+                        }
+                    }
+                }
 
                 /// <summary>
                 /// Get all the configured info about a synchronized folder.
@@ -354,11 +377,11 @@ namespace CmisSync.Lib
                     repoInfo.TargetDirectory = LocalPath;
                     if (PollInterval < 1) PollInterval = 5000;
                     repoInfo.PollInterval = PollInterval;
-
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
                     {
                         repoInfo.addIgnorePath(ignoredFolder.Path);
                     }
+                    repoInfo.TrunkSize = TrunkSize;
                     return repoInfo;
                 }
             }

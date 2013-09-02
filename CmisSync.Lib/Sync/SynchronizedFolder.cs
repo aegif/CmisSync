@@ -40,8 +40,6 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool BIDIRECTIONAL = true;
 
-            private long TrunkSize = 1024 * 1024;
-
             /// <summary>
             /// At which degree the repository supports Change Logs.
             /// See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
@@ -430,7 +428,7 @@ namespace CmisSync.Lib.Sync
                             using (SHA1 hashAlg = new SHA1Managed())
                             using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                             {
-                                if (TrunkSize <= 0)
+                                if (repoinfo.TrunkSize <= 0)
                                 {
                                     contentStream = remoteDocument.GetContentStream();
                                     // If this file does not have a content stream, ignore it.
@@ -452,9 +450,9 @@ namespace CmisSync.Lib.Sync
                                 }
                                 else
                                 {
-                                    for (long offset = 0; offset < fileLength; offset += TrunkSize)
+                                    for (long offset = 0; offset < fileLength; offset += repoinfo.TrunkSize)
                                     {
-                                        contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId,offset,TrunkSize);
+                                        contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.TrunkSize);
                                         // If this file does not have a content stream, ignore it.
                                         // Even 0 bytes files have a contentStream.
                                         // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
@@ -465,7 +463,7 @@ namespace CmisSync.Lib.Sync
                                             return true;
                                         }
 
-                                        using (TrunkedStream trunkstream = new TrunkedStream(hashstream, TrunkSize))
+                                        using (TrunkedStream trunkstream = new TrunkedStream(hashstream, repoinfo.TrunkSize))
                                         {
                                             // Download
                                             byte[] buffer = new byte[8 * 1024];
@@ -559,7 +557,7 @@ namespace CmisSync.Lib.Sync
                     using (SHA1 hashAlg = new SHA1Managed())
                     using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                     {
-                        if (TrunkSize <= 0)
+                        if (repoinfo.TrunkSize <= 0)
                         {
                             ContentStream contentStream = new ContentStream();
                             contentStream.FileName = fileName;
@@ -581,19 +579,19 @@ namespace CmisSync.Lib.Sync
                         }
                         else
                         {
-                            for (long offset = 0; offset < file.Length; offset += TrunkSize)
+                            for (long offset = 0; offset < file.Length; offset += repoinfo.TrunkSize)
                             {
                                 bool isLastTrunk = false;
-                                if (offset + TrunkSize >= file.Length)
+                                if (offset + repoinfo.TrunkSize >= file.Length)
                                 {
                                     isLastTrunk = true;
                                 }
-                                using (TrunkedStream trunkstream = new TrunkedStream(hashstream, TrunkSize))
+                                using (TrunkedStream trunkstream = new TrunkedStream(hashstream, repoinfo.TrunkSize))
                                 {
                                     ContentStream contentStream = new ContentStream();
                                     contentStream.FileName = fileName;
                                     contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                                    contentStream.Length = TrunkSize;
+                                    contentStream.Length = repoinfo.TrunkSize;
                                     if (isLastTrunk)
                                     {
                                         contentStream.Length = file.Length - offset;
@@ -761,7 +759,7 @@ namespace CmisSync.Lib.Sync
                             return true;
                         }
 
-                        if (TrunkSize <= 0)
+                        if (repoinfo.TrunkSize <= 0)
                         {
                             ContentStream contentStream = new ContentStream();
                             contentStream.FileName = remoteFile.ContentStreamFileName;
@@ -780,18 +778,18 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Debug("before SetContentStream");
 
-                            for (long offset = 0; offset < localfile.Length; offset += TrunkSize)
+                            for (long offset = 0; offset < localfile.Length; offset += repoinfo.TrunkSize)
                             {
                                 bool isLastTrunk = false;
-                                if (offset + TrunkSize >= localfile.Length)
+                                if (offset + repoinfo.TrunkSize >= localfile.Length)
                                 {
                                     isLastTrunk = true;
                                 }
-                                using (TrunkedStream trunkstream = new TrunkedStream(localfile, TrunkSize))
+                                using (TrunkedStream trunkstream = new TrunkedStream(localfile, repoinfo.TrunkSize))
                                 {
                                     ContentStream contentStream = new ContentStream();
                                     contentStream.FileName = remoteFile.ContentStreamFileName;
-                                    contentStream.Length = TrunkSize;
+                                    contentStream.Length = repoinfo.TrunkSize;
                                     if (isLastTrunk)
                                     {
                                         contentStream.Length = localfile.Length - offset;

@@ -78,6 +78,14 @@ namespace CmisSync.Lib
         /// </summary>
         private List<string> ignoredPaths = new List<string>();
 
+
+        /// <summary>
+        /// Trunk size
+        /// If none zero, CmisSync will divide the document by trunk size for download/upload.
+        /// </summary>
+        public long TrunkSize { get; set; }
+
+
         /// <summary>
         /// Simple constructor.
         /// </summary>
@@ -106,6 +114,7 @@ namespace CmisSync.Lib
             RepoID = repoID;
             TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
             PollInterval = pollInterval;
+            TrunkSize = 0;
         }
 
         /// <summary>
