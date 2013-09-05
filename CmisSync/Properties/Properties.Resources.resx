@@ -306,4 +306,14 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="RemoveFolderFromSync" xml:space="preserve">
     <value>Remove the folder from synchronization</value>
   </data>
+  <data name="DoYouTrustTheCertificate" xml:space="preserve">
+    <value>Do you trust this certificate?
+(Yes == Always, Cancel = Just Now)</value>
+  </data>
+  <data name="TrustFailure" xml:space="preserve">
+    <value>Failed to establish a trusted Connection. Please inform your server administrator.</value>
+  </data>
+  <data name="UntrustedCertificate" xml:space="preserve">
+    <value>Untrusted Certificate</value>
+  </data>
 </root>
