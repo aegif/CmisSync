@@ -281,4 +281,14 @@ Eventuell ist auch die URL nicht ganz korrekt.</value>
     <value>Die Kommunikation mit dem Server ist fehlgeschlagen!
 Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ändern Sie das Protokoll nur auf http, wenn Sie wissen, dass der Server nicht per https benutzt werden kann.</value>
   </data>
+  <data name="DoYouTrustTheCertificate" xml:space="preserve">
+    <value>Vertrauen Sie diesem Zertifikat?
+(Ja == Ja auch in Zukunft, Abbrechen = Nur für diese Sitzung)</value>
+  </data>
+  <data name="TrustFailure" xml:space="preserve">
+    <value>Es konnte keine vertrauenswürdige Verbindung hergestellt werden. Bitte informieren Sie  Ihren Administrator.</value>
+  </data>
+  <data name="UntrustedCertificate" xml:space="preserve">
+    <value>Unvertrauenswürdiges oder unbekanntes Zertifikat</value>
+  </data>
 </root>
