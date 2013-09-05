@@ -29,6 +29,7 @@ using log4net.Config;
 using Gtk;
 #else
 using System.Windows;
+using System.Collections.Generic;
 #endif
 
 namespace CmisSync
@@ -73,10 +74,18 @@ namespace CmisSync
             CertAcceptAlways
         }
 
-        /**
-         * List of temporarily accepted certs.
-         */
-        private static IList acceptedCerts = new ArrayList();
+        /// <summary>
+        /// List of temporarily accepted certs.
+        /// </summary>
+        private static List<X509Certificate2> acceptedCerts = new List<X509Certificate2>();
+        /// <summary>
+        /// List of already denied certs. Just for this session.
+        /// </summary>
+        private static List<X509Certificate2> deniedCerts = new List<X509Certificate2>();
+        /// <summary>
+        /// Persistent store of saved certificates
+        /// </summary>
+        private static X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
 
         public UserResponse ShowCertDialog(String msg) {
             Logger.Debug("Showing Cert Dialog: " + msg);
@@ -98,8 +107,8 @@ namespace CmisSync
             });
 #else
                     var r = MessageBox.Show(msg +
-                        "\n\nDo you trust this certificate?\n(Yes == Always, Cancel = Just Now)",
-                        "Untrusted Certificate", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+                        "\n\n"+ Properties_Resources.DoYouTrustTheCertificate,
+                        Properties_Resources.UntrustedCertificate, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
                     switch (r) {
                         case MessageBoxResult.Yes:
                             ret = UserResponse.CertAcceptAlways;
@@ -125,27 +134,48 @@ namespace CmisSync
         public bool CheckValidationResult (ServicePoint sp, X509Certificate certificate,
                 WebRequest request, int error)
         {
-            if (0 == error) {
+            if (0 == error)
+            {
+                return true;
+            }
+            X509Certificate2 cert = new X509Certificate2(certificate);
+            {
+                store.Open(OpenFlags.ReadOnly);
+                bool found = store.Certificates.Contains(cert);
+                store.Close();
+                // If the certificate has been stored persistent, accept it
+                if (found) return true;
+            }
+            if (acceptedCerts.Contains(cert))
+            {
+                // User has already accepted this certificate in this session.
                 return true;
             }
 
-            if (acceptedCerts.Contains(certificate)) {
-                // User has already accepted this certificate in this session.
-                return true;
+            if (deniedCerts.Contains(cert))
+            {
+                // User has already denied this certificate in this session.
+                return false;
             }
 
             string msg = GetCertificateHR(certificate) +
                 GetProblemMessage((CertificateProblem)error);
 
-            switch (ShowCertDialog(msg)) {
+            switch (ShowCertDialog(msg))
+            {
                 case UserResponse.CertDeny:
+                    // Deny this cert for the actual session
+                    deniedCerts.Add(cert);
                     return false;
                 case UserResponse.CertAcceptSession:
-                    acceptedCerts.Add(certificate);
+                    // Just accept this cert for the actual session
+                    acceptedCerts.Add(cert);
                     return true;
                 case UserResponse.CertAcceptAlways:
-                    acceptedCerts.Add(certificate);
-                    // TODO save to local truststore
+                    // Write the newly accepted cert to the persistent store
+                    store.Open(OpenFlags.ReadWrite);
+                    store.Add(cert);
+                    store.Close();
                     return true;
             }
 

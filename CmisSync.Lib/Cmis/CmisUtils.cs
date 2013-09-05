@@ -8,6 +8,7 @@ using DotCMIS;
 using DotCMIS.Exceptions;
 using log4net;
 using System.Web;
+using DotCMIS.Data;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -316,7 +317,7 @@ namespace CmisSync.Lib.Cmis
             {
                 throw new ArgumentNullException("repo");
             }
-
+            
             // Case of Alfresco.
             if (repo.Address.AbsoluteUri.EndsWith("alfresco/cmisatom"))
             {
@@ -359,8 +360,19 @@ namespace CmisSync.Lib.Cmis
             }
             else
             {
-                // If no particular server was detected, concatenate and hope it will hit close, maybe to a page that allows to access the folder with a few clicks.
-                return repo.Address.AbsoluteUri + repo.RemotePath;
+                // If GRAU DATA AG server was detected, try to open the thinclient url, otherwise try to open the repo path
+                Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
+                cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+                cmisParameters[SessionParameter.AtomPubUrl] = repo.Address.ToString();
+                cmisParameters[SessionParameter.User] = repo.User;
+                cmisParameters[SessionParameter.Password] = repo.Password.ToString();
+                cmisParameters[SessionParameter.RepositoryId] = repo.RepoID;
+                SessionFactory factory = SessionFactory.NewInstance();
+                ISession session = factory.CreateSession(cmisParameters);
+                if (!String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
+                    return session.RepositoryInfo.ThinClientUri;
+                else
+                    return repo.Address.AbsoluteUri + repo.RemotePath;
             }
         }
     }
