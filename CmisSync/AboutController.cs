@@ -60,13 +60,15 @@ namespace CmisSync {
         /// URL addresses to display in the About dialog.
         /// </summary>
         public readonly string WebsiteLinkAddress       = "https://github.com/OpenDataSpace/DataSpaceSync";
+
         /// <summary>
         /// URL to the AUTHORS file
         /// </summary>
-        public readonly string CreditsLinkAddress       = "https://raw.github.com/OpenDataSpace/DataSpaceSync/master/legal/AUTHORS.txt";
+        public readonly string CreditsLinkAddress       = "https://raw.github.com/OpenDataSpace/CmisSync/master/legal/AUTHORS.tx";
         /// <summary>
         /// URL for Issue reports
         /// </summary>
+
         public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
 
 
