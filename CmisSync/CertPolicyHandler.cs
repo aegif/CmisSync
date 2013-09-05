@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Security.Cryptography.X509Certificates;
 
@@ -29,7 +30,6 @@ using log4net.Config;
 using Gtk;
 #else
 using System.Windows;
-using System.Collections.Generic;
 #endif
 
 namespace CmisSync
