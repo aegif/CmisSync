@@ -277,6 +277,15 @@ namespace CmisSync.Lib.Sync
                                 success = success && DownloadFile(remoteDocument, localFolder);
                             }
                         }
+                        else if (serverSideModificationDate == lastDatabaseUpdate)
+                        {
+                            //  check chunked upload
+                            FileInfo fileInfo = new FileInfo(filePath);
+                            if (remoteDocument.ContentStreamLength < fileInfo.Length)
+                            {
+                                success = success && ResumeUploadFile(filePath, remoteDocument);
+                            }
+                        }
 
                     }
                 }
