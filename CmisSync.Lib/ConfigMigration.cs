@@ -24,7 +24,17 @@ namespace CmisSync.Lib.Sync
             ReplaceCaseSensitiveNotification();
             // Replace XML root element from <sparkleshare> to <CmisSync>
             ReplaceXMLRootElement();
-            
+            CheckForDoublicatedLog4NetElement();
+        }
+
+        private static void CheckForDoublicatedLog4NetElement()
+        {
+            XmlElement log4net = ConfigManager.CurrentConfig.GetLog4NetConfig();
+            if (log4net.ChildNodes.Item(0).Name.Equals("log4net"))
+            {
+                ConfigManager.CurrentConfig.SetLog4NetConfig(log4net.ChildNodes.Item(0));
+                ConfigManager.CurrentConfig.Save();
+            }
         }
 
 
@@ -36,7 +46,7 @@ namespace CmisSync.Lib.Sync
             try
             {
                 // If log4net element is found, it means that the root element is already correct.
-                XmlElement element = (XmlElement)ConfigManager.CurrentConfig.GetLog4NetConfig();
+                XmlElement element = ConfigManager.CurrentConfig.GetLog4NetConfig();
                 if (element != null)
                     return;
             }
