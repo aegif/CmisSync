@@ -607,6 +607,10 @@ namespace CmisSync
                                         {
                                             warning = Properties_Resources.SendFailureHttps;
                                         }
+                                        else if (e.Message == "TrustFailure")
+                                        {
+                                            warning = Properties_Resources.TrustFailure;
+                                        }
                                         else
                                         {
                                             warning = message + Environment.NewLine + Properties_Resources.Sorry;

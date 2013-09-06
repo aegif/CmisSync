@@ -23,8 +23,7 @@ namespace CmisSync.Lib.Sync
                 Logger.Debug(remoteFolder + " : " + localFolder);
                 foreach (string pathname in repo.Watcher.GetChangeList())
                 {
-                    string name = Path.GetFileName(pathname);
-                    if (!Utils.WorthSyncing(name) || repoinfo.isPathIgnored(pathname))
+                    if (repoinfo.isPathIgnored(pathname))
                     {
                         repo.Watcher.RemoveChange(pathname);
                         continue;
@@ -38,6 +37,22 @@ namespace CmisSync.Lib.Sync
                     if (pathname == localFolder)
                     {
                         repo.Watcher.RemoveChange(pathname);
+                        continue;
+                    }
+
+                    bool worthSync = true;
+                    string name = pathname.Substring(localFolder.Length + 1);
+                    foreach (string item in name.Split(Path.DirectorySeparatorChar))
+                    {
+                        if (!Utils.WorthSyncing(item))
+                        {
+                            repo.Watcher.RemoveChange(pathname);
+                            worthSync = false;
+                            break;
+                        }
+                    }
+                    if (!worthSync)
+                    {
                         continue;
                     }
 

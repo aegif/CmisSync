@@ -140,7 +140,10 @@ namespace CmisSync.Lib.Cmis
                             checksum TEXT);   /* Checksum of metadata */
                         CREATE TABLE general (
                             key TEXT PRIMARY KEY,
-                            value TEXT);";    /* Other data such as ChangeLog token */
+                            value TEXT);      /* Other data such as ChangeLog token */
+                        CREATE TABLE downloads (
+                            PATH TEXT PRIMARY KEY,
+                            serverSideModificationDate DATE);";     /* Download */
                         ExecuteSQLAction(command, null);
                         Logger.Info("Database created");
                     }
@@ -333,6 +336,10 @@ namespace CmisSync.Lib.Cmis
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", path);
             ExecuteSQLAction("DELETE FROM files WHERE path=@path", parameters);
+
+            parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+            ExecuteSQLAction("DELETE FROM downloads WHERE path=@path", parameters);
         }
 
 
@@ -369,6 +376,7 @@ namespace CmisSync.Lib.Cmis
 
             // Remove all files under this folder
             ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
+            ExecuteSQLAction("DELETE FROM downloads WHERE path LIKE '" + path + "/%'", null);
         }
 
 
@@ -440,8 +448,6 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        // 
-
         /// <summary>
         /// Set the last modification date of a file.
         /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
@@ -450,16 +456,63 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public void SetFileServerSideModificationDate(string path, DateTime? serverSideModificationDate)
         {
-            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones.
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // See http://www.sqlite.org/datatype3.html
-            if ((null != serverSideModificationDate) && (((DateTime)serverSideModificationDate).Kind != DateTimeKind.Utc)) {
-                throw new ArgumentException("serverSideModificationDate is not UTC");
+            if (null != serverSideModificationDate)
+            {
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
             }
             path = Normalize(path);
 
             string command = @"UPDATE files
                     SET serverSideModificationDate=@serverSideModificationDate
                     WHERE path=@path";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("serverSideModificationDate", serverSideModificationDate);
+            parameters.Add("path", path);
+            ExecuteSQLAction(command, parameters);
+        }
+
+
+        /// <summary>
+        /// Get the date at which the file was last download.
+        /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
+        /// </summary>
+        public DateTime? GetDownloadServerSideModificationDate(string path)
+        {
+            path = Normalize(path);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+            object obj = ExecuteSQLFunction("SELECT serverSideModificationDate FROM downloads WHERE path=@path", parameters);
+            if (null != obj)
+            {
+#if __MonoCS__
+                obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
+#else
+                obj = ((DateTime)obj).ToUniversalTime();
+#endif
+            }
+            return (DateTime?)obj;
+        }
+
+
+        /// <summary>
+        /// Set the last download date of a file.
+        /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
+        /// </summary>
+        public void SetDownloadServerSideModificationDate(string path, DateTime? serverSideModificationDate)
+        {
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
+            // See http://www.sqlite.org/datatype3.html
+            if (null != serverSideModificationDate)
+            {
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
+            }
+            path = Normalize(path);
+
+            string command = @"INSERT OR REPLACE INTO downloads (path, serverSideModificationDate)
+                    VALUES (@path, @serverSideModificationDate)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("serverSideModificationDate", serverSideModificationDate);
             parameters.Add("path", path);

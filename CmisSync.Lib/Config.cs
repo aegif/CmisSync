@@ -194,9 +194,17 @@ namespace CmisSync.Lib
         /// <returns></returns>
         public XmlElement GetLog4NetConfig()
         {
-            return configXml.Log4Net;
+            return configXml.Log4Net as XmlElement;
         }
 
+        /// <summary>
+        /// Sets a new XmlNode as Log4NetConfig. Is useful for config migration
+        /// </summary>
+        /// <param name="node"></param>
+        public void SetLog4NetConfig(XmlNode node)
+        {
+            this.configXml.Log4Net = node;
+        }
 
 
         /// <summary>
@@ -291,8 +299,8 @@ namespace CmisSync.Lib
         public class SyncConfig {
             [XmlElement("notifications")]
             public Boolean Notifications { get; set; }
-            [XmlElement("log4net")]
-            public XmlElement Log4Net { get; set; }
+            [XmlAnyElement("log4net")]
+            public XmlNode Log4Net { get; set; }
             /// <summary>
             /// List of the CmisSync synchronized folders.
             /// </summary>
