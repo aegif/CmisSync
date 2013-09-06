@@ -267,18 +267,19 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info("Invoke a remote change log sync");
                     ChangeLogSync(remoteFolder);
-                    Logger.Info("Invoke a file system watcher sync");
-                    WatcherSync(remoteFolderPath, localFolder);
-                    foreach (string name in repo.Watcher.GetChangeList())
-                    {
-                        Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
-                    }
                 }
                 else
                 {
                     //  have to crawl remote
                     Logger.Info("Invoke a remote crawl sync");
                     CrawlSync(remoteFolder, localFolder);
+                }
+
+                Logger.Info("Invoke a file system watcher sync");
+                WatcherSync(remoteFolderPath, localFolder);
+                foreach (string name in repo.Watcher.GetChangeList())
+                {
+                    Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
                 }
             }
 
@@ -373,13 +374,6 @@ namespace CmisSync.Lib.Sync
                 string remotePathname = remoteSubFolder.Path;
                 string localSubFolder = Path.Combine(localFolder, name);
 
-                // If there was previously a file with this name, delete it.
-                // TODO warn if local changes in the file.
-                if (File.Exists(localSubFolder))
-                {
-                    File.Delete(localSubFolder);
-                }
-
                 if (Directory.Exists(localSubFolder))
                 {
                     return true;
@@ -399,6 +393,14 @@ namespace CmisSync.Lib.Sync
                 else
                 {
                     // The folder has been recently created on server, so download it.
+
+                    // If there was previously a file with this name, delete it.
+                    // TODO warn if local changes in the file.
+                    if (File.Exists(localSubFolder))
+                    {
+                        Logger.Warn("Local file \"" + localSubFolder + "\" has been renamed to \"" + localSubFolder + ".conflict\"");
+                        File.Move(localSubFolder, localSubFolder + ".conflict");
+                    }
 
                     // Skip if invalid folder name. See https://github.com/nicolas-raoul/CmisSync/issues/196
                     if (Utils.IsInvalidFolderName(name))
@@ -427,7 +429,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download a single file from the CMIS server for sync.
             /// </summary>
-            private bool SyncDownloadFile(IDocument remoteDocument, string localFolder, IList remoteFiles = null)
+            private bool SyncDownloadFile(IDocument remoteDocument, string localFolder, IList<string> remoteFiles = null)
             {
                 string name = remoteDocument.Name;
                 // We use the filename of the document's content stream.
@@ -445,6 +447,11 @@ namespace CmisSync.Lib.Sync
                     return true;
                 }
 
+                if (null != remoteFiles)
+                {
+                    remoteFiles.Add(fileName);
+                }
+
                 if (!Utils.WorthSyncing(fileName))
                 {
                     Logger.Info("Ignore the unworth syncing remote file: " + fileName);
@@ -452,11 +459,6 @@ namespace CmisSync.Lib.Sync
                 }
 
                 // Check if file extension is allowed
-
-                if (null != remoteFiles)
-                {
-                    remoteFiles.Add(fileName);
-                }
 
                 bool success = true;
 

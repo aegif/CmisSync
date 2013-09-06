@@ -118,16 +118,20 @@ namespace CmisSync.Lib.Sync
                         remoteSubfolders.Add(remoteSubFolder.Name);
                         if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                         {
-                            string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name;
+                            string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
 
                             //Check whether local folder exists.
                             if (Directory.Exists(localSubFolder))
                             {
-                                success = success && CrawlDescendants(remoteSubFolder, node.Children, localSubFolder);
+                                success = CrawlDescendants(remoteSubFolder, node.Children, localSubFolder) && success;
                             }
                             else
                             {
-                                success = success && handleDiffOfLocalAndRemoteFolder(remoteSubFolder, localSubFolder);
+                                success = SyncDownloadFolder(remoteSubFolder, localFolder) && success;
+                                if (Directory.Exists(localSubFolder))
+                                {
+                                    success = RecursiveFolderCopy(remoteSubFolder, localSubFolder) && success;
+                                }
                             }
                         }
                     }
@@ -138,19 +142,12 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)node.Item;
-                        remoteFiles.Add(remoteDocument.Name);
-                        if (Utils.WorthSyncing(remoteDocument.Name))
-                        {
-                            if (remoteDocument.ContentStreamFileName == null)
-                                Logger.Warn("Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
-                            else
-                                success = success && handleDiffLocalAndRemoteDocument(localFolder, remoteDocument);
-                        }
+                        success = SyncDownloadFile(remoteDocument, localFolder, remoteFiles) && success;
                     }
                     #endregion
                 }
-                success = success && CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
-                success = success && CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
+                success = CrawlLocalFiles(localFolder, remoteFolder, remoteFiles) && success;
+                success = CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders) && success;
                 return success;
             }
 
@@ -188,7 +185,11 @@ namespace CmisSync.Lib.Sync
                             }
                             else
                             {
-                                success = success && handleDiffOfLocalAndRemoteFolder(remoteSubFolder, localSubFolder);
+                                success = SyncDownloadFolder(remoteSubFolder, localFolder) && success;
+                                if (Directory.Exists(localSubFolder))
+                                {
+                                    success = RecursiveFolderCopy(remoteSubFolder, localSubFolder) && success;
+                                }
                             }
                         }
                     }
@@ -199,29 +200,7 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)cmisObject;
-                        if (Utils.WorthSyncing(remoteDocument.Name))
-                        {
-                            // We use the filename of the document's content stream.
-                            // This can be different from the name of the document.
-                            // For instance in FileNet it is not usual to have a document where
-                            // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
-                            string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
-                            //Logger.Debug("CrawlRemote doc: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName);
-
-                            // Check if file extension is allowed
-
-                            remoteFiles.Add(remoteDocumentFileName);
-                            // If this file does not have a filename, ignore it.
-                            // It sometimes happen on IBM P8 CMIS server, not sure why.
-                            if (remoteDocumentFileName == null)
-                            {
-                                Logger.Warn("Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
-                            }
-                            else
-                            {
-                                success = success && handleDiffLocalAndRemoteDocument(localFolder, remoteDocument);
-                            }
-                        }
+                        success = success && SyncDownloadFile(remoteDocument, localFolder, remoteFiles);
                     }
                     #endregion
                 }
