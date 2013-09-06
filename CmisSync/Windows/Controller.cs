@@ -150,7 +150,13 @@ namespace CmisSync
         /// <param name="name">Name of the synchronized folder</param>
         public void OpenCmisSyncFolder(string name)
         {
-            Utils.OpenFolder(ConfigManager.GetFullPath(name));
+            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+            if (folder != null)
+                Utils.OpenFolder(folder.LocalPath);
+            else if (String.IsNullOrWhiteSpace(name))
+                OpenCmisSyncFolder();
+            else
+                Logger.Warn("Could not find requested config for \"" + name + "\"");
         }
 
         /// <summary>
@@ -159,8 +165,16 @@ namespace CmisSync
         /// <param name="name">Name of the synchronized folder</param>
         public void OpenRemoteFolder(string name)
         {
-            RepoInfo repo = ConfigManager.CurrentConfig.GetRepoInfo(name);
-            Process.Start(CmisUtils.GetBrowsableURL(repo));
+            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+            if (folder != null)
+            {
+                RepoInfo repo = folder.GetRepoInfo();
+                Process.Start(CmisUtils.GetBrowsableURL(repo));
+            }
+            else
+            {
+                Logger.Warn("Could not find requested config for \"" + name + "\"");
+            }
         }
 
 

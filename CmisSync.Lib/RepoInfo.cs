@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using CmisSync.Lib.Cmis;
 
 namespace CmisSync.Lib
 {
@@ -50,7 +51,7 @@ namespace CmisSync.Lib
         /// CMIS password, hashed.
         /// For instance: AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAtiSvUCYn...
         /// </summary>
-        public string Password { get; set; }
+        public CmisPassword Password { get; set; }
 
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// All folders, which should be ignored on synchronization.
         /// </summary>
-        private LinkedList<string> ignoredPaths = new LinkedList<string>();
+        private List<string> ignoredPaths = new List<string>();
 
         /// <summary>
         /// Simple constructor.
@@ -83,6 +84,8 @@ namespace CmisSync.Lib
         public RepoInfo(string name, string cmisDatabaseFolder)
         {
             Name = name;
+            name = name.Replace("\\", "_");
+            name = name.Replace("/", "_");
             CmisDatabase = Path.Combine(cmisDatabaseFolder, name + ".cmissync");
         }
 
@@ -93,6 +96,8 @@ namespace CmisSync.Lib
         public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval)
         {
             Name = name;
+            name = name.Replace("\\", "_");
+            name = name.Replace("/", "_");
             CmisDatabase = Path.Combine(cmisDatabaseFolder, name + ".cmissync");
             RemotePath = remotePath;
             Address = new Uri(address);
@@ -112,7 +117,7 @@ namespace CmisSync.Lib
         public void addIgnorePath(string path)
         {
             if(!this.ignoredPaths.Contains(path))
-                this.ignoredPaths.AddFirst(path);
+                this.ignoredPaths.Add(path);
         }
 
         /// <summary>
@@ -122,9 +127,7 @@ namespace CmisSync.Lib
         /// <returns>all ignored folders</returns>
         public string[] getIgnoredPaths()
         {
-            string[] result = new string[this.ignoredPaths.Count];
-            ignoredPaths.CopyTo(result, 0);
-            return result;
+            return ignoredPaths.ToArray();
         }
 
         /// <summary>
@@ -138,5 +141,29 @@ namespace CmisSync.Lib
             return ignoredPaths.Contains(path);
         }
 
+        public class CmisPassword
+        {
+            private string password = null;
+            public CmisPassword(string password)
+            {
+                this.password = Crypto.Obfuscate(password);
+            }
+
+            public CmisPassword(){}
+
+            public static implicit operator CmisPassword(string value)
+            {
+                return new CmisPassword(value);
+            }
+            override
+            public string ToString()
+            {
+                if(password == null)
+                    return null;
+                return Crypto.Deobfuscate(password);
+            }
+
+            public string ObfuscatedPassword { get { return password; } set { password = value; } }
+        }
     }
 }

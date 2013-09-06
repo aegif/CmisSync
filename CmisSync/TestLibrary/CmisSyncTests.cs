@@ -51,7 +51,7 @@ namespace TestLibrary
     [TestFixture]
     public class CmisSyncTests
     {
-        private readonly string CMISSYNCDIR = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "DataSpace Sync");
+        private readonly string CMISSYNCDIR = ConfigManager.CurrentConfig.FoldersPath;
 
         
         public CmisSyncTests()
@@ -193,7 +193,7 @@ namespace TestLibrary
                     }
                 }
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Exception on testing side, ignoring " + ex);
             }
@@ -466,8 +466,14 @@ namespace TestLibrary
                     bw.RunWorkerAsync();
 
                     // Keep creating/removing a file as long as sync is going on.
+                    int count = 10000;
                     while (syncing)
                     {
+                        count --;
+                        if (count <= 0)
+                        {
+                            System.Threading.Thread.Sleep(1000);
+                        }
                         //Console.WriteLine("Create/remove " + LocalFilesystemActivityGenerator.id);
                         LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
                         CleanAll(localDirectory);
@@ -536,8 +542,14 @@ namespace TestLibrary
                     bw.RunWorkerAsync();
 
                     // Keep creating/removing a file as long as sync is going on.
+                    int count = 1000;
                     while (syncing)
                     {
+                        count --;
+                        if (count <= 0)
+                        {
+                            System.Threading.Thread.Sleep(1000);
+                        }
                         //Console.WriteLine("Create/remove.");
                         LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
                         CleanAll(localDirectory);

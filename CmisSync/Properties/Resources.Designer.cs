@@ -189,6 +189,25 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enable folder for synchronization.
+        /// </summary>
+        internal static string DoNotIgnoreFolder {
+            get {
+                return ResourceManager.GetString("DoNotIgnoreFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you trust this certificate?
+        ///(Yes == Always, Cancel = Just Now).
+        /// </summary>
+        internal static string DoYouTrustTheCertificate {
+            get {
+                return ResourceManager.GetString("DoYouTrustTheCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty URL.
         /// </summary>
         internal static string EmptyURLNotAllowed {
@@ -270,6 +289,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ignore folder on synchronization.
+        /// </summary>
+        internal static string IgnoreFolder {
+            get {
+                return ResourceManager.GetString("IgnoreFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DataSpace Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
         ///
         ///It is like Dropbox for Enterprise Content Management!.
@@ -295,6 +323,24 @@ namespace CmisSync {
         internal static string InvalidURL {
             get {
                 return ResourceManager.GetString("InvalidURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to loading ....
+        /// </summary>
+        internal static string LoadingStatusLOADING {
+            get {
+                return ResourceManager.GetString("LoadingStatusLOADING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to pending ....
+        /// </summary>
+        internal static string LoadingStatusSTART {
+            get {
+                return ResourceManager.GetString("LoadingStatusSTART", resourceCulture);
             }
         }
         
@@ -390,6 +436,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove the folder from synchronization.
+        /// </summary>
+        internal static string RemoveFolderFromSync {
+            get {
+                return ResourceManager.GetString("RemoveFolderFromSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Resume sync.
         /// </summary>
         internal static string ResumeSync {
@@ -480,6 +535,24 @@ namespace CmisSync {
         internal static string SyncingChanges {
             get {
                 return ResourceManager.GetString("SyncingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to establish a trusted Connection. Please inform your server administrator..
+        /// </summary>
+        internal static string TrustFailure {
+            get {
+                return ResourceManager.GetString("TrustFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Untrusted Certificate.
+        /// </summary>
+        internal static string UntrustedCertificate {
+            get {
+                return ResourceManager.GetString("UntrustedCertificate", resourceCulture);
             }
         }
         

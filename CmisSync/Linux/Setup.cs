@@ -123,7 +123,7 @@ namespace CmisSync {
             };
 
             Entry address_entry = new Entry () {
-                Text = Controller.PreviousAddress,
+                Text = Controller.PreviousAddress.ToString(),
                      ActivatesDefault = false
             };
 
@@ -291,7 +291,7 @@ namespace CmisSync {
                 {
                     // Continue to folder selection
                     Controller.Add1PageCompleted(
-                            address_entry.Text, user_entry.Text, password_entry.Text);
+                            new Uri(address_entry.Text), user_entry.Text, password_entry.Text);
                 }
             };
 
@@ -373,7 +373,7 @@ namespace CmisSync {
                         // Get list of subfolders asynchronously
                         GetSubfoldersDelegate dlgt = new GetSubfoldersDelegate(CmisUtils.GetSubfolders);
                         IAsyncResult ar = dlgt.BeginInvoke(Controller.saved_repository,
-                                Controller.saved_remote_path, Controller.saved_address,
+                                Controller.saved_remote_path, Controller.saved_address.ToString(),
                                 Controller.saved_user, Controller.saved_password, null, null);
                         while (!ar.AsyncWaitHandle.WaitOne(100)) {
                             while (Application.EventsPending()) {
