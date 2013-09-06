@@ -33,11 +33,11 @@ RESOURCES_RESOURCES = $(addprefix CmisSync.,$(patsubst %.resx,%.resources,$(notd
 CmisSync.%.resources: $(srcdir)/../Properties/%.resx
 	resgen2 $< $@
 
-bin_SCRIPTS = cmissync
+bin_SCRIPTS = dataspacesync
 
 Applicationsdir = $(datadir)/applications
-dist_Applications_DATA = cmissync.desktop \
-	cmissync-invite-opener.desktop
+dist_Applications_DATA = dataspacesync.desktop \
+	dataspacesync-invite-opener.desktop
 
 EXTRA_DIST = README.md
 

@@ -204,7 +204,7 @@ CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
 CmisSync/TestLibrary/Makefile
 CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibraryRunner/Makefile
-CmisSync/Linux/cmissync
+CmisSync/Linux/dataspacesync
 CmisSync/Makefile
 Makefile
 ])

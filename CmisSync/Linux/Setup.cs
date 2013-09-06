@@ -56,11 +56,11 @@ namespace CmisSync {
         private static Gdk.Cursor default_cursor = new Gdk.Cursor(Gdk.CursorType.LeftPtr);
 
         private string cancelText =
-            CmisSync.Properties_Resources.ResourceManager.GetString("Cancel", CultureInfo.CurrentCulture);
+            CmisSync.Properties_Resources.Cancel;
         private string continueText =
-            CmisSync.Properties_Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture);
+            CmisSync.Properties_Resources.Continue;
         private string backText =
-            CmisSync.Properties_Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture);
+            CmisSync.Properties_Resources.Back;
 
         delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
 
@@ -69,8 +69,8 @@ namespace CmisSync {
 
         private void ShowSetupPage()
         {
-            Header = CmisSync.Properties_Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
-            Description = CmisSync.Properties_Resources.ResourceManager.GetString("Intro", CultureInfo.CurrentCulture);
+            Header = CmisSync.Properties_Resources.Welcome;
+            Description = CmisSync.Properties_Resources.Intro;
 
             Add(new Label("")); // Page must have at least one element in order to show Header and Descripton
 
@@ -103,7 +103,7 @@ namespace CmisSync {
         private void ShowAdd1Page()
         {
 
-            Header = CmisSync.Properties_Resources.ResourceManager.GetString("Where", CultureInfo.CurrentCulture);
+            Header = CmisSync.Properties_Resources.Where;
 
             VBox layout_vertical   = new VBox (false, 12);
             HBox layout_fields     = new HBox (true, 12);
@@ -118,7 +118,7 @@ namespace CmisSync {
                 UseMarkup = true,
                           Xalign = 0,
                           Markup = "<b>" + 
-                              CmisSync.Properties_Resources.ResourceManager.GetString("EnterWebAddress", CultureInfo.CurrentCulture) +
+                              CmisSync.Properties_Resources.EnterWebAddress +
                               "</b>"
             };
 
@@ -132,7 +132,7 @@ namespace CmisSync {
                 Xalign = 0,
                        UseMarkup = true,
                        Markup = "<span foreground=\"#808080\" size=\"small\">" +
-                           CmisSync.Properties_Resources.ResourceManager.GetString("Help", CultureInfo.CurrentCulture) + ": " +
+                           CmisSync.Properties_Resources.Help + ": " +
                            "</span>"
             };
             EventBox address_help_urlbox = new EventBox();
@@ -141,7 +141,7 @@ namespace CmisSync {
                 Xalign = 0,
                        UseMarkup = true,
                        Markup = "<span foreground=\"blue\" underline=\"single\" size=\"small\">" +
-                           CmisSync.Properties_Resources.ResourceManager.GetString("WhereToFind", CultureInfo.CurrentCulture) +
+                           CmisSync.Properties_Resources.WhereToFind +
                            "</span>"
             };
             address_help_urlbox.Add(address_help_urllabel);
