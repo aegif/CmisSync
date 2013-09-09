@@ -101,6 +101,24 @@ else
     AC_ERROR([${dotcmis_dll} not found])
 fi
 
+AC_ARG_WITH([log4net],
+            AS_HELP_STRING([--with-log4net=PATH],[Specify path to log4net.dll]),
+            [log4net_dll=${withval}],[log4net_dll=no])
+if test ${log4net_dll} != "no" ; then
+    case ${log4net_dll} in
+        /*)
+        AC_SUBST(LOG4NETLIBS,[-r:${log4net_dll}])
+        AC_SUBST(LOG4NETPATH,[${log4net_dll}])
+        ;;
+        *)
+        AC_SUBST(LOG4NETLIBS,[[-r:\$\(top_srcdir\)/${log4net_dll}]])
+        AC_SUBST(LOG4NETPATH,[[\$\(top_srcdir\)/${log4net_dll}]])
+        ;;
+    esac
+else
+    AC_ERROR([${log4net_dll} not found])
+fi
+
 TEST_URL="https://devel.dataspace.cc/cmis/atom"
 AC_ARG_WITH([test-url],
     AS_HELP_STRING([--with-test-url=URL],[Specify server URL for testing]),
@@ -150,7 +168,11 @@ if test "$OSNAME" = "Linux" ; then
     dnl check for log4net
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
-		AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        if test -n "$LOG4NETLIBS" ; then
+            LOG4NET_LIBS = "$LOG4NETLIBS"
+        else
+		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        fi
 	fi
 	AC_SUBST(LOG4NET_LIBS)
 
