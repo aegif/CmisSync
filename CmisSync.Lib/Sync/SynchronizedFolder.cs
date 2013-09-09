@@ -16,6 +16,7 @@ using System.Net;
 using CmisSync.Lib.Cmis;
 using DotCMIS.Data;
 using log4net;
+using System.Security.Cryptography;
 
 namespace CmisSync.Lib.Sync
 {
@@ -30,6 +31,9 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder : IDisposable
         {
+            // Log
+            private static readonly ILog Logger = LogManager.GetLogger(typeof(SynchronizedFolder));
+            
             /// <summary>
             /// Whether sync is bidirectional or only from server to client.
             /// TODO make it a CMIS folder - specific setting
@@ -128,7 +132,7 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
                 cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
                 cmisParameters[SessionParameter.User] = repoInfo.User;
-                cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(repoInfo.Password); // Deobfuscate password.
+                cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
 
@@ -190,9 +194,18 @@ namespace CmisSync.Lib.Sync
                     Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Info("Created CMIS session: " + session.ToString());
                 }
+                //TODO Implement error handling -> informing user about connection problems by showing status
                 catch (CmisRuntimeException e)
                 {
                     Logger.Error("Connection to repository failed: ", e);
+                }
+                catch (CmisObjectNotFoundException e)
+                {
+                    Logger.Error("Failed to find cmis object: ", e);
+                }
+                catch (CmisBaseException e)
+                {
+                    Logger.Error("Failed to create session to remote " + this.repoinfo.Address.ToString() + ": ", e);
                 }
             }
 
@@ -345,14 +358,6 @@ namespace CmisSync.Lib.Sync
                 string fileName = remoteDocument.ContentStreamFileName;
                 Logger.Info("Downloading: " + fileName);
 
-                // TODO: Make this configurable.
-                if (remoteDocument.ContentStreamLength == 0)
-                {
-                    Logger.Info("Skipping download of file with content length zero: " + fileName);
-                    activityListener.ActivityStopped();
-                    return true;
-                }
-
                 // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
                 if (Utils.IsInvalidFileName(fileName))
                 {
@@ -380,6 +385,7 @@ namespace CmisSync.Lib.Sync
 
                     // Download file.
                     Boolean success = false;
+                    byte[] filehash = { };
                     try
                     {
                         contentStream = remoteDocument.GetContentStream();
@@ -393,10 +399,20 @@ namespace CmisSync.Lib.Sync
                             activityListener.ActivityStopped();
                             return true;
                         }
-
-                        DownloadStream(contentStream, tmpfilepath);
-
-                        contentStream.Stream.Close();
+                        // Skip downloading the content, just go on with an empty file
+                        if (remoteDocument.ContentStreamLength == 0)
+                        {
+                            Logger.Info("Skipping download of file with content length zero: " + fileName);
+                            using (FileStream s = File.Create(tmpfilepath))
+                            {
+                                s.Close();
+                            }
+                        }
+                        else
+                        {
+                            filehash = DownloadStream(contentStream, tmpfilepath);
+                            contentStream.Stream.Close();
+                        }
                         success = true;
                     }
                     catch (Exception ex)
@@ -431,7 +447,7 @@ namespace CmisSync.Lib.Sync
                         File.Move(tmpfilepath, filepath);
 
                         // Create database entry for this file.
-                        database.AddFile(filepath, remoteDocument.LastModificationDate, metadata);
+                        database.AddFile(filepath, remoteDocument.LastModificationDate, metadata, filehash);
 
                         Logger.Info("Added to database: " + fileName);
                     }
@@ -451,18 +467,24 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download a file, without retrying.
             /// </summary>
-            private void DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
+            private byte[] DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
             {
+                byte[] hash = {};
                 using (Stream file = File.OpenWrite(filePath))
+                using (SHA1 hashAlg = new SHA1Managed())
+                using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                 {
                     byte[] buffer = new byte[8 * 1024];
                     int len;
                     while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        file.Write(buffer, 0, len);
+                        hashstream.Write(buffer, 0, len);
                     }
+                    hashstream.FlushFinalBlock();
+                    hash = hashAlg.Hash;
                 }
                 contentStream.Stream.Close();
+                return hash;
             }
 
 
@@ -475,6 +497,7 @@ namespace CmisSync.Lib.Sync
 
                 IDocument remoteDocument = null;
                 Boolean success = false;
+                byte[] filehash = { };
                 try
                 {
                     Logger.Info("Uploading: " + filePath);
@@ -487,17 +510,20 @@ namespace CmisSync.Lib.Sync
 
                     // Prepare content stream
                     using (Stream file = File.OpenRead(filePath))
+                    using (SHA1 hashAlg = new SHA1Managed())
+                    using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                     {
                         ContentStream contentStream = new ContentStream();
                         contentStream.FileName = fileName;
                         contentStream.MimeType = MimeType.GetMIMEType(fileName);
                         contentStream.Length = file.Length;
-                        contentStream.Stream = file;
+                        contentStream.Stream = hashstream;
 
                         // Upload
                         try
                         {
                             remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                            filehash = hashAlg.Hash;
                             success = true;
                         }
                         catch (Exception ex)
@@ -535,7 +561,7 @@ namespace CmisSync.Lib.Sync
                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                     // Create database entry for this file.
-                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata);
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata, filehash);
                 }
 
                 activityListener.ActivityStopped();

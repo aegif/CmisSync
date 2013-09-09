@@ -99,14 +99,14 @@ namespace CmisSync
         /// </summary>
         private PageType FolderAdditionWizardCurrentPage;
 
-        public string PreviousAddress { get; private set; }
+        public Uri PreviousAddress { get; private set; }
         public string PreviousPath { get; private set; }
         public string PreviousRepository { get; private set; }
         public string SyncingReponame { get; private set; }
         public string DefaultRepoPath { get; private set; }
         public double ProgressBarPercentage { get; private set; }
 
-        public string saved_address = "";
+        public Uri saved_address = null;
         public string saved_remote_path = "";
         public string saved_user = "";
         public string saved_password = "";
@@ -184,7 +184,7 @@ namespace CmisSync
             Logger.Info("Entering constructor.");
 
             TutorialCurrentPage = 0;
-            PreviousAddress = "";
+            PreviousAddress = null;
             PreviousPath = "";
             SyncingReponame = "";
             DefaultRepoPath = Program.Controller.FoldersPath;
@@ -241,7 +241,7 @@ namespace CmisSync
         /// </summary>
         public void PageCancelled()
         {
-            PreviousAddress = "";
+            PreviousAddress = null;
             PreviousRepository = "";
             PreviousPath = "";
             ignoredPaths.Clear();
@@ -332,11 +332,14 @@ namespace CmisSync
         public string CheckAddPage(string address)
         {
             address = address.Trim();
-            this.saved_address = address;
+ 
 
             // Check address validity.
             bool fields_valid = ((!string.IsNullOrEmpty(address)) && (this.UrlRegex.IsMatch(address)));
-
+            if (fields_valid)
+            {
+                this.saved_address = new Uri(address);
+            }
             // Enable button to next step.
             UpdateAddProjectButtonEvent(fields_valid);
 
@@ -390,7 +393,7 @@ namespace CmisSync
         /// <summary>
         /// First step of remote folder addition wizard is complete, switch to second step
         /// </summary>
-        public void Add1PageCompleted(string address, string user, string password)
+        public void Add1PageCompleted(Uri address, string user, string password)
         {
             saved_address = address;
             saved_user = user;
@@ -414,14 +417,14 @@ namespace CmisSync
         /// <summary>
         /// Second step of remote folder addition wizard is complete, switch to customization step.
         /// </summary>
-        public void Add2PageCompleted(string repository, string remote_path, string[] ignoredPaths)
+        public void Add2PageCompleted(string repository, string remote_path, string[] ignoredPaths, string[] selectedFolder)
         {
             SyncingReponame = Path.GetFileName(remote_path);
             ProgressBarPercentage = 1.0;
 
             ChangePageEvent(PageType.Customize);
 
-            String address = saved_address.Trim();
+            Uri address = saved_address;
             repository = repository.Trim();
             remote_path = remote_path.Trim();
 
@@ -438,7 +441,7 @@ namespace CmisSync
         /// </summary>
         public void Add2PageCompleted(string repository, string remote_path)
         {
-            Add2PageCompleted(repository, remote_path, new string[] { });
+            Add2PageCompleted(repository, remote_path, new string[] { }, new string[] { });
         }
 
 
@@ -458,10 +461,15 @@ namespace CmisSync
             {
                 new Thread(() =>
                 {
-                    Program.Controller.StartFetcher(PreviousAddress, PreviousPath, repoName,
-                        PreviousRepository, PreviousPath, saved_user.TrimEnd(),
-                        saved_password.TrimEnd(), localrepopath, ignoredPaths);
-
+                    Program.Controller.StartFetcher(
+                        repoName,
+                        saved_address,
+                        saved_user.TrimEnd(),
+                        saved_password.TrimEnd(),
+                        PreviousRepository,
+                        PreviousPath,
+                        localrepopath,
+                        ignoredPaths);
                 }).Start();
             }
             catch (Exception ex)
@@ -509,7 +517,7 @@ namespace CmisSync
         /// </summary>
         public void FinishPageCompleted()
         {
-            PreviousAddress = "";
+            PreviousAddress = null;
             PreviousPath = "";
 
             this.FolderAdditionWizardCurrentPage = PageType.None;

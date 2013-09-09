@@ -151,7 +151,7 @@
     <value>Leere URL</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Geben Sie einen Namen für den lokalen Ordner ein, wo die Dokumente synchronisiert werden</value>
+    <value>Geben Sie dem zu synchronisierenden Ordner einen Namen:</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
     <value>Geben Sie eine CMIS Server Adresse ein:</value>
@@ -250,7 +250,7 @@
     <value>Sie finden den im Ordner CmisSync.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Ändern Sie den lokalen Pfad dieses Archivs:</value>
+    <value>Ändern Sie den lokalen Pfad dieses Ordners:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
     <value>Ein lokaler Ordner mit demselben Namen ist bereits vorhanden, bitte benutzen Sie einen anderen Namen.</value>
@@ -280,5 +280,16 @@ Eventuell ist auch die URL nicht ganz korrekt.</value>
   <data name="SendFailureHttps" xml:space="preserve">
     <value>Die Kommunikation mit dem Server ist fehlgeschlagen!
 Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ändern Sie das Protokoll nur auf http, wenn Sie wissen, dass der Server nicht per https benutzt werden kann.</value>
+  </data>
+</root>
+  <data name="DoYouTrustTheCertificate" xml:space="preserve">
+    <value>Vertrauen Sie diesem Zertifikat?
+(Ja == Ja auch in Zukunft, Abbrechen = Nur für diese Sitzung)</value>
+  </data>
+  <data name="TrustFailure" xml:space="preserve">
+    <value>Es konnte keine vertrauenswürdige Verbindung hergestellt werden. Bitte informieren Sie  Ihren Administrator.</value>
+  </data>
+  <data name="UntrustedCertificate" xml:space="preserve">
+    <value>Unvertrauenswürdiges oder unbekanntes Zertifikat</value>
   </data>
 </root>

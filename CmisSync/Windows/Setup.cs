@@ -362,7 +362,7 @@ namespace CmisSync
                                 TextBox address_box = new TextBox()
                                 {
                                     Width = 420,
-                                    Text = Controller.PreviousAddress
+                                    Text = (Controller.PreviousAddress!=null)?Controller.PreviousAddress.ToString():""
                                 };
 
                                 TextBlock address_help_label = new TextBlock()
@@ -501,10 +501,10 @@ namespace CmisSync
                                 TaskbarItemInfo.ProgressValue = 0.0;
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 
-                                if (Controller.PreviousAddress == null || Controller.PreviousAddress == String.Empty)
+                                if (Controller.PreviousAddress == null || Controller.PreviousAddress.ToString() == String.Empty)
                                     address_box.Text = "https://";
                                 else
-                                    address_box.Text = Controller.PreviousAddress;
+                                    address_box.Text = Controller.PreviousAddress.ToString();
                                 address_box.Focus();
                                 address_box.Select(address_box.Text.Length, 0);
 
@@ -594,23 +594,26 @@ namespace CmisSync
                                         // Could not retrieve repositories list from server, show warning.
                                         string warning = "";
                                         string message = result.Item2.Message;
-                                        switch (message)
+                                        Exception e = result.Item2;
+                                        if (e is CmisPermissionDeniedException)
                                         {
-                                            case "Forbidden":
-                                                warning = Properties_Resources.LoginFailedForbidden;
-                                                break;
-                                            case "ConnectFailure":
-                                                warning = Properties_Resources.ConnectFailure;
-                                                break;
-                                            case "SendFailure":
-                                                if (cmisServer.Url.Scheme.StartsWith("https"))
-                                                    warning = Properties_Resources.SendFailureHttps;
-                                                else
-                                                    goto default;
-                                                break;
-                                            default:
-                                                warning = message + Environment.NewLine + Properties_Resources.Sorry;
-                                                break;
+                                            warning = Properties_Resources.LoginFailedForbidden;
+                                        }
+                                        else if (e is CmisServerNotFoundException)
+                                        {
+                                            warning = Properties_Resources.ConnectFailure;
+                                        }
+                                        else if (e.Message == "SendFailure" && cmisServer.Url.Scheme.StartsWith("https"))
+                                        {
+                                            warning = Properties_Resources.SendFailureHttps;
+                                        }
+                                        else if (e.Message == "TrustFailure")
+                                        {
+                                            warning = Properties_Resources.TrustFailure;
+                                        }
+                                        else
+                                        {
+                                            warning = message + Environment.NewLine + Properties_Resources.Sorry;
                                         }
                                         address_error_label.Text = warning;
                                         address_error_label.Visibility = Visibility.Visible;
@@ -619,7 +622,7 @@ namespace CmisSync
                                     {
                                         // Continue to next step, which is choosing a particular folder.
                                         Controller.Add1PageCompleted(
-                                            address_box.Text, user_box.Text, password_box.Password);
+                                            new Uri(address_box.Text), user_box.Text, password_box.Password);
                                     }
                                 };
                                 break;
@@ -641,15 +644,21 @@ namespace CmisSync
                                 ObservableCollection<CmisRepo> repos = new ObservableCollection<CmisRepo>();
 
                                 // Some CMIS servers hold several repositories (ex:Nuxeo). Show one root per repository.
+                                bool firstRepo = true;
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
-                                    CmisRepo repo = new CmisRepo(Controller.saved_user, Controller.saved_password, Controller.saved_address)
+                                    CmisRepo repo = new CmisRepo(Controller.saved_user, Controller.saved_password, Controller.saved_address.ToString())
                                     {
                                         Name = repository.Value,
                                         Id = repository.Key
                                     };
                                     repos.Add(repo);
-                                    repo.asyncSubFolderLoading();
+                                    repo.LoadingSubfolderAsync();
+                                    if (firstRepo)
+                                    {
+                                        repo.Selected = true;
+                                        firstRepo = false;
+                                    }
                                 }
                                 treeView.DataContext = repos;
 
@@ -660,45 +669,9 @@ namespace CmisSync
                                 Button continue_button = new Button()
                                 {
                                     Content = Properties_Resources.Continue,
-                                    IsEnabled = false
+                                    IsEnabled = !firstRepo,
+                                    IsDefault = true
                                 };
-
-                                // Action: when an element in the tree is clicked, loads its children and show them.
-                                treeView.SelectedItemChanged += delegate
-                                {
-                                    // Identify the selected remote path.
-                                    object o = treeView.SelectedItem;
-
-                                    // Root entry has been selected
-                                    CmisRepo repo = o as CmisRepo;
-                                    if (repo != null)
-                                    {
-                                        Controller.saved_remote_path = repo.Path;
-                                        Controller.saved_repository = repo.Id;
-                                        continue_button.IsEnabled = true;
-                                        return;
-                                    }
-
-                                    // Folder has been selected
-                                    Folder folder = o as Folder;
-                                    if (folder != null)
-                                    {
-                                        Controller.saved_remote_path = folder.Path;
-                                        Controller.saved_repository = folder.Repo.Id;
-                                        if (folder.IsIgnored)
-                                        {
-                                            continue_button.IsEnabled = false;
-                                        }
-                                        else
-                                        {
-                                            continue_button.IsEnabled = true;
-                                        }
-                                        return;
-                                    }
-                                    continue_button.IsEnabled = false;
-                                };
-
-                                
 
                                 Button cancel_button = new Button()
                                 {
@@ -709,7 +682,8 @@ namespace CmisSync
 
                                 Button back_button = new Button()
                                 {
-                                    Content = Properties_Resources.Back
+                                    Content = Properties_Resources.Back,
+                                    IsDefault = false
                                 };
 
                                 Buttons.Add(back_button);
@@ -726,25 +700,50 @@ namespace CmisSync
                                 continue_button.Click += delegate
                                 {
                                     List<string> ignored = new List<string>();
-                                    CmisRepo repo = treeView.SelectedItem as CmisRepo;
-                                    if (repo != null)
+                                    List<string> selectedFolder = new List<string>();
+                                    ItemCollection items = treeView.Items;
+                                    CmisRepo selectedRepo = null;
+                                    foreach (var item in items)
                                     {
-                                        foreach (Folder child in repo.Folder)
+                                        CmisRepo repo = item as CmisRepo;
+                                        if (repo != null)
+                                            if (repo.Selected)
+                                            {
+                                                selectedRepo = repo;
+                                                break;
+                                            }
+                                    }
+                                    if (selectedRepo != null)
+                                    {
+                                        foreach (Folder child in selectedRepo.Folder)
+                                        {
                                             ignored.AddRange(getIgnoredFolder(child));
+                                            selectedFolder.AddRange(getSelectedFolder(child));
+                                        }
+                                        Controller.saved_repository = selectedRepo.Id;
+                                        Controller.saved_remote_path = selectedRepo.Path;
+                                        Controller.Add2PageCompleted(
+                                            Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray(), selectedFolder.ToArray());
+                                        foreach (CmisRepo repo in repos)
+                                            repo.cancelLoadingAsync();
                                     }
                                     else
                                     {
-                                        Folder folder = treeView.SelectedItem as Folder;
-                                        if (folder != null)
-                                            ignored.AddRange(getIgnoredFolder(folder));
+                                        return;
                                     }
-                                    Controller.Add2PageCompleted(
-                                        Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray());
                                 };
 
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
+                                    foreach (CmisRepo repo in repos)
+                                        repo.cancelLoadingAsync();
+                                };
+
+                                Controller.HideWindowEvent += delegate
+                                {
+                                    foreach (CmisRepo repo in repos)
+                                        repo.cancelLoadingAsync();
                                 };
                                 break;
                             }
@@ -764,13 +763,23 @@ namespace CmisSync
                                 TextBlock localfolder_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.EnterLocalFolderName,
-                                    FontWeight = FontWeights.Bold
+                                    FontWeight = FontWeights.Bold,
+                                    TextWrapping = TextWrapping.Wrap,
+                                    Width = 420
                                 };
-
+                                string localfoldername = Controller.saved_address.Host.ToString();
+                                foreach (KeyValuePair<String, String> repository in Controller.repositories)
+                                {
+                                    if (repository.Key == Controller.saved_repository)
+                                    {
+                                        localfoldername += "\\" + repository.Value;
+                                        break;
+                                    }
+                                }
                                 TextBox localfolder_box = new TextBox()
                                 {
                                     Width = 420,
-                                    Text = Controller.SyncingReponame
+                                    Text = localfoldername
                                 };
 
                                 TextBlock localrepopath_label = new TextBlock()
@@ -811,7 +820,8 @@ namespace CmisSync
 
                                 Button add_button = new Button()
                                 {
-                                    Content = Properties_Resources.Add
+                                    Content = Properties_Resources.Add,
+                                    IsDefault = true
                                 };
 
                                 Button back_button = new Button()
@@ -822,8 +832,6 @@ namespace CmisSync
                                 Buttons.Add(back_button);
                                 Buttons.Add(add_button);
                                 Buttons.Add(cancel_button);
-
-                                add_button.Focus();
 
                                 // Local Folder Name
                                 ContentCanvas.Children.Add(localfolder_label);
@@ -862,7 +870,15 @@ namespace CmisSync
                                 {
                                     Dispatcher.BeginInvoke((Action)delegate
                                     {
-                                        add_button.IsEnabled = button_enabled;
+                                        if (add_button.IsEnabled != button_enabled)
+                                        {
+                                            add_button.IsEnabled = button_enabled;
+                                            if (button_enabled)
+                                            {
+                                                add_button.IsDefault = true;
+                                                back_button.IsDefault = false;
+                                            }
+                                        }
                                     });
                                 };
 
@@ -1057,6 +1073,19 @@ namespace CmisSync
             {
                 foreach (Folder child in f.SubFolder)
                     result.AddRange(getIgnoredFolder(child));
+            }
+            return result;
+        }
+
+        private List<string> getSelectedFolder(Folder f)
+        {
+            List<string> result = new List<string>();
+            if (f.Selected == true)
+                result.Add(f.Path);
+            else
+            {
+                foreach (Folder child in f.SubFolder)
+                    result.AddRange(getSelectedFolder(child));
             }
             return result;
         }

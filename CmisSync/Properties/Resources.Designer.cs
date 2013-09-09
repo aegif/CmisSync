@@ -198,6 +198,16 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you trust this certificate?
+        ///(Yes == Always, Cancel = Just Now).
+        /// </summary>
+        internal static string DoYouTrustTheCertificate {
+            get {
+                return ResourceManager.GetString("DoYouTrustTheCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty URL.
         /// </summary>
         internal static string EmptyURLNotAllowed {
@@ -524,6 +534,24 @@ namespace CmisSync {
         internal static string SyncingChanges {
             get {
                 return ResourceManager.GetString("SyncingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to establish a trusted Connection. Please inform your server administrator..
+        /// </summary>
+        internal static string TrustFailure {
+            get {
+                return ResourceManager.GetString("TrustFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Untrusted Certificate.
+        /// </summary>
+        internal static string UntrustedCertificate {
+            get {
+                return ResourceManager.GetString("UntrustedCertificate", resourceCulture);
             }
         }
         
