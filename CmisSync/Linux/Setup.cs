@@ -123,7 +123,7 @@ namespace CmisSync {
             };
 
             Entry address_entry = new Entry () {
-                Text = Controller.PreviousAddress.ToString(),
+                Text = (Controller.PreviousAddress!=null)?Controller.PreviousAddress.ToString():"",
                      ActivatesDefault = false
             };
 
