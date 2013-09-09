@@ -205,6 +205,7 @@ CmisSync/TestLibrary/Makefile
 CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibraryRunner/Makefile
 CmisSync/Linux/dataspacesync
+DataSpaceSync.Console/Makefile
 CmisSync/Makefile
 Makefile
 ])
