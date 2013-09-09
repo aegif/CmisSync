@@ -8,6 +8,7 @@ LIBS = $(REF_CMISSYNC) $(LOG4NET_LIBS) $(NOTIFY_SHARP_LIBS)
 SOURCES =  \
 	Program.cs
 
+bin_SCRIPTS = dsscli
 EXTRA_DIST =
 
 
