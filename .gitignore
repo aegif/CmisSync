@@ -26,6 +26,7 @@ libtool
 ltmain.sh
 missing
 CmisSync/Linux/cmissync
+CmisSync/Linux/dataspacesync
 CmisSync/Mac/git
 CmisSync.Lib/Defines.cs
 CmisSync/Linux/Defines.cs

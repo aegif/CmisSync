@@ -178,7 +178,7 @@ namespace CmisSync.Lib.Cmis
             }
             catch (Exception e)
             {
-                if (e is CryptographicException || e is FormatException)
+                if (e is CryptographicException || e is FormatException || e is ArgumentException)
                 {
                     Console.WriteLine("Your password is not obfuscated yet.");
                     Console.WriteLine("Using unobfuscated value directly might be deprecated soon, so please delete your local directories and recreate them. Thank you for your understanding.");

@@ -29,7 +29,7 @@ namespace CmisSync {
 
     public class SetupWindow : Window    {
 
-        // TODO: caps
+        // TODO: capscmi
         private HBox HBox;
         private VBox VBox;
         private VBox Wrapper;
@@ -45,7 +45,7 @@ namespace CmisSync {
 
         public SetupWindow () : base ("")
         {
-            Title          = Catalog.GetString ("CmisSync Setup");
+            Title          = Catalog.GetString ("DataSpace Sync Setup");
             BorderWidth    = 0;
             IconName       = "folder-cmissync";
             Resizable      = false;
