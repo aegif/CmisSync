@@ -115,8 +115,6 @@ if test ${log4net_dll} != "no" ; then
         AC_SUBST(LOG4NETPATH,[[\$\(top_srcdir\)/${log4net_dll}]])
         ;;
     esac
-else
-    AC_ERROR([${log4net_dll} not found])
 fi
 
 TEST_URL="https://devel.dataspace.cc/cmis/atom"
