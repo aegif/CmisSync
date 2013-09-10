@@ -98,6 +98,8 @@ namespace CmisSync {
 
         private void CreateAbout ()
         {
+            Gdk.Color fgcolor = new Gdk.Color();
+            Gdk.Color.Parse("red", ref fgcolor);
             Label version = new Label () {
                 Markup = string.Format ("<span font_size='small' fgcolor='#729fcf'>version {0}</span>",
                         Controller.RunningVersion),
@@ -113,9 +115,9 @@ namespace CmisSync {
                 LineWrap     = true,
                              LineWrapMode = Pango.WrapMode.Word,
                              Markup = "<span font_size='small' fgcolor='#729fcf'>" +
-                                 "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
+                                 "Copyright © 2010–" + DateTime.Now.Year.ToString() + " GRAU DATA AG, Aegif and others.\n" +
                                  "\n" +
-                                 "CmisSync is Open Source software. You are free to use, modify, " +
+                                 "DataSpace Sync is Open Source software. You are free to use, modify, " +
                                  "and redistribute it under the GNU General Public License version 3 or later." +
                                  "</span>",
                              WidthRequest = 330,
@@ -123,9 +125,10 @@ namespace CmisSync {
                              Xalign = 0
             };
 
-			LinkButton website_link = new LinkButton (Controller.WebsiteLinkAddress, "Website");
-			LinkButton credits_link = new LinkButton (Controller.CreditsLinkAddress, "Credits");
-			LinkButton report_problem_link = new LinkButton (Controller.ReportProblemLinkAddress, "Report a problem");
+            LinkButton website_link = new LinkButton (Controller.WebsiteLinkAddress, "Website");
+            website_link.ModifyFg(StateType.Active, fgcolor);
+            LinkButton credits_link = new LinkButton (Controller.CreditsLinkAddress, "Credits");
+            LinkButton report_problem_link = new LinkButton (Controller.ReportProblemLinkAddress, "Report a problem");
 
             HBox layout_links = new HBox (false, 0);
             layout_links.PackStart (website_link, false, false, 0);
@@ -135,7 +138,7 @@ namespace CmisSync {
             VBox layout_vertical = new VBox (false, 0);
             layout_vertical.PackStart (new Label (""), false, false, 42);
             layout_vertical.PackStart (version, false, false, 0);
-            layout_vertical.PackStart (this.updates, false, false, 0);
+            //layout_vertical.PackStart (this.updates, false, false, 0);
             layout_vertical.PackStart (credits, false, false, 9);
             layout_vertical.PackStart (new Label (""), false, false, 0);
             layout_vertical.PackStart (layout_links, false, false, 0);

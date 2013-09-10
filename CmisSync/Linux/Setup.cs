@@ -123,7 +123,7 @@ namespace CmisSync {
             };
 
             Entry address_entry = new Entry () {
-                Text = (Controller.PreviousAddress!=null)?Controller.PreviousAddress.ToString():"",
+                Text = (Controller.PreviousAddress!=null)?Controller.PreviousAddress.ToString():"https://",
                      ActivatesDefault = false
             };
 
@@ -168,6 +168,15 @@ namespace CmisSync {
                 Text = Controller.PreviousPath,
                      ActivatesDefault = false
             };
+
+            if(Controller.saved_user == String.Empty || Controller.saved_user == null)
+            {
+                user_entry.Text = Environment.UserName;
+            }
+            else
+            {
+                user_entry.Text = Controller.saved_user;
+            }
 
             // Password
             Entry password_entry = new Entry () {
@@ -750,6 +759,10 @@ namespace CmisSync {
 
                         ShowAll ();
                 });
+            };
+            this.DeleteEvent += delegate
+            {
+                Controller.PageCancelled();
             };
         }
 
