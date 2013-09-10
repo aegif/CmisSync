@@ -44,3 +44,4 @@ Extras/log4net-1.2.11/src/log4net.xml
 cmissync-*.zip
 cmissync-*.tar*
 build/cmissync.spec
+DataSpaceSync.Console/dsscli
