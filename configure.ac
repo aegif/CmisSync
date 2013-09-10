@@ -156,6 +156,7 @@ AC_ARG_WITH([test-repoid],
 AC_SUBST(TEST_REPOID)
 
 OSNAME=`uname -s`
+OSOK=no
 if test "$OSNAME" = "Linux" ; then
 
 	dnl check for notify-sharp
@@ -168,8 +169,8 @@ if test "$OSNAME" = "Linux" ; then
     dnl check for log4net
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
-        if test -n "$LOG4NETLIBS" ; then
-            LOG4NET_LIBS = "$LOG4NETLIBS"
+        if test "$log4net_dll" != "no" ; then
+            LOG4NET_LIBS = ['[$](LOG4NETLIBS)']
         else
 		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
         fi
@@ -200,7 +201,53 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
 	GUISUBDIRS=CmisSync
     enable_gtkui=yes
-else
+    OSOK=yes
+fi
+
+if test "$OSNAME" = "Darwin" ; then
+    AC_MSG_RESULT([Building on OSX])
+
+	AC_SUBST(NOTIFY_SHARP_LIBS)
+
+    dnl check for log4net
+	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
+	if test "x$have_log4net" = "xno" ; then
+        if test "$log4net_dll" != "no" ; then
+            LOG4NET_LIBS='[$](LOG4NETLIBS)'
+        else
+		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        fi
+	fi
+	AC_SUBST(LOG4NET_LIBS)
+
+	APPINDICATOR_REQUIRED=0.0.7
+	if test x$enable_appindicator = xauto ; then
+			PKG_CHECK_EXISTS([appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED],
+							 enable_appindicator="yes",
+							 enable_appindicator="no")
+	fi
+
+	if test x$enable_appindicator = xyes ; then
+			PKG_CHECK_EXISTS([appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED],,
+							 AC_MSG_ERROR([appindicator-sharp-0.1 is not installed]))
+			PKG_CHECK_MODULES(APP_INDICATOR,
+							appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED)
+			AC_SUBST(APP_INDICATOR_CFLAGS)
+			AC_SUBST(APP_INDICATOR_LIBS)
+            [BUILD_DEFINES="$BUILD_DEFINES -define:HAVE_APP_INDICATOR"]
+	fi
+
+    AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
+    AC_SUBST(WEBLIBS,[-r:System.Web.dll])
+    AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
+
+    AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
+	GUISUBDIRS=CmisSync
+    enable_gtkui=yes
+    OSOK=yes
+fi
+
+if test "$OSOK" = "no" ; then
 	GUISUBDIRS=
     enable_gtkui=no
 fi
