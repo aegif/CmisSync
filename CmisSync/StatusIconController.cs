@@ -184,7 +184,7 @@ namespace CmisSync {
                 this.animation.Stop ();
 
                 UpdateIconEvent (0);
-                UpdateMenuEvent (CurrentState);
+//                UpdateMenuEvent (CurrentState);
             };
 
             // Syncing.

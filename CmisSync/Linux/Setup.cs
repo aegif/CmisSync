@@ -663,9 +663,8 @@ namespace CmisSync {
 
                 case 2:
                     {
-                        Header      = "Sharing files with others";
-                        Description = "All files added to the server are automatically synced to your " +
-                            "local folder.";
+                        Header      = CmisSync.Properties_Resources.Synchronization;
+                        Description = CmisSync.Properties_Resources.DocumentsAre;
 
                         Button continue_button = new Button (continueText);
                         continue_button.Clicked += delegate {
@@ -682,9 +681,8 @@ namespace CmisSync {
 
                 case 3:
                     {
-                        Header      = "The status icon is here to help";
-                        Description = "It shows the syncing progress, provides easy access to " +
-                            "your folders and let's you view recent changes.";
+                        Header      = CmisSync.Properties_Resources.StatusIcon;
+                        Description = CmisSync.Properties_Resources.StatusIconShows;
 
                         Button continue_button = new Button (continueText);
                         continue_button.Clicked += delegate {
@@ -701,9 +699,8 @@ namespace CmisSync {
 
                 case 4:
                     {
-                        Header      = "Adding repository folders to DataSpace Sync";
-                        Description = "           " +
-                            "           ";
+                        Header      = Properties_Resources.AddFolders;
+                        Description = Properties_Resources.YouCan;
 
                         Image slide = UIHelpers.GetImage ("tutorial-slide-4.png");
 
