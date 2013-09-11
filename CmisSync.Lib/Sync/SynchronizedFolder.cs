@@ -885,7 +885,7 @@ namespace CmisSync.Lib.Sync
 
                             remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                             Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-                            database.AddFile(filePath, remoteDocument.LastModificationDate, metadata, filehash);
+                            database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
 
                             success = UploadStreamInTrunk(filePath, file, remoteDocument);
                         }
