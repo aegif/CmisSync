@@ -154,10 +154,10 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
 
-				foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
-				{
-					Logger.Info("The folder \""+ignoredFolder+"\" will be ignored");
-				}
+                foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
+                {
+                    Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
+                }
             }
 
 
