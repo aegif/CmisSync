@@ -36,8 +36,7 @@ CmisSync.%.resources: $(srcdir)/../Properties/%.resx
 bin_SCRIPTS = dataspacesync
 
 Applicationsdir = $(datadir)/applications
-dist_Applications_DATA = dataspacesync.desktop \
-	dataspacesync-invite-opener.desktop
+dist_Applications_DATA = dataspacesync.desktop 
 
 EXTRA_DIST = README.md
 

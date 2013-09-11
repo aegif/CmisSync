@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 m4_define([cmissync_version], [1.0.0])
 
 AC_PREREQ([2.54])
-AC_INIT([CmisSync], cmissync_version)
+AC_INIT([DataSpace Sync], cmissync_version)
 AC_CONFIG_SRCDIR([CmisSync/Program.cs])
 AM_INIT_AUTOMAKE([foreign dist-bzip2 dist-zip no-dist-gzip])
 AM_MAINTAINER_MODE
@@ -279,7 +279,7 @@ Makefile
 ])
 
 echo "
-CmisSync ${VERSION}
+DataSpace Sync ${VERSION}
 
 Configuration:
        Prefix              : ${prefix}

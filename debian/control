@@ -1,0 +1,20 @@
+Source: dataspacesync
+Section: net
+Priority: extra
+Maintainer: Till Lorentzen <till.lorentzen@graudata.com>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev, gtk-sharp2, mono-devel, libtool, intltool, desktop-file-utils
+Standards-Version: 3.9.3
+Homepage: http://graudata.com
+Vcs-Git: git@github.com:OpenDataSpace/CmisSync.git
+Vcs-Browser: https://github.com/OpenDataSpace/CmisSync
+
+Package: dataspacesync
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, mono-data-sqlite
+Description: DataSpace Sync Client
+ DataSpace Sync allows you to keep in sync with your DataSpace (CMIS) repository. It is like Dropbox for Enterprise Content Management! See: http://graudata.com
+
+Package: dataspacesync-doc
+Architecture: all
+Description: documentation for dataspacesync
+ documentation for dataspacesync
