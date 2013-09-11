@@ -102,7 +102,7 @@ namespace CmisSync {
 
         private void ShowAdd1Page()
         {
-
+            this.Present();
             Header = CmisSync.Properties_Resources.Where;
 
             VBox layout_vertical   = new VBox (false, 12);
@@ -329,8 +329,13 @@ namespace CmisSync {
 
             Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
                 Application.Invoke (delegate {
-                        continue_button.Sensitive = button_enabled;
-                        });
+                    continue_button.Sensitive = button_enabled;
+                    if(button_enabled) {
+                        continue_button.SetFlag(Gtk.WidgetFlags.CanFocus);
+                        continue_button.SetFlag(Gtk.WidgetFlags.CanDefault);
+                        continue_button.GrabDefault();
+                    }
+                });
             };
 
             AddButton (continue_button);
@@ -357,7 +362,7 @@ namespace CmisSync {
             };
             continue_button.Clicked += delegate {
                 Controller.Add2PageCompleted(
-                        Controller.saved_repository, Controller.saved_remote_path);
+                        Controller.saved_repository, "/", new string[]{}, new string[] {});
             };
 
             Button back_button = new Button (backText)
@@ -431,6 +436,9 @@ namespace CmisSync {
                         this.GdkWindow.Cursor = default_cursor;
                     }
                     continue_button.Sensitive = true;
+                    continue_button.SetFlag(Gtk.WidgetFlags.CanFocus);
+                    continue_button.SetFlag(Gtk.WidgetFlags.CanDefault);
+                    continue_button.GrabDefault();
 
                 }
             };
@@ -451,7 +459,15 @@ namespace CmisSync {
         private void ShowCustomizePage()
         {
             Header = CmisSync.Properties_Resources.Customize;
-
+            string localfoldername = Controller.saved_address.Host.ToString();
+            foreach (KeyValuePair<String, String> repository in Controller.repositories)
+            {
+                                    if (repository.Key == Controller.saved_repository)
+                                    {
+                                        localfoldername += "/" + repository.Value;
+                                        break;
+                                    }
+            }
             Label localfolder_label = new Label() {
                 Xalign = 0,
                        UseMarkup = true,
@@ -459,7 +475,7 @@ namespace CmisSync {
             };
 
             Entry localfolder_entry = new Entry() {
-                Text = Controller.SyncingReponame,
+                Text = localfoldername,
                      ActivatesDefault = false
             };
 

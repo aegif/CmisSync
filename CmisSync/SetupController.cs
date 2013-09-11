@@ -174,6 +174,7 @@ namespace CmisSync
         /// Basically, it should be a valid local filesystem folder name.
         /// </summary>
         Regex RepositoryRegex = new Regex(@"^([a-zA-Z0-9][^*/><?\|:]*)$");
+		Regex RepositoryRegexLinux = new Regex(@"^([a-zA-Z0-9][^*\\><?\|:]*)$");
 
 
         /// <summary>
@@ -364,8 +365,9 @@ namespace CmisSync
             // Check whether foldername is already in use
             bool folderAlreadyExists = (Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase)) != -1);
 
-            // Check whether folde rname contains invalid characters.
-            bool valid = (RepositoryRegex.IsMatch(reponame) && (!folderAlreadyExists));
+            // Check whether folder name contains invalid characters.
+            Regex regexRepoName = (Path.DirectorySeparatorChar.Equals("\\"))?RepositoryRegex:RepositoryRegexLinux;
+            bool valid = (regexRepoName.IsMatch(reponame) && (!folderAlreadyExists));
 
             if (!valid)
             {
@@ -374,7 +376,7 @@ namespace CmisSync
             }
             // Return validity error, or continue validating.
             if (folderAlreadyExists) return "FolderAlreadyExist";
-            if (!RepositoryRegex.IsMatch(reponame)) return "InvalidFolderName";
+            if (!regexRepoName.IsMatch(reponame)) return "InvalidFolderName";
 
             // Validate localpath
             folderAlreadyExists = Directory.Exists(localpath);
