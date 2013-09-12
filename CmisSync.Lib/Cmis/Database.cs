@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -127,11 +128,13 @@ namespace CmisSync.Lib.Cmis
                         string command =
                             @"CREATE TABLE files (
                             path TEXT PRIMARY KEY,
+                            id TEXT,
                             serverSideModificationDate DATE,
                             metadata TEXT,
                             checksum TEXT);   /* Checksum of both data and metadata */
                         CREATE TABLE folders (
                             path TEXT PRIMARY KEY,
+                            id TEXT,
                             serverSideModificationDate DATE,
                             metadata TEXT,
                             checksum TEXT);   /* Checksum of metadata */
@@ -169,6 +172,20 @@ namespace CmisSync.Lib.Cmis
             // Normalize all slashes to forward slash
             path = path.Replace('\\', '/');
             return path;
+        }
+
+
+        /// <summary>
+        /// Denormalize a path from the normalized one to a local path.
+        /// </summary>
+        private string Denormalize(string path)
+        {
+            if (null == path)
+            {
+                return null;
+            }
+            // Insert path prefix
+            return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, path).Replace('/', Path.DirectorySeparatorChar);
         }
 
 
@@ -226,17 +243,17 @@ namespace CmisSync.Lib.Cmis
         /// Add a file to the database. And calculate the checksum of the file
         /// </summary>
         [Obsolete("Adding a file without a filehash could produce wrong behaviour, please use AddFile(string path, DateTime? serverSideModificationDate, Dictionary<string, string[]> metadata, byte[] filehash) instead")]
-        public void AddFile(string path, DateTime? serverSideModificationDate,
+        public void AddFile(string path, string objectId, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata)
         {
-            AddFile(path, serverSideModificationDate, metadata, null);
+            AddFile(path, objectId, serverSideModificationDate, metadata, null);
         }
 
         /// <summary>
         /// Add a file to the database.
         /// If checksum is not null, it will be used for the database entry
         /// </summary>
-        public void AddFile(string path, DateTime? serverSideModificationDate,
+        public void AddFile(string path, string objectId, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata, byte[] filehash)
         {
             Logger.Debug("Starting database file addition for file: " + path);
@@ -272,10 +289,11 @@ namespace CmisSync.Lib.Cmis
 
             // Insert into database.
             string command =
-                @"INSERT OR REPLACE INTO files (path, serverSideModificationDate, metadata, checksum)
-                    VALUES (@path, @serverSideModificationDate, @metadata, @checksum)";
+                @"INSERT OR REPLACE INTO files (path, id, serverSideModificationDate, metadata, checksum)
+                    VALUES (@path, @id, @serverSideModificationDate, @metadata, @checksum)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", normalizedPath);
+            parameters.Add("id", objectId);
             parameters.Add("serverSideModificationDate", serverSideModificationDate);
             parameters.Add("metadata", Json(metadata));
             parameters.Add("checksum", checksum);
@@ -287,7 +305,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Add a folder to the database.
         /// </summary>
-        public void AddFolder(string path, DateTime? serverSideModificationDate)
+        public void AddFolder(string path, string objectId, DateTime? serverSideModificationDate)
         {
             // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // See http://www.sqlite.org/datatype3.html
@@ -298,10 +316,11 @@ namespace CmisSync.Lib.Cmis
             path = Normalize(path);
 
             string command =
-                @"INSERT OR REPLACE INTO folders (path, serverSideModificationDate)
-                    VALUES (@path, @serverSideModificationDate)";
+                @"INSERT OR REPLACE INTO folders (path, id, serverSideModificationDate)
+                    VALUES (@path, @id, @serverSideModificationDate)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", path);
+            parameters.Add("id", objectId);
             parameters.Add("serverSideModificationDate", serverSideModificationDate);
             ExecuteSQLAction(command, parameters);
         }
@@ -325,14 +344,32 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// move a file from the database.
+        /// </summary>
+        public void MoveFile(string oldPath, string newPath)
+        {
+            oldPath = Normalize(oldPath);
+            newPath = Normalize(newPath);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("oldpath", oldPath);
+            parameters.Add("newpath", newPath);
+            ExecuteSQLAction("UPDATE files SET path=@newpath WHERE path=@oldpath", parameters);
+        }
+
+
+        /// <summary>
         /// Remove a folder from the database.
         /// </summary>
         public void RemoveFolder(string path)
         {
             path = Normalize(path);
 
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", path);
+
             // Remove folder itself
-            ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
+            ExecuteSQLAction("DELETE FROM folders WHERE path=@path", parameters);
 
             // Remove all folders under this folder
             ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
@@ -340,6 +377,51 @@ namespace CmisSync.Lib.Cmis
             // Remove all files under this folder
             ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
             ExecuteSQLAction("DELETE FROM downloads WHERE path LIKE '" + path + "/%'", null);
+        }
+
+
+        /// <summary>
+        /// move a folder from the database.
+        /// </summary>
+        public void MoveFolder(string oldPath, string newPath)
+        {
+            oldPath = Normalize(oldPath);
+            newPath = Normalize(newPath);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("oldpath", oldPath);
+            parameters.Add("newpath", newPath);
+            ExecuteSQLAction("UPDATE folders SET path=@newpath WHERE path=@oldpath", parameters);
+
+            string path = null;
+
+            while(null != (path = (string)ExecuteSQLFunction("SELECT path FROM files WHERE path LIKE '" + oldPath + "/%'", null)))
+            {
+                string newFilePath = Path.Combine(newPath, path.Substring(oldPath.Length + 1)).Replace('\\', '/');
+                Logger.Info("File Move");
+                Logger.Info(oldPath);
+                Logger.Info(newPath);
+                Logger.Info(path);
+                Logger.Info(newFilePath);
+                Dictionary<string, object> parametersSub = new Dictionary<string, object>();
+                parametersSub.Add("oldpath", path);
+                parametersSub.Add("newpath", newFilePath);
+                ExecuteSQLAction("UPDATE files SET path=@newpath WHERE path=@oldpath", parametersSub);
+            }
+            
+            while (null != (path = (string)ExecuteSQLFunction("SELECT path FROM folders WHERE path LIKE '" + oldPath + "/%'", null)))
+            {
+                string newFolderPath = Path.Combine(newPath, path.Substring(oldPath.Length + 1)).Replace('\\', '/');
+                Logger.Info("Folder Move");
+                Logger.Info(oldPath);
+                Logger.Info(newPath);
+                Logger.Info(path);
+                Logger.Info(newFolderPath);
+                Dictionary<string, object> parametersSub = new Dictionary<string, object>();
+                parametersSub.Add("oldpath", path);
+                parametersSub.Add("newpath", newFolderPath);
+                ExecuteSQLAction("UPDATE folders SET path=@newpath WHERE path=@oldpath", parametersSub);
+            }
         }
 
 
@@ -480,6 +562,17 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// <returns>path field in files table for <paramref name="id"/></returns>
+        /// </summary>
+        public string GetFilePath(string id)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("id", id);
+            return Denormalize((string)ExecuteSQLFunction("SELECT path FROM files WHERE id=@id", parameters));
+        }
+
+
+        /// <summary>
         /// Checks whether the database contains a given folder.
         /// </summary>
         public bool ContainsFolder(string path)
@@ -489,6 +582,17 @@ namespace CmisSync.Lib.Cmis
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", path);
             return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM folders WHERE path=@path", parameters);
+        }
+
+
+        /// <summary>
+        /// <returns>path field in folders table for <paramref name="id"/></returns>
+        /// </summary>
+        public string GetFolderPath(string id)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("id", id);
+            return Denormalize((string)ExecuteSQLFunction("SELECT path FROM folders WHERE id=@id", parameters));
         }
 
 

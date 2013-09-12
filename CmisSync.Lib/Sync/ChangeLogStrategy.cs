@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ using System.Collections;
 using DotCMIS.Data.Impl;
 
 using System.Net;
+using CmisSync.Lib;
 
 namespace CmisSync.Lib.Sync
 {
@@ -30,115 +32,279 @@ namespace CmisSync.Lib.Sync
             private void ChangeLogSync(IFolder remoteFolder)
             {
                 // Get last change log token on server side.
+                session.Binding.GetRepositoryService().GetRepositoryInfos(null);    //  refresh
                 string lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
 
                 // Get last change token that had been saved on client side.
                 // TODO catch exception invalidArgument which means that changelog has been truncated and this token is not found anymore.
                 string lastTokenOnClient = database.GetChangeLogToken();
 
+                if (lastTokenOnClient == lastTokenOnServer)
+                {
+                    Logger.Info("No change from remote, wait for the next time.");
+                    return;
+                }
+
                 if (lastTokenOnClient == null)
                 {
-                    // Token is null, which means no sync has ever happened yet, so just copy everything.
-                    // RecursiveFolderCopy(remoteFolder, localRootFolder);
-                    RecursiveFolderCopy(remoteFolder, repoinfo.TargetDirectory);
-                }
-                else
-                {
-                    // If there are remote changes, apply them.
-                    if (lastTokenOnServer.Equals(lastTokenOnClient))
+                    // Token is null, which means no sync has ever happened yet, so just sync everything from remote.
+                    if (CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null))
                     {
-                        Logger.Info("Sync | No changes on server, ChangeLog token: " + lastTokenOnServer);
+                        Logger.Info("Success to sync from remote, update ChangeLog token: " + lastTokenOnServer);
+                        database.SetChangeLogToken(lastTokenOnServer);
                     }
                     else
                     {
-                        // Check which files/folders have changed.
-                        int maxNumItems = 1000;
-                        IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
+                        Logger.Warn("Failure to sync from remote, wait for the next time.");
+                    }
+                    return;
+                }
 
-                        // Replicate each change to the local side.
-                        foreach (IChangeEvent change in changes.ChangeEventList)
+                do
+                {
+                    // Check which files/folders have changed.
+                    int maxNumItems = 100;
+                    IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
+
+                    // Replicate each change to the local side.
+                    bool success = true;
+                    foreach (IChangeEvent change in changes.ChangeEventList)
+                    {
+                        Logger.Debug("Change type:" + change.ChangeType.ToString() + " id:" + change.ObjectId + " properties:" + change.Properties);
+                        try
                         {
-                            ApplyRemoteChange(change);
+                            switch (change.ChangeType)
+                            {
+                                case ChangeType.Created:
+                                case ChangeType.Updated:
+                                    success = ApplyRemoteChangeUpdate(change) && success;
+                                    break;
+                                case ChangeType.Deleted:
+                                    success = ApplyRemoteChangeDelete(change) && success;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-
-                        // Save change log token locally.
-                        // TODO only if successful
-                        Logger.Info("Sync | Updating ChangeLog token: " + lastTokenOnServer);
-                        database.SetChangeLogToken(lastTokenOnServer);
+                        catch (Exception ex)
+                        {
+                            Logger.Warn("Exception when apply the change: " + Utils.ToLogString(ex));
+                            success = false;
+                        }
                     }
 
-                    // Upload local changes by comparing with database.
-                    // TODO
+                    if (success)
+                    {
+                        // Save change log token locally.
+                        lastTokenOnClient = changes.LatestChangeLogToken;
+                        Logger.Info("Sync the changes on server, update ChangeLog token: " + lastTokenOnClient);
+                        database.SetChangeLogToken(lastTokenOnClient);
+                        session.Binding.GetRepositoryService().GetRepositoryInfos(null);    //  refresh
+                        lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
+                    }
+                    else
+                    {
+                        Logger.Warn("Failure to sync the changes on server, force crawl sync from remote");
+                        if (CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null))
+                        {
+                            Logger.Info("Success to sync from remote, update ChangeLog token: " + lastTokenOnServer);
+                            database.SetChangeLogToken(lastTokenOnServer);
+                        }
+                        else
+                        {
+                            Logger.Warn("Failure to sync from remote, wait for the next time.");
+                        }
+                        return;
+                    }
                 }
+                while (!lastTokenOnServer.Equals(lastTokenOnClient));
             }
 
 
             /// <summary>
-            /// Apply a remote change.
+            /// Apply a remote change for Created or Updated.
             /// </summary>
-            private void ApplyRemoteChange(IChangeEvent change)
+            private bool ApplyRemoteChangeUpdate(IChangeEvent change)
             {
-                Logger.Info("Sync | Change type:" + change.ChangeType.ToString() + " id:" + change.ObjectId + " properties:" + change.Properties);
-                IFolder remoteFolder;
-                IDocument remoteDocument;
-                switch (change.ChangeType)
+                ICmisObject cmisObject = null;
+                IFolder remoteFolder = null;
+                IDocument remoteDocument = null;
+                string remotePath = null;
+                ICmisObject remoteObject = null;
+
+                try
                 {
-                    // Case when an object has been created or updated.
-                    case ChangeType.Created:
-                    case ChangeType.Updated:
-                        ICmisObject cmisObject = session.GetObject(change.ObjectId);
-                        if (null != (remoteDocument = cmisObject as IDocument))
-                        {
-                            string remoteDocumentPath = remoteDocument.Paths.First();
-                            if (!remoteDocumentPath.StartsWith(remoteFolderPath))
-                            {
-                                Logger.Info("Sync | Change in unrelated document: " + remoteDocumentPath);
-                                break; // The change is not under the folder we care about.
-                            }
-                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
-                            string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            relativeFolderPath = relativeFolderPath.Replace('/', '\\'); // TODO OS-specific separator
-                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
-                            DownloadFile(remoteDocument, localFolderPath);
-                        }
-                        else if (null != (remoteFolder = cmisObject as IFolder))
-                        {
-                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
-                            if(!this.repoinfo.isPathIgnored(remoteFolder.Path))
-                                RecursiveFolderCopy(remoteFolder, localFolder);
-                        }
-                        break;
-
-                    // Case when an object has been deleted.
-                    case ChangeType.Deleted:
-                        cmisObject = session.GetObject(change.ObjectId);
-                        if (null != (remoteDocument = cmisObject as IDocument))
-                        {
-                            string remoteDocumentPath = remoteDocument.Paths.First();
-                            if (!remoteDocumentPath.StartsWith(remoteFolderPath))
-                            {
-                                Logger.Info("Sync | Change in unrelated document: " + remoteDocumentPath);
-                                break; // The change is not under the folder we care about.
-                            }
-                            string relativePath = remoteDocumentPath.Substring(remoteFolderPath.Length + 1);
-                            string relativeFolderPath = Path.GetDirectoryName(relativePath);
-                            relativeFolderPath = relativeFolderPath.Replace('/', '\\'); // TODO OS-specific separator
-                            string localFolderPath = Path.Combine(repoinfo.TargetDirectory, relativeFolderPath);
-                            // TODO DeleteFile(localFolderPath); // Delete on filesystem and in database
-                        }
-                        else if (null != (remoteFolder = cmisObject as IFolder))
-                        {
-                            string localFolder = Path.Combine(repoinfo.TargetDirectory, remoteFolder.Path);
-                            if(!this.repoinfo.isPathIgnored(remoteFolder.Path))
-                                RemoveFolderLocally(localFolder); // Remove from filesystem and database.
-                        }
-                        break;
-
-                    // Case when access control or security policy has changed.
-                    case ChangeType.Security:
-                        // TODO
-                        break;
+                    cmisObject = session.GetObject(change.ObjectId);
                 }
+                catch(CmisObjectNotFoundException)
+                {
+                    Logger.Warn("Ignore the missed object for " + change.ObjectId);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " : " + Utils.ToLogString(ex));
+                    return false;
+                }
+
+                remoteDocument = cmisObject as IDocument;
+                if (remoteDocument != null)
+                {
+                    remotePath = Path.Combine(remoteDocument.Paths.ToArray()).Replace('\\', '/');
+                }
+                else
+                {
+                    remoteFolder = cmisObject as IFolder;
+                    if (remoteFolder == null)
+                    {
+                        Logger.Info("Change in no sync object: " + change.ObjectId);
+                        return true;
+                    }
+                    remotePath = remoteFolder.Path;
+                    if (this.repoinfo.isPathIgnored(remotePath))
+                    {
+                        Logger.Info("Change in ignored path: " + remotePath);
+                        return true;
+                    }
+                }
+
+                if (!remotePath.StartsWith(remoteFolderPath))
+                {
+                    Logger.Info("Change in unrelated path: " + remotePath);
+                    return true;    // The change is not under the folder we care about.
+                }
+
+                string relativePath = remotePath.Substring(remoteFolderPath.Length);
+                if (relativePath.Length <= 0)
+                {
+                    Logger.Info("Ignore change in root path: " + remotePath);
+                    return true;
+                }
+                if (relativePath[0] == '/')
+                {
+                    relativePath = relativePath.Substring(1);
+                }
+                foreach (string name in relativePath.Split('/'))
+                {
+                    if (!Utils.WorthSyncing(name))
+                    {
+                        Logger.Info("Change in unworth syncing path: " + remotePath);
+                        return true;
+                    }
+                }
+
+                try
+                {
+                    remoteObject = session.GetObjectByPath(remotePath);
+                }
+                catch(CmisObjectNotFoundException)
+                {
+                    Logger.Info(String.Format("Ignore remote path {0} deleted from id {1}", remotePath, cmisObject.Id));
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("Exception when GetObject for " + remotePath + " : " + Utils.ToLogString(ex));
+                    return false;
+                }
+
+                if (remoteObject.Id != cmisObject.Id)
+                {
+                    Logger.Info(String.Format("Ignore remote path {0} changed from id {1} to id {2}", remotePath, cmisObject.Id, remoteObject.Id));
+                    return true;
+                }
+
+                string localPath = Path.Combine(repoinfo.TargetDirectory, relativePath).Replace('/', Path.DirectorySeparatorChar);
+
+                if (null != remoteDocument)
+                {
+                    //  check moveObject
+                    string savedDocumentPath = database.GetFilePath(change.ObjectId);
+                    if ((null != savedDocumentPath) && (savedDocumentPath != localPath))
+                    {
+                        if (File.Exists(localPath))
+                        {
+                            File.Delete(savedDocumentPath);
+                            database.RemoveFile(savedDocumentPath);
+                        }
+                        else
+                        {
+                            if (File.Exists(savedDocumentPath))
+                            {
+                                if (!Directory.Exists(Path.GetDirectoryName(localPath)))
+                                {
+                                    Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+                                }
+                                File.Move(savedDocumentPath, localPath);
+                            }
+                            database.MoveFile(savedDocumentPath, localPath);
+                        }
+                    }
+
+                    return SyncDownloadFile(remoteDocument, Path.GetDirectoryName(localPath));
+                }
+
+                if (null != remoteFolder)
+                {
+                    //  check moveObject
+                    string savedFolderPath = database.GetFolderPath(change.ObjectId);
+                    if ((null != savedFolderPath) && (savedFolderPath != localPath))
+                    {
+                        MoveFolderLocally(savedFolderPath, localPath);
+                        return CrawlSync(remoteFolder, localPath);
+                    }
+                    else
+                    {
+                        return SyncDownloadFolder(remoteFolder, Path.GetDirectoryName(localPath));
+                    }
+                }
+
+                return true;
+            }
+
+
+            /// <summary>
+            /// Apply a remote change for Deleted.
+            /// </summary>
+            private bool ApplyRemoteChangeDelete(IChangeEvent change)
+            {
+                try
+                {
+                    ICmisObject remoteObject = session.GetObject(change.ObjectId);
+                    if (null != remoteObject)
+                    {
+                        //  should be moveObject
+                        Logger.Info("Ignore moveObject for id " + change.ObjectId);
+                        return true;
+                    }
+                }
+                catch (CmisObjectNotFoundException)
+                {
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " : " + Utils.ToLogString(ex));
+                }
+
+                string savedDocumentPath = database.GetFilePath(change.ObjectId);
+                if (null != savedDocumentPath)
+                {
+                    File.Delete(savedDocumentPath);
+                    database.RemoveFile(savedDocumentPath);
+                    Logger.Info("Remove locally document: " + savedDocumentPath);
+                    return true;
+                }
+
+                string savedFolderPath = database.GetFolderPath(change.ObjectId);
+                if (null != savedFolderPath)
+                {
+                    Directory.Delete(savedFolderPath,true);
+                    database.RemoveFolder(savedFolderPath);
+                    Logger.Info("Remove locally folder: " + savedFolderPath);
+                    return true;
+                }
+
+                return true;
             }
         }
     }
