@@ -269,11 +269,21 @@ namespace CmisSync
 
         public void RemoveRepositoryFromSync(string reponame)
         {
-            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
-            if (f != null)
-                RemoveRepository(f);
-            else
-                Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
+            lock (this.check_repos_lock)
+            {
+                Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
+                if (f != null)
+                {
+                    RemoveRepository(f);
+                    ConfigManager.CurrentConfig.Folder.Remove(f);
+                    ConfigManager.CurrentConfig.Save();
+                    FolderListChanged();
+                }
+                else
+                {
+                    Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
+                }
+            }
         }
 
         
