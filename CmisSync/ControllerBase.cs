@@ -175,7 +175,6 @@ namespace CmisSync
         /// Concurrency locks.
         /// </summary>
         private Object repo_lock = new Object();
-        private Object check_repos_lock = new Object();
 
 
         /// <summary>
@@ -269,7 +268,7 @@ namespace CmisSync
 
         public void RemoveRepositoryFromSync(string reponame)
         {
-            lock (this.check_repos_lock)
+            lock (this.repo_lock)
             {
                 Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
                 if (f != null)
@@ -334,19 +333,22 @@ namespace CmisSync
         /// <param name="repoName">the folder to pause/unpause</param>
         public void StartOrSuspendRepository(string repoName)
         {
-            foreach (RepoBase aRepo in this.repositories)
+            lock (this.repo_lock)
             {
-                if (aRepo.Name == repoName)
+                foreach (RepoBase aRepo in this.repositories)
                 {
-                    if (aRepo.Status != SyncStatus.Suspend)
+                    if (aRepo.Name == repoName)
                     {
-                        aRepo.Suspend();
-                        Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
-                    }
-                    else
-                    {
-                        aRepo.Resume();
-                        Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        if (aRepo.Status != SyncStatus.Suspend)
+                        {
+                            aRepo.Suspend();
+                            Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
+                        }
+                        else
+                        {
+                            aRepo.Resume();
+                            Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        }
                     }
                 }
             }
@@ -359,7 +361,7 @@ namespace CmisSync
         /// </summary>
         private void CheckRepositories()
         {
-            lock (this.check_repos_lock)
+            lock (this.repo_lock)
             {
                 string path = ConfigManager.CurrentConfig.FoldersPath;
 
@@ -487,17 +489,20 @@ namespace CmisSync
         /// </summary>
         public void FinishFetcher()
         {
-            // Add folder to XML config file.
-            ConfigManager.CurrentConfig.AddFolder(repoInfo);
+            lock (this.repo_lock)
+            {
+                // Add folder to XML config file.
+                ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
-            FolderFetched(this.fetcher.RemoteUrl.ToString());
+                FolderFetched(this.fetcher.RemoteUrl.ToString());
 
-            // Initialize in the UI.
-            AddRepository(repoInfo);
-            FolderListChanged();
+                // Initialize in the UI.
+                AddRepository(repoInfo);
+                FolderListChanged();
 
-            this.fetcher.Dispose();
-            this.fetcher = null;
+                this.fetcher.Dispose();
+                this.fetcher = null;
+            }
         }
 
 
