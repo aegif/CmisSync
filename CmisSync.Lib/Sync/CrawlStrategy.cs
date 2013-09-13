@@ -200,144 +200,11 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)cmisObject;
-                        success = success && SyncDownloadFile(remoteDocument, localFolder, remoteFiles);
+                        success = SyncDownloadFile(remoteDocument, localFolder, remoteFiles) && success;
                     }
                     #endregion
                 }
 
-                return success;
-            }
-
-            private bool handleDiffLocalAndRemoteDocument(string localFolder, IDocument remoteDocument)
-            {
-                bool success = true;
-                string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
-                string filePath = localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName;
-
-                if (File.Exists(filePath))
-                {
-                    // Check modification date stored in database and download if remote modification date if different.
-                    DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
-                    DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
-                    DateTime? lastLocalUpdate = File.GetLastWriteTime(filePath);
-                    if (lastDatabaseUpdate == null)
-                    {
-                        Logger.Info("Downloading file absent from database: " + filePath);
-                        success = success && DownloadFile(remoteDocument, localFolder);
-                    }
-                    else
-                    {
-                        // If the file has been modified since last time we downloaded it, then download again.
-                        if (serverSideModificationDate > lastDatabaseUpdate)
-                        {
-                            if (database.LocalFileHasChanged(filePath))
-                            {
-                                Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
-                                // Rename locally modified file.
-                                String ext = Path.GetExtension(filePath);
-                                String filename = Path.GetFileNameWithoutExtension(filePath);
-                                String path = Path.GetDirectoryName(filePath);
-
-                                String NewFileName = Utils.SuffixIfExists(filename + "_" + repoinfo.User + "-version");
-                                String newFilePath = Path.Combine(path, NewFileName);
-                                File.Move(filePath, newFilePath);
-
-                                // Download server version
-                                success = success && DownloadFile(remoteDocument, localFolder);
-                                repo.OnConflictResolved();
-
-                                // TODO move to OS-dependant layer
-                                //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
-                                // TODO show CMIS property lastModifiedBy
-                            }
-                            else
-                            {
-                                Logger.Info("Downloading modified file: " + remoteDocumentFileName);
-                                success = success && DownloadFile(remoteDocument, localFolder);
-                            }
-                        }
-                        else if (serverSideModificationDate == lastDatabaseUpdate)
-                        {
-                            //  check chunked upload
-                            FileInfo fileInfo = new FileInfo(filePath);
-                            if (remoteDocument.ContentStreamLength < fileInfo.Length)
-                            {
-                                success = success && ResumeUploadFile(filePath, remoteDocument);
-                            }
-                        }
-
-                    }
-                }
-                else
-                {
-                    if (database.ContainsFile(filePath))
-                    {
-                        // File has been recently removed locally, so remove it from server too.
-                        Logger.Info("Removing locally deleted file on server: " + filePath);
-                        remoteDocument.DeleteAllVersions();
-                        // Remove it from database.
-                        database.RemoveFile(filePath);
-                    }
-                    else
-                    {
-                        // New remote file, download it.
-                        Logger.Info("New remote file: " + filePath);
-                        success = success && DownloadFile(remoteDocument, localFolder);
-                    }
-                }
-                return success;
-            }
-
-            private bool handleDiffOfLocalAndRemoteFolder(IFolder remoteSubFolder, string localSubFolder)
-            {
-                bool success = true;
-
-                if (database.ContainsFolder(localSubFolder))
-                {
-                    // If there was previously a folder with this name, it means that
-                    // the user has deleted it voluntarily, so delete it from server too.
-
-                    // Delete the folder from the remote server.
-                    remoteSubFolder.DeleteTree(true, null, true);
-
-                    // Delete the folder from database.
-                    database.RemoveFolder(localSubFolder);
-                }
-                else
-                {
-                    // The folder has been recently created on server, so download it.
-
-                    // If there was previously a file with this name, delete it.
-                    // TODO warn if local changes in the file.
-                    if (File.Exists(localSubFolder))
-                    {
-                        Logger.Warn("Local file \"" + localSubFolder + "\" has been renamed to \"" + localSubFolder + ".conflict\"");
-                        File.Move(localSubFolder, localSubFolder + ".conflict");
-                    }
-
-                    // Skip if invalid folder name. See https://github.com/nicolas-raoul/CmisSync/issues/196
-                    if (Utils.IsInvalidFileName(remoteSubFolder.Name))
-                    {
-                        Logger.Info("Skipping download of folder with illegal name: " + remoteSubFolder.Name);
-                    }
-                    else if (repoinfo.isPathIgnored(remoteSubFolder.Path))
-                    {
-                        Logger.Info("Skipping dowload of ignored folder: " + remoteSubFolder.Name);
-                    }
-                    else
-                    {
-                        // Create local folder.remoteDocument.Name
-                        Directory.CreateDirectory(localSubFolder);
-
-                        // Create database entry for this folder.
-                        // TODO - Yannick - Add metadata
-                        database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
-
-                        // Recursive copy of the whole folder.
-                        success = success && RecursiveFolderCopy(remoteSubFolder, localSubFolder);
-                    }
-                }
                 return success;
             }
 
@@ -347,72 +214,70 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList<string> remoteFiles)
             {
-                string[] files;
+                bool success = true;
+
                 try
                 {
-                    files = Directory.GetFiles(localFolder);
-                }
-                catch (Exception e)
-                {
-                    Logger.Warn(String.Format("Exception while get the file list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
-                    return false;
-                }
-
-                bool success = true;
-                foreach (string filePath in files)
-                {
-                    sleepWhileSuspended();
-
-                    string fileName = Path.GetFileName(filePath);
-
-                    if (Utils.WorthSyncing(fileName))
+                    foreach (string filePath in Directory.GetFiles(localFolder))
                     {
-                        if (!remoteFiles.Contains(fileName))
+                        sleepWhileSuspended();
+
+                        string fileName = Path.GetFileName(filePath);
+
+                        if (Utils.WorthSyncing(fileName))
                         {
-                            // This local file is not on the CMIS server now, so
-                            // check whether it used invalidFolderNameRegex to exist on server or not.
-                            if (database.ContainsFile(filePath))
+                            if (!remoteFiles.Contains(fileName))
                             {
-                                // If file has changed locally, move to 'your_version' and warn about conflict
-                                // TODO
-
-                                // File has been deleted on server, so delete it locally.
-                                Logger.Info("Removing remotely deleted file: " + filePath);
-                                File.Delete(filePath);
-
-                                // Delete file from database.
-                                database.RemoveFile(filePath);
-                            }
-                            else
-                            {
-                                if (BIDIRECTIONAL)
+                                // This local file is not on the CMIS server now, so
+                                // check whether it used invalidFolderNameRegex to exist on server or not.
+                                if (database.ContainsFile(filePath))
                                 {
-                                    // New file, sync up.
-                                    Logger.Info("Uploading file absent on repository: " + filePath);
-                                    if (Utils.WorthSyncing(filePath))
-                                    {
-                                        success = UploadFile(filePath, remoteFolder) && success;
-                                    }
+                                    // If file has changed locally, move to 'your_version' and warn about conflict
+                                    // TODO
+
+                                    // File has been deleted on server, so delete it locally.
+                                    Logger.Info("Removing remotely deleted file: " + filePath);
+                                    File.Delete(filePath);
+
+                                    // Delete file from database.
+                                    database.RemoveFile(filePath);
                                 }
-                            }
-                        }
-                        else
-                        {
-                            // The file exists both on server and locally.
-                            if (!syncFull)
-                            {
-                                if (database.LocalFileHasChanged(filePath))
+                                else
                                 {
                                     if (BIDIRECTIONAL)
                                     {
-                                        // Upload new version of file content.
-                                        Logger.Info("Uploading file update on repository: " + filePath);
-                                        success = success && UpdateFile(filePath, remoteFolder);
+                                        // New file, sync up.
+                                        Logger.Info("Uploading file absent on repository: " + filePath);
+                                        if (Utils.WorthSyncing(filePath))
+                                        {
+                                            success = UploadFile(filePath, remoteFolder) && success;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // The file exists both on server and locally.
+                                if (!syncFull)
+                                {
+                                    if (database.LocalFileHasChanged(filePath))
+                                    {
+                                        if (BIDIRECTIONAL)
+                                        {
+                                            // Upload new version of file content.
+                                            Logger.Info("Uploading file update on repository: " + filePath);
+                                            success = success && UpdateFile(filePath, remoteFolder);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(String.Format("Exception while crawl the file list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
+                    success = false;
                 }
 
                 return success;
@@ -433,44 +298,43 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList<string> remoteFolders)
             {
-                string[] folders;
+                bool success = true;
+
                 try
                 {
-                    folders = Directory.GetDirectories(localFolder);
-                }
-                catch (Exception e)
-                {
-                    Logger.Warn(String.Format("Exception while get the folder list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
-                    return false;
-                }
-
-                bool success = true;
-                foreach (string localSubFolder in folders)
-                {
-                    sleepWhileSuspended();
-                    string path = localSubFolder.Substring(repoinfo.TargetDirectory.Length).Replace("\\", "/");
-                    string folderName = Path.GetFileName(localSubFolder);
-                    if (Utils.WorthSyncing(folderName) && !repoinfo.isPathIgnored(path))
+                    foreach (string localSubFolder in Directory.GetDirectories(localFolder))
                     {
-                        if (!remoteFolders.Contains(folderName))
+                        sleepWhileSuspended();
+                        string path = localSubFolder.Substring(repoinfo.TargetDirectory.Length).Replace("\\", "/");
+                        string folderName = Path.GetFileName(localSubFolder);
+                        if (Utils.WorthSyncing(folderName) && !repoinfo.isPathIgnored(path))
                         {
-                            // This local folder is not on the CMIS server now, so
-                            // check whether it used to exist on server or not.
-                            if (database.ContainsFolder(localSubFolder))
+                            if (!remoteFolders.Contains(folderName))
                             {
-                                success = RemoveFolderLocally(localSubFolder) && success;
-                            }
-                            else
-                            {
-                                if (BIDIRECTIONAL)
+                                // This local folder is not on the CMIS server now, so
+                                // check whether it used to exist on server or not.
+                                if (database.ContainsFolder(localSubFolder))
                                 {
-                                    // New local folder, upload recursively.
-                                    success = UploadFolderRecursively(remoteFolder, localSubFolder) && success;
+                                    success = RemoveFolderLocally(localSubFolder) && success;
+                                }
+                                else
+                                {
+                                    if (BIDIRECTIONAL)
+                                    {
+                                        // New local folder, upload recursively.
+                                        success = UploadFolderRecursively(remoteFolder, localSubFolder) && success;
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                catch (Exception e)
+                {
+                    Logger.Warn(String.Format("Exception while crawl the folder list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
+                    success = false;
+                }
+
                 return success;
             }
         }

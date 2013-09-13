@@ -344,32 +344,41 @@ namespace CmisSync.Lib.Sync
                 activityListener.ActivityStarted();
 
                 bool success = true;
-                // List all children.
-                foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
+
+                try
                 {
-                    if (cmisObject is DotCMIS.Client.Impl.Folder)
+                    // List all children.
+                    foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                     {
-                        IFolder remoteSubFolder = (IFolder)cmisObject;
-                        string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
-                        if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                        if (cmisObject is DotCMIS.Client.Impl.Folder)
                         {
-                            // Create local folder.
-                            Directory.CreateDirectory(localSubFolder);
+                            IFolder remoteSubFolder = (IFolder)cmisObject;
+                            string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
+                            if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                            {
+                                // Create local folder.
+                                Directory.CreateDirectory(localSubFolder);
 
-                            // Create database entry for this folder
-                            // TODO Add metadata
-                            database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
+                                // Create database entry for this folder
+                                // TODO Add metadata
+                                database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
 
-                            // Recurse into folder.
-                            success = RecursiveFolderCopy(remoteSubFolder, localSubFolder) && success;
+                                // Recurse into folder.
+                                success = RecursiveFolderCopy(remoteSubFolder, localSubFolder) && success;
+                            }
+                        }
+                        else
+                        {
+                            if (Utils.WorthSyncing(cmisObject.Name))
+                                // It is a file, just download it.
+                                success = DownloadFile((IDocument)cmisObject, localFolder) && success;
                         }
                     }
-                    else
-                    {
-                        if (Utils.WorthSyncing(cmisObject.Name))
-                            // It is a file, just download it.
-                            success = DownloadFile((IDocument)cmisObject, localFolder) && success;
-                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(String.Format("Exception while download to local folder {0}: {1}", localFolder, Utils.ToLogString(e)));
+                    success = false;
                 }
 
                 activityListener.ActivityStopped();
@@ -513,68 +522,84 @@ namespace CmisSync.Lib.Sync
 
                 bool success = true;
 
-                if (File.Exists(filePath))
+                try
                 {
-                    // Check modification date stored in database and download if remote modification date if different.
-                    DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
-                    DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
+                    if (File.Exists(filePath))
+                    {
+                        // Check modification date stored in database and download if remote modification date if different.
+                        DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
+                        DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
 
-                    if (lastDatabaseUpdate == null)
-                    {
-                        Logger.Info("Downloading file absent from database: " + filePath);
-                        success = DownloadFile(remoteDocument, localFolder);
-                    }
-                    else
-                    {
-                        // If the file has been modified since last time we downloaded it, then download again.
-                        if (serverSideModificationDate > lastDatabaseUpdate)
+                        if (lastDatabaseUpdate == null)
                         {
-                            if (database.LocalFileHasChanged(filePath))
+                            Logger.Info("Downloading file absent from database: " + filePath);
+                            success = DownloadFile(remoteDocument, localFolder);
+                        }
+                        else
+                        {
+                            // If the file has been modified since last time we downloaded it, then download again.
+                            if (serverSideModificationDate > lastDatabaseUpdate)
                             {
-                                Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
-                                // Rename locally modified file.
-                                String ext = Path.GetExtension(filePath);
-                                String filename = Path.GetFileNameWithoutExtension(filePath);
-                                String dir = Path.GetDirectoryName(filePath);
+                                if (database.LocalFileHasChanged(filePath))
+                                {
+                                    Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
+                                    // Rename locally modified file.
+                                    String ext = Path.GetExtension(filePath);
+                                    String filename = Path.GetFileNameWithoutExtension(filePath);
+                                    String dir = Path.GetDirectoryName(filePath);
 
-                                String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filePath) + "_" + repoinfo.User + "-version");
-                                String newFilePath = Path.Combine(dir, newFileName);
-                                File.Move(filePath, newFilePath);
+                                    String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filePath) + "_" + repoinfo.User + "-version");
+                                    String newFilePath = Path.Combine(dir, newFileName);
+                                    File.Move(filePath, newFilePath);
 
-                                // Download server version
-                                success = DownloadFile(remoteDocument, localFolder);
-                                repo.OnConflictResolved();
+                                    // Download server version
+                                    success = DownloadFile(remoteDocument, localFolder);
+                                    repo.OnConflictResolved();
 
-                                // TODO move to OS-dependant layer
-                                //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
-                                // TODO show CMIS property lastModifiedBy
+                                    // TODO move to OS-dependant layer
+                                    //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
+                                    //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
+                                    // TODO show CMIS property lastModifiedBy
+                                }
+                                else
+                                {
+                                    Logger.Info("Downloading modified file: " + fileName);
+                                    success = DownloadFile(remoteDocument, localFolder);
+                                }
                             }
-                            else
+                            else if(serverSideModificationDate == lastDatabaseUpdate)
                             {
-                                Logger.Info("Downloading modified file: " + fileName);
-                                success = DownloadFile(remoteDocument, localFolder);
+                                //  check chunked upload
+                                FileInfo fileInfo = new FileInfo(filePath);
+                                if (remoteDocument.ContentStreamLength < fileInfo.Length)
+                                {
+                                    success = ResumeUploadFile(filePath, remoteDocument);
+                                }
                             }
                         }
-
-                    }
-                }
-                else
-                {
-                    if (database.ContainsFile(filePath))
-                    {
-                        // File has been recently removed locally, so remove it from server too.
-                        Logger.Info("Removing locally deleted file on server: " + filePath);
-                        remoteDocument.DeleteAllVersions();
-                        // Remove it from database.
-                        database.RemoveFile(filePath);
                     }
                     else
                     {
-                        // New remote file, download it.
-                        Logger.Info("New remote file: " + filePath);
-                        success = DownloadFile(remoteDocument, localFolder);
+                        if (database.ContainsFile(filePath))
+                        {
+                            // File has been recently removed locally, so remove it from server too.
+                            Logger.Info("Removing locally deleted file on server: " + filePath);
+                            remoteDocument.DeleteAllVersions();
+                            // Remove it from database.
+                            database.RemoveFile(filePath);
+                        }
+                        else
+                        {
+                            // New remote file, download it.
+                            Logger.Info("New remote file: " + filePath);
+                            success = DownloadFile(remoteDocument, localFolder);
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(String.Format("Exception while download file to {0}: {1}", filePath, Utils.ToLogString(e)));
+                    success = false;
                 }
 
                 return success;
