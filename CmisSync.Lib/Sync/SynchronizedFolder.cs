@@ -245,11 +245,15 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             public void Sync()
             {
-                // If not connected, connect.
-                if (session == null)
-                {
-                    Connect();
-                }
+                //// If not connected, connect.
+                //if (session == null)
+                //{
+                //    Connect();
+                //}
+
+                //  Force to create the session to reset the cache for each Sync, since DotCMIS uses cache
+                Connect();
+
                 if (session == null)
                 {
                     Logger.Error("Could not connect to: " + cmisParameters[SessionParameter.AtomPubUrl]);
@@ -311,14 +315,14 @@ namespace CmisSync.Lib.Sync
                         delegate(Object o, DoWorkEventArgs args)
                         {
                             Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
-                        try
-                        {
-                            Sync();
-                        }
-                        catch (CmisBaseException e)
-                        {
-                            Logger.Error("CMIS exception while syncing:", e);
-                        }
+                            try
+                            {
+                                Sync();
+                            }
+                            catch (CmisBaseException e)
+                            {
+                                Logger.Error("CMIS exception while syncing:", e);
+                            }
                         }
                     );
                     bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
