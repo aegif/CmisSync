@@ -54,6 +54,12 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// the prefix to remove before storing paths.
+        /// </summary>
+        private string pathPrefix;
+
+
+        /// <summary>
         /// Length of the prefix to remove before storing paths.
         /// </summary>
         private int pathPrefixSize;
@@ -65,6 +71,7 @@ namespace CmisSync.Lib.Cmis
         public Database(string dataPath)
         {
             this.databaseFileName = dataPath;
+            pathPrefix = ConfigManager.CurrentConfig.FoldersPath;
             pathPrefixSize = ConfigManager.CurrentConfig.FoldersPath.Length + 1;
         }
 
@@ -167,10 +174,13 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         private string Normalize(string path)
         {
-            // Remove path prefix
-            path = path.Substring(pathPrefixSize, path.Length - pathPrefixSize);
-            // Normalize all slashes to forward slash
-            path = path.Replace('\\', '/');
+            if (path.StartsWith(pathPrefix))
+            {
+                // Remove path prefix
+                path = path.Substring(pathPrefixSize, path.Length - pathPrefixSize);
+                // Normalize all slashes to forward slash
+                path = path.Replace('\\', '/');
+            }
             return path;
         }
 
@@ -183,6 +193,11 @@ namespace CmisSync.Lib.Cmis
             if (null == path)
             {
                 return null;
+            }
+
+            if (Path.IsPathRooted(path))
+            {
+                return path;
             }
             // Insert path prefix
             return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, path).Replace('/', Path.DirectorySeparatorChar);
