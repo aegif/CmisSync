@@ -147,21 +147,6 @@ namespace CmisSync.Lib
             return msg.ToString();
         }
 
-
-        /// <summary>
-        /// Names of files that must be excluded from synchronization.
-        /// </summary>
-        private static HashSet<String> ignoredFilenames = new HashSet<String>{
-            "~", // gedit and emacs
-            "thumbs.db", "desktop.ini", // Windows
-            "cvs", ".svn", ".git", ".hg", ".bzr", // Version control local settings
-            ".directory", // KDE
-            ".ds_store", ".icon\r", ".spotlight-V100", ".trashes", // Mac OS X
-            ".cvsignore", ".~cvsignore", ".bzrignore", ".gitignore", // Version control ignore list
-            "$~"
-        };
-
-
         /// <summary>
         /// Extensions of files that must be excluded from synchronization.
         /// </summary>
@@ -188,15 +173,20 @@ namespace CmisSync.Lib
             }
 
             // TODO: Consider these ones as well:
-            //    "*~", // gedit and emacs
             //    ".~lock.*", // LibreOffice
             //    ".*.sw[a-z]", // vi(m)
             //    "*(Autosaved).graffle", // Omnigraffle
 
+            // "*~", // gedit and emacs
+            if(filename.EndsWith("~"))
+            {
+                Logger.Debug("Unworth syncing: " + filename);
+                return false;
+            }
+
             filename = filename.ToLower();
 
-            if (ignoredFilenames.Contains(filename)
-                || ignoredExtensions.Contains(Path.GetExtension(filename))
+            if (ignoredExtensions.Contains(Path.GetExtension(filename))
                 || filename[0] == '~' // Microsoft Office temporary files start with ~
                 || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
             {
