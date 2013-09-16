@@ -349,6 +349,9 @@ namespace CmisSync.Lib
                         }
                 } }
 
+                [XmlElement("features", IsNullable=true)]
+                public Feature SupportedFeatures { get; set;}
+
                 [XmlElement("ignoreFolder",IsNullable=true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
@@ -384,7 +387,7 @@ namespace CmisSync.Lib
                     repoInfo.RemotePath = RemotePath;
                     repoInfo.TargetDirectory = LocalPath;
                     if (PollInterval < 1) PollInterval = 5000;
-                    repoInfo.PollInterval = PollInterval;
+                        repoInfo.PollInterval = PollInterval;
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
                     {
                         repoInfo.addIgnorePath(ignoredFolder.Path);
@@ -406,6 +409,17 @@ namespace CmisSync.Lib
             public string Name { get; set; }
             [XmlElement("email")]
             public string EMail { get; set; }
+        }
+
+        public class Feature {
+            [XmlElement("getFolderTree",IsNullable=true)]
+            public bool? GetFolderTreeSupport {get; set;}
+            [XmlElement("getDescendants",IsNullable=true)]
+            public bool? GetDescendantsSupport {get; set;}
+            [XmlElement("getContentChanges",IsNullable=true)]
+            public bool? GetContentChangesSupport {get; set;}
+            [XmlElement("fileSystemWatcher",IsNullable=true)]
+            public bool? FileSystemWatcherSupport {get; set;}
         }
 
         public class XmlUri : IXmlSerializable

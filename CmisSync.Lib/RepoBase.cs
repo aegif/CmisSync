@@ -120,13 +120,13 @@ namespace CmisSync.Lib
         /// <summary>
         /// Interval at which the local and remote filesystems should be polled.
         /// </summary>
-        private TimeSpan poll_interval = PollInterval.Short;
+        //private TimeSpan poll_interval = PollInterval.Short;
 
 
         /// <summary>
         /// When the local and remote filesystems were last checked for modifications.
         /// </summary>
-        private DateTime last_poll = DateTime.Now;
+        //private DateTime last_poll = DateTime.Now;
 
 
         /// <summary>

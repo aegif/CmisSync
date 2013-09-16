@@ -210,12 +210,21 @@ namespace CmisSync.Lib.Sync
                     SessionFactory factory = SessionFactory.NewInstance();
                     session = factory.CreateSession(cmisParameters);
                     // Detect whether the repository has the ChangeLog capability.
+                    Logger.Info("Created CMIS session: " + session.ToString());
                     ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-                    Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
-                    Logger.Info("Created CMIS session: " + session.ToString());
                     IsGetDescendantsSupported = session.RepositoryInfo.Capabilities.IsGetDescendantsSupported == true;
                     IsGetFolderTreeSupported = session.RepositoryInfo.Capabilities.IsGetFolderTreeSupported == true;
+                    Config.Feature features = ConfigManager.CurrentConfig.getFolder(this.repoinfo.Name).SupportedFeatures;
+                    if(features != null) {
+                        if(IsGetDescendantsSupported && features.GetDescendantsSupport == false)
+                            IsGetDescendantsSupported = false;
+                        if(IsGetFolderTreeSupported && features.GetFolderTreeSupport == false)
+                            IsGetFolderTreeSupported = false;
+                        if(ChangeLogCapability && features.GetContentChangesSupport == false)
+                            ChangeLogCapability = false;
+                    }
+                    Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Info("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
                     Logger.Info("Get descendants support: " + IsGetDescendantsSupported.ToString());
                 }
@@ -544,8 +553,8 @@ namespace CmisSync.Lib.Sync
                                 {
                                     Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
                                     // Rename locally modified file.
-                                    String ext = Path.GetExtension(filePath);
-                                    String filename = Path.GetFileNameWithoutExtension(filePath);
+                                    //String ext = Path.GetExtension(filePath);
+                                    //String filename = Path.GetFileNameWithoutExtension(filePath);
                                     String dir = Path.GetDirectoryName(filePath);
 
                                     String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filePath) + "_" + repoinfo.User + "-version");
@@ -806,7 +815,7 @@ namespace CmisSync.Lib.Sync
                     return UploadStreamInTrunk(filePath, file, remoteDocument);
                 }
 
-                return false;
+                //return false;
             }
 
 
