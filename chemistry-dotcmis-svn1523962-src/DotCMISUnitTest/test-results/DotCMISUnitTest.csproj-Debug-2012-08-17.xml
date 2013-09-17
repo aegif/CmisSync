@@ -1,0 +1,1299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <UnitTestResult>
+      <TestDate>2012-08-17T15:19:44</TestDate>
+      <Status>Failure</Status>
+      <TotalFailures>2</TotalFailures>
+      <TotalSuccess>0</TotalSuccess>
+      <TotalIgnored>0</TotalIgnored>
+      <Time />
+      <Message>Child test failed</Message>
+    </UnitTestResult>
+  </Results>
+  <Tests>
+    <TestRecord Name="DotCMISUnitTest">
+      <Results>
+        <UnitTestResult>
+          <TestDate>2012-08-17T11:08:52</TestDate>
+          <Status>Success Failure</Status>
+          <TotalFailures>4</TotalFailures>
+          <TotalSuccess>2</TotalSuccess>
+          <TotalIgnored>0</TotalIgnored>
+          <Time />
+          <Message>Child test failed</Message>
+        </UnitTestResult>
+        <UnitTestResult>
+          <TestDate>2012-08-17T15:19:44</TestDate>
+          <Status>Success Failure</Status>
+          <TotalFailures>4</TotalFailures>
+          <TotalSuccess>2</TotalSuccess>
+          <TotalIgnored>0</TotalIgnored>
+          <Time />
+          <Message>Child test failed</Message>
+        </UnitTestResult>
+      </Results>
+      <Tests>
+        <TestRecord Name="CacheTest">
+          <Results>
+            <UnitTestResult>
+              <TestDate>2012-08-17T11:08:52</TestDate>
+              <Status>Success</Status>
+              <TotalFailures>0</TotalFailures>
+              <TotalSuccess>5</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Test successful
+
+Execution time: 1.16ms</Message>
+            </UnitTestResult>
+            <UnitTestResult>
+              <TestDate>2012-08-17T15:19:44</TestDate>
+              <Status>Success</Status>
+              <TotalFailures>0</TotalFailures>
+              <TotalSuccess>5</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Test successful
+
+Execution time: 1.39ms</Message>
+            </UnitTestResult>
+          </Results>
+          <Tests>
+            <TestRecord Name="TestCache">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.02ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T14:17:23</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.02ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.06ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestExpiration">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 1.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 1.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestLRU">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.01ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestPath">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+          </Tests>
+        </TestRecord>
+        <TestRecord Name="CRUDTest">
+          <Results>
+            <UnitTestResult>
+              <TestDate>2012-08-17T11:08:52</TestDate>
+              <Status>Failure</Status>
+              <TotalFailures>5</TotalFailures>
+              <TotalSuccess>0</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Child test failed</Message>
+            </UnitTestResult>
+            <UnitTestResult>
+              <TestDate>2012-08-17T15:19:44</TestDate>
+              <Status>Failure</Status>
+              <TotalFailures>5</TotalFailures>
+              <TotalSuccess>0</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Child test failed</Message>
+            </UnitTestResult>
+          </Results>
+          <Tests>
+            <TestRecord Name="TestCreateDocument">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.InvalidOperationException : There is an error in XML document.
+  ----&gt; System.InvalidOperationException : Read by order only possible for encoded/bare format</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--InvalidOperationException
+  at System.Xml.Serialization.XmlSerializer.Deserialize (System.Xml.Serialization.XmlSerializationReader reader) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializer.Deserialize (System.Xml.XmlReader xmlReader) [0x00000] in &lt;filename unknown&gt;:0 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.DeserializeObject (System.Xml.XmlReader reader) [0x0000e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:598 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseElement (System.Xml.XmlReader reader) [0x0002a] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:482 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x00019] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:424 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 
+--InvalidOperationException
+  at System.Xml.Serialization.ClassMap.GetElement (Int32 index) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadMembers (System.Xml.Serialization.ClassMap map, System.Object ob, Boolean isValueList, Boolean readBySoapOrder) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadClassInstanceMembers (System.Xml.Serialization.XmlTypeMapping typeMap, System.Object ob) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadClassInstance (System.Xml.Serialization.XmlTypeMapping typeMap, Boolean isNullable, Boolean checkType) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadObject (System.Xml.Serialization.XmlTypeMapping typeMap, Boolean isNullable, Boolean checkType) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadObjectElement (System.Xml.Serialization.XmlTypeMapElementInfo elem) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadMembers (System.Xml.Serialization.ClassMap map, System.Object ob, Boolean isValueList, Boolean readBySoapOrder) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadClassInstanceMembers (System.Xml.Serialization.XmlTypeMapping typeMap, System.Object ob) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadClassInstance (System.Xml.Serialization.XmlTypeMapping typeMap, Boolean isNullable, Boolean checkType) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadObject (System.Xml.Serialization.XmlTypeMapping typeMap, Boolean isNullable, Boolean checkType) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadRoot (System.Xml.Serialization.XmlTypeMapping rootMap) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadRoot () [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializer.Deserialize (System.Xml.Serialization.XmlSerializationReader reader) [0x00000] in &lt;filename unknown&gt;:0 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.InvalidOperationException : There is an error in XML document.
+  ----&gt; System.InvalidOperationException : Read by order only possible for encoded/bare format</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--InvalidOperationException
+  at System.Xml.Serialization.XmlSerializer.Deserialize (System.Xml.Serialization.XmlSerializationReader reader) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializer.Deserialize (System.Xml.XmlReader xmlReader) [0x00000] in &lt;filename unknown&gt;:0 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.DeserializeObject (System.Xml.XmlReader reader) [0x0000e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:598 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseElement (System.Xml.XmlReader reader) [0x0002a] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:482 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x00019] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:424 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 
+--InvalidOperationException
+  at System.Xml.Serialization.ClassMap.GetElement (Int32 index) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadMembers (System.Xml.Serialization.ClassMap map, System.Object ob, Boolean isValueList, Boolean readBySoapOrder) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadClassInstanceMembers (System.Xml.Serialization.XmlTypeMapping typeMap, System.Object ob) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadClassInstance (System.Xml.Serialization.XmlTypeMapping typeMap, Boolean isNullable, Boolean checkType) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadObject (System.Xml.Serialization.XmlTypeMapping typeMap, Boolean isNullable, Boolean checkType) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadObjectElement (System.Xml.Serialization.XmlTypeMapElementInfo elem) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadMembers (System.Xml.Serialization.ClassMap map, System.Object ob, Boolean isValueList, Boolean readBySoapOrder) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadClassInstanceMembers (System.Xml.Serialization.XmlTypeMapping typeMap, System.Object ob) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadClassInstance (System.Xml.Serialization.XmlTypeMapping typeMap, Boolean isNullable, Boolean checkType) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadObject (System.Xml.Serialization.XmlTypeMapping typeMap, Boolean isNullable, Boolean checkType) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadRoot (System.Xml.Serialization.XmlTypeMapping rootMap) [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializationReaderInterpreter.ReadRoot () [0x00000] in &lt;filename unknown&gt;:0 
+  at System.Xml.Serialization.XmlSerializer.Deserialize (System.Xml.Serialization.XmlSerializationReader reader) [0x00000] in &lt;filename unknown&gt;:0 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestCreateFolder">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestRepositoryInfo">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestRootFolder">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+          </Tests>
+        </TestRecord>
+        <TestRecord Name="EnumeratorTest">
+          <Results>
+            <UnitTestResult>
+              <TestDate>2012-08-17T11:08:52</TestDate>
+              <Status>Success</Status>
+              <TotalFailures>0</TotalFailures>
+              <TotalSuccess>7</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Test successful
+
+Execution time: 0.18ms</Message>
+            </UnitTestResult>
+            <UnitTestResult>
+              <TestDate>2012-08-17T15:19:44</TestDate>
+              <Status>Success</Status>
+              <TotalFailures>0</TotalFailures>
+              <TotalSuccess>7</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Test successful
+
+Execution time: 0.25ms</Message>
+            </UnitTestResult>
+          </Results>
+          <Tests>
+            <TestRecord Name="TestBigPage">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.02ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.01ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestIteration">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.01ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.01ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestOverSkip">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestPage">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestSkip">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestSkipAndPage">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Success</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>1</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+          </Tests>
+        </TestRecord>
+        <TestRecord Name="SmokeTest">
+          <Results>
+            <UnitTestResult>
+              <TestDate>2012-08-17T11:08:52</TestDate>
+              <Status>Failure</Status>
+              <TotalFailures>9</TotalFailures>
+              <TotalSuccess>0</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Child test failed</Message>
+            </UnitTestResult>
+            <UnitTestResult>
+              <TestDate>2012-08-17T15:19:44</TestDate>
+              <Status>Failure</Status>
+              <TotalFailures>9</TotalFailures>
+              <TotalSuccess>0</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Child test failed</Message>
+            </UnitTestResult>
+          </Results>
+          <Tests>
+            <TestRecord Name="SmokeTestContentChanges">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="SmokeTestCreateDocument">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="SmokeTestCreateFolder">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="SmokeTestQuery">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="SmokeTestRootFolder">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="SmokeTestSession">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="SmokeTestTypes">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="SmokeTestVersioning">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+          </Tests>
+        </TestRecord>
+        <TestRecord Name="TypeTest">
+          <Results>
+            <UnitTestResult>
+              <TestDate>2012-08-17T11:08:52</TestDate>
+              <Status>Failure</Status>
+              <TotalFailures>3</TotalFailures>
+              <TotalSuccess>0</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Child test failed</Message>
+            </UnitTestResult>
+            <UnitTestResult>
+              <TestDate>2012-08-17T15:19:44</TestDate>
+              <Status>Failure</Status>
+              <TotalFailures>3</TotalFailures>
+              <TotalSuccess>0</TotalSuccess>
+              <TotalIgnored>0</TotalIgnored>
+              <Time />
+              <Message>Child test failed</Message>
+            </UnitTestResult>
+          </Results>
+          <Tests>
+            <TestRecord Name="TestBaseTypes">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+            <TestRecord Name="TestTypeChildren">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T11:08:52</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+                <UnitTestResult>
+                  <TestDate>2012-08-17T15:19:44</TestDate>
+                  <Status>Failure</Status>
+                  <TotalFailures>1</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>SetUp : DotCMIS.Exceptions.CmisConnectionException : Parsing exception!
+  ----&gt; System.NullReferenceException : Object reference not set to an instance of an object</Message>
+                  <StackTrace>  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00013] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:416 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.GetObjectInternal (System.String repositoryId, IdentifierType idOrPath, System.String objectIdOrPath, Nullable`1 returnVersion, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x0010e] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:743 
+  at DotCMIS.Binding.AtomPub.ObjectService.GetObjectByPath (System.String repositoryId, System.String path, System.String filter, Nullable`1 includeAllowableActions, Nullable`1 includeRelationships, System.String renditionFilter, Nullable`1 includePolicyIds, Nullable`1 includeAcl, IExtensionsData extension) [0x00000] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:1722 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path, IOperationContext context) [0x00055] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:576 
+  at DotCMIS.Client.Impl.Session.GetObjectByPath (System.String path) [0x00000] in /home/nico/src/dotcmis/DotCMIS/client/client-impl.cs:549 
+  at DotCMISUnitTest.TestFramework.ConnectFromConfig () [0x00113] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:116 
+  at DotCMISUnitTest.TestFramework.Init () [0x00038] in /home/nico/src/dotcmis/DotCMISUnitTest/TestFramework.cs:68 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in &lt;filename unknown&gt;:0 
+--NullReferenceException
+  at DotCMIS.Binding.AtomPub.AtomPubParser.ParseEntry (System.Xml.XmlReader reader) [0x0009f] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:432 
+  at DotCMIS.Binding.AtomPub.AtomPubParser.Parse () [0x0007d] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub-parser.cs:99 
+  at DotCMIS.Binding.AtomPub.AbstractAtomPubService.Parse[AtomEntry] (System.IO.Stream stream) [0x00007] in /home/nico/src/dotcmis/DotCMIS/binding/atompub/atompub.cs:412 </StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+              <Tests />
+            </TestRecord>
+          </Tests>
+        </TestRecord>
+      </Tests>
+    </TestRecord>
+  </Tests>
+</TestRecord>
