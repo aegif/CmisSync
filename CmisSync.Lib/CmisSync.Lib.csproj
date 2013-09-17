@@ -75,7 +75,7 @@
     <Compile Include="ActivityListenerAggregator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1512156-src-patched-for-large-files\DotCMIS\DotCMIS.csproj">
+    <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1523966-src\DotCMIS\DotCMIS.csproj">
       <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
       <Name>DotCMIS</Name>
     </ProjectReference>
