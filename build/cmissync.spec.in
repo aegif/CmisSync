@@ -2,14 +2,14 @@
 %global _libdir %{_prefix}/lib
 %global debug_package %{nil}
 
-Name: cmissync
+Name: dataspcasesync
 Version: @VERSION@
 Release: 1%{?dist}
-Summary: A CMIS Sync tool
+Summary: A DataSpace Sync tool
 
 Group: Applications/Internet
 License: GPLv3
-URL: http://cmissync.com/
+URL: http://graudata.com/
 Source0: %{name}-%{version}.tar.bz2
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -21,10 +21,10 @@ BuildRequires: libtool intltool desktop-file-utils
 Requires: mono-data-sqlite
 
 %description
-CmisSync allows you to keep in sync with your CMIS repository.
+DataSpace Sync allows you to keep in sync with your CMIS repository.
 It is like Dropbox for Enterprise Content Management!
 
-More information is available at http://cmissync.com/ .
+More information is available at http://graudata.com/ .
 
 %prep
 %setup -q
@@ -37,21 +37,21 @@ make
 %install
 rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
-%__install -m 0755 Extras/Newtonsoft.Json.dll %{buildroot}%{_libdir}/cmissync/
-%__install -m 0755 Extras/DotCMIS.dll %{buildroot}%{_libdir}/cmissync/
+%__install -m 0755 Extras/Newtonsoft.Json.dll %{buildroot}%{_libdir}/dataspace-sync/
+%__install -m 0755 Extras/DotCMIS.dll %{buildroot}%{_libdir}/dataspace-sync/
 
-rm -f %{buildroot}%{_libdir}/cmissync/TestLibrary*
+rm -f %{buildroot}%{_libdir}/dataspace-sync/TestLibrary*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%{_bindir}/cmissync
-%{_libdir}/cmissync/*.dll
-%{_libdir}/cmissync/*.exe
-%{_libdir}/cmissync/*.mdb
-%{_datadir}/cmissync
+%{_bindir}/dataspace-sync
+%{_libdir}/dataspace-sync/*.dll
+%{_libdir}/dataspace-sync/*.exe
+%{_libdir}/dataspace-sync/*.mdb
+%{_datadir}/dataspace-sync
 %{_datadir}/applications/*.desktop
 %{_datadir}/icons/*
 
