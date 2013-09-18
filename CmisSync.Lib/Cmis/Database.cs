@@ -71,8 +71,8 @@ namespace CmisSync.Lib.Cmis
         public Database(string dataPath)
         {
             this.databaseFileName = dataPath;
-            pathPrefix = ConfigManager.CurrentConfig.FoldersPath;
-            pathPrefixSize = ConfigManager.CurrentConfig.FoldersPath.Length + 1;
+            pathPrefix = GetPathPrefix();
+            pathPrefixSize = pathPrefix.Length+1;
         }
 
 
@@ -152,6 +152,10 @@ namespace CmisSync.Lib.Cmis
                             PATH TEXT PRIMARY KEY,
                             serverSideModificationDate DATE);";     /* Download */
                         ExecuteSQLAction(command, null);
+                        command = "INSERT INTO general (key, value) VALUES (\"PathPrefix\", @prefix)";
+                        Dictionary<string, object> parameters = new Dictionary<string, object>();
+                        parameters.Add("prefix", ConfigManager.CurrentConfig.FoldersPath);
+                        ExecuteSQLAction(command, parameters);
                         Logger.Info("Database created");
                     }
                 }
@@ -663,6 +667,40 @@ namespace CmisSync.Lib.Cmis
             string command = "INSERT OR REPLACE INTO general (key, value) VALUES (\"ChangeLogToken\", @token)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("token", token);
+            ExecuteSQLAction(command, parameters);
+        }
+
+        /// <summary>
+        /// Gets the path prefix.
+        /// If no prefix has been found, the db will be migrated and the old one will be returned
+        /// </summary>
+        /// <returns>
+        /// The path prefix.
+        /// </returns>
+        private string GetPathPrefix()
+        {
+            object result = ExecuteSQLFunction("SELECT value FROM general WHERE key=\"PathPrefix\"", null);
+            // Migration of databases, which do not have any prefix safed
+            if(result == null) {
+                string oldprefix = Path.Combine(ConfigManager.CurrentConfig.HomePath, "DataSpace Sync");
+                SetPathPrefix(oldprefix);
+                return oldprefix;
+            }else {
+                return (string) result;
+            }
+        }
+
+        /// <summary>
+        /// Sets the path prefix.
+        /// </summary>
+        /// <param name='pathprefix'>
+        /// Pathprefix.
+        /// </param>
+        private void SetPathPrefix(string pathprefix)
+        {
+            string command = "INSERT OR REPLACE INTO general (key, value) VALUES (\"PathPrefix\", @prefix)";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("prefix", pathprefix);
             ExecuteSQLAction(command, parameters);
         }
 

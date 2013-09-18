@@ -101,6 +101,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Full constructor.
         /// </summary>
+        [Obsolete("Use other contructor outside of testings")]
         public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval)
         {
             Name = name;

@@ -83,7 +83,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(HomePath, "DataSpace Sync");
+                return Path.Combine(HomePath, "DataSpace");
             }
         }
 
@@ -281,11 +281,11 @@ namespace CmisSync.Lib
       <maximumFileSize value=""5MB"" />
       <staticLogFileName value=""true"" />
       <layout type=""log4net.Layout.PatternLayout"">
-        <conversionPattern value=""%date [%thread] %-5level %logger [%property{NDC}] - %message%newline"" />
+        <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
       </layout>
     </appender>
     <root>
-      <level value=""DEBUG"" />
+      <level value=""INFO"" />
       <appender-ref ref=""CmisSyncFileAppender"" />
     </root>
   </log4net>"))
@@ -352,7 +352,7 @@ namespace CmisSync.Lib
                 [XmlElement("features", IsNullable=true)]
                 public Feature SupportedFeatures { get; set;}
 
-                [XmlElement("ignoreFolder",IsNullable=true)]
+                [XmlElement("ignoreFolder", IsNullable=true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
                 private long trunkSize = 1024 * 1024;
@@ -412,14 +412,16 @@ namespace CmisSync.Lib
         }
 
         public class Feature {
-            [XmlElement("getFolderTree",IsNullable=true)]
+            [XmlElement("getFolderTree", IsNullable=true)]
             public bool? GetFolderTreeSupport {get; set;}
-            [XmlElement("getDescendants",IsNullable=true)]
+            [XmlElement("getDescendants", IsNullable=true)]
             public bool? GetDescendantsSupport {get; set;}
-            [XmlElement("getContentChanges",IsNullable=true)]
+            [XmlElement("getContentChanges", IsNullable=true)]
             public bool? GetContentChangesSupport {get; set;}
-            [XmlElement("fileSystemWatcher",IsNullable=true)]
+            [XmlElement("fileSystemWatcher", IsNullable=true)]
             public bool? FileSystemWatcherSupport {get; set;}
+            [XmlElement("maxContentChanges", IsNullable=true)]
+            public int? MaxNumberOfContentChanges {get; set;}
         }
 
         public class XmlUri : IXmlSerializable
