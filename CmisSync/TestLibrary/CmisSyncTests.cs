@@ -596,7 +596,7 @@ namespace TestLibrary
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url;
             cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
+            cmisParameters[SessionParameter.Password] = password;
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
             SessionFactory factory = SessionFactory.NewInstance();
@@ -652,7 +652,7 @@ namespace TestLibrary
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url;
             cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
+            cmisParameters[SessionParameter.Password] = password;
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
             SessionFactory factory = SessionFactory.NewInstance();
