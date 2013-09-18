@@ -215,14 +215,19 @@ namespace CmisSync.Lib.Sync
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
                     IsGetDescendantsSupported = session.RepositoryInfo.Capabilities.IsGetDescendantsSupported == true;
                     IsGetFolderTreeSupported = session.RepositoryInfo.Capabilities.IsGetFolderTreeSupported == true;
-                    Config.Feature features = ConfigManager.CurrentConfig.getFolder(this.repoinfo.Name).SupportedFeatures;
-                    if(features != null) {
-                        if(IsGetDescendantsSupported && features.GetDescendantsSupport == false)
-                            IsGetDescendantsSupported = false;
-                        if(IsGetFolderTreeSupported && features.GetFolderTreeSupport == false)
-                            IsGetFolderTreeSupported = false;
-                        if(ChangeLogCapability && features.GetContentChangesSupport == false)
-                            ChangeLogCapability = false;
+                    Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(this.repoinfo.Name);
+                    if (folder != null)
+                    {
+                        Config.Feature features = folder.SupportedFeatures;
+                        if (features != null)
+                        {
+                            if (IsGetDescendantsSupported && features.GetDescendantsSupport == false)
+                                IsGetDescendantsSupported = false;
+                            if (IsGetFolderTreeSupported && features.GetFolderTreeSupport == false)
+                                IsGetFolderTreeSupported = false;
+                            if (ChangeLogCapability && features.GetContentChangesSupport == false)
+                                ChangeLogCapability = false;
+                        }
                     }
                     Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Info("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
