@@ -25,6 +25,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder
         {
+
             /// <summary>
             /// Synchronize using the ChangeLog feature of CMIS.
             /// Not all CMIS servers support this feature, so sometimes CrawlStrategy is used instead.
@@ -41,7 +42,7 @@ namespace CmisSync.Lib.Sync
 
                 if (lastTokenOnClient == lastTokenOnServer)
                 {
-                    Logger.Info("No change from remote, wait for the next time.");
+                    Logger.Debug("No change from remote, wait for the next time.");
                     return;
                 }
 
@@ -62,24 +63,28 @@ namespace CmisSync.Lib.Sync
 
                 do
                 {
+                    Config.Feature f = ConfigManager.CurrentConfig.getFolder(repoinfo.Name).SupportedFeatures;
+                    int maxNumItems = (f!=null && f.MaxNumberOfContentChanges!=null)? (int)f.MaxNumberOfContentChanges: 100;
                     // Check which files/folders have changed.
-                    int maxNumItems = 100;
-                    IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, true, maxNumItems);
-
+                    IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, IsPropertyChangesSupported, maxNumItems);
                     // Replicate each change to the local side.
                     bool success = true;
                     foreach (IChangeEvent change in changes.ChangeEventList)
                     {
-                        Logger.Debug("Change type:" + change.ChangeType.ToString() + " id:" + change.ObjectId + " properties:" + change.Properties);
                         try
                         {
                             switch (change.ChangeType)
                             {
                                 case ChangeType.Created:
+                                    Logger.Info("New remote object ("+change.ObjectId+") found.");
+                                    goto case ChangeType.Updated;
                                 case ChangeType.Updated:
+                                    if(change.ChangeType == ChangeType.Updated)
+                                        Logger.Info("Remote object ("+change.ObjectId + ") has been changed remotely.");
                                     success = ApplyRemoteChangeUpdate(change) && success;
                                     break;
                                 case ChangeType.Deleted:
+                                    Logger.Info("Remote object ("+change.ObjectId+") has been deleted remotely.");
                                     success = ApplyRemoteChangeDelete(change) && success;
                                     break;
                                 default:
@@ -289,18 +294,23 @@ namespace CmisSync.Lib.Sync
                 string savedDocumentPath = database.GetFilePath(change.ObjectId);
                 if (null != savedDocumentPath)
                 {
-                    File.Delete(savedDocumentPath);
+                    Logger.Info("Remove local document: " + savedDocumentPath);
+                    if(File.Exists(savedDocumentPath))
+                        File.Delete(savedDocumentPath);
                     database.RemoveFile(savedDocumentPath);
-                    Logger.Info("Remove locally document: " + savedDocumentPath);
+                    Logger.Info("Removed local document: " + savedDocumentPath);
                     return true;
                 }
 
                 string savedFolderPath = database.GetFolderPath(change.ObjectId);
                 if (null != savedFolderPath)
                 {
-                    Directory.Delete(savedFolderPath,true);
-                    database.RemoveFolder(savedFolderPath);
-                    Logger.Info("Remove locally folder: " + savedFolderPath);
+                    Logger.Info("Remove local folder: " + savedFolderPath);
+                    if(Directory.Exists(savedFolderPath)) {
+                        Directory.Delete(savedFolderPath, true);
+                        database.RemoveFolder(savedFolderPath);
+                    }
+                    Logger.Info("Removed local folder: " + savedFolderPath);
                     return true;
                 }
 

@@ -61,6 +61,11 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool IsGetDescendantsSupported = false;
 
+            /// <summary>
+            /// Is true, if the repository is able to return property changes.
+            /// </summary>
+            private bool IsPropertyChangesSupported = false;
+
 
             /// <summary>
             /// Session to the CMIS repository.
@@ -210,7 +215,7 @@ namespace CmisSync.Lib.Sync
                     SessionFactory factory = SessionFactory.NewInstance();
                     session = factory.CreateSession(cmisParameters);
                     // Detect whether the repository has the ChangeLog capability.
-                    Logger.Info("Created CMIS session: " + session.ToString());
+                    Logger.Debug("Created CMIS session: " + session.ToString());
                     ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
                     IsGetDescendantsSupported = session.RepositoryInfo.Capabilities.IsGetDescendantsSupported == true;
@@ -223,10 +228,13 @@ namespace CmisSync.Lib.Sync
                             IsGetFolderTreeSupported = false;
                         if(ChangeLogCapability && features.GetContentChangesSupport == false)
                             ChangeLogCapability = false;
+                        if(ChangeLogCapability && session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All 
+                           || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.Properties)
+                            IsPropertyChangesSupported = true;
                     }
-                    Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
-                    Logger.Info("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
-                    Logger.Info("Get descendants support: " + IsGetDescendantsSupported.ToString());
+                    Logger.Debug("ChangeLog capability: " + ChangeLogCapability.ToString());
+                    Logger.Debug("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
+                    Logger.Debug("Get descendants support: " + IsGetDescendantsSupported.ToString());
                 }
                 //TODO Implement error handling -> informing user about connection problems by showing status
                 catch (CmisRuntimeException e)
@@ -280,24 +288,24 @@ namespace CmisSync.Lib.Sync
                 }
                 if (!syncFull)
                 {
-                    Logger.Info("Invoke a full crawl sync");
+                    Logger.Debug("Invoke a full crawl sync");
                     syncFull = CrawlSync(remoteFolder, localFolder);
                     return;
                 }
 
                 if (ChangeLogCapability)
                 {
-                    Logger.Info("Invoke a remote change log sync");
+                    Logger.Debug("Invoke a remote change log sync");
                     ChangeLogSync(remoteFolder);
                 }
                 else
                 {
                     //  have to crawl remote
-                    Logger.Info("Invoke a remote crawl sync");
+                    Logger.Debug("Invoke a remote crawl sync");
                     CrawlSync(remoteFolder, localFolder);
                 }
 
-                Logger.Info("Invoke a file system watcher sync");
+                Logger.Debug("Invoke a file system watcher sync");
                 WatcherSync(remoteFolderPath, localFolder);
                 foreach (string name in repo.Watcher.GetChangeList())
                 {
@@ -323,7 +331,7 @@ namespace CmisSync.Lib.Sync
                     bw.DoWork += new DoWorkEventHandler(
                         delegate(Object o, DoWorkEventArgs args)
                         {
-                            Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
+                            Logger.Debug("Launching sync: " + repoinfo.TargetDirectory);
                             try
                             {
                                 Sync();
@@ -622,7 +630,6 @@ namespace CmisSync.Lib.Sync
                 activityListener.ActivityStarted();
 
                 string fileName = remoteDocument.ContentStreamFileName;
-                Logger.Info("Downloading: " + fileName);
 
                 // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
                 if (Utils.IsInvalidFileName(fileName))
