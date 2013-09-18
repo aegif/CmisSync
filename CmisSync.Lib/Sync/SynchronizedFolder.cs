@@ -419,7 +419,6 @@ namespace CmisSync.Lib.Sync
                             {
                                 throw new ObjectDisposedException("Downloading");
                             }
-
                             byte[] buffer = new byte[8 * 1024];
                             int len;
                             while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
@@ -847,15 +846,22 @@ namespace CmisSync.Lib.Sync
                             contentStream.Length = fileStream.Length - offset;
                         }
                         contentStream.Stream = trunkstream;
-                        try
+                        lock (disposeLock)
                         {
-                            remoteDocument.AppendContentStream(contentStream, isLastTrunk);
-                            database.SetFileServerSideModificationDate(filePath, remoteDocument.LastModificationDate);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Fatal("Upload failed: " + ex);
-                            return false;
+                            if (disposed)
+                            {
+                                throw new ObjectDisposedException("Downloading");
+                            }
+                            try
+                            {
+                                remoteDocument.AppendContentStream(contentStream, isLastTrunk);
+                                database.SetFileServerSideModificationDate(filePath, remoteDocument.LastModificationDate);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Fatal("Upload failed: " + ex);
+                                return false;
+                            }
                         }
                     }
                 }
