@@ -200,6 +200,20 @@ namespace TestLibrary
         }
 
 
+        private ISession CreateSession(RepoInfo repoInfo)
+        {
+            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
+            cmisParameters[SessionParameter.User] = repoInfo.User;
+            cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
+            cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
+            cmisParameters[SessionParameter.ConnectTimeout] = "-1";
+
+            return SessionFactory.NewInstance().CreateSession(cmisParameters);
+        }
+
+
         // /////////////////////////// TESTS ///////////////////////////
 
 
@@ -303,6 +317,8 @@ namespace TestLibrary
                     Console.WriteLine("Synced to clean state.");
 
                     // Create random small file.
+                    string filename = LocalFilesystemActivityGenerator.GetNextFileName();
+                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//","/");
                     LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
 
                     // Sync again.
@@ -310,7 +326,9 @@ namespace TestLibrary
                     Console.WriteLine("Second sync done.");
 
                     // Check that file is present server-side.
-                    // TODO
+                    IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+                    Assert.NotNull(doc);
+                    Assert.AreEqual(filename, doc.ContentStreamFileName);
 
                     // Clean.
                     Console.WriteLine("Clean all.");
@@ -351,6 +369,8 @@ namespace TestLibrary
                     Console.WriteLine("Synced to clean state.");
 
                     // Create random big file.
+                    string filename = LocalFilesystemActivityGenerator.GetNextFileName();
+                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
                     LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000); // 1 MB ... no that big to not load servers too much.
 
                     // Sync again.
@@ -358,7 +378,9 @@ namespace TestLibrary
                     Console.WriteLine("Second sync done.");
 
                     // Check that file is present server-side.
-                    // TODO
+                    IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+                    Assert.NotNull(doc);
+                    Assert.AreEqual(filename, doc.ContentStreamFileName);
 
                     // Clean.
                     Console.WriteLine("Clean all.");
