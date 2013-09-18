@@ -350,7 +350,7 @@ namespace TestLibrary
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             RepoInfo repoInfo = new RepoInfo(
                     canonical_name,
-                    ".",
+                    CMISSYNCDIR,
                     remoteFolderPath,
                     url,
                     user,
