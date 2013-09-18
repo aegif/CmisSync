@@ -363,8 +363,6 @@ namespace CmisSync
         {
             lock (this.repo_lock)
             {
-                string path = ConfigManager.CurrentConfig.FoldersPath;
-
                 List<Config.SyncConfig.Folder> toBeDeleted = new List<Config.SyncConfig.Folder>();
                 // If folder has been deleted, remove it from configuration too.
                 foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
