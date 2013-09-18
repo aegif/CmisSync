@@ -63,7 +63,9 @@ namespace CmisSync.Lib.Sync
 
                 do
                 {
-                    Config.Feature f = ConfigManager.CurrentConfig.getFolder(repoinfo.Name).SupportedFeatures;
+                    Config.Feature f = null;
+                    if(ConfigManager.CurrentConfig.getFolder(repoinfo.Name)!=null)
+                        f = ConfigManager.CurrentConfig.getFolder(repoinfo.Name).SupportedFeatures;
                     int maxNumItems = (f!=null && f.MaxNumberOfContentChanges!=null)? (int)f.MaxNumberOfContentChanges: 100;
                     // Check which files/folders have changed.
                     IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, IsPropertyChangesSupported, maxNumItems);
