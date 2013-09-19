@@ -5,7 +5,7 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CmisSync.CmisTree;assembly=DataSpaceSync"
+        xmlns:local="clr-namespace:CmisSync.CmisTree;assembly=CmisSync"
         Margin="10" ItemsSource="{Binding}"
         Width="410" Height="267" >
     <TreeView.Resources>
