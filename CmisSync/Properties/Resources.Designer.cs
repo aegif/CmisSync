@@ -298,7 +298,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DataSpace Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+        ///   Looks up a localized string similar to CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
         ///It is like Dropbox for Enterprise Content Management!.
         /// </summary>
         internal static string Intro {
