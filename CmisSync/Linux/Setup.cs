@@ -646,7 +646,7 @@ namespace CmisSync {
             AddButton (open_folder_button);
             AddButton (finish_button);
 
-            System.Media.SystemSounds.Exclamation.Play();
+            //System.Media.SystemSounds.Exclamation.Play();
         }
 
         private void ShowTutorialPage()
