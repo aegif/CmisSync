@@ -225,7 +225,8 @@ namespace CmisSync.Lib
                 RemotePath = repoInfo.RemotePath,
                 UserName = repoInfo.User,
                 ObfuscatedPassword = repoInfo.Password.ObfuscatedPassword,
-                PollInterval = repoInfo.PollInterval
+                PollInterval = repoInfo.PollInterval,
+                SupportedFeatures = null
             };
             foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
             {
