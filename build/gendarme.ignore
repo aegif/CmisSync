@@ -1,9 +1,6 @@
 R: Gendarme.Rules.Design.MarkAssemblyWithAssemblyVersionRule
 A: CmisSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 
-R: Gendarme.Rules.Design.MarkAssemblyWithAssemblyVersionRule
-A: CmisSync, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-
 #Configure setting
 R: Gendarme.Rules.BadPractice.AvoidVisibleConstantFieldRule
 T: CmisSync.Defines
@@ -43,8 +40,14 @@ R: Gendarme.Rules.Design.TypesWithDisposableFieldsShouldBeDisposableRule
 T: CmisSync.ControllerBase
 T: CmisSync.StatusIconController
 T: CmisSync.UI
+T: CmisSync.CmisTree.Folder
+T: CmisSync.CmisTree.CmisRepo
 
 #Windows Gendarme bug? XmlNodeList is not an IDisposal object at all
 R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
 M: System.Collections.ObjectModel.Collection`1<System.String> CmisSync.Lib.Config::get_Folders()
 M: System.Void CmisSync.Lib.Config::RemoveFolder(System.String)
+
+#Ignore DotCMIS based rule
+R: Gendarme.Rules.Design.Generic.DoNotExposeNestedGenericSignaturesRule
+M: System.Void CmisSync.Lib.Cmis.CmisUtils/FolderTree::.ctor(System.Collections.Generic.IList`1<DotCMIS.Client.ITree`1<DotCMIS.Client.IFileableCmisObject>>,DotCMIS.Client.IFolder)

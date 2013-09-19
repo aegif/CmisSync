@@ -9,9 +9,24 @@ namespace CmisSync.Lib.Cmis
     [Serializable]
     public class CmisPermissionDeniedException : Exception
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public CmisPermissionDeniedException() { }
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public CmisPermissionDeniedException(string message) : base(message) { }
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public CmisPermissionDeniedException(string message, Exception inner) : base(message, inner) { }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         protected CmisPermissionDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

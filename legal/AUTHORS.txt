@@ -32,6 +32,7 @@ Code:
 	Steven Harms <sharms@ubuntu.com>
 	Sven Mueller <thelightmaker@gmail.com>
 	Takuma Sugimoto <takuma.sugimoto@aegif.jp>
+	Till Lorentzen <till.lorentzen@graudata.com>
 	Travis Glenn Hansen <travisghansen@yahoo.com>
 	Vincent Untz <vuntz@gnome.org>
 	Will Thompson <will@willthompson.co.uk>

@@ -114,7 +114,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Watches the local filesystem for changes.
         /// </summary>
-        private Watcher watcher;
+        public Watcher Watcher { get; private set; }
 
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace CmisSync.Lib
         {
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
-            Name = Path.GetFileName(LocalPath);
+            Name = repoInfo.Name;
             RemoteUrl = repoInfo.Address;
 
             Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
@@ -169,19 +169,11 @@ namespace CmisSync.Lib
                 Status = status;
             };
 
-            this.watcher = new Watcher(LocalPath);
+            this.Watcher = new Watcher(LocalPath);
 
             // Main loop syncing every X seconds.
             this.remote_timer.Elapsed += delegate
             {
-                int time_comparison = DateTime.Compare(this.last_poll, DateTime.Now.Subtract(this.poll_interval));
-                bool time_to_poll = (time_comparison < 0);
-
-                if (time_to_poll)
-                {
-                    this.last_poll = DateTime.Now;
-                }
-
                 // Synchronize.
                 SyncInBackground();
             };
@@ -220,7 +212,7 @@ namespace CmisSync.Lib
                 {
                     this.remote_timer.Stop();
                     this.remote_timer.Dispose();
-                    this.watcher.Dispose();
+                    this.Watcher.Dispose();
                 }
                 this.disposed = true;
             }
@@ -232,7 +224,7 @@ namespace CmisSync.Lib
         /// </summary>
         public void Initialize()
         {
-            this.watcher.ChangeEvent += OnFileActivity;
+            this.Watcher.ChangeEvent += OnFileActivity;
 
             // Sync up everything that changed
             // since we've been offline
@@ -249,9 +241,9 @@ namespace CmisSync.Lib
         {
             ChangesDetected();
 
-            this.watcher.Disable();
+            this.Watcher.EnableEvent = false;
             // TODO
-            this.watcher.Enable();
+            this.Watcher.EnableEvent = true;
         }
 
 

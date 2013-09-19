@@ -64,7 +64,7 @@ namespace CmisSync
             string shortcut_target = Forms.Application.ExecutablePath;
 
             Shortcut shortcut = new Shortcut();
-            shortcut.Create(shortcut_path, shortcut_target);
+            shortcut.Create(shortcut_target, shortcut_path);
         }
 
 
@@ -105,35 +105,33 @@ namespace CmisSync
 
             if (!File.Exists(icon_file_path))
             {
-                string ini_file_path = Path.Combine(FoldersPath, "desktop.ini");
+                icon_file_path = Assembly.GetExecutingAssembly().Location;
+            }
+            string ini_file_path = Path.Combine(FoldersPath, "desktop.ini");
 
-                string ini_file = "[.ShellClassInfo]\r\n" +
-                    "IconFile=" + Assembly.GetExecutingAssembly().Location + "\r\n" +
+            string ini_file = "[.ShellClassInfo]\r\n" +
+                    "IconFile=" + icon_file_path + "\r\n" +
                     "IconIndex=0\r\n" +
                     "InfoTip=CmisSync\r\n" +
-                    "IconResource=" + Assembly.GetExecutingAssembly().Location + ",0\r\n" +
+                    "IconResource=" + icon_file_path + ",0\r\n" +
                     "[ViewState]\r\n" +
                     "Mode=\r\n" +
                     "Vid=\r\n" +
                     "FolderType=Generic\r\n";
 
-                try
-                {
-                    File.WriteAllText(ini_file_path, ini_file);
+            try
+            {
+                File.WriteAllText(ini_file_path, ini_file);
 
                     File.SetAttributes(ini_file_path,
                         File.GetAttributes(ini_file_path) | FileAttributes.Hidden | FileAttributes.System);
 
-                }
-                catch (IOException e)
-                {
-                    Logger.Info("Config | Failed setting icon for '" + FoldersPath + "': " + e.Message);
-                }
-
-                return true;
             }
-
-            return false;
+            catch (IOException e)
+            {
+                Logger.Info("Config | Failed setting icon for '" + FoldersPath + "': " + e.Message);
+            }
+            return true;
         }
 
 
@@ -152,7 +150,13 @@ namespace CmisSync
         /// <param name="name">Name of the synchronized folder</param>
         public void OpenCmisSyncFolder(string name)
         {
-            Utils.OpenFolder(ConfigManager.GetFullPath(name));
+            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+            if (folder != null)
+                Utils.OpenFolder(folder.LocalPath);
+            else if (String.IsNullOrWhiteSpace(name))
+                OpenCmisSyncFolder();
+            else
+                Logger.Warn("Could not find requested config for \"" + name + "\"");
         }
 
         /// <summary>
@@ -161,8 +165,16 @@ namespace CmisSync
         /// <param name="name">Name of the synchronized folder</param>
         public void OpenRemoteFolder(string name)
         {
-            RepoInfo repo = ConfigManager.CurrentConfig.GetRepoInfo(name);
-            Process.Start(CmisUtils.GetBrowsableURL(repo));
+            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+            if (folder != null)
+            {
+                RepoInfo repo = folder.GetRepoInfo();
+                Process.Start(CmisUtils.GetBrowsableURL(repo));
+            }
+            else
+            {
+                Logger.Warn("Could not find requested config for \"" + name + "\"");
+            }
         }
 
 

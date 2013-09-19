@@ -69,7 +69,7 @@ namespace CmisSync {
         /// <summary>
         /// Short text shown at the top of the menu of the CmisSync tray icon.
         /// </summary>
-        public string StateText = Properties_Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
+        public string StateText = Properties_Resources.Welcome;
 
 
         /// <summary>
@@ -159,9 +159,9 @@ namespace CmisSync {
                     CurrentState = IconState.Idle;
 
                     if (Program.Controller.Folders.Count == 0)
-                        StateText = Properties_Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
+                        StateText = Properties_Resources.Welcome;
                     else
-                        StateText = Properties_Resources.ResourceManager.GetString("FilesUpToDate", CultureInfo.CurrentCulture);
+                        StateText = Properties_Resources.FilesUpToDate;
                 }
 
                 UpdateStatusItemEvent (StateText);
@@ -174,9 +174,9 @@ namespace CmisSync {
                     CurrentState = IconState.Idle;
 
                     if (Program.Controller.Folders.Count == 0)
-                        StateText = Properties_Resources.ResourceManager.GetString("Welcome", CultureInfo.CurrentCulture);
+                        StateText = Properties_Resources.Welcome;
                     else
-                        StateText = Properties_Resources.ResourceManager.GetString("FilesUpToDate", CultureInfo.CurrentCulture);
+                        StateText = Properties_Resources.FilesUpToDate;
                 }
 
                 UpdateStatusItemEvent (StateText);
@@ -189,8 +189,8 @@ namespace CmisSync {
 
             // Syncing.
             Program.Controller.OnSyncing += delegate {
-				CurrentState = IconState.Syncing;
-                StateText = Properties_Resources.ResourceManager.GetString("SyncingChanges", CultureInfo.CurrentCulture);
+                CurrentState = IconState.Syncing;
+                StateText = Properties_Resources.SyncingChanges;
 
                 UpdateStatusItemEvent (StateText);
 
@@ -260,6 +260,11 @@ namespace CmisSync {
         {
             Program.Controller.StartOrSuspendRepository(reponame);
             UpdateSuspendSyncFolderEvent(reponame);
+        }
+
+        public void RemoveFolderFromSyncClicked(string reponame)
+        {
+            Program.Controller.RemoveRepositoryFromSync(reponame);
         }
 
 

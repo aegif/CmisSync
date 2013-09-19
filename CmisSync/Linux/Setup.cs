@@ -62,7 +62,7 @@ namespace CmisSync {
         private string backText =
             CmisSync.Properties_Resources.ResourceManager.GetString("Back", CultureInfo.CurrentCulture);
 
-        delegate CmisServer GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
 
         delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
             string address, string user, string password);
@@ -123,7 +123,7 @@ namespace CmisSync {
             };
 
             Entry address_entry = new Entry () {
-                Text = Controller.PreviousAddress,
+                Text = Controller.PreviousAddress.ToString(),
                      ActivatesDefault = false
             };
 
@@ -267,25 +267,31 @@ namespace CmisSync {
                         Application.RunIteration();
                     }
                 }
-                CmisServer cmisServer = dlgt.EndInvoke(ar);
-
-                Controller.repositories = cmisServer.Repositories;
-                address_entry.Text = cmisServer.Url.ToString();
-
+                Tuple<CmisServer, Exception> result = dlgt.EndInvoke(ar);
+                CmisServer cmisServer = result.Item1;
+                if(cmisServer != null)
+                {
+                    Controller.repositories = cmisServer.Repositories;
+                    address_entry.Text = cmisServer.Url.ToString();
+                }
+                else
+                {
+                    Controller.repositories = null;
+                }
                 // Hide wait cursor
                 this.GdkWindow.Cursor = default_cursor;
 
                 if (Controller.repositories == null)
                 {
                     // Show warning
-                    address_error_label.Markup = "<span foreground=\"red\">" + CmisSync.Properties_Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture) + "</span>";
+                    address_error_label.Markup = "<span foreground=\"red\">" + result.Item2.Message +": "+ CmisSync.Properties_Resources.ResourceManager.GetString("Sorry", CultureInfo.CurrentCulture) + "</span>";
                     address_error_label.Show();
                 }
                 else
                 {
                     // Continue to folder selection
                     Controller.Add1PageCompleted(
-                            address_entry.Text, user_entry.Text, password_entry.Text);
+                            new Uri(address_entry.Text), user_entry.Text, password_entry.Text);
                 }
             };
 
@@ -367,7 +373,7 @@ namespace CmisSync {
                         // Get list of subfolders asynchronously
                         GetSubfoldersDelegate dlgt = new GetSubfoldersDelegate(CmisUtils.GetSubfolders);
                         IAsyncResult ar = dlgt.BeginInvoke(Controller.saved_repository,
-                                Controller.saved_remote_path, Controller.saved_address,
+                                Controller.saved_remote_path, Controller.saved_address.ToString(),
                                 Controller.saved_user, Controller.saved_password, null, null);
                         while (!ar.AsyncWaitHandle.WaitOne(100)) {
                             while (Application.EventsPending()) {

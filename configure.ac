@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-m4_define([cmissync_version], [0.9.1])
+m4_define([cmissync_version], [1.0.0])
 
 AC_PREREQ([2.54])
 AC_INIT([CmisSync], cmissync_version)
@@ -114,7 +114,7 @@ AC_ARG_WITH([test-localpath],
 AC_SUBST(TEST_LOCALPATH)
 
 TEST_REMOTEPATH="/remotepath"
-AC_ARG_WITH([test-localpath],
+AC_ARG_WITH([test-remotepath],
     AS_HELP_STRING([--with-test-remotepath=PATH],[Specify remote path for testing]),
     TEST_REMOTEPATH=${withval})
 AC_SUBST(TEST_REMOTEPATH)
