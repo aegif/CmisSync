@@ -561,32 +561,8 @@ namespace CmisSync.Lib.Sync
                             // If the file has been modified since last time we downloaded it, then download again.
                             if (serverSideModificationDate > lastDatabaseUpdate)
                             {
-                                if (database.LocalFileHasChanged(filePath))
-                                {
-                                    Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
-                                    // Rename locally modified file.
-                                    //String ext = Path.GetExtension(filePath);
-                                    //String filename = Path.GetFileNameWithoutExtension(filePath);
-                                    String dir = Path.GetDirectoryName(filePath);
-
-                                    String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filePath) + "_" + repoinfo.User + "-version");
-                                    String newFilePath = Path.Combine(dir, newFileName);
-                                    File.Move(filePath, newFilePath);
-
-                                    // Download server version
-                                    success = DownloadFile(remoteDocument, localFolder);
-                                    repo.OnConflictResolved();
-
-                                    // TODO move to OS-dependant layer
-                                    //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                    //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
-                                    // TODO show CMIS property lastModifiedBy
-                                }
-                                else
-                                {
-                                    Logger.Info("Downloading modified file: " + fileName);
-                                    success = DownloadFile(remoteDocument, localFolder);
-                                }
+                                Logger.Info("Downloading modified file: " + fileName);
+                                success = DownloadFile(remoteDocument, localFolder);
                             }
                             else if(serverSideModificationDate == lastDatabaseUpdate)
                             {
@@ -657,8 +633,6 @@ namespace CmisSync.Lib.Sync
                         Directory.Delete(filepath);
                     }
 
-                    // If file exists, delete it.
-                    File.Delete(filepath);
                     if (File.Exists(tmpfilepath))
                     {
                         DateTime? remoteDate = remoteDocument.LastModificationDate;
@@ -787,8 +761,39 @@ namespace CmisSync.Lib.Sync
                             return false;
                         }
 
-                        // Remove the ".sync" suffix.
-                        File.Move(tmpfilepath, filepath);
+                        // If file exists, check it.
+                        if (File.Exists(filepath))
+                        {
+                            if (database.LocalFileHasChanged(filepath))
+                            {
+                                Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
+                                // Rename locally modified file.
+                                //String ext = Path.GetExtension(filePath);
+                                //String filename = Path.GetFileNameWithoutExtension(filePath);
+                                String dir = Path.GetDirectoryName(filepath);
+
+                                String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filepath) + "_" + repoinfo.User + "-version");
+                                String newFilePath = Path.Combine(dir, newFileName);
+                                File.Move(filepath, newFilePath);
+
+                                File.Move(tmpfilepath, filepath);
+
+                                repo.OnConflictResolved();
+                                // TODO move to OS-dependant layer
+                                //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
+                                //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
+                                // TODO show CMIS property lastModifiedBy
+                            }
+                            else
+                            {
+                                File.Delete(filepath);
+                                File.Move(tmpfilepath, filepath);
+                            }
+                        }
+                        else
+                        {
+                            File.Move(tmpfilepath, filepath);
+                        }
 
                         // Create database entry for this file.
                         database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
