@@ -214,6 +214,52 @@ namespace TestLibrary
         }
 
 
+        public IDocument CreateDocument(IFolder folder, string name, string content)
+        {
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties.Add(PropertyIds.Name, name);
+            properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
+
+            ContentStream contentStream = new ContentStream();
+            contentStream.FileName = name;
+            contentStream.MimeType = MimeType.GetMIMEType(name);
+            contentStream.Length = content.Length;
+            contentStream.Stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+
+            return folder.CreateDocument(properties, contentStream, null);
+        }
+
+
+        public IFolder CreateFolder(IFolder folder, string name)
+        {
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties.Add(PropertyIds.Name, name);
+            properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
+
+            return folder.CreateFolder(properties);
+        }
+
+
+        public IDocument CopyDocument(IFolder folder, IDocument source, string name)
+        {
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties.Add(PropertyIds.Name, name);
+            properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
+
+            return folder.CreateDocumentFromSource(source, properties, null);
+        }
+
+
+        public IDocument RenameDocument(IDocument source, string name)
+        {
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties.Add(PropertyIds.Name, name);
+            properties.Add(PropertyIds.ContentStreamFileName, name);
+
+            return (IDocument)source.UpdateProperties(properties);
+        }
+
+
         // /////////////////////////// TESTS ///////////////////////////
 
 
@@ -381,6 +427,116 @@ namespace TestLibrary
                     IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
                     Assert.NotNull(doc);
                     Assert.AreEqual(filename, doc.ContentStreamFileName);
+
+                    // Clean.
+                    Console.WriteLine("Clean all.");
+                    Clean(localDirectory, synchronizedFolder);
+                }
+            }
+        }
+
+
+        // Goal: Make sure that CmisSync works for remote changes.
+        [Test, TestCaseSource("TestServers")]
+        public void SyncRemote(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
+            Console.WriteLine("Synced to clean state.");
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            {
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                {
+                    synchronizedFolder.Sync();
+                    CleanAll(localDirectory);
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Synced to clean state.");
+
+                    ISession session = CreateSession(repoInfo);
+                    IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+
+                    string name1 = "SyncChangeLog.1";
+                    string path1 = Path.Combine(localDirectory, name1);
+
+                    string name2 = "SyncChangeLog.2";
+                    string path2 = Path.Combine(localDirectory, name2);
+
+                    //  create document
+                    Assert.IsFalse(File.Exists(path1));
+                    IDocument doc1 = CreateDocument(folder, name1, "SyncChangeLog");
+                    synchronizedFolder.Sync();
+                    Assert.IsTrue(File.Exists(path1));
+
+                    //TODO: AtomPub does not support copy
+                    ////  copy document
+                    //Assert.IsFalse(File.Exists(path2));
+                    //IDocument doc2 = CopyDocument(folder, doc1, name2);
+                    //synchronizedFolder.Sync();
+                    //Assert.IsTrue(File.Exists(path2));
+
+                    //TODO: CMIS does not support rename ContentStreamFileName
+                    ////  rename document
+                    //Assert.IsTrue(File.Exists(path1));
+                    //Assert.IsFalse(File.Exists(path2));
+                    //IDocument doc2 = RenameDocument(doc1, name2);
+                    //synchronizedFolder.Sync();
+                    //Assert.IsFalse(File.Exists(path1));
+                    //Assert.IsTrue(File.Exists(path2));
+
+                    //  create folder
+                    Assert.IsFalse(Directory.Exists(path2));
+                    IFolder folder2 = CreateFolder(folder, name2);
+                    synchronizedFolder.Sync();
+                    Assert.IsTrue(Directory.Exists(path2));
+
+                    ////  move document
+                    //Assert.IsFalse(File.Exists(Path.Combine(path2, name1)));
+                    //string id = doc1.Id;
+                    //doc1.Move(folder2, folder);
+                    ////session.Binding.GetObjectService().MoveObject(repositoryId, ref id, folder2.Id, folder.Id, null);
+                    //synchronizedFolder.Sync();
+                    //Assert.IsTrue(File.Exists(Path.Combine(path2, name1)));
+
+                    ////  move folder
+                    //Assert.IsFalse(Directory.Exists(path1));
+                    //IFolder folder1 = CreateFolder(folder, name1);
+                    //synchronizedFolder.Sync();
+                    //Assert.IsTrue(Directory.Exists(path1));
+                    //Assert.IsFalse(File.Exists(Path.Combine(path1, name2, name1)));
+                    //folder2.Move(folder, folder1);
+                    //synchronizedFolder.Sync();
+                    //Assert.IsTrue(File.Exists(Path.Combine(path1, name2, name1)));
+
+                    //  delete document
+                    Assert.IsTrue(File.Exists(path1));
+                    doc1.DeleteAllVersions();
+                    synchronizedFolder.Sync();
+                    Assert.IsFalse(File.Exists(path1));
+
+                    //  delete folder tree
+                    Assert.IsTrue(Directory.Exists(path2));
+                    folder2.DeleteTree(true, null, true);
+                    synchronizedFolder.Sync();
+                    Assert.IsFalse(Directory.Exists(path2));
 
                     // Clean.
                     Console.WriteLine("Clean all.");
