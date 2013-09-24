@@ -546,6 +546,177 @@ namespace TestLibrary
         }
 
 
+        // Goal: Make sure that CmisSync works for equality.
+        [Test, TestCaseSource("TestServers")]
+        public void SyncEquality(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            string canonical_name2 = canonical_name + ".equality";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            CleanDirectory(localDirectory);
+            CleanDirectory(localDirectory2);
+            Console.WriteLine("Synced to clean state.");
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            RepoInfo repoInfo2 = new RepoInfo(
+                    canonical_name2,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                cmis))
+            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
+                repoInfo2,
+                activityListener,
+                cmis2))
+            {
+                synchronizedFolder.Sync();
+                synchronizedFolder2.Sync();
+                CleanAll(localDirectory);
+                synchronizedFolder.Sync();
+                synchronizedFolder2.Sync();
+                Console.WriteLine("Synced to clean state.");
+
+                //  create file
+                string filename = "SyncEquality.File";
+                string file = Path.Combine(localDirectory, filename);
+                string file2 = Path.Combine(localDirectory2, filename);
+                Assert.IsFalse(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                using (Stream stream = File.OpenWrite(file))
+                {
+                    byte[] content = new byte[1024];
+                    stream.Write(content, 0, content.Length);
+                }
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                synchronizedFolder.Sync();
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                synchronizedFolder2.Sync();
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsTrue(File.Exists(file2));
+
+                //  create folder
+                string foldername = "SyncEquality.Folder";
+                string folder = Path.Combine(localDirectory, foldername);
+                string folder2 = Path.Combine(localDirectory2, foldername);
+                Assert.IsFalse(Directory.Exists(folder));
+                Assert.IsFalse(Directory.Exists(folder2));
+                Directory.CreateDirectory(folder);
+                Assert.IsTrue(Directory.Exists(folder));
+                Assert.IsFalse(Directory.Exists(folder2));
+                synchronizedFolder.Sync();
+                Assert.IsTrue(Directory.Exists(folder));
+                Assert.IsFalse(Directory.Exists(folder2));
+                synchronizedFolder2.Sync();
+                Assert.IsTrue(Directory.Exists(folder));
+                Assert.IsTrue(Directory.Exists(folder2));
+
+                //  move file
+                string source = file;
+                file = Path.Combine(folder, filename);
+                file2 = Path.Combine(folder2, filename);
+                Assert.IsFalse(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                File.Move(source, file);
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                synchronizedFolder.Sync();
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                synchronizedFolder2.Sync();
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsTrue(File.Exists(file2));
+
+                //  move folder
+                //create a folder to move
+                string foldername2 = "SyncEquality.Folder.2";
+                folder = Path.Combine(localDirectory, foldername2);
+                folder2 = Path.Combine(localDirectory2, foldername2);
+                Assert.IsFalse(Directory.Exists(folder));
+                Assert.IsFalse(Directory.Exists(folder2));
+                Directory.CreateDirectory(folder);
+                Assert.IsTrue(Directory.Exists(folder));
+                Assert.IsFalse(Directory.Exists(folder2));
+                synchronizedFolder.Sync();
+                Assert.IsTrue(Directory.Exists(folder));
+                Assert.IsFalse(Directory.Exists(folder2));
+                synchronizedFolder2.Sync();
+                Assert.IsTrue(Directory.Exists(folder));
+                Assert.IsTrue(Directory.Exists(folder2));
+                //move to the created folder
+                file = Path.Combine(folder, foldername, filename);
+                file2 = Path.Combine(folder2, foldername, filename);
+                Assert.IsFalse(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                Directory.Move(
+                    Path.Combine(localDirectory, foldername),
+                    Path.Combine(folder, foldername));
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                synchronizedFolder.Sync();
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                synchronizedFolder2.Sync();
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsTrue(File.Exists(file2));
+
+                //  delete file
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsTrue(File.Exists(file2));
+                File.Delete(file);
+                Assert.IsFalse(File.Exists(file));
+                Assert.IsTrue(File.Exists(file2));
+                synchronizedFolder.Sync();
+                Assert.IsFalse(File.Exists(file));
+                Assert.IsTrue(File.Exists(file2));
+                synchronizedFolder2.Sync();
+                Assert.IsFalse(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+
+                //  delete folder tree
+                Assert.IsTrue(Directory.Exists(folder));
+                Assert.IsTrue(Directory.Exists(folder2));
+                Directory.Delete(folder, true);
+                Assert.IsFalse(Directory.Exists(folder));
+                Assert.IsTrue(Directory.Exists(folder2));
+                synchronizedFolder.Sync();
+                Assert.IsFalse(Directory.Exists(folder));
+                Assert.IsTrue(Directory.Exists(folder2));
+                synchronizedFolder2.Sync();
+                Assert.IsFalse(Directory.Exists(folder));
+                Assert.IsFalse(Directory.Exists(folder2));
+
+                // Clean.
+                Console.WriteLine("Clean all.");
+                Clean(localDirectory, synchronizedFolder);
+                Clean(localDirectory2, synchronizedFolder2);
+            }
+        }
+
+
         [Test, TestCaseSource("TestServers")]
         public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
