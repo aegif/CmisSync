@@ -363,49 +363,48 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
             {
-                activityListener.ActivityStarted();
-
-                bool success = true;
-
-                try
+                using (new ActivityListenerResource(activityListener))
                 {
-                    // List all children.
-                    foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
+                    bool success = true;
+
+                    try
                     {
-                        if (cmisObject is DotCMIS.Client.Impl.Folder)
+                        // List all children.
+                        foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                         {
-                            IFolder remoteSubFolder = (IFolder)cmisObject;
-                            string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
-                            if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                            if (cmisObject is DotCMIS.Client.Impl.Folder)
                             {
-                                // Create local folder.
-                                Directory.CreateDirectory(localSubFolder);
+                                IFolder remoteSubFolder = (IFolder)cmisObject;
+                                string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
+                                if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                                {
+                                    // Create local folder.
+                                    Directory.CreateDirectory(localSubFolder);
 
-                                // Create database entry for this folder
-                                // TODO Add metadata
-                                database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
+                                    // Create database entry for this folder
+                                    // TODO Add metadata
+                                    database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
 
-                                // Recurse into folder.
-                                success = RecursiveFolderCopy(remoteSubFolder, localSubFolder) && success;
+                                    // Recurse into folder.
+                                    success = RecursiveFolderCopy(remoteSubFolder, localSubFolder) && success;
+                                }
+                            }
+                            else
+                            {
+                                if (Utils.WorthSyncing(cmisObject.Name))
+                                    // It is a file, just download it.
+                                    success = DownloadFile((IDocument)cmisObject, localFolder) && success;
                             }
                         }
-                        else
-                        {
-                            if (Utils.WorthSyncing(cmisObject.Name))
-                                // It is a file, just download it.
-                                success = DownloadFile((IDocument)cmisObject, localFolder) && success;
-                        }
                     }
-                }
-                catch (Exception e)
-                {
-                    Logger.Warn(String.Format("Exception while download to local folder {0}: {1}", localFolder, Utils.ToLogString(e)));
-                    success = false;
-                }
+                    catch (Exception e)
+                    {
+                        Logger.Warn(String.Format("Exception while download to local folder {0}: {1}", localFolder, Utils.ToLogString(e)));
+                        success = false;
+                    }
 
-                activityListener.ActivityStopped();
-
-                return success;
+                    return success;
+                }
             }
 
 
@@ -608,207 +607,202 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool DownloadFile(IDocument remoteDocument, string localFolder)
             {
-                activityListener.ActivityStarted();
-
-                string fileName = remoteDocument.ContentStreamFileName;
-
-                // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
-                if (Utils.IsInvalidFileName(fileName))
+                using (new ActivityListenerResource(activityListener))
                 {
-                    Logger.Info("Skipping download of file with illegal filename: " + fileName);
-                    activityListener.ActivityStopped();
-                    return true;
-                }
+                    string fileName = remoteDocument.ContentStreamFileName;
 
-                try
-                {
-                    DotCMIS.Data.IContentStream contentStream = null;
-                    string filepath = Path.Combine(localFolder, fileName);
-                    string tmpfilepath = filepath + ".sync";
-
-                    // If there was previously a directory with this name, delete it.
-                    // TODO warn if local changes inside the folder.
-                    if (Directory.Exists(filepath))
+                    // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
+                    if (Utils.IsInvalidFileName(fileName))
                     {
-                        Directory.Delete(filepath);
+                        Logger.Info("Skipping download of file with illegal filename: " + fileName);
+                        return true;
                     }
 
-                    if (File.Exists(tmpfilepath))
+                    try
                     {
-                        DateTime? remoteDate = remoteDocument.LastModificationDate;
-                        if (null == remoteDate)
+                        DotCMIS.Data.IContentStream contentStream = null;
+                        string filepath = Path.Combine(localFolder, fileName);
+                        string tmpfilepath = filepath + ".sync";
+
+                        // If there was previously a directory with this name, delete it.
+                        // TODO warn if local changes inside the folder.
+                        if (Directory.Exists(filepath))
                         {
-                            File.Delete(tmpfilepath);
+                            Directory.Delete(filepath);
                         }
-                        else
+
+                        if (File.Exists(tmpfilepath))
                         {
-                            remoteDate = ((DateTime)remoteDate).ToUniversalTime();
-                            DateTime? serverDate = database.GetDownloadServerSideModificationDate(filepath);
-                            if (remoteDate != serverDate)
+                            DateTime? remoteDate = remoteDocument.LastModificationDate;
+                            if (null == remoteDate)
                             {
                                 File.Delete(tmpfilepath);
                             }
-                        }
-                    }
-
-                    // Download file.
-                    Boolean success = false;
-                    byte[] filehash = { };
-                    try
-                    {
-                        long? fileLength = remoteDocument.ContentStreamLength;
-
-                        if (null == fileLength)
-                        {
-                            Logger.Warn("Skipping download of file with null content stream: " + fileName);
-                            activityListener.ActivityStopped();
-                            return true;
-                        }
-
-                        // Skip downloading the content, just go on with an empty file
-                        if (0 == fileLength)
-                        {
-                            Logger.Info("Skipping download of file with content length zero: " + fileName);
-                            using (FileStream s = File.Open(tmpfilepath, FileMode.Create))
+                            else
                             {
-                                s.Close();
-                            }
-                            using (SHA1 sha = new SHA1CryptoServiceProvider())
-                            {
-                                filehash = sha.ComputeHash(new byte[0]);
-                            }
-                            success = true;
-                        }
-                        else
-                        {
-                            using (Stream file = new FileStream(tmpfilepath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
-                            using (SHA1 hashAlg = new SHA1Managed())
-                            {
-                                if (repoinfo.TrunkSize <= 0)
+                                remoteDate = ((DateTime)remoteDate).ToUniversalTime();
+                                DateTime? serverDate = database.GetDownloadServerSideModificationDate(filepath);
+                                if (remoteDate != serverDate)
                                 {
-                                    using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
-                                    {
-                                        contentStream = remoteDocument.GetContentStream();
-                                        // If this file does not have a content stream, ignore it.
-                                        // Even 0 bytes files have a contentStream.
-                                        // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-                                        if (contentStream == null)
-                                        {
-                                            Logger.Warn("Skipping download of file with null content stream: " + fileName);
-                                            activityListener.ActivityStopped();
-                                            return true;
-                                        }
-
-                                        using (contentStream.Stream)
-                                        {
-                                            byte[] buffer = new byte[8 * 1024];
-                                            int len;
-                                            while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
-                                            {
-                                                hashstream.Write(buffer, 0, len);
-                                            }
-                                            success = true;
-                                        }
-                                    }
+                                    File.Delete(tmpfilepath);
                                 }
-                                else
-                                {
-                                    database.SetDownloadServerSideModificationDate(filepath, remoteDocument.LastModificationDate);
-                                    byte[] buffer = new byte[8 * 1024];
-                                    int len;
-                                    while ((len = file.Read(buffer, 0, buffer.Length)) > 0)
-                                    {
-                                        hashAlg.TransformBlock(buffer, 0, len, buffer, 0);
-                                    }
-                                    using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
-                                    {
-                                        success = DownloadStreamInTrunk(tmpfilepath, hashstream, remoteDocument);
-                                    }
-                                }
-                                filehash = hashAlg.Hash;
                             }
                         }
-                    }
-                    catch (ObjectDisposedException ex)
-                    {
-                        Logger.Error("Download aborted: " + fileName + " " + ex);
-                        return false;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error("Download failed: " + fileName + " " + ex);
-                        success = false;
-                        File.Delete(tmpfilepath);
-                    }
 
-                    if (success)
-                    {
-                        Logger.Info("Downloaded: " + fileName);
-                        // TODO Control file integrity by using hash compare?
-
-                        // Get metadata.
-                        Dictionary<string, string[]> metadata = null;
+                        // Download file.
+                        Boolean success = false;
+                        byte[] filehash = { };
                         try
                         {
-                            metadata = FetchMetadata(remoteDocument);
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Info("Exception while fetching metadata: " + fileName + " " + Utils.ToLogString(e));
-                            // Remove temporary local document to avoid it being considered a new document.
-                            File.Delete(tmpfilepath);
-                            activityListener.ActivityStopped();
-                            return false;
-                        }
+                            long? fileLength = remoteDocument.ContentStreamLength;
 
-                        // If file exists, check it.
-                        if (File.Exists(filepath))
-                        {
-                            if (database.LocalFileHasChanged(filepath))
+                            if (null == fileLength)
                             {
-                                Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
-                                // Rename locally modified file.
-                                //String ext = Path.GetExtension(filePath);
-                                //String filename = Path.GetFileNameWithoutExtension(filePath);
-                                String dir = Path.GetDirectoryName(filepath);
+                                Logger.Warn("Skipping download of file with null content stream: " + fileName);
+                                return true;
+                            }
 
-                                String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filepath) + "_" + repoinfo.User + "-version");
-                                String newFilePath = Path.Combine(dir, newFileName);
-                                File.Move(filepath, newFilePath);
-
-                                File.Move(tmpfilepath, filepath);
-
-                                repo.OnConflictResolved();
-                                // TODO move to OS-dependant layer
-                                //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
-                                // TODO show CMIS property lastModifiedBy
+                            // Skip downloading the content, just go on with an empty file
+                            if (0 == fileLength)
+                            {
+                                Logger.Info("Skipping download of file with content length zero: " + fileName);
+                                using (FileStream s = File.Open(tmpfilepath, FileMode.Create))
+                                {
+                                    s.Close();
+                                }
+                                using (SHA1 sha = new SHA1CryptoServiceProvider())
+                                {
+                                    filehash = sha.ComputeHash(new byte[0]);
+                                }
+                                success = true;
                             }
                             else
                             {
-                                File.Delete(filepath);
-                                File.Move(tmpfilepath, filepath);
+                                using (Stream file = new FileStream(tmpfilepath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+                                using (SHA1 hashAlg = new SHA1Managed())
+                                {
+                                    if (repoinfo.TrunkSize <= 0)
+                                    {
+                                        using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
+                                        {
+                                            contentStream = remoteDocument.GetContentStream();
+                                            // If this file does not have a content stream, ignore it.
+                                            // Even 0 bytes files have a contentStream.
+                                            // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                                            if (contentStream == null)
+                                            {
+                                                Logger.Warn("Skipping download of file with null content stream: " + fileName);
+                                                return true;
+                                            }
+
+                                            using (contentStream.Stream)
+                                            {
+                                                byte[] buffer = new byte[8 * 1024];
+                                                int len;
+                                                while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                                                {
+                                                    hashstream.Write(buffer, 0, len);
+                                                }
+                                                success = true;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        database.SetDownloadServerSideModificationDate(filepath, remoteDocument.LastModificationDate);
+                                        byte[] buffer = new byte[8 * 1024];
+                                        int len;
+                                        while ((len = file.Read(buffer, 0, buffer.Length)) > 0)
+                                        {
+                                            hashAlg.TransformBlock(buffer, 0, len, buffer, 0);
+                                        }
+                                        using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
+                                        {
+                                            success = DownloadStreamInTrunk(tmpfilepath, hashstream, remoteDocument);
+                                        }
+                                    }
+                                    filehash = hashAlg.Hash;
+                                }
                             }
                         }
-                        else
+                        catch (ObjectDisposedException ex)
                         {
-                            File.Move(tmpfilepath, filepath);
+                            Logger.Error("Download aborted: " + fileName + " " + ex);
+                            return false;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error("Download failed: " + fileName + " " + ex);
+                            success = false;
+                            File.Delete(tmpfilepath);
                         }
 
-                        // Create database entry for this file.
-                        database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                        if (success)
+                        {
+                            Logger.Info("Downloaded: " + fileName);
+                            // TODO Control file integrity by using hash compare?
 
-                        Logger.Info("Added to database: " + fileName);
+                            // Get metadata.
+                            Dictionary<string, string[]> metadata = null;
+                            try
+                            {
+                                metadata = FetchMetadata(remoteDocument);
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.Info("Exception while fetching metadata: " + fileName + " " + Utils.ToLogString(e));
+                                // Remove temporary local document to avoid it being considered a new document.
+                                File.Delete(tmpfilepath);
+                                return false;
+                            }
+
+                            // If file exists, check it.
+                            if (File.Exists(filepath))
+                            {
+                                if (database.LocalFileHasChanged(filepath))
+                                {
+                                    Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
+                                    // Rename locally modified file.
+                                    //String ext = Path.GetExtension(filePath);
+                                    //String filename = Path.GetFileNameWithoutExtension(filePath);
+                                    String dir = Path.GetDirectoryName(filepath);
+
+                                    String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filepath) + "_" + repoinfo.User + "-version");
+                                    String newFilePath = Path.Combine(dir, newFileName);
+                                    File.Move(filepath, newFilePath);
+
+                                    File.Move(tmpfilepath, filepath);
+
+                                    repo.OnConflictResolved();
+                                    // TODO move to OS-dependant layer
+                                    //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
+                                    //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
+                                    // TODO show CMIS property lastModifiedBy
+                                }
+                                else
+                                {
+                                    File.Delete(filepath);
+                                    File.Move(tmpfilepath, filepath);
+                                }
+                            }
+                            else
+                            {
+                                File.Move(tmpfilepath, filepath);
+                            }
+
+                            // Create database entry for this file.
+                            database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+
+                            Logger.Info("Added to database: " + fileName);
+                        }
+
+                        return success;
                     }
-
-                    activityListener.ActivityStopped();
-                    return success;
-                }
-                catch (IOException e)
-                {
-                    Logger.Warn("Exception while file operation: " + Utils.ToLogString(e));
-                    activityListener.ActivityStopped();
-                    return false;
+                    catch (IOException e)
+                    {
+                        Logger.Warn("Exception while file operation: " + Utils.ToLogString(e));
+                        return false;
+                    }
                 }
             }
 
@@ -891,101 +885,101 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UploadFile(string filePath, IFolder remoteFolder)
             {
-                activityListener.ActivityStarted();
-
-                IDocument remoteDocument = null;
-                Boolean success = false;
-                byte[] filehash = { };
-                try
+                using (new ActivityListenerResource(activityListener))
                 {
-                    Logger.Info("Uploading: " + filePath);
-
-                    // Prepare properties
-                    string fileName = Path.GetFileName(filePath);
-                    Dictionary<string, object> properties = new Dictionary<string, object>();
-                    properties.Add(PropertyIds.Name, fileName);
-                    properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
-
-                    // Prepare content stream
-                    using (Stream file = File.OpenRead(filePath))
+                    IDocument remoteDocument = null;
+                    Boolean success = false;
+                    byte[] filehash = { };
+                    try
                     {
-                        if (repoinfo.TrunkSize <= 0 || file.Length <= repoinfo.TrunkSize)
+                        Logger.Info("Uploading: " + filePath);
+
+                        // Prepare properties
+                        string fileName = Path.GetFileName(filePath);
+                        Dictionary<string, object> properties = new Dictionary<string, object>();
+                        properties.Add(PropertyIds.Name, fileName);
+                        properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
+
+                        // Prepare content stream
+                        using (Stream file = File.OpenRead(filePath))
                         {
-                            using (SHA1 hashAlg = new SHA1Managed())
-                            using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
+                            if (repoinfo.TrunkSize <= 0 || file.Length <= repoinfo.TrunkSize)
                             {
+                                using (SHA1 hashAlg = new SHA1Managed())
+                                using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
+                                {
+                                    ContentStream contentStream = new ContentStream();
+                                    contentStream.FileName = fileName;
+                                    contentStream.MimeType = MimeType.GetMIMEType(fileName);
+                                    contentStream.Length = file.Length;
+                                    contentStream.Stream = hashstream;
+
+                                    // Upload
+                                    try
+                                    {
+                                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                        filehash = hashAlg.Hash;
+                                        success = true;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                filehash = new SHA1Managed().ComputeHash(file);
+                                file.Position = 0;
+
                                 ContentStream contentStream = new ContentStream();
                                 contentStream.FileName = fileName;
                                 contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                                contentStream.Length = file.Length;
-                                contentStream.Stream = hashstream;
+                                contentStream.Length = 0;
+                                contentStream.Stream = new MemoryStream(0);
 
-                                // Upload
-                                try
-                                {
-                                    remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                                    filehash = hashAlg.Hash;
-                                    success = true;
-                                }
-                                catch (Exception ex)
-                                {
-                                    Logger.Fatal("Upload failed: " + filePath + " " + ex);
-                                }
+                                remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+                                database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+
+                                success = UploadStreamInTrunk(filePath, file, remoteDocument);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        if (e is FileNotFoundException ||
+                            e is IOException)
+                        {
+                            Logger.Warn("File deleted while trying to upload it, reverting.");
+                            // File has been deleted while we were trying to upload/checksum/add.
+                            // This can typically happen in Windows Explore when creating a new text file and giving it a name.
+                            // In this case, revert the upload.
+                            if (remoteDocument != null)
+                            {
+                                remoteDocument.DeleteAllVersions();
                             }
                         }
                         else
                         {
-                            filehash = new SHA1Managed().ComputeHash(file);
-                            file.Position = 0;
-
-                            ContentStream contentStream = new ContentStream();
-                            contentStream.FileName = fileName;
-                            contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                            contentStream.Length = 0;
-                            contentStream.Stream = new MemoryStream(0);
-
-                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                            Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-                            database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
-
-                            success = UploadStreamInTrunk(filePath, file, remoteDocument);
+                            //throw;
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    if (e is FileNotFoundException ||
-                        e is IOException)
+
+                    // Metadata.
+                    if (success)
                     {
-                        Logger.Warn("File deleted while trying to upload it, reverting.");
-                        // File has been deleted while we were trying to upload/checksum/add.
-                        // This can typically happen in Windows Explore when creating a new text file and giving it a name.
-                        // In this case, revert the upload.
-                        if (remoteDocument != null)
-                        {
-                            remoteDocument.DeleteAllVersions();
-                        }
+                        Logger.Info("Uploaded: " + filePath);
+
+                        // Get metadata. Some metadata has probably been automatically added by the server.
+                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+
+                        // Create database entry for this file.
+                        database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                     }
-                    else
-                    {
-                        //throw;
-                    }
+
+                    return success;
                 }
-                    
-                // Metadata.
-                if (success)
-                {
-                    Logger.Info("Uploaded: " + filePath);
-
-                    // Get metadata. Some metadata has probably been automatically added by the server.
-                    Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-
-                    // Create database entry for this file.
-                    database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
-                }
-
-                activityListener.ActivityStopped();
-                return success;
             }
 
 
@@ -1157,54 +1151,51 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UpdateFile(string filePath, IFolder remoteFolder)
             {
-                Logger.Info("# Updating " + filePath);
-
-                // Tell the tray icon to start spinning.
-                activityListener.ActivityStarted();
-                
-                // Find the document within the folder.
-                string fileName = Path.GetFileName(filePath);
-                IDocument document = null;
-                bool found = false;
-                foreach (ICmisObject obj in remoteFolder.GetChildren())
+                using (new ActivityListenerResource(activityListener))
                 {
-                    if (null != (document = obj as IDocument))
+                    Logger.Info("# Updating " + filePath);
+
+                    // Find the document within the folder.
+                    string fileName = Path.GetFileName(filePath);
+                    IDocument document = null;
+                    bool found = false;
+                    foreach (ICmisObject obj in remoteFolder.GetChildren())
                     {
-                        if (document.Name == fileName)
+                        if (null != (document = obj as IDocument))
                         {
-                            found = true;
-                            break;
+                            if (document.Name == fileName)
+                            {
+                                found = true;
+                                break;
+                            }
                         }
                     }
+
+                    // If not found, it means the document has been deleted.
+                    if (!found)
+                    {
+                        Logger.Info(filePath + " not found on server, must be uploaded instead of updated");
+                        return UploadFile(filePath, remoteFolder);
+                    }
+
+                    // Update the document itself.
+                    bool success = UpdateFile(filePath, document);
+
+                    if (success)
+                    {
+                        // Update timestamp in database.
+                        database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
+
+                        // Update checksum
+                        database.RecalculateChecksum(filePath);
+
+                        // TODO Update metadata?
+                    }
+
+                    Logger.Info("# Updated " + filePath);
+
+                    return success;
                 }
-
-                // If not found, it means the document has been deleted.
-                if (!found)
-                {
-                    Logger.Info(filePath + " not found on server, must be uploaded instead of updated");
-                    return UploadFile(filePath, remoteFolder);
-                }
-
-                // Update the document itself.
-                bool success = UpdateFile(filePath, document);
-
-                if (success)
-                {
-                    // Update timestamp in database.
-                    database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
-
-                    // Update checksum
-                    database.RecalculateChecksum(filePath);
-
-                    // TODO Update metadata?
-                }
-
-                // Tell the tray icon to stop spinning.
-                activityListener.ActivityStopped();
-
-                Logger.Info("# Updated " + filePath);
-
-                return success;
             }
 
 
