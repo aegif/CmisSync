@@ -291,4 +291,13 @@ Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ä
   <data name="UntrustedCertificate" xml:space="preserve">
     <value>Unvertrauenswürdiges oder unbekanntes Zertifikat</value>
   </data>
+  <data name="RemoveFolderFromSync" xml:space="preserve">
+    <value>Synchronisation dauerhaft beenden</value>
+  </data>
+  <data name="RemoveSyncQuestion" xml:space="preserve">
+    <value>Möchten Sie die Synchronisation mit dem Server wirklich dauerhaft beenden?</value>
+  </data>
+  <data name="RemoveSyncTitle" xml:space="preserve">
+    <value>Synchronisation beenden</value>
+  </data>
 </root>

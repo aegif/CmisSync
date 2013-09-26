@@ -445,6 +445,24 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you really want to remove folder from synchronization?.
+        /// </summary>
+        internal static string RemoveSyncQuestion {
+            get {
+                return ResourceManager.GetString("RemoveSyncQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove folder from sync.
+        /// </summary>
+        internal static string RemoveSyncTitle {
+            get {
+                return ResourceManager.GetString("RemoveSyncTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Resume sync.
         /// </summary>
         internal static string ResumeSync {

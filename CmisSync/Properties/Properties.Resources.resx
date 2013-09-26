@@ -316,4 +316,10 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="UntrustedCertificate" xml:space="preserve">
     <value>Untrusted Certificate</value>
   </data>
+  <data name="RemoveSyncQuestion" xml:space="preserve">
+    <value>Do you really want to remove folder from synchronization?</value>
+  </data>
+  <data name="RemoveSyncTitle" xml:space="preserve">
+    <value>Remove folder from sync</value>
+  </data>
 </root>
