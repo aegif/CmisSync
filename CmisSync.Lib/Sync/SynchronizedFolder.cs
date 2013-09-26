@@ -281,7 +281,7 @@ namespace CmisSync.Lib.Sync
                 //{
                 //    Connect();
                 //}
-
+                sleepWhileSuspended();
                 //  Force to create the session to reset the cache for each Sync, since DotCMIS uses cache
                 Connect();
 
