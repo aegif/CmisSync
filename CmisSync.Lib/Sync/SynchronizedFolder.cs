@@ -240,6 +240,15 @@ namespace CmisSync.Lib.Sync
                     Logger.Debug("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Debug("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
                     Logger.Debug("Get descendants support: " + IsGetDescendantsSupported.ToString());
+
+                    HashSet<string> filters = new HashSet<string>();
+                    filters.Add("cmis:objectId");
+                    filters.Add("cmis:name");
+                    filters.Add("cmis:contentStreamFileName");
+                    filters.Add("cmis:contentStreamLength");
+                    filters.Add("cmis:lastModificationDate");
+                    filters.Add("cmis:path");
+                    session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
                 }
                 //TODO Implement error handling -> informing user about connection problems by showing status
                 catch (CmisRuntimeException e)
