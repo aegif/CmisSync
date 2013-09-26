@@ -16,6 +16,7 @@ T: CmisSync.Lib.Sync.CmisRepo/SynchronizedFolder
 #Ignore dispose pattern for UI widget (Linux)
 R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
 M: System.Void CmisSync.CertPolicyHandler/<ShowCertDialog>c__AnonStorey0::<>m__7(System.Object,System.EventArgs)
+M: System.Void CmisSync.StatusIcon/<RemoveFolderFromSyncDelegate>c__AnonStorey17::<>m__73(System.Object,System.EventArgs)
 M: System.Void CmisSync.Setup::ShowSetupPage()
 M: System.Void CmisSync.Setup::ShowAdd2Page()
 M: System.Void CmisSync.Setup::ShowFinishedPage()
