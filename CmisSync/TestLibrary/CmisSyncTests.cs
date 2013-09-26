@@ -483,6 +483,7 @@ namespace TestLibrary
                     //  create document
                     Assert.IsFalse(File.Exists(path1));
                     IDocument doc1 = CreateDocument(folder, name1, "SyncChangeLog");
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                     synchronizedFolder.Sync();
                     Assert.IsTrue(File.Exists(path1));
 
@@ -505,6 +506,7 @@ namespace TestLibrary
                     //  create folder
                     Assert.IsFalse(Directory.Exists(path2));
                     IFolder folder2 = CreateFolder(folder, name2);
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                     synchronizedFolder.Sync();
                     Assert.IsTrue(Directory.Exists(path2));
 
@@ -529,12 +531,14 @@ namespace TestLibrary
                     //  delete document
                     Assert.IsTrue(File.Exists(path1));
                     doc1.DeleteAllVersions();
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                     synchronizedFolder.Sync();
                     Assert.IsFalse(File.Exists(path1));
 
                     //  delete folder tree
                     Assert.IsTrue(Directory.Exists(path2));
                     folder2.DeleteTree(true, null, true);
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                     synchronizedFolder.Sync();
                     Assert.IsFalse(Directory.Exists(path2));
 
@@ -614,6 +618,7 @@ namespace TestLibrary
                 synchronizedFolder.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
@@ -627,9 +632,11 @@ namespace TestLibrary
                 Directory.CreateDirectory(folder);
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
+                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                 synchronizedFolder.Sync();
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
+                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
@@ -643,9 +650,11 @@ namespace TestLibrary
                 File.Move(source, file);
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                 synchronizedFolder.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
@@ -660,9 +669,11 @@ namespace TestLibrary
                 Directory.CreateDirectory(folder);
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
+                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                 synchronizedFolder.Sync();
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
+                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
@@ -676,9 +687,11 @@ namespace TestLibrary
                     Path.Combine(folder, foldername));
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                 synchronizedFolder.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
@@ -689,9 +702,11 @@ namespace TestLibrary
                 File.Delete(file);
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
+                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                 synchronizedFolder.Sync();
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
+                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
@@ -702,9 +717,11 @@ namespace TestLibrary
                 Directory.Delete(folder, true);
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
+                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                 synchronizedFolder.Sync();
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
+                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));

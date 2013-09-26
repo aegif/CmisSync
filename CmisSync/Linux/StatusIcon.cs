@@ -229,7 +229,7 @@ namespace CmisSync {
 
             // Log Menu
             MenuItem log_item = new MenuItem(
-                    CmisSync.Properties_Resources. ViewLog);
+                    CmisSync.Properties_Resources.ViewLog);
             log_item.Activated += delegate
             {
                 Controller.LogClicked();
@@ -293,11 +293,11 @@ namespace CmisSync {
             return delegate
             {
                 using( Dialog dialog = new Dialog
-                    (String.Format("Remove {0} from sync?",reponame), null, Gtk.DialogFlags.DestroyWithParent))
+                    (String.Format(CmisSync.Properties_Resources.RemoveSyncTitle), null, Gtk.DialogFlags.DestroyWithParent))
                 {
                     dialog.Modal = true;
                     dialog.AddButton ("No, please continue synchronizing", ResponseType.No);
-                    dialog.AddButton ("Yes, remove folder from sync", ResponseType.Yes);
+                    dialog.AddButton ("Yes, stop synchronizing permanently", ResponseType.Yes);
                     dialog.Response += delegate (object obj, ResponseArgs args){
                         if(args.ResponseId == ResponseType.Yes)
                             Controller.RemoveFolderFromSyncClicked(reponame);
