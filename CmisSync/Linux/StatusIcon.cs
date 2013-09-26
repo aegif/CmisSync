@@ -292,17 +292,19 @@ namespace CmisSync {
         {
             return delegate
             {
-                Dialog dialog = new Dialog
-                    (String.Format("Remove {0} from sync?",reponame), null, Gtk.DialogFlags.DestroyWithParent);
-                dialog.Modal = true;
-                dialog.AddButton ("No, please continue synchronizing", ResponseType.No);
-                dialog.AddButton ("Yes, remove folder from sync", ResponseType.Yes);
-                dialog.Response += delegate (object obj, ResponseArgs args){
-                    if(args.ResponseId == ResponseType.Yes)
-                        Controller.RemoveFolderFromSyncClicked(reponame);
-                };
-                dialog.Run();
-                dialog.Destroy();
+                using( Dialog dialog = new Dialog
+                    (String.Format("Remove {0} from sync?",reponame), null, Gtk.DialogFlags.DestroyWithParent))
+                {
+                    dialog.Modal = true;
+                    dialog.AddButton ("No, please continue synchronizing", ResponseType.No);
+                    dialog.AddButton ("Yes, remove folder from sync", ResponseType.Yes);
+                    dialog.Response += delegate (object obj, ResponseArgs args){
+                        if(args.ResponseId == ResponseType.Yes)
+                            Controller.RemoveFolderFromSyncClicked(reponame);
+                    };
+                    dialog.Run();
+                    dialog.Destroy();
+                }
             };
         }
 
