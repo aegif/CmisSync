@@ -124,7 +124,7 @@ namespace CmisSync {
                                     if (aRepo.Name.Equals(reponame))
                                     {
                                         Menu submenu = (Menu)((CmisSyncMenuItem)menuItem).Submenu;
-                                        CmisSyncMenuItem pauseItem = (CmisSyncMenuItem)submenu.Children[2];
+                                        CmisSyncMenuItem pauseItem = (CmisSyncMenuItem)submenu.Children[1];
                                         setSyncItemState(pauseItem, aRepo.Status);
                                         break;
                                     }
@@ -178,13 +178,13 @@ namespace CmisSync {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
                     };
                     open_localfolder_item.Activated += OpenFolderDelegate(folder_name);
-
+/*
                     ImageMenuItem browse_remotefolder_item = new CmisSyncMenuItem(
                             CmisSync.Properties_Resources.BrowseRemoteFolder) {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
                     };
                     browse_remotefolder_item.Activated += OpenRemoteFolderDelegate(folder_name);
-
+*/
                     ImageMenuItem suspend_folder_item = new CmisSyncMenuItem(
                             CmisSync.Properties_Resources.PauseSync) {
                         RepoName = folder_name
@@ -204,11 +204,9 @@ namespace CmisSync {
                         Image = new Image (UIHelpers.GetIcon ("document-deleted", 12))
                     };
                     remove_folder_from_sync_item.Activated += RemoveFolderFromSyncDelegate(folder_name);
-                    // TODO Remove this line, if this feature is implemented
-                    remove_folder_from_sync_item.Sensitive = false;
 
                     submenu.Add(open_localfolder_item);
-                    submenu.Add(browse_remotefolder_item);
+                    //submenu.Add(browse_remotefolder_item);
                     submenu.Add(suspend_folder_item);
                     submenu.Add(new SeparatorMenuItem());
                     submenu.Add(remove_folder_from_sync_item);
@@ -294,7 +292,17 @@ namespace CmisSync {
         {
             return delegate
             {
-                Controller.RemoveFolderFromSyncClicked(reponame);
+                Dialog dialog = new Dialog
+                    (String.Format("Remove {0} from sync?",reponame), null, Gtk.DialogFlags.DestroyWithParent);
+                dialog.Modal = true;
+                dialog.AddButton ("No, please continue synchronizing", ResponseType.No);
+                dialog.AddButton ("Yes, remove folder from sync", ResponseType.Yes);
+                dialog.Response += delegate (object obj, ResponseArgs args){
+                    if(args.ResponseId == ResponseType.Yes)
+                        Controller.RemoveFolderFromSyncClicked(reponame);
+                };
+                dialog.Run();
+                dialog.Destroy();
             };
         }
 

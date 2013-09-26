@@ -290,24 +290,19 @@ namespace CmisSync
         /// Remove a synchronized folder from the CmisSync configuration.
         /// This happens after the user removes the folder.
         /// </summary>
-        /// <param name="folder_path">The synchronized folder to remove</param>
+        /// <param name="folder">The synchronized folder to remove</param>
         private void RemoveRepository(Config.SyncConfig.Folder folder)
         {
-            if (this.repositories.Count > 0)
+            foreach (RepoBase repo in this.repositories)
             {
-                for (int i = 0; i < this.repositories.Count; i++)
+                if (repo.LocalPath.Equals(folder.LocalPath))
                 {
-                    RepoBase repo = this.repositories[i];
-
-                    if (repo.LocalPath.Equals(folder.LocalPath))
-                    {
-                        repo.Dispose();
-                        this.repositories.Remove(repo);
-                        repo = null;
-                        break;
-                    }
+                    repo.Dispose();
+                    this.repositories.Remove(repo);
+                    break;
                 }
             }
+
             // Remove Cmis Database File
             string dbfilename = folder.DisplayName;
             dbfilename = dbfilename.Replace("\\", "_");
@@ -520,7 +515,6 @@ namespace CmisSync
         {
             ShowAboutWindowEvent();
         }
-
 
         /// <summary>
         /// Quit CmisSync.
