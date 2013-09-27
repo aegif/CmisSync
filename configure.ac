@@ -75,6 +75,19 @@ AC_SUBST(NUNIT_LIBS)
 CMISSYNC_CHECK_NOTIFY_SHARP
 CMISSYNC_CHECK_GTK_SHARP
 
+AC_ARG_ENABLE(fat-binary,
+  AS_HELP_STRING([--enable-fat-binary[=@<:@no/yes@:>@]],[Build fat binary after compilation]),
+  [enable_fat_binary=$enableval],
+  [enable_fat_binary="no"])
+
+if test "x$enable_fat_binary" = "xno" ; then
+    AC_SUBST(SLIMMONO, "mono")
+    AC_SUBST(MONOEXE, ".exe")
+  else
+    AC_SUBST(SLIMMONO, "")
+    AC_SUBST(MONOEXE, "")
+fi
+
 AC_ARG_ENABLE(appindicator,
 	AS_HELP_STRING([--enable-appindicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
 	[enable_appindicator=$enableval],

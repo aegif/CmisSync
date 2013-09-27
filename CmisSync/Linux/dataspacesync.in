@@ -25,9 +25,9 @@ start() {
 
   echo -n "Starting DataSpace Sync... "
   if [ -n "${SSH_AGENT_PID}" -o -n "${SSH_AUTH_SOCK}" ] ; then
-    @expanded_libdir@/@PACKAGE@/DataSpaceSync $2 &
+    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync@MONOEXE@ $2 &
   else
-    ssh-agent @expanded_libdir@/@PACKAGE@/DataSpaceSync $2 &
+    ssh-agent @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync@MONOEXE@ $2 &
   fi
   ( umask 066; echo $! > ${pidfile} )
   echo "Done."
@@ -68,6 +68,6 @@ case $1 in
     curl --insecure --output ~/DataSpace Sync/$invite.xml $open
     ;;
   *)
-    @expanded_libdir@/@PACKAGE@/DataSpaceSync --help
+    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync@MONOEXE@ --help
     ;;
 esac

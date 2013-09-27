@@ -25,9 +25,9 @@ start() {
 
   echo -n "Starting DataSpace Sync... "
   if [ -n "${SSH_AGENT_PID}" -o -n "${SSH_AUTH_SOCK}" ] ; then
-    @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console $2 &
+    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console@MONOEXE@ $2 &
   else
-    ssh-agent @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console $2 &
+    ssh-agent @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console@MONOEXE@ $2 &
   fi
   ( umask 066; echo $! > ${pidfile} )
   echo "Done."
@@ -62,6 +62,6 @@ case $1 in
     start
     ;;
   *)
-    @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console --help
+    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console@MONOEXE@ --help
     ;;
 esac
