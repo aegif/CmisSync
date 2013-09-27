@@ -456,8 +456,9 @@ namespace CmisSync.Lib.Cmis
             }
             catch (IOException)
             {
-                Logger.Error("IOException while reading file checksum: " + path);
-                return true;
+                Logger.Warn("IOException while reading file checksum: " + path
+                    + " File is probably being edited right now, so skip it. See https://github.com/nicolas-raoul/CmisSync/issues/245");
+                return false;
             }
 
             // Read previous checksum from database.
