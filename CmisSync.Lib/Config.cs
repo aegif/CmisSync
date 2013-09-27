@@ -342,7 +342,12 @@ namespace CmisSync.Lib
                         {
                             pollInterval = 5000;
                         }
-                } }
+                        else
+                        {
+                            pollInterval = value;
+                        }
+                    }
+                }
 
                 [XmlElement("ignoreFolder",IsNullable=true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
