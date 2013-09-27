@@ -199,8 +199,8 @@ namespace CmisSync.Lib
             Changed += new FileSystemEventHandler(OnChanged);
             Renamed += new RenamedEventHandler(OnRenamed);
 
-            EnableRaisingEvents = false;
-            EnableEvent = false;
+            EnableRaisingEvents = true;
+            EnableEvent = true;
         }
 
 
