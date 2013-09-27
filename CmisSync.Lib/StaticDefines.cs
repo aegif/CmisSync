@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 [assembly:AssemblyTitle ("CmisSync.Lib")]
 
 // Version of the CmisSync library. It is used as the CmisSync version.
-[assembly:AssemblyVersion ("1.0.4")]
+[assembly:AssemblyVersion ("1.0.5")]
 
 // Copyright.
 [assembly:AssemblyCopyright ("Copyright (c) 2010 Hylke Bons, Aegif and others")]
