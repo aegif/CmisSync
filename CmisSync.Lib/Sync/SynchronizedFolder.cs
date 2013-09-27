@@ -425,8 +425,6 @@ namespace CmisSync.Lib.Sync
                 }
 
                 long? fileLength = remoteDocument.ContentStreamLength;
-                string fileName = remoteDocument.ContentStreamFileName;
-                DateTime? remoteDate = remoteDocument.LastModificationDate;
                 FileInfo fileInfo = new FileInfo(filePath);
 
                 for (long offset = fileInfo.Length; offset < fileLength; offset += repoinfo.TrunkSize)
@@ -520,19 +518,14 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool SyncDownloadFile(IDocument remoteDocument, string localFolder, IList<string> remoteFiles = null)
             {
-                string name = remoteDocument.Name;
-                // We use the filename of the document's content stream.
-                // This can be different from the name of the document.
-                // For instance in FileNet it is not usual to have a document where
-                // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
-                string fileName = remoteDocument.ContentStreamFileName;
+                string fileName = remoteDocument.Name;
                 string filePath = Path.Combine(localFolder, fileName);
 
                 // If this file does not have a filename, ignore it.
                 // It sometimes happen on IBM P8 CMIS server, not sure why.
-                if (fileName == null)
+                if (remoteDocument.ContentStreamFileName == null)
                 {
-                    Logger.Warn("Skipping download of '" + name + "' with null content stream in " + localFolder);
+                    Logger.Warn("Skipping download of '" + fileName + "' with null content stream in " + localFolder);
                     return true;
                 }
 
@@ -618,7 +611,7 @@ namespace CmisSync.Lib.Sync
             {
                 using (new ActivityListenerResource(activityListener))
                 {
-                    string fileName = remoteDocument.ContentStreamFileName;
+                    string fileName = remoteDocument.Name;
 
                     // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
                     if (Utils.IsInvalidFileName(fileName))
@@ -845,7 +838,7 @@ namespace CmisSync.Lib.Sync
                     return false;
                 }
 
-                string fileName = remoteDocument.ContentStreamFileName;
+                string fileName = remoteDocument.Name;
                 for (long offset = fileStream.Position; offset < fileStream.Length; offset += repoinfo.TrunkSize)
                 {
                     bool isLastTrunk = false;
@@ -1095,7 +1088,7 @@ namespace CmisSync.Lib.Sync
                         if (repoinfo.TrunkSize <= 0)
                         {
                             ContentStream contentStream = new ContentStream();
-                            contentStream.FileName = remoteFile.ContentStreamFileName;
+                            contentStream.FileName = remoteFile.Name;
                             contentStream.Length = localfile.Length;
                             contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
                             contentStream.Stream = localfile;
@@ -1121,7 +1114,7 @@ namespace CmisSync.Lib.Sync
                                 using (TrunkedStream trunkstream = new TrunkedStream(localfile, repoinfo.TrunkSize))
                                 {
                                     ContentStream contentStream = new ContentStream();
-                                    contentStream.FileName = remoteFile.ContentStreamFileName;
+                                    contentStream.FileName = remoteFile.Name;
                                     contentStream.Length = repoinfo.TrunkSize;
                                     if (isLastTrunk)
                                     {

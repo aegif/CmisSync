@@ -22,7 +22,7 @@ using System.Net;
  * Put it in TestLibrary/test-servers.json and use this format:
 [
     [
-		"unittest1",
+        "unittest1",
         "/mylocalpath",
         "/myremotepath",
         "http://example.com/p8cmis/resources/Service",
@@ -31,7 +31,7 @@ using System.Net;
         "repository987080"
     ],
     [
-		"unittest2",
+        "unittest2",
         "/mylocalpath",
         "/myremotepath",
         "http://example.org:8080/Nemaki/cmis",
@@ -53,14 +53,14 @@ namespace TestLibrary
     {
         private readonly string CMISSYNCDIR = ConfigManager.CurrentConfig.FoldersPath;
 
-        
+
         public CmisSyncTests()
         {
         }
 
         class TrustAlways : ICertificatePolicy
         {
-            public bool CheckValidationResult (ServicePoint sp, X509Certificate certificate, WebRequest request, int error)
+            public bool CheckValidationResult(ServicePoint sp, X509Certificate certificate, WebRequest request, int error)
             {
                 // For testing, always accept any certificate
                 return true;
@@ -83,8 +83,9 @@ namespace TestLibrary
                 string path = "../../test-servers.json";
                 bool exists = File.Exists(path);
 
-                if (!exists) {
-                    path= "../CmisSync/TestLibrary/test-servers.json";
+                if (!exists)
+                {
+                    path = "../CmisSync/TestLibrary/test-servers.json";
                 }
 
                 return JsonConvert.DeserializeObject<List<object[]>>(
@@ -100,8 +101,9 @@ namespace TestLibrary
                 string path = "../../test-servers-fuzzy.json";
                 bool exists = File.Exists(path);
 
-                if (!exists) {
-                    path= "../CmisSync/TestLibrary/test-servers-fuzzy.json";
+                if (!exists)
+                {
+                    path = "../CmisSync/TestLibrary/test-servers-fuzzy.json";
                 }
 
                 return JsonConvert.DeserializeObject<List<object[]>>(
@@ -254,9 +256,17 @@ namespace TestLibrary
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
-            properties.Add(PropertyIds.ContentStreamFileName, name);
 
             return (IDocument)source.UpdateProperties(properties);
+        }
+
+
+        public IFolder RenameFolder(IFolder source, string name)
+        {
+            Dictionary<string, object> properties = new Dictionary<string, object>();
+            properties.Add(PropertyIds.Name, name);
+
+            return (IFolder)source.UpdateProperties(properties);
         }
 
 
@@ -274,7 +284,8 @@ namespace TestLibrary
         public void TestCrypto()
         {
             String[] test_pws = { "", "test", "Whatever", "Something to try" };
-            foreach (String pass in test_pws) {
+            foreach (String pass in test_pws)
+            {
                 String crypted = Crypto.Obfuscate(pass);
                 Assert.AreEqual(Crypto.Deobfuscate(crypted), pass);
             }
@@ -286,7 +297,7 @@ namespace TestLibrary
             string url, string user, string password, string repositoryId)
         {
             Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
-            foreach (KeyValuePair<string,string> pair in repos)
+            foreach (KeyValuePair<string, string> pair in repos)
             {
                 Console.WriteLine(pair.Key + " : " + pair.Value);
             }
@@ -364,7 +375,7 @@ namespace TestLibrary
 
                     // Create random small file.
                     string filename = LocalFilesystemActivityGenerator.GetNextFileName();
-                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//","/");
+                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
                     LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
 
                     // Sync again.
@@ -375,6 +386,7 @@ namespace TestLibrary
                     IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
                     Assert.NotNull(doc);
                     Assert.AreEqual(filename, doc.ContentStreamFileName);
+                    Assert.AreEqual(filename, doc.Name);
 
                     // Clean.
                     Console.WriteLine("Clean all.");
@@ -427,6 +439,7 @@ namespace TestLibrary
                     IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
                     Assert.NotNull(doc);
                     Assert.AreEqual(filename, doc.ContentStreamFileName);
+                    Assert.AreEqual(filename, doc.Name);
 
                     // Clean.
                     Console.WriteLine("Clean all.");
@@ -494,46 +507,58 @@ namespace TestLibrary
                     //synchronizedFolder.Sync();
                     //Assert.IsTrue(File.Exists(path2));
 
-                    //TODO: CMIS does not support rename ContentStreamFileName
-                    ////  rename document
-                    //Assert.IsTrue(File.Exists(path1));
-                    //Assert.IsFalse(File.Exists(path2));
-                    //IDocument doc2 = RenameDocument(doc1, name2);
-                    //synchronizedFolder.Sync();
-                    //Assert.IsFalse(File.Exists(path1));
-                    //Assert.IsTrue(File.Exists(path2));
-
-                    //  create folder
-                    Assert.IsFalse(Directory.Exists(path2));
-                    IFolder folder2 = CreateFolder(folder, name2);
-                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
-                    synchronizedFolder.Sync();
-                    Assert.IsTrue(Directory.Exists(path2));
-
-                    ////  move document
-                    //Assert.IsFalse(File.Exists(Path.Combine(path2, name1)));
-                    //string id = doc1.Id;
-                    //doc1.Move(folder2, folder);
-                    ////session.Binding.GetObjectService().MoveObject(repositoryId, ref id, folder2.Id, folder.Id, null);
-                    //synchronizedFolder.Sync();
-                    //Assert.IsTrue(File.Exists(Path.Combine(path2, name1)));
-
-                    ////  move folder
-                    //Assert.IsFalse(Directory.Exists(path1));
-                    //IFolder folder1 = CreateFolder(folder, name1);
-                    //synchronizedFolder.Sync();
-                    //Assert.IsTrue(Directory.Exists(path1));
-                    //Assert.IsFalse(File.Exists(Path.Combine(path1, name2, name1)));
-                    //folder2.Move(folder, folder1);
-                    //synchronizedFolder.Sync();
-                    //Assert.IsTrue(File.Exists(Path.Combine(path1, name2, name1)));
-
-                    //  delete document
+                    //  rename document
                     Assert.IsTrue(File.Exists(path1));
-                    doc1.DeleteAllVersions();
+                    Assert.IsFalse(File.Exists(path2));
+                    IDocument doc2 = RenameDocument(doc1, name2);
                     System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                     synchronizedFolder.Sync();
                     Assert.IsFalse(File.Exists(path1));
+                    Assert.IsTrue(File.Exists(path2));
+
+                    //  create folder
+                    Assert.IsFalse(Directory.Exists(path1));
+                    IFolder folder1 = CreateFolder(folder, name1);
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                    synchronizedFolder.Sync();
+                    Assert.IsTrue(Directory.Exists(path1));
+
+                    ////  move document
+                    //Assert.IsFalse(File.Exists(Path.Combine(path1, name2)));
+                    //doc2.Move(folder, folder1);
+                    ////string id = doc2.Id;
+                    ////session.Binding.GetObjectService().MoveObject(repositoryId, ref id, folder1.Id, folder.Id, null);
+                    //System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                    //synchronizedFolder.Sync();
+                    //Assert.IsTrue(File.Exists(Path.Combine(path1, name2)));
+
+                    //  delete document
+                    Assert.IsTrue(File.Exists(path2));
+                    doc2.DeleteAllVersions();
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                    synchronizedFolder.Sync();
+                    Assert.IsFalse(File.Exists(path2));
+
+                    //  rename folder
+                    Assert.IsTrue(Directory.Exists(path1));
+                    Assert.IsFalse(Directory.Exists(path2));
+                    IFolder folder2 = RenameFolder(folder1, name2);
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                    synchronizedFolder.Sync();
+                    Assert.IsFalse(Directory.Exists(path1));
+                    Assert.IsTrue(Directory.Exists(path2));
+
+                    ////  move folder
+                    //Assert.IsFalse(Directory.Exists(path1));
+                    //folder1 = CreateFolder(folder, name1);
+                    //System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                    //synchronizedFolder.Sync();
+                    //Assert.IsTrue(Directory.Exists(path1));
+                    //Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1)));
+                    //folder1.Move(folder, folder2);
+                    //System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                    //synchronizedFolder.Sync();
+                    //Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1)));
 
                     //  delete folder tree
                     Assert.IsTrue(Directory.Exists(path2));
@@ -615,6 +640,7 @@ namespace TestLibrary
                 }
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
@@ -835,7 +861,7 @@ namespace TestLibrary
                     int count = 10000;
                     while (syncing)
                     {
-                        count --;
+                        count--;
                         if (count <= 0)
                         {
                             System.Threading.Thread.Sleep(1000);
@@ -862,7 +888,7 @@ namespace TestLibrary
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
             Console.WriteLine("Synced to clean state.");
-            
+
             // Mock.
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
@@ -911,7 +937,7 @@ namespace TestLibrary
                     int count = 1000;
                     while (syncing)
                     {
-                        count --;
+                        count--;
                         if (count <= 0)
                         {
                             System.Threading.Thread.Sleep(1000);
@@ -983,7 +1009,7 @@ namespace TestLibrary
             Assert.True(found);
 
             // Clean.
-            IDocument doc = (IDocument)session.GetObjectByPath((remoteFolderPath + "/" + fileName).Replace("//","/"));
+            IDocument doc = (IDocument)session.GetObjectByPath((remoteFolderPath + "/" + fileName).Replace("//", "/"));
             doc.DeleteAllVersions();
         }
 
