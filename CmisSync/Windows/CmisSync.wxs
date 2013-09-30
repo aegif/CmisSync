@@ -22,6 +22,9 @@
             <Component Id='CmisSync.exe' Guid='bab5a922-b5c4-4958-ab79-5e303b767a61'>
               <File Id='CmisSync.exe' Name='CmisSync.exe' Source='!(wix.root)\CmisSync\Windows\bin\Debug\CmisSync.exe' KeyPath='yes' DiskId='1' />
             </Component>
+            <Component Id='CmisSync.Console.exe' Guid='ee872f29-46a0-469a-82f4-b4047957fd7a'>
+              <File Id='CmisSync.Console.exe' Name='CmisSync.Console.exe' Source='!(wix.root)\CmisSync.Console\bin\Debug\CmisSync.Console.exe' KeyPath='yes' DiskId='1' />
+            </Component>
             <Component Id='Libraries' Guid='f982a0bb-824d-4835-921d-e51b47b8598b'>
               <File Id='CmisSync.Lib.dll' Name='CmisSync.Lib.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\CmisSync.Lib.dll' DiskId='1' />
               <File Id='DotCMIS.dll' Name='DotCMIS.dll' Source='!(wix.root)\CmisSync\Windows\bin\Debug\DotCMIS.dll' DiskId='1' />
@@ -99,6 +102,7 @@
 
     <Feature Id='CmisSyncFeature' Title='CmisSync' Description='CmisSync' Level='1' AllowAdvertise='no'>
       <ComponentRef Id="CmisSync.exe" />
+      <ComponentRef Id="CmisSync.Console.exe" />
       <ComponentRef Id="Libraries" />
       <ComponentRef Id="COMP_x86" />
       <ComponentRef Id="COMP_x64" />
