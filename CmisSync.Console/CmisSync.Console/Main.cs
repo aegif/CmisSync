@@ -49,7 +49,7 @@ namespace CmisSync.Console
 			Document doc = (Document)session.GetObjectByPath(remoteFilePath);
 		}
 
-		private void init ()
+/*		private void init ()
 		{
 			Config config = ConfigManager.CurrentConfig;
 			RepoInfo repoInfo = config.GetRepoInfo("documentLibrary");
@@ -63,7 +63,7 @@ namespace CmisSync.Console
 			cmisRepo.DoFirstSync (); 
 			TimerCallback timerDelegate = new TimerCallback(Sync);
 			Timer timer = new Timer(timerDelegate, null , 0, 1000);
-		}
+		}*/
 
 		public  void Sync ( object o)
 		{
