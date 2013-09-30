@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.vs2010", "..\..\Ext
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotCMIS", "..\..\Extras\chemistry-dotcmis-svn1523966-src\DotCMIS\DotCMIS.csproj", "{529EF90F-A34C-4426-A4F9-65113AC23841}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Console", "..\..\CmisSync.Console\CmisSync.Console\CmisSync.Console.csproj", "{A37D5F2B-AD95-44A6-9301-7532359D1A6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Console", "..\..\CmisSync.Console\CmisSync.Console.csproj", "{A37D5F2B-AD95-44A6-9301-7532359D1A6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
