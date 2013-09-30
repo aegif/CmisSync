@@ -241,7 +241,7 @@ namespace CmisSync.Lib.Sync
                     Logger.Debug("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
                     Logger.Debug("Get descendants support: " + IsGetDescendantsSupported.ToString());
                     if(repoinfo.ChunkSize>0) {
-                        Logger.Debug("Chunked Up/Download enabled: chunk size = "+repoinfo.ChunkSize+" byte");
+                        Logger.Debug("Chunked Up/Download enabled: chunk size = "+ repoinfo.ChunkSize.ToString() + " byte");
                     }else {
                         Logger.Debug("Chunked Up/Download disabled");
                     }
@@ -874,7 +874,7 @@ namespace CmisSync.Lib.Sync
                             try
                             {
                                 remoteDocument.AppendContentStream(contentStream, isLastTrunk);
-                                Logger.Debug("Response of the server: " + offset);
+                                Logger.Debug("Response of the server: " + offset.ToString());
                                 database.SetFileServerSideModificationDate(filePath, remoteDocument.LastModificationDate);
                             }
                             catch (Exception ex)
