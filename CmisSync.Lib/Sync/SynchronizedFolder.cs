@@ -240,7 +240,11 @@ namespace CmisSync.Lib.Sync
                     Logger.Debug("ChangeLog capability: " + ChangeLogCapability.ToString());
                     Logger.Debug("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
                     Logger.Debug("Get descendants support: " + IsGetDescendantsSupported.ToString());
-
+                    if(repoinfo.ChunkSize>0) {
+                        Logger.Debug("Trunkated Up/Download enabled: chunk size = "+repoinfo.ChunkSize+" byte");
+                    }else {
+                        Logger.Debug("Trunkated Up/Download disabled");
+                    }
                     HashSet<string> filters = new HashSet<string>();
                     filters.Add("cmis:objectId");
                     filters.Add("cmis:name");
@@ -419,17 +423,17 @@ namespace CmisSync.Lib.Sync
 
             private bool DownloadStreamInTrunk(string filePath, Stream fileStream, IDocument remoteDocument)
             {
-                if (repoinfo.TrunkSize <= 0)
+                if (repoinfo.ChunkSize <= 0)
                 {
                     return false;
                 }
-
+                Logger.Debug("Start downloading in trunk (size="+ repoinfo.ChunkSize+"): " + filePath + " from remote document: "+ remoteDocument.Name);
                 long? fileLength = remoteDocument.ContentStreamLength;
                 FileInfo fileInfo = new FileInfo(filePath);
 
-                for (long offset = fileInfo.Length; offset < fileLength; offset += repoinfo.TrunkSize)
+                for (long offset = fileInfo.Length; offset < fileLength; offset += repoinfo.ChunkSize)
                 {
-                    IContentStream contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.TrunkSize);
+                    IContentStream contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.ChunkSize);
                     using (contentStream.Stream)
                     {
                         lock (disposeLock)
@@ -683,7 +687,7 @@ namespace CmisSync.Lib.Sync
                                 using (Stream file = new FileStream(tmpfilepath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
                                 using (SHA1 hashAlg = new SHA1Managed())
                                 {
-                                    if (repoinfo.TrunkSize <= 0)
+                                    if (repoinfo.ChunkSize <= 0 )
                                     {
                                         using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                                         {
@@ -811,7 +815,8 @@ namespace CmisSync.Lib.Sync
 
             private bool ResumeUploadFile(string filePath, IDocument remoteDocument)
             {
-                if (repoinfo.TrunkSize <= 0)
+                Logger.Debug("Resuming Upload: "+ filePath + " to remote document: " + remoteDocument.Name);
+                if (repoinfo.ChunkSize <= 0)
                 {
                     return UpdateFile(filePath, remoteDocument);
                 }
@@ -833,41 +838,43 @@ namespace CmisSync.Lib.Sync
 
             private bool UploadStreamInTrunk(string filePath, Stream fileStream, IDocument remoteDocument)
             {
-                if (repoinfo.TrunkSize <= 0)
+                if (repoinfo.ChunkSize <= 0)
                 {
                     return false;
                 }
 
                 string fileName = remoteDocument.Name;
-                for (long offset = fileStream.Position; offset < fileStream.Length; offset += repoinfo.TrunkSize)
+                for (long offset = fileStream.Position; offset < fileStream.Length; offset += repoinfo.ChunkSize)
                 {
                     bool isLastTrunk = false;
-                    if (offset + repoinfo.TrunkSize >= fileStream.Length)
+                    if (offset + repoinfo.ChunkSize >= fileStream.Length)
                     {
                         isLastTrunk = true;
                     }
-                    using (TrunkedStream trunkstream = new TrunkedStream(fileStream, repoinfo.TrunkSize))
+                    Logger.Debug(String.Format("Uploading next chunk (size={1}) of {0}: {2} of {3} finished({4}%)", fileName, repoinfo.ChunkSize, offset, fileStream.Length, 100*offset / fileStream.Length));
+                    using (ChunkedStream chunkstream = new ChunkedStream(fileStream, repoinfo.ChunkSize))
                     {
-                        trunkstream.TrunkPosition = offset;
+                        chunkstream.ChunkPosition = offset;
 
                         ContentStream contentStream = new ContentStream();
                         contentStream.FileName = fileName;
                         contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                        contentStream.Length = repoinfo.TrunkSize;
+                        contentStream.Length = repoinfo.ChunkSize;
                         if (isLastTrunk)
                         {
                             contentStream.Length = fileStream.Length - offset;
                         }
-                        contentStream.Stream = trunkstream;
+                        contentStream.Stream = chunkstream;
                         lock (disposeLock)
                         {
                             if (disposed)
                             {
-                                throw new ObjectDisposedException("Downloading");
+                                throw new ObjectDisposedException("Uploading");
                             }
                             try
                             {
                                 remoteDocument.AppendContentStream(contentStream, isLastTrunk);
+                                Logger.Debug("Response of the server: " + offset);
                                 database.SetFileServerSideModificationDate(filePath, remoteDocument.LastModificationDate);
                             }
                             catch (Exception ex)
@@ -905,7 +912,7 @@ namespace CmisSync.Lib.Sync
                         // Prepare content stream
                         using (Stream file = File.OpenRead(filePath))
                         {
-                            if (repoinfo.TrunkSize <= 0 || file.Length <= repoinfo.TrunkSize)
+                            if (repoinfo.ChunkSize <= 0 || file.Length <= repoinfo.ChunkSize)
                             {
                                 using (SHA1 hashAlg = new SHA1Managed())
                                 using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
@@ -1085,7 +1092,7 @@ namespace CmisSync.Lib.Sync
                             return true;
                         }
 
-                        if (repoinfo.TrunkSize <= 0)
+                        if (repoinfo.ChunkSize <= 0)
                         {
                             ContentStream contentStream = new ContentStream();
                             contentStream.FileName = remoteFile.Name;
@@ -1104,24 +1111,24 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Debug("before SetContentStream");
 
-                            for (long offset = 0; offset < localfile.Length; offset += repoinfo.TrunkSize)
+                            for (long offset = 0; offset < localfile.Length; offset += repoinfo.ChunkSize)
                             {
-                                bool isLastTrunk = false;
-                                if (offset + repoinfo.TrunkSize >= localfile.Length)
+                                bool isLastChunk = false;
+                                if (offset + repoinfo.ChunkSize >= localfile.Length)
                                 {
-                                    isLastTrunk = true;
+                                    isLastChunk = true;
                                 }
-                                using (TrunkedStream trunkstream = new TrunkedStream(localfile, repoinfo.TrunkSize))
+                                using (ChunkedStream chunkstream = new ChunkedStream(localfile, repoinfo.ChunkSize))
                                 {
                                     ContentStream contentStream = new ContentStream();
                                     contentStream.FileName = remoteFile.Name;
-                                    contentStream.Length = repoinfo.TrunkSize;
-                                    if (isLastTrunk)
+                                    contentStream.Length = repoinfo.ChunkSize;
+                                    if (isLastChunk)
                                     {
                                         contentStream.Length = localfile.Length - offset;
                                     }
                                     contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
-                                    contentStream.Stream = trunkstream;
+                                    contentStream.Stream = chunkstream;
 
                                     // Upload
                                     if (offset == 0)
@@ -1130,7 +1137,7 @@ namespace CmisSync.Lib.Sync
                                     }
                                     else
                                     {
-                                        remoteFile.AppendContentStream(contentStream, isLastTrunk);
+                                        remoteFile.AppendContentStream(contentStream, isLastChunk);
                                     }
                                 }
                             }

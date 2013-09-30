@@ -4,19 +4,19 @@ using System.IO;
 
 namespace CmisSync.Lib
 {
-    public class TrunkedStream : Stream
+    public class ChunkedStream : Stream
     {
         private Stream source;
-        private long trunkSize;
+        private long chunkSize;
 
-        public TrunkedStream(Stream stream, long trunk)
+        public ChunkedStream(Stream stream, long chunk)
         {
             source = stream;
-            trunkSize = trunk;
+            chunkSize = chunk;
 
             //if (!source.CanRead)
             //{
-            //    throw new System.NotSupportedException("Read access is needed for TrunkedStream");
+            //    throw new System.NotSupportedException("Read access is needed for ChunkedStream");
             //}
         }
 
@@ -25,18 +25,18 @@ namespace CmisSync.Lib
         public override bool CanSeek { get { return source.CanSeek; } }
         public override void Flush() { source.Flush(); }
 
-        private long trunkPosition;
-        public long TrunkPosition
+        private long chunkPosition;
+        public long ChunkPosition
         {
             get
             {
-                return trunkPosition;
+                return chunkPosition;
             }
 
             set
             {
                 source.Position = value;
-                trunkPosition = value;
+                chunkPosition = value;
             }
         }
 
@@ -45,15 +45,15 @@ namespace CmisSync.Lib
             get
             {
                 long lengthSource = source.Length;
-                if (lengthSource <= TrunkPosition)
+                if (lengthSource <= ChunkPosition)
                 {
                     return 0;
                 }
 
-                long length = lengthSource - TrunkPosition;
-                if (length >= trunkSize)
+                long length = lengthSource - ChunkPosition;
+                if (length >= chunkSize)
                 {
-                    return trunkSize;
+                    return chunkSize;
                 }
                 else
                 {
@@ -72,21 +72,21 @@ namespace CmisSync.Lib
                     return position;
                 }
 
-                long offset = source.Position - TrunkPosition;
-                if (offset < 0 || offset > trunkSize)
+                long offset = source.Position - ChunkPosition;
+                if (offset < 0 || offset > chunkSize)
                 {
-                    Debug.Assert(false, String.Format("Position {0} not in [0,{1}]", offset, trunkSize));
+                    Debug.Assert(false, String.Format("Position {0} not in [0,{1}]", offset, chunkSize));
                 }
                 return offset;
             }
 
             set
             {
-                if (value < 0 || value > trunkSize)
+                if (value < 0 || value > chunkSize)
                 {
-                    throw new System.ArgumentOutOfRangeException(String.Format("Position {0} not in [0,{1}]", value, trunkSize));
+                    throw new System.ArgumentOutOfRangeException(String.Format("Position {0} not in [0,{1}]", value, chunkSize));
                 }
-                source.Position = TrunkPosition + value;
+                source.Position = ChunkPosition + value;
             }
         }
 
@@ -101,9 +101,9 @@ namespace CmisSync.Lib
                 throw new System.ArgumentOutOfRangeException("count", count, "count is negative");
             }
 
-            if (count > trunkSize - Position)
+            if (count > chunkSize - Position)
             {
-                count = (int)(trunkSize - Position);
+                count = (int)(chunkSize - Position);
             }
             count = source.Read(buffer, offset, count);
             position += count;
@@ -121,7 +121,7 @@ namespace CmisSync.Lib
                 throw new System.ArgumentOutOfRangeException("count", count, "count is negative");
             }
 
-            if (count > trunkSize - Position)
+            if (count > chunkSize - Position)
             {
                 throw new System.ArgumentOutOfRangeException("count", count, "count is overflow");
             }

@@ -356,20 +356,20 @@ namespace CmisSync.Lib
                 [XmlElement("ignoreFolder", IsNullable=true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
-                private long trunkSize = 1024 * 1024;
-                [XmlElement("trunkSize"), System.ComponentModel.DefaultValue(1024 * 1024)]
-                public long TrunkSize
+                private long chunkSize = 1024 * 1024;
+                [XmlElement("chunkSize"), System.ComponentModel.DefaultValue(1024 * 1024)]
+                public long ChunkSize
                 {
-                    get { return trunkSize; }
+                    get { return chunkSize; }
                     set
                     {
                         if (value < 0)
                         {
-                            trunkSize = 0;
+                            chunkSize = 0;
                         }
                         else
                         {
-                            trunkSize = value;
+                            chunkSize = value;
                         }
                     }
                 }
@@ -393,7 +393,10 @@ namespace CmisSync.Lib
                     {
                         repoInfo.addIgnorePath(ignoredFolder.Path);
                     }
-                    repoInfo.TrunkSize = TrunkSize;
+                    if(SupportedFeatures != null && SupportedFeatures.ChunkedSupport != null && SupportedFeatures.ChunkedSupport == true)
+                        repoInfo.ChunkSize = ChunkSize;
+                    else
+                        repoInfo.ChunkSize = 0;
                     return repoInfo;
                 }
             }
@@ -423,6 +426,8 @@ namespace CmisSync.Lib
             public bool? FileSystemWatcherSupport {get; set;}
             [XmlElement("maxContentChanges", IsNullable=true)]
             public int? MaxNumberOfContentChanges {get; set;}
+            [XmlElement("tunkedSupport", IsNullable=true)]
+            public bool? ChunkedSupport {get;set;}
         }
 
         public class XmlUri : IXmlSerializable

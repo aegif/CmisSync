@@ -63,8 +63,8 @@
     <Compile Include="ConfigurationTest.cs" />
     <Compile Include="LocalFilesystemActivityGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrunkedStreamTest.cs" />
     <Compile Include="WatcherTest.cs" />
+    <Compile Include="ChunkedStreamTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">

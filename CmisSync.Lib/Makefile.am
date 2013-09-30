@@ -8,6 +8,7 @@ LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) $(WEBLIBS) $(MONO
 SOURCES =  \
 	ActivityListenerAggregator.cs \
 	Backend.cs \
+	ChunkedStream.cs \
 	Cmis/CmisPermissionDeniedException.cs \
 	Cmis/CmisServerNotFoundException.cs \
 	Cmis/CmisUtils.cs \
@@ -29,12 +30,8 @@ SOURCES =  \
 	Sync/CrawlStrategy.cs \
 	Sync/SynchronizedFolder.cs \
 	Sync/WatcherStrategy.cs \
-	TrunkedStream.cs \
 	Utils.cs \
-	Watcher.cs \
-	Events/SyncEventHandler.cs \
-	Events/SyncEvent.cs \
-	Events/SyncEventManager.cs
+	Watcher.cs
 
 EXTRA_DIST = CmisSync.Lib.csproj StaticDefines.cs
 

@@ -80,10 +80,10 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// Trunk size
-        /// If none zero, CmisSync will divide the document by trunk size for download/upload.
+        /// Chunk size
+        /// If none zero, CmisSync will divide the document by chunk size for download/upload.
         /// </summary>
-        public long TrunkSize { get; set; }
+        public long ChunkSize { get; set; }
 
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace CmisSync.Lib
             RepoID = repoID;
             TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
             PollInterval = pollInterval;
-            TrunkSize = 0;
+            ChunkSize = 0;
         }
 
         /// <summary>
