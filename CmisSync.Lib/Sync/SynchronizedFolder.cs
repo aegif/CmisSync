@@ -241,9 +241,9 @@ namespace CmisSync.Lib.Sync
                     Logger.Debug("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
                     Logger.Debug("Get descendants support: " + IsGetDescendantsSupported.ToString());
                     if(repoinfo.ChunkSize>0) {
-                        Logger.Debug("Trunkated Up/Download enabled: chunk size = "+repoinfo.ChunkSize+" byte");
+                        Logger.Debug("Chunked Up/Download enabled: chunk size = "+repoinfo.ChunkSize+" byte");
                     }else {
-                        Logger.Debug("Trunkated Up/Download disabled");
+                        Logger.Debug("Chunked Up/Download disabled");
                     }
                     HashSet<string> filters = new HashSet<string>();
                     filters.Add("cmis:objectId");
