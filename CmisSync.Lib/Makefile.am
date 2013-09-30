@@ -17,6 +17,9 @@ SOURCES =  \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
+	Events/SyncEvent.cs \
+	Events/SyncEventHandler.cs \
+	Events/SyncEventManager.cs \
 	Fetcher.cs \
 	IActivityListener.cs \
 	RepoBase.cs \
@@ -28,7 +31,10 @@ SOURCES =  \
 	Sync/WatcherStrategy.cs \
 	TrunkedStream.cs \
 	Utils.cs \
-	Watcher.cs
+	Watcher.cs \
+	Events/SyncEventHandler.cs \
+	Events/SyncEvent.cs \
+	Events/SyncEventManager.cs
 
 EXTRA_DIST = CmisSync.Lib.csproj StaticDefines.cs
 

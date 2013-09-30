@@ -25,6 +25,25 @@ using log4net;
 
 namespace CmisSync.Lib
 {
+
+    public interface EventFilter {
+        bool shouldBeIgnored(NodeEvent e);
+    }
+
+    public class NodeEvent {
+        public string Path {get;set;}
+        public Watcher.ChangeTypes ChangeType { get; set;}
+        public string Name {get; set;}
+    };
+
+    public class IgnoreFolderFilter : EventFilter {
+        public bool shouldBeIgnored(NodeEvent e) {
+            if(!Utils.IsInvalidFileName(e.Name))
+                return true;
+            return !Utils.WorthSyncing(e.Name);
+        }
+    };
+
     /// <summary>
     /// Watches the local filesystem for changes.
     /// </summary>
@@ -206,6 +225,7 @@ namespace CmisSync.Lib
 
         private void OnCreated(object source, FileSystemEventArgs e)
         {
+            Logger.Debug("FS Object creation detected: " + e.FullPath);
             List<ChangeTypes> checks = new List<ChangeTypes>();
             checks.Add(ChangeTypes.Deleted);
             ChangeHandle(e.FullPath, ChangeTypes.Created, checks);
@@ -215,6 +235,7 @@ namespace CmisSync.Lib
         
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
+            Logger.Debug("FS Object deletion detected: " + e.FullPath);
             List<ChangeTypes> checks = new List<ChangeTypes>();
             checks.Add(ChangeTypes.Created);
             checks.Add(ChangeTypes.Changed);
@@ -225,6 +246,7 @@ namespace CmisSync.Lib
         
         private void OnChanged(object source, FileSystemEventArgs e)
         {
+            Logger.Debug("FS Object change detected: " + e.FullPath);
             List<ChangeTypes> checks = new List<ChangeTypes>();
             checks.Add(ChangeTypes.Created);
             checks.Add(ChangeTypes.Changed);
@@ -252,6 +274,7 @@ namespace CmisSync.Lib
         
         private void OnRenamed(object source, RenamedEventArgs e)
         {
+            Logger.Debug("FS Object renaming detected: " + e.OldFullPath + " to " + e.FullPath);
             string oldname = e.OldFullPath;
             string newname = e.FullPath;
             if (oldname.StartsWith(Path))
