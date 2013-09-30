@@ -14,7 +14,7 @@ SOURCES =  \
 	CmisSyncTests.cs \
 	WatcherTest.cs \
 	CmisDatabaseTest.cs \
-	TrunkedStreamTest.cs \
+	ChunkedStreamTest.cs \
 	LocalFilesystemActivityGenerator.cs
 
 EXTRA_DIST = TestLibrary.csproj \
