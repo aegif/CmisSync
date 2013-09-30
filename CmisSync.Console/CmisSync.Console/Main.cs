@@ -13,16 +13,25 @@ using DotCMIS;
 using DotCMIS.Client.Impl;
 using DotCMIS.Client;
 
-
 namespace CmisSync.Console
 {
-	class MainClass
+    /// <summary>
+    /// Utility that performs a single synchronization.
+    /// Useful for scripts, cron or command-line usage.
+    /// </summary>
+	class CmisSyncOnce
 	{
-
+        /// <summary>
+        /// Configured synchronized folder on which the synchronization must be performed.
+        /// </summary>
 		private CmisRepo cmisRepo;
 
+        /// <summary>
+        /// Main method, pass folder name as argument.
+        /// </summary>
 		public static void Main (string[] args)
 		{
+            // Check arguments.
             if (args.Length < 1)
             {
                 System.Console.WriteLine("Usage: CmisSyncOnce.exe mysyncedfolder");
@@ -31,11 +40,15 @@ namespace CmisSync.Console
                 return;
             }
 
-			MainClass main = new MainClass();
-			main.Init(args[0]);
-            main.Sync();
+            // Load and synchronize.
+			CmisSyncOnce once = new CmisSyncOnce();
+			once.Init(args[0]);
+            once.Sync();
 		}
 
+        /// <summary>
+        /// Load folder configuration.
+        /// </summary>
 		private void Init (string folderName)
 		{
 			Config config = ConfigManager.CurrentConfig;
@@ -53,11 +66,12 @@ namespace CmisSync.Console
 			cmisRepo.Initialize ();
 		}
 
+        /// <summary>
+        /// Synchronize folder.
+        /// </summary>
 		private void Sync ()
 		{
-			cmisRepo.SyncInBackground();
+            cmisRepo.SyncInBackground(); // TODO should not be put in background.
 		}
-
 	}
-
 }
