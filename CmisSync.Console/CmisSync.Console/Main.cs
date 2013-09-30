@@ -23,49 +23,37 @@ namespace CmisSync.Console
 
 		public static void Main (string[] args)
 		{
+            if (args.Length < 1)
+            {
+                System.Console.WriteLine("Usage: CmisSyncOnce.exe mysyncedfolder");
+                System.Console.WriteLine("Example: CmisSyncOnce.exe \"192.168.0.22\\Main Repository\"");
+                System.Console.WriteLine("See your folders names in C:\\Users\\you\\AppData\\Roaming\\cmissync\\config.xml or similar");
+                return;
+            }
 
-			//System.Console.WriteLine(ConfigManager.CurrentConfigFile);
 			MainClass main = new MainClass();
-			//main.init();
-			main.Test();
-
-			//System.Console.WriteLine(Crypto.Obfuscate("admin"));
-
-
-		}
-		public void Test ()
-		{
-			// Create session.
-			var parameters = new Dictionary<string, string>();
-			parameters[SessionParameter.BindingType] = BindingType.AtomPub;
-			parameters[SessionParameter.AtomPubUrl] = "http://192.168.0.22:8080/alfresco/cmisatom"; // MODIFY HERE
-			parameters[SessionParameter.User] = "admin"; // MODIFY HERE
-			parameters[SessionParameter.Password] = "admin"; // MODIFY HERE
-			var factory = SessionFactory.NewInstance();
-			ISession session = factory.GetRepositories(parameters)[0].CreateSession();
-			
-			// Update a document twice.
-			string remoteFilePath = "/User Homes/test.txt";
-			Document doc = (Document)session.GetObjectByPath(remoteFilePath);
+			main.Init(args[0]);
+            main.Sync();
 		}
 
-/*		private void init ()
+		private void Init (string folderName)
 		{
 			Config config = ConfigManager.CurrentConfig;
-			RepoInfo repoInfo = config.GetRepoInfo("documentLibrary");
+            CmisSync.Lib.Config.SyncConfig.Folder folder = config.getFolder(folderName);
+            if (folder == null)
+            {
+                System.Console.WriteLine("No folder found with this name: " + folderName);
+                return;
+            }
+			RepoInfo repoInfo = folder.GetRepoInfo();
 			
 			ConsoleController controller = new ConsoleController ();
 			cmisRepo = new CmisRepo (repoInfo, controller);
 			
 			cmisRepo.Initialize ();
+		}
 
-			//main Loop
-			cmisRepo.DoFirstSync (); 
-			TimerCallback timerDelegate = new TimerCallback(Sync);
-			Timer timer = new Timer(timerDelegate, null , 0, 1000);
-		}*/
-
-		public  void Sync ( object o)
+		private void Sync ()
 		{
 			cmisRepo.SyncInBackground();
 		}
