@@ -4,12 +4,12 @@ using System.Runtime.CompilerServices;
 // Information about this assembly is defined by the following attributes. 
 // Change them to the values specific to your project.
 
-[assembly: AssemblyTitle("CmisSync.Console")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("CmisSyncOnce")]
+[assembly: AssemblyDescription("Command-line tool for CmisSync")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("totanitakeshi")]
+[assembly: AssemblyCompany("Aegif")]
+[assembly: AssemblyProduct("CmisSyncOnce")]
+[assembly: AssemblyCopyright("Aegif")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
