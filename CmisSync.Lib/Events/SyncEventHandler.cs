@@ -4,7 +4,6 @@ using log4net;
 
 namespace CmisSync.Lib
 {
-
     public interface ISyncEventHandler
     {
         bool handle(ISyncEvent e);
