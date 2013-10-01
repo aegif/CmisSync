@@ -5,13 +5,13 @@ namespace CmisSync.Lib
 {
     public class SyncEventManager
     {
-        private List<SyncEventHandler> handler;
+        private List<ISyncEventHandler> handler;
         public SyncEventManager()
         {
-            handler = new List<SyncEventHandler>();
+            handler = new List<ISyncEventHandler>();
         }
 
-        public void addEventHandler(SyncEventHandler h)
+        public void addEventHandler(ISyncEventHandler h)
         {
             int pos;
             for( pos = 0; pos < this.handler.Count; pos++) {
@@ -26,15 +26,15 @@ namespace CmisSync.Lib
             handler.Insert(pos, h);
         }
 
-        public void handle(SyncEvent e) {
-            foreach ( SyncEventHandler h in handler)
+        public void handle(ISyncEvent e) {
+            foreach ( ISyncEventHandler h in handler)
             {
                 if(h.handle(e))
                     return;
             }
         }
 
-        public void removeEventHandler(SyncEventHandler h)
+        public void removeEventHandler(ISyncEventHandler h)
         {
             handler.Remove(h);
         }

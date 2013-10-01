@@ -2,10 +2,10 @@ using System;
 
 namespace CmisSync.Lib
 {
-    public interface SyncEventHandler
+    public interface ISyncEventHandler
     {
-        bool handle(SyncEvent e);
-        uint getPriority();
+        bool handle(ISyncEvent e);
+        int getPriority();
     }
 }
 
