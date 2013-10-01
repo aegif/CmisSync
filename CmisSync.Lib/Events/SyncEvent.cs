@@ -3,17 +3,17 @@ using System.IO;
 
 namespace CmisSync.Lib
 {
-    public interface SyncEvent
+    public interface ISyncEvent
     {
         object getSourceEvent();
         SyncEventType getType();
     }
 
     public enum SyncEventType {
-            FILESYSTEM, CONTENTCHANGE, LOCALCRAWL, REMOTECRAWL
-    }
+            FileSystem, ContentChange, LocalCrawl, RemoteCrawl
+    };
 
-    public abstract class FSEvent : SyncEvent
+    public abstract class FSEvent : ISyncEvent
     {
         protected WatcherChangeTypes type;
         protected string path;
@@ -23,7 +23,7 @@ namespace CmisSync.Lib
         }
 
         public SyncEventType getType() {
-            return SyncEventType.FILESYSTEM;
+            return SyncEventType.FileSystem;
         }
 
         abstract public object getSourceEvent();

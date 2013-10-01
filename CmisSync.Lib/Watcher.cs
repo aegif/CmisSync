@@ -25,25 +25,6 @@ using log4net;
 
 namespace CmisSync.Lib
 {
-
-    public interface EventFilter {
-        bool shouldBeIgnored(NodeEvent e);
-    }
-
-    public class NodeEvent {
-        public string Path {get;set;}
-        public Watcher.ChangeTypes ChangeType { get; set;}
-        public string Name {get; set;}
-    };
-
-    public class IgnoreFolderFilter : EventFilter {
-        public bool shouldBeIgnored(NodeEvent e) {
-            if(!Utils.IsInvalidFileName(e.Name))
-                return true;
-            return !Utils.WorthSyncing(e.Name);
-        }
-    };
-
     /// <summary>
     /// Watches the local filesystem for changes.
     /// </summary>
