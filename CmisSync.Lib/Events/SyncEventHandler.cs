@@ -11,7 +11,7 @@ namespace CmisSync.Lib
     }
 
     abstract public class EventFilter : ISyncEventHandler {
-        public const int EVENTFILTERPRIORITY = 1000;
+        private static readonly int EVENTFILTERPRIORITY = 1000;
         public abstract bool handle(ISyncEvent e);
         public int getPriority() {
             return EVENTFILTERPRIORITY;
