@@ -392,6 +392,7 @@ namespace CmisSync.Lib.Sync
                                 if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                                 {
                                     // Create local folder.
+                                    Logger.Info("Creating local directory: "+ localSubFolder);
                                     Directory.CreateDirectory(localSubFolder);
 
                                     // Create database entry for this folder
@@ -505,6 +506,7 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         // Create local folder.remoteDocument.Name
+                        Logger.Info("Creating local directory: " + localSubFolder);
                         Directory.CreateDirectory(localSubFolder);
 
                         // Create database entry for this folder.
@@ -684,6 +686,7 @@ namespace CmisSync.Lib.Sync
                             }
                             else
                             {
+                                Logger.Debug("Creating local download file: " + tmpfilepath);
                                 using (Stream file = new FileStream(tmpfilepath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
                                 using (SHA1 hashAlg = new SHA1Managed())
                                 {
@@ -740,6 +743,7 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Error("Download failed: " + fileName + " " + ex);
                             success = false;
+                            Logger.Debug("Removing temp download file: "+ tmpfilepath);
                             File.Delete(tmpfilepath);
                         }
 
@@ -758,6 +762,7 @@ namespace CmisSync.Lib.Sync
                             {
                                 Logger.Info("Exception while fetching metadata: " + fileName + " " + Utils.ToLogString(e));
                                 // Remove temporary local document to avoid it being considered a new document.
+                                Logger.Debug("Removing local temp file: " + tmpfilepath);
                                 File.Delete(tmpfilepath);
                                 return false;
                             }
@@ -775,8 +780,9 @@ namespace CmisSync.Lib.Sync
 
                                     String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filepath) + "_" + repoinfo.User + "-version");
                                     String newFilePath = Path.Combine(dir, newFileName);
+                                    Logger.Debug(String.Format("Moving local file {0} file to new file {1}", filepath, newFilePath));
                                     File.Move(filepath, newFilePath);
-
+                                    Logger.Debug(String.Format("Moving temporary local download file {0} to target file {1}", tmpfilepath, filepath));
                                     File.Move(tmpfilepath, filepath);
 
                                     repo.OnConflictResolved();
@@ -787,19 +793,22 @@ namespace CmisSync.Lib.Sync
                                 }
                                 else
                                 {
+                                    Logger.Debug("Removing local file: " + filepath);
                                     File.Delete(filepath);
+                                    Logger.Debug(String.Format("Moving temporary local download file {0} to target file {1}", tmpfilepath, filepath));
                                     File.Move(tmpfilepath, filepath);
                                 }
                             }
                             else
                             {
+                                Logger.Debug(String.Format("Moving temporary local download file {0} to target file {1}", tmpfilepath, filepath));
                                 File.Move(tmpfilepath, filepath);
                             }
 
                             // Create database entry for this file.
                             database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
 
-                            Logger.Info("Added to database: " + fileName);
+                            Logger.Debug("Added to database: " + fileName);
                         }
 
                         return success;
@@ -926,6 +935,9 @@ namespace CmisSync.Lib.Sync
                                     // Upload
                                     try
                                     {
+                                        Logger.Debug(String.Format("CMIS::CreateDocument(Properties(Name={0}, ObjectType={1})," +
+                                            "ContentStream(FileName={0}, MimeType={2}, Length={3})",
+                                                                   fileName,"cmis:document", contentStream.MimeType,contentStream.Length));
                                         remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                                         filehash = hashAlg.Hash;
                                         success = true;
