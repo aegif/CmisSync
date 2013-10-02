@@ -148,6 +148,8 @@ namespace CmisSync.Lib
         /// <returns></returns>
         public bool isPathIgnored(string path)
         {
+            if(Utils.IsInvalidFolderName(path.Replace("/", "").Replace("\"","")))
+                return true;
             return ignoredPaths.Contains(path);
         }
 

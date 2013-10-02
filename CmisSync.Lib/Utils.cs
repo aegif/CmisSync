@@ -172,6 +172,9 @@ namespace CmisSync.Lib
                 return false;
             }
 
+            if(IsInvalidFileName(filename))
+                return false;
+
             // TODO: Consider these ones as well:
             //    ".~lock.*", // LibreOffice
             //    ".*.sw[a-z]", // vi(m)
@@ -216,7 +219,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a file name is valid or not.
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())) + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?") + "]");
 
 
         /// <summary>
@@ -236,7 +239,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a filename is valid or not.
         /// </summary>
         private static Regex invalidFolderNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?") + "]");
 
 
         /// <summary>
