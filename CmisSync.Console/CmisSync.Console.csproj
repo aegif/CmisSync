@@ -34,7 +34,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Main.cs" />
+    <Compile Include="CmisSyncOnce.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ConsoleController.cs" />
   </ItemGroup>
