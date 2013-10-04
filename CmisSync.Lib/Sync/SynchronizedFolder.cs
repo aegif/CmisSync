@@ -693,6 +693,7 @@ namespace CmisSync.Lib.Sync
                                     if (repoinfo.ChunkSize <= 0 )
                                     {
                                         using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
+                                        using (LoggingStream logstream = new LoggingStream(hashstream, "Download progress", fileName, (long) fileLength))
                                         {
                                             contentStream = remoteDocument.GetContentStream();
                                             // If this file does not have a content stream, ignore it.
@@ -710,7 +711,7 @@ namespace CmisSync.Lib.Sync
                                                 int len;
                                                 while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
                                                 {
-                                                    hashstream.Write(buffer, 0, len);
+                                                    logstream.Write(buffer, 0, len);
                                                 }
                                                 success = true;
                                             }
@@ -925,12 +926,13 @@ namespace CmisSync.Lib.Sync
                             {
                                 using (SHA1 hashAlg = new SHA1Managed())
                                 using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
+                                using(LoggingStream logstream = new LoggingStream(hashstream, "Upload progress", fileName, file.Length))
                                 {
                                     ContentStream contentStream = new ContentStream();
                                     contentStream.FileName = fileName;
                                     contentStream.MimeType = MimeType.GetMIMEType(fileName);
                                     contentStream.Length = file.Length;
-                                    contentStream.Stream = hashstream;
+                                    contentStream.Stream = logstream;
 
                                     // Upload
                                     try

@@ -219,7 +219,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a file name is valid or not.
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?'") + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:'") + "]");
 
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a filename is valid or not.
         /// </summary>
         private static Regex invalidFolderNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?") + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?:") + "]");
 
 
         /// <summary>
@@ -275,21 +275,30 @@ namespace CmisSync.Lib
         }
 
         /// <summary>
-        /// Format a file size nicely with small caps.
-        /// Example: 1048576 becomes "1 ᴍʙ"
+        /// Format a file size nicely.
+        /// Example: 1048576 becomes "1 MB"
         /// </summary>
         public static string FormatSize(double byteCount)
         {
             if (byteCount >= 1099511627776)
-                return String.Format("{0:##.##} ᴛʙ", Math.Round(byteCount / 1099511627776, 1));
+                return String.Format("{0:##.##} TB", Math.Round(byteCount / 1099511627776, 1));
             else if (byteCount >= 1073741824)
-                return String.Format("{0:##.##} ɢʙ", Math.Round(byteCount / 1073741824, 1));
+                return String.Format("{0:##.##} GB", Math.Round(byteCount / 1073741824, 1));
             else if (byteCount >= 1048576)
-                return String.Format("{0:##.##} ᴍʙ", Math.Round(byteCount / 1048576, 0));
+                return String.Format("{0:##.##} MB", Math.Round(byteCount / 1048576, 0));
             else if (byteCount >= 1024)
-                return String.Format("{0:##.##} ᴋʙ", Math.Round(byteCount / 1024, 0));
+                return String.Format("{0:##.##} KB", Math.Round(byteCount / 1024, 0));
             else
                 return byteCount.ToString() + " bytes";
+        }
+
+        /// <summary>
+        /// Format a file size nicely.
+        /// Example: 1048576 becomes "1 MB"
+        /// </summary>
+        public static string FormatSize(long byteCount)
+        {
+            return FormatSize((double) byteCount);
         }
     }
 }

@@ -23,6 +23,7 @@ SOURCES =  \
 	Events/SyncEventManager.cs \
 	Fetcher.cs \
 	IActivityListener.cs \
+	LoggingStream.cs \
 	RepoBase.cs \
 	RepoInfo.cs \
 	Sync/ChangeLogStrategy.cs \

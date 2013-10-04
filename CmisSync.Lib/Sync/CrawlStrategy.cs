@@ -248,10 +248,7 @@ namespace CmisSync.Lib.Sync
                                     {
                                         // New file, sync up.
                                         Logger.Info("Uploading file absent on repository: " + filePath);
-                                        if (Utils.WorthSyncing(filePath))
-                                        {
-                                            success = UploadFile(filePath, remoteFolder) && success;
-                                        }
+                                        success = UploadFile(filePath, remoteFolder) && success;
                                     }
                                 }
                             }
