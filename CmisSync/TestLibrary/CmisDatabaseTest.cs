@@ -87,6 +87,41 @@ namespace TestLibrary
             }
         }
 
+        [Test, Category("Database")]
+        public void TestFailedUploadCounter()
+        {
+            using (Database database = new Database(DatabasePath))
+            {
+                string path = Path.Combine(RootPath,"1.test");
+                string path2 = Path.Combine(RootPath,"2.test");
+                CreateTestFile(path, 1);
+                CreateTestFile(path2, 1);
+                File.SetLastWriteTimeUtc(path,File.GetLastWriteTimeUtc(path).Subtract(TimeSpan.FromMinutes(1)));
+                Assert.True(database.GetUploadRetryCounter(path) == 0);
+                database.SetUploadRetryCounter(path, 1);
+                Assert.True(database.GetUploadRetryCounter(path) == 1);
+                Console.WriteLine("Database failed upload test done.");
+                database.SetUploadRetryCounter(path, 2);
+                Assert.True(database.GetUploadRetryCounter(path) == 2);
+                Console.WriteLine("Database failed upload test done.");
+                CreateTestFile(path, 1);
+                Assert.True(database.GetUploadRetryCounter(path) == 0);
+                database.SetUploadRetryCounter(path, 1);
+                Assert.True(database.GetUploadRetryCounter(path) == 1);
+                database.SetUploadRetryCounter(path2, 2);
+                database.DeleteUploadRetryCounter(path);
+                Assert.True(database.GetUploadRetryCounter(path) == 0);
+                database.SetUploadRetryCounter(path, 1);
+                Assert.True(database.GetUploadRetryCounter(path) == 1);
+                Assert.True(database.GetUploadRetryCounter(path2) == 2);
+                database.DeleteAllFailedUploadCounter();
+                Assert.True(database.GetUploadRetryCounter(path) == 0);
+                Assert.True(database.GetUploadRetryCounter(path2) == 0);
+                database.SetUploadRetryCounter(path, -1);
+                Assert.True(database.GetUploadRetryCounter(path) == 0);
+            }
+        }
+
         private void CreateTestFile(string path, int sizeInKB)
         {
             Random random = new Random();

@@ -85,6 +85,14 @@ namespace CmisSync.Lib
         /// </summary>
         public long ChunkSize { get; set; }
 
+        /// <summary>
+        /// Gets or sets the max upload retries.
+        /// </summary>
+        /// <value>
+        /// The max upload retries.
+        /// </value>
+        public long MaxUploadRetries { get; set; }
+
 
         /// <summary>
         /// Simple constructor.

@@ -469,6 +469,7 @@ namespace CmisSync
             repoInfo.RemotePath = remote_path;
             repoInfo.TargetDirectory = local_path;
             repoInfo.PollInterval = 5000;
+            repoInfo.MaxUploadRetries = 2;
             foreach (string ignore in ignoredPaths)
                 repoInfo.addIgnorePath(ignore);
 

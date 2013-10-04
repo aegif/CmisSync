@@ -422,13 +422,13 @@ namespace CmisSync.Lib.Sync
             }
 
 
-            private bool DownloadStreamInTrunk(string filePath, Stream fileStream, IDocument remoteDocument)
+            private bool DownloadStreamInChunks(string filePath, Stream fileStream, IDocument remoteDocument)
             {
                 if (repoinfo.ChunkSize <= 0)
                 {
                     return false;
                 }
-                Logger.Debug("Start downloading in trunk (size="+ repoinfo.ChunkSize+"): " + filePath + " from remote document: "+ remoteDocument.Name);
+                Logger.Debug("Start downloading a chunk (size="+ repoinfo.ChunkSize+"): " + filePath + " from remote document: "+ remoteDocument.Name);
                 long? fileLength = remoteDocument.ContentStreamLength;
                 FileInfo fileInfo = new FileInfo(filePath);
 
@@ -728,7 +728,7 @@ namespace CmisSync.Lib.Sync
                                         }
                                         using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                                         {
-                                            success = DownloadStreamInTrunk(tmpfilepath, hashstream, remoteDocument);
+                                            success = DownloadStreamInChunks(tmpfilepath, hashstream, remoteDocument);
                                         }
                                     }
                                     filehash = hashAlg.Hash;
@@ -906,102 +906,116 @@ namespace CmisSync.Lib.Sync
             {
                 using (new ActivityListenerResource(activityListener))
                 {
-                    IDocument remoteDocument = null;
-                    Boolean success = false;
-                    byte[] filehash = { };
-                    try
-                    {
-                        Logger.Info("Uploading: " + filePath);
-
-                        // Prepare properties
-                        string fileName = Path.GetFileName(filePath);
-                        Dictionary<string, object> properties = new Dictionary<string, object>();
-                        properties.Add(PropertyIds.Name, fileName);
-                        properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
-
-                        // Prepare content stream
-                        using (Stream file = File.OpenRead(filePath))
+                    long retries = database.GetUploadRetryCounter(filePath);
+                    if(retries >= this.repoinfo.MaxUploadRetries) {
+                        Logger.Info(String.Format("Skipping uploading file absent on repository, because of too many failed retries({0}): {1}", retries-1, filePath));
+                        return true;
+                    }
+                    try{
+                        IDocument remoteDocument = null;
+                        Boolean success = false;
+                        byte[] filehash = { };
+                        try
                         {
-                            if (repoinfo.ChunkSize <= 0 || file.Length <= repoinfo.ChunkSize)
+                            Logger.Info("Uploading: " + filePath);
+
+                            // Prepare properties
+                            string fileName = Path.GetFileName(filePath);
+                            Dictionary<string, object> properties = new Dictionary<string, object>();
+                            properties.Add(PropertyIds.Name, fileName);
+                            properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
+
+                            // Prepare content stream
+                            using (Stream file = File.OpenRead(filePath))
                             {
-                                using (SHA1 hashAlg = new SHA1Managed())
-                                using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
-                                using(LoggingStream logstream = new LoggingStream(hashstream, "Upload progress", fileName, file.Length))
+                                if (repoinfo.ChunkSize <= 0 || file.Length <= repoinfo.ChunkSize)
                                 {
+                                    using (SHA1 hashAlg = new SHA1Managed())
+                                    using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
+                                    using(LoggingStream logstream = new LoggingStream(hashstream, "Upload progress", fileName, file.Length))
+                                    {
+                                        ContentStream contentStream = new ContentStream();
+                                        contentStream.FileName = fileName;
+                                        contentStream.MimeType = MimeType.GetMIMEType(fileName);
+                                        contentStream.Length = file.Length;
+                                        contentStream.Stream = logstream;
+
+                                        // Upload
+                                        try
+                                        {
+                                            Logger.Debug(String.Format("CMIS::CreateDocument(Properties(Name={0}, ObjectType={1})," +
+                                                                       "ContentStream(FileName={0}, MimeType={2}, Length={3})",
+                                                                   fileName,"cmis:document", contentStream.MimeType,contentStream.Length));
+                                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                            filehash = hashAlg.Hash;
+                                            success = true;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                                            throw;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    filehash = new SHA1Managed().ComputeHash(file);
+                                    file.Position = 0;
+
                                     ContentStream contentStream = new ContentStream();
                                     contentStream.FileName = fileName;
                                     contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                                    contentStream.Length = file.Length;
-                                    contentStream.Stream = logstream;
+                                    contentStream.Length = 0;
+                                    contentStream.Stream = new MemoryStream(0);
 
-                                    // Upload
-                                    try
-                                    {
-                                        Logger.Debug(String.Format("CMIS::CreateDocument(Properties(Name={0}, ObjectType={1})," +
-                                            "ContentStream(FileName={0}, MimeType={2}, Length={3})",
-                                                                   fileName,"cmis:document", contentStream.MimeType,contentStream.Length));
-                                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                                        filehash = hashAlg.Hash;
-                                        success = true;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Logger.Fatal("Upload failed: " + filePath + " " + ex);
-                                    }
+                                    remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                    Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+                                    database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+
+                                    success = UploadStreamInTrunk(filePath, file, remoteDocument);
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            if (e is FileNotFoundException ||
+                                e is IOException)
+                            {
+                                Logger.Warn("File deleted while trying to upload it, reverting.");
+                                // File has been deleted while we were trying to upload/checksum/add.
+                            // This can typically happen in Windows Explore when creating a new text file and giving it a name.
+                            // In this case, revert the upload.
+                                if (remoteDocument != null)
+                                {
+                                    remoteDocument.DeleteAllVersions();
                                 }
                             }
                             else
                             {
-                                filehash = new SHA1Managed().ComputeHash(file);
-                                file.Position = 0;
-
-                                ContentStream contentStream = new ContentStream();
-                                contentStream.FileName = fileName;
-                                contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                                contentStream.Length = 0;
-                                contentStream.Stream = new MemoryStream(0);
-
-                                remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                                Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-                                database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
-
-                                success = UploadStreamInTrunk(filePath, file, remoteDocument);
+                                throw;
                             }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        if (e is FileNotFoundException ||
-                            e is IOException)
+
+                        // Metadata.
+                        if (success)
                         {
-                            Logger.Warn("File deleted while trying to upload it, reverting.");
-                            // File has been deleted while we were trying to upload/checksum/add.
-                            // This can typically happen in Windows Explore when creating a new text file and giving it a name.
-                            // In this case, revert the upload.
-                            if (remoteDocument != null)
-                            {
-                                remoteDocument.DeleteAllVersions();
-                            }
-                        }
-                        else
-                        {
-                            //throw;
-                        }
-                    }
+                            Logger.Info("Uploaded: " + filePath);
 
-                    // Metadata.
-                    if (success)
+                            // Get metadata. Some metadata has probably been automatically added by the server.
+                            Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+
+                            // Create database entry for this file.
+                            database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                        }
+                        return success;
+                    }
+                    catch(Exception e)
                     {
-                        Logger.Info("Uploaded: " + filePath);
-
-                        // Get metadata. Some metadata has probably been automatically added by the server.
-                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-
-                        // Create database entry for this file.
-                        database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                        retries++;
+                        database.SetUploadRetryCounter(filePath, retries);
+                        Logger.Warn(String.Format("Uploading of {0} failed {1} times: ", filePath, retries), e);
+                        return false;
                     }
-
-                    return success;
                 }
             }
 
@@ -1094,6 +1108,13 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UpdateFile(string filePath, IDocument remoteFile)
             {
+                long retries = database.GetUploadRetryCounter(filePath);
+                if(retries >= repoinfo.MaxUploadRetries)
+                {
+                    Logger.Info(String.Format("Skipping updating file content on repository, because of too many failed retries({0}): {1}", retries, filePath));
+                    return true;
+                }
+
                 try
                 {
                     Logger.Info("## Updating " + filePath);
@@ -1108,18 +1129,20 @@ namespace CmisSync.Lib.Sync
 
                         if (repoinfo.ChunkSize <= 0)
                         {
-                            ContentStream contentStream = new ContentStream();
-                            contentStream.FileName = remoteFile.Name;
-                            contentStream.Length = localfile.Length;
-                            contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
-                            contentStream.Stream = localfile;
-                            Logger.Debug("before SetContentStream");
+                            using(LoggingStream logstream = new LoggingStream(localfile, "Updating ContentStream", filePath, localfile.Length)) {
+                                ContentStream contentStream = new ContentStream();
+                                contentStream.FileName = remoteFile.Name;
+                                contentStream.Length = localfile.Length;
+                                contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
+                                contentStream.Stream = logstream;
+                                Logger.Debug("before SetContentStream");
 
-                            remoteFile.SetContentStream(contentStream, true, true);
+                                remoteFile.SetContentStream(contentStream, true, true);
 
-                            Logger.Debug("after SetContentStream");
-                            Logger.Info("## Updated " + filePath);
-                            return true;
+                                Logger.Debug("after SetContentStream");
+                                Logger.Info("## Updated " + filePath);
+                                return true;
+                            }
                         }
                         else
                         {
@@ -1164,7 +1187,9 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while update file {0}: {1}", filePath, e));
+                    retries++;
+                    database.SetUploadRetryCounter(filePath, retries);
+                    Logger.Warn(String.Format("Updating content of {0} failed {1} times: ", filePath, retries), e);
                     return false;
                 }
             }

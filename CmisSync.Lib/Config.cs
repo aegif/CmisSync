@@ -321,16 +321,16 @@ namespace CmisSync.Lib
  
                 [XmlElement("url")]
                 public XmlUri RemoteUrl { get; set; }
-                
+
                 [XmlElement("repository")]
                 public string RepositoryId { get; set; }
-                
+
                 [XmlElement("remoteFolder")]
                 public string RemotePath { get; set; }
 
                 [XmlElement("user")]
-                public string UserName { get; set; } 
-                
+                public string UserName { get; set; }
+
                 [XmlElement("password")]
                 public string ObfuscatedPassword { get; set; }
 
@@ -349,6 +349,17 @@ namespace CmisSync.Lib
                             pollInterval = value;
                         }
                 } }
+
+                private int uploadRetries = 2;
+                [XmlElement("maxUploadRetries", IsNullable=true)]
+                public int? UploadRetries {
+                    get {return uploadRetries;}
+                    set{
+                        if(value==null || value < 0)
+                            uploadRetries = 2;
+                        else
+                            uploadRetries = (int) value;
+                    }}
 
                 [XmlElement("features", IsNullable=true)]
                 public Feature SupportedFeatures { get; set;}
@@ -387,6 +398,7 @@ namespace CmisSync.Lib
                     repoInfo.RepoID = RepositoryId;
                     repoInfo.RemotePath = RemotePath;
                     repoInfo.TargetDirectory = LocalPath;
+                    repoInfo.MaxUploadRetries = uploadRetries;
                     if (PollInterval < 1) PollInterval = 5000;
                         repoInfo.PollInterval = PollInterval;
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
@@ -426,7 +438,7 @@ namespace CmisSync.Lib
             public bool? FileSystemWatcherSupport {get; set;}
             [XmlElement("maxContentChanges", IsNullable=true)]
             public int? MaxNumberOfContentChanges {get; set;}
-            [XmlElement("tunkedSupport", IsNullable=true)]
+            [XmlElement("chunkedSupport", IsNullable=true)]
             public bool? ChunkedSupport {get;set;}
         }
 

@@ -150,13 +150,26 @@ namespace CmisSync.Lib.Cmis
                             value TEXT);      /* Other data such as ChangeLog token */
                         CREATE TABLE downloads (
                             PATH TEXT PRIMARY KEY,
-                            serverSideModificationDate DATE);";     /* Download */
+                            serverSideModificationDate DATE);     /* Download */
+                        CREATE TABLE faileduploads (
+                            path TEXT PRIMARY KEY,
+                            counter INTEGER,
+                            localLastModificationDate DATE);     /* Failed Uploads*/";
+
                         ExecuteSQLAction(command, null);
                         command = "INSERT INTO general (key, value) VALUES (\"PathPrefix\", @prefix)";
                         Dictionary<string, object> parameters = new Dictionary<string, object>();
                         parameters.Add("prefix", ConfigManager.CurrentConfig.FoldersPath);
                         ExecuteSQLAction(command, parameters);
                         Logger.Info("Database created");
+                    } else {
+                        string command =
+                            @"CREATE TABLE IF NOT EXISTS faileduploads(
+                                path TEXT PRIMARY KEY,
+                                counter INTEGER,
+                                localLastModificationDate DATE);";
+                        ExecuteSQLAction(command, null);
+                        Logger.Debug("Database migration successful");
                     }
                 }
                 catch (Exception e)
@@ -535,6 +548,70 @@ namespace CmisSync.Lib.Cmis
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("serverSideModificationDate", serverSideModificationDate);
             parameters.Add("path", path);
+            ExecuteSQLAction(command, parameters);
+        }
+
+        /// <summary>
+        /// Gets the upload retry counter.
+        /// </summary>
+        /// <returns>
+        /// The upload retry counter.
+        /// </returns>
+        /// <param name='path'>
+        /// Path of the local file.
+        /// </param>
+        public long GetUploadRetryCounter(string path)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("date", File.GetLastWriteTimeUtc(path));
+            parameters.Add("path", Normalize(path));
+            object result = ExecuteSQLFunction("SELECT counter FROM faileduploads WHERE path=@path AND localLastModificationDate=@date", parameters);
+            if( result != null )
+            { return (long) result; }
+            else
+            { return 0; }
+        }
+
+        /// <summary>
+        /// Sets the upload retry counter.
+        /// </summary>
+        /// <param name='path'>
+        /// Path of the local file.
+        /// </param>
+        /// <param name='counter'>
+        /// Counter.
+        /// </param>
+        public void SetUploadRetryCounter(string path, long counter)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("date", File.GetLastWriteTimeUtc(path));
+            parameters.Add("path", Normalize(path));
+            parameters.Add("counter", (counter>=0) ? counter:0);
+            string command = @"INSERT OR REPLACE INTO faileduploads (path, counter, localLastModificationDate) VALUES( @path, @counter, @date)";
+            ExecuteSQLAction(command, parameters);
+        }
+
+        /// <summary>
+        /// Deletes the upload retry counter.
+        /// </summary>
+        /// <param name='path'>
+        /// Path of the local file.
+        /// </param>
+        public void DeleteUploadRetryCounter(string path)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", Normalize(path));
+            string command = @"DELETE FROM faileduploads WHERE path=@path";
+            ExecuteSQLAction(command, parameters);
+        }
+
+        /// <summary>
+        /// Deletes all failed upload counter.
+        /// </summary>
+        public void DeleteAllFailedUploadCounter()
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            string command = @"DELETE FROM faileduploads";
             ExecuteSQLAction(command, parameters);
         }
 
