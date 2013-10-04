@@ -463,7 +463,7 @@ namespace CmisSync
             repoInfo.RepoID = repository;
             repoInfo.RemotePath = remote_path;
             repoInfo.TargetDirectory = local_path;
-            repoInfo.PollInterval = 5000;
+            repoInfo.PollInterval = Config.DEFAULT_POLL_INTERVAL;
             foreach (string ignore in ignoredPaths)
                 repoInfo.addIgnorePath(ignore);
 

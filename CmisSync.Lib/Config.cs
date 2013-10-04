@@ -20,6 +20,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Xml;
+using log4net;
 
 namespace CmisSync.Lib
 {
@@ -29,6 +30,19 @@ namespace CmisSync.Lib
     /// </summary>
     public class Config
     {
+        /// <summary>
+        /// Default poll interval.
+        /// It is used for any newly created synchronized folder.
+        /// </summary>
+        public static readonly int DEFAULT_POLL_INTERVAL = 5000;
+
+
+        /// <summary>
+        /// Log.
+        /// </summary>
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(Config));
+
+
         /// <summary>
         /// data structure storing the configuration.
         /// </summary>
@@ -333,14 +347,16 @@ namespace CmisSync.Lib
                 [XmlElement("password")]
                 public string ObfuscatedPassword { get; set; }
 
-                private double pollInterval = 5000;
-                [XmlElement("pollinterval"), System.ComponentModel.DefaultValue(5000)]
+                private double pollInterval = DEFAULT_POLL_INTERVAL;
+                [XmlElement("pollinterval")]
                 public double PollInterval {
                     get { return pollInterval; }
                     set {
                         if (value <= 0)
                         {
-                            pollInterval = 5000;
+                            Logger.Warn("Poll interval value is invalid, "
+                                + "using default poll interval: " + DEFAULT_POLL_INTERVAL);
+                            pollInterval = DEFAULT_POLL_INTERVAL;
                         }
                         else
                         {
@@ -365,7 +381,7 @@ namespace CmisSync.Lib
                     repoInfo.RepoID = RepositoryId;
                     repoInfo.RemotePath = RemotePath;
                     repoInfo.TargetDirectory = LocalPath;
-                    if (PollInterval < 1) PollInterval = 5000;
+                    if (PollInterval < 1) PollInterval = Config.DEFAULT_POLL_INTERVAL;
                     repoInfo.PollInterval = PollInterval;
 
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
