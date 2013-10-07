@@ -36,15 +36,35 @@ SHAMROCK_CHECK_MONO_4_0_GAC_ASSEMBLIES([
 ])]
 )
 
-PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
-if test "x$have_nunit" = "xno" ; then
-    dnl On som distro's the package is named mono-nunit
-    PKG_CHECK_MODULES(NUNIT, mono-nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+AC_ARG_WITH([nunit],
+            AS_HELP_STRING([--with-nunit=PATH],[Specify path to nunit.framework.dll]),
+            [nunit_dll=${withval}],[nunit_dll=no])
+if test "x$nunit_dll" = "xno" ; then
+    PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
     if test "x$have_nunit" = "xno" ; then
-        AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+      dnl On som distro's the package is named mono-nunit
+      PKG_CHECK_MODULES(NUNIT, mono-nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+      if test "x$have_nunit" = "xno" ; then
+          AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+      fi
+    fi
+    AC_SUBST(NUNIT_LIBS)
+else
+ if test -f ${nunit_dll} ; then
+        case ${nunit_dll} in
+            /*)
+            AC_SUBST(NUNIT_LIBS,[-r:${nunit_dll}])
+            AC_SUBST(NUNIT_PATH,[${nunit_dll}])
+            ;;
+            *)
+            AC_SUBST(NUNIT_LIBS,[[-r:\$\(top_srcdir\)/${nunit_dll}]])
+            AC_SUBST(NUNIT_PATH,[[\$\(top_srcdir\)/${nunit_dll}]])
+            ;;
+        esac
+    else
+        AC_ERROR([${nunit_dll} not found])
     fi
 fi
-AC_SUBST(NUNIT_LIBS)
 
 AC_ARG_WITH([newtonsoft-json],
             AS_HELP_STRING([--with-newtonsoft-json=PATH],[Specify path to NewtonSoft.Json.dll]),
@@ -70,7 +90,6 @@ else
         AC_ERROR([${newtonsoft_json_dll} not found])
     fi
 fi
-AC_SUBST(NUNIT_LIBS)
 
 CMISSYNC_CHECK_NOTIFY_SHARP
 CMISSYNC_CHECK_GTK_SHARP
