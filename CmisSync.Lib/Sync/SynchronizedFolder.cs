@@ -472,6 +472,12 @@ namespace CmisSync.Lib.Sync
                 string name = remoteSubFolder.Name;
                 string remotePathname = remoteSubFolder.Path;
                 string localSubFolder = Path.Combine(localFolder, name);
+                if(!Directory.Exists(localFolder))
+                {
+                    // The target folder has been removed/renamed => relaunch sync
+                    Logger.Warn("The target folder has been removed/renamed: "+ localFolder);
+                    return false;
+                }
 
                 if (Directory.Exists(localSubFolder))
                 {
