@@ -370,6 +370,7 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
+                    synchronizedFolder.resetFailedUploadsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -423,6 +424,7 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
+                    synchronizedFolder.resetFailedUploadsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -620,6 +622,8 @@ namespace TestLibrary
                 activityListener,
                 cmis2))
             {
+                synchronizedFolder.resetFailedUploadsCounter();
+                synchronizedFolder2.resetFailedUploadsCounter();
                 synchronizedFolder.Sync();
                 synchronizedFolder2.Sync();
                 CleanAll(localDirectory);
@@ -814,6 +818,7 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
+                    synchronizedFolder.resetFailedUploadsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -860,6 +865,7 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
+                    synchronizedFolder.resetFailedUploadsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -936,6 +942,7 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
+                    synchronizedFolder.resetFailedUploadsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 

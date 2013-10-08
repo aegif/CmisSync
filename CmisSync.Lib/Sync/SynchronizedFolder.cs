@@ -203,6 +203,14 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
+            /// <summary>
+            /// Resets all the failed upload to zero.
+            /// </summary>
+            public void resetFailedUploadsCounter()
+            {
+                database.DeleteAllFailedUploadCounter();
+            }
+
 
             /// <summary>
             /// Connect to the CMIS repository.
