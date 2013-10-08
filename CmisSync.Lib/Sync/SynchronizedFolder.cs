@@ -315,6 +315,12 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Debug("Invoke a remote change log sync");
                     ChangeLogSync(remoteFolder);
+                    if(repo.Watcher.GetChangeList().Count > 0)
+                    {
+                        Logger.Debug("Changes on the local file system detected => starting crawl sync");
+                        if(CrawlSync(remoteFolder,localFolder))
+                            repo.Watcher.RemoveAll();
+                    }
                 }
                 else
                 {
@@ -322,13 +328,13 @@ namespace CmisSync.Lib.Sync
                     Logger.Debug("Invoke a remote crawl sync");
                     CrawlSync(remoteFolder, localFolder);
                 }
-
+                /*
                 Logger.Debug("Invoke a file system watcher sync");
                 WatcherSync(remoteFolderPath, localFolder);
                 foreach (string name in repo.Watcher.GetChangeList())
                 {
                     Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
-                }
+                }*/
             }
 
 

@@ -81,8 +81,9 @@ namespace CmisSync.Lib
             if(isDebuggingEnabled) {
                 int result = this.stream.Read(buffer,offset,count);
                 readpos+=result;
+                long percentage = (readpos * 100)/ (this.length>0?this.length:100);
                 Logger.Debug(String.Format("{0}% {1} of {2}",
-                                           (readpos * 100)/this.length,
+                                           percentage,
                                            Utils.FormatSize(this.readpos),
                                            Utils.FormatSize(this.length)));
                 return result;
@@ -102,8 +103,9 @@ namespace CmisSync.Lib
             if(isDebuggingEnabled)
             {
                 writepos += count;
+                long percentage = (writepos * 100)/ (this.length>0?this.length:100);
                 Logger.Debug(String.Format("{0}% {1} of {2})",
-                                           (writepos*100)/this.length,
+                                           percentage,
                                            Utils.FormatSize(this.writepos),
                                            Utils.FormatSize(this.length)));
             }
