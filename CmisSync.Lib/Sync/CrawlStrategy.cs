@@ -266,16 +266,13 @@ namespace CmisSync.Lib.Sync
                             else
                             {
                                 // The file exists both on server and locally.
-                                if (!syncFull)
+                                if (database.LocalFileHasChanged(filePath))
                                 {
-                                    if (database.LocalFileHasChanged(filePath))
+                                    if (BIDIRECTIONAL)
                                     {
-                                        if (BIDIRECTIONAL)
-                                        {
-                                            // Upload new version of file content.
-                                            Logger.Info("Uploading file update on repository: " + filePath);
-                                            success = success && UpdateFile(filePath, remoteFolder);
-                                        }
+                                        // Upload new version of file content.
+                                        Logger.Info("Uploading file update on repository: " + filePath);
+                                        success = success && UpdateFile(filePath, remoteFolder);
                                     }
                                 }
                             }
