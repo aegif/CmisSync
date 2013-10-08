@@ -722,6 +722,33 @@ namespace TestLibrary
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
 
+                //change filecontent
+                int filecount = Directory.GetFiles(folder).Count();
+                int filecount2 = Directory.GetFiles(folder2).Count();
+                int length = 2048;
+                Assert.IsTrue(filecount == filecount2);
+                using (Stream stream = File.OpenWrite(file))
+                {
+                    byte[] content = new byte[length];
+                    stream.Write(content, 0, content.Length);
+                }
+                synchronizedFolder.Sync();
+                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                synchronizedFolder2.Sync();
+                Assert.IsTrue(filecount == Directory.GetFiles(folder).Count());
+                Assert.IsTrue(filecount2 == Directory.GetFiles(folder2).Count());
+                using (Stream stream = File.OpenRead(file))
+                using (Stream stream2 = File.OpenRead(file2))
+                {
+                    Assert.IsTrue(stream.Length == stream2.Length && stream2.Length == length);
+                    byte[] content = new byte[length];
+                    byte[] content2 = new byte[length];
+                    stream.Read(content,0,length);
+                    stream.Read(content2,0,length);
+                    for(int i = 0; i < length; i++)
+                        Assert.IsTrue(content[i] == content2[i]);
+                }
+
                 //  delete file
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
