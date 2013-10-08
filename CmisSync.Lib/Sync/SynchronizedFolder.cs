@@ -748,6 +748,10 @@ namespace CmisSync.Lib.Sync
                             Logger.Error("Download aborted: " + fileName + " " + ex);
                             return false;
                         }
+                        catch (System.IO.DirectoryNotFoundException ex)
+                        {
+                            Logger.Warn(String.Format("Download failed because of a missing folder in the file path: {0}" , ex.Message ));
+                        }
                         catch (Exception ex)
                         {
                             Logger.Error("Download failed: " + fileName + " " + ex);

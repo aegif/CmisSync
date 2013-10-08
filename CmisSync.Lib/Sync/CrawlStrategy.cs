@@ -71,7 +71,18 @@ namespace CmisSync.Lib.Sync
 
                 if (IsGetDescendantsSupported)
                 {
-                    return CrawlDescendants(remoteFolder, remoteFolder.GetDescendants(-1), localFolder);
+                    IList<ITree<IFileableCmisObject>> desc;
+                    try{
+                        desc = remoteFolder.GetDescendants(-1);
+                    }catch (DotCMIS.Exceptions.CmisConnectionException ex) {
+                        if(ex.InnerException is System.Xml.XmlException)
+                        {
+                            Logger.Warn(String.Format("CMIS::getDescendants() response could not be parsed: {0}", ex.InnerException.Message ));
+                            return false;
+                        }
+                        throw;
+                    }
+                    return CrawlDescendants(remoteFolder, desc, localFolder);
                 }
 
                 // Lists of files/folders, to delete those that have been removed on the server.
