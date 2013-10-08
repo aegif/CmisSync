@@ -157,6 +157,12 @@ namespace CmisSync.Lib.Sync
                 remoteDocument = cmisObject as IDocument;
                 if (remoteDocument != null)
                 {
+                    if (!Utils.WorthSyncing(remoteDocument.Name))
+                    {
+                        Logger.Info("Change in remote unworth syncing file: " + remoteDocument.Paths);
+                        return true;
+                    }
+                    // TODO PLEASE CHECK, IF THIS IS CORRECT! PATHS COULD CONTAIN MULTIPLE PATHS TO THE TARGET FILE
                     remotePath = Path.Combine(remoteDocument.Paths.ToArray()).Replace('\\', '/');
                 }
                 else
@@ -172,6 +178,14 @@ namespace CmisSync.Lib.Sync
                     {
                         Logger.Info("Change in ignored path: " + remotePath);
                         return true;
+                    }
+                    foreach (string name in remotePath.Split('/'))
+                    {
+                        if (!String.IsNullOrEmpty(name) && !Utils.IsInvalidFolderName(name))
+                        {
+                            Logger.Info(String.Format("Change in illegal syncing path name {0}: {1}", name, remotePath));
+                            return true;
+                        }
                     }
                 }
 
@@ -190,14 +204,6 @@ namespace CmisSync.Lib.Sync
                 if (relativePath[0] == '/')
                 {
                     relativePath = relativePath.Substring(1);
-                }
-                foreach (string name in relativePath.Split('/'))
-                {
-                    if (!Utils.WorthSyncing(name))
-                    {
-                        Logger.Info("Change in unworth syncing path: " + remotePath);
-                        return true;
-                    }
                 }
 
                 try

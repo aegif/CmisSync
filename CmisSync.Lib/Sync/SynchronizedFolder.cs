@@ -389,7 +389,7 @@ namespace CmisSync.Lib.Sync
                             {
                                 IFolder remoteSubFolder = (IFolder)cmisObject;
                                 string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
-                                if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                                if (!Utils.IsInvalidFolderName(remoteFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                                 {
                                     // Create local folder.
                                     Logger.Info("Creating local directory: "+ localSubFolder);
@@ -477,6 +477,7 @@ namespace CmisSync.Lib.Sync
                     // the user has deleted it voluntarily, so delete it from server too.
 
                     // Delete the folder from the remote server.
+                    Logger.Debug(String.Format("CMIS::DeleteTree({0})",remoteSubFolder.Path));
                     remoteSubFolder.DeleteTree(true, null, true);
 
                     // Delete the folder from database.
@@ -1033,6 +1034,7 @@ namespace CmisSync.Lib.Sync
                 IFolder folder = null;
                 try
                 {
+                    Logger.Debug("Creating remote folder: " + Path.GetFileName(localFolder));
                     folder = remoteBaseFolder.CreateFolder(properties);
                 }
                 catch (CmisNameConstraintViolationException)
@@ -1066,8 +1068,9 @@ namespace CmisSync.Lib.Sync
                     // Upload each file in this folder.
                     foreach (string file in Directory.GetFiles(localFolder))
                     {
-                        if (Utils.WorthSyncing(file))
+                        if (Utils.WorthSyncing(file.Substring(file.LastIndexOf(Path.DirectorySeparatorChar)+1)))
                         {
+                            Logger.Debug(String.Format("Invoke upload file {0} of folder {1}", file, localFolder));
                             success = UploadFile(file, folder) && success;
                         }
                     }
@@ -1077,8 +1080,9 @@ namespace CmisSync.Lib.Sync
                     {
                         string path = subfolder.Substring(repoinfo.TargetDirectory.Length);
                         path = path.Replace("\\\\","/");
-                        if (Utils.WorthSyncing(subfolder) && !repoinfo.isPathIgnored(path))
+                        if (!Utils.IsInvalidFolderName(subfolder) && !repoinfo.isPathIgnored(path))
                         {
+                            Logger.Debug("Start recursive upload of folder: " + subfolder);
                             success = UploadFolderRecursively(folder, subfolder) && success;
                         }
                     }
@@ -1095,6 +1099,7 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
+                        Logger.Warn("Exception on recursiv upload of folder: " + localFolder);
                         return false;
                     }
                 }

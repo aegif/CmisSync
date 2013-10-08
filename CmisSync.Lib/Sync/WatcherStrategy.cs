@@ -40,15 +40,25 @@ namespace CmisSync.Lib.Sync
                         continue;
                     }
 
+                    Watcher.ChangeTypes change = repo.Watcher.GetChangeType(pathname);
                     bool worthSync = true;
                     string name = pathname.Substring(localFolder.Length + 1);
-                    foreach (string item in name.Split(Path.DirectorySeparatorChar))
+                    string[] folderNames = name.Split(Path.DirectorySeparatorChar);
+                    for(int i = 0; i < folderNames.Length - 1 ; i++)
                     {
-                        if (!Utils.WorthSyncing(item))
+                        if(Utils.IsInvalidFolderName(folderNames[i]))
                         {
                             repo.Watcher.RemoveChange(pathname);
                             worthSync = false;
                             break;
+                        }
+                    }
+                    if(change == Watcher.ChangeTypes.Changed || change == Watcher.ChangeTypes.Created) {
+                        if((File.Exists(pathname) && !Utils.WorthSyncing(folderNames[folderNames.Length -1])) ||
+                           (Directory.Exists(pathname) && Utils.IsInvalidFolderName(folderNames[folderNames.Length -1])))
+                        {
+                            repo.Watcher.RemoveChange(pathname);
+                            worthSync = false;
                         }
                     }
                     if (!worthSync)
@@ -56,7 +66,6 @@ namespace CmisSync.Lib.Sync
                         continue;
                     }
 
-                    Watcher.ChangeTypes change = repo.Watcher.GetChangeType(pathname);
                     Logger.Debug(String.Format("Detect change {0} for {1}.", change, pathname));
                     switch (change)
                     {
