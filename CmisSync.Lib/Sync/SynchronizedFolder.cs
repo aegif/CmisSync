@@ -318,8 +318,9 @@ namespace CmisSync.Lib.Sync
                     if(repo.Watcher.GetChangeList().Count > 0)
                     {
                         Logger.Debug("Changes on the local file system detected => starting crawl sync");
-                        if(CrawlSync(remoteFolder,localFolder))
-                            repo.Watcher.RemoveAll();
+                        repo.Watcher.RemoveAll();
+                        if(!CrawlSync(remoteFolder,localFolder))
+                            repo.Watcher.InsertChange("/", Watcher.ChangeTypes.Changed);
                     }
                 }
                 else

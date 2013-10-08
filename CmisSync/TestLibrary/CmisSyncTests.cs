@@ -377,11 +377,11 @@ namespace TestLibrary
                     string filename = LocalFilesystemActivityGenerator.GetNextFileName();
                     string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
                     LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
-
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                     // Sync again.
                     synchronizedFolder.Sync();
                     Console.WriteLine("Second sync done.");
-
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                     // Check that file is present server-side.
                     IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
                     Assert.NotNull(doc);
@@ -434,7 +434,7 @@ namespace TestLibrary
                     // Sync again.
                     synchronizedFolder.Sync();
                     Console.WriteLine("Second sync done.");
-
+                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                     // Check that file is present server-side.
                     IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
                     Assert.NotNull(doc);

@@ -124,6 +124,7 @@ namespace CmisSync.Lib
             TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
             PollInterval = pollInterval;
             ChunkSize = 0;
+            MaxUploadRetries = 2;
         }
 
         /// <summary>
