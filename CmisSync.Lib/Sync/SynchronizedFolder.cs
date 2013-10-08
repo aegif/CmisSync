@@ -1129,6 +1129,7 @@ namespace CmisSync.Lib.Sync
 
                 try
                 {
+                    bool success = false;
                     Logger.Info("## Updating " + filePath);
                     using (Stream localfile = File.OpenRead(filePath))
                     {
@@ -1153,7 +1154,7 @@ namespace CmisSync.Lib.Sync
 
                                 Logger.Debug("after SetContentStream");
                                 Logger.Info("## Updated " + filePath);
-                                return true;
+                                success = true;
                             }
                         }
                         else
@@ -1193,9 +1194,22 @@ namespace CmisSync.Lib.Sync
 
                             Logger.Debug("after SetContentStream");
                             Logger.Info("## Updated " + filePath);
-                            return true;
+                            success = true;
                         }
                     }
+
+                    if (success)
+                    {
+                        // Update timestamp in database.
+                        database.SetFileServerSideModificationDate(filePath, ((DateTime)remoteFile.LastModificationDate).ToUniversalTime());
+
+                        // Update checksum
+                        database.RecalculateChecksum(filePath);
+
+                        // TODO Update metadata?
+                    }
+
+                    return success;
                 }
                 catch (Exception e)
                 {
@@ -1240,17 +1254,6 @@ namespace CmisSync.Lib.Sync
 
                     // Update the document itself.
                     bool success = UpdateFile(filePath, document);
-
-                    if (success)
-                    {
-                        // Update timestamp in database.
-                        database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
-
-                        // Update checksum
-                        database.RecalculateChecksum(filePath);
-
-                        // TODO Update metadata?
-                    }
 
                     Logger.Info("# Updated " + filePath);
 
