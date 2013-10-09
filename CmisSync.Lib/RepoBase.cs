@@ -99,7 +99,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Restart syncing.
         /// </summary>
-        public void Resume()
+        public virtual void Resume()
         {
             Status = SyncStatus.Idle;
         }
