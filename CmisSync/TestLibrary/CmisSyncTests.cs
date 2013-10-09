@@ -380,6 +380,7 @@ namespace TestLibrary
                     repoInfo,
                     activityListener,
                     cmis))
+                using (Watcher watcher = new Watcher(localDirectory))
                 {
                     synchronizedFolder.resetFailedUploadsCounter();
                     synchronizedFolder.Sync();
@@ -388,8 +389,9 @@ namespace TestLibrary
                     // Create random small file.
                     string filename = LocalFilesystemActivityGenerator.GetNextFileName();
                     string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
+                    watcher.EnableRaisingEvents = true;
                     LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
-                    System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                    WatcherTest.WaitWatcher((int)repoInfo.PollInterval, watcher, 1);
                     // Sync again.
                     synchronizedFolder.Sync();
                     Console.WriteLine("Second sync done.");
@@ -434,6 +436,7 @@ namespace TestLibrary
                     repoInfo,
                     activityListener,
                     cmis))
+                using (Watcher watcher = new Watcher(localDirectory))
                 {
                     synchronizedFolder.resetFailedUploadsCounter();
                     synchronizedFolder.Sync();
@@ -442,8 +445,9 @@ namespace TestLibrary
                     // Create random big file.
                     string filename = LocalFilesystemActivityGenerator.GetNextFileName();
                     string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
+                    watcher.EnableRaisingEvents = true;
                     LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000); // 1 MB ... no that big to not load servers too much.
-
+                    WatcherTest.WaitWatcher((int)repoInfo.PollInterval, watcher, 1);
                     // Sync again.
                     synchronizedFolder.Sync();
                     Console.WriteLine("Second sync done.");
@@ -491,9 +495,11 @@ namespace TestLibrary
                     repoInfo,
                     activityListener,
                     cmis))
+                using (Watcher watcher = new Watcher(localDirectory))
                 {
                     synchronizedFolder.Sync();
                     CleanAll(localDirectory);
+                    WatcherTest.WaitWatcher();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -632,12 +638,15 @@ namespace TestLibrary
                 repoInfo2,
                 activityListener,
                 cmis2))
+            using (Watcher watcher = new Watcher(localDirectory))
+            using (Watcher watcher2 = new Watcher(localDirectory2))
             {
                 synchronizedFolder.resetFailedUploadsCounter();
                 synchronizedFolder2.resetFailedUploadsCounter();
                 synchronizedFolder.Sync();
                 synchronizedFolder2.Sync();
                 CleanAll(localDirectory);
+                WatcherTest.WaitWatcher();
                 synchronizedFolder.Sync();
                 synchronizedFolder2.Sync();
                 Console.WriteLine("Synced to clean state.");
@@ -648,6 +657,7 @@ namespace TestLibrary
                 string file2 = Path.Combine(localDirectory2, filename);
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                watcher.EnableRaisingEvents = true;
                 using (Stream stream = File.OpenWrite(file))
                 {
                     byte[] content = new byte[1024];
@@ -655,7 +665,9 @@ namespace TestLibrary
                 }
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
-                System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
@@ -670,10 +682,13 @@ namespace TestLibrary
                 string folder2 = Path.Combine(localDirectory2, foldername);
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
+                watcher.EnableRaisingEvents = true;
                 Directory.CreateDirectory(folder);
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
-                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
@@ -688,10 +703,13 @@ namespace TestLibrary
                 file2 = Path.Combine(folder2, filename);
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                watcher.EnableRaisingEvents = true;
                 File.Move(source, file);
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
-                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
@@ -707,10 +725,13 @@ namespace TestLibrary
                 folder2 = Path.Combine(localDirectory2, foldername2);
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
+                watcher.EnableRaisingEvents = true;
                 Directory.CreateDirectory(folder);
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
-                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
@@ -723,12 +744,15 @@ namespace TestLibrary
                 file2 = Path.Combine(folder2, foldername, filename);
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
+                watcher.EnableRaisingEvents = true;
                 Directory.Move(
                     Path.Combine(localDirectory, foldername),
                     Path.Combine(folder, foldername));
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
-                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
@@ -742,11 +766,15 @@ namespace TestLibrary
                 int filecount2 = Directory.GetFiles(folder2).Count();
                 int length = 2048;
                 Assert.IsTrue(filecount == filecount2);
+                watcher.EnableRaisingEvents = true;
                 using (Stream stream = File.OpenWrite(file))
                 {
                     byte[] content = new byte[length];
                     stream.Write(content, 0, content.Length);
                 }
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                 synchronizedFolder2.Sync();
@@ -767,10 +795,13 @@ namespace TestLibrary
                 //  delete file
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
+                watcher.EnableRaisingEvents = true;
                 File.Delete(file);
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
-                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
@@ -782,15 +813,16 @@ namespace TestLibrary
                 //  delete folder tree
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
+                watcher.EnableRaisingEvents = true;
                 Directory.Delete(folder, true);
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
-                synchronizedFolder.Sync();
-                System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
-                synchronizedFolder2.Sync();
                 System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsFalse(Directory.Exists(folder));

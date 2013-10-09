@@ -86,7 +86,7 @@ namespace TestLibrary
             }
         }
 
-        class FileSystemEventCount
+        public class FileSystemEventCount
         {
             public int Count { get; private set; }
 
@@ -581,7 +581,7 @@ namespace TestLibrary
             }
         }
 
-        private void WaitWatcher(int milliseconds = 10)
+        public static void WaitWatcher(int milliseconds = 10)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -589,7 +589,7 @@ namespace TestLibrary
             Thread.Sleep(milliseconds);
         }
 
-        private void WaitWatcher(int milliseconds,Watcher watcher,int expect)
+        public static void WaitWatcher(int milliseconds, Watcher watcher, int expect)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -606,7 +606,7 @@ namespace TestLibrary
             Console.WriteLine("Timeout");
         }
 
-        private void WaitWatcher(int milliseconds,Watcher watcher,Func<Watcher,bool> checkStop)
+        public static void WaitWatcher(int milliseconds, Watcher watcher, Func<Watcher,bool> checkStop)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -623,7 +623,7 @@ namespace TestLibrary
             Console.WriteLine("Timeout");
         }
 
-        private void WaitWatcher(int milliseconds,FileSystemEventCount count,Func<FileSystemEventCount,bool> checkStop)
+        public static void WaitWatcher(int milliseconds, FileSystemEventCount count, Func<FileSystemEventCount,bool> checkStop)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
