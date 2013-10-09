@@ -75,6 +75,17 @@ namespace TestLibrary
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            foreach( string file in Directory.GetFiles(CMISSYNCDIR)) {
+                if(file.EndsWith(".cmissync"))
+                {
+                    File.Delete(file);
+                }
+                    
+            }
+        }
 
         public static IEnumerable<object[]> TestServers
         {
@@ -774,10 +785,12 @@ namespace TestLibrary
                 Directory.Delete(folder, true);
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
+                synchronizedFolder.Sync();
                 System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
                 synchronizedFolder.Sync();
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
+                synchronizedFolder2.Sync();
                 System.Threading.Thread.Sleep((int)repoInfo2.PollInterval);
                 synchronizedFolder2.Sync();
                 Assert.IsFalse(Directory.Exists(folder));
