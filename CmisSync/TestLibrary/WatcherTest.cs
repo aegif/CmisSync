@@ -25,6 +25,7 @@ namespace TestLibrary
         public void ClassInit()
         {
             Directory.CreateDirectory(TestFolder);
+            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
         [TestFixtureTearDown]
