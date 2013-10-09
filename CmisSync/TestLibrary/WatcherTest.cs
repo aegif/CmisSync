@@ -31,6 +31,7 @@ namespace TestLibrary
         public void TestInit()
         {
             Directory.CreateDirectory(TestFolder);
+            WaitWatcher();
         }
 
         [TearDown]
@@ -136,9 +137,9 @@ namespace TestLibrary
                     return c.Count >= number + 1;
                 });
                 Assert.LessOrEqual(number + 1, count.Count);
+                watcher.EnableEvent = false;
                 number = count.Count;
 
-                watcher.EnableEvent = false;
 
                 CreateTestFile(6);
                 Assert.AreEqual(number, count.Count);
