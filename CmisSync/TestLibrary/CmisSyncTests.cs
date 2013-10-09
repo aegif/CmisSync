@@ -796,7 +796,7 @@ namespace TestLibrary
                 int filecount2 = Directory.GetFiles(folder2).Count();
                 int length = 2048;
                 Assert.IsTrue(filecount == filecount2);
-                Console.WriteLine(" filecontent size = "+ length);
+                Console.WriteLine(" filecontent size = "+ length.ToString());
                 watcher.EnableRaisingEvents = true;
                 using (Stream stream = File.OpenWrite(file))
                 {
@@ -1187,7 +1187,7 @@ namespace TestLibrary
                 synchronizedFolder.Sync();
                 if(checkStop())
                     return true;
-                Console.WriteLine("Retry Sync in "+ pollInterval +"ms");
+                Console.WriteLine(String.Format("Retry Sync in {0}ms", pollInterval));
                 System.Threading.Thread.Sleep(pollInterval);
                 i++;
             }
