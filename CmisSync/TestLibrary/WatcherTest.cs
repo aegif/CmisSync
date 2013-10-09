@@ -24,23 +24,27 @@ namespace TestLibrary
         [TestFixtureSetUp]
         public void ClassInit()
         {
-            Directory.CreateDirectory(TestFolder);
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
-        }
-
-        [TestFixtureTearDown]
-        public void ClassCleanup()
-        {
-            if (Directory.Exists(TestFolder))
-            {
-                Directory.Delete(TestFolder, true);
-            }
         }
 
         [SetUp]
         public void TestInit()
         {
+            Directory.CreateDirectory(TestFolder);
         }
+
+        [TearDown]
+        public void TestCleanup()
+        {
+            if (Directory.Exists(TestFolder))
+            {
+                Directory.Delete(TestFolder, true);
+                Console.WriteLine("Deleted TestFolder");
+            }
+            File.Delete(oldnameOut);
+            File.Delete(newnameOut);
+        }
+
 
         [Test, Category("Fast")]
         public void TestEnableRaisingEvents()
@@ -418,17 +422,17 @@ namespace TestLibrary
             }
         }
 
-        [Test, Category("Fast")]
-        public void TestChangeTypeForMove()
-        {
-            string oldnameOut = Path.Combine(TestFolderParent, "test.old");
-            string newnameOut = Path.Combine(TestFolderParent, "test.new");
-            string oldname = Path.Combine(TestFolder, "test.old");
-            string newname = Path.Combine(TestFolder, "test.new");
+        //Filenames for move tests
+        private static readonly string oldnameOut = Path.Combine(TestFolderParent, "test.old");
+        private static readonly string newnameOut = Path.Combine(TestFolderParent, "test.new");
+        private static readonly string oldname = Path.Combine(TestFolder, "test.old");
+        private static readonly string newname = Path.Combine(TestFolder, "test.new");
 
+        [Test, Category("Fast")]
+        public void TestChangeTypeForMoveInsideSyncedFolder()
+        {
             using (Watcher watcher = new Watcher(TestFolder))
             {
-                File.Delete(newname);
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldname, 1);
                 WaitWatcher(40000,watcher,1);
@@ -444,12 +448,14 @@ namespace TestLibrary
                 Assert.Contains(newname, changeList);
                 Assert.AreEqual(Watcher.ChangeTypes.Deleted, watcher.GetChangeType(oldname));
                 Assert.AreEqual(Watcher.ChangeTypes.Created, watcher.GetChangeType(newname));
-                File.Delete(newname);
             }
+        }
 
+        [Test, Category("Fast")]
+        public void TestChangeTypeForMoveIntoSyncedFolder()
+        {
             using (Watcher watcher = new Watcher(TestFolder))
             {
-                File.Delete(newname);
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldnameOut, 1);
                 WaitWatcher();
@@ -458,16 +464,23 @@ namespace TestLibrary
                 Assert.AreEqual(1, watcher.GetChangeList().Count);
                 Assert.AreEqual(newname, watcher.GetChangeList()[0]);
                 Assert.AreEqual(Watcher.ChangeTypes.Created, watcher.GetChangeType(newname));
-                File.Delete(newname);
             }
+        }
+
+        [Test, Category("Fast")]
+        public void TestChangeTypeForMoveOutOfSyncedFolder()
+        {
 
             using (Watcher watcher = new Watcher(TestFolder))
             {
-                File.Delete(newnameOut);
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldname, 1);
-                WaitWatcher(40000,watcher,1);
+                WaitWatcher(40000,watcher,(w) => 
+                {
+                    return w.GetChangeType(oldname) == Watcher.ChangeTypes.Changed;
+                });
                 File.Move(oldname, newnameOut);
+                Console.WriteLine("moved:"+oldname);
                 WaitWatcher(40000,watcher,(w) => 
                 {
                     return w.GetChangeType(oldname) == Watcher.ChangeTypes.Deleted;
@@ -475,19 +488,21 @@ namespace TestLibrary
                 Assert.AreEqual(1, watcher.GetChangeList().Count);
                 Assert.AreEqual(oldname, watcher.GetChangeList()[0]);
                 Assert.AreEqual(Watcher.ChangeTypes.Deleted, watcher.GetChangeType(oldname));
-                File.Delete(newnameOut);
             }
+        }
+
+        [Test, Category("Fast")]
+        public void TestChangeTypeForMoveInNotSyncedFolder()
+        {
 
             using (Watcher watcher = new Watcher(TestFolder))
             {
-                File.Delete(newnameOut);
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldnameOut, 1);
                 WaitWatcher();
                 File.Move(oldnameOut, newnameOut);
                 WaitWatcher();
                 Assert.AreEqual(0, watcher.GetChangeList().Count);
-                File.Delete(newnameOut);
             }
         }
 
