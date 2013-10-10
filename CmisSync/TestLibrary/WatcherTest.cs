@@ -261,14 +261,15 @@ namespace TestLibrary
                     CreateTestFile();
                     names.Add(GetPathname());
                 }
-                WaitWatcher(40000,watcher,NormalNumber);
-                Assert.AreEqual(NormalNumber, watcher.GetChangeList().Count);
+                WaitWatcher(40000, watcher, (w) =>
+                {
+                    return watcher.GetChangeType(names[NormalNumber -1]) == Watcher.ChangeTypes.Created;
+                });
                 for (int i = 0; i < NormalNumber; ++i)
                 {
-                    Assert.AreEqual(names[i], watcher.GetChangeList()[i]);
                     Assert.AreEqual(
                         Watcher.ChangeTypes.Created,
-                        watcher.GetChangeType((string)watcher.GetChangeList()[i]));
+                        watcher.GetChangeType(names[i]));
                 }
             }
         }

@@ -285,9 +285,16 @@ namespace CmisSync.Lib
         <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
       </layout>
     </appender>
+    <appender name=""ConsoleAppender"" type=""log4net.Appender.ConsoleAppender"">
+
+      <layout type=""log4net.Layout.PatternLayout"">
+        <conversionPattern value=""%-4timestamp [%thread] %-5level %logger %ndc - %message%newline"" />
+      </layout>
+    </appender>
     <root>
-      <level value=""INFO"" />
+      <level value=""DEBUG"" />
       <appender-ref ref=""CmisSyncFileAppender"" />
+      <appender-ref ref=""ConsoleAppender"" />
     </root>
   </log4net>"))
             {
