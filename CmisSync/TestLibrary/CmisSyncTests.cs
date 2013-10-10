@@ -846,7 +846,7 @@ namespace TestLibrary
                     return WaitUntilSyncIsDone(synchronizedFolder2, delegate{
                         return !File.Exists(file) && !File.Exists(file2);
                     }, 1);
-                    }));
+                    }, 20));
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
 
@@ -866,7 +866,7 @@ namespace TestLibrary
                 Assert.IsTrue(Directory.Exists(folder2));
                 Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate {
                         return !Directory.Exists(folder2);
-                    },20));
+                    }, 20));
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
 
