@@ -866,7 +866,7 @@ namespace TestLibrary
                 Assert.IsTrue(Directory.Exists(folder2));
                 Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate {
                         return !Directory.Exists(folder2);
-                    }));
+                    },20));
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
 
@@ -1184,7 +1184,13 @@ namespace TestLibrary
             int i = 0;
             while(i < maxTries)
             {
-                synchronizedFolder.Sync();
+                try{
+                    synchronizedFolder.Sync();
+                }catch(DotCMIS.Exceptions.CmisRuntimeException e){
+                    Console.WriteLine("{0} Exception caught and swallowed, retry.", e);
+                    System.Threading.Thread.Sleep(pollInterval);
+                    continue;
+                }
                 if(checkStop())
                     return true;
                 Console.WriteLine(String.Format("Retry Sync in {0}ms", pollInterval));
