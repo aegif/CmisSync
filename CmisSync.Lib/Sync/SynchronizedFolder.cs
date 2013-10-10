@@ -211,7 +211,7 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
-            /// Track whether a full sync is done
+            /// Track whether a full sync has ever been done successfully.
             /// </summary>
             private bool syncFull = false;
 
@@ -243,6 +243,7 @@ namespace CmisSync.Lib.Sync
                 // No ChangeLog capability, so we have to crawl remote and local folders.
                 // CrawlSync(remoteFolder, localFolder);
 
+                // If no local filesystem watching is disabled, then perform full sync.
                 if (!repo.Watcher.EnableRaisingEvents)
                 {
                     repo.Watcher.RemoveAll();
@@ -250,11 +251,16 @@ namespace CmisSync.Lib.Sync
                     syncFull = false;
                 }
 
+                // Sync by crawling remote folder and local folder.
+                // The result is whether the sync has fully completed or not.
                 syncFull = CrawlSync(remoteFolder, localFolder);
 
+                // If the crawl sync has fully completed, then perform a watcher sync.
                 if (syncFull)
                 {
                     WatcherSync(remoteFolderPath, localFolder);
+                    
+                    // Show debug info: all changes
                     foreach (string name in repo.Watcher.GetChangeList())
                     {
                         Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
