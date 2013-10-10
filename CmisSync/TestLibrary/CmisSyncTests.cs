@@ -672,6 +672,7 @@ namespace TestLibrary
                 Console.WriteLine("Synced to clean state.");
 
                 //  create file
+                // remote filename = /SyncEquality.File
                 Console.WriteLine("create file test.");
                 string filename = "SyncEquality.File";
                 string file = Path.Combine(localDirectory, filename);
@@ -699,6 +700,7 @@ namespace TestLibrary
                 Assert.IsTrue(File.Exists(file2));
 
                 //  create folder
+                // remote folder name = /SyncEquality.Folder
                 Console.WriteLine("create folder test.");
                 string foldername = "SyncEquality.Folder";
                 string folder = Path.Combine(localDirectory, foldername);
@@ -722,6 +724,7 @@ namespace TestLibrary
                 Assert.IsTrue(Directory.Exists(folder2));
 
                 //  move file
+                // /SyncEquality.File -> /SyncEquality.Folder/SyncEquality.File
                 Console.WriteLine("move file test.");
                 string source = file;
                 file = Path.Combine(folder, filename);
@@ -745,7 +748,7 @@ namespace TestLibrary
                 Assert.IsTrue(File.Exists(file2));
 
                 //  move folder
-                //create a folder to move
+                // create a folder as move target = /SyncEquality.Folder.2/
                 Console.WriteLine("move folder test.");
                 string foldername2 = "SyncEquality.Folder.2";
                 folder = Path.Combine(localDirectory, foldername2);
@@ -768,6 +771,9 @@ namespace TestLibrary
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
                 //move to the created folder
+                // moved folder = /SyncEquality.Folder/
+                // target folder = /SyncEquality.Folder.2/
+                // result = /SyncEquality.Folder.2/SyncEquality.Folder/
                 file = Path.Combine(folder, foldername, filename);
                 file2 = Path.Combine(folder2, foldername, filename);
                 Assert.IsFalse(File.Exists(file));
@@ -791,11 +797,13 @@ namespace TestLibrary
                 Assert.IsTrue(File.Exists(file2));
 
                 //change filecontent
+                // remote file path = /SyncEquality.Folder.2/SyncEquality.Folder/SyncEquality.File
                 Console.WriteLine("update file test.");
-                int filecount = Directory.GetFiles(folder).Count();
-                int filecount2 = Directory.GetFiles(folder2).Count();
+                int filecount = Directory.GetFiles(Path.Combine(folder, foldername)).Count();
+                int filecount2 = Directory.GetFiles(Path.Combine(folder2, foldername)).Count();
                 int length = 2048;
                 Assert.IsTrue(filecount == filecount2);
+                Assert.IsTrue(filecount == 1);
                 Console.WriteLine(" filecontent size = "+ length.ToString());
                 watcher.EnableRaisingEvents = true;
                 using (Stream stream = File.OpenWrite(file))
@@ -816,8 +824,8 @@ namespace TestLibrary
                         return false;
                     }
                     }));
-                Assert.IsTrue(filecount == Directory.GetFiles(folder).Count());
-                Assert.IsTrue(filecount2 == Directory.GetFiles(folder2).Count());
+                Assert.IsTrue(filecount == Directory.GetFiles(Path.Combine(folder, foldername)).Count());
+                Assert.IsTrue(filecount2 == Directory.GetFiles(Path.Combine(folder2, foldername)).Count());
                 Console.WriteLine(" checking file content equality");
                 using (Stream stream = File.OpenRead(file))
                 using (Stream stream2 = File.OpenRead(file2))
@@ -832,6 +840,7 @@ namespace TestLibrary
                 }
 
                 //  delete file
+                // remote file path = /SyncEquality.Folder.2/SyncEquality.Folder/SyncEquality.File
                 Console.WriteLine("delete file test.");
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
@@ -851,6 +860,7 @@ namespace TestLibrary
                 Assert.IsFalse(File.Exists(file2));
 
                 //  delete folder tree
+                // delete remote folder = /SyncEquality.Folder.2/
                 Console.WriteLine("delete folder tree test.");
                 Assert.IsTrue(Directory.Exists(folder));
                 Assert.IsTrue(Directory.Exists(folder2));
