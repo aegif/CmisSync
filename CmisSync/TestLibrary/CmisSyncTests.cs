@@ -382,7 +382,7 @@ namespace TestLibrary
                     cmis))
                 using (Watcher watcher = new Watcher(localDirectory))
                 {
-                    synchronizedFolder.resetFailedUploadsCounter();
+                    synchronizedFolder.resetFailedOperationsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -445,7 +445,7 @@ namespace TestLibrary
                     cmis))
                 using (Watcher watcher = new Watcher(localDirectory))
                 {
-                    synchronizedFolder.resetFailedUploadsCounter();
+                    synchronizedFolder.resetFailedOperationsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -661,8 +661,8 @@ namespace TestLibrary
             using (Watcher watcher = new Watcher(localDirectory))
             using (Watcher watcher2 = new Watcher(localDirectory2))
             {
-                synchronizedFolder.resetFailedUploadsCounter();
-                synchronizedFolder2.resetFailedUploadsCounter();
+                synchronizedFolder.resetFailedOperationsCounter();
+                synchronizedFolder2.resetFailedOperationsCounter();
                 synchronizedFolder.Sync();
                 synchronizedFolder2.Sync();
                 CleanAll(localDirectory);
@@ -915,7 +915,7 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
-                    synchronizedFolder.resetFailedUploadsCounter();
+                    synchronizedFolder.resetFailedOperationsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -962,7 +962,7 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
-                    synchronizedFolder.resetFailedUploadsCounter();
+                    synchronizedFolder.resetFailedOperationsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 
@@ -1039,7 +1039,7 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
-                    synchronizedFolder.resetFailedUploadsCounter();
+                    synchronizedFolder.resetFailedOperationsCounter();
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
 

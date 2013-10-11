@@ -88,7 +88,7 @@ namespace TestLibrary
         }
 
         [Test, Category("Database")]
-        public void TestFailedUploadCounter()
+        public void TestFailedOperationCounter()
         {
             using (Database database = new Database(DatabasePath))
             {
@@ -97,28 +97,71 @@ namespace TestLibrary
                 CreateTestFile(path, 1);
                 CreateTestFile(path2, 1);
                 File.SetLastWriteTimeUtc(path,File.GetLastWriteTimeUtc(path).Subtract(TimeSpan.FromMinutes(1)));
-                Assert.True(database.GetUploadRetryCounter(path) == 0);
-                database.SetUploadRetryCounter(path, 1);
-                Assert.True(database.GetUploadRetryCounter(path) == 1);
-                Console.WriteLine("Database failed upload test done.");
-                database.SetUploadRetryCounter(path, 2);
-                Assert.True(database.GetUploadRetryCounter(path) == 2);
-                Console.WriteLine("Database failed upload test done.");
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
+                database.SetOperationRetryCounter(path, 1, Database.OperationType.UPLOAD);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 1);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
+                database.SetOperationRetryCounter(path, 2, Database.OperationType.UPLOAD);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 2);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
                 CreateTestFile(path, 1);
-                Assert.True(database.GetUploadRetryCounter(path) == 0);
-                database.SetUploadRetryCounter(path, 1);
-                Assert.True(database.GetUploadRetryCounter(path) == 1);
-                database.SetUploadRetryCounter(path2, 2);
-                database.DeleteUploadRetryCounter(path);
-                Assert.True(database.GetUploadRetryCounter(path) == 0);
-                database.SetUploadRetryCounter(path, 1);
-                Assert.True(database.GetUploadRetryCounter(path) == 1);
-                Assert.True(database.GetUploadRetryCounter(path2) == 2);
-                database.DeleteAllFailedUploadCounter();
-                Assert.True(database.GetUploadRetryCounter(path) == 0);
-                Assert.True(database.GetUploadRetryCounter(path2) == 0);
-                database.SetUploadRetryCounter(path, -1);
-                Assert.True(database.GetUploadRetryCounter(path) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
+                database.SetOperationRetryCounter(path, 1, Database.OperationType.UPLOAD);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 1);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
+                database.SetOperationRetryCounter(path2, 2, Database.OperationType.UPLOAD);
+                database.DeleteAllFailedOperations(path);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 0);
+                database.SetOperationRetryCounter(path, 1, Database.OperationType.UPLOAD);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 1);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path2, Database.OperationType.UPLOAD) == 2);
+                Assert.True(database.GetOperationRetryCounter(path2, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path2, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path2, Database.OperationType.DELETE) == 0);
+                database.DeleteAllFailedOperations();
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path2, Database.OperationType.UPLOAD) == 0);
+                database.SetOperationRetryCounter(path, -1, Database.OperationType.UPLOAD);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
+                database.SetOperationRetryCounter(path, 1, Database.OperationType.UPLOAD);
+                database.SetOperationRetryCounter(path, 1, Database.OperationType.CHANGE);
+                database.SetOperationRetryCounter(path, 1, Database.OperationType.DOWNLOAD);
+                database.SetOperationRetryCounter(path, 1, Database.OperationType.DELETE);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 1);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 1);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 1);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 1);
+                database.SetOperationRetryCounter(path, 2, Database.OperationType.UPLOAD);
+                database.SetOperationRetryCounter(path, 3, Database.OperationType.CHANGE);
+                database.SetOperationRetryCounter(path, 4, Database.OperationType.DOWNLOAD);
+                database.SetOperationRetryCounter(path, 5, Database.OperationType.DELETE);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 2);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 3);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 4);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 5);
+                database.DeleteAllFailedOperations();
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
             }
         }
 

@@ -206,9 +206,9 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Resets all the failed upload to zero.
             /// </summary>
-            public void resetFailedUploadsCounter()
+            public void resetFailedOperationsCounter()
             {
-                database.DeleteAllFailedUploadCounter();
+                database.DeleteAllFailedOperations();
             }
 
 
@@ -932,7 +932,7 @@ namespace CmisSync.Lib.Sync
             {
                 using (new ActivityListenerResource(activityListener))
                 {
-                    long retries = database.GetUploadRetryCounter(filePath);
+                    long retries = database.GetOperationRetryCounter(filePath, Database.OperationType.UPLOAD);
                     if(retries >= this.repoinfo.MaxUploadRetries) {
                         Logger.Info(String.Format("Skipping uploading file absent on repository, because of too many failed retries({0}): {1}", retries-1, filePath));
                         return true;
@@ -1038,7 +1038,7 @@ namespace CmisSync.Lib.Sync
                     catch(Exception e)
                     {
                         retries++;
-                        database.SetUploadRetryCounter(filePath, retries);
+                        database.SetOperationRetryCounter(filePath, retries, Database.OperationType.UPLOAD);
                         Logger.Warn(String.Format("Uploading of {0} failed {1} times: ", filePath, retries), e);
                         return false;
                     }
@@ -1138,7 +1138,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UpdateFile(string filePath, IDocument remoteFile)
             {
-                long retries = database.GetUploadRetryCounter(filePath);
+                long retries = database.GetOperationRetryCounter(filePath, Database.OperationType.UPLOAD);
                 if(retries >= repoinfo.MaxUploadRetries)
                 {
                     Logger.Info(String.Format("Skipping updating file content on repository, because of too many failed retries({0}): {1}", retries, filePath));
@@ -1232,7 +1232,7 @@ namespace CmisSync.Lib.Sync
                 catch (Exception e)
                 {
                     retries++;
-                    database.SetUploadRetryCounter(filePath, retries);
+                    database.SetOperationRetryCounter(filePath, retries, Database.OperationType.UPLOAD);
                     Logger.Warn(String.Format("Updating content of {0} failed {1} times: ", filePath, retries), e);
                     return false;
                 }

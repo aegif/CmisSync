@@ -48,7 +48,7 @@ namespace CmisSync.Lib.Sync
             if(this.synchronizedFolder != null)
             {
                 Logger.Debug("Reset all failed upload counter");
-                this.synchronizedFolder.resetFailedUploadsCounter();
+                this.synchronizedFolder.resetFailedOperationsCounter();
             }
             base.Resume();
         }
