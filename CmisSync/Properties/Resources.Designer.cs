@@ -171,6 +171,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Credits.
+        /// </summary>
+        internal static string Credits {
+            get {
+                return ResourceManager.GetString("Credits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Customize the local folder name.
         /// </summary>
         internal static string Customize {
@@ -373,6 +382,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A newer version ({0}) is available!.
+        /// </summary>
+        internal static string NewVersionAvailable {
+            get {
+                return ResourceManager.GetString("NewVersionAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the synchronized folder.
         /// </summary>
         internal static string OpenFolder {
@@ -463,11 +481,29 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Report a problem.
+        /// </summary>
+        internal static string ReportProblem {
+            get {
+                return ResourceManager.GetString("ReportProblem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Resume sync.
         /// </summary>
         internal static string ResumeSync {
             get {
                 return ResourceManager.GetString("ResumeSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are running the latest version..
+        /// </summary>
+        internal static string RunningLatestVersion {
+            get {
+                return ResourceManager.GetString("RunningLatestVersion", resourceCulture);
             }
         }
         
@@ -584,11 +620,29 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version {0}.
+        /// </summary>
+        internal static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View Log.
         /// </summary>
         internal static string ViewLog {
             get {
                 return ResourceManager.GetString("ViewLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Website.
+        /// </summary>
+        internal static string Website {
+            get {
+                return ResourceManager.GetString("Website", resourceCulture);
             }
         }
         
