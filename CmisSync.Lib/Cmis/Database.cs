@@ -589,10 +589,10 @@ namespace CmisSync.Lib.Cmis
             parameters.Add("date", File.GetLastWriteTimeUtc(path));
             parameters.Add("path", Normalize(path));
             parameters.Add("counter", (counter>=0) ? counter:0);
-            string uploadCounter = "(SELECT uploadCounter FROM failedoperations WHERE path=@path)";
-            string downloadCounter = "(SELECT downloadCounter FROM failedoperations WHERE path=@path)";
-            string changeCounter = "(SELECT changeCounter FROM failedoperations WHERE path=@path)";
-            string deleteCounter = "(SELECT deleteCounter FROM failedoperations WHERE path=@path)";
+            string uploadCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN uploadCounter ELSE '' END FROM failedoperations WHERE path=@path)";
+            string downloadCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN downloadCounter ELSE '' END FROM failedoperations WHERE path=@path)";
+            string changeCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN changeCounter ELSE '' END FROM failedoperations WHERE path=@path)";
+            string deleteCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN deleteCounter ELSE '' END FROM failedoperations WHERE path=@path)";
             switch(type)
             {
                 case OperationType.UPLOAD:
@@ -612,10 +612,10 @@ namespace CmisSync.Lib.Cmis
                                 uploadCounter, downloadCounter, changeCounter, deleteCounter,
                                 uploadMessage, downloadMessage, changeMessage, deleteCounter)
                                 VALUES( @path, @date, {0},{1},{2},{3},
-                                (SELECT uploadMessage FROM failedoperations WHERE path=@path),
-                                (SELECT downloadMessage FROM failedoperations WHERE path=@path),
-                                (SELECT changeMessage FROM failedoperations WHERE path=@path),
-                                (SELECT deleteMessage FROM failedoperations WHERE path=@path)
+                                (SELECT CASE WHEN lastLocalModificationDate=@date THEN uploadMessage ELSE '' END FROM failedoperations WHERE path=@path ), 
+                                (SELECT CASE WHEN lastLocalModificationDate=@date THEN downloadMessage ELSE '' END FROM failedoperations WHERE path=@path),
+                                (SELECT CASE WHEN lastLocalModificationDate=@date THEN changeMessage ELSE '' END FROM failedoperations WHERE path=@path),
+                                (SELECT CASE WHEN lastLocalModificationDate=@date THEN deleteMessage ELSE '' END FROM failedoperations WHERE path=@path)
                             )",uploadCounter,downloadCounter,changeCounter,deleteCounter);
             ExecuteSQLAction(command, parameters);
         }

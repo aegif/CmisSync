@@ -107,10 +107,13 @@ namespace TestLibrary
                 Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
                 Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
                 database.SetOperationRetryCounter(path, 2, Database.OperationType.UPLOAD);
+                database.SetOperationRetryCounter(path, 3, Database.OperationType.DOWNLOAD);
+                database.SetOperationRetryCounter(path, 4, Database.OperationType.CHANGE);
+                database.SetOperationRetryCounter(path, 5, Database.OperationType.DELETE);
                 Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 2);
-                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
-                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
-                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 3);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 4);
+                Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 5);
                 CreateTestFile(path, 1);
                 Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.UPLOAD) == 0);
                 Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DOWNLOAD) == 0);
