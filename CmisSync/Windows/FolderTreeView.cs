@@ -122,6 +122,14 @@ namespace CmisSync
                 get { return _folder; }
             }
             /// <summary>
+            /// The folder that is selected by user
+            /// </summary>
+            public Folder SelectFolder
+            {
+                get;
+                set;
+            }
+            /// <summary>
             /// Constructor
             /// </summary>
             /// <param name="username">login username</param>
@@ -161,12 +169,12 @@ namespace CmisSync
             private void DoWork(object sender, DoWorkEventArgs e)
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
-                try
-                {
-                    e.Result = CmisUtils.GetSubfolderTree(Id,Path,address,username,password,-1);
-                } catch(Exception) {
+                //try
+                //{
+                //    e.Result = CmisUtils.GetSubfolderTree(Id,Path,address,username,password,-1);
+                //} catch(Exception) {
                     e.Result = CmisUtils.GetSubfolders(Id, Path, address, username, password);
-                }
+                //}
                 if (worker.CancellationPending)
                     e.Cancel = true;
             }
@@ -174,10 +182,22 @@ namespace CmisSync
             private void SubFolderWork(object sender, DoWorkEventArgs e)
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
-                Folder f = queue.Dequeue();
+
+                Folder f = SelectFolder;
+                if (f == null || f.Status != LoadingStatus.START)
+                {
+                    f = queue.Dequeue();
+                }
+                if (f.Status == LoadingStatus.DONE)
+                {
+                    return;
+                }
+
                 currentWorkingObject = f;
                 currentWorkingObject.Status = LoadingStatus.LOADING;
+                Console.WriteLine("subfolder for " + f.Name);
                 e.Result = CmisUtils.GetSubfolders(Id, f.Path, address, username, password);
+                System.Threading.Thread.Sleep(3000);
                 if (worker.CancellationPending)
                     e.Cancel = true;
             }
@@ -206,7 +226,8 @@ namespace CmisSync
                                 Type = CmisTree.Folder.FolderType.REMOTE,
                                 IsIgnored = currentWorkingObject.IsIgnored,
                                 Selected = currentWorkingObject.Selected,
-                                Enabled = currentWorkingObject.Enabled
+                                Enabled = currentWorkingObject.Enabled,
+                                Status = LoadingStatus.START
                             };
                         currentWorkingObject.SubFolder.Add(folder);
                         this.queue.Enqueue(folder);
@@ -464,6 +485,29 @@ namespace CmisSync
                         foreach (Folder child in SubFolder)
                         {
                             child.Enabled = enabled;
+                        }
+                    }
+                }
+            }
+            private bool expanded = false;
+            /// <summary>
+            /// Sets and gets the Expanded state of a folder.
+            /// </summary>
+            public bool Expanded
+            {
+                get { return enabled; }
+                set
+                {
+                    expanded = value;
+                    if (value)
+                    {
+                        this.Repo.SelectFolder = this;
+                    }
+                    else
+                    {
+                        if (this.Repo.SelectFolder == this)
+                        {
+                            this.Repo.SelectFolder = null;
                         }
                     }
                 }

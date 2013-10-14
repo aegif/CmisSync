@@ -25,23 +25,22 @@
         <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding SubFolder}" >
             <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
                 <StackPanel Orientation="Horizontal">
-<!--
-                    <StackPanel.ContextMenu>
+                    <!--<StackPanel.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="{Binding Converter={StaticResource IgnoreText}, Path=IsIgnored}" IsCheckable="True" IsChecked="{Binding IsIgnored}">
 
                             </MenuItem>
                         </ContextMenu>
-                    </StackPanel.ContextMenu>
--->
+                    </StackPanel.ContextMenu>-->
                     <TextBlock Text="{Binding Name, Mode=OneTime}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
                     <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
                 </StackPanel>
             </CheckBox>
         </HierarchicalDataTemplate>
-        </TreeView.Resources>
+    </TreeView.Resources>
     <TreeView.ItemContainerStyle>
         <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=OneWayToSource}"/>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="White" />
