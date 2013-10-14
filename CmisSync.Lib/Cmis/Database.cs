@@ -565,9 +565,19 @@ namespace CmisSync.Lib.Cmis
         public long GetOperationRetryCounter(string path, OperationType type)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("date", File.GetLastWriteTimeUtc(path));
             parameters.Add("path", Normalize(path));
-            object result = ExecuteSQLFunction(String.Format("SELECT {0}Counter FROM failedoperations WHERE path=@path AND lastLocalModificationDate=@date", operationTypeToString(type)), parameters);
+            object result = null;
+            switch(type){
+                case OperationType.DOWNLOAD:
+                    goto case OperationType.DELETE;
+                case OperationType.DELETE:
+                    result = ExecuteSQLFunction(String.Format("SELECT {0}Counter FROM failedoperations WHERE path=@path", operationTypeToString(type)), parameters);
+                    break;
+                default:
+                    parameters.Add("date", File.GetLastWriteTimeUtc(path));
+                    result = ExecuteSQLFunction(String.Format("SELECT {0}Counter FROM failedoperations WHERE path=@path AND lastLocalModificationDate=@date", operationTypeToString(type)), parameters);
+                    break;
+            }
             if( result != null && !(result is DBNull))
             { return (long) result; }
             else
@@ -586,7 +596,16 @@ namespace CmisSync.Lib.Cmis
         public void SetOperationRetryCounter(string path, long counter, OperationType type)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("date", File.GetLastWriteTimeUtc(path));
+            switch(type){
+                case OperationType.DOWNLOAD:
+                    goto case OperationType.DELETE;
+                case OperationType.DELETE:
+                    parameters.Add("date", DateTime.Now.ToFileTimeUtc());
+                    break;
+                default:
+                    parameters.Add("date", File.GetLastWriteTimeUtc(path));
+                    break;
+            }
             parameters.Add("path", Normalize(path));
             parameters.Add("counter", (counter>=0) ? counter:0);
             string uploadCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN uploadCounter ELSE '' END FROM failedoperations WHERE path=@path)";

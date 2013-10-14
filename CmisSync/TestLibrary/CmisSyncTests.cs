@@ -1124,7 +1124,6 @@ namespace TestLibrary
                 state = DotCMIS.Enums.VersioningState.None;
             }
             session.CreateDocument(properties, root, contentStream, state);
-
             // Check whether file is present.
             IItemEnumerable<ICmisObject> children = root.GetChildren();
             bool found = false;
