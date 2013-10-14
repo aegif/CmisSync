@@ -443,7 +443,7 @@ namespace CmisSync.Lib.Sync
                 {
                     return false;
                 }
-                Logger.Debug("Start downloading a chunk (size="+ repoinfo.ChunkSize+"): " + filePath + " from remote document: "+ remoteDocument.Name);
+                Logger.Debug(String.Format("Start downloading a chunk (size={0}): {1} from remote document: {2}", repoinfo.ChunkSize, filePath, remoteDocument.Name ));
                 long? fileLength = remoteDocument.ContentStreamLength;
                 FileInfo fileInfo = new FileInfo(filePath);
 
