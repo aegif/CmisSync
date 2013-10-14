@@ -186,6 +186,7 @@ namespace CmisSync
                 Folder f = SelectFolder;
                 if (f != null && f.Status == LoadingStatus.DONE)
                 {
+                    //  adjust the queue to handle the subfolders for the selected folder
                     int index = 0;
                     foreach (Folder subfolder in f.SubFolder)
                     {
@@ -202,14 +203,12 @@ namespace CmisSync
                 else if (f != null && f.Status == LoadingStatus.START)
                 {
                     //  continue with this selected folder
+                    queue.Remove(f);
                 }
                 else
                 {
-                    do
-                    {
-                        f = queue[0];
-                        queue.RemoveAt(0);
-                    } while (f.Status == LoadingStatus.DONE && queue.Count > 0);
+                    f = queue[0];
+                    queue.RemoveAt(0);
                 }
 
                 currentWorkingObject = f;
