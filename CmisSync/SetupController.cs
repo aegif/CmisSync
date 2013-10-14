@@ -368,7 +368,10 @@ namespace CmisSync
             // Check whether folder name contains invalid characters.
             Regex regexRepoName = (Path.DirectorySeparatorChar.Equals('\\'))?RepositoryRegex:RepositoryRegexLinux;
             bool valid = (regexRepoName.IsMatch(reponame) && (!folderAlreadyExists));
-
+            if(valid)
+            {
+                valid = CmisSync.Lib.Utils.IsInvalidFolderName(reponame.Replace(Path.DirectorySeparatorChar,' '));
+            }
             if (!valid)
             {
                 // Disable button to next step.
@@ -376,7 +379,7 @@ namespace CmisSync
             }
             // Return validity error, or continue validating.
             if (folderAlreadyExists) return "FolderAlreadyExist";
-            if (!regexRepoName.IsMatch(reponame)) return "InvalidFolderName";
+            if (!regexRepoName.IsMatch(reponame)|| CmisSync.Lib.Utils.IsInvalidFolderName(reponame.Replace(Path.DirectorySeparatorChar,' '))) return "InvalidFolderName";
 
             // Validate localpath
             folderAlreadyExists = Directory.Exists(localpath);
