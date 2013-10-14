@@ -246,17 +246,27 @@ namespace CmisSync.Lib.Cmis
             public List<FolderTree> children = new List<FolderTree>();
             public string path;
             public string Name { get; set; }
+            public bool Finished;
 
-            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder)
+            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder, int depth)
             {
                 this.path = folder.Path;
                 this.Name = folder.Name;
+                if (depth == 0)
+                {
+                    this.Finished = false;
+                }
+                else
+                {
+                    this.Finished = true;
+                }
+
                 if(trees != null)
                     foreach (ITree<IFileableCmisObject> tree in trees)
                     {
                         Folder f = tree.Item as Folder;
-                        if(f!=null)
-                            this.children.Add(new FolderTree(tree.Children, f));
+                        if (f != null)
+                            this.children.Add(new FolderTree(tree.Children, f, depth - 1));
                     }
             }
         }
@@ -297,7 +307,7 @@ namespace CmisSync.Lib.Cmis
             try
             {
                 IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
-                return new FolderTree(trees, folder);
+                return new FolderTree(trees, folder, depth);
             }
             catch (Exception e)
             {
