@@ -1087,7 +1087,7 @@ namespace TestLibrary
 
 
         // Write a file and immediately check whether it has been created.
-        // Should help see whether CMIS servers are synchronous or not.
+        // Should help to find out whether CMIS servers are synchronous or not.
         [Test, TestCaseSource("TestServers")]
         public void WriteThenRead(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -1101,7 +1101,7 @@ namespace TestLibrary
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
             SessionFactory factory = SessionFactory.NewInstance();
-            ISession session = factory.GetRepositories(cmisParameters)[0].CreateSession();
+            ISession session = factory.CreateSession(cmisParameters);
 
             // IFolder root = session.GetRootFolder();
             IFolder root = (IFolder)session.GetObjectByPath(remoteFolderPath);
