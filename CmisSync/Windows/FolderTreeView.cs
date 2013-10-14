@@ -48,7 +48,7 @@ namespace CmisSync
             public string Address { get { return address; } }
 
             private Folder currentWorkingObject;
-            private Queue<Folder> queue = new Queue<Folder>();
+            private List<Folder> queue = new List<Folder>();
 
             private LoadingStatus status = LoadingStatus.START;
             /// <summary>
@@ -184,20 +184,37 @@ namespace CmisSync
                 BackgroundWorker worker = sender as BackgroundWorker;
 
                 Folder f = SelectFolder;
-                if (f == null || f.Status != LoadingStatus.START)
+                if (f != null && f.Status == LoadingStatus.DONE)
                 {
-                    f = queue.Dequeue();
+                    int index = 0;
+                    foreach (Folder subfolder in f.SubFolder)
+                    {
+                        if (subfolder.Status == LoadingStatus.START)
+                        {
+                            queue.Remove(subfolder);
+                            queue.Insert(index, subfolder);
+                            index++;
+                        }
+                    }
+                    f = queue[0];
+                    queue.RemoveAt(0);
                 }
-                if (f.Status == LoadingStatus.DONE)
+                else if (f != null && f.Status == LoadingStatus.START)
                 {
-                    return;
+                    //  continue with this selected folder
+                }
+                else
+                {
+                    do
+                    {
+                        f = queue[0];
+                        queue.RemoveAt(0);
+                    } while (f.Status == LoadingStatus.DONE && queue.Count > 0);
                 }
 
                 currentWorkingObject = f;
                 currentWorkingObject.Status = LoadingStatus.LOADING;
-                Console.WriteLine("subfolder for " + f.Name);
                 e.Result = CmisUtils.GetSubfolders(Id, f.Path, address, username, password);
-                System.Threading.Thread.Sleep(3000);
                 if (worker.CancellationPending)
                     e.Cancel = true;
             }
@@ -230,7 +247,7 @@ namespace CmisSync
                                 Status = LoadingStatus.START
                             };
                         currentWorkingObject.SubFolder.Add(folder);
-                        this.queue.Enqueue(folder);
+                        this.queue.Add(folder);
                     }
                     currentWorkingObject.Status = LoadingStatus.DONE;
                 }
@@ -278,7 +295,7 @@ namespace CmisSync
                                 Enabled = this.selected
                             };
                             this.Folder.Add(folder);
-                            this.queue.Enqueue(folder);
+                            this.queue.Add(folder);
                         }
                         Status = LoadingStatus.DONE;
                         if (this.queue.Count > 0 && !this.worker.CancellationPending)
