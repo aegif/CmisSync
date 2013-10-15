@@ -223,15 +223,15 @@ namespace CmisSync
                 currentWorkingObject.Status = LoadingStatus.LOADING;
                 if (treeWork)
                 {
-                    Console.WriteLine("Handle tree " + f.Path);
+                    //Console.WriteLine("Handle tree " + f.Path);
                     e.Result = CmisUtils.GetSubfolderTree(Id, f.Path, address, username, password, 2);
                 }
                 else
                 {
-                    Console.WriteLine("Handle " + f.Path);
+                    //Console.WriteLine("Handle " + f.Path);
                     e.Result = CmisUtils.GetSubfolders(Id, f.Path, address, username, password);
                 }
-                System.Threading.Thread.Sleep(3000);
+                //System.Threading.Thread.Sleep(3000);
                 if (worker.CancellationPending)
                     e.Cancel = true;
             }
