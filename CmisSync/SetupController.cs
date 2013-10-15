@@ -437,6 +437,7 @@ namespace CmisSync
             PreviousRepository = repository;
             PreviousPath = remote_path;
 
+            this.ignoredPaths.Clear();
             foreach (string ignore in ignoredPaths)
                 this.ignoredPaths.Add(ignore);
         }
