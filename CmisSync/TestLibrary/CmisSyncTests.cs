@@ -680,9 +680,10 @@ namespace TestLibrary
                 Assert.IsFalse(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
                 watcher.EnableRaisingEvents = true;
+                int length = 1024;
                 using (Stream stream = File.OpenWrite(file))
                 {
-                    byte[] content = new byte[1024];
+                    byte[] content = new byte[length];
                     stream.Write(content, 0, content.Length);
                 }
                 Assert.IsTrue(File.Exists(file));
@@ -694,7 +695,8 @@ namespace TestLibrary
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsFalse(File.Exists(file2));
                 Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate {
-                        return File.Exists(file2);
+                        FileInfo info = new FileInfo(file2);
+                        return info.Exists && info.Length == length;
                     }));
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
@@ -801,7 +803,7 @@ namespace TestLibrary
                 Console.WriteLine("update file test.");
                 int filecount = Directory.GetFiles(Path.Combine(folder, foldername)).Count();
                 int filecount2 = Directory.GetFiles(Path.Combine(folder2, foldername)).Count();
-                int length = 2048;
+                length = 2048;
                 Assert.IsTrue(filecount == filecount2);
                 Assert.IsTrue(filecount == 1);
                 Console.WriteLine(" filecontent size = "+ length.ToString());
@@ -816,7 +818,7 @@ namespace TestLibrary
                 watcher.RemoveAll();
                 synchronizedFolder.Sync();
                 Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate {
-                    if(filecount2 == Directory.GetFiles(folder2).Count())
+                    if(filecount2 == Directory.GetFiles(Path.Combine(folder2, foldername)).Count())
                     {
                         FileInfo info = new FileInfo(file2);
                         return info.Exists && info.Length == length;
