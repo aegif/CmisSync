@@ -373,6 +373,14 @@ namespace CmisSync.Lib.Sync
                             {
                                 Logger.Error("CMIS exception while syncing:", e);
                             }
+                            catch(ObjectDisposedException e)
+                            {
+                                Logger.Warn("Object disposed while syncing:", e);
+                            }
+                            catch(Exception e)
+                            {
+                                Logger.Warn("Execption thrown while syncing:", e);
+                            }
                         }
                     );
                     bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -826,7 +834,7 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (ObjectDisposedException ex)
                         {
-                            Logger.Error("Download aborted: " + fileName + " " + ex);
+                            Logger.Error(String.Format("Download aborted: {0}", fileName), ex);
                             return false;
                         }
                         catch (System.IO.DirectoryNotFoundException ex)
@@ -849,7 +857,7 @@ namespace CmisSync.Lib.Sync
 
                         if (success)
                         {
-                            Logger.Info("Downloaded: " + fileName);
+                            Logger.Info(String.Format("Downloaded remote object({0}): {1}", remoteDocument.Id, fileName));
                             // TODO Control file integrity by using hash compare?
 
                             // Get metadata.
@@ -1050,6 +1058,8 @@ namespace CmisSync.Lib.Sync
                                                                        "ContentStream(FileName={0}, MimeType={2}, Length={3})",
                                                                    fileName,"cmis:document", contentStream.MimeType,contentStream.Length));
                                             remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                            Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
+                                                                   remoteDocument.Id, fileName));
                                             filehash = hashAlg.Hash;
                                             success = true;
                                         }
@@ -1070,8 +1080,10 @@ namespace CmisSync.Lib.Sync
                                     contentStream.MimeType = MimeType.GetMIMEType(fileName);
                                     contentStream.Length = 0;
                                     contentStream.Stream = new MemoryStream(0);
-
+                                    Logger.Debug("CMIS::CreateDocument()");
                                     remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                    Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
+                                                                   remoteDocument.Id, fileName));
                                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
                                     database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
 
@@ -1139,8 +1151,9 @@ namespace CmisSync.Lib.Sync
                 IFolder folder = null;
                 try
                 {
-                    Logger.Debug("Creating remote folder: " + Path.GetFileName(localFolder));
+                    Logger.Debug(String.Format("Creating remote folder {0} for local folder {1}", Path.GetFileName(localFolder), localFolder));
                     folder = remoteBaseFolder.CreateFolder(properties);
+                    Logger.Debug(String.Format("Created remote folder {0}({1}) for local folder {2}", Path.GetFileName(localFolder), folder.Id ,localFolder));
                 }
                 catch (CmisNameConstraintViolationException)
                 {
@@ -1246,18 +1259,18 @@ namespace CmisSync.Lib.Sync
                                 contentStream.Length = localfile.Length;
                                 contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
                                 contentStream.Stream = logstream;
-                                Logger.Debug("before SetContentStream");
+                                Logger.Debug(String.Format("before SetContentStream to remote object ({0})", remoteFile.Id));
 
                                 remoteFile.SetContentStream(contentStream, true, true);
 
-                                Logger.Debug("after SetContentStream");
-                                Logger.Info("## Updated " + filePath);
+                                Logger.Debug(String.Format("after SetContentStream to remote object ({0})", remoteFile.Id));
+                                Logger.Info(String.Format("## Updated {0} ({1})", filePath, remoteFile.Id));
                                 success = true;
                             }
                         }
                         else
                         {
-                            Logger.Debug("before SetContentStream");
+                            Logger.Debug(String.Format("before SetContentStream to remote object ({0})", remoteFile.Id));
 
                             for (long offset = 0; offset < localfile.Length; offset += repoinfo.ChunkSize)
                             {
@@ -1290,8 +1303,8 @@ namespace CmisSync.Lib.Sync
                                 }
                             }
 
-                            Logger.Debug("after SetContentStream");
-                            Logger.Info("## Updated " + filePath);
+                            Logger.Debug(String.Format("after SetContentStream to remote object ({0})",remoteFile.Id));
+                            Logger.Info(String.Format("## Updated {0} ({1})", filePath, remoteFile.Id));
                             success = true;
                         }
                     }
