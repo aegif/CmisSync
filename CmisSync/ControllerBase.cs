@@ -285,6 +285,23 @@ namespace CmisSync
             }
         }
 
+        public void EditRepositoryFolder(string reponame)
+        {
+            lock (this.repo_lock)
+            {
+                Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
+                if (f != null)
+                {
+                    Console.WriteLine("TODO edit folder for " + reponame);
+                    //TODO
+                }
+                else
+                {
+                    Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
+                }
+            }
+        }
+
         
         /// <summary>
         /// Remove a synchronized folder from the CmisSync configuration.
