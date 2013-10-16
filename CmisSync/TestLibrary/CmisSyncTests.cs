@@ -815,9 +815,9 @@ namespace TestLibrary
                     } else {
                         return false;
                     }
-                    }));
-                Assert.IsTrue(filecount == Directory.GetFiles(folder).Count());
-                Assert.IsTrue(filecount2 == Directory.GetFiles(folder2).Count());
+                    }, 20));
+                Assert.AreEqual(filecount, Directory.GetFiles(folder).Count());
+                Assert.AreEqual(filecount2, Directory.GetFiles(folder2).Count());
                 Console.WriteLine(" checking file content equality");
                 using (Stream stream = File.OpenRead(file))
                 using (Stream stream2 = File.OpenRead(file2))
@@ -828,7 +828,7 @@ namespace TestLibrary
                     stream.Read(content,0,length);
                     stream.Read(content2,0,length);
                     for(int i = 0; i < length; i++)
-                        Assert.IsTrue(content[i] == content2[i]);
+                        Assert.AreEqual(content[i], content2[i]);
                 }
 
                 //  delete file
