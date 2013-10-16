@@ -65,6 +65,14 @@ namespace CmisSync
 
 
         /// <summary>
+        /// Dictionary of the edit folder diaglogs
+        /// Key: synchronized folder name
+        /// Value: <c>EditController</c>
+        /// </summary>
+        private Dictionary<string, EditController> edits = new Dictionary<string, EditController>();
+
+
+        /// <summary>
         /// Path where the CmisSync synchronized folders are by default.
         /// </summary>
         public string FoldersPath { get; private set; }
@@ -287,22 +295,55 @@ namespace CmisSync
 
         public void EditRepositoryFolder(string reponame)
         {
+            Config.SyncConfig.Folder folder;
+
             lock (this.repo_lock)
             {
-                Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
-                if (f != null)
+                folder = ConfigManager.CurrentConfig.getFolder(reponame);
+                if (folder == null)
                 {
-                    Console.WriteLine("TODO edit folder for " + reponame);
-                    //TODO
+                    Logger.Warn("Reponame \"" + reponame + "\" could not be found: Editing Repository failed");
+                    return;
                 }
-                else
+
+                foreach (KeyValuePair<string,EditController> pair in edits)
                 {
-                    Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
+                    if (pair.Key == reponame)
+                    {
+                        pair.Value.ShowWindow();
+                        return;
+                    }
                 }
+
+                RepoInfo.CmisPassword password = new RepoInfo.CmisPassword();
+                password.ObfuscatedPassword = folder.ObfuscatedPassword;
+                Uri address = folder.RemoteUrl;
+                Edit edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath);
+                edits.Add(reponame, edit.Controller);
+
+                edit.Controller.SaveFolderEvent += delegate
+                {
+                    lock (this.repo_lock)
+                    {
+                        Console.WriteLine("TODO save folder configuration");
+                    }
+                };
+
+                edit.Controller.HideWindowEvent += delegate
+                {
+                    lock (this.repo_lock)
+                    {
+                        edits.Remove(reponame);
+                    }
+                };
+
+                edit.Controller.ShowWindow();
             }
+
+            Console.WriteLine("TODO show edit folder for " + reponame);
+            //TODO
         }
 
-        
         /// <summary>
         /// Remove a synchronized folder from the CmisSync configuration.
         /// This happens after the user removes the folder.
