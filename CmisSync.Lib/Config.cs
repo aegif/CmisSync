@@ -347,7 +347,7 @@ namespace CmisSync.Lib
                 {
                     get { return pollInterval; }
                     set {
-                        if (value <= 0)
+                        if( value <= 0 )
                         {
                             pollInterval = 5000;
                         }
@@ -359,14 +359,42 @@ namespace CmisSync.Lib
 
                 private int uploadRetries = 2;
                 [XmlElement("maxUploadRetries", IsNullable=true)]
-                public int? UploadRetries {
-                    get {return uploadRetries;}
-                    set{
-                        if(value==null || value < 0)
+                public int? UploadRetries
+                {
+                    get { return uploadRetries; }
+                    set {
+                        if( value==null || value < 0 )
                             uploadRetries = 2;
                         else
                             uploadRetries = (int) value;
-                    }}
+                    }
+                }
+
+                private int downloadRetries = 2;
+                [XmlElement("maxDownloadRetries", IsNullable=true)]
+                public int? DownLoadRetries
+                {
+                    get { return downloadRetries; }
+                    set {
+                        if( value == null || value < 0 )
+                            downloadRetries = 2;
+                        else
+                            downloadRetries = (int) value;
+                    }
+                }
+
+                private int deletionRetries = 2;
+                [XmlElement("maxDeletionRetries", IsNullable=true)]
+                public int? DeletionRetries
+                {
+                    get { return deletionRetries; }
+                    set {
+                        if ( value == null || value < 0 )
+                            deletionRetries = 2;
+                        else
+                            deletionRetries = (int) value;
+                    }
+                }
 
                 [XmlElement("features", IsNullable=true)]
                 public Feature SupportedFeatures { get; set;}
@@ -406,6 +434,8 @@ namespace CmisSync.Lib
                     repoInfo.RemotePath = RemotePath;
                     repoInfo.TargetDirectory = LocalPath;
                     repoInfo.MaxUploadRetries = uploadRetries;
+                    repoInfo.MaxDownloadRetries = downloadRetries;
+                    repoInfo.MaxDeletionRetries = deletionRetries;
                     if (PollInterval < 1) PollInterval = 5000;
                         repoInfo.PollInterval = PollInterval;
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
