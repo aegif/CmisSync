@@ -659,47 +659,48 @@ namespace CmisSync.Lib.Sync
 
             private void SetLastModifiedDate(IDocument remoteDocument, string filepath, Dictionary<string, string[]> metadata)
             {
-                if (remoteDocument.LastModificationDate != null)
+                try
                 {
-                    File.SetLastWriteTimeUtc(filepath, (DateTime)remoteDocument.LastModificationDate);
-                }
-                else
-                {
-                    string[] cmisModDate;
-                    if (metadata.TryGetValue("cmis:lastModificationDate", out cmisModDate) && cmisModDate.Length == 3)
+                    if (remoteDocument.LastModificationDate != null)
                     {
-                        try
+                        File.SetLastWriteTimeUtc(filepath, (DateTime)remoteDocument.LastModificationDate);
+                    }
+                    else
+                    {
+                        string[] cmisModDate;
+                        if (metadata.TryGetValue("cmis:lastModificationDate", out cmisModDate) && cmisModDate.Length == 3)
                         {
                             DateTime modDate = DateTime.Parse(cmisModDate[2]);
                             File.SetLastWriteTimeUtc(filepath, modDate);
                         }
-                        catch (Exception)
-                        {
-                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    Logger.Debug(String.Format("Failed to set last modified date for the local file: {0}", filepath), e);
                 }
             }
 
-            private void SetLastModifiedDate(IFolder remoteFolder, string filepath, Dictionary<string, string[]> metadata)
+            private void SetLastModifiedDate(IFolder remoteFolder, string folderpath, Dictionary<string, string[]> metadata)
             {
-                if (remoteFolder.LastModificationDate != null)
-                {
-                    File.SetLastWriteTimeUtc(filepath, (DateTime)remoteFolder.LastModificationDate);
-                }
-                else
-                {
-                    string[] cmisModDate;
-                    if (metadata.TryGetValue("cmis:lastModificationDate", out cmisModDate) && cmisModDate.Length == 3)
+                try{
+                    if (remoteFolder.LastModificationDate != null)
                     {
-                        try
+                        File.SetLastWriteTimeUtc(folderpath, (DateTime)remoteFolder.LastModificationDate);
+                    }
+                    else
+                    {
+                        string[] cmisModDate;
+                        if (metadata.TryGetValue("cmis:lastModificationDate", out cmisModDate) && cmisModDate.Length == 3)
                         {
                             DateTime modDate = DateTime.Parse(cmisModDate[2]);
-                            File.SetLastWriteTimeUtc(filepath, modDate);
-                        }
-                        catch (Exception)
-                        {
+                            File.SetLastWriteTimeUtc(folderpath, modDate);
                         }
                     }
+                }
+                catch(Exception e)
+                {
+                    Logger.Debug(String.Format("Failed to set last modified date for the local folder: {0}", folderpath), e);
                 }
             }
 
