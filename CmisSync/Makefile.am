@@ -1,4 +1,9 @@
-SUBDIRS = Common Linux TestLibrary TestLibraryRunner
+
+if HAVE_MAC_OS
+	SUBDIRS = Common Mac TestLibrary TestLibraryRunner
+else
+	SUBDIRS = Common Linux TestLibrary TestLibraryRunner
+endif
 
 EXTRA_DIST =  \
 	Program.cs \
