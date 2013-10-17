@@ -10,6 +10,7 @@ using System.Text;
 using System.Windows.Data;
 using System.Windows;
 using System.Windows.Input;
+using System.IO;
 
 namespace CmisSync
 {
@@ -135,7 +136,9 @@ namespace CmisSync
             /// <param name="username">login username</param>
             /// <param name="password">password</param>
             /// <param name="address">URL of the repo location</param>
-            public CmisRepo(string username, string password, string address)
+            /// <param name="ignores">ignore folder list</param>
+            /// <param name="localFolder">local repository folder</param>
+            public CmisRepo(string username, string password, string address, List<string> ignores = null, string localFolder = null)
             {
                 this.username = username;
                 this.password = password;
@@ -146,6 +149,110 @@ namespace CmisSync
                 folderworker.DoWork += new DoWorkEventHandler(SubFolderWork);
                 folderworker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(SubfolderFinished);
                 folderworker.WorkerSupportsCancellation = true;
+                BuildLocalFolder("D:\\Cmis","/");
+                ignores = new List<string>();
+                ignores.Add("/IgnoreFolder0/folder0/folder01");
+                ignores.Add("/IgnoreFolder0");
+                ignores.Add("/IgnoreFolder0/folder0");
+                ignores.Add("/IgnoreFolder0/folder0/folder00");
+                ignores.Add("/IgnoreFolder0/folder1");
+                ignores.Add("/Folder1/IgnoreFolder0");
+                BuildIgnoreFolder(ignores);
+            }
+
+            private Folder BuildFolder(string path)
+            {
+                if (String.IsNullOrEmpty(path))
+                {
+                    return null;
+                }
+
+                Folder current = null;
+                string [] names = path.Split('/');
+                foreach (string name in names)
+                {
+                    if (String.IsNullOrEmpty(name))
+                    {
+                        continue;
+                    }
+                    if (current == null)
+                    {
+                        //  Folder in CmisRepo.Folder
+                        foreach (Folder folder in Folder)
+                        {
+                            if (folder.Name == name)
+                            {
+                                current = folder;
+                                break;
+                            }
+                        }
+                        if (current == null)
+                        {
+                            current = new Folder()
+                            {
+                                Repo = this,
+                                Path = "/" + name,
+                                Name = name,
+                                Parent = this,
+                                Type = CmisTree.Folder.FolderType.LOCAL,
+                                Enabled = this.selected
+                            };
+                            Folder.Add(current);
+                        }
+                    }
+                    else
+                    {
+                        //  Folder in Folder.SubFolder
+                        bool found = false;
+                        foreach (Folder folder in current.SubFolder)
+                        {
+                            if (folder.Name == name)
+                            {
+                                current = folder;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                        {
+                            current = SubfolderHandleFolder(current.Parent + "/" + name, current);
+                            current.Type = CmisTree.Folder.FolderType.LOCAL;
+                        }
+                    }
+                }
+
+                return current;
+            }
+
+            private void BuildIgnoreFolder(List<string> ignores)
+            {
+                if (null == ignores)
+                {
+                    return;
+                }
+
+                foreach (string ignore in ignores)
+                {
+                    BuildFolder(ignore).Selected = false;
+                }
+            }
+
+            private void BuildLocalFolder(string localFolder,string path)
+            {
+                if (null == localFolder)
+                {
+                    return;
+                }
+
+                foreach (DirectoryInfo dir in (new DirectoryInfo(localFolder)).GetDirectories())
+                {
+                    BuildFolder(path + "/" + dir.Name);
+                    BuildLocalFolder(dir.FullName, path + "/" + dir.Name);
+                }
+
+                
+
+                Console.WriteLine("TODO build local folder tree");
             }
 
             /// <summary>
@@ -160,6 +267,9 @@ namespace CmisSync
                 }
             }
 
+            /// <summary>
+            /// Cancels the loading of the CMIS Repo
+            /// </summary>
             public void cancelLoadingAsync()
             {
                 this.worker.CancelAsync();
@@ -243,7 +353,7 @@ namespace CmisSync
                     Folder folder = currentWorkingObject.GetSubFolder(child.path);
                     if (folder == null)
                     {
-                        folder = SubfolderHandleFolder(child.path);
+                        folder = SubfolderHandleFolder(child.path,currentWorkingObject);
                         if (child.Finished)
                         {
                             folder.Status = LoadingStatus.DONE;
@@ -272,21 +382,20 @@ namespace CmisSync
                 currentWorkingObject = current;
             }
 
-            private Folder SubfolderHandleFolder(string path)
+            private Folder SubfolderHandleFolder(string path, Folder parent)
             {
                 Folder folder = new Folder()
                 {
                     Repo = this,
                     Path = path,
                     Name = path.Split('/')[path.Split('/').Length - 1],
-                    Parent = currentWorkingObject,
+                    Parent = parent,
                     Type = CmisTree.Folder.FolderType.REMOTE,
-                    IsIgnored = currentWorkingObject.IsIgnored,
-                    Selected = currentWorkingObject.Selected,
-                    Enabled = currentWorkingObject.Enabled,
-                    Status = LoadingStatus.START
+                    IsIgnored = parent.IsIgnored,
+                    Selected = (parent.Selected == false) ? false : true,
+                    Enabled = parent.Enabled
                 };
-                currentWorkingObject.SubFolder.Add(folder);
+                parent.SubFolder.Add(folder);
                 return folder;
             }
 
@@ -311,7 +420,7 @@ namespace CmisSync
                         string[] subfolder = (string[])e.Result;
                         foreach (string f in subfolder)
                         {
-                            this.queue.Add(SubfolderHandleFolder(f));
+                            this.queue.Add(SubfolderHandleFolder(f,currentWorkingObject));
                         }
                     }
                     currentWorkingObject.Status = LoadingStatus.DONE;

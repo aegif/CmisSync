@@ -318,7 +318,12 @@ namespace CmisSync
                 RepoInfo.CmisPassword password = new RepoInfo.CmisPassword();
                 password.ObfuscatedPassword = folder.ObfuscatedPassword;
                 Uri address = folder.RemoteUrl;
-                Edit edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath);
+                List<string> ignores = new List<string>();
+                foreach (Config.IgnoredFolder ignore in folder.IgnoredFolders)
+                {
+                    ignores.Add(ignore.Path);
+                }
+                Edit edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath, ignores, folder.LocalPath);
                 edits.Add(reponame, edit.Controller);
 
                 edit.Controller.SaveFolderEvent += delegate
@@ -339,9 +344,6 @@ namespace CmisSync
 
                 edit.Controller.ShowWindow();
             }
-
-            Console.WriteLine("TODO show edit folder for " + reponame);
-            //TODO
         }
 
         /// <summary>

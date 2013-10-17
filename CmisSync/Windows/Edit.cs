@@ -28,20 +28,24 @@ namespace CmisSync
         private string password;
         private string address;
         private string id;
-        private string path;
+        private string remotePath;
+        private List<string> ignores;
+        private string localPath;
 
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public Edit(string name, string username, string password, string address, string id, string path)
+        public Edit(string name, string username, string password, string address, string id, string remotePath, List<string> ignores, string localPath)
         {
             Name = name;
             this.username = username;
             this.password = password;
             this.address = address;
             this.id = id;
-            this.path = path;
+            this.remotePath = remotePath;
+            this.ignores = ignores;
+            this.localPath = localPath;
 
             CreateEdit();
 
@@ -66,7 +70,7 @@ namespace CmisSync
             System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/TreeView.xaml", System.UriKind.Relative);
             TreeView treeView = Application.LoadComponent(resourceLocater) as TreeView;
 
-            CmisSync.CmisTree.CmisRepo repo = new CmisSync.CmisTree.CmisRepo(username, password, address)
+            CmisSync.CmisTree.CmisRepo repo = new CmisSync.CmisTree.CmisRepo(username, password, address, ignores, localPath)
             {
                 Name = Name,
                 Id = id
