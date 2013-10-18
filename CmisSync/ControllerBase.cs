@@ -426,20 +426,9 @@ namespace CmisSync
             string[] files = Directory.GetFiles(path);
 
             foreach (string file in files)
-                if (!IsSymlink(file))
+                if (!CmisSync.Lib.Utils.IsSymlink(file))
                     File.SetAttributes(file, FileAttributes.Normal);
         }
-
-
-        /// <summary>
-        /// Whether a file is a symbolic link.
-        /// </summary>
-        private bool IsSymlink(string file)
-        {
-            FileAttributes attributes = File.GetAttributes(file);
-            return ((attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
-        }
-
 
         /// <summary>
         /// Reacts when a local change occurs.

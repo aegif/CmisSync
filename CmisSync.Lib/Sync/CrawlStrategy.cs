@@ -233,6 +233,12 @@ namespace CmisSync.Lib.Sync
                     {
                         sleepWhileSuspended();
 
+                        if(Utils.IsSymlink(new FileInfo(filePath)))
+                        {
+                            Logger.Info("Skipping symbolic linked file: "+ filePath);
+                            continue;
+                        }
+
                         string fileName = Path.GetFileName(filePath);
 
                         if (Utils.WorthSyncing(fileName))
@@ -310,6 +316,11 @@ namespace CmisSync.Lib.Sync
                     foreach (string localSubFolder in Directory.GetDirectories(localFolder))
                     {
                         sleepWhileSuspended();
+                        if(Utils.IsSymlink(new DirectoryInfo(localSubFolder)))
+                        {
+                            Logger.Info("Skipping symbolic link folder: "+ localSubFolder);
+                            continue;
+                        }
                         string path = localSubFolder.Substring(repoinfo.TargetDirectory.Length).Replace("\\", "/");
                         string folderName = Path.GetFileName(localSubFolder);
                         if (!Utils.IsInvalidFolderName(folderName) && !repoinfo.isPathIgnored(path))
