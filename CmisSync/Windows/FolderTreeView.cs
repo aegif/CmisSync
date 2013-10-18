@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows;
 using System.Windows.Input;
 using System.IO;
+using System.Diagnostics;
 
 namespace CmisSync
 {
@@ -130,6 +131,35 @@ namespace CmisSync
                 get;
                 set;
             }
+
+            /// <summary>
+            /// Get the ignored folder list
+            /// </summary>
+            /// <returns></returns>
+            public List<string> GetIgnoredFolder()
+            {
+                List<string> result = new List<string>();
+                foreach (Folder child in Folder)
+                {
+                    result.AddRange(child.GetIgnoredFolder());
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Get the selected folder list
+            /// </summary>
+            /// <returns></returns>
+            public List<string> GetSelectedFolder()
+            {
+                List<string> result = new List<string>();
+                foreach (Folder child in Folder)
+                {
+                    result.AddRange(child.GetSelectedFolder());
+                }
+                return result;
+            }
+
             /// <summary>
             /// Constructor
             /// </summary>
@@ -196,21 +226,14 @@ namespace CmisSync
                     else
                     {
                         //  Folder in Folder.SubFolder
-                        bool found = false;
-                        foreach (Folder folder in current.SubFolder)
+                        string pathSub = current.Path + "/" + name;
+                        Folder folder = current.GetSubFolder(pathSub);
+                        if (folder == null)
                         {
-                            if (folder.Name == name)
-                            {
-                                current = folder;
-                                found = true;
-                                break;
-                            }
+                            folder = SubfolderHandleFolder(pathSub, current);
                         }
-                        if (!found)
-                        {
-                            current = SubfolderHandleFolder(current.Path + "/" + name, current);
-                            current.Type = CmisTree.Folder.FolderType.LOCAL;
-                        }
+                        current = folder;
+                        current.Type = CmisTree.Folder.FolderType.LOCAL;
                     }
                 }
 
@@ -239,8 +262,9 @@ namespace CmisSync
 
                 foreach (DirectoryInfo dir in (new DirectoryInfo(localFolder)).GetDirectories())
                 {
-                    BuildFolder(path + "/" + dir.Name);
-                    BuildLocalFolder(dir.FullName, path + "/" + dir.Name);
+                    string pathSub = (path + "/" + dir.Name).Replace("//", "/");
+                    BuildFolder(pathSub);
+                    BuildLocalFolder(dir.FullName, pathSub);
                 }
             }
 
@@ -270,8 +294,10 @@ namespace CmisSync
                 BackgroundWorker worker = sender as BackgroundWorker;
                 //try
                 //{
-                //    e.Result = CmisUtils.GetSubfolderTree(Id,Path,address,username,password,-1);
-                //} catch(Exception) {
+                //    e.Result = CmisUtils.GetSubfolderTree(Id, Path, address, username, password, -1);
+                //}
+                //catch (Exception)
+                //{
                     e.Result = CmisUtils.GetSubfolders(Id, Path, address, username, password);
                 //}
                 if (worker.CancellationPending)
@@ -326,17 +352,32 @@ namespace CmisSync
                 currentWorkingObject.Status = LoadingStatus.LOADING;
                 if (treeWork)
                 {
-                    Console.WriteLine("Handle tree " + f.Path);
+                    //Console.WriteLine("Handle tree " + f.Path);
                     e.Result = CmisUtils.GetSubfolderTree(Id, f.Path, address, username, password, 2);
                 }
                 else
                 {
-                    Console.WriteLine("Handle " + f.Path);
+                    //Console.WriteLine("Handle " + f.Path);
                     e.Result = CmisUtils.GetSubfolders(Id, f.Path, address, username, password);
                 }
-                System.Threading.Thread.Sleep(1000);
+                //System.Threading.Thread.Sleep(1000);
                 if (worker.CancellationPending)
                     e.Cancel = true;
+            }
+
+            private void SubfolderHandleLocal(Folder folder)
+            {
+                if (folder.Type == CmisTree.Folder.FolderType.LOCAL)
+                {
+                    folder.Status = LoadingStatus.DONE;
+                }
+                foreach (Folder f in folder.SubFolder)
+                {
+                    if (f.Type == CmisTree.Folder.FolderType.LOCAL)
+                    {
+                        SubfolderHandleLocal(f);
+                    }
+                }
             }
 
             private void SubfolderHandleTree(CmisUtils.FolderTree tree, Folder parent)
@@ -354,7 +395,11 @@ namespace CmisSync
                         queue.Remove(folder);
                         queue.Add(folder);
                     }
-                    //TODO local folder should be set as done
+                }
+
+                if (tree.Finished)
+                {
+                    SubfolderHandleLocal(parent);
                 }
 
                 foreach (CmisUtils.FolderTree child in tree.children)
@@ -415,10 +460,11 @@ namespace CmisSync
                             Folder folder = SubfolderHandleFolder(f, currentWorkingObject);
                             if (folder.Status == LoadingStatus.START)
                             {
+                                this.queue.Remove(folder);
                                 this.queue.Add(folder);
                             }
                         }
-                        //TODO local folder should be set as done
+                        SubfolderHandleLocal(currentWorkingObject);
                     }
                     currentWorkingObject.Status = LoadingStatus.DONE;
                 }
@@ -451,12 +497,16 @@ namespace CmisSync
                                 if (f.Path == repofolder.path)
                                 {
                                     folder = f;
-                                    this.Folder.Remove(folder);
                                     break;
                                 }
                             }
+                            this.Folder.Remove(folder);
                             folder = new Folder(repofolder, this, folder);
                             this.Folder.Add(folder);
+                        }
+                        foreach (Folder folder in this.Folder)
+                        {
+                            SubfolderHandleLocal(folder);
                         }
                         Status = LoadingStatus.DONE;
                     }
@@ -548,6 +598,46 @@ namespace CmisSync
                         f.IsIgnored = !f.ignored;
                 }
             }*/
+
+
+            /// <summary>
+            /// Return the folder list when <c>Selected</c> is <c>false</c>
+            /// </summary>
+            /// <returns></returns>
+            public List<string> GetIgnoredFolder()
+            {
+                List<string> result = new List<string>();
+                if (IsIgnored)
+                {
+                    result.Add(Path);
+                }
+                else
+                {
+                    foreach (Folder child in SubFolder)
+                        result.AddRange(child.GetIgnoredFolder());
+                }
+                return result;
+            }
+
+
+            /// <summary>
+            /// Return the folder list when <c>Selected</c> is <c>true</c>
+            /// </summary>
+            /// <returns></returns>
+            public List<string> GetSelectedFolder()
+            {
+                List<string> result = new List<string>();
+                if (Selected == true)
+                    result.Add(Path);
+                else
+                {
+                    foreach (Folder child in SubFolder)
+                        result.AddRange(child.GetSelectedFolder());
+                }
+                return result;
+            }
+
+
             /// <summary>
             /// Constructor if the whole FolderTree is loaded. It creates a folder tree recursivly.
             /// </summary>
@@ -566,23 +656,41 @@ namespace CmisSync
                 else
                 {
                     this.Status = LoadingStatus.START;
+                    Debug.Assert(false, "Whole CMIS folder tree should be queried");
                 }
                 this.Enabled = repo.Selected;
                 foreach (CmisUtils.FolderTree t in tree.children)
                 {
-                    Folder folder = null;
-                    foreach (Folder f in SubFolder)
+                    Folder oldSub = null;
+                    if (old != null)
                     {
-                        if (f.path == t.path)
+                        oldSub = old.GetSubFolder(t.path);
+                    }
+                    this.SubFolder.Add(new Folder(t, Repo, oldSub) { Parent = this });
+                }
+
+                //  Support local folder in old
+                if (old != null)
+                {
+                    if (old.Type != FolderType.LOCAL)
+                    {
+                        Debug.Assert(false, "old Folder should be local folder tree only");
+                    }
+                    this.Type = FolderType.BOTH;
+                    this.Selected = old.Selected;
+                    foreach (Folder o in old.SubFolder)
+                    {
+                        if (o.Type != FolderType.LOCAL)
                         {
-                            folder = f;
-                            this.SubFolder.Remove(folder);
-                            break;
+                            Debug.Assert(false, "old Folder should be local folder tree only");
+                            continue;
+                        }
+                        if (null == GetSubFolder(o.path))
+                        {
+                            this.SubFolder.Add(o);
                         }
                     }
-                    this.SubFolder.Add(new Folder(t, Repo, folder) { Parent = this});
                 }
-                //  TODO: Support local folder in old
             }
             /// <summary>
             /// Default constructor. All properties must be manually set.

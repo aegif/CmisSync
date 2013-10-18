@@ -23,13 +23,16 @@ namespace CmisSync
         /// </summary>
         public string Name;
 
+        /// <summary>
+        /// Ignore folder list
+        /// </summary>
+        public List<string> Ignores;
 
         private string username;
         private string password;
         private string address;
         private string id;
         private string remotePath;
-        private List<string> ignores;
         private string localPath;
 
 
@@ -44,21 +47,16 @@ namespace CmisSync
             this.address = address;
             this.id = id;
             this.remotePath = remotePath;
-            this.ignores = ignores;
+            this.Ignores = ignores;
             this.localPath = localPath;
 
             CreateEdit();
-
-            Controller.ShowWindowEvent += delegate
-            {
-                this.Show();
-            };
         }
 
 
         protected override void Close(object sender, CancelEventArgs args)
         {
-            Controller.HideWindow();
+            Controller.CloseWindow();
         }
 
 
@@ -70,7 +68,7 @@ namespace CmisSync
             System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/TreeView.xaml", System.UriKind.Relative);
             TreeView treeView = Application.LoadComponent(resourceLocater) as TreeView;
 
-            CmisSync.CmisTree.CmisRepo repo = new CmisSync.CmisTree.CmisRepo(username, password, address, ignores, localPath)
+            CmisSync.CmisTree.CmisRepo repo = new CmisSync.CmisTree.CmisRepo(username, password, address, Ignores, localPath)
             {
                 Name = Name,
                 Id = id
@@ -87,7 +85,7 @@ namespace CmisSync
             Canvas.SetTop(treeView, 70);
             Canvas.SetLeft(treeView, 185);
 
-            Controller.HideWindowEvent += delegate
+            Controller.CloseWindowEvent += delegate
             {
                 repo.cancelLoadingAsync();
             };
@@ -112,15 +110,15 @@ namespace CmisSync
 
             finish_button.Click += delegate
             {
+                Ignores = repo.GetIgnoredFolder();
                 Controller.SaveFolder();
-                this.Close();
+                Close();
             };
 
             cancel_button.Click += delegate
             {
-                this.Close();
+                Close();
             };
-
 
             this.ShowAll();
         }

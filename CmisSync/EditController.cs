@@ -9,24 +9,24 @@ namespace CmisSync
     {
         //===== Actions =====
         /// <summary>
-        /// Show Edit Window Action
+        /// Open Edit Window Action
         /// </summary>
-        public event Action ShowWindowEvent = delegate { };
+        public event Action OpenWindowEvent = delegate { };
         /// <summary>
         /// Save Folder Action
         /// </summary>
         public event Action SaveFolderEvent = delegate { };
         /// <summary>
-        /// Hide Edit Window Action
+        /// Close Edit Window Action
         /// </summary>
-        public event Action HideWindowEvent = delegate { };
+        public event Action CloseWindowEvent = delegate { };
 
         /// <summary>
         /// Show Edit Window
         /// </summary>
-        public void ShowWindow()
+        public void OpenWindow()
         {
-            ShowWindowEvent();
+            OpenWindowEvent();
         }
 
         /// <summary>
@@ -38,11 +38,11 @@ namespace CmisSync
         }
 
         /// <summary>
-        /// Hide Window
+        /// Close Edit Window
         /// </summary>
-        public void HideWindow()
+        public void CloseWindow()
         {
-            HideWindowEvent();
+            CloseWindowEvent();
         }
     }
 }

@@ -14,7 +14,7 @@
         <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
         <local:IgnoreToTextDecoration x:Key="IgnoreTextDecoration" />
         <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
-            <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
+            <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                     <TextBlock Text="{Binding Name, Mode=OneTime}" />
 <!--                    <CheckBox Content="Automatically sync new folder" IsChecked="{Binding SyncAllSubFolder, Mode=TwoWay}" FlowDirection="RightToLeft" Margin="20,0,0,0" Foreground="DarkGray"/> -->
@@ -23,7 +23,7 @@
             </RadioButton>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding SubFolder}" >
-            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
+            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
                 <StackPanel Orientation="Horizontal">
                     <!--<StackPanel.ContextMenu>
                         <ContextMenu>

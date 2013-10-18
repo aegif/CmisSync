@@ -1,4 +1,4 @@
-//   CmisSync, a collaboration and sharing tool.
+﻿//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -69,7 +69,7 @@ namespace CmisSync
         /// Key: synchronized folder name
         /// Value: <c>EditController</c>
         /// </summary>
-        private Dictionary<string, EditController> edits = new Dictionary<string, EditController>();
+        private Dictionary<string, Edit> edits = new Dictionary<string, Edit>();
 
 
         /// <summary>
@@ -281,6 +281,11 @@ namespace CmisSync
                 Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
                 if (f != null)
                 {
+                    Edit edit = null;
+                    if (edits.TryGetValue(reponame, out edit))
+                    {
+                        edit.Close();
+                    }
                     RemoveRepository(f);
                     ConfigManager.CurrentConfig.Folder.Remove(f);
                     ConfigManager.CurrentConfig.Save();
@@ -306,13 +311,11 @@ namespace CmisSync
                     return;
                 }
 
-                foreach (KeyValuePair<string,EditController> pair in edits)
+                Edit edit = null;
+                if (edits.TryGetValue(reponame, out edit))
                 {
-                    if (pair.Key == reponame)
-                    {
-                        pair.Value.ShowWindow();
-                        return;
-                    }
+                    edit.Show();
+                    return;
                 }
 
                 RepoInfo.CmisPassword password = new RepoInfo.CmisPassword();
@@ -323,18 +326,23 @@ namespace CmisSync
                 {
                     ignores.Add(ignore.Path);
                 }
-                Edit edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath, ignores, folder.LocalPath);
-                edits.Add(reponame, edit.Controller);
+                edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath, ignores, folder.LocalPath);
+                edits.Add(reponame, edit);
 
                 edit.Controller.SaveFolderEvent += delegate
                 {
                     lock (this.repo_lock)
                     {
-                        Console.WriteLine("TODO save folder configuration");
+                        folder.IgnoredFolders.Clear();
+                        foreach (string ignore in edit.Ignores)
+                        {
+                            folder.IgnoredFolders.Add(new Config.IgnoredFolder() { Path = ignore });
+                        }
+                        ConfigManager.CurrentConfig.Save();
                     }
                 };
 
-                edit.Controller.HideWindowEvent += delegate
+                edit.Controller.CloseWindowEvent += delegate
                 {
                     lock (this.repo_lock)
                     {
@@ -342,7 +350,7 @@ namespace CmisSync
                     }
                 };
 
-                edit.Controller.ShowWindow();
+                edit.Show();
             }
         }
 
