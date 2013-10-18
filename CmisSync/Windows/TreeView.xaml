@@ -13,6 +13,7 @@
         <local:LoadingStatusToTextConverter x:Key="StatusText" />
         <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
         <local:IgnoreToTextDecoration x:Key="IgnoreTextDecoration" />
+        <local:FolderTypeToBrushConverter x:Key="FolderType"/>
         <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
             <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
@@ -32,7 +33,7 @@
                             </MenuItem>
                         </ContextMenu>
                     </StackPanel.ContextMenu>-->
-                    <TextBlock Text="{Binding Name, Mode=OneTime}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
+                    <TextBlock Text="{Binding Name, Mode=OneTime}" Foreground="{Binding Converter={StaticResource FolderType}, Path=Type}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
                     <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
                 </StackPanel>
             </CheckBox>

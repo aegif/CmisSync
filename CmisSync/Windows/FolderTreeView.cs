@@ -179,8 +179,8 @@ namespace CmisSync
                 folderworker.DoWork += new DoWorkEventHandler(SubFolderWork);
                 folderworker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(SubfolderFinished);
                 folderworker.WorkerSupportsCancellation = true;
-                BuildLocalFolder(localFolder,"/");
                 BuildIgnoreFolder(ignores);
+                BuildLocalFolder(localFolder, "/");
             }
 
             private Folder BuildFolder(string path)
@@ -217,7 +217,7 @@ namespace CmisSync
                                 Path = "/" + name,
                                 Name = name,
                                 Parent = this,
-                                Type = CmisTree.Folder.FolderType.LOCAL,
+                                Type = CmisTree.Folder.FolderType.NONE,
                                 Enabled = this.selected
                             };
                             Folder.Add(current);
@@ -230,10 +230,9 @@ namespace CmisSync
                         Folder folder = current.GetSubFolder(pathSub);
                         if (folder == null)
                         {
-                            folder = SubfolderHandleFolder(pathSub, current);
+                            folder = SubfolderHandleFolder(pathSub, current, CmisTree.Folder.FolderType.NONE);
                         }
                         current = folder;
-                        current.Type = CmisTree.Folder.FolderType.LOCAL;
                     }
                 }
 
@@ -249,7 +248,8 @@ namespace CmisSync
 
                 foreach (string ignore in ignores)
                 {
-                    BuildFolder(ignore).Selected = false;
+                    Folder folder = BuildFolder(ignore);
+                    folder.Selected = false;
                 }
             }
 
@@ -263,7 +263,8 @@ namespace CmisSync
                 foreach (DirectoryInfo dir in (new DirectoryInfo(localFolder)).GetDirectories())
                 {
                     string pathSub = (path + "/" + dir.Name).Replace("//", "/");
-                    BuildFolder(pathSub);
+                    Folder folder = BuildFolder(pathSub);
+                    folder.AddType(CmisTree.Folder.FolderType.LOCAL);
                     BuildLocalFolder(dir.FullName, pathSub);
                 }
             }
@@ -367,13 +368,13 @@ namespace CmisSync
 
             private void SubfolderHandleLocal(Folder folder)
             {
-                if (folder.Type == CmisTree.Folder.FolderType.LOCAL)
+                if (folder.Type == CmisTree.Folder.FolderType.LOCAL || folder.Type == CmisTree.Folder.FolderType.NONE)
                 {
                     folder.Status = LoadingStatus.DONE;
                 }
                 foreach (Folder f in folder.SubFolder)
                 {
-                    if (f.Type == CmisTree.Folder.FolderType.LOCAL)
+                    if (folder.Type == CmisTree.Folder.FolderType.LOCAL || folder.Type == CmisTree.Folder.FolderType.NONE)
                     {
                         SubfolderHandleLocal(f);
                     }
@@ -384,7 +385,7 @@ namespace CmisSync
             {
                 foreach (CmisUtils.FolderTree child in tree.children)
                 {
-                    Folder folder = SubfolderHandleFolder(child.path, parent);
+                    Folder folder = SubfolderHandleFolder(child.path, parent, CmisTree.Folder.FolderType.REMOTE);
                     if (child.Finished)
                     {
                         queue.Remove(folder);
@@ -409,15 +410,12 @@ namespace CmisSync
                 }
             }
 
-            private Folder SubfolderHandleFolder(string path, Folder parent)
+            private Folder SubfolderHandleFolder(string path, Folder parent, CmisTree.Folder.FolderType type)
             {
                 Folder folder = parent.GetSubFolder(path);
                 if (folder != null)
                 {
-                    if (folder.Type == CmisTree.Folder.FolderType.LOCAL)
-                    {
-                        folder.Type = CmisTree.Folder.FolderType.BOTH;
-                    }
+                    folder.AddType(type);
                     return folder;
                 }
 
@@ -427,7 +425,7 @@ namespace CmisSync
                     Path = path,
                     Name = path.Split('/')[path.Split('/').Length - 1],
                     Parent = parent,
-                    Type = CmisTree.Folder.FolderType.REMOTE,
+                    Type = type,
                     IsIgnored = parent.IsIgnored,
                     Selected = (parent.Selected == false) ? false : true,
                     Enabled = parent.Enabled
@@ -457,7 +455,7 @@ namespace CmisSync
                         string[] subfolder = (string[])e.Result;
                         foreach (string f in subfolder)
                         {
-                            Folder folder = SubfolderHandleFolder(f, currentWorkingObject);
+                            Folder folder = SubfolderHandleFolder(f, currentWorkingObject, CmisTree.Folder.FolderType.REMOTE);
                             if (folder.Status == LoadingStatus.START)
                             {
                                 this.queue.Remove(folder);
@@ -521,10 +519,7 @@ namespace CmisSync
                             {
                                 if (f == sub.Path)
                                 {
-                                    if (sub.Type == CmisTree.Folder.FolderType.LOCAL)
-                                    {
-                                        sub.Type = CmisTree.Folder.FolderType.BOTH;
-                                    }
+                                    sub.AddType(CmisTree.Folder.FolderType.REMOTE);
                                     folder = sub;
                                     break;
                                 }
@@ -672,19 +667,10 @@ namespace CmisSync
                 //  Support local folder in old
                 if (old != null)
                 {
-                    if (old.Type != FolderType.LOCAL)
-                    {
-                        Debug.Assert(false, "old Folder should be local folder tree only");
-                    }
-                    this.Type = FolderType.BOTH;
+                    this.AddType(old.Type);
                     this.Selected = old.Selected;
                     foreach (Folder o in old.SubFolder)
                     {
-                        if (o.Type != FolderType.LOCAL)
-                        {
-                            Debug.Assert(false, "old Folder should be local folder tree only");
-                            continue;
-                        }
                         if (null == GetSubFolder(o.path))
                         {
                             this.SubFolder.Add(o);
@@ -884,13 +870,51 @@ namespace CmisSync
             /// The Type of a folder can be any FolderType
             /// </summary>
             public FolderType Type { get { return folderType; } set { SetField(ref folderType, value, "Type"); } }
+            /// <summary>
+            /// Add a type
+            /// <c>FolderType.REMOTE</c> + <c>FolderType.LOCAL</c> = <c>FolderType.BOTH</c>
+            /// </summary>
+            /// <param name="type"></param>
+            public void AddType(FolderType type)
+            {
+                if (folderType == FolderType.BOTH)
+                {
+                    return;
+                }
+                if (folderType == FolderType.NONE)
+                {
+                    Type = type;
+                    return;
+                }
+                if (type == FolderType.BOTH)
+                {
+                    Type = type;
+                    return;
+                }
+                if (folderType == FolderType.LOCAL)
+                {
+                    if (type == FolderType.REMOTE)
+                    {
+                        Type = FolderType.BOTH;
+                    }
+                    return;
+                }
+                if (folderType == FolderType.REMOTE)
+                {
+                    if (type == FolderType.LOCAL)
+                    {
+                        Type = FolderType.BOTH;
+                    }
+                    return;
+                }
+            }
 
             /// <summary>
             /// Enumaration of all possible Folder Types. It can be Remote, Local, or Both.
             /// </summary>
             public enum FolderType
             {
-                LOCAL, REMOTE, BOTH
+                NONE, LOCAL, REMOTE, BOTH
             }
 
             // boiler-plate
@@ -1112,8 +1136,13 @@ namespace CmisSync
         /// Converter for FolderType to Color convertion
         /// </summary>
         [ValueConversion(typeof(Folder.FolderType), typeof(Brush))]
-        public class ForlderTypeToBrushConverter : IValueConverter
+        public class FolderTypeToBrushConverter : IValueConverter
         {
+            private Brush noneFolderBrush = Brushes.Red;
+            /// <summary>
+            /// Color of FolderType.NONE
+            /// </summary>
+            public Brush NocalFolderBrush { get { return noneFolderBrush; } set { localFolderBrush = value; } }
             private Brush localFolderBrush = Brushes.LightGray;
             /// <summary>
             /// Color of FolderType.LOCAL
@@ -1142,6 +1171,8 @@ namespace CmisSync
                 Folder.FolderType type = (Folder.FolderType)value;
                 switch (type)
                 {
+                    case Folder.FolderType.NONE:
+                        return noneFolderBrush;
                     case Folder.FolderType.LOCAL:
                         return localFolderBrush;
                     case Folder.FolderType.REMOTE:
