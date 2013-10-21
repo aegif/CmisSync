@@ -559,22 +559,21 @@ namespace TestLibrary
                     }));
                     Assert.IsTrue(Directory.Exists(path1));
 
-                    ////  move document
-                    //Assert.IsFalse(File.Exists(Path.Combine(path1, name2)));
-                    //doc2.Move(folder, folder1);
-                    ////string id = doc2.Id;
-                    ////session.Binding.GetObjectService().MoveObject(repositoryId, ref id, folder1.Id, folder.Id, null);
-                    //System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
-                    //synchronizedFolder.Sync();
-                    //Assert.IsTrue(File.Exists(Path.Combine(path1, name2)));
+                    //  move document
+                    string filename = Path.Combine(path1, name2);
+                    Assert.IsFalse(File.Exists(filename));
+                    doc2.Move(folder, folder1);
+                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                        return File.Exists(filename);
+                    }));
 
                     //  delete document
-                    Assert.IsTrue(File.Exists(path2));
+                    Assert.IsTrue(File.Exists(filename));
                     doc2.DeleteAllVersions();
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return !File.Exists(path2);
+                        return !File.Exists(filename);
                     }));
-                    Assert.IsFalse(File.Exists(path2));
+                    Assert.IsFalse(File.Exists(filename));
 
                     //  rename folder
                     Assert.IsTrue(Directory.Exists(path1));
@@ -589,8 +588,9 @@ namespace TestLibrary
                     ////  move folder
                     //Assert.IsFalse(Directory.Exists(path1));
                     //folder1 = CreateFolder(folder, name1);
-                    //System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
-                    //synchronizedFolder.Sync();
+                    //Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                    //    return Directory.Exists(path1) && !Directory.Exists(Path.Combine(path2, name1));
+                    //}));
                     //Assert.IsTrue(Directory.Exists(path1));
                     //Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1)));
                     //folder1.Move(folder, folder2);

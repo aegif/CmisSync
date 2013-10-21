@@ -270,9 +270,13 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         if(SyncDownloadFolder(remoteFolder, Path.GetDirectoryName(localPath)))
-                            return CrawlLocalFiles(localPath, remoteFolder, null);
+                        {
+                            return CrawlSync(remoteFolder,localPath);
+                        }
                         else
+                        {
                             return false;
+                        }
                     }
                 }
 
