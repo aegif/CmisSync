@@ -41,7 +41,7 @@ namespace CmisSync {
             BorderWidth    = 0;
             IconName       = "folder-cmissync";
             WindowPosition = WindowPosition.Center;
-            Title          = "About DataSpace Sync";
+            Title          = Properties_Resources.About;
             AppPaintable   = true;
 
             string image_path = System.IO.Path.Combine(UI.AssetsPath, "pixmaps", "about.png");
@@ -70,7 +70,7 @@ namespace CmisSync {
             Controller.NewVersionEvent += delegate (string new_version) {
                 Application.Invoke (delegate {
                         this.updates.Markup = String.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
-                            string.Format ("A newer version ({0}) is available!", new_version));
+                            string.Format (Properties_Resources.NewVersionAvailable, new_version));
 
                         this.updates.ShowAll ();
                         });
@@ -79,7 +79,7 @@ namespace CmisSync {
             Controller.VersionUpToDateEvent += delegate {
                 Application.Invoke (delegate {
                         this.updates.Markup = String.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
-                            "You are running the latest version.");
+                            Properties_Resources.RunningLatestVersion);
 
                         this.updates.ShowAll ();
                         });
@@ -101,8 +101,8 @@ namespace CmisSync {
             Gdk.Color fgcolor = new Gdk.Color();
             Gdk.Color.Parse("red", ref fgcolor);
             Label version = new Label () {
-                Markup = string.Format ("<span font_size='small' fgcolor='#729fcf'>version {0}</span>",
-                        Controller.RunningVersion),
+                Markup = string.Format ("<span font_size='small' fgcolor='#729fcf'>{0}</span>",
+                        String.Format(Properties_Resources.Version, Controller.RunningVersion)),
                        Xalign = 0
             };
 
@@ -115,7 +115,7 @@ namespace CmisSync {
                 LineWrap     = true,
                              LineWrapMode = Pango.WrapMode.Word,
                              Markup = "<span font_size='small' fgcolor='#729fcf'>" +
-                                 "Copyright © 2010–" + DateTime.Now.Year.ToString() + " GRAU DATA AG, Aegif and others.\n" +
+                                 "Copyright © 2013–" + DateTime.Now.Year.ToString() + " GRAU DATA AG, Aegif and others.\n" +
                                  "\n" +
                                  "DataSpace Sync is Open Source software. You are free to use, modify, " +
                                  "and redistribute it under the GNU General Public License version 3 or later." +
@@ -125,10 +125,10 @@ namespace CmisSync {
                              Xalign = 0
             };
 
-            LinkButton website_link = new LinkButton (Controller.WebsiteLinkAddress, "Website");
+            LinkButton website_link = new LinkButton (Controller.WebsiteLinkAddress, Properties_Resources.Website);
             website_link.ModifyFg(StateType.Active, fgcolor);
-            LinkButton credits_link = new LinkButton (Controller.CreditsLinkAddress, "Credits");
-            LinkButton report_problem_link = new LinkButton (Controller.ReportProblemLinkAddress, "Report a problem");
+            LinkButton credits_link = new LinkButton (Controller.CreditsLinkAddress, Properties_Resources.Credits);
+            LinkButton report_problem_link = new LinkButton (Controller.ReportProblemLinkAddress, Properties_Resources.ReportProblem);
 
             HBox layout_links = new HBox (false, 0);
             layout_links.PackStart (website_link, false, false, 0);

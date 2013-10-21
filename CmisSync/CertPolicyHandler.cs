@@ -27,7 +27,11 @@ using log4net;
 using log4net.Config;
 
 #if __MonoCS__
+#if __COCOA__
+using MonoMac;
+#else
 using Gtk;
+#endif
 #else
 using System.Windows;
 #endif
@@ -92,6 +96,10 @@ namespace CmisSync
             UserResponse ret = UserResponse.None;
             ManualResetEvent ev = new ManualResetEvent(false);
 #if __MonoCS__
+#if __COCOA__
+//TODO Implement a COCOA dialog
+
+#else
             Application.Invoke(delegate {
                     MessageDialog md = new MessageDialog (null, DialogFlags.Modal,
                         MessageType.Warning, ButtonsType.None, msg +
@@ -105,6 +113,7 @@ namespace CmisSync
                     md.Destroy();
                     ev.Set();
             });
+#endif
 #else
                     var r = MessageBox.Show(msg +
                         "\n\n"+ Properties_Resources.DoYouTrustTheCertificate,

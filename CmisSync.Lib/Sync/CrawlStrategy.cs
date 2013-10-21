@@ -71,7 +71,18 @@ namespace CmisSync.Lib.Sync
 
                 if (IsGetDescendantsSupported)
                 {
-                    return CrawlDescendants(remoteFolder, remoteFolder.GetDescendants(-1), localFolder);
+                    IList<ITree<IFileableCmisObject>> desc;
+                    try{
+                        desc = remoteFolder.GetDescendants(-1);
+                    }catch (DotCMIS.Exceptions.CmisConnectionException ex) {
+                        if(ex.InnerException is System.Xml.XmlException)
+                        {
+                            Logger.Warn(String.Format("CMIS::getDescendants() response could not be parsed: {0}", ex.InnerException.Message ));
+                            return false;
+                        }
+                        throw;
+                    }
+                    return CrawlDescendants(remoteFolder, desc, localFolder);
                 }
 
                 // Lists of files/folders, to delete those that have been removed on the server.
@@ -116,7 +127,7 @@ namespace CmisSync.Lib.Sync
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)node.Item;
                         remoteSubfolders.Add(remoteSubFolder.Name);
-                        if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                        if (!Utils.IsInvalidFolderName(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                         {
                             string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
 
@@ -169,7 +180,7 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                        if (!Utils.IsInvalidFolderName(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                         {
                             if (null != remoteFolders)
                             {
@@ -222,6 +233,12 @@ namespace CmisSync.Lib.Sync
                     {
                         sleepWhileSuspended();
 
+                        if(Utils.IsSymlink(new FileInfo(filePath)))
+                        {
+                            Logger.Info("Skipping symbolic linked file: "+ filePath);
+                            continue;
+                        }
+
                         string fileName = Path.GetFileName(filePath);
 
                         if (Utils.WorthSyncing(fileName))
@@ -255,16 +272,13 @@ namespace CmisSync.Lib.Sync
                             else
                             {
                                 // The file exists both on server and locally.
-                                if (!syncFull)
+                                if (database.LocalFileHasChanged(filePath))
                                 {
-                                    if (database.LocalFileHasChanged(filePath))
+                                    if (BIDIRECTIONAL)
                                     {
-                                        if (BIDIRECTIONAL)
-                                        {
-                                            // Upload new version of file content.
-                                            Logger.Info("Uploading file update on repository: " + filePath);
-                                            success = success && UpdateFile(filePath, remoteFolder);
-                                        }
+                                        // Upload new version of file content.
+                                        Logger.Info("Uploading file update on repository: " + filePath);
+                                        success = success && UpdateFile(filePath, remoteFolder);
                                     }
                                 }
                             }
@@ -302,9 +316,14 @@ namespace CmisSync.Lib.Sync
                     foreach (string localSubFolder in Directory.GetDirectories(localFolder))
                     {
                         sleepWhileSuspended();
+                        if(Utils.IsSymlink(new DirectoryInfo(localSubFolder)))
+                        {
+                            Logger.Info("Skipping symbolic link folder: "+ localSubFolder);
+                            continue;
+                        }
                         string path = localSubFolder.Substring(repoinfo.TargetDirectory.Length).Replace("\\", "/");
                         string folderName = Path.GetFileName(localSubFolder);
-                        if (Utils.WorthSyncing(folderName) && !repoinfo.isPathIgnored(path))
+                        if (!Utils.IsInvalidFolderName(folderName) && !repoinfo.isPathIgnored(path))
                         {
                             if (!remoteFolders.Contains(folderName))
                             {

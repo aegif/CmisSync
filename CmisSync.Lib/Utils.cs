@@ -300,5 +300,34 @@ namespace CmisSync.Lib
         {
             return FormatSize((double) byteCount);
         }
+
+        
+        /// <summary>
+        /// Whether a file or directory is a symbolic link.
+        /// </summary>
+        public static bool IsSymlink(string path)
+        {
+            FileInfo fileinfo = new FileInfo(path);
+            if(fileinfo.Exists)
+                return IsSymlink(fileinfo);
+            DirectoryInfo dirinfo = new DirectoryInfo(path);
+            if(dirinfo.Exists)
+                return IsSymlink(dirinfo);
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether this instance is a symlink the specified FileSystemInfo.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if this instance is a symlink the specified fsi; otherwise, <c>false</c>.
+        /// </returns>
+        /// <param name='fsi'>
+        /// If set to <c>true</c> fsi.
+        /// </param>
+        public static bool IsSymlink(FileSystemInfo fsi)
+        {
+            return ((fsi.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
+        }
     }
 }

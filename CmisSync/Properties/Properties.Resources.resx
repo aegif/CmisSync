@@ -180,7 +180,7 @@
 It is like Dropbox for Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>The folder name is invalid. Special characters are not allowed.</value>
+    <value>The folder name {0} is invalid. Special characters are not allowed.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
     <value>Invalid URL</value>
@@ -212,8 +212,8 @@ It is like Dropbox for Enterprise Content Management!</value>
   <data name="Sorry" xml:space="preserve">
     <value>Sorry, DataSpace Sync can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
-If you are sure about the address, open it in a browser and send
-the resulting XML to cmissync@aegif.jp</value>
+If you are sure about the address, open it in a browser and post
+the resulting XML on the cmissync forum.</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Add DataSpace Sync to startup items</value>
@@ -321,5 +321,29 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   </data>
   <data name="RemoveSyncTitle" xml:space="preserve">
     <value>Remove folder from sync</value>
+  </data>
+  <data name="Credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>A newer version ({0}) is available!</value>
+  </data>
+  <data name="ReportProblem" xml:space="preserve">
+    <value>Report a problem</value>
+  </data>
+  <data name="RunningLatestVersion" xml:space="preserve">
+    <value>You are running the latest version.</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Website</value>
+  </data>
+  <data name="FolderAlreadyInUse" xml:space="preserve">
+    <value>The directory {0} is already in use by {1}</value>
+  </data>
+  <data name="InvalidRepoName" xml:space="preserve">
+    <value>The repository name {0} contains illegal characters</value>
   </data>
 </root>

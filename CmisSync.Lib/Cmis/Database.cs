@@ -130,47 +130,49 @@ namespace CmisSync.Lib.Cmis
                     sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL;");
                     sqliteConnection.Open();
 
-                    if (createDatabase)
-                    {
                         string command =
-                            @"CREATE TABLE files (
+                            @"CREATE TABLE IF NOT EXISTS files (
                             path TEXT PRIMARY KEY,
                             id TEXT,
                             serverSideModificationDate DATE,
                             metadata TEXT,
                             checksum TEXT);   /* Checksum of both data and metadata */
-                        CREATE TABLE folders (
+                        CREATE TABLE IF NOT EXISTS folders (
                             path TEXT PRIMARY KEY,
                             id TEXT,
                             serverSideModificationDate DATE,
                             metadata TEXT,
                             checksum TEXT);   /* Checksum of metadata */
-                        CREATE TABLE general (
+                        CREATE TABLE IF NOT EXISTS general (
                             key TEXT PRIMARY KEY,
                             value TEXT);      /* Other data such as ChangeLog token */
-                        CREATE TABLE downloads (
+                        CREATE TABLE IF NOT EXISTS downloads (
                             PATH TEXT PRIMARY KEY,
                             serverSideModificationDate DATE);     /* Download */
-                        CREATE TABLE faileduploads (
+                        CREATE TABLE IF NOT EXISTS failedoperations (
                             path TEXT PRIMARY KEY,
-                            counter INTEGER,
-                            localLastModificationDate DATE);     /* Failed Uploads*/";
+                            lastLocalModificationDate DATE,
+                            uploadCounter INTEGER,
+                            downloadCounter INTEGER,
+                            changeCounter INTEGER,
+                            deleteCounter INTEGER,
+                            uploadMessage TEXT,
+                            downloadMessage TEXT,
+                            changeMessage TEXT,
+                            deleteMessage TEXT);     /* Failed Operations*/
+                        DROP TABLE IF EXISTS faileduploads; /* Drop old upload Counter Table*/";
 
                         ExecuteSQLAction(command, null);
+                    if (createDatabase)
+                    {
                         command = "INSERT INTO general (key, value) VALUES (\"PathPrefix\", @prefix)";
                         Dictionary<string, object> parameters = new Dictionary<string, object>();
                         parameters.Add("prefix", ConfigManager.CurrentConfig.FoldersPath);
                         ExecuteSQLAction(command, parameters);
                         Logger.Info("Database created");
-                    } else {
-                        string command =
-                            @"CREATE TABLE IF NOT EXISTS faileduploads(
-                                path TEXT PRIMARY KEY,
-                                counter INTEGER,
-                                localLastModificationDate DATE);";
-                        ExecuteSQLAction(command, null);
-                        Logger.Debug("Database migration successful");
                     }
+                    Logger.Debug("Database migration successful");
+
                 }
                 catch (Exception e)
                 {
@@ -560,13 +562,23 @@ namespace CmisSync.Lib.Cmis
         /// <param name='path'>
         /// Path of the local file.
         /// </param>
-        public long GetUploadRetryCounter(string path)
+        public long GetOperationRetryCounter(string path, OperationType type)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("date", File.GetLastWriteTimeUtc(path));
             parameters.Add("path", Normalize(path));
-            object result = ExecuteSQLFunction("SELECT counter FROM faileduploads WHERE path=@path AND localLastModificationDate=@date", parameters);
-            if( result != null )
+            object result = null;
+            switch(type){
+                case OperationType.DOWNLOAD:
+                    goto case OperationType.DELETE;
+                case OperationType.DELETE:
+                    result = ExecuteSQLFunction(String.Format("SELECT {0}Counter FROM failedoperations WHERE path=@path", operationTypeToString(type)), parameters);
+                    break;
+                default:
+                    parameters.Add("date", File.GetLastWriteTimeUtc(path));
+                    result = ExecuteSQLFunction(String.Format("SELECT {0}Counter FROM failedoperations WHERE path=@path AND lastLocalModificationDate=@date", operationTypeToString(type)), parameters);
+                    break;
+            }
+            if( result != null && !(result is DBNull))
             { return (long) result; }
             else
             { return 0; }
@@ -581,13 +593,49 @@ namespace CmisSync.Lib.Cmis
         /// <param name='counter'>
         /// Counter.
         /// </param>
-        public void SetUploadRetryCounter(string path, long counter)
+        public void SetOperationRetryCounter(string path, long counter, OperationType type)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("date", File.GetLastWriteTimeUtc(path));
+            switch(type){
+                case OperationType.DOWNLOAD:
+                    goto case OperationType.DELETE;
+                case OperationType.DELETE:
+                    parameters.Add("date", DateTime.Now.ToFileTimeUtc());
+                    break;
+                default:
+                    parameters.Add("date", File.GetLastWriteTimeUtc(path));
+                    break;
+            }
             parameters.Add("path", Normalize(path));
             parameters.Add("counter", (counter>=0) ? counter:0);
-            string command = @"INSERT OR REPLACE INTO faileduploads (path, counter, localLastModificationDate) VALUES( @path, @counter, @date)";
+            string uploadCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN uploadCounter ELSE '' END FROM failedoperations WHERE path=@path)";
+            string downloadCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN downloadCounter ELSE '' END FROM failedoperations WHERE path=@path)";
+            string changeCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN changeCounter ELSE '' END FROM failedoperations WHERE path=@path)";
+            string deleteCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN deleteCounter ELSE '' END FROM failedoperations WHERE path=@path)";
+            switch(type)
+            {
+                case OperationType.UPLOAD:
+                    uploadCounter = "@counter";
+                    break;
+                case OperationType.DOWNLOAD:
+                    downloadCounter = "@counter";
+                    break;
+                case OperationType.CHANGE:
+                    changeCounter = "@counter";
+                    break;
+                case OperationType.DELETE:
+                    deleteCounter = "@counter";
+                    break;
+            }
+            string command = String.Format(@"INSERT OR REPLACE INTO failedoperations (path, lastLocalModificationDate,
+                                uploadCounter, downloadCounter, changeCounter, deleteCounter,
+                                uploadMessage, downloadMessage, changeMessage, deleteCounter)
+                                VALUES( @path, @date, {0},{1},{2},{3},
+                                (SELECT CASE WHEN lastLocalModificationDate=@date THEN uploadMessage ELSE '' END FROM failedoperations WHERE path=@path ), 
+                                (SELECT CASE WHEN lastLocalModificationDate=@date THEN downloadMessage ELSE '' END FROM failedoperations WHERE path=@path),
+                                (SELECT CASE WHEN lastLocalModificationDate=@date THEN changeMessage ELSE '' END FROM failedoperations WHERE path=@path),
+                                (SELECT CASE WHEN lastLocalModificationDate=@date THEN deleteMessage ELSE '' END FROM failedoperations WHERE path=@path)
+                            )",uploadCounter,downloadCounter,changeCounter,deleteCounter);
             ExecuteSQLAction(command, parameters);
         }
 
@@ -597,21 +645,21 @@ namespace CmisSync.Lib.Cmis
         /// <param name='path'>
         /// Path of the local file.
         /// </param>
-        public void DeleteUploadRetryCounter(string path)
+        public void DeleteAllFailedOperations(string path)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", Normalize(path));
-            string command = @"DELETE FROM faileduploads WHERE path=@path";
+            string command = @"DELETE FROM failedoperations WHERE path=@path";
             ExecuteSQLAction(command, parameters);
         }
 
         /// <summary>
         /// Deletes all failed upload counter.
         /// </summary>
-        public void DeleteAllFailedUploadCounter()
+        public void DeleteAllFailedOperations()
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            string command = @"DELETE FROM faileduploads";
+            string command = @"DELETE FROM failedoperations";
             ExecuteSQLAction(command, parameters);
         }
 
@@ -844,6 +892,27 @@ namespace CmisSync.Lib.Cmis
                 {
                     command.Parameters.AddWithValue(pair.Key, pair.Value);
                 }
+            }
+        }
+
+        public enum OperationType 
+        {
+            UPLOAD, DOWNLOAD, CHANGE, DELETE
+        }
+
+        private string operationTypeToString(OperationType type)
+        {
+            switch(type) {
+                case OperationType.UPLOAD:
+                    return "upload";
+                case OperationType.CHANGE:
+                    return "change";
+                case OperationType.DOWNLOAD:
+                    return "download";
+                case OperationType.DELETE:
+                    return "delete";
+                default:
+                    return "";
             }
         }
     }

@@ -5,7 +5,7 @@
 	<key>CFBundleIconFile</key>
 	<string>cmissync-app</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.cmissync.cmissync</string>
+	<string>com.graudata.dataspacesync</string>
 	<key>CFBundleName</key>
 	<string>CmisSync</string>
 	<key>CFBundleVersion</key>
@@ -13,12 +13,14 @@
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.6</string>
+	<string>10.8</string>
 	<key>LSUIElement</key>
 	<string>1</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>CFBundleDisplayName</key>
+	<string>DataSpace Sync</string>
 </dict>
 </plist>

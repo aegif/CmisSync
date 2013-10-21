@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}</ProjectGuid>
-    <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <RootNamespace>CmisSync</RootNamespace>
     <AssemblyName>CmisSync</AssemblyName>
@@ -17,7 +17,6 @@
     <DebugType>none</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
@@ -32,16 +31,35 @@
     <ConsolePause>False</ConsolePause>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
-    <I18n />
+    <I18n>
+    </I18n>
+    <UseSGen>true</UseSGen>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <DefineConstants>DEBUG</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="MonoMac" />
     <Reference Include="System.Net" />
     <Reference Include="Mono.Posix" />
+    <Reference Include="log4net">
+      <HintPath>..\..\Extras\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="XamMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.cs">
@@ -60,12 +78,8 @@
     </Compile>
     <Compile Include="MacWatcher.cs" />
     <Compile Include="Badger.cs" />
-    <Compile Include="Bubbles.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SetupWindow.cs" />
-    <Compile Include="..\BubblesController.cs">
-      <Link>BubblesController.cs</Link>
-    </Compile>
     <Compile Include="..\SetupController.cs">
       <Link>SetupController.cs</Link>
     </Compile>
@@ -77,6 +91,12 @@
     </Compile>
     <Compile Include="Controller.cs" />
     <Compile Include="About.cs" />
+    <Compile Include="..\CertPolicyHandler.cs">
+      <Link>CertPolicyHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Properties\Resources.Designer.cs">
+      <Link>Resources.Designer.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />
@@ -87,15 +107,6 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
-    <Content Include="..\Common\HTML\day-entry.html">
-      <Link>HTML\day-entry.html</Link>
-    </Content>
-    <Content Include="..\Common\HTML\event-entry.html">
-      <Link>HTML\event-entry.html</Link>
-    </Content>
-    <Content Include="..\Common\HTML\event-log.html">
-      <Link>HTML\event-log.html</Link>
-    </Content>
     <Content Include="..\Common\Pixmaps\side-splash.png">
       <Link>Pixmaps\side-splash.png</Link>
     </Content>
@@ -156,9 +167,6 @@
     <Content Include="..\Common\Pixmaps\about.png">
       <Link>Pixmaps\about.png</Link>
     </Content>
-    <Content Include="..\Common\HTML\jquery.js">
-      <Link>HTML\jquery.js</Link>
-    </Content>
     <Content Include="Pixmaps\tutorial-slide-1.png">
       <Link>Pixmaps\tutorial-slide-1.png</Link>
     </Content>
@@ -204,12 +212,9 @@
     <Content Include="..\Common\Pixmaps\avatar-k.png">
       <Link>Pixmaps\avatar-k.png</Link>
     </Content>
-    <Content Include="Growl.plist" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Pixmaps\" />
-    <Folder Include="HTML\" />
-    <Folder Include="Plugins\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
@@ -217,4 +222,19 @@
       <Name>CmisSync.Lib</Name>
     </ProjectReference>
   </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <MonoDevelop.Autotools.MakefileInfo RelativeMakefileName="Makefile.am" IsAutotoolsProject="True" RelativeConfigureInPath="../..">
+          <BuildFilesVar Sync="True" Name="ASSEMBLY_INFO_SOURCE" />
+          <DeployFilesVar />
+          <ResourcesVar Sync="True" Name="RESOURCES" />
+          <OthersVar />
+          <GacRefVar />
+          <AsmRefVar />
+          <ProjectRefVar />
+        </MonoDevelop.Autotools.MakefileInfo>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

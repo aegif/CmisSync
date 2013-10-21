@@ -490,7 +490,9 @@ namespace CmisSync {
             };
 
             localfolder_entry.Changed += delegate {
-                localrepopath_entry.Text = System.IO.Path.Combine(Controller.DefaultRepoPath, localfolder_entry.Text);
+                try{
+                    localrepopath_entry.Text = System.IO.Path.Combine(Controller.DefaultRepoPath, localfolder_entry.Text);
+                }catch(Exception){}
             };
 
             Label localfolder_error_label = new Label() {
@@ -518,7 +520,7 @@ namespace CmisSync {
             string error = Controller.CheckRepoPathAndName(localrepopath_entry.Text, localfolder_entry.Text);
             if (!String.IsNullOrEmpty(error)) {
                 localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
-                    CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                    error +
                     "</span>";
                 localfolder_error_label.Show();
             } else {
@@ -529,7 +531,7 @@ namespace CmisSync {
                 error = Controller.CheckRepoPathAndName(localrepopath_entry.Text, localfolder_entry.Text);
                 if (!String.IsNullOrEmpty(error)) {
                     localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
-                        CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                        error +
                         "</span>";
                     localfolder_error_label.Show();
                 } else {
@@ -540,7 +542,7 @@ namespace CmisSync {
             error = Controller.CheckRepoPathAndName(localrepopath_entry.Text, localfolder_entry.Text);
             if (!String.IsNullOrEmpty(error)) {
                 localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
-                    CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                    error +
                 "</span>";
                 localfolder_error_label.Show();
             } else {
@@ -551,7 +553,7 @@ namespace CmisSync {
                 error = Controller.CheckRepoPathAndName(localrepopath_entry.Text, localfolder_entry.Text);
                 if (!String.IsNullOrEmpty(error)) {
                     localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
-                        CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                        error +
                         "</span>";
                     localfolder_error_label.Show();
                 } else {

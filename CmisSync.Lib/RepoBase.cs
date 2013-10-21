@@ -99,7 +99,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Restart syncing.
         /// </summary>
-        public void Resume()
+        public virtual void Resume()
         {
             Status = SyncStatus.Idle;
         }
@@ -307,6 +307,11 @@ namespace CmisSync.Lib
         /// Synchronization is suspended.
         /// TODO this should be written in XML configuration instead.
         /// </summary>
-        Suspend
+        Suspend,
+
+        /// <summary>
+        /// Any sync conflict or warning happend
+        /// </summary>
+        Warning
     }
 }

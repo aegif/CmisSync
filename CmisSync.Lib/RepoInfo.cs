@@ -93,6 +93,10 @@ namespace CmisSync.Lib
         /// </value>
         public long MaxUploadRetries { get; set; }
 
+        public long MaxDownloadRetries { get; set; }
+
+        public long MaxDeletionRetries { get; set; }
+
 
         /// <summary>
         /// Simple constructor.
@@ -124,6 +128,9 @@ namespace CmisSync.Lib
             TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
             PollInterval = pollInterval;
             ChunkSize = 0;
+            MaxUploadRetries = 2;
+            MaxDownloadRetries = 2;
+            MaxDeletionRetries = 2;
         }
 
         /// <summary>

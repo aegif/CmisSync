@@ -43,6 +43,16 @@ namespace CmisSync.Lib.Sync
             Logger.Info(synchronizedFolder);
         }
 
+        public override void Resume()
+        {
+            if(this.synchronizedFolder != null)
+            {
+                Logger.Debug("Reset all failed upload counter");
+                this.synchronizedFolder.resetFailedOperationsCounter();
+            }
+            base.Resume();
+        }
+
 
         /// <summary>
         /// Dispose pattern implementation.
