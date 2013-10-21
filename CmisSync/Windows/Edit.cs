@@ -47,7 +47,7 @@ namespace CmisSync
             this.address = address;
             this.id = id;
             this.remotePath = remotePath;
-            this.Ignores = ignores;
+            this.Ignores = new List<string>(ignores);
             this.localPath = localPath;
 
             CreateEdit();

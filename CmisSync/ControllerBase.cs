@@ -321,12 +321,12 @@ namespace CmisSync
                 RepoInfo.CmisPassword password = new RepoInfo.CmisPassword();
                 password.ObfuscatedPassword = folder.ObfuscatedPassword;
                 Uri address = folder.RemoteUrl;
-                List<string> ignores = new List<string>();
+                List<string> oldIgnores = new List<string>();
                 foreach (Config.IgnoredFolder ignore in folder.IgnoredFolders)
                 {
-                    ignores.Add(ignore.Path);
+                    oldIgnores.Add(ignore.Path);
                 }
-                edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath, ignores, folder.LocalPath);
+                edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath, oldIgnores, folder.LocalPath);
                 edits.Add(reponame, edit);
 
                 edit.Controller.SaveFolderEvent += delegate
@@ -339,6 +339,36 @@ namespace CmisSync
                             folder.IgnoredFolders.Add(new Config.IgnoredFolder() { Path = ignore });
                         }
                         ConfigManager.CurrentConfig.Save();
+                        foreach (string oldIgnore in oldIgnores)
+                        {
+                            if (String.IsNullOrEmpty(edit.Ignores.Find(
+                                delegate(string ignore)
+                                {
+                                    if (ignore == oldIgnore || oldIgnore.StartsWith(ignore + "/"))
+                                    {
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                })))
+                            {
+                                Logger.Info(String.Format("The remote folder {0} should be synced after editing ignore folders", oldIgnore));
+                                lock (this.repo_lock)
+                                {
+                                    foreach (RepoBase repo in this.repositories)
+                                    {
+                                        if (repo.Name == reponame)
+                                        {
+                                            //  force a full tree work sync
+                                            repo.Watcher.EnableRaisingEvents = false;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
                     }
                 };
 
