@@ -67,7 +67,7 @@ namespace CmisSync
         /// <summary>
         /// Dictionary of the edit folder diaglogs
         /// Key: synchronized folder name
-        /// Value: <c>EditController</c>
+        /// Value: <c>Edit</c>
         /// </summary>
         private Dictionary<string, Edit> edits = new Dictionary<string, Edit>();
 
@@ -284,7 +284,11 @@ namespace CmisSync
                     Edit edit = null;
                     if (edits.TryGetValue(reponame, out edit))
                     {
+#if __MonoCS__
+                        edit.Destroy();
+#else
                         edit.Close();
+#endif
                     }
                     RemoveRepository(f);
                     ConfigManager.CurrentConfig.Folder.Remove(f);
