@@ -15,6 +15,7 @@ SOURCES =  \
 	WatcherTest.cs \
 	CmisDatabaseTest.cs \
 	ChunkedStreamTest.cs \
+	SyncEventQueueTest.cs \
 	LocalFilesystemActivityGenerator.cs
 
 EXTRA_DIST = TestLibrary.csproj \
