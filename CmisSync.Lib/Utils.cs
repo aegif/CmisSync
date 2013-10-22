@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -219,7 +219,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a file name is valid or not.
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:'") + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:") + "]");
 
 
         /// <summary>
