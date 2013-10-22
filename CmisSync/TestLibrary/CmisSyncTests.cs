@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -585,20 +585,45 @@ namespace TestLibrary
                     Assert.IsFalse(Directory.Exists(path1));
                     Assert.IsTrue(Directory.Exists(path2));
 
-                    ////  move folder
-                    //Assert.IsFalse(Directory.Exists(path1));
-                    //folder1 = CreateFolder(folder, name1);
-                    //Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                    //    return Directory.Exists(path1) && !Directory.Exists(Path.Combine(path2, name1));
-                    //}));
-                    //Assert.IsTrue(Directory.Exists(path1));
-                    //Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1)));
-                    //folder1.Move(folder, folder2);
-                    //System.Threading.Thread.Sleep((int)repoInfo.PollInterval);
-                    //synchronizedFolder.Sync();
-                    //Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1)));
+                    //  move folder
+                    Assert.IsFalse(Directory.Exists(path1));
+                    folder1 = CreateFolder(folder, name1);
+                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                        return Directory.Exists(path1) && !Directory.Exists(Path.Combine(path2, name1));
+                    }));
+                    Assert.IsTrue(Directory.Exists(path1));
+                    Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1)));
+                    folder1.Move(folder, folder2);
+                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                        return !Directory.Exists(path1) && Directory.Exists(Path.Combine(path2, name1));
+                    }));
+                    Assert.IsFalse(Directory.Exists(path1));
+                    Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1)));
+
+                    //  move folder with sub folder and sub file
+                    Assert.IsFalse(File.Exists(Path.Combine(path2, name1, name1)));
+                    Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1, name2)));
+                    CreateDocument(folder1, name1, "SyncChangeLog");
+                    CreateFolder(folder1, name2);
+                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                        return File.Exists(Path.Combine(path2, name1, name1)) && Directory.Exists(Path.Combine(path2, name1, name2));
+                    }));
+                    Assert.IsTrue(File.Exists(Path.Combine(path2, name1, name1)));
+                    Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1, name2)));
+                    folder1.Move(folder2, folder);
+                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                        return File.Exists(Path.Combine(path1, name1)) && Directory.Exists(Path.Combine(path1, name2));
+                    }));
+                    Assert.IsTrue(File.Exists(Path.Combine(path1, name1)));
+                    Assert.IsTrue(Directory.Exists(Path.Combine(path1, name2)));
 
                     //  delete folder tree
+                    Assert.IsTrue(Directory.Exists(path1));
+                    folder1.DeleteTree(true, null, true);
+                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                        return !Directory.Exists(path1);
+                    }));
+                    Assert.IsFalse(Directory.Exists(path1));
                     Assert.IsTrue(Directory.Exists(path2));
                     folder2.DeleteTree(true, null, true);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
