@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +17,7 @@ namespace TestLibrary
     {
         private static readonly string RootPath = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, "CmisDatabaseTest");
         private static readonly string DatabasePath = Path.Combine(RootPath, "CmisDatabaseTest.cmissync");
+        private static readonly byte[] FakeHash = {1,2,3,4,5};
 
         [TestFixtureSetUp]
         public void ClassInit()
@@ -40,6 +41,40 @@ namespace TestLibrary
         }
 
         [Test, Category("Database")]
+        public void TestSpecialCharacter()
+        {
+            string oldPath = Path.Combine(RootPath, "a'b'c");
+            string newPath = Path.Combine(RootPath, "'a'b'c'");
+
+            using (Database database = new Database(DatabasePath))
+            {
+                CreateTestFile(oldPath, 10);
+                database.AddFile(oldPath, "1", DateTime.Now, null, FakeHash);
+                Assert.True(database.ContainsFile(oldPath));
+                Assert.False(database.ContainsFile(newPath));
+                database.MoveFile(oldPath, newPath);
+                Assert.False(database.ContainsFile(oldPath));
+                Assert.True(database.ContainsFile(newPath));
+                database.RemoveFile(newPath);
+                Assert.False(database.ContainsFile(oldPath));
+                Assert.False(database.ContainsFile(newPath));
+            }
+
+            using (Database database = new Database(DatabasePath))
+            {
+                database.AddFolder(oldPath, "1", DateTime.Now);
+                Assert.True(database.ContainsFolder(oldPath));
+                Assert.False(database.ContainsFolder(newPath));
+                database.MoveFolder(oldPath, newPath);
+                Assert.False(database.ContainsFolder(oldPath));
+                Assert.True(database.ContainsFolder(newPath));
+                database.RemoveFolder(newPath);
+                Assert.False(database.ContainsFolder(oldPath));
+                Assert.False(database.ContainsFolder(newPath));
+            }
+        }
+
+        [Test, Category("Database")]
         public void TestMoveFile()
         {
             using (Database database = new Database(DatabasePath))
@@ -48,7 +83,7 @@ namespace TestLibrary
                 CreateTestFile(oldPath, 10);
                 string newPath = Path.Combine(RootPath, "1.new");
                 
-                database.AddFile(oldPath, "1", DateTime.Now, null);
+                database.AddFile(oldPath, "1", DateTime.Now, null, FakeHash);
                 Assert.True(database.ContainsFile(oldPath));
                 Assert.False(database.ContainsFile(newPath));
                 database.MoveFile(oldPath, newPath);
@@ -68,7 +103,7 @@ namespace TestLibrary
                 CreateTestFile(oldPath, 10);
                 string newPath = Path.Combine(RootPath, "sub1/folder2", "1.test");
 
-                database.AddFile(oldPath, "1", DateTime.Now, null);
+                database.AddFile(oldPath, "1", DateTime.Now, null, FakeHash);
                 database.AddFolder(Path.Combine(RootPath, "folder1"), "D1", DateTime.Now);
                 database.AddFolder(Path.Combine(RootPath, "folder1/folder2"), "D12", DateTime.Now);
                 Assert.True(database.ContainsFile(oldPath));
