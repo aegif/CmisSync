@@ -225,7 +225,7 @@ namespace CmisSync {
             layout_address.PackStart (address_label, true, true, 0);
             layout_address.PackStart (address_entry, true, true, 0);
             layout_address.PackStart (layout_address_help, true, true, 0);
-            layout_address.PackStart (address_error_label, true, true, 0);
+//            layout_address.PackStart (address_error_label, true, true, 0);
 
             // User
             layout_user.PackStart (new Label () {
@@ -244,9 +244,10 @@ namespace CmisSync {
             layout_fields.PackStart (layout_user);
             layout_fields.PackStart (layout_password);
 
-            layout_vertical.PackStart (new Label (""), false, false, 0);
+//            layout_vertical.PackStart (new Label (""), false, false, 0);
             layout_vertical.PackStart (layout_address, false, false, 0);
             layout_vertical.PackStart (layout_fields, false, false, 0);
+            layout_vertical.PackStart (address_error_label, true, true, 0);
 
             Add (layout_vertical);
 
