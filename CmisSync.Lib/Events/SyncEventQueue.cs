@@ -6,7 +6,7 @@ using log4net;
 
 namespace CmisSync.Lib.Events
 {
-    public class SyncEventQueue {
+    public class SyncEventQueue : IDisposable {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncEventQueue));
 
         private BlockingCollection<ISyncEvent> queue = new BlockingCollection<ISyncEvent>();
@@ -52,6 +52,16 @@ namespace CmisSync.Lib.Events
         
         public bool IsStopped {
             get { return this.consumer == null || this.consumer.IsCompleted; }
+        }
+
+        public void Dispose() {
+            if(!IsStopped){
+                throw new InvalidOperationException("Trying to dispose a not yet stopped SyncEventQueue");
+            }
+            if(this.consumer != null){
+                this.consumer.Dispose();
+            }
+            this.queue.Dispose();
         }
     }
 }
