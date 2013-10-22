@@ -56,7 +56,7 @@ namespace CmisSync.Lib.Events
 
         public void Dispose() {
             if(!IsStopped){
-                throw new InvalidOperationException("Trying to dispose a not yet stopped SyncEventQueue");
+                Logger.Error("Disposing a not yet stopped SyncEventQueue - implementation error");
             }
             if(this.consumer != null){
                 this.consumer.Dispose();
