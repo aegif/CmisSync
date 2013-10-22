@@ -2,7 +2,7 @@ using System;
 
 using log4net;
 
-namespace CmisSync.Lib
+namespace CmisSync.Lib.Events
 {
     public interface ISyncEventHandler
     {

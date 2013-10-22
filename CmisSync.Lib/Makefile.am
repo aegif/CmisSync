@@ -21,6 +21,7 @@ SOURCES =  \
 	Events/SyncEvent.cs \
 	Events/SyncEventHandler.cs \
 	Events/SyncEventManager.cs \
+	Events/SyncEventQueue.cs \
 	Fetcher.cs \
 	IActivityListener.cs \
 	LoggingStream.cs \
