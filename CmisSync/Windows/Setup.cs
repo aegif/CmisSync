@@ -388,6 +388,7 @@ namespace CmisSync
                                     TextWrapping = TextWrapping.Wrap,
                                     Visibility = Visibility.Hidden,
                                     BorderThickness = new Thickness(0),
+                                    IsReadOnly = true,
                                     Background = Brushes.Transparent,
                                     MaxWidth = 420
                                 };
