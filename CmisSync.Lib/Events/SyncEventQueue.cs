@@ -2,9 +2,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
+using log4net;
+
 namespace CmisSync.Lib.Events
 {
     public class SyncEventQueue {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncEventQueue));
 
         private BlockingCollection<ISyncEvent> queue = new BlockingCollection<ISyncEvent>();
         private SyncEventManager manager;
@@ -40,6 +43,7 @@ namespace CmisSync.Lib.Events
 
         public void StartListener() {
             this.consumer = new Task(() => Listen(this.queue, this.manager));
+            this.consumer.Start();
         }
 
         public void StopListener() {
