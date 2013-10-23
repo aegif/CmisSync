@@ -36,6 +36,7 @@ namespace CmisSync.Lib.Events
                     manager.handle(syncEvent);
                 }
             }
+            Logger.Debug("Stopping to listen on SyncEventQueue");
         }
 
         public SyncEventQueue(SyncEventManager manager) {
