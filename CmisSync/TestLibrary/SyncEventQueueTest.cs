@@ -24,7 +24,7 @@ namespace TestLibrary
         private static void WaitFor<T>(T obj, Func<T,bool> check){
             for(int i = 0; i < 5; i++){
                 if (check(obj)) {
-                    break;
+                    return;
                 }
                 Thread.Sleep(100);
             }
