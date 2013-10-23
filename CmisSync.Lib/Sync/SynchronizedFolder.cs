@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -335,6 +335,7 @@ namespace CmisSync.Lib.Sync
                 {
                     //  have to crawl remote
                     Logger.Debug("Invoke a remote crawl sync");
+                    repo.Watcher.RemoveAll();
                     CrawlSync(remoteFolder, localFolder);
                 }
                 /*
@@ -735,6 +736,11 @@ namespace CmisSync.Lib.Sync
                         if (Directory.Exists(filepath))
                         {
                             Directory.Delete(filepath);
+                        }
+
+                        if (!Directory.Exists(Path.GetDirectoryName(filepath)))
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(filepath));
                         }
 
                         if (File.Exists(tmpfilepath))
