@@ -61,10 +61,8 @@ namespace CmisSync.Lib.Events
         public bool IsStopped {
             get { 
                 if(this.consumer == null){
-                    Logger.Debug("consumer null");
                     return true;
                 }
-                Logger.Debug(this.consumer.Status);
                 return this.consumer.IsCompleted; 
             }
         }
