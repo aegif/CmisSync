@@ -539,6 +539,101 @@ namespace TestLibrary
             }
         }
 
+        // Goal: Make sure that CmisSync works for uploading modified files.
+        [Test, TestCaseSource("TestServers")]
+        public void SyncUploads(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+                        // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
+            Console.WriteLine("Synced to clean state.");
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            {
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                using (Watcher watcher = new Watcher(localDirectory))
+                {
+                    // Clear local and remote folder
+                    synchronizedFolder.Sync();
+                    CleanAll(localDirectory);
+                    WatcherTest.WaitWatcher();
+                    synchronizedFolder.Sync();
+                    // Create a list of file names
+                    List<string> files = new List<string>();
+                    for(int i = 1 ; i <= 10; i++) {
+                        string filename =  "file" + i + ".bin";
+                        files.Add(filename);
+                    }
+                    // Sizes of the files
+                    int[] sizes = {1024, 2048, 324, 3452, 43256};
+                    // Create and modify all files and start syncing to ensure that any local modification is uploaded correctly
+                    foreach ( int length in sizes )
+                    {
+                        foreach(string filename in files)
+                        {
+                            createOrModifyBinaryFile(Path.Combine(localDirectory, filename), length);
+                        }
+                        // Ensure, all local files are available
+                        Assert.AreEqual(files.Count, Directory.GetFiles(localDirectory).Length);
+                        // Sync until all remote files do have got the same content length like the local one
+                        Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                            foreach(string filename in files)
+                            {
+                                try{
+                                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
+                                    IDocument d = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+                                    if(d == null || d.ContentStreamLength != length)
+                                        return false;
+                                }catch(Exception)
+                                {return false;}
+                            }
+                            return true;
+                        }));
+                        // Check, if all local files are available
+                        Assert.AreEqual(files.Count, Directory.GetFiles(localDirectory).Length);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates or modifies binary file.
+        /// </summary>
+        /// <returns>
+        /// Path of the created or modified binary file
+        /// </returns>
+        /// <param name='file'>
+        /// File path
+        /// </param>
+        /// <param name='length'>
+        /// Length (default is 1024)
+        /// </param>
+        private string createOrModifyBinaryFile(string file, int length = 1024)
+        {
+            using (Stream stream = File.Open(file, FileMode.Create))
+            {
+                byte[] content = new byte[length];
+                stream.Write(content, 0, content.Length);
+            }
+            return file;
+        }
 
         // Goal: Make sure that CmisSync works for remote changes.
         [Test, TestCaseSource("TestServers")]
