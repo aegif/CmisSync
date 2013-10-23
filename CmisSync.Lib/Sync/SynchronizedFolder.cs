@@ -738,11 +738,6 @@ namespace CmisSync.Lib.Sync
                             Directory.Delete(filepath);
                         }
 
-                        if (!Directory.Exists(Path.GetDirectoryName(filepath)))
-                        {
-                            Directory.CreateDirectory(Path.GetDirectoryName(filepath));
-                        }
-
                         if (File.Exists(tmpfilepath))
                         {
                             DateTime? remoteDate = remoteDocument.LastModificationDate;
