@@ -52,6 +52,8 @@ namespace TestLibrary
     public class CmisSyncTests
     {
         private readonly string CMISSYNCDIR = ConfigManager.CurrentConfig.FoldersPath;
+        private readonly int HeavyNumber = 10;
+        private readonly int HeavyFileSize = 1024;
 
 
         public CmisSyncTests()
@@ -278,6 +280,64 @@ namespace TestLibrary
             properties.Add(PropertyIds.Name, name);
 
             return (IFolder)source.UpdateProperties(properties);
+        }
+
+
+        public void CreateHeavyFolder(string root)
+        {
+            for (int iFolder = 0; iFolder < HeavyNumber; ++iFolder)
+            {
+                string folder = Path.Combine(root, iFolder.ToString());
+                Directory.CreateDirectory(folder);
+                for (int iFile = 0; iFile < HeavyNumber; ++iFile)
+                {
+                    string file = Path.Combine(folder, iFile.ToString());
+                    using (Stream stream = File.OpenWrite(file))
+                    {
+                        byte[] content = new byte[HeavyFileSize];
+                        for (int i = 0; i < HeavyFileSize; ++i)
+                        {
+                            content[i] = (byte)iFile;
+                        }
+                        stream.Write(content, 0, content.Length);
+                    }
+                }
+            }
+        }
+
+
+        public bool CheckHeavyFolder(string root)
+        {
+            for (int iFolder = 0; iFolder < HeavyNumber; ++iFolder)
+            {
+                string folder = Path.Combine(root, iFolder.ToString());
+                if (!Directory.Exists(folder))
+                {
+                    return false;
+                }
+                for (int iFile = 0; iFile < HeavyNumber; ++iFile)
+                {
+                    string file = Path.Combine(folder, iFile.ToString());
+                    FileInfo info = new FileInfo(file);
+                    if(!info.Exists || info.Length != HeavyFileSize)
+                    {
+                        return false;
+                    }
+                    using (Stream stream = File.OpenRead(file))
+                    {
+                        byte[] content = new byte[HeavyFileSize];
+                        stream.Read(content, 0, HeavyFileSize);
+                        for (int i = 0; i < HeavyFileSize; ++i)
+                        {
+                            if (content[i] != (byte)iFile)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
         }
 
 
@@ -691,6 +751,7 @@ namespace TestLibrary
                 synchronizedFolder.Sync();
                 synchronizedFolder2.Sync();
                 CleanAll(localDirectory);
+                CleanAll(localDirectory2);
                 WatcherTest.WaitWatcher();
                 synchronizedFolder.Sync();
                 synchronizedFolder2.Sync();
@@ -906,6 +967,126 @@ namespace TestLibrary
                     }, 20));
                 Assert.IsFalse(Directory.Exists(folder));
                 Assert.IsFalse(Directory.Exists(folder2));
+
+                // Clean.
+                Console.WriteLine("Clean all.");
+                Clean(localDirectory, synchronizedFolder);
+                Clean(localDirectory2, synchronizedFolder2);
+            }
+        }
+
+
+        // Goal: Make sure that CmisSync works for heavy folder.
+        [Test, TestCaseSource("TestServers")]
+        public void SyncEqualityHeavyFolder(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            string canonical_name2 = canonical_name + ".equality";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            CleanDirectory(localDirectory);
+            CleanDirectory(localDirectory2);
+            Console.WriteLine("Synced to clean state.");
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            RepoInfo repoInfo2 = new RepoInfo(
+                    canonical_name2,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                cmis))
+            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
+                repoInfo2,
+                activityListener,
+                cmis2))
+            using (Watcher watcher = new Watcher(localDirectory))
+            using (Watcher watcher2 = new Watcher(localDirectory2))
+            {
+                synchronizedFolder.resetFailedOperationsCounter();
+                synchronizedFolder2.resetFailedOperationsCounter();
+                synchronizedFolder.Sync();
+                synchronizedFolder2.Sync();
+                CleanAll(localDirectory);
+                CleanAll(localDirectory2);
+                WatcherTest.WaitWatcher();
+                synchronizedFolder.Sync();
+                synchronizedFolder2.Sync();
+                Console.WriteLine("Synced to clean state.");
+
+                string oldname = "SyncEquality.Old";
+                string newname = "SyncEquality.New";
+
+                //  test heavy folder create
+                Console.WriteLine(" create heavy folder");
+                string oldfolder = Path.Combine(localDirectory, oldname);
+                string oldfolder2 = Path.Combine(localDirectory2, oldname);
+                Directory.CreateDirectory(oldfolder);
+                CreateHeavyFolder(oldfolder);
+                Assert.IsTrue(CheckHeavyFolder(oldfolder));
+                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
+                {
+                    synchronizedFolder.Sync();
+                    return CheckHeavyFolder(oldfolder2);
+                }, 10));
+                Assert.IsTrue(CheckHeavyFolder(oldfolder2));
+
+                //  test heavy folder rename
+                Console.WriteLine(" rename heavy folder");
+                string newfolder = Path.Combine(localDirectory, newname);
+                string newfolder2 = Path.Combine(localDirectory2, newname);
+                Directory.Move(oldfolder, newfolder);
+                Assert.IsTrue(CheckHeavyFolder(newfolder));
+                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
+                {
+                    synchronizedFolder.Sync();
+                    return CheckHeavyFolder(newfolder2);
+                }, 10));
+                Assert.IsTrue(CheckHeavyFolder(newfolder2));
+
+                //  test heavy folder move
+                Console.WriteLine(" move heavy folder");
+                Directory.CreateDirectory(oldfolder);
+                Directory.Move(newfolder,Path.Combine(oldfolder,newname));
+                newfolder = Path.Combine(oldfolder, newname);
+                newfolder2 = Path.Combine(oldfolder2, newname);
+                Assert.IsTrue(CheckHeavyFolder(newfolder));
+                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
+                {
+                    synchronizedFolder.Sync();
+                    return CheckHeavyFolder(newfolder2);
+                }, 10));
+                Assert.IsTrue(CheckHeavyFolder(newfolder2));
+
+                //  test heavy folder delete
+                Console.WriteLine(" delete heavy folder");
+                Directory.Delete(newfolder, true);
+                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
+                {
+                    synchronizedFolder.Sync();
+                    return !Directory.Exists(newfolder2);
+                }, 10));
+                Assert.IsTrue(!Directory.Exists(newfolder2));
 
                 // Clean.
                 Console.WriteLine("Clean all.");

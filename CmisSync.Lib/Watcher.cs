@@ -1,4 +1,4 @@
-//   CmisSync, a collaboration and sharing tool.
+﻿//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -192,6 +192,7 @@ namespace CmisSync.Lib
             IncludeSubdirectories = true;
             Filter                = "*";
             InternalBufferSize = 4 * 1024 * 16;
+            NotifyFilter = NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 
             Error += new ErrorEventHandler(OnError);
             Created += new FileSystemEventHandler(OnCreated);
