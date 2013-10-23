@@ -37,6 +37,7 @@ namespace TestLibrary
         }  
 
         [Test]
+        [Ignore]
         public void EventlessStartStop() {
             SyncEventQueue queue = new SyncEventQueue(null);
             //stoping of not initialized Listener
