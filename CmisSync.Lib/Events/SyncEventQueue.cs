@@ -46,17 +46,11 @@ namespace CmisSync.Lib.Events
         }
 
         public void StopListener() {
-            if(this.consumer == null) {
-                throw new InvalidOperationException("Listener can not be stopped without beeing started.");
-            }
             this.queue.CompleteAdding();
         }            
         
         public bool IsStopped {
             get { 
-                if(this.consumer == null){
-                    return true;
-                }
                 return this.consumer.IsCompleted; 
             }
         }
@@ -65,9 +59,7 @@ namespace CmisSync.Lib.Events
             if(!IsStopped){
                 Logger.Error("Disposing a not yet stopped SyncEventQueue - implementation error");
             }
-            if(this.consumer != null){
-                this.consumer.Dispose();
-            }
+            this.consumer.Dispose();
             this.queue.Dispose();
         }
     }
