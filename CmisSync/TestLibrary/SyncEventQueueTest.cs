@@ -40,9 +40,9 @@ namespace TestLibrary
         [Test]
         public void EventlessStartStop() {
             SyncEventQueue queue = new SyncEventQueue(null);
-            //stoping of not initialized Listener
+            Logger.Info("stoping of not initialized Listener");
             queue.StopListener();
-            //starting and stopping
+            Logger.Info("starting and stopping");
             Assert.True(queue.IsStopped);
             queue.StartListener();
             WaitFor(queue, (q) => { return !q.IsStopped; } );
@@ -50,17 +50,20 @@ namespace TestLibrary
             queue.StopListener();
             WaitFor(queue, (q) => { return q.IsStopped; } );
             Assert.True(queue.IsStopped);
-            //restartable?
-            queue.StartListener();
-            WaitFor(queue, (q) => { return !q.IsStopped; } );
-            Assert.False(queue.IsStopped);
-            queue.StopListener();
-            WaitFor(queue, (q) => { return q.IsStopped; } );
-            Assert.True(queue.IsStopped);
-            //stopping of initialized but stopped Listener
+            Logger.Info("stopping of initialized but stopped Listener");
             queue.StopListener();
             Assert.True(queue.IsStopped);
         }
-
+        
+        [Test]
+        [ExpectedException( typeof( InvalidOperationException ) )]
+        public void PreventRestart() {
+            SyncEventQueue queue = new SyncEventQueue(null);
+            queue.StartListener();
+            WaitFor(queue, (q) => { return !q.IsStopped; } );
+            queue.StopListener();
+            WaitFor(queue, (q) => { return q.IsStopped; } );
+            queue.StartListener();
+        }
     }
 }

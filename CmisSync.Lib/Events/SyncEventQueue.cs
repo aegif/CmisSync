@@ -44,6 +44,9 @@ namespace CmisSync.Lib.Events
         }
 
         public void StartListener() {
+            if(this.consumer != null) {
+                throw new InvalidOperationException("Listener is not restartable");
+            }
             this.consumer = new Task(() => Listen(this.queue, this.manager));
             this.consumer.Start();
         }
@@ -53,7 +56,14 @@ namespace CmisSync.Lib.Events
         }            
         
         public bool IsStopped {
-            get { return this.consumer == null || this.consumer.IsCompleted; }
+            get { 
+                if(this.consumer == null){
+                    Logger.Debug("consumer null");
+                    return true;
+                }
+                Logger.Debug(this.consumer.Status);
+                return this.consumer.IsCompleted; 
+            }
         }
 
         public void Dispose() {
