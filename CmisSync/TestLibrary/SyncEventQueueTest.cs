@@ -28,6 +28,7 @@ namespace TestLibrary
                 }
                 Thread.Sleep(100);
             }
+            Logger.Error("Timeout exceeded!");
         }
 
         [Test]
@@ -37,7 +38,6 @@ namespace TestLibrary
         }  
 
         [Test]
-        [Ignore]
         public void EventlessStartStop() {
             SyncEventQueue queue = new SyncEventQueue(null);
             //stoping of not initialized Listener
