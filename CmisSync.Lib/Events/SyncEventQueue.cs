@@ -52,6 +52,9 @@ namespace CmisSync.Lib.Events
         }
 
         public void StopListener() {
+            if(this.consumer == null) {
+                throw new InvalidOperationException("Listener can not be stopped without beeing started.");
+            }
             this.queue.CompleteAdding();
         }            
         
