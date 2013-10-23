@@ -21,9 +21,9 @@ namespace TestLibrary
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
-        private static void WaitForStop(SyncEventQueue queue){
+        private static void WaitFor<T>(T obj, Func<T,bool> check){
             for(int i = 0; i < 5; i++){
-                if (queue.IsStopped) {
+                if (check(obj)) {
                     break;
                 }
                 Thread.Sleep(100);
@@ -44,15 +44,16 @@ namespace TestLibrary
             //starting and stopping
             Assert.True(queue.IsStopped);
             queue.StartListener();
+            WaitFor(queue, (q) => { return !q.IsStopped; } );
             Assert.False(queue.IsStopped);
             queue.StopListener();
-            WaitForStop(queue);
+            WaitFor(queue, (q) => { return q.IsStopped; } );
             Assert.True(queue.IsStopped);
             //restartable?
             queue.StartListener();
             Assert.False(queue.IsStopped);
             queue.StopListener();
-            WaitForStop(queue);
+            WaitFor(queue, (q) => { return q.IsStopped; } );
             Assert.True(queue.IsStopped);
             //stopping of initialized but stopped Listener
             queue.StopListener();
