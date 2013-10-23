@@ -1059,9 +1059,17 @@ namespace CmisSync.Lib.Sync
                                             Logger.Debug(String.Format("CMIS::CreateDocument(Properties(Name={0}, ObjectType={1})," +
                                                                        "ContentStream(FileName={0}, MimeType={2}, Length={3})",
                                                                    fileName,"cmis:document", contentStream.MimeType,contentStream.Length));
-                                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                                            Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
-                                                                   remoteDocument.Id, fileName));
+                                            try
+                                            {
+                                                remoteDocument = remoteFolder.CreateDocument(properties, null, null);
+                                                Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
+                                                                           remoteDocument.Id, fileName));
+                                            } catch(Exception e) {
+                                                string reason = Utils.IsValidISO(fileName)?String.Empty:" Reason: Upload perhaps failed because of an invalid UTF-8 character";
+                                                Logger.Info(String.Format("Could not create the remote document {0} as target for local document {1}{2}", fileName, filePath, reason));
+                                                throw;
+                                            }
+                                            remoteDocument.SetContentStream(contentStream, false);
                                             filehash = hashAlg.Hash;
                                             success = true;
                                         }

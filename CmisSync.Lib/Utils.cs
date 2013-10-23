@@ -201,13 +201,29 @@ namespace CmisSync.Lib
             return true;
         }
 
+        /// <summary>
+        /// Determines whether this instance is valid ISO-8859-1 specified input.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if this instance is valid ISO-8859-1 specified input; otherwise, <c>false</c>.
+        /// </returns>
+        /// <param name='input'>
+        /// If set to <c>true</c> input.
+        /// </param>
+        public static bool IsValidISO(string input)
+        {
+            byte[] bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(input);
+            String result = Encoding.GetEncoding("ISO-8859-1").GetString(bytes);
+            return String.Equals(input, result);
+        }
+
 
         /// <summary>
         /// Check whether a file name is valid or not.
         /// </summary>
         public static bool IsInvalidFileName(string name)
         {
-            bool ret = invalidFileNameRegex.IsMatch(name);
+            bool ret = invalidFileNameRegex.IsMatch(name) && !IsValidISO(name);
             if (ret) {
                 Logger.Debug("Invalid filename: " + name);
             }
@@ -227,7 +243,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsInvalidFolderName(string name)
         {
-            bool ret = invalidFolderNameRegex.IsMatch(name);
+            bool ret = invalidFolderNameRegex.IsMatch(name) && !IsValidISO(name);
             if (ret) {
                 Logger.Debug("Invalid dirname: " + name);
             }
