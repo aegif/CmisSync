@@ -5,7 +5,6 @@ namespace CmisSync.Lib.Events
 {
     public interface ISyncEvent
     {
-        object getSourceEvent();
         SyncEventType getType();
     }
 
@@ -26,7 +25,6 @@ namespace CmisSync.Lib.Events
             return SyncEventType.FileSystem;
         }
 
-        abstract public object getSourceEvent();
     }
 }
 
