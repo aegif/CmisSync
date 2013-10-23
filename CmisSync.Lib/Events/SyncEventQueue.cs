@@ -41,12 +41,6 @@ namespace CmisSync.Lib.Events
 
         public SyncEventQueue(SyncEventManager manager) {
             this.manager = manager;
-        }
-
-        public void StartListener() {
-            if(this.consumer != null) {
-                throw new InvalidOperationException("Listener is not restartable");
-            }
             this.consumer = new Task(() => Listen(this.queue, this.manager));
             this.consumer.Start();
         }

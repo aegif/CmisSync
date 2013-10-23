@@ -32,43 +32,19 @@ namespace TestLibrary
         }
 
         [Test]
-        public void CorrectStateAfterConstrution() {
-            SyncEventQueue queue = new SyncEventQueue(null);
-            Assert.True(queue.IsStopped);
-        }  
-
-        [Test]
         public void EventlessStartStop() {
-            SyncEventQueue queue = new SyncEventQueue(null);
-            Logger.Info("starting and stopping");
-            Assert.True(queue.IsStopped);
-            queue.StartListener();
-            WaitFor(queue, (q) => { return !q.IsStopped; } );
-            Assert.False(queue.IsStopped);
-            queue.StopListener();
-            WaitFor(queue, (q) => { return q.IsStopped; } );
-            Assert.True(queue.IsStopped);
-            Logger.Info("stopping of initialized but stopped Listener");
-            queue.StopListener();
-            Assert.True(queue.IsStopped);
+            using(SyncEventQueue queue = new SyncEventQueue(null)){
+                Logger.Info("starting and stopping");
+                WaitFor(queue, (q) => { return !q.IsStopped; } );
+                Assert.False(queue.IsStopped);
+                queue.StopListener();
+                WaitFor(queue, (q) => { return q.IsStopped; } );
+                Assert.True(queue.IsStopped);
+                Logger.Info("stopping of initialized but stopped Listener");
+                queue.StopListener();
+                Assert.True(queue.IsStopped);
+            }
         }
         
-        [Test]
-        [ExpectedException( typeof( InvalidOperationException ) )]
-        public void PreventRestart() {
-            SyncEventQueue queue = new SyncEventQueue(null);
-            queue.StartListener();
-            WaitFor(queue, (q) => { return !q.IsStopped; } );
-            queue.StopListener();
-            WaitFor(queue, (q) => { return q.IsStopped; } );
-            queue.StartListener();
-        }
-
-        [Test]
-        [ExpectedException( typeof( InvalidOperationException ) )]
-        public void PreventStopWithoutStart() {
-            SyncEventQueue queue = new SyncEventQueue(null);
-            queue.StopListener();
-        }
     }
 }
