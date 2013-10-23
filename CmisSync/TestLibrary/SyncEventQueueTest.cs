@@ -66,7 +66,7 @@ namespace TestLibrary
         }
 
         [Test]
-        public void AddEvent(){
+        public void AddEvent() {
             SyncEventManager manager = new SyncEventManager();
             DummyHandler handler = new DummyHandler();
             manager.AddEventHandler(handler);
@@ -77,6 +77,17 @@ namespace TestLibrary
                 Assert.True(queue.IsStopped);
             }
             Assert.True(handler.called);
+        }
+
+        [Test]
+        [ExpectedException( typeof( InvalidOperationException ) )]
+        public void AddEventToStoppedQueue() {
+            using(SyncEventQueue queue = new SyncEventQueue(new SyncEventManager())){
+                queue.StopListener();
+                WaitFor(queue, (q) => { return q.IsStopped; } );
+                queue.AddEvent(new DummyEvent());
+            }
+
         }
         
     }

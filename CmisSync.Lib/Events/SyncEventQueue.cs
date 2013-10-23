@@ -44,7 +44,7 @@ namespace CmisSync.Lib.Events
             Logger.Debug("Stopping to listen on SyncEventQueue");
         }
 
-        /// <exception cref="InvalidOperationException">When Listener is stopped</exception>
+        /// <exception cref="InvalidOperationException">When Listener is already stopped</exception>
         public void AddEvent(ISyncEvent newEvent) {
             this.queue.Add(newEvent);
         } 
@@ -75,6 +75,5 @@ namespace CmisSync.Lib.Events
             this.consumer.Dispose();
             this.queue.Dispose();
         }
-
     }
 }
