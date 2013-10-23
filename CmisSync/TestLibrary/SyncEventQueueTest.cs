@@ -52,6 +52,7 @@ namespace TestLibrary
             Assert.True(queue.IsStopped);
             //restartable?
             queue.StartListener();
+            WaitFor(queue, (q) => { return !q.IsStopped; } );
             Assert.False(queue.IsStopped);
             queue.StopListener();
             WaitFor(queue, (q) => { return q.IsStopped; } );
