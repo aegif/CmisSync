@@ -14,6 +14,7 @@ namespace CmisSync.Lib.Events
         private Task consumer;
         
         private static void Listen(BlockingCollection<ISyncEvent> queue, SyncEventManager manager){
+            Logger.Debug("Starting to listen on SyncEventQueue");
             while (!queue.IsCompleted)
             {
 
