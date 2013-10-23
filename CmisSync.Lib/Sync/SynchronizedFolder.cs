@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -335,6 +335,7 @@ namespace CmisSync.Lib.Sync
                 {
                     //  have to crawl remote
                     Logger.Debug("Invoke a remote crawl sync");
+                    repo.Watcher.RemoveAll();
                     CrawlSync(remoteFolder, localFolder);
                 }
                 /*

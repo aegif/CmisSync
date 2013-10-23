@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,7 +103,14 @@ namespace CmisSync.Lib.Sync
                     if (success)
                     {
                         // Save change log token locally.
-                        lastTokenOnClient = changes.LatestChangeLogToken;
+                        if (changes.HasMoreItems == true)
+                        {
+                            lastTokenOnClient = changes.LatestChangeLogToken;
+                        }
+                        else
+                        {
+                            lastTokenOnClient = lastTokenOnServer;
+                        }
                         Logger.Info("Sync the changes on server, update ChangeLog token: " + lastTokenOnClient);
                         database.SetChangeLogToken(lastTokenOnClient);
                         session.Binding.GetRepositoryService().GetRepositoryInfos(null);    //  refresh
