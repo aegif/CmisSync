@@ -11,14 +11,14 @@ namespace CmisSync.Lib.Events
             handler = new List<ISyncEventHandler>();
         }
 
-        public void addEventHandler(ISyncEventHandler h)
+        public void AddEventHandler(ISyncEventHandler h)
         {
             int pos;
             for( pos = 0; pos < this.handler.Count; pos++) {
-                if(h.getPriority() > handler[pos].getPriority())
+                if(h.GetPriority() > handler[pos].GetPriority())
                 {
                     break;
-                } else if(h.getPriority() == handler[pos].getPriority() && h==handler[pos])
+                } else if(h.GetPriority() == handler[pos].GetPriority() && h==handler[pos])
                 {
                     return;
                 }
@@ -26,15 +26,15 @@ namespace CmisSync.Lib.Events
             handler.Insert(pos, h);
         }
 
-        public void handle(ISyncEvent e) {
+        public void Handle(ISyncEvent e) {
             foreach ( ISyncEventHandler h in handler)
             {
-                if(h.handle(e))
+                if(h.Handle(e))
                     return;
             }
         }
 
-        public void removeEventHandler(ISyncEventHandler h)
+        public void RemoveEventHandler(ISyncEventHandler h)
         {
             handler.Remove(h);
         }

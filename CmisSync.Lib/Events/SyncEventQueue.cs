@@ -33,13 +33,26 @@ namespace CmisSync.Lib.Events
 
                 if (syncEvent != null)
                 {
-                    manager.handle(syncEvent);
+                    try{
+                        manager.Handle(syncEvent);
+                    }catch(Exception e) {
+                        Logger.Error("Exception in EventHandler");
+                        Logger.Error(e);
+                    }
                 }
             }
             Logger.Debug("Stopping to listen on SyncEventQueue");
         }
 
+        /// <exception cref="InvalidOperationException">When Listener is stopped</exception>
+        public void AddEvent(ISyncEvent newEvent) {
+            this.queue.Add(newEvent);
+        } 
+
         public SyncEventQueue(SyncEventManager manager) {
+            if(manager == null) {
+                throw new ArgumentException("manager may not be null");
+            }
             this.manager = manager;
             this.consumer = new Task(() => Listen(this.queue, this.manager));
             this.consumer.Start();
@@ -62,5 +75,6 @@ namespace CmisSync.Lib.Events
             this.consumer.Dispose();
             this.queue.Dispose();
         }
+
     }
 }

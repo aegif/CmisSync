@@ -6,21 +6,21 @@ namespace CmisSync.Lib.Events
 {
     public interface ISyncEventHandler
     {
-        bool handle(ISyncEvent e);
-        int getPriority();
+        bool Handle(ISyncEvent e);
+        int GetPriority();
     }
 
     abstract public class EventFilter : ISyncEventHandler {
         private static readonly int EVENTFILTERPRIORITY = 1000;
-        public abstract bool handle(ISyncEvent e);
-        public int getPriority() {
+        public abstract bool Handle(ISyncEvent e);
+        public int GetPriority() {
             return EVENTFILTERPRIORITY;
         }
     }
 
     public class IgnoreFolderFilter : EventFilter {
 
-        public override bool handle(ISyncEvent e) {
+        public override bool Handle(ISyncEvent e) {
             return false;
         }
     };
@@ -30,13 +30,13 @@ namespace CmisSync.Lib.Events
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DebugLoggingHandler));
         private static readonly int DEBUGGINGLOGGERPRIORITY = 10000;
 
-        public bool handle(ISyncEvent e)
+        public bool Handle(ISyncEvent e)
         {
             Logger.Debug("Incomming Event: " + e.ToString());
             return false;
         }
 
-        public int getPriority()
+        public int GetPriority()
         {
             return DEBUGGINGLOGGERPRIORITY;
         }

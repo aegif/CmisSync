@@ -5,7 +5,7 @@ namespace CmisSync.Lib.Events
 {
     public interface ISyncEvent
     {
-        SyncEventType getType();
+        SyncEventType GetType();
     }
 
     public enum SyncEventType {
@@ -21,7 +21,7 @@ namespace CmisSync.Lib.Events
             this.path = path;
         }
 
-        public SyncEventType getType() {
+        public SyncEventType GetType() {
             return SyncEventType.FileSystem;
         }
 

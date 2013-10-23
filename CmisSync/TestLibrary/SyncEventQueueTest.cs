@@ -13,6 +13,29 @@ namespace TestLibrary
     [TestFixture]
     public class SyncEventQueueTest
     {
+        private class DummyEvent : ISyncEvent 
+        {
+            public bool called;
+
+            public SyncEventType GetType() {
+                return SyncEventType.FileSystem;
+            }
+        }
+        
+        private class DummyHandler : ISyncEventHandler
+        {
+            public bool called;
+
+            public bool Handle(ISyncEvent e){
+                called = true;
+                return true;
+            }
+
+            public int GetPriority() {
+                return 5;
+            }
+        }
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncEventQueueTest));
 
         [TestFixtureSetUp]
@@ -33,17 +56,27 @@ namespace TestLibrary
 
         [Test]
         public void EventlessStartStop() {
-            using(SyncEventQueue queue = new SyncEventQueue(null)){
-                Logger.Info("starting and stopping");
+            using(SyncEventQueue queue = new SyncEventQueue(new SyncEventManager())){
                 WaitFor(queue, (q) => { return !q.IsStopped; } );
                 Assert.False(queue.IsStopped);
                 queue.StopListener();
                 WaitFor(queue, (q) => { return q.IsStopped; } );
                 Assert.True(queue.IsStopped);
-                Logger.Info("stopping of initialized but stopped Listener");
+            }
+        }
+
+        [Test]
+        public void AddEvent(){
+            SyncEventManager manager = new SyncEventManager();
+            DummyHandler handler = new DummyHandler();
+            manager.AddEventHandler(handler);
+            using(SyncEventQueue queue = new SyncEventQueue(manager)){
+                queue.AddEvent(new DummyEvent());
                 queue.StopListener();
+                WaitFor(queue, (q) => { return q.IsStopped; } );
                 Assert.True(queue.IsStopped);
             }
+            Assert.True(handler.called);
         }
         
     }
