@@ -73,9 +73,9 @@ namespace CmisSync {
                 this.status_item.AlternateImage      = this.animation_frames_active [0];
                 this.status_item.AlternateImage.Size = new SizeF (16, 16);
 
-                this.folder_image       = NSImage.ImageNamed ("NSFolder");
-                this.caution_image      = NSImage.ImageNamed ("NSCaution");
-                this.cmissync_image = NSImage.ImageNamed ("cmissync-folder");
+                this.folder_image       = NSImage.ImageNamed ("cmissync-folder.icns");
+                this.caution_image      = NSImage.ImageNamed ("cmissync-folder.icns");
+                this.cmissync_image     = NSImage.ImageNamed ("cmissync-folder.icns");
 
                 CreateMenu ();
             }
@@ -150,7 +150,7 @@ namespace CmisSync {
                 };
 
                 this.folder_item = new NSMenuItem () {
-                    Title = "CmisSync"
+                    Title = "DataSpace Sync"
                 };
 
                 this.folder_item.Activated += delegate {
@@ -202,7 +202,7 @@ namespace CmisSync {
                 };*/
 
                 this.about_item = new NSMenuItem () {
-                    Title   = "About CmisSync",
+                    Title   = "About DataSpace Sync",
                     Enabled = true
                 };
 
@@ -298,11 +298,11 @@ namespace CmisSync {
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.add_item);
                 this.menu.AddItem (this.recent_events_item);
+//                this.menu.AddItem (NSMenuItem.SeparatorItem);
+//                this.menu.AddItem (this.notify_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.notify_item);
+                this.menu.AddItem (this.about_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-				this.menu.AddItem (this.about_item);
-			    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.quit_item);
 
                 this.menu.Delegate    = new StatusIconMenuDelegate ();

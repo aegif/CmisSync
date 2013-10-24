@@ -14,8 +14,8 @@
         <customObject id="-3" userLabel="Application"/>
         <menu title="AMainMenu" systemMenu="main" id="29">
             <items>
-                <menuItem title="DataSpace Sync" id="56">
-                    <menu key="submenu" title="DataSpace Sync" systemMenu="apple" id="57">
+                <menuItem title="CmisSync" id="56">
+                    <menu key="submenu" title="CmisSync" systemMenu="apple" id="57">
                         <items>
                             <menuItem title="Services" id="131">
                                 <menu key="submenu" title="Services" systemMenu="services" id="130"/>

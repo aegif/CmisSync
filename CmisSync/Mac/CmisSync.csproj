@@ -16,7 +16,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>False</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>..\..\bin</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
@@ -37,7 +37,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>..\..\bin</OutputPath>
     <WarningLevel>4</WarningLevel>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
@@ -65,9 +65,6 @@
     <Compile Include="AppDelegate.cs">
       <DependentUpon>MainMenu.xib</DependentUpon>
     </Compile>
-    <Compile Include="MainMenu.xib.designer.cs">
-      <DependentUpon>MainMenu.xib</DependentUpon>
-    </Compile>
     <Compile Include="StatusIcon.cs" />
     <Compile Include="UI.cs" />
     <Compile Include="..\Program.cs">
@@ -85,6 +82,10 @@
     <Compile Include="..\Properties\Resources.Designer.cs">
       <Link>Resources.Designer.cs</Link>
     </Compile>
+    <Compile Include="..\AboutController.cs" />
+    <Compile Include="..\CertPolicyHandler.cs" />
+    <Compile Include="..\ControllerBase.cs" />
+    <Compile Include="..\SetupController.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" xmlns="" />
@@ -97,12 +98,6 @@
   <ItemGroup>
     <Content Include="..\Common\Pixmaps\side-splash.png">
       <Link>Pixmaps\side-splash.png</Link>
-    </Content>
-    <Content Include="Pixmaps\cmissync-folder.icns">
-      <Link>cmissync-folder.icns</Link>
-    </Content>
-    <Content Include="Pixmaps\cmissync-app.icns">
-      <Link>cmissync-app.icns</Link>
     </Content>
     <Content Include="Pixmaps\process-syncing-i-active.png">
       <Link>Pixmaps\process-syncing-i-active.png</Link>
@@ -216,7 +211,7 @@
         <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am" IsAutotoolsProject="True" RelativeConfigureInPath="../..">
           <BuildFilesVar Sync="True" Name="SOURCES" />
           <DeployFilesVar />
-          <ResourcesVar Sync="True" Name="RESOURCES_RESOURCES" />
+          <ResourcesVar Sync="True" Name="RESOURCES_RESOURCES" Prefix="CmisSync" />
           <OthersVar />
           <GacRefVar />
           <AsmRefVar />
@@ -225,4 +220,16 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <BundleResource Include="Pixmaps\cmissync-app.icns">
+      <Link>cmissync-app.icns</Link>
+      <DeployService-Deploy>True</DeployService-Deploy>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\cmissync-folder.icns">
+      <Link>cmissync-folder.icns</Link>
+      <DeployService-Deploy>True</DeployService-Deploy>
+    </BundleResource>
+    <BundleResource Include="Resources\MainMenu.nib\designable.nib" />
+    <BundleResource Include="Resources\MainMenu.nib\keyedobjects.nib" />
+  </ItemGroup>
 </Project>
