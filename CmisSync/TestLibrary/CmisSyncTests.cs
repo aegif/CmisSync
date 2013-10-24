@@ -855,6 +855,7 @@ namespace TestLibrary
                     string path2 = Path.Combine(localDirectory, name2);
 
                     //  create heavy folder
+                    Console.WriteLine(" Remote create heavy folder");
                     Assert.IsFalse(Directory.Exists(path1));
                     IFolder folder1 = CreateFolder(folder, name1);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
@@ -870,6 +871,7 @@ namespace TestLibrary
                     Assert.IsTrue(CheckHeavyFolder(path1));
 
                     //  rename heavy folder
+                    Console.WriteLine(" Remote rename heavy folder");
                     IFolder folder2 = RenameFolder(folder1, name2);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
                     {
@@ -878,6 +880,7 @@ namespace TestLibrary
                     Assert.IsTrue(CheckHeavyFolder(path2));
 
                     //  move heavy folder
+                    Console.WriteLine(" Remote move heavy folder");
                     folder1 = CreateFolder(folder, name1);
                     folder2.Move(folder, folder1);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
@@ -887,6 +890,7 @@ namespace TestLibrary
                     Assert.IsTrue(CheckHeavyFolder(Path.Combine(path1, name2)));
 
                     //  delete heavy folder
+                    Console.WriteLine(" Remote delete heavy folder");
                     folder1.DeleteTree(true, null, true);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
                     {
@@ -1241,7 +1245,7 @@ namespace TestLibrary
                 string newname = "SyncEquality.New";
 
                 //  test heavy folder create
-                Console.WriteLine(" create heavy folder");
+                Console.WriteLine(" Local create heavy folder");
                 string oldfolder = Path.Combine(localDirectory, oldname);
                 string oldfolder2 = Path.Combine(localDirectory2, oldname);
                 Directory.CreateDirectory(oldfolder);
@@ -1255,7 +1259,7 @@ namespace TestLibrary
                 Assert.IsTrue(CheckHeavyFolder(oldfolder2));
 
                 //  test heavy folder rename
-                Console.WriteLine(" rename heavy folder");
+                Console.WriteLine(" Local rename heavy folder");
                 string newfolder = Path.Combine(localDirectory, newname);
                 string newfolder2 = Path.Combine(localDirectory2, newname);
                 Directory.Move(oldfolder, newfolder);
@@ -1268,7 +1272,7 @@ namespace TestLibrary
                 Assert.IsTrue(CheckHeavyFolder(newfolder2));
 
                 //  test heavy folder move
-                Console.WriteLine(" move heavy folder");
+                Console.WriteLine(" Local move heavy folder");
                 Directory.CreateDirectory(oldfolder);
                 Directory.Move(newfolder,Path.Combine(oldfolder,newname));
                 newfolder = Path.Combine(oldfolder, newname);
@@ -1282,7 +1286,7 @@ namespace TestLibrary
                 Assert.IsTrue(CheckHeavyFolder(newfolder2));
 
                 //  test heavy folder delete
-                Console.WriteLine(" delete heavy folder");
+                Console.WriteLine(" Local delete heavy folder");
                 Directory.Delete(newfolder, true);
                 Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
                 {
