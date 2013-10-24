@@ -209,14 +209,14 @@ namespace CmisSync {
             Program.Controller.OpenCmisSyncFolder (reponame);
         }
 
-
+        /*
         /// <summary>
         /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
         /// </summary>
         public void RemoteFolderClicked(string reponame)
         {
             Program.Controller.OpenRemoteFolder(reponame);
-        }
+        }*/
 
 
         /// <summary>
