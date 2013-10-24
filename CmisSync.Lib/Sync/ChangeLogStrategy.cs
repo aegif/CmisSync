@@ -268,7 +268,7 @@ namespace CmisSync.Lib.Sync
                             {
                                 if (!Directory.Exists(Path.GetDirectoryName(localPath)))
                                 {
-                                    Logger.Info("Creating local directory: "+ localPath);
+                                    Logger.Warn("Creating local directory: "+ localPath);
                                     Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                                 }
                                 File.Move(savedDocumentPath, localPath);
