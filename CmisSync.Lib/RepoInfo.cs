@@ -165,7 +165,10 @@ namespace CmisSync.Lib
         {
             if(Utils.IsInvalidFolderName(path.Replace("/", "").Replace("\"","")))
                 return true;
-            return ignoredPaths.Contains(path);
+            return !String.IsNullOrEmpty(ignoredPaths.Find(delegate(string ignore)
+            {
+                return path.StartsWith(ignore);
+            }));
         }
 
         public class CmisPassword

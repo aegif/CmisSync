@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CmisSync.Lib
+namespace CmisSync.Lib.Events
 {
     public class SyncEventManager
     {

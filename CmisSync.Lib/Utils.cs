@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -201,13 +201,29 @@ namespace CmisSync.Lib
             return true;
         }
 
+        /// <summary>
+        /// Determines whether this instance is valid ISO-8859-1 specified input.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if this instance is valid ISO-8859-1 specified input; otherwise, <c>false</c>.
+        /// </returns>
+        /// <param name='input'>
+        /// If set to <c>true</c> input.
+        /// </param>
+        public static bool IsValidISO(string input)
+        {
+            byte[] bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(input);
+            String result = Encoding.GetEncoding("ISO-8859-1").GetString(bytes);
+            return String.Equals(input, result);
+        }
+
 
         /// <summary>
         /// Check whether a file name is valid or not.
         /// </summary>
         public static bool IsInvalidFileName(string name)
         {
-            bool ret = invalidFileNameRegex.IsMatch(name);
+            bool ret = invalidFileNameRegex.IsMatch(name) && !IsValidISO(name);
             if (ret) {
                 Logger.Debug("Invalid filename: " + name);
             }
@@ -219,7 +235,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a file name is valid or not.
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:'") + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:") + "]");
 
 
         /// <summary>
@@ -227,7 +243,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsInvalidFolderName(string name)
         {
-            bool ret = invalidFolderNameRegex.IsMatch(name);
+            bool ret = invalidFolderNameRegex.IsMatch(name) && !IsValidISO(name);
             if (ret) {
                 Logger.Debug("Invalid dirname: " + name);
             }
@@ -299,6 +315,35 @@ namespace CmisSync.Lib
         public static string FormatSize(long byteCount)
         {
             return FormatSize((double) byteCount);
+        }
+
+        
+        /// <summary>
+        /// Whether a file or directory is a symbolic link.
+        /// </summary>
+        public static bool IsSymlink(string path)
+        {
+            FileInfo fileinfo = new FileInfo(path);
+            if(fileinfo.Exists)
+                return IsSymlink(fileinfo);
+            DirectoryInfo dirinfo = new DirectoryInfo(path);
+            if(dirinfo.Exists)
+                return IsSymlink(dirinfo);
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether this instance is a symlink the specified FileSystemInfo.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if this instance is a symlink the specified fsi; otherwise, <c>false</c>.
+        /// </returns>
+        /// <param name='fsi'>
+        /// If set to <c>true</c> fsi.
+        /// </param>
+        public static bool IsSymlink(FileSystemInfo fsi)
+        {
+            return ((fsi.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
         }
     }
 }

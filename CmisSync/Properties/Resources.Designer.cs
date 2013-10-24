@@ -289,6 +289,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The directory {0} is already in use by {1}.
+        /// </summary>
+        internal static string FolderAlreadyInUse {
+            get {
+                return ResourceManager.GetString("FolderAlreadyInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help.
         /// </summary>
         internal static string Help {
@@ -318,11 +327,20 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The folder name is invalid. Special characters are not allowed..
+        ///   Looks up a localized string similar to The folder name {0} is invalid. Special characters are not allowed..
         /// </summary>
         internal static string InvalidFolderName {
             get {
                 return ResourceManager.GetString("InvalidFolderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The repository name {0} contains illegal characters.
+        /// </summary>
+        internal static string InvalidRepoName {
+            get {
+                return ResourceManager.GetString("InvalidRepoName", resourceCulture);
             }
         }
         
@@ -538,8 +556,8 @@ namespace CmisSync {
         /// <summary>
         ///   Looks up a localized string similar to Sorry, DataSpace Sync can not find a CMIS server at this address.
         ///Please ask your server administrator for the CMIS endpoint URL.
-        ///If you are sure about the address, open it in a browser and send
-        ///the resulting XML to cmissync@aegif.jp.
+        ///If you are sure about the address, open it in a browser and post
+        ///the resulting XML on the cmissync forum..
         /// </summary>
         internal static string Sorry {
             get {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -335,6 +335,7 @@ namespace CmisSync.Lib.Sync
                 {
                     //  have to crawl remote
                     Logger.Debug("Invoke a remote crawl sync");
+                    repo.Watcher.RemoveAll();
                     CrawlSync(remoteFolder, localFolder);
                 }
                 /*
@@ -622,7 +623,7 @@ namespace CmisSync.Lib.Sync
                         if (database.ContainsFile(filePath))
                         {
                             long retries = database.GetOperationRetryCounter(filePath, Database.OperationType.DELETE);
-                            if(retries < repoinfo.MaxDeletionRetries) {
+                            if(retries <= repoinfo.MaxDeletionRetries) {
                                 // File has been recently removed locally, so remove it from server too.
                                 Logger.Info("Removing locally deleted file on server: " + filePath);
                                 try{
@@ -630,14 +631,14 @@ namespace CmisSync.Lib.Sync
                                     // Remove it from database.
                                     database.RemoveFile(filePath);
                                     database.SetOperationRetryCounter(filePath, 0, Database.OperationType.DELETE);
-                                }catch(CmisBaseException ex)
+                                } catch(CmisBaseException ex)
                                 {
                                     Logger.Warn("Could not delete remote file: ", ex);
                                     database.SetOperationRetryCounter(filePath, retries+1, Database.OperationType.DELETE);
                                     throw;
                                 }
                             } else {
-                                Logger.Info(String.Format("Skipped deletion of remote file {0} because of too many failed retries ({1})", filePath, retries));
+                                Logger.Info(String.Format("Skipped deletion of remote file {0} because of too many failed retries ({1} max={2})", filePath, retries, repoinfo.MaxDeletionRetries));
                             }
                         }
                         else
@@ -1018,8 +1019,8 @@ namespace CmisSync.Lib.Sync
                 using (new ActivityListenerResource(activityListener))
                 {
                     long retries = database.GetOperationRetryCounter(filePath, Database.OperationType.UPLOAD);
-                    if(retries >= this.repoinfo.MaxUploadRetries) {
-                        Logger.Info(String.Format("Skipping uploading file absent on repository, because of too many failed retries({0}): {1}", retries-1, filePath));
+                    if(retries > this.repoinfo.MaxUploadRetries) {
+                        Logger.Info(String.Format("Skipping uploading file absent on repository, because of too many failed retries({0}): {1}", retries, filePath));
                         return true;
                     }
                     try{
@@ -1058,9 +1059,17 @@ namespace CmisSync.Lib.Sync
                                             Logger.Debug(String.Format("CMIS::CreateDocument(Properties(Name={0}, ObjectType={1})," +
                                                                        "ContentStream(FileName={0}, MimeType={2}, Length={3})",
                                                                    fileName,"cmis:document", contentStream.MimeType,contentStream.Length));
-                                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                                            Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
-                                                                   remoteDocument.Id, fileName));
+                                            try
+                                            {
+                                                remoteDocument = remoteFolder.CreateDocument(properties, null, null);
+                                                Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
+                                                                           remoteDocument.Id, fileName));
+                                            } catch(Exception e) {
+                                                string reason = Utils.IsValidISO(fileName)?String.Empty:" Reason: Upload perhaps failed because of an invalid UTF-8 character";
+                                                Logger.Info(String.Format("Could not create the remote document {0} as target for local document {1}{2}", fileName, filePath, reason));
+                                                throw;
+                                            }
+                                            remoteDocument.SetContentStream(contentStream, false);
                                             filehash = hashAlg.Hash;
                                             success = true;
                                         }

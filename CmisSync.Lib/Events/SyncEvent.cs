@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace CmisSync.Lib
+namespace CmisSync.Lib.Events
 {
     public interface ISyncEvent
     {

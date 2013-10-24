@@ -66,7 +66,6 @@ namespace CmisSync.Lib.Cmis
                 if (e.Message == "ConnectFailure")
                     return new Tuple<CmisServer, Exception>(new CmisServer(url, null), new CmisServerNotFoundException(e.Message, e));
                 firstException = e;
-
             }
             catch (Exception e)
             {
@@ -115,7 +114,7 @@ namespace CmisSync.Lib.Cmis
                 catch (Exception e)
                 {
                     // Do nothing, try other possibilities.
-                    Logger.Info(e.Message);
+                    Logger.Debug(e.Message);
                 }
                 if (repositories != null)
                 {
@@ -160,27 +159,27 @@ namespace CmisSync.Lib.Cmis
             }
             catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
-                Logger.Error("CMIS server found, but permission denied. Please check username/password. " + Utils.ToLogString(e));
+                Logger.Debug("CMIS server found, but permission denied. Please check username/password. " + Utils.ToLogString(e));
                 throw;
             }
             catch (CmisRuntimeException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Debug("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
                 throw;
             }
             catch (CmisObjectNotFoundException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Debug("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
                 throw;
             }
             catch (CmisConnectionException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Debug("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
                 throw;
             }
             catch (CmisInvalidArgumentException e)
             {
-                Logger.Error("Invalid URL, maybe Alfresco Cloud? " + Utils.ToLogString(e));
+                Logger.Debug("Invalid URL, maybe Alfresco Cloud? " + Utils.ToLogString(e));
                 throw;
             }
 

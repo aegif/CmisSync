@@ -385,13 +385,14 @@ namespace CmisSync
                                 {
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
+                                    TextWrapping = TextWrapping.Wrap,
                                     Visibility = Visibility.Hidden,
+                                    BorderThickness = new Thickness(0),
                                     IsReadOnly = true,
                                     Background = Brushes.Transparent,
-                                    BorderThickness = new Thickness(0),
-                                    TextWrapping = TextWrapping.Wrap,
                                     MaxWidth = 420
                                 };
+
 
                                 // User input UI.
                                 TextBlock user_label = new TextBlock()
@@ -457,46 +458,46 @@ namespace CmisSync
 
                                 // Address
                                 ContentCanvas.Children.Add(address_label);
-                                Canvas.SetTop(address_label, 160);
+                                Canvas.SetTop(address_label, 100);
                                 Canvas.SetLeft(address_label, 185);
 
                                 ContentCanvas.Children.Add(address_box);
-                                Canvas.SetTop(address_box, 180);
+                                Canvas.SetTop(address_box, 120);
                                 Canvas.SetLeft(address_box, 185);
 
                                 ContentCanvas.Children.Add(address_help_label);
-                                Canvas.SetTop(address_help_label, 205);
+                                Canvas.SetTop(address_help_label, 145);
                                 Canvas.SetLeft(address_help_label, 185);
-
-                                ContentCanvas.Children.Add(address_error_label);
-                                Canvas.SetTop(address_error_label, 235);
-                                Canvas.SetLeft(address_error_label, 185);
 
                                 // User
                                 ContentCanvas.Children.Add(user_label);
-                                Canvas.SetTop(user_label, 300);
+                                Canvas.SetTop(user_label, 160);
                                 Canvas.SetLeft(user_label, 185);
 
                                 ContentCanvas.Children.Add(user_box);
-                                Canvas.SetTop(user_box, 330);
+                                Canvas.SetTop(user_box, 180);
                                 Canvas.SetLeft(user_box, 185);
 
                                 ContentCanvas.Children.Add(user_help_label);
-                                Canvas.SetTop(user_help_label, 355);
+                                Canvas.SetTop(user_help_label, 215);
                                 Canvas.SetLeft(user_help_label, 185);
 
                                 // Password
                                 ContentCanvas.Children.Add(password_label);
-                                Canvas.SetTop(password_label, 300);
+                                Canvas.SetTop(password_label, 160);
                                 Canvas.SetRight(password_label, 30);
 
                                 ContentCanvas.Children.Add(password_box);
-                                Canvas.SetTop(password_box, 330);
+                                Canvas.SetTop(password_box, 180);
                                 Canvas.SetRight(password_box, 30);
 
                                 ContentCanvas.Children.Add(password_help_label);
-                                Canvas.SetTop(password_help_label, 355);
+                                Canvas.SetTop(password_help_label, 215);
                                 Canvas.SetRight(password_help_label, 30);
+
+                                ContentCanvas.Children.Add(address_error_label);
+                                Canvas.SetTop(address_error_label, 220);
+                                Canvas.SetLeft(address_error_label, 185);
 
                                 TaskbarItemInfo.ProgressValue = 0.0;
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
@@ -796,7 +797,12 @@ namespace CmisSync
 
                                 localfolder_box.TextChanged += delegate
                                 {
-                                    localrepopath_box.Text = Path.Combine(parentFolder, localfolder_box.Text);
+                                    try
+                                    {
+                                        localrepopath_box.Text = Path.Combine(parentFolder, localfolder_box.Text);
+                                    }
+                                    catch (Exception)
+                                    {}
                                 };
 
                                 Button choose_folder_button = new Button()
@@ -888,7 +894,7 @@ namespace CmisSync
 
                                 if (!String.IsNullOrEmpty(error))
                                 {
-                                    localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                    localfolder_error_label.Text = error;
                                     localfolder_error_label.Visibility = Visibility.Visible;
                                 }
                                 else localfolder_error_label.Visibility = Visibility.Hidden;
@@ -898,7 +904,7 @@ namespace CmisSync
                                     error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
                                     if (!String.IsNullOrEmpty(error))
                                     {
-                                        localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                        localfolder_error_label.Text = error;
                                         localfolder_error_label.Visibility = Visibility.Visible;
                                     }
                                     else localfolder_error_label.Visibility = Visibility.Hidden;
@@ -909,7 +915,7 @@ namespace CmisSync
                                 error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
                                 if (!String.IsNullOrEmpty(error))
                                 {
-                                    localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                    localfolder_error_label.Text = error;
                                     localfolder_error_label.Visibility = Visibility.Visible;
                                 }
                                 else localfolder_error_label.Visibility = Visibility.Hidden;
@@ -919,7 +925,7 @@ namespace CmisSync
                                     error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
                                     if (!String.IsNullOrEmpty(error))
                                     {
-                                        localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                        localfolder_error_label.Text = error;
                                         localfolder_error_label.Visibility = Visibility.Visible;
                                        
                                     }

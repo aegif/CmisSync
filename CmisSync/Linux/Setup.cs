@@ -225,7 +225,7 @@ namespace CmisSync {
             layout_address.PackStart (address_label, true, true, 0);
             layout_address.PackStart (address_entry, true, true, 0);
             layout_address.PackStart (layout_address_help, true, true, 0);
-            layout_address.PackStart (address_error_label, true, true, 0);
+//            layout_address.PackStart (address_error_label, true, true, 0);
 
             // User
             layout_user.PackStart (new Label () {
@@ -244,9 +244,10 @@ namespace CmisSync {
             layout_fields.PackStart (layout_user);
             layout_fields.PackStart (layout_password);
 
-            layout_vertical.PackStart (new Label (""), false, false, 0);
+//            layout_vertical.PackStart (new Label (""), false, false, 0);
             layout_vertical.PackStart (layout_address, false, false, 0);
             layout_vertical.PackStart (layout_fields, false, false, 0);
+            layout_vertical.PackStart (address_error_label, true, true, 0);
 
             Add (layout_vertical);
 
@@ -490,7 +491,9 @@ namespace CmisSync {
             };
 
             localfolder_entry.Changed += delegate {
-                localrepopath_entry.Text = System.IO.Path.Combine(Controller.DefaultRepoPath, localfolder_entry.Text);
+                try{
+                    localrepopath_entry.Text = System.IO.Path.Combine(Controller.DefaultRepoPath, localfolder_entry.Text);
+                }catch(Exception){}
             };
 
             Label localfolder_error_label = new Label() {
@@ -518,7 +521,7 @@ namespace CmisSync {
             string error = Controller.CheckRepoPathAndName(localrepopath_entry.Text, localfolder_entry.Text);
             if (!String.IsNullOrEmpty(error)) {
                 localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
-                    CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                    error +
                     "</span>";
                 localfolder_error_label.Show();
             } else {
@@ -529,7 +532,7 @@ namespace CmisSync {
                 error = Controller.CheckRepoPathAndName(localrepopath_entry.Text, localfolder_entry.Text);
                 if (!String.IsNullOrEmpty(error)) {
                     localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
-                        CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                        error +
                         "</span>";
                     localfolder_error_label.Show();
                 } else {
@@ -540,7 +543,7 @@ namespace CmisSync {
             error = Controller.CheckRepoPathAndName(localrepopath_entry.Text, localfolder_entry.Text);
             if (!String.IsNullOrEmpty(error)) {
                 localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
-                    CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                    error +
                 "</span>";
                 localfolder_error_label.Show();
             } else {
@@ -551,7 +554,7 @@ namespace CmisSync {
                 error = Controller.CheckRepoPathAndName(localrepopath_entry.Text, localfolder_entry.Text);
                 if (!String.IsNullOrEmpty(error)) {
                     localfolder_error_label.Markup = "<span foreground=\"#ff8080\">" +
-                        CmisSync.Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture) +
+                        error +
                         "</span>";
                     localfolder_error_label.Show();
                 } else {

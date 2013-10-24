@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -276,7 +276,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Add a file to the database. And calculate the checksum of the file
         /// </summary>
-        [Obsolete("Adding a file without a filehash could produce wrong behaviour, please use AddFile(string path, DateTime? serverSideModificationDate, Dictionary<string, string[]> metadata, byte[] filehash) instead")]
+        [Obsolete("Adding a file without a filehash could produce wrong behaviour, please use AddFile(string path, string objectId, DateTime? serverSideModificationDate, Dictionary<string, string[]> metadata, byte[] filehash) instead")]
         public void AddFile(string path, string objectId, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata)
         {
@@ -406,11 +406,11 @@ namespace CmisSync.Lib.Cmis
             ExecuteSQLAction("DELETE FROM folders WHERE path=@path", parameters);
 
             // Remove all folders under this folder
-            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
+            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE \"" + path + "/%\"", null);
 
             // Remove all files under this folder
-            ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
-            ExecuteSQLAction("DELETE FROM downloads WHERE path LIKE '" + path + "/%'", null);
+            ExecuteSQLAction("DELETE FROM files WHERE path LIKE \"" + path + "/%\"", null);
+            ExecuteSQLAction("DELETE FROM downloads WHERE path LIKE \"" + path + "/%\"", null);
         }
 
 
@@ -429,7 +429,7 @@ namespace CmisSync.Lib.Cmis
 
             string path = null;
 
-            while(null != (path = (string)ExecuteSQLFunction("SELECT path FROM files WHERE path LIKE '" + oldPath + "/%'", null)))
+            while(null != (path = (string)ExecuteSQLFunction("SELECT path FROM files WHERE path LIKE \"" + oldPath + "/%\"", null)))
             {
                 string newFilePath = Path.Combine(newPath, path.Substring(oldPath.Length + 1)).Replace('\\', '/');
                 Logger.Info("File Move");
@@ -443,7 +443,7 @@ namespace CmisSync.Lib.Cmis
                 ExecuteSQLAction("UPDATE files SET path=@newpath WHERE path=@oldpath", parametersSub);
             }
             
-            while (null != (path = (string)ExecuteSQLFunction("SELECT path FROM folders WHERE path LIKE '" + oldPath + "/%'", null)))
+            while (null != (path = (string)ExecuteSQLFunction("SELECT path FROM folders WHERE path LIKE \"" + oldPath + "/%\"", null)))
             {
                 string newFolderPath = Path.Combine(newPath, path.Substring(oldPath.Length + 1)).Replace('\\', '/');
                 Logger.Info("Folder Move");

@@ -362,36 +362,32 @@ namespace CmisSync
         /// <returns>validity error, or empty string if valid</returns>
         public string CheckRepoPathAndName(string localpath, string reponame)
         {
-            // Check whether foldername is already in use
-            bool folderAlreadyExists = (Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase)) != -1);
+            try
+            {
+                // Check whether foldername is already in use
+                int index = Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase));
+                if ( index != -1)
+                    throw new ArgumentException(String.Format(Properties_Resources.FolderAlreadyInUse, localpath, Program.Controller.Folders[index]));
 
-            // Check whether folder name contains invalid characters.
-            Regex regexRepoName = (Path.DirectorySeparatorChar.Equals('\\'))?RepositoryRegex:RepositoryRegexLinux;
-            bool valid = (regexRepoName.IsMatch(reponame) && (!folderAlreadyExists));
-            if(valid)
-            {
-                valid = CmisSync.Lib.Utils.IsInvalidFolderName(reponame.Replace(Path.DirectorySeparatorChar,' '));
+                // Check whether folder name contains invalid characters.
+                Regex regexRepoName = (Path.DirectorySeparatorChar.Equals('\\')) ? RepositoryRegex : RepositoryRegexLinux;
+                if (!regexRepoName.IsMatch(reponame)||CmisSync.Lib.Utils.IsInvalidFolderName(reponame.Replace(Path.DirectorySeparatorChar, ' ')))
+                    throw new ArgumentException(String.Format(Properties_Resources.InvalidRepoName, reponame));
+                // Validate localpath
+                if(localpath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    localpath = localpath.Substring(0,localpath.Length-1);
+                if (CmisSync.Lib.Utils.IsInvalidFolderName(Path.GetFileName(localpath)))
+                    throw new ArgumentException(String.Format(Properties_Resources.InvalidFolderName, Path.GetFileName(localpath)));
+                if (Directory.Exists(localpath))
+                    throw new ArgumentException(String.Format(Properties_Resources.LocalDirectoryExist));
+                UpdateAddProjectButtonEvent(true);
+                return String.Empty;
             }
-            if (!valid)
+            catch (Exception e)
             {
-                // Disable button to next step.
                 UpdateAddProjectButtonEvent(false);
+                return e.Message;
             }
-            // Return validity error, or continue validating.
-            if (folderAlreadyExists) return "FolderAlreadyExist";
-            if (!regexRepoName.IsMatch(reponame)|| CmisSync.Lib.Utils.IsInvalidFolderName(reponame.Replace(Path.DirectorySeparatorChar,' '))) return "InvalidFolderName";
-
-            // Validate localpath
-            folderAlreadyExists = Directory.Exists(localpath);
-
-            valid = !folderAlreadyExists;
-
-            // Enable button to next step.
-            UpdateAddProjectButtonEvent(valid);
-
-            // Return validity error, or empty string if valid.
-            if (folderAlreadyExists) return "LocalDirectoryExist";
-            return String.Empty;
         }
 
 
