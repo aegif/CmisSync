@@ -7,35 +7,13 @@ using System.Threading;
 namespace TestLibrary
 {
     using NUnit.Framework;
+    using Moq;
     using CmisSync.Lib;
     using CmisSync.Lib.Events;
 
     [TestFixture]
     public class SyncEventQueueTest
     {
-        private class DummyEvent : ISyncEvent 
-        {
-            public bool called;
-
-            public SyncEventType GetType() {
-                return SyncEventType.FileSystem;
-            }
-        }
-        
-        private class DummyHandler : ISyncEventHandler
-        {
-            public bool called;
-
-            public bool Handle(ISyncEvent e){
-                called = true;
-                return true;
-            }
-
-            public int GetPriority() {
-                return 5;
-            }
-        }
-
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncEventQueueTest));
 
         [TestFixtureSetUp]
@@ -56,7 +34,7 @@ namespace TestLibrary
 
         [Test]
         public void EventlessStartStop() {
-            using(SyncEventQueue queue = new SyncEventQueue(new SyncEventManager())){
+            using(SyncEventQueue queue = new SyncEventQueue(new Mock<SyncEventManager>().Object)){
                 WaitFor(queue, (q) => { return !q.IsStopped; } );
                 Assert.False(queue.IsStopped);
                 queue.StopListener();
@@ -67,27 +45,25 @@ namespace TestLibrary
 
         [Test]
         public void AddEvent() {
-            SyncEventManager manager = new SyncEventManager();
-            DummyHandler handler = new DummyHandler();
-            manager.AddEventHandler(handler);
-            using(SyncEventQueue queue = new SyncEventQueue(manager)){
-                queue.AddEvent(new DummyEvent());
+            var managerMock = new Mock<SyncEventManager>();
+            var eventMock = new Mock<ISyncEvent>();
+            using(SyncEventQueue queue = new SyncEventQueue(managerMock.Object)){
+                queue.AddEvent(eventMock.Object);
                 queue.StopListener();
                 WaitFor(queue, (q) => { return q.IsStopped; } );
                 Assert.True(queue.IsStopped);
             }
-            Assert.True(handler.called);
+            managerMock.Verify(foo => foo.Handle(eventMock.Object));
         }
 
         [Test]
         [ExpectedException( typeof( InvalidOperationException ) )]
         public void AddEventToStoppedQueue() {
-            using(SyncEventQueue queue = new SyncEventQueue(new SyncEventManager())){
+            using(SyncEventQueue queue = new SyncEventQueue(new Mock<SyncEventManager>().Object)){
                 queue.StopListener();
                 WaitFor(queue, (q) => { return q.IsStopped; } );
-                queue.AddEvent(new DummyEvent());
+                queue.AddEvent(new Mock<ISyncEvent>().Object);
             }
-
         }
         
     }

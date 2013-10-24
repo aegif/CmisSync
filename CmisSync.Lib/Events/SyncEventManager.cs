@@ -26,7 +26,7 @@ namespace CmisSync.Lib.Events
             handler.Insert(pos, h);
         }
 
-        public void Handle(ISyncEvent e) {
+        public virtual void Handle(ISyncEvent e) {
             foreach ( ISyncEventHandler h in handler)
             {
                 if(h.Handle(e))
