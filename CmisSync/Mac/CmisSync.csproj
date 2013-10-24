@@ -68,9 +68,6 @@
     <Compile Include="MainMenu.xib.designer.cs">
       <DependentUpon>MainMenu.xib</DependentUpon>
     </Compile>
-    <Compile Include="..\ControllerBase.cs">
-      <Link>ControllerBase.cs</Link>
-    </Compile>
     <Compile Include="StatusIcon.cs" />
     <Compile Include="UI.cs" />
     <Compile Include="..\Program.cs">
@@ -80,20 +77,11 @@
     <Compile Include="Badger.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SetupWindow.cs" />
-    <Compile Include="..\SetupController.cs">
-      <Link>SetupController.cs</Link>
-    </Compile>
     <Compile Include="..\StatusIconController.cs">
       <Link>StatusIconController.cs</Link>
     </Compile>
-    <Compile Include="..\AboutController.cs">
-      <Link>AboutController.cs</Link>
-    </Compile>
     <Compile Include="Controller.cs" />
     <Compile Include="About.cs" />
-    <Compile Include="..\CertPolicyHandler.cs">
-      <Link>CertPolicyHandler.cs</Link>
-    </Compile>
     <Compile Include="..\Properties\Resources.Designer.cs">
       <Link>Resources.Designer.cs</Link>
     </Compile>
@@ -225,10 +213,10 @@
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
-        <MonoDevelop.Autotools.MakefileInfo RelativeMakefileName="Makefile.am" IsAutotoolsProject="True" RelativeConfigureInPath="../..">
-          <BuildFilesVar Sync="True" Name="ASSEMBLY_INFO_SOURCE" />
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am" IsAutotoolsProject="True" RelativeConfigureInPath="../..">
+          <BuildFilesVar Sync="True" Name="SOURCES" />
           <DeployFilesVar />
-          <ResourcesVar Sync="True" Name="RESOURCES" />
+          <ResourcesVar Sync="True" Name="RESOURCES_RESOURCES" />
           <OthersVar />
           <GacRefVar />
           <AsmRefVar />
