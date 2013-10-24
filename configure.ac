@@ -257,7 +257,9 @@ if test "$OSNAME" = "Darwin" ; then
     AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
-dnl    AC_SUBST(MONOMAC,[-r:XamMac.dll])
+    AC_SUBST(DRAWING, [-r:System.Drawing.dll])
+    PKG_CHECK_MODULES(MONOMAC, xammac)
+    AC_SUBST(MONOMAC_LIBS)
 
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES} -define:__COCOA__")
     GUISUBDIRS=CmisSync
