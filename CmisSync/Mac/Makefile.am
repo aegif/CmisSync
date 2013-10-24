@@ -26,11 +26,7 @@ SOURCES =  \
 RESOURCES = $(RESOURCES_RESOURCES)
 
 RESOURCES_RESX = $(wildcard $(srcdir)/../Properties/*.resx)
-RESOURCES_RESOURCES =  \
-	$(addprefix \
-	$(RESOURCES_RESX)))) \
-	%.resx,%.resources,$(notdir \
-	CmisSync.,$(patsubst
+RESOURCES_RESOURCES = $(addprefix CmisSync.,$(patsubst %.resx,%.resources,$(notdir $(RESOURCES_RESX))))
 
 CmisSync.%.resources: $(srcdir)/../Properties/%.resx
 	resgen2 $< $@
