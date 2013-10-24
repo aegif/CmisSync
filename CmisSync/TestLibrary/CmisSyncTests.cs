@@ -592,7 +592,7 @@ namespace TestLibrary
                     // Create a list of file names
                     List<string> files = new List<string>();
                     for(int i = 1 ; i <= 10; i++) {
-                        string filename =  "file" + i + ".bin";
+                        string filename =  String.Format("file{0}.bin", i.ToString());
                         files.Add(filename);
                     }
                     // Sizes of the files
