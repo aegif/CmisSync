@@ -145,6 +145,7 @@ namespace CmisSync.Lib.Sync
                 IDocument remoteDocument = null;
                 string remotePath = null;
                 ICmisObject remoteObject = null;
+                IFolder remoteParent = null;
 
                 try
                 {
@@ -152,7 +153,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch(CmisObjectNotFoundException)
                 {
-                    Logger.Warn("Ignore the missed object for " + change.ObjectId);
+                    Logger.Info("Ignore the missed object for " + change.ObjectId);
                     return true;
                 }
                 catch (Exception ex)
@@ -162,6 +163,12 @@ namespace CmisSync.Lib.Sync
                 }
 
                 remoteDocument = cmisObject as IDocument;
+                remoteFolder = cmisObject as IFolder;
+                if (remoteDocument == null && remoteFolder == null)
+                {
+                    Logger.Info("Change in no sync object: " + change.ObjectId);
+                    return true;
+                }
                 if (remoteDocument != null)
                 {
                     if (!Utils.WorthSyncing(remoteDocument.Name))
@@ -169,23 +176,19 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("Change in remote unworth syncing file: " + remoteDocument.Paths);
                         return true;
                     }
-                    // TODO PLEASE CHECK, IF THIS IS CORRECT! PATHS COULD CONTAIN MULTIPLE PATHS TO THE TARGET FILE
-                    remotePath = Path.Combine(remoteDocument.Paths.ToArray()).Replace('\\', '/');
+                    if (remoteDocument.Paths.Count == 0)
+                    {
+                        Logger.Info("Ignore the unfiled object: " + remoteDocument.Name);
+                        return true;
+                    }
+                    // TODO: Support Multiple Paths
+                    remotePath = remoteDocument.Paths[0];
+                    remoteParent = remoteDocument.Parents[0];
                 }
-                else
+                if (remoteFolder != null)
                 {
-                    remoteFolder = cmisObject as IFolder;
-                    if (remoteFolder == null)
-                    {
-                        Logger.Info("Change in no sync object: " + change.ObjectId);
-                        return true;
-                    }
                     remotePath = remoteFolder.Path;
-                    if (this.repoinfo.isPathIgnored(remotePath))
-                    {
-                        Logger.Info("Change in ignored path: " + remotePath);
-                        return true;
-                    }
+                    remoteParent = remoteFolder.FolderParent;
                     foreach (string name in remotePath.Split('/'))
                     {
                         if (!String.IsNullOrEmpty(name) && Utils.IsInvalidFolderName(name))
@@ -196,10 +199,16 @@ namespace CmisSync.Lib.Sync
                     }
                 }
 
-                if (!remotePath.StartsWith(remoteFolderPath))
+                if (!remotePath.StartsWith(this.remoteFolderPath))
                 {
                     Logger.Info("Change in unrelated path: " + remotePath);
                     return true;    // The change is not under the folder we care about.
+                }
+
+                if (this.repoinfo.isPathIgnored(remotePath))
+                {
+                    Logger.Info("Change in ignored path: " + remotePath);
+                    return true;
                 }
 
                 string relativePath = remotePath.Substring(remoteFolderPath.Length);
@@ -235,9 +244,15 @@ namespace CmisSync.Lib.Sync
                 }
 
                 string localPath = Path.Combine(repoinfo.TargetDirectory, relativePath).Replace('/', Path.DirectorySeparatorChar);
+                if (!DownloadFolder(remoteParent, Path.GetDirectoryName(localPath)))
+                {
+                    Logger.Warn("Failed to download the parent folder for " + localPath);
+                    return false;
+                }
 
                 if (null != remoteDocument)
                 {
+                    Logger.Info(String.Format("New remote file ({0}) found.", remotePath));
                     //  check moveObject
                     string savedDocumentPath = database.GetFilePath(change.ObjectId);
                     if ((null != savedDocumentPath) && (savedDocumentPath != localPath))
@@ -267,6 +282,7 @@ namespace CmisSync.Lib.Sync
 
                 if (null != remoteFolder)
                 {
+                    Logger.Info(String.Format("New remote folder ({0}) found.", remotePath));
                     //  check moveObject
                     string savedFolderPath = database.GetFolderPath(change.ObjectId);
                     if ((null != savedFolderPath) && (savedFolderPath != localPath))
@@ -338,6 +354,26 @@ namespace CmisSync.Lib.Sync
                 }
 
                 return true;
+            }
+
+            private bool DownloadFolder(IFolder remoteFolder, string localFolder)
+            {
+                if (Directory.Exists(localFolder))
+                {
+                    return true;
+                }
+                if (remoteFolder == null)
+                {
+                    return false;
+                }
+                if (!Directory.Exists(Path.GetDirectoryName(localFolder)))
+                {
+                    if (!DownloadFolder(remoteFolder.FolderParent, Path.GetDirectoryName(localFolder)))
+                    {
+                        return false;
+                    }
+                }
+                return SyncDownloadFolder(remoteFolder, Path.GetDirectoryName(localFolder));
             }
         }
     }
