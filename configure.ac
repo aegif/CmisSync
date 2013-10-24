@@ -230,7 +230,7 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
 
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
-	GUISUBDIRS=CmisSync
+    GUISUBDIRS=CmisSync
     enable_gtkui=yes
 	cocoa=false
 	macos=false
@@ -257,9 +257,10 @@ if test "$OSNAME" = "Darwin" ; then
     AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
+dnl    AC_SUBST(MONOMAC,[-r:XamMac.dll])
 
-    AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
-	GUISUBDIRS=CmisSync
+    AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES} -define:__COCOA__")
+    GUISUBDIRS=CmisSync
     enable_gtkui=no
 	cocoa=true
 	macos=true
