@@ -12,8 +12,7 @@ EXTRA_DIST = \
 	legal/AUTHORS.txt \
 	Extras/DotCMIS.dll \
 	Extras/Newtonsoft.Json.dll \
-	Extras/nunit.framework.dll \
-	Extras/DotCMIS.dll
+	Extras/nunit.framework.dll
 
 DISTCLEANFILES = \
 	intltool-extract \
