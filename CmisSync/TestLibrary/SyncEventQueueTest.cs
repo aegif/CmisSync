@@ -49,11 +49,12 @@ namespace TestLibrary
             var eventMock = new Mock<ISyncEvent>();
             using(SyncEventQueue queue = new SyncEventQueue(managerMock.Object)){
                 queue.AddEvent(eventMock.Object);
+                queue.AddEvent(eventMock.Object);
                 queue.StopListener();
                 WaitFor(queue, (q) => { return q.IsStopped; } );
                 Assert.True(queue.IsStopped);
             }
-            managerMock.Verify(foo => foo.Handle(eventMock.Object));
+            managerMock.Verify(foo => foo.Handle(eventMock.Object), Times.Exactly(2));
         }
 
         [Test]
