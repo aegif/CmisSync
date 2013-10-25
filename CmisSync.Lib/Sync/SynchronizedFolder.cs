@@ -1091,12 +1091,18 @@ namespace CmisSync.Lib.Sync
                                     contentStream.Length = 0;
                                     contentStream.Stream = new MemoryStream(0);
                                     Logger.Debug("CMIS::CreateDocument()");
-                                    remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                                    Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
-                                                                   remoteDocument.Id, fileName));
-                                    Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-                                    database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
-
+                                    lock (disposeLock)
+                                    {
+                                        if (disposed)
+                                        {
+                                            throw new ObjectDisposedException("Uploading");
+                                        }
+                                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                        Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
+                                                                       remoteDocument.Id, fileName));
+                                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+                                        database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                                    }
                                     success = UploadStreamInTrunk(filePath, file, remoteDocument);
                                 }
                             }

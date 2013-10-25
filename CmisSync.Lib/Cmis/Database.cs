@@ -227,7 +227,7 @@ namespace CmisSync.Lib.Cmis
         /// Calculate the SHA1 checksum of a file.
         /// Code from http://stackoverflow.com/a/1993919/226958
         /// </summary>
-        private string Checksum(string filePath)
+        public static string Checksum(string filePath)
         {
             using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             using (var bs = new BufferedStream(fs))
@@ -243,7 +243,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Transforms a given hash into a string
         /// </summary>
-        private string ChecksumToString(byte[] hash)
+        private static string ChecksumToString(byte[] hash)
         {
             if(hash == null || hash.Length == 0) return String.Empty;
             StringBuilder formatted = new StringBuilder(2 * hash.Length);
