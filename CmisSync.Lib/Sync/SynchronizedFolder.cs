@@ -458,15 +458,15 @@ namespace CmisSync.Lib.Sync
 
                 for (long offset = fileInfo.Length; offset < fileLength; offset += repoinfo.ChunkSize)
                 {
-                    IContentStream contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.ChunkSize);
-                    using (contentStream.Stream)
+                    lock (disposeLock)
                     {
-                        lock (disposeLock)
+                        if (disposed)
                         {
-                            if (disposed)
-                            {
-                                throw new ObjectDisposedException("Downloading");
-                            }
+                            throw new ObjectDisposedException("Downloading");
+                        }
+                        IContentStream contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.ChunkSize);
+                        using (contentStream.Stream)
+                        {
                             byte[] buffer = new byte[8 * 1024];
                             int len;
                             while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)

@@ -677,6 +677,17 @@ namespace TestLibrary
             string checksum1 = Database.Checksum(file);
             string checksum2 = Database.Checksum(file2);
             Assert.IsTrue(checksum1 == checksum2);
+
+            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
+                repoInfo2,
+                activityListener,
+                cmis2))
+            {
+                // Clean.
+                Console.WriteLine("Clean all.");
+                Clean(localDirectory2, synchronizedFolder2);
+            }
         }
 
 
