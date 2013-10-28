@@ -78,6 +78,7 @@
     <Compile Include="Events\SyncEvent.cs" />
     <Compile Include="Events\SyncEventManager.cs" />
     <Compile Include="Events\SyncEventHandler.cs" />
+    <Compile Include="Events\SyncEventQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1490179-src\DotCMIS.csproj">
