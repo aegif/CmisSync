@@ -734,7 +734,7 @@ namespace TestLibrary
                         files.Add(filename);
                     }
                     // Sizes of the files
-                    int[] sizes = {1024, 2048, 324, 3452, 43256};
+                    int[] sizes = {1024, 2048, 324, 3452, 0, 43256};
                     // Create and modify all files and start syncing to ensure that any local modification is uploaded correctly
                     foreach ( int length in sizes )
                     {
