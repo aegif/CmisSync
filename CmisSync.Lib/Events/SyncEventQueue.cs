@@ -91,7 +91,6 @@ namespace CmisSync.Lib.Events
                 Logger.Warn("Disposing a not yet stopped SyncEventQueue");
             }
             if(isDisposing) {
-                this.consumer.Dispose();
                 this.queue.Dispose();
             }
             this.alreadyDisposed = true;
