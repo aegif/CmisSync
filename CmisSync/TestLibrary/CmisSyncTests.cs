@@ -553,6 +553,144 @@ namespace TestLibrary
             }
         }
 
+
+        [Test, TestCaseSource("TestServers")]
+        public void ResumeBigFile(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            string canonical_name2 = canonical_name + ".BigFile";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            CleanDirectory(localDirectory);
+            CleanDirectory(localDirectory2);
+            Console.WriteLine("Synced to clean state.");
+
+            string filename = "ResumeBigFile.File";
+            int fileSizeInMB = 10;
+            string file = Path.Combine(localDirectory, filename);
+            string file2 = Path.Combine(localDirectory2, filename);
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            repoInfo.ChunkSize = 1024 * 1024;
+            RepoInfo repoInfo2 = new RepoInfo(
+                    canonical_name2,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            repoInfo2.ChunkSize = 1024 * 1024;
+
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                cmis))
+            {
+                synchronizedFolder.resetFailedOperationsCounter();
+                synchronizedFolder.Sync();
+                CleanAll(localDirectory);
+                WatcherTest.WaitWatcher();
+                synchronizedFolder.Sync();
+                Console.WriteLine("Synced to clean state.");
+            }
+
+            //  create file
+            byte[] data = new byte[1024 * 1024];
+            new Random().NextBytes(data);
+            using (FileStream stream = File.OpenWrite(file))
+            {
+                for (int i = 0; i < fileSizeInMB; i++)
+                {
+                    stream.Write(data, 0, data.Length);
+                }
+            }
+            string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
+
+            Console.WriteLine(String.Format("Upload big file size: {0}MB", fileSizeInMB));
+            for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 100; ++retry)
+            {
+                using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                    repoInfo,
+                    activityListener,
+                    cmis))
+                {
+                    synchronizedFolder.SyncInBackground();
+                    System.Threading.Thread.Sleep(1000);
+                }
+
+                try
+                {
+                    IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+                    long fileSize = doc.ContentStreamLength ?? 0;
+                    Assert.IsTrue(0 == fileSize % (1024 * 1024));
+                    currentFileSizeInMB = (int)(fileSize / 1024 / 1024);
+                }
+                catch (Exception)
+                {
+                }
+                Console.WriteLine("Upload big file, current size: {0}MB", currentFileSizeInMB);
+            }
+
+            Console.WriteLine(String.Format("Download big file size: {0}MB", fileSizeInMB));
+            for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 100; ++retry)
+            {
+                using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+                using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
+                    repoInfo2,
+                    activityListener,
+                    cmis2))
+                {
+                    synchronizedFolder2.SyncInBackground();
+                    System.Threading.Thread.Sleep(1000);
+                }
+
+                string file2Tmp = file2 + ".sync";
+                FileInfo info = new FileInfo(file2);
+                FileInfo infoTmp = new FileInfo(file2Tmp);
+                if (infoTmp.Exists)
+                {
+                    currentFileSizeInMB = (int)(infoTmp.Length / 1024 / 1024);
+                }
+                else if (info.Exists)
+                {
+                    currentFileSizeInMB = (int)(info.Length / 1024 / 1024);
+                }
+                Console.WriteLine("Download big file, current size: {0}MB", currentFileSizeInMB);
+            }
+
+            string checksum1 = Database.Checksum(file);
+            string checksum2 = Database.Checksum(file2);
+            Assert.IsTrue(checksum1 == checksum2);
+
+            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
+                repoInfo2,
+                activityListener,
+                cmis2))
+            {
+                // Clean.
+                Console.WriteLine("Clean all.");
+                Clean(localDirectory2, synchronizedFolder2);
+            }
+        }
+
+
         // Goal: Make sure that CmisSync works for uploading modified files.
         [Test, TestCaseSource("TestServers")]
         public void SyncUploads(string canonical_name, string localPath, string remoteFolderPath,

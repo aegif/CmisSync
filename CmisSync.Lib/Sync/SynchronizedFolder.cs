@@ -458,15 +458,15 @@ namespace CmisSync.Lib.Sync
 
                 for (long offset = fileInfo.Length; offset < fileLength; offset += repoinfo.ChunkSize)
                 {
-                    IContentStream contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.ChunkSize);
-                    using (contentStream.Stream)
+                    lock (disposeLock)
                     {
-                        lock (disposeLock)
+                        if (disposed)
                         {
-                            if (disposed)
-                            {
-                                throw new ObjectDisposedException("Downloading");
-                            }
+                            throw new ObjectDisposedException("Downloading");
+                        }
+                        IContentStream contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.ChunkSize);
+                        using (contentStream.Stream)
+                        {
                             byte[] buffer = new byte[8 * 1024];
                             int len;
                             while ((len = contentStream.Stream.Read(buffer, 0, buffer.Length)) > 0)
@@ -1091,12 +1091,18 @@ namespace CmisSync.Lib.Sync
                                     contentStream.Length = 0;
                                     contentStream.Stream = new MemoryStream(0);
                                     Logger.Debug("CMIS::CreateDocument()");
-                                    remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                                    Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
-                                                                   remoteDocument.Id, fileName));
-                                    Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-                                    database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
-
+                                    lock (disposeLock)
+                                    {
+                                        if (disposed)
+                                        {
+                                            throw new ObjectDisposedException("Uploading");
+                                        }
+                                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                        Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
+                                                                       remoteDocument.Id, fileName));
+                                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+                                        database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                                    }
                                     success = UploadStreamInTrunk(filePath, file, remoteDocument);
                                 }
                             }
