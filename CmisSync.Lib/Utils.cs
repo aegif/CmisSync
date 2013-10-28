@@ -210,10 +210,10 @@ namespace CmisSync.Lib
         /// <param name='input'>
         /// If set to <c>true</c> input.
         /// </param>
-        public static bool IsValidISO(string input)
+        public static bool IsValidISO88591(string input)
         {
-            byte[] bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(input);
-            String result = Encoding.GetEncoding("ISO-8859-1").GetString(bytes);
+            byte[] bytes = Encoding.GetEncoding(28591).GetBytes(input);
+            String result = Encoding.GetEncoding(28591).GetString(bytes);
             return String.Equals(input, result);
         }
 
@@ -223,7 +223,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsInvalidFileName(string name)
         {
-            bool ret = invalidFileNameRegex.IsMatch(name) && !IsValidISO(name);
+            bool ret = invalidFileNameRegex.IsMatch(name) && !IsValidISO88591(name);
             if (ret) {
                 Logger.Debug("Invalid filename: " + name);
             }
@@ -243,7 +243,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsInvalidFolderName(string name)
         {
-            bool ret = invalidFolderNameRegex.IsMatch(name) && !IsValidISO(name);
+            bool ret = invalidFolderNameRegex.IsMatch(name) && !IsValidISO88591(name);
             if (ret) {
                 Logger.Debug("Invalid dirname: " + name);
             }

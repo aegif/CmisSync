@@ -62,7 +62,7 @@ namespace CmisSync {
         private string backText =
             CmisSync.Properties_Resources.Back;
 
-        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, RepoInfo.CmisPassword password);
 
         delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
             string address, string user, string password);

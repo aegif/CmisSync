@@ -1182,6 +1182,84 @@ namespace TestLibrary
             }
         }
 
+        // Goal: Make sure that CmisSync works for empty files without creating conflict files.
+        [Test, TestCaseSource("TestServers")]
+        public void SyncEmptyFileEquality(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            string canonical_name2 = canonical_name + ".equality";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            CleanDirectory(localDirectory);
+            CleanDirectory(localDirectory2);
+            Console.WriteLine("Synced to clean state.");
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            RepoInfo repoInfo2 = new RepoInfo(
+                    canonical_name2,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                cmis))
+            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
+                repoInfo2,
+                activityListener,
+                cmis2))
+            using (Watcher watcher = new Watcher(localDirectory))
+            using (Watcher watcher2 = new Watcher(localDirectory2))
+            {
+                synchronizedFolder.resetFailedOperationsCounter();
+                synchronizedFolder2.resetFailedOperationsCounter();
+                synchronizedFolder.Sync();
+                synchronizedFolder2.Sync();
+                CleanAll(localDirectory);
+                CleanAll(localDirectory2);
+                WatcherTest.WaitWatcher();
+                synchronizedFolder.Sync();
+                synchronizedFolder2.Sync();
+                Console.WriteLine("Synced to clean state.");
+                string filename = "empty-file.bin";
+                string file = Path.Combine(localDirectory, filename);
+                string file2 = Path.Combine(localDirectory2, filename);
+                watcher.EnableRaisingEvents = true;
+                // Writing an empty file to the first local folder
+                using(FileStream stream = File.Create(Path.Combine(localDirectory, filename))){
+                    stream.Close();
+                };
+                WatcherTest.WaitWatcher((int)repoInfo.PollInterval, watcher, 1);
+                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
+                    return WaitUntilSyncIsDone(synchronizedFolder2, delegate{
+                        int files = Directory.GetFiles(localDirectory).Length;
+                        int files2 = Directory.GetFiles(localDirectory2).Length;
+                        Assert.LessOrEqual(files, 1, String.Format("There are more files ({0}) as has been created in the source repo", files));
+                        Assert.LessOrEqual(files2, 1, String.Format("There are more files ({0}) as has been created in the target repo", files));
+                        return File.Exists(file) && File.Exists(file2);
+                    }, 1);
+                    }, 20));
+            }
+        }
+
 
         // Goal: Make sure that CmisSync works for heavy folder.
         [Test, TestCaseSource("TestServers")]

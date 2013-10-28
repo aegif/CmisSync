@@ -1065,7 +1065,7 @@ namespace CmisSync.Lib.Sync
                                                 Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
                                                                            remoteDocument.Id, fileName));
                                             } catch(Exception e) {
-                                                string reason = Utils.IsValidISO(fileName)?String.Empty:" Reason: Upload perhaps failed because of an invalid UTF-8 character";
+                                                string reason = Utils.IsValidISO88591(fileName)?String.Empty:" Reason: Upload perhaps failed because of an invalid ISO 8859-1 character";
                                                 Logger.Info(String.Format("Could not create the remote document {0} as target for local document {1}{2}", fileName, filePath, reason));
                                                 throw;
                                             }
@@ -1313,7 +1313,7 @@ namespace CmisSync.Lib.Sync
                                 }
                             }
 
-                            Logger.Debug(String.Format("after SetContentStream to remote object ({0})",remoteFile.Id));
+                            Logger.Debug(String.Format("after SetContentStream to remote object ({0})", remoteFile.Id));
                             Logger.Info(String.Format("## Updated {0} ({1})", filePath, remoteFile.Id));
                             success = true;
                         }
