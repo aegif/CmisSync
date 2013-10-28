@@ -1,23 +1,26 @@
-using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using DotCMIS.Client;
-using DotCMIS;
-using DotCMIS.Client.Impl;
-using DotCMIS.Exceptions;
-using DotCMIS.Enums;
-using System.ComponentModel;
-using System.Collections;
-using DotCMIS.Data.Impl;
-
-using System.Net;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Events;
+
+using DotCMIS.Client.Impl;
+using DotCMIS.Client;
+using DotCMIS.Data.Impl;
 using DotCMIS.Data;
-using log4net;
+using DotCMIS.Enums;
+using DotCMIS.Exceptions;
+using DotCMIS;
+
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
+using System.Text;
+using System;
+
+using log4net;
 
 namespace CmisSync.Lib.Sync
 {
@@ -127,9 +130,13 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Link to parent object.
             /// </summary>
+
             private RepoBase repo;
-
-
+            /// <summary>
+            /// Link to parent object.
+            /// </summary>
+            private SyncEventQueue queue;
+            
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
             /// </summary>
@@ -144,6 +151,9 @@ namespace CmisSync.Lib.Sync
                 this.repo = repoCmis;
                 this.activityListener = listener;
                 this.repoinfo = repoInfo;
+
+                var eventManager = new SyncEventManager(); 
+                this.queue = new SyncEventQueue(eventManager);
 
                 // Database is the user's AppData/Roaming
                 database = new Database(repoinfo.CmisDatabase);
@@ -197,6 +207,7 @@ namespace CmisSync.Lib.Sync
                         if (disposing)
                         {
                             this.database.Dispose();
+                            this.queue.Dispose();
                         }
                         this.disposed = true;
                     }
