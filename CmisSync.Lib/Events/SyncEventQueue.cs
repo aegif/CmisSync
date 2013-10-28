@@ -10,8 +10,12 @@ namespace CmisSync.Lib.Events
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncEventQueue));
 
         private BlockingCollection<ISyncEvent> queue = new BlockingCollection<ISyncEvent>();
+
         private SyncEventManager manager;
+        
         private Task consumer;
+
+        private bool alreadyDisposed = false;
         
         private static void Listen(BlockingCollection<ISyncEvent> queue, SyncEventManager manager){
             Logger.Debug("Starting to listen on SyncEventQueue");
@@ -22,8 +26,8 @@ namespace CmisSync.Lib.Events
                 // Blocks if number.Count == 0 
                 // IOE means that Take() was called on a completed collection. 
                 // Some other thread can call CompleteAdding after we pass the 
-                // IsCompleted check but before we call Take.  
-                // In this example, we can simply catch the exception since the  
+                // IsCompleted check but before we call Take.
+                // In this example, we can simply catch the exception since the
                 // loop will break on the next iteration. 
                 try
                 {
@@ -46,6 +50,9 @@ namespace CmisSync.Lib.Events
 
         /// <exception cref="InvalidOperationException">When Listener is already stopped</exception>
         public void AddEvent(ISyncEvent newEvent) {
+            if(alreadyDisposed) {
+                throw new ObjectDisposedException("SyncEventQueue", "Called AddEvent on Disposed object");
+            }
             this.queue.Add(newEvent);
         } 
 
@@ -59,6 +66,9 @@ namespace CmisSync.Lib.Events
         }
 
         public void StopListener() {
+            if(alreadyDisposed) {
+                return;
+            }
             this.queue.CompleteAdding();
         }            
         
@@ -69,11 +79,22 @@ namespace CmisSync.Lib.Events
         }
 
         public void Dispose() {
-            if(!IsStopped){
-                Logger.Error("Disposing a not yet stopped SyncEventQueue - implementation error");
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool isDisposing) {
+            if(alreadyDisposed) {
+                return;
             }
-            this.consumer.Dispose();
-            this.queue.Dispose();
+            if(!IsStopped){
+                Logger.Warn("Disposing a not yet stopped SyncEventQueue");
+            }
+            if(isDisposing) {
+                this.consumer.Dispose();
+                this.queue.Dispose();
+            }
+            this.alreadyDisposed = true;
         }
     }
 }
