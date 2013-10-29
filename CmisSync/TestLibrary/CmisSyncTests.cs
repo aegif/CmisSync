@@ -629,7 +629,7 @@ namespace TestLibrary
             string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
 
             Console.WriteLine(String.Format("Upload big file size: {0}MB", fileSizeInMB));
-            for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 100; ++retry)
+            for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 20; ++retry)
             {
                 using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
@@ -637,8 +637,10 @@ namespace TestLibrary
                     activityListener,
                     cmis))
                 {
-                    synchronizedFolder.SyncInBackground();
-                    System.Threading.Thread.Sleep(1000);
+                    //  disable the chunk upload
+                    //synchronizedFolder.SyncInBackground();
+                    //System.Threading.Thread.Sleep(1000);
+                    synchronizedFolder.Sync();
                 }
 
                 try
@@ -655,7 +657,7 @@ namespace TestLibrary
             }
 
             Console.WriteLine(String.Format("Download big file size: {0}MB", fileSizeInMB));
-            for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 100; ++retry)
+            for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 20; ++retry)
             {
                 using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
                 using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
