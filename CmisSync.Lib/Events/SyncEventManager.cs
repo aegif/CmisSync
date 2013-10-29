@@ -15,10 +15,10 @@ namespace CmisSync.Lib.Events
         {
             int pos;
             for( pos = 0; pos < this.handler.Count; pos++) {
-                if(h.GetPriority() > handler[pos].GetPriority())
+                if(h.Priority > handler[pos].Priority)
                 {
                     break;
-                } else if(h.GetPriority() == handler[pos].GetPriority() && h==handler[pos])
+                } else if(h.Priority == handler[pos].Priority && h==handler[pos])
                 {
                     return;
                 }
