@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-dnl test8
+dnl test9
 m4_define([cmissync_version], [1.0.0])
 
 AC_PREREQ([2.54])
