@@ -38,6 +38,8 @@ R: Gendarme.Rules.Correctness.TypesWithDisposableFieldsShouldBeDisposableRule
 T: CmisSync.UI
 T: CmisSync.StatusIcon
 T: CmisSync.ControllerBase
+#  http://blogs.msdn.com/b/pfxteam/archive/2012/03/25/10287435.aspx
+T: CmisSync.Lib.Events.SystemEventQueue
 
 #Ignore dispose pattern for UI widget (Windows)
 R: Gendarme.Rules.Design.TypesWithDisposableFieldsShouldBeDisposableRule

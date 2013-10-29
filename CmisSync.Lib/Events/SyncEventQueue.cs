@@ -13,8 +13,6 @@ namespace CmisSync.Lib.Events
 
         private SyncEventManager manager;
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "DisposableFieldsShouldBeDisposedRule")]
-        // http://blogs.msdn.com/b/pfxteam/archive/2012/03/25/10287435.aspx
         private Task consumer;
 
         private bool alreadyDisposed = false;
