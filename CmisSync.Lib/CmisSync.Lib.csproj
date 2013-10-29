@@ -75,7 +75,8 @@
     <Compile Include="Defines.cs" />
     <Compile Include="IActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />
-    <Compile Include="Events\SyncEvent.cs" />
+    <Compile Include="Events\ISyncEvent.cs" />
+    <Compile Include="Events\FSEvent.cs" />
     <Compile Include="Events\SyncEventManager.cs" />
     <Compile Include="Events\SyncEventHandler.cs" />
     <Compile Include="Events\SyncEventQueue.cs" />

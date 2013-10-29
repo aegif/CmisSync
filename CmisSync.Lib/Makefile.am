@@ -18,7 +18,8 @@ SOURCES =  \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
-	Events/SyncEvent.cs \
+	Events/ISyncEvent.cs \
+	Events/FSEvent.cs \
 	Events/SyncEventHandler.cs \
 	Events/SyncEventManager.cs \
 	Events/SyncEventQueue.cs \

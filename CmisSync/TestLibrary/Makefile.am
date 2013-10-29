@@ -16,6 +16,7 @@ SOURCES =  \
 	CmisDatabaseTest.cs \
 	ChunkedStreamTest.cs \
 	SyncEventQueueTest.cs \
+	EventTypesTest.cs \
 	LocalFilesystemActivityGenerator.cs
 
 EXTRA_DIST = TestLibrary.csproj \
