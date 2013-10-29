@@ -276,7 +276,7 @@ namespace CmisSync.Lib
   <log4net>
     <appender name=""CmisSyncFileAppender"" type=""log4net.Appender.RollingFileAppender"">
       <file value=""" + GetLogFilePath() + @""" />
-      <appendToFile value=""true"" />
+      <appendToFile value=""false"" />
       <rollingStyle value=""Size"" />
       <maxSizeRollBackups value=""10"" />
       <maximumFileSize value=""5MB"" />
@@ -292,9 +292,9 @@ namespace CmisSync.Lib
       </layout>
     </appender>
     <root>
-      <level value=""DEBUG"" />
+      <level value=""INFO"" />
       <appender-ref ref=""CmisSyncFileAppender"" />
-      <appender-ref ref=""ConsoleAppender"" />
+      <!-- <appender-ref ref=""ConsoleAppender"" /> -->
     </root>
   </log4net>"))
             {
