@@ -20,7 +20,8 @@ SOURCES =  \
 	ConfigMigration.cs \
 	Events/ISyncEvent.cs \
 	Events/FSEvent.cs \
-	Events/SyncEventHandler.cs \
+	Events/ISyncEventHandler.cs \
+	Events/DebugLoggingHandler.cs \
 	Events/SyncEventManager.cs \
 	Events/SyncEventQueue.cs \
 	Fetcher.cs \
