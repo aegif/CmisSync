@@ -284,6 +284,25 @@ namespace CmisSync.Lib.Sync
             private bool syncFull = false;
 
             /// <summary>
+            /// Forces the full sync independent of FS events or Remote events.
+            /// </summary>
+            public void ForceFullSync()
+            {
+                ForceFullSyncAtNextSync();
+                Sync();
+            }
+
+            /// <summary>
+            /// Forces the full sync at next sync.
+            /// This can be used to ensure a full sync if fs or remote events where lost.
+            /// </summary>
+            public void ForceFullSyncAtNextSync()
+            {
+                syncFull = false;
+            }
+
+
+            /// <summary>
             /// Synchronize between CMIS folder and local folder.
             /// </summary>
             public void Sync()
