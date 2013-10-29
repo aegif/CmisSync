@@ -621,7 +621,7 @@ namespace TestLibrary
                     Assert.IsTrue(Directory.Exists(path1));
                     folder1.DeleteTree(true, null, true);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return !Directory.Exists(path1);
+                        return !Directory.Exists(path1, 20);
                     }));
                     Assert.IsFalse(Directory.Exists(path1));
                     Assert.IsTrue(Directory.Exists(path2));
