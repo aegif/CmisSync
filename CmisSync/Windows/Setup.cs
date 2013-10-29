@@ -56,7 +56,7 @@ namespace CmisSync
         /// </summary>
         public SetupController Controller = new SetupController();
 
-        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, string password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, RepoInfo.CmisPassword password);
 
         /// <summary>
         /// Constructor.
