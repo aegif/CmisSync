@@ -622,7 +622,7 @@ namespace TestLibrary
                     folder1.DeleteTree(true, null, true);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
                         return !Directory.Exists(path1);
-                    }, 40));
+                    }, 20));
                     Assert.IsFalse(Directory.Exists(path1));
                     Assert.IsTrue(Directory.Exists(path2));
                     folder2.DeleteTree(true, null, true);
