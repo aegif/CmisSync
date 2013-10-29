@@ -2,7 +2,7 @@ ASSEMBLY = TestLibrary
 TARGET = library
 
 ASSEMBLY_INFO_SOURCE =  \
-	Properties/AssemblyInfo.cs \
+	Properties/AssemblyInfo.cs
 
 LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) \
 	   $(LIBS_CMISSYNCLIB_DEPS) \
