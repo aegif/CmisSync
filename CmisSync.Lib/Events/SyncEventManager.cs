@@ -5,36 +5,33 @@ namespace CmisSync.Lib.Events
 {
     public class SyncEventManager
     {
-        private List<ISyncEventHandler> handler;
+        private List<SyncEventHandler> handler = new List<SyncEventHandler>();
         public SyncEventManager()
         {
-            handler = new List<ISyncEventHandler>();
         }
 
-        public void AddEventHandler(ISyncEventHandler h)
+        public void AddEventHandler(SyncEventHandler h)
         {
-            int pos;
-            for( pos = 0; pos < this.handler.Count; pos++) {
-                if(h.Priority > handler[pos].Priority)
-                {
-                    break;
-                } else if(h.Priority == handler[pos].Priority && h==handler[pos])
-                {
-                    return;
-                }
+            //The zero-based index of item in the sorted List<T>, 
+            //if item is found; otherwise, a negative number that 
+            //is the bitwise complement of the index of the next 
+            //element that is larger than item or.
+            int pos = handler.BinarySearch(h);
+            if(pos < 0){
+                pos = ~pos;
             }
             handler.Insert(pos, h);
         }
 
         public virtual void Handle(ISyncEvent e) {
-            foreach ( ISyncEventHandler h in handler)
+            foreach ( SyncEventHandler h in handler)
             {
                 if(h.Handle(e))
                     return;
             }
         }
 
-        public void RemoveEventHandler(ISyncEventHandler h)
+        public void RemoveEventHandler(SyncEventHandler h)
         {
             handler.Remove(h);
         }

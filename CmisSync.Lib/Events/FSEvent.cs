@@ -14,7 +14,7 @@ namespace CmisSync.Lib.Events
             Path = path;
         }
 
-        public virtual string ToString() {
+        public override string ToString() {
             return string.Format("FSEvent with type \"{0}\" on path \"{1}\"", Type, Path);
         }
     }

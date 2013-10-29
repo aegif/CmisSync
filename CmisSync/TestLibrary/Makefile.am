@@ -16,6 +16,7 @@ SOURCES =  \
 	CmisDatabaseTest.cs \
 	ChunkedStreamTest.cs \
 	SyncEventQueueTest.cs \
+	SyncEventManagerTest.cs \
 	EventTypesTest.cs \
 	LocalFilesystemActivityGenerator.cs
 

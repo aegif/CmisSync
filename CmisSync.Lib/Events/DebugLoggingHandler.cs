@@ -4,18 +4,18 @@ using log4net;
 
 namespace CmisSync.Lib.Events
 {
-    public class DebugLoggingHandler : ISyncEventHandler
+    public class DebugLoggingHandler : SyncEventHandler
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DebugLoggingHandler));
         private static readonly int DEBUGGINGLOGGERPRIORITY = 10000;
 
-        public bool Handle(ISyncEvent e)
+        public override bool Handle(ISyncEvent e)
         {
             Logger.Debug("Incomming Event: " + e.ToString());
             return false;
         }
 
-        public int Priority
+        public override int Priority
         {
             get {return DEBUGGINGLOGGERPRIORITY;}
         }
