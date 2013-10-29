@@ -323,17 +323,24 @@ namespace TestLibrary
                     {
                         return false;
                     }
-                    using (Stream stream = File.OpenRead(file))
+                    try
                     {
-                        byte[] content = new byte[HeavyFileSize];
-                        stream.Read(content, 0, HeavyFileSize);
-                        for (int i = 0; i < HeavyFileSize; ++i)
+                        using (Stream stream = File.OpenRead(file))
                         {
-                            if (content[i] != (byte)('A' + iFile % 10))
+                            byte[] content = new byte[HeavyFileSize];
+                            stream.Read(content, 0, HeavyFileSize);
+                            for (int i = 0; i < HeavyFileSize; ++i)
                             {
-                                return false;
+                                if (content[i] != (byte)('A' + iFile % 10))
+                                {
+                                    return false;
+                                }
                             }
                         }
+                    }
+                    catch (Exception)
+                    {
+                        return false;
                     }
                 }
             }
@@ -1519,6 +1526,117 @@ namespace TestLibrary
         }
 
 
+        // Goal: Make sure that CmisSync works for concurrent heavy folder.
+        [Test, TestCaseSource("TestServers")]
+        public void SyncConcurrentHeavyFolder(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
+            Console.WriteLine("Synced to clean state.");
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    100);
+
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                cmis))
+            {
+                synchronizedFolder.resetFailedOperationsCounter();
+                synchronizedFolder.Sync();
+                CleanAll(localDirectory);
+                WatcherTest.WaitWatcher();
+                synchronizedFolder.Sync();
+                Console.WriteLine("Synced to clean state.");
+
+                //  Invoke the backend synchronize for concurrent
+                cmis.Initialize();
+
+                ISession session = CreateSession(repoInfo);
+                IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+
+                string name1 = "SyncConcurrent.1";
+                string path1 = Path.Combine(localDirectory, name1);
+                string name2 = "SyncConcurrent.2";
+                string path2 = Path.Combine(localDirectory, name2);
+
+                //  create heavy folder in concurrent
+                Console.WriteLine(" Concurrent create heavy folder");
+                Assert.IsFalse(Directory.Exists(path1));
+                IFolder folder1 = CreateFolder(folder, name1);
+                Assert.IsTrue(WaitUntilDone(delegate
+                {
+                    return Directory.Exists(path1);
+                }));
+                Assert.IsTrue(Directory.Exists(path1));
+                CreateHeavyFolderRemote(folder1);
+                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
+                {
+                    return CheckHeavyFolder(path1);
+                }));
+                Assert.IsTrue(CheckHeavyFolder(path1));
+
+                //  rename heavy folder in concurrent 
+                Console.WriteLine(" Concurrent rename heavy folder");
+                IFolder folder2 = RenameFolder(folder1, name2);
+                Assert.IsTrue(WaitUntilDone(delegate
+                {
+                    return CheckHeavyFolder(path2);
+                }));
+                Assert.IsTrue(CheckHeavyFolder(path2));
+
+                //  move heavy folder in concurrent
+                Console.WriteLine(" Concurrent move heavy folder");
+                folder1 = CreateFolder(folder, name1);
+                folder2.Move(folder, folder1);
+                Assert.IsTrue(WaitUntilDone(delegate
+                {
+                    return CheckHeavyFolder(Path.Combine(path1, name2));
+                }));
+                Assert.IsTrue(CheckHeavyFolder(Path.Combine(path1, name2)));
+
+                //  delete heavy folder in concurrent
+                Console.WriteLine(" Remote delete heavy folder");
+                folder1.DeleteTree(true, null, true);
+                Assert.IsTrue(WaitUntilDone(delegate
+                {
+                    return !Directory.Exists(path1);
+                }));
+                Assert.IsFalse(Directory.Exists(path1));
+
+                //  create and delete heavy folder in concurrent
+                Console.WriteLine(" Remote create and delete heavy folder");
+                cmis.Suspend();
+                folder1 = CreateFolder(folder, name1);
+                CreateHeavyFolderRemote(folder1);
+                cmis.Resume();
+                folder1.DeleteTree(true, null, true);
+                Assert.IsTrue(WaitUntilDone(delegate
+                {
+                    return !Directory.Exists(path1);
+                }));
+                Assert.IsFalse(Directory.Exists(path1));
+
+                // Clean.
+                Console.WriteLine("Clean all.");
+                Clean(localDirectory, synchronizedFolder);
+            }
+        }
+
+
         [Test, TestCaseSource("TestServers")]
         public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -1840,5 +1958,20 @@ namespace TestLibrary
             Console.WriteLine("Sync call was not successful");
             return false;
         }
+
+        public static bool WaitUntilDone(Func<bool> checkStop, int wait = 300000, int pollInterval = 1000)
+        {
+            while (wait > 0)
+            {
+                System.Threading.Thread.Sleep(pollInterval);
+                wait -= pollInterval;
+                if (checkStop())
+                    return true;
+                Console.WriteLine(String.Format("Retry Wait in {0}ms", pollInterval));
+            }
+            Console.WriteLine("Wait was not successful");
+            return false;
+        }
+
     }
 }
