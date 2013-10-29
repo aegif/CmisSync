@@ -59,3 +59,8 @@ M: System.Void CmisSync.Lib.Config::RemoveFolder(System.String)
 #Ignore DotCMIS based rule
 R: Gendarme.Rules.Design.Generic.DoNotExposeNestedGenericSignaturesRule
 M: System.Void CmisSync.Lib.Cmis.CmisUtils/FolderTree::.ctor(System.Collections.Generic.IList`1<DotCMIS.Client.ITree`1<DotCMIS.Client.IFileableCmisObject>>,DotCMIS.Client.IFolder,System.Int32)
+
+#We want to sort only
+R: Gendarme.Rules.Design.ImplementIComparableCorrectlyRule
+T: CmisSync.Lib.Events.SyncEventHandler
+
