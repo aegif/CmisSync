@@ -6,9 +6,9 @@ ASSEMBLY_INFO_SOURCE = Defines.cs
 LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) $(WEBLIBS) $(MONOPOSIX)
 
 SOURCES =  \
-	IActivityListener.cs \
 	ActivityListenerAggregator.cs \
 	Backend.cs \
+	ChunkedStream.cs \
 	Cmis/CmisPermissionDeniedException.cs \
 	Cmis/CmisServerNotFoundException.cs \
 	Cmis/CmisUtils.cs \
@@ -18,7 +18,13 @@ SOURCES =  \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
+	Events/SyncEvent.cs \
+	Events/SyncEventHandler.cs \
+	Events/SyncEventManager.cs \
+	Events/SyncEventQueue.cs \
 	Fetcher.cs \
+	IActivityListener.cs \
+	LoggingStream.cs \
 	RepoBase.cs \
 	RepoInfo.cs \
 	Sync/ChangeLogStrategy.cs \

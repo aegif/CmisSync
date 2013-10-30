@@ -208,7 +208,7 @@
     <value>Einführung überspringen</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Leider kann DataSpace Sync keinen CMIS-Server unter dieser Adresse finden. Bitte prüfen Sie angegebene Adresse. Wenn Sie sich sicher sind das die Adresse stimmt, öffnen Sie diese in einem Browser um das resultierende XML im CmisSync Forum zu Posten.</value>
+    <value>Leider kann DataSpace Sync keinen CMIS-Server unter dieser Adresse finden. Bitte prüfen Sie angegebene Adresse. Wenn Sie sich sicher sind das die Adresse stimmt, öffnen Sie diese in einem Browser und posten Sie die XML Antwort im CmisSync Forum.</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>DataSpace Sync im Autostart hinzufügen</value>
@@ -290,5 +290,17 @@ Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ä
   </data>
   <data name="UntrustedCertificate" xml:space="preserve">
     <value>Unvertrauenswürdiges oder unbekanntes Zertifikat</value>
+  </data>
+  <data name="RemoveFolderFromSync" xml:space="preserve">
+    <value>Synchronisation dauerhaft beenden</value>
+  </data>
+  <data name="RemoveSyncQuestion" xml:space="preserve">
+    <value>Möchten Sie die Synchronisation mit dem Server wirklich dauerhaft beenden?</value>
+  </data>
+  <data name="RemoveSyncTitle" xml:space="preserve">
+    <value>Synchronisation beenden</value>
+  </data>
+  <data name="InvalidRepoName" xml:space="preserve">
+    <value>Der angegebene Name {0} enthält verbotene Zeichen.</value>
   </data>
 </root>

@@ -171,6 +171,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Credits.
+        /// </summary>
+        internal static string Credits {
+            get {
+                return ResourceManager.GetString("Credits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Customize the local folder name.
         /// </summary>
         internal static string Customize {
@@ -280,6 +289,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The directory {0} is already in use by {1}.
+        /// </summary>
+        internal static string FolderAlreadyInUse {
+            get {
+                return ResourceManager.GetString("FolderAlreadyInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help.
         /// </summary>
         internal static string Help {
@@ -309,11 +327,20 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The folder name is invalid. Special characters are not allowed..
+        ///   Looks up a localized string similar to The folder name {0} is invalid. Special characters are not allowed..
         /// </summary>
         internal static string InvalidFolderName {
             get {
                 return ResourceManager.GetString("InvalidFolderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The repository name {0} contains illegal characters.
+        /// </summary>
+        internal static string InvalidRepoName {
+            get {
+                return ResourceManager.GetString("InvalidRepoName", resourceCulture);
             }
         }
         
@@ -369,6 +396,15 @@ namespace CmisSync {
         internal static string MayTakeTime {
             get {
                 return ResourceManager.GetString("MayTakeTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A newer version ({0}) is available!.
+        /// </summary>
+        internal static string NewVersionAvailable {
+            get {
+                return ResourceManager.GetString("NewVersionAvailable", resourceCulture);
             }
         }
         
@@ -445,11 +481,47 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you really want to remove folder from synchronization?.
+        /// </summary>
+        internal static string RemoveSyncQuestion {
+            get {
+                return ResourceManager.GetString("RemoveSyncQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove folder from sync.
+        /// </summary>
+        internal static string RemoveSyncTitle {
+            get {
+                return ResourceManager.GetString("RemoveSyncTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report a problem.
+        /// </summary>
+        internal static string ReportProblem {
+            get {
+                return ResourceManager.GetString("ReportProblem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Resume sync.
         /// </summary>
         internal static string ResumeSync {
             get {
                 return ResourceManager.GetString("ResumeSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are running the latest version..
+        /// </summary>
+        internal static string RunningLatestVersion {
+            get {
+                return ResourceManager.GetString("RunningLatestVersion", resourceCulture);
             }
         }
         
@@ -484,8 +556,8 @@ namespace CmisSync {
         /// <summary>
         ///   Looks up a localized string similar to Sorry, DataSpace Sync can not find a CMIS server at this address.
         ///Please ask your server administrator for the CMIS endpoint URL.
-        ///If you are sure about the address, open it in a browser and send
-        ///the resulting XML to cmissync@aegif.jp.
+        ///If you are sure about the address, open it in a browser and post
+        ///the resulting XML on the cmissync forum..
         /// </summary>
         internal static string Sorry {
             get {
@@ -566,11 +638,29 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version {0}.
+        /// </summary>
+        internal static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View Log.
         /// </summary>
         internal static string ViewLog {
             get {
                 return ResourceManager.GetString("ViewLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Website.
+        /// </summary>
+        internal static string Website {
+            get {
+                return ResourceManager.GetString("Website", resourceCulture);
             }
         }
         

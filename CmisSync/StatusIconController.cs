@@ -184,17 +184,19 @@ namespace CmisSync {
                 this.animation.Stop ();
 
                 UpdateIconEvent (0);
-                UpdateMenuEvent (CurrentState);
+//                UpdateMenuEvent (CurrentState);
             };
 
             // Syncing.
             Program.Controller.OnSyncing += delegate {
-                CurrentState = IconState.Syncing;
-                StateText = Properties_Resources.SyncingChanges;
+                if (CurrentState != IconState.Syncing)
+                {
+                    CurrentState = IconState.Syncing;
+                    StateText = Properties_Resources.SyncingChanges;
+                    UpdateStatusItemEvent(StateText);
 
-                UpdateStatusItemEvent (StateText);
-
-                this.animation.Start ();
+                    this.animation.Start();
+                }
             };
         }
 
@@ -261,7 +263,10 @@ namespace CmisSync {
             Program.Controller.StartOrSuspendRepository(reponame);
             UpdateSuspendSyncFolderEvent(reponame);
         }
-
+        /// <summary>
+        /// Tries to remove a given repo from sync
+        /// </summary>
+        /// <param name="reponame"></param>
         public void RemoveFolderFromSyncClicked(string reponame)
         {
             Program.Controller.RemoveRepositoryFromSync(reponame);

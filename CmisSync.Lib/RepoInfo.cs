@@ -78,6 +78,26 @@ namespace CmisSync.Lib
         /// </summary>
         private List<string> ignoredPaths = new List<string>();
 
+
+        /// <summary>
+        /// Chunk size
+        /// If none zero, CmisSync will divide the document by chunk size for download/upload.
+        /// </summary>
+        public long ChunkSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the max upload retries.
+        /// </summary>
+        /// <value>
+        /// The max upload retries.
+        /// </value>
+        public long MaxUploadRetries { get; set; }
+
+        public long MaxDownloadRetries { get; set; }
+
+        public long MaxDeletionRetries { get; set; }
+
+
         /// <summary>
         /// Simple constructor.
         /// </summary>
@@ -93,6 +113,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Full constructor.
         /// </summary>
+        [Obsolete("Use other contructor outside of testings")]
         public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval)
         {
             Name = name;
@@ -106,6 +127,10 @@ namespace CmisSync.Lib
             RepoID = repoID;
             TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
             PollInterval = pollInterval;
+            ChunkSize = 0;
+            MaxUploadRetries = 2;
+            MaxDownloadRetries = 2;
+            MaxDeletionRetries = 2;
         }
 
         /// <summary>
@@ -138,7 +163,12 @@ namespace CmisSync.Lib
         /// <returns></returns>
         public bool isPathIgnored(string path)
         {
-            return ignoredPaths.Contains(path);
+            if(Utils.IsInvalidFolderName(path.Replace("/", "").Replace("\"","")))
+                return true;
+            return !String.IsNullOrEmpty(ignoredPaths.Find(delegate(string ignore)
+            {
+                return path.StartsWith(ignore);
+            }));
         }
 
         public class CmisPassword

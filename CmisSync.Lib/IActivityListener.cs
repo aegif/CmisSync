@@ -24,4 +24,53 @@ namespace CmisSync.Lib
         /// </summary>
         void ActivityStopped();
     }
+
+
+    /// <summary>
+    /// RAII class for IActivityListener
+    /// </summary>
+    public class ActivityListenerResource : IDisposable
+    {
+        private IActivityListener activityListener;
+
+        private bool disposed = false;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ActivityListenerResource(IActivityListener listener)
+        {
+            activityListener = listener;
+            activityListener.ActivityStarted();
+        }
+
+        /// <summary>
+        /// Implement <code>IDisposable.Dispose</code>
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose pattern
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if(!disposed)
+            {
+                activityListener.ActivityStopped();
+                disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~ActivityListenerResource()
+        {
+            Dispose(false);
+        }
+    }
 }

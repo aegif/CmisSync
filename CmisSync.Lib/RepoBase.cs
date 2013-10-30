@@ -99,7 +99,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Restart syncing.
         /// </summary>
-        public void Resume()
+        public virtual void Resume()
         {
             Status = SyncStatus.Idle;
         }
@@ -120,13 +120,13 @@ namespace CmisSync.Lib
         /// <summary>
         /// Interval at which the local and remote filesystems should be polled.
         /// </summary>
-        private TimeSpan poll_interval = PollInterval.Short;
+        //private TimeSpan poll_interval = PollInterval.Short;
 
 
         /// <summary>
         /// When the local and remote filesystems were last checked for modifications.
         /// </summary>
-        private DateTime last_poll = DateTime.Now;
+        //private DateTime last_poll = DateTime.Now;
 
 
         /// <summary>
@@ -307,6 +307,11 @@ namespace CmisSync.Lib
         /// Synchronization is suspended.
         /// TODO this should be written in XML configuration instead.
         /// </summary>
-        Suspend
+        Suspend,
+
+        /// <summary>
+        /// Any sync conflict or warning happend
+        /// </summary>
+        Warning
     }
 }

@@ -25,15 +25,17 @@ using MonoMac.ObjCRuntime;
 
 using CmisSync.Lib;
 
+using log4net;
+
 namespace CmisSync {
 
 	public class Controller : ControllerBase {
 
-        public override string PluginsPath {
+        /*public override string PluginsPath {
             get {
                 return Path.Combine (NSBundle.MainBundle.ResourcePath, "Plugins");
             }
-        }
+        }*/
 
         // We have to use our own custom made folder watcher, as
         // System.IO.FileSystemWatcher fails watching subfolders on Mac
@@ -56,7 +58,7 @@ namespace CmisSync {
 		}
 
 
-        public override void Initialize ()
+        /*public override void Initialize ()
         {
             base.Initialize ();
 
@@ -86,7 +88,7 @@ namespace CmisSync {
                         repo.OnFileActivity (fse_args);
                 }
             };
-        }
+        }*/
 
 
 		public override void CreateStartupItem ()
@@ -103,15 +105,13 @@ namespace CmisSync {
 
             process.Start ();
             process.WaitForExit ();
-
-            SparkleLogger.LogInfo ("Controller", "Added " + NSBundle.MainBundle.BundlePath + " to login items");
 		}
 
 
-        public override void InstallProtocolHandler ()
+        /*public override void InstallProtocolHandler ()
         {
              // We ship CmisSyncInviteHandler.app in the bundle
-        }
+        }*/
 
 
 		// Adds the CmisSync folder to the user's
@@ -180,20 +180,37 @@ namespace CmisSync {
             }
 		}
 
+		public void OpenCmisSyncFolder (string reponame)
+		{
+			foreach(CmisSync.Lib.RepoBase repo in Program.Controller.Repositories)
+			{
+				if(repo.Name.Equals(reponame))
+				{
+					LocalFolderClicked(repo.LocalPath);
+					break;
+				}
+			}
+			throw new NotImplementedException ();
+		}
 
-		public override void OpenFolder (string path)
+		public void ShowLog (string str)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void LocalFolderClicked (string path)
 		{
 			NSWorkspace.SharedWorkspace.OpenFile (path);
 		}
 		
 
-        public override void OpenFile (string path)
+        public void OpenFile (string path)
         {
             path = Uri.UnescapeDataString (path);
             NSWorkspace.SharedWorkspace.OpenFile (path);
         }
 
-
+		/*
         private string event_log_html;
 		public override string EventLogHTML
 		{
@@ -236,6 +253,6 @@ namespace CmisSync {
 
                return this.event_entry_html;
             }
-        }
+        }*/
 	}
 }

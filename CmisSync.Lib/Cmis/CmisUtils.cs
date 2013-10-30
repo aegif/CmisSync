@@ -51,7 +51,7 @@ namespace CmisSync.Lib.Cmis
         /// Users can provide the URL of the web interface, and we have to return the CMIS URL
         /// Returns the list of repositories as well.
         /// </summary>
-        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(Uri url, string user, string password)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(Uri url, string user, RepoInfo.CmisPassword password)
         {
             Dictionary<string, string> repositories = null;
             Exception firstException = null;
@@ -66,7 +66,6 @@ namespace CmisSync.Lib.Cmis
                 if (e.Message == "ConnectFailure")
                     return new Tuple<CmisServer, Exception>(new CmisServer(url, null), new CmisServerNotFoundException(e.Message, e));
                 firstException = e;
-
             }
             catch (Exception e)
             {
@@ -115,7 +114,7 @@ namespace CmisSync.Lib.Cmis
                 catch (Exception e)
                 {
                     // Do nothing, try other possibilities.
-                    Logger.Info(e.Message);
+                    Logger.Debug(e.Message);
                 }
                 if (repositories != null)
                 {
@@ -134,7 +133,7 @@ namespace CmisSync.Lib.Cmis
         /// Each item contains id + 
         /// </summary>
         /// <returns>The list of repositories. Each item contains the identifier and the human-readable name of the repository.</returns>
-        static public Dictionary<string,string> GetRepositories(Uri url, string user, string password)
+        static public Dictionary<string,string> GetRepositories(Uri url, string user, RepoInfo.CmisPassword password)
         {
             Dictionary<string,string> result = new Dictionary<string,string>();
 
@@ -151,7 +150,7 @@ namespace CmisSync.Lib.Cmis
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url.ToString();
             cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
+            cmisParameters[SessionParameter.Password] = password.ToString();
 
             IList<IRepository> repositories;
             try
@@ -160,27 +159,27 @@ namespace CmisSync.Lib.Cmis
             }
             catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
-                Logger.Error("CMIS server found, but permission denied. Please check username/password. " + Utils.ToLogString(e));
+                Logger.Debug("CMIS server found, but permission denied. Please check username/password. " + Utils.ToLogString(e));
                 throw;
             }
             catch (CmisRuntimeException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Debug("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
                 throw;
             }
             catch (CmisObjectNotFoundException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Debug("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
                 throw;
             }
             catch (CmisConnectionException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Debug("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
                 throw;
             }
             catch (CmisInvalidArgumentException e)
             {
-                Logger.Error("Invalid URL, maybe Alfresco Cloud? " + Utils.ToLogString(e));
+                Logger.Debug("Invalid URL, maybe Alfresco Cloud? " + Utils.ToLogString(e));
                 throw;
             }
 

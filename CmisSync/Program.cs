@@ -66,10 +66,16 @@ namespace CmisSync
             if ( ! firstRun )
                 ConfigMigration.Migrate();
 
-            // Clear log file.
-            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));
+            if(alternativeLog4NetConfigFile.Exists)
+            {
+                log4net.Config.XmlConfigurator.ConfigureAndWatch(alternativeLog4NetConfigFile);
+            }
+            else
+            {
+                log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            }
 
-            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             Logger.Info("Starting.");
 
             if (args.Length != 0 && !args[0].Equals("start") &&
@@ -80,7 +86,7 @@ namespace CmisSync
                 string n = Environment.NewLine;
 
                 Console.WriteLine(n +
-                    "CmisSync is a collaboration and sharing tool that is" + n +
+                    "DataSpace Sync is a collaboration and sharing tool that is" + n +
                     "designed to keep things simple and to stay out of your way." + n +
                     n +
                     "Version: " + CmisSync.Lib.Backend.Version + n +
@@ -90,14 +96,14 @@ namespace CmisSync
                     "This is free software, and you are welcome to redistribute it" + n +
                     "under certain conditions. Please read the GNU GPLv3 for details." + n +
                     n +
-                    "Usage: CmisSync [start|stop|restart]");
+                    "Usage: DataSpaceSync [start|stop|restart]");
                 Environment.Exit(-1);
             }
 
             // Only allow one instance of CmisSync (on Windows)
             if (!program_mutex.WaitOne(0, false))
             {
-                Logger.Error("CmisSync is already running.");
+                Logger.Error("DataSpace Sync is already running.");
                 Environment.Exit(-1);
             }
 

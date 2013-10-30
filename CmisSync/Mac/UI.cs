@@ -22,7 +22,6 @@ using System.IO;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
-using MonoMac.Growl;
 
 namespace CmisSync {
 
@@ -30,8 +29,7 @@ namespace CmisSync {
 
         public StatusIcon StatusIcon;
         public Setup Setup;
-        public Bubbles Bubbles;
-        public About About;
+		public About About;
 		
 		public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
 			"Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
@@ -44,8 +42,8 @@ namespace CmisSync {
         {
             using (var a = new NSAutoreleasePool ())
             {
-                GrowlApplicationBridge.WeakDelegate = this;
-                GrowlApplicationBridge.Delegate     = new CmisSyncGrowlDelegate ();
+//                GrowlApplicationBridge.WeakDelegate = this;
+//                GrowlApplicationBridge.Delegate     = new CmisSyncGrowlDelegate ();
 
                 NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("cmissync-app.icns");
 
@@ -53,7 +51,7 @@ namespace CmisSync {
     
                 Setup      = new Setup ();
                 About      = new About ();
-                Bubbles    = new Bubbles ();
+//                Bubbles    = new Bubbles ();
                 StatusIcon = new StatusIcon ();
 
                 Program.Controller.UIHasLoaded ();
@@ -105,7 +103,7 @@ namespace CmisSync {
         public override void WillBecomeActive (NSNotification notification)
         {
             if (NSApplication.SharedApplication.DockTile.BadgeLabel != null) {
-                Program.Controller.ShowEventLogWindow ();
+                //Program.Controller.ShowEventLogWindow ();
                 NSApplication.SharedApplication.DockTile.BadgeLabel = null;
             }
         }

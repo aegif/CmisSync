@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -147,21 +147,6 @@ namespace CmisSync.Lib
             return msg.ToString();
         }
 
-
-        /// <summary>
-        /// Names of files that must be excluded from synchronization.
-        /// </summary>
-        private static HashSet<String> ignoredFilenames = new HashSet<String>{
-            "~", // gedit and emacs
-            "thumbs.db", "desktop.ini", // Windows
-            "cvs", ".svn", ".git", ".hg", ".bzr", // Version control local settings
-            ".directory", // KDE
-            ".ds_store", ".icon\r", ".spotlight-V100", ".trashes", // Mac OS X
-            ".cvsignore", ".~cvsignore", ".bzrignore", ".gitignore", // Version control ignore list
-            "$~"
-        };
-
-
         /// <summary>
         /// Extensions of files that must be excluded from synchronization.
         /// </summary>
@@ -187,16 +172,24 @@ namespace CmisSync.Lib
                 return false;
             }
 
+            if(IsInvalidFileName(filename))
+                return false;
+
             // TODO: Consider these ones as well:
-            //    "*~", // gedit and emacs
             //    ".~lock.*", // LibreOffice
             //    ".*.sw[a-z]", // vi(m)
             //    "*(Autosaved).graffle", // Omnigraffle
 
+            // "*~", // gedit and emacs
+            if(filename.EndsWith("~"))
+            {
+                Logger.Debug("Unworth syncing: " + filename);
+                return false;
+            }
+
             filename = filename.ToLower();
 
-            if (ignoredFilenames.Contains(filename)
-                || ignoredExtensions.Contains(Path.GetExtension(filename))
+            if (ignoredExtensions.Contains(Path.GetExtension(filename))
                 || filename[0] == '~' // Microsoft Office temporary files start with ~
                 || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
             {
@@ -208,6 +201,22 @@ namespace CmisSync.Lib
             return true;
         }
 
+        /// <summary>
+        /// Determines whether this instance is valid ISO-8859-1 specified input.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if this instance is valid ISO-8859-1 specified input; otherwise, <c>false</c>.
+        /// </returns>
+        /// <param name='input'>
+        /// If set to <c>true</c> input.
+        /// </param>
+        public static bool IsValidISO88591(string input)
+        {
+            byte[] bytes = Encoding.GetEncoding(28591).GetBytes(input);
+            String result = Encoding.GetEncoding(28591).GetString(bytes);
+            return String.Equals(input, result);
+        }
+
 
         /// <summary>
         /// Check whether a file name is valid or not.
@@ -215,8 +224,15 @@ namespace CmisSync.Lib
         public static bool IsInvalidFileName(string name)
         {
             bool ret = invalidFileNameRegex.IsMatch(name);
-            if (ret) {
-                Logger.Debug("Invalid filename: " + name);
+            if (ret)
+            {
+                Logger.Debug(String.Format("The given file name {0} contains invalid patterns", name));
+                return ret;
+            }
+            ret = !IsValidISO88591(name);
+            if (ret)
+            {
+                Logger.Debug(String.Format("The given file name {0} contains invalid characters", name));
             }
             return ret;
         }
@@ -226,7 +242,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a file name is valid or not.
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())) + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:/\\|<>*") + "]");
 
 
         /// <summary>
@@ -235,8 +251,15 @@ namespace CmisSync.Lib
         public static bool IsInvalidFolderName(string name)
         {
             bool ret = invalidFolderNameRegex.IsMatch(name);
-            if (ret) {
-                Logger.Debug("Invalid dirname: " + name);
+            if (ret)
+            {
+                Logger.Debug(String.Format("The given directory name {0} contains invalid patterns", name));
+                return ret;
+            }
+            ret = !IsValidISO88591(name);
+            if (ret)
+            {
+                Logger.Debug(String.Format("The given directory name {0} contains invalid characters", name));
             }
             return ret;
         }
@@ -246,7 +269,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a filename is valid or not.
         /// </summary>
         private static Regex invalidFolderNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?:/\\|<>*") + "]");
 
 
         /// <summary>
@@ -282,21 +305,59 @@ namespace CmisSync.Lib
         }
 
         /// <summary>
-        /// Format a file size nicely with small caps.
-        /// Example: 1048576 becomes "1 ᴍʙ"
+        /// Format a file size nicely.
+        /// Example: 1048576 becomes "1 MB"
         /// </summary>
         public static string FormatSize(double byteCount)
         {
             if (byteCount >= 1099511627776)
-                return String.Format("{0:##.##} ᴛʙ", Math.Round(byteCount / 1099511627776, 1));
+                return String.Format("{0:##.##} TB", Math.Round(byteCount / 1099511627776, 1));
             else if (byteCount >= 1073741824)
-                return String.Format("{0:##.##} ɢʙ", Math.Round(byteCount / 1073741824, 1));
+                return String.Format("{0:##.##} GB", Math.Round(byteCount / 1073741824, 1));
             else if (byteCount >= 1048576)
-                return String.Format("{0:##.##} ᴍʙ", Math.Round(byteCount / 1048576, 0));
+                return String.Format("{0:##.##} MB", Math.Round(byteCount / 1048576, 0));
             else if (byteCount >= 1024)
-                return String.Format("{0:##.##} ᴋʙ", Math.Round(byteCount / 1024, 0));
+                return String.Format("{0:##.##} KB", Math.Round(byteCount / 1024, 0));
             else
                 return byteCount.ToString() + " bytes";
+        }
+
+        /// <summary>
+        /// Format a file size nicely.
+        /// Example: 1048576 becomes "1 MB"
+        /// </summary>
+        public static string FormatSize(long byteCount)
+        {
+            return FormatSize((double) byteCount);
+        }
+
+        
+        /// <summary>
+        /// Whether a file or directory is a symbolic link.
+        /// </summary>
+        public static bool IsSymlink(string path)
+        {
+            FileInfo fileinfo = new FileInfo(path);
+            if(fileinfo.Exists)
+                return IsSymlink(fileinfo);
+            DirectoryInfo dirinfo = new DirectoryInfo(path);
+            if(dirinfo.Exists)
+                return IsSymlink(dirinfo);
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether this instance is a symlink the specified FileSystemInfo.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if this instance is a symlink the specified fsi; otherwise, <c>false</c>.
+        /// </returns>
+        /// <param name='fsi'>
+        /// If set to <c>true</c> fsi.
+        /// </param>
+        public static bool IsSymlink(FileSystemInfo fsi)
+        {
+            return ((fsi.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
         }
     }
 }

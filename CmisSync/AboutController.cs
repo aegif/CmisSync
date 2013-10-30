@@ -28,22 +28,45 @@ namespace CmisSync {
     /// </summary>
     public class AboutController {
 
+        //===== Actions =====
         /// <summary>
-        /// Actions.
+        /// Show About Windows Action
         /// </summary>
         public event Action ShowWindowEvent = delegate { };
+        /// <summary>
+        /// Hide About Windows Action
+        /// </summary>
         public event Action HideWindowEvent = delegate { };
+        /// <summary>
+        /// Version UpToDate Action
+        /// </summary>
         public event Action VersionUpToDateEvent = delegate { };
+        /// <summary>
+        /// Check for new Versions Action
+        /// </summary>
         public event Action CheckingForNewVersionEvent = delegate { };
-
+        //===== Events =====
+        /// <summary>
+        /// A new version is available event
+        /// </summary>
         public event NewVersionEventDelegate NewVersionEvent = delegate { };
+        /// <summary>
+        /// Delegate for NewVersionEvent
+        /// </summary>
+        /// <param name="new_version_string"></param>
         public delegate void NewVersionEventDelegate (string new_version_string);
 
         /// <summary>
         /// URL addresses to display in the About dialog.
         /// </summary>
         public readonly string WebsiteLinkAddress       = "https://github.com/OpenDataSpace/CmisSync";
-        public readonly string CreditsLinkAddress       = "https://raw.github.com/OpenDataSpace/CmisSync/master/legal/AUTHORS.txt";
+        /// <summary>
+        /// URL to the AUTHORS file
+        /// </summary>
+        public readonly string CreditsLinkAddress       = "https://raw.github.com/OpenDataSpace/CmisSync/master/legal/AUTHORS.tx";
+        /// <summary>
+        /// URL for Issue reports
+        /// </summary>
         public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
 
 

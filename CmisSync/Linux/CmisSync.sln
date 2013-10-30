@@ -5,19 +5,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync", "CmisSync.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Lib", "..\..\CmisSync.Lib\CmisSync.Lib.csproj", "{2C914413-B31C-4362-93C7-1AE34F09112A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataSpaceSync.Console", "..\..\DataSpaceSync.Console\DataSpaceSync.Console.csproj", "{F62D4C7B-3A91-41A6-A758-8CEB95DEB629}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
+		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C914413-B31C-4362-93C7-1AE34F09112A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C914413-B31C-4362-93C7-1AE34F09112A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{728483AA-E34B-4441-BF2C-C8BC2901E4E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{728483AA-E34B-4441-BF2C-C8BC2901E4E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F62D4C7B-3A91-41A6-A758-8CEB95DEB629}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F62D4C7B-3A91-41A6-A758-8CEB95DEB629}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F62D4C7B-3A91-41A6-A758-8CEB95DEB629}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F62D4C7B-3A91-41A6-A758-8CEB95DEB629}.Release|Any CPU.Build.0 = Release|Any CPU
+		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = CmisSync.csproj
+		outputpath = ..\..\bin
 	EndGlobalSection
 EndGlobal

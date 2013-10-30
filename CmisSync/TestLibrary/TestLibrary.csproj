@@ -58,11 +58,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CmisDatabaseTest.cs" />
     <Compile Include="CmisSyncTests.cs" />
     <Compile Include="ConfigurationTest.cs" />
     <Compile Include="LocalFilesystemActivityGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WatcherTest.cs" />
+    <Compile Include="ChunkedStreamTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">

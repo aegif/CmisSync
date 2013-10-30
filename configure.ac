@@ -1,8 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
-m4_define([cmissync_version], [1.0.0])
+m4_define([cmissync_version], [1.1.0])
 
 AC_PREREQ([2.54])
-AC_INIT([CmisSync], cmissync_version)
+AC_INIT([DataSpace Sync], cmissync_version)
 AC_CONFIG_SRCDIR([CmisSync/Program.cs])
 AM_INIT_AUTOMAKE([foreign dist-bzip2 dist-zip no-dist-gzip])
 AM_MAINTAINER_MODE
@@ -36,15 +36,35 @@ SHAMROCK_CHECK_MONO_4_0_GAC_ASSEMBLIES([
 ])]
 )
 
-PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
-if test "x$have_nunit" = "xno" ; then
-    dnl On som distro's the package is named mono-nunit
-    PKG_CHECK_MODULES(NUNIT, mono-nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+AC_ARG_WITH([nunit],
+            AS_HELP_STRING([--with-nunit=PATH],[Specify path to nunit.framework.dll]),
+            [nunit_dll=${withval}],[nunit_dll=no])
+if test "x$nunit_dll" = "xno" ; then
+    PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
     if test "x$have_nunit" = "xno" ; then
-        AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+      dnl On som distro's the package is named mono-nunit
+      PKG_CHECK_MODULES(NUNIT, mono-nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+      if test "x$have_nunit" = "xno" ; then
+          AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+      fi
+    fi
+    AC_SUBST(NUNIT_LIBS)
+else
+ if test -f ${nunit_dll} ; then
+        case ${nunit_dll} in
+            /*)
+            AC_SUBST(NUNIT_LIBS,[-r:${nunit_dll}])
+            AC_SUBST(NUNIT_PATH,[${nunit_dll}])
+            ;;
+            *)
+            AC_SUBST(NUNIT_LIBS,[[-r:\$\(top_srcdir\)/${nunit_dll}]])
+            AC_SUBST(NUNIT_PATH,[[\$\(top_srcdir\)/${nunit_dll}]])
+            ;;
+        esac
+    else
+        AC_ERROR([${nunit_dll} not found])
     fi
 fi
-AC_SUBST(NUNIT_LIBS)
 
 AC_ARG_WITH([newtonsoft-json],
             AS_HELP_STRING([--with-newtonsoft-json=PATH],[Specify path to NewtonSoft.Json.dll]),
@@ -70,10 +90,22 @@ else
         AC_ERROR([${newtonsoft_json_dll} not found])
     fi
 fi
-AC_SUBST(NUNIT_LIBS)
 
 CMISSYNC_CHECK_NOTIFY_SHARP
 CMISSYNC_CHECK_GTK_SHARP
+
+AC_ARG_ENABLE(fat-binary,
+  AS_HELP_STRING([--enable-fat-binary[=@<:@no/yes@:>@]],[Build fat binary after compilation]),
+  [enable_fat_binary=$enableval],
+  [enable_fat_binary="no"])
+
+if test "x$enable_fat_binary" = "xno" ; then
+    AC_SUBST(SLIMMONO, "mono")
+    AC_SUBST(MONOEXE, ".exe")
+  else
+    AC_SUBST(SLIMMONO, "")
+    AC_SUBST(MONOEXE, "")
+fi
 
 AC_ARG_ENABLE(appindicator,
 	AS_HELP_STRING([--enable-appindicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
@@ -99,6 +131,22 @@ if test -f ${dotcmis_dll} ; then
     esac
 else
     AC_ERROR([${dotcmis_dll} not found])
+fi
+
+AC_ARG_WITH([log4net],
+            AS_HELP_STRING([--with-log4net=PATH],[Specify path to log4net.dll]),
+            [log4net_dll=${withval}],[log4net_dll=no])
+if test ${log4net_dll} != "no" ; then
+    case ${log4net_dll} in
+        /*)
+        AC_SUBST(LOG4NETLIBS,[-r:${log4net_dll}])
+        AC_SUBST(LOG4NETPATH,[${log4net_dll}])
+        ;;
+        *)
+        AC_SUBST(LOG4NETLIBS,[[-r:\$\(top_srcdir\)/${log4net_dll}]])
+        AC_SUBST(LOG4NETPATH,[[\$\(top_srcdir\)/${log4net_dll}]])
+        ;;
+    esac
 fi
 
 TEST_URL="https://devel.dataspace.cc/cmis/atom"
@@ -138,6 +186,7 @@ AC_ARG_WITH([test-repoid],
 AC_SUBST(TEST_REPOID)
 
 OSNAME=`uname -s`
+OSOK=no
 if test "$OSNAME" = "Linux" ; then
 
 	dnl check for notify-sharp
@@ -150,7 +199,11 @@ if test "$OSNAME" = "Linux" ; then
     dnl check for log4net
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
-		AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        if test "$log4net_dll" != "no" ; then
+            LOG4NET_LIBS = ['[$](LOG4NETLIBS)']
+        else
+		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        fi
 	fi
 	AC_SUBST(LOG4NET_LIBS)
 
@@ -178,7 +231,53 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
 	GUISUBDIRS=CmisSync
     enable_gtkui=yes
-else
+    OSOK=yes
+fi
+
+if test "$OSNAME" = "Darwin" ; then
+    AC_MSG_RESULT([Building on OSX])
+
+	AC_SUBST(NOTIFY_SHARP_LIBS)
+
+    dnl check for log4net
+	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
+	if test "x$have_log4net" = "xno" ; then
+        if test "$log4net_dll" != "no" ; then
+            LOG4NET_LIBS='[$](LOG4NETLIBS)'
+        else
+		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        fi
+	fi
+	AC_SUBST(LOG4NET_LIBS)
+
+	APPINDICATOR_REQUIRED=0.0.7
+	if test x$enable_appindicator = xauto ; then
+			PKG_CHECK_EXISTS([appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED],
+							 enable_appindicator="yes",
+							 enable_appindicator="no")
+	fi
+
+	if test x$enable_appindicator = xyes ; then
+			PKG_CHECK_EXISTS([appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED],,
+							 AC_MSG_ERROR([appindicator-sharp-0.1 is not installed]))
+			PKG_CHECK_MODULES(APP_INDICATOR,
+							appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED)
+			AC_SUBST(APP_INDICATOR_CFLAGS)
+			AC_SUBST(APP_INDICATOR_LIBS)
+            [BUILD_DEFINES="$BUILD_DEFINES -define:HAVE_APP_INDICATOR"]
+	fi
+
+    AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
+    AC_SUBST(WEBLIBS,[-r:System.Web.dll])
+    AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
+
+    AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
+	GUISUBDIRS=CmisSync
+    enable_gtkui=yes
+    OSOK=yes
+fi
+
+if test "$OSOK" = "no" ; then
 	GUISUBDIRS=
     enable_gtkui=no
 fi
@@ -204,13 +303,15 @@ CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
 CmisSync/TestLibrary/Makefile
 CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibraryRunner/Makefile
-CmisSync/Linux/cmissync
+CmisSync/Linux/dataspacesync
+DataSpaceSync.Console/Makefile
+DataSpaceSync.Console/dsscli
 CmisSync/Makefile
 Makefile
 ])
 
 echo "
-CmisSync ${VERSION}
+DataSpace Sync ${VERSION}
 
 Configuration:
        Prefix              : ${prefix}

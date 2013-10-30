@@ -1,4 +1,4 @@
-//   CmisSync, a collaboration and sharing tool.
+﻿//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -192,6 +192,7 @@ namespace CmisSync.Lib
             IncludeSubdirectories = true;
             Filter                = "*";
             InternalBufferSize = 4 * 1024 * 16;
+            NotifyFilter = NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 
             Error += new ErrorEventHandler(OnError);
             Created += new FileSystemEventHandler(OnCreated);
@@ -206,6 +207,7 @@ namespace CmisSync.Lib
 
         private void OnCreated(object source, FileSystemEventArgs e)
         {
+            Logger.Debug("FS Object creation detected: " + e.FullPath);
             List<ChangeTypes> checks = new List<ChangeTypes>();
             checks.Add(ChangeTypes.Deleted);
             ChangeHandle(e.FullPath, ChangeTypes.Created, checks);
@@ -215,6 +217,7 @@ namespace CmisSync.Lib
         
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
+            Logger.Debug("FS Object deletion detected: " + e.FullPath);
             List<ChangeTypes> checks = new List<ChangeTypes>();
             checks.Add(ChangeTypes.Created);
             checks.Add(ChangeTypes.Changed);
@@ -225,6 +228,7 @@ namespace CmisSync.Lib
         
         private void OnChanged(object source, FileSystemEventArgs e)
         {
+            Logger.Debug("FS Object change detected: " + e.FullPath);
             List<ChangeTypes> checks = new List<ChangeTypes>();
             checks.Add(ChangeTypes.Created);
             checks.Add(ChangeTypes.Changed);
@@ -252,6 +256,7 @@ namespace CmisSync.Lib
         
         private void OnRenamed(object source, RenamedEventArgs e)
         {
+            Logger.Debug("FS Object renaming detected: " + e.OldFullPath + " to " + e.FullPath);
             string oldname = e.OldFullPath;
             string newname = e.FullPath;
             if (oldname.StartsWith(Path))

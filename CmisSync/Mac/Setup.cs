@@ -66,7 +66,6 @@ namespace CmisSync {
         private NSScrollView ScrollView;
         private NSTableColumn IconColumn;
         private NSTableColumn DescriptionColumn;
-        private CmisSyncDataSource DataSource;
 
 
         public Setup () : base ()
@@ -83,6 +82,7 @@ namespace CmisSync {
                 });
             };
 
+			/*
             Controller.ChangePageEvent += delegate (PageType type, string [] warnings) {
                 using (var a = new NSAutoreleasePool ())
                 {
@@ -92,7 +92,7 @@ namespace CmisSync {
                         ShowAll ();
                     });
                 }
-            };
+            };*/
         }
 
 
@@ -181,7 +181,7 @@ namespace CmisSync {
                 Controller.CheckSetupPage ();
             }
 
-            if (type == PageType.Invite) {
+            /*if (type == PageType.Invite) {
                 Header      = "You've received an invite!";
                 Description = "Do you want to add this project to CmisSync?";
 
@@ -251,7 +251,7 @@ namespace CmisSync {
 
                 Buttons.Add (AddButton);
                 Buttons.Add (CancelButton);
-            }
+            }*/
 
 			if (type == PageType.Add1) {
 				Header      = "Where's your project hosted?";
@@ -271,7 +271,7 @@ namespace CmisSync {
 				AddressTextField = new NSTextField () {
 					Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
 					Font        = UI.Font,
-					Enabled     = (Controller.SelectedPlugin.Address == null),
+//					Enabled     = (Controller.SelectedPlugin.Address == null),
 					Delegate    = new CmisSyncTextFieldDelegate (),
 					StringValue = "" + Controller.PreviousAddress
 				};
@@ -290,7 +290,7 @@ namespace CmisSync {
 				
 				PathTextField = new NSTextField () {
 					Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
-					Enabled     = (Controller.SelectedPlugin.Path == null),
+//					Enabled     = (Controller.SelectedPlugin.Path == null),
 					Delegate    = new CmisSyncTextFieldDelegate (),
 					StringValue = "" + Controller.PreviousPath
 				};
@@ -305,7 +305,7 @@ namespace CmisSync {
 					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 355, 204, 17),
 					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
 					                                                                  NSFontTraitMask.Condensed, 0, 11),
-					StringValue = "" + Controller.SelectedPlugin.PathExample
+//					StringValue = "" + Controller.SelectedPlugin.PathExample
 				};
 				
 				AddressHelpLabel = new NSTextField () {
@@ -316,7 +316,7 @@ namespace CmisSync {
 					Frame           = new RectangleF (190, Frame.Height - 355, 204, 17),
 					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
 					                                                                  NSFontTraitMask.Condensed, 0, 11),
-					StringValue = "" + Controller.SelectedPlugin.AddressExample
+//					StringValue = "" + Controller.SelectedPlugin.AddressExample
 				};
 				
 				TableView = new NSTableView () {
@@ -354,20 +354,20 @@ namespace CmisSync {
 				TableView.AddColumn (IconColumn);
 				TableView.AddColumn (DescriptionColumn);
 				
-				DataSource = new CmisSyncDataSource (Controller.Plugins);
+//				DataSource = new CmisSyncDataSource (Controller.Plugins);
 				
-				TableView.DataSource = DataSource;
-				TableView.ReloadData ();
+//				TableView.DataSource = DataSource;
+//				TableView.ReloadData ();
 				
-				HistoryCheckButton = new NSButton () {
-					Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
-					Title = "Fetch prior revisions"
-				};
+//				HistoryCheckButton = new NSButton () {
+//					Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
+//					Title = "Fetch prior revisions"
+//				};
 				
-				if (Controller.FetchPriorHistory)
-					HistoryCheckButton.State = NSCellStateValue.On;
+//				if (Controller.FetchPriorHistory)
+//					HistoryCheckButton.State = NSCellStateValue.On;
 				
-				HistoryCheckButton.SetButtonType (NSButtonType.Switch);
+//				HistoryCheckButton.SetButtonType (NSButtonType.Switch);
 				
 				AddButton = new NSButton () {
 					Title = "Add",
@@ -380,27 +380,27 @@ namespace CmisSync {
 				
 				
 				Controller.ChangeAddressFieldEvent += delegate (string text,
-				                                                string example_text, FieldState state) {
+				                                                string example_text) {
 					
 					InvokeOnMainThread (delegate {
 						AddressTextField.StringValue = text;
-						AddressTextField.Enabled     = (state == FieldState.Enabled);
+						AddressTextField.Enabled     = true;
 						AddressHelpLabel.StringValue = example_text;
 					});
 				};
 				
 				Controller.ChangePathFieldEvent += delegate (string text,
-				                                             string example_text, FieldState state) {
+				                                             string example_text) {
 					
 					InvokeOnMainThread (delegate {
 						PathTextField.StringValue = text;
-						PathTextField.Enabled     = (state == FieldState.Enabled);
+						PathTextField.Enabled     = true;
 						PathHelpLabel.StringValue = example_text;
 					});
 				};
 				
-				TableView.SelectRow (Controller.SelectedPluginIndex, false);
-				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
+//				TableView.SelectRow (Controller.SelectedPluginIndex, false);
+//				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
 				
 				(AddressTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
 					Controller.CheckAddPage (AddressTextField.StringValue);
@@ -411,16 +411,16 @@ namespace CmisSync {
 				};
 				
 				(TableView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
-					Controller.SelectedPluginChanged (TableView.SelectedRow);
+					//Controller.SelectedPluginChanged (TableView.SelectedRow);
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
-				HistoryCheckButton.Activated += delegate {
-					Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
-				};
+//				HistoryCheckButton.Activated += delegate {
+//					Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
+//				};
 				
 				AddButton.Activated += delegate {
-					Controller.Add1PageCompleted (AddressTextField.StringValue, "user", "password");
+					Controller.Add1PageCompleted (new Uri(AddressTextField.StringValue), "name" , "password");
 				};
 				
 				CancelButton.Activated += delegate {
@@ -467,7 +467,7 @@ namespace CmisSync {
 				AddressTextField = new NSTextField () {
 					Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
 					Font        = UI.Font,
-					Enabled     = (Controller.SelectedPlugin.Address == null),
+					Enabled     = true,
 					Delegate    = new CmisSyncTextFieldDelegate (),
 					StringValue = "" + Controller.PreviousAddress
 				};
@@ -486,7 +486,7 @@ namespace CmisSync {
 				
 				PathTextField = new NSTextField () {
 					Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
-					Enabled     = (Controller.SelectedPlugin.Path == null),
+					Enabled     = true,
 					Delegate    = new CmisSyncTextFieldDelegate (),
 					StringValue = "" + Controller.PreviousPath
 				};
@@ -501,7 +501,7 @@ namespace CmisSync {
 					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 355, 204, 17),
 					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
 					                                                                  NSFontTraitMask.Condensed, 0, 11),
-					StringValue = "" + Controller.SelectedPlugin.PathExample
+//					StringValue = "" + Controller.SelectedPlugin.PathExample
 				};
 				
 				AddressHelpLabel = new NSTextField () {
@@ -512,7 +512,7 @@ namespace CmisSync {
 					Frame           = new RectangleF (190, Frame.Height - 355, 204, 17),
 					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
 					                                                                  NSFontTraitMask.Condensed, 0, 11),
-					StringValue = "" + Controller.SelectedPlugin.AddressExample
+//					StringValue = "" + Controller.SelectedPlugin.AddressExample
 				};
 				
 				TableView = new NSTableView () {
@@ -550,18 +550,18 @@ namespace CmisSync {
 				TableView.AddColumn (IconColumn);
 				TableView.AddColumn (DescriptionColumn);
 				
-				DataSource = new CmisSyncDataSource (Controller.Plugins);
+//				DataSource = new CmisSyncDataSource (Controller.Plugins);
 				
-				TableView.DataSource = DataSource;
-				TableView.ReloadData ();
+//				TableView.DataSource = DataSource;
+//				TableView.ReloadData ();
 				
 				HistoryCheckButton = new NSButton () {
 					Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
 					Title = "Fetch prior revisions"
 				};
 				
-				if (Controller.FetchPriorHistory)
-					HistoryCheckButton.State = NSCellStateValue.On;
+//				if (Controller.FetchPriorHistory)
+//					HistoryCheckButton.State = NSCellStateValue.On;
 				
 				HistoryCheckButton.SetButtonType (NSButtonType.Switch);
 				
@@ -576,27 +576,27 @@ namespace CmisSync {
 				
 				
 				Controller.ChangeAddressFieldEvent += delegate (string text,
-				                                                string example_text, FieldState state) {
+				                                                string example_text) {
 					
 					InvokeOnMainThread (delegate {
 						AddressTextField.StringValue = text;
-						AddressTextField.Enabled     = (state == FieldState.Enabled);
+						AddressTextField.Enabled     = true;
 						AddressHelpLabel.StringValue = example_text;
 					});
 				};
 				
 				Controller.ChangePathFieldEvent += delegate (string text,
-				                                             string example_text, FieldState state) {
+				                                             string example_text) {
 					
 					InvokeOnMainThread (delegate {
 						PathTextField.StringValue = text;
-						PathTextField.Enabled     = (state == FieldState.Enabled);
+						PathTextField.Enabled     = true;
 						PathHelpLabel.StringValue = example_text;
 					});
 				};
 				
-				TableView.SelectRow (Controller.SelectedPluginIndex, false);
-				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
+//				TableView.SelectRow (Controller.SelectedPluginIndex, false);
+//				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
 				
 				(AddressTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
 					Controller.CheckAddPage (AddressTextField.StringValue);
@@ -607,13 +607,13 @@ namespace CmisSync {
 				};
 				
 				(TableView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
-					Controller.SelectedPluginChanged (TableView.SelectedRow);
+//					Controller.SelectedPluginChanged (TableView.SelectedRow);
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
 				
-				HistoryCheckButton.Activated += delegate {
-					Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
-				};
+//				HistoryCheckButton.Activated += delegate {
+//					Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
+//				};
 				
 				AddButton.Activated += delegate {
 					Controller.Add2PageCompleted (AddressTextField.StringValue, PathTextField.StringValue);
@@ -646,7 +646,7 @@ namespace CmisSync {
 			}
 			
 			if (type == PageType.Syncing) {
-                Header      = "Adding project ‘" + Controller.SyncingFolder + "’…";
+                //Header      = "Adding project ‘" + Controller.SyncingFolder + "’…";
                 Description = "This may take a while on big projects.\nIsn't it coffee-o'clock?";
 
 
@@ -677,9 +677,9 @@ namespace CmisSync {
                     });
                 };
 
-                CancelButton.Activated += delegate {
-                    Controller.SyncingCancelled ();
-                };
+//                CancelButton.Activated += delegate {
+//                    Controller.SyncingCancelled ();
+//                };
 
 
                 ContentView.AddSubview (ProgressIndicator);
@@ -688,7 +688,7 @@ namespace CmisSync {
                 Buttons.Add (CancelButton);
             }
 
-            if (type == PageType.Error) {
+/*            if (type == PageType.Error) {
                 Header      = "Oops! Something went wrong…";
                 Description = "Please check the following:";
 
@@ -954,7 +954,7 @@ namespace CmisSync {
                 Buttons.Add (CancelButton);
 
                 NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
-            }
+            }*/
 
 
             if (type == PageType.Finished) {
@@ -1011,7 +1011,7 @@ namespace CmisSync {
 
             if (type == PageType.Tutorial) {
                 string slide_image_path = Path.Combine (NSBundle.MainBundle.ResourcePath,
-                    "Pixmaps", "tutorial-slide-" + Controller.TutorialPageNumber + ".png");
+                    "Pixmaps", "tutorial-slide-" + Controller.TutorialCurrentPage + ".png");
 
                 SlideImage = new NSImage (slide_image_path) {
                     Size = new SizeF (350, 200)
@@ -1025,7 +1025,7 @@ namespace CmisSync {
                 ContentView.AddSubview (SlideImageView);
 
 
-                switch (Controller.TutorialPageNumber) {
+                switch (Controller.TutorialCurrentPage) {
 
                     case 1: {
                         Header      = "What's happening next?";
@@ -1135,7 +1135,7 @@ namespace CmisSync {
         }
     }
 
-
+	/*
     [Register("CmisSyncDataSource")]
     public class CmisSyncDataSource : NSTableViewDataSource {
 
@@ -1238,7 +1238,7 @@ namespace CmisSync {
                 };
             }
         }
-    }
+    }*/
 
 
     public class CmisSyncTextFieldDelegate : NSTextFieldDelegate {

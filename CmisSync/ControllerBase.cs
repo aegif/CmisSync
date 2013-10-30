@@ -175,7 +175,6 @@ namespace CmisSync
         /// Concurrency locks.
         /// </summary>
         private Object repo_lock = new Object();
-        private Object check_repos_lock = new Object();
 
 
         /// <summary>
@@ -269,11 +268,21 @@ namespace CmisSync
 
         public void RemoveRepositoryFromSync(string reponame)
         {
-            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
-            if (f != null)
-                RemoveRepository(f);
-            else
-                Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
+            lock (this.repo_lock)
+            {
+                Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
+                if (f != null)
+                {
+                    RemoveRepository(f);
+                    ConfigManager.CurrentConfig.Folder.Remove(f);
+                    ConfigManager.CurrentConfig.Save();
+                    FolderListChanged();
+                }
+                else
+                {
+                    Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
+                }
+            }
         }
 
         
@@ -281,24 +290,19 @@ namespace CmisSync
         /// Remove a synchronized folder from the CmisSync configuration.
         /// This happens after the user removes the folder.
         /// </summary>
-        /// <param name="folder_path">The synchronized folder to remove</param>
+        /// <param name="folder">The synchronized folder to remove</param>
         private void RemoveRepository(Config.SyncConfig.Folder folder)
         {
-            if (this.repositories.Count > 0)
+            foreach (RepoBase repo in this.repositories)
             {
-                for (int i = 0; i < this.repositories.Count; i++)
+                if (repo.LocalPath.Equals(folder.LocalPath))
                 {
-                    RepoBase repo = this.repositories[i];
-
-                    if (repo.LocalPath.Equals(folder.LocalPath))
-                    {
-                        repo.Dispose();
-                        this.repositories.Remove(repo);
-                        repo = null;
-                        break;
-                    }
+                    repo.Dispose();
+                    this.repositories.Remove(repo);
+                    break;
                 }
             }
+
             // Remove Cmis Database File
             string dbfilename = folder.DisplayName;
             dbfilename = dbfilename.Replace("\\", "_");
@@ -324,19 +328,22 @@ namespace CmisSync
         /// <param name="repoName">the folder to pause/unpause</param>
         public void StartOrSuspendRepository(string repoName)
         {
-            foreach (RepoBase aRepo in this.repositories)
+            lock (this.repo_lock)
             {
-                if (aRepo.Name == repoName)
+                foreach (RepoBase aRepo in this.repositories)
                 {
-                    if (aRepo.Status != SyncStatus.Suspend)
+                    if (aRepo.Name == repoName)
                     {
-                        aRepo.Suspend();
-                        Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
-                    }
-                    else
-                    {
-                        aRepo.Resume();
-                        Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        if (aRepo.Status != SyncStatus.Suspend)
+                        {
+                            aRepo.Suspend();
+                            Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
+                        }
+                        else
+                        {
+                            aRepo.Resume();
+                            Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        }
                     }
                 }
             }
@@ -349,10 +356,8 @@ namespace CmisSync
         /// </summary>
         private void CheckRepositories()
         {
-            lock (this.check_repos_lock)
+            lock (this.repo_lock)
             {
-                string path = ConfigManager.CurrentConfig.FoldersPath;
-
                 List<Config.SyncConfig.Folder> toBeDeleted = new List<Config.SyncConfig.Folder>();
                 // If folder has been deleted, remove it from configuration too.
                 foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
@@ -421,20 +426,9 @@ namespace CmisSync
             string[] files = Directory.GetFiles(path);
 
             foreach (string file in files)
-                if (!IsSymlink(file))
+                if (!CmisSync.Lib.Utils.IsSymlink(file))
                     File.SetAttributes(file, FileAttributes.Normal);
         }
-
-
-        /// <summary>
-        /// Whether a file is a symbolic link.
-        /// </summary>
-        private bool IsSymlink(string file)
-        {
-            FileAttributes attributes = File.GetAttributes(file);
-            return ((attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
-        }
-
 
         /// <summary>
         /// Reacts when a local change occurs.
@@ -464,6 +458,7 @@ namespace CmisSync
             repoInfo.RemotePath = remote_path;
             repoInfo.TargetDirectory = local_path;
             repoInfo.PollInterval = 5000;
+            repoInfo.MaxUploadRetries = 2;
             foreach (string ignore in ignoredPaths)
                 repoInfo.addIgnorePath(ignore);
 
@@ -477,17 +472,20 @@ namespace CmisSync
         /// </summary>
         public void FinishFetcher()
         {
-            // Add folder to XML config file.
-            ConfigManager.CurrentConfig.AddFolder(repoInfo);
+            lock (this.repo_lock)
+            {
+                // Add folder to XML config file.
+                ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
-            FolderFetched(this.fetcher.RemoteUrl.ToString());
+                FolderFetched(this.fetcher.RemoteUrl.ToString());
 
-            // Initialize in the UI.
-            AddRepository(repoInfo);
-            FolderListChanged();
+                // Initialize in the UI.
+                AddRepository(repoInfo);
+                FolderListChanged();
 
-            this.fetcher.Dispose();
-            this.fetcher = null;
+                this.fetcher.Dispose();
+                this.fetcher = null;
+            }
         }
 
 
@@ -507,7 +505,6 @@ namespace CmisSync
         {
             ShowAboutWindowEvent();
         }
-
 
         /// <summary>
         /// Quit CmisSync.

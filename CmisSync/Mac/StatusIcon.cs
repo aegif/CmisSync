@@ -117,7 +117,7 @@ namespace CmisSync {
                 }
             };
 
-            Controller.UpdateQuitItemEvent += delegate (bool quit_item_enabled) {
+/*            Controller.UpdateQuitItemEvent += delegate (bool quit_item_enabled) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
@@ -133,7 +133,7 @@ namespace CmisSync {
                         this.recent_events_item.Enabled = events_item_enabled;
                     });
                 }
-            };
+            };*/
         }
 
 
@@ -154,7 +154,7 @@ namespace CmisSync {
                 };
 
                 this.folder_item.Activated += delegate {
-                    Controller.CmisSyncClicked ();
+                    Controller.AboutClicked ();
                 };
 
                 this.folder_item.Image      = this.cmissync_image;
@@ -167,20 +167,20 @@ namespace CmisSync {
                 };
 
                 this.add_item.Activated += delegate {
-                    Controller.AddHostedProjectClicked ();
+                    Controller.AddRemoteFolderClicked ();
                 };
 
                 this.recent_events_item = new NSMenuItem () {
                     Title   = "Recent Changes…",
-                    Enabled = Controller.OpenRecentEventsItemEnabled
+					Enabled = false
                 };
 
                 if (Controller.Folders.Length > 0) {
                     this.recent_events_item.Activated += delegate {
-                        Controller.OpenRecentEventsClicked ();
+                        //Controller.OpenRecentEventsClicked ();
                     };
                 }
-
+				/*
                 this.notify_item = new NSMenuItem () {
                     Enabled = (Controller.Folders.Length > 0)
                 };
@@ -199,7 +199,7 @@ namespace CmisSync {
                         else
                             this.notify_item.Title = "Turn Notifications On";
                     });
-                };
+                };*/
 
                 this.about_item = new NSMenuItem () {
                     Title   = "About CmisSync",
@@ -212,7 +212,7 @@ namespace CmisSync {
 
                 this.quit_item = new NSMenuItem () {
                     Title   = "Quit",
-                    Enabled = Controller.QuitItemEnabled
+                    Enabled = true
                 };
 
                 this.quit_item.Activated += delegate {
@@ -235,12 +235,14 @@ namespace CmisSync {
                     foreach (string folder_name in Controller.Folders) {
                         NSMenuItem item = new NSMenuItem ();
                         item.Title      = folder_name;
+						item.Image		= this.folder_image;
 
-                        if (Program.Controller.UnsyncedFolders.Contains (folder_name))
-                            item.Image = this.caution_image;
-                        else
-                            item.Image = this.folder_image;
-
+						foreach (CmisSync.Lib.RepoBase repo in Program.Controller.Repositories) {
+							if (repo.Name.Equals (folder_name) && repo.Status == CmisSync.Lib.SyncStatus.Warning) {
+								item.Image = this.caution_image;
+								break;
+							}
+						}
                         item.Image.Size = new SizeF (16, 16);
                         this.folder_tasks [i] = OpenFolderDelegate (folder_name);
 
@@ -254,11 +256,14 @@ namespace CmisSync {
                     foreach (string folder_name in Controller.OverflowFolders) {
                         NSMenuItem item = new NSMenuItem ();
                         item.Title      = folder_name;
+						item.Image		= folder_image;
 
-                        if (Program.Controller.UnsyncedFolders.Contains (folder_name))
-                            item.Image = this.caution_image;
-                        else
-                            item.Image = this.folder_image;
+						foreach (CmisSync.Lib.RepoBase repo in Program.Controller.Repositories) {
+							if (repo.Name.Equals (folder_name) && repo.Status == CmisSync.Lib.SyncStatus.Warning) {
+								item.Image = this.caution_image;
+								break;
+							}
+						}
 
                         item.Image.Size   = new SizeF (16, 16);
                         this.overflow_tasks [i] = OpenFolderDelegate (folder_name);
@@ -311,7 +316,7 @@ namespace CmisSync {
         private EventHandler OpenFolderDelegate (string name)
         {
             return delegate {
-                Controller.SubfolderClicked (name);
+                Controller.LocalFolderClicked (name);
             };
         }
 

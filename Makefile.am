@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I build/m4/cmissync -I build/m4/shamrock
 
-basedirs = build CmisSync.Lib
+basedirs = build CmisSync.Lib DataSpaceSync.Console
 
 SUBDIRS = $(basedirs) $(GUISUBDIRS)
 DIST_SUBDIRS = $(basedirs) CmisSync

@@ -83,7 +83,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(HomePath, "DataSpace Sync");
+                return Path.Combine(HomePath, "DataSpace");
             }
         }
 
@@ -95,7 +95,7 @@ namespace CmisSync.Lib
         {
             FullPath = fullPath;
             ConfigPath = Path.GetDirectoryName(FullPath);
-            Console.WriteLine("FullPath:" + FullPath);
+            Console.WriteLine("FullPath: " + FullPath);
 
             // Create configuration folder if it does not exist yet.
             if (!Directory.Exists(ConfigPath))
@@ -225,7 +225,8 @@ namespace CmisSync.Lib
                 RemotePath = repoInfo.RemotePath,
                 UserName = repoInfo.User,
                 ObfuscatedPassword = repoInfo.Password.ObfuscatedPassword,
-                PollInterval = repoInfo.PollInterval
+                PollInterval = repoInfo.PollInterval,
+                SupportedFeatures = null
             };
             foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
             {
@@ -275,18 +276,25 @@ namespace CmisSync.Lib
   <log4net>
     <appender name=""CmisSyncFileAppender"" type=""log4net.Appender.RollingFileAppender"">
       <file value=""" + GetLogFilePath() + @""" />
-      <appendToFile value=""true"" />
+      <appendToFile value=""false"" />
       <rollingStyle value=""Size"" />
       <maxSizeRollBackups value=""10"" />
       <maximumFileSize value=""5MB"" />
       <staticLogFileName value=""true"" />
       <layout type=""log4net.Layout.PatternLayout"">
-        <conversionPattern value=""%date [%thread] %-5level %logger [%property{NDC}] - %message%newline"" />
+        <conversionPattern value=""%date [%thread] %-5level %logger - %message%newline"" />
+      </layout>
+    </appender>
+    <appender name=""ConsoleAppender"" type=""log4net.Appender.ConsoleAppender"">
+
+      <layout type=""log4net.Layout.PatternLayout"">
+        <conversionPattern value=""%-4timestamp [%thread] %-5level %logger %ndc - %message%newline"" />
       </layout>
     </appender>
     <root>
-      <level value=""DEBUG"" />
+      <level value=""INFO"" />
       <appender-ref ref=""CmisSyncFileAppender"" />
+      <!-- <appender-ref ref=""ConsoleAppender"" /> -->
     </root>
   </log4net>"))
             {
@@ -320,32 +328,97 @@ namespace CmisSync.Lib
  
                 [XmlElement("url")]
                 public XmlUri RemoteUrl { get; set; }
-                
+
                 [XmlElement("repository")]
                 public string RepositoryId { get; set; }
-                
+
                 [XmlElement("remoteFolder")]
                 public string RemotePath { get; set; }
 
                 [XmlElement("user")]
-                public string UserName { get; set; } 
-                
+                public string UserName { get; set; }
+
                 [XmlElement("password")]
                 public string ObfuscatedPassword { get; set; }
 
                 private double pollInterval = 5000;
                 [XmlElement("pollinterval"), System.ComponentModel.DefaultValue(5000)]
-                public double PollInterval {
+                public double PollInterval
+                {
                     get { return pollInterval; }
                     set {
-                        if (value <= 0)
+                        if( value <= 0 )
                         {
                             pollInterval = 5000;
                         }
+                        else
+                        {
+                            pollInterval = value;
+                        }
                 } }
 
-                [XmlElement("ignoreFolder",IsNullable=true)]
+                private int uploadRetries = 2;
+                [XmlElement("maxUploadRetries", IsNullable=true)]
+                public int? UploadRetries
+                {
+                    get { return uploadRetries; }
+                    set {
+                        if( value==null || value < 0 )
+                            uploadRetries = 2;
+                        else
+                            uploadRetries = (int) value;
+                    }
+                }
+
+                private int downloadRetries = 2;
+                [XmlElement("maxDownloadRetries", IsNullable=true)]
+                public int? DownLoadRetries
+                {
+                    get { return downloadRetries; }
+                    set {
+                        if( value == null || value < 0 )
+                            downloadRetries = 2;
+                        else
+                            downloadRetries = (int) value;
+                    }
+                }
+
+                private int deletionRetries = 2;
+                [XmlElement("maxDeletionRetries", IsNullable=true)]
+                public int? DeletionRetries
+                {
+                    get { return deletionRetries; }
+                    set {
+                        if ( value == null || value < 0 )
+                            deletionRetries = 2;
+                        else
+                            deletionRetries = (int) value;
+                    }
+                }
+
+                [XmlElement("features", IsNullable=true)]
+                public Feature SupportedFeatures { get; set;}
+
+                [XmlElement("ignoreFolder", IsNullable=true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
+
+                private long chunkSize = 1024 * 1024;
+                [XmlElement("chunkSize"), System.ComponentModel.DefaultValue(1024 * 1024)]
+                public long ChunkSize
+                {
+                    get { return chunkSize; }
+                    set
+                    {
+                        if (value < 0)
+                        {
+                            chunkSize = 0;
+                        }
+                        else
+                        {
+                            chunkSize = value;
+                        }
+                    }
+                }
 
                 /// <summary>
                 /// Get all the configured info about a synchronized folder.
@@ -360,13 +433,19 @@ namespace CmisSync.Lib
                     repoInfo.RepoID = RepositoryId;
                     repoInfo.RemotePath = RemotePath;
                     repoInfo.TargetDirectory = LocalPath;
+                    repoInfo.MaxUploadRetries = uploadRetries;
+                    repoInfo.MaxDownloadRetries = downloadRetries;
+                    repoInfo.MaxDeletionRetries = deletionRetries;
                     if (PollInterval < 1) PollInterval = 5000;
-                    repoInfo.PollInterval = PollInterval;
-
+                        repoInfo.PollInterval = PollInterval;
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
                     {
                         repoInfo.addIgnorePath(ignoredFolder.Path);
                     }
+                    if(SupportedFeatures != null && SupportedFeatures.ChunkedSupport != null && SupportedFeatures.ChunkedSupport == true)
+                        repoInfo.ChunkSize = ChunkSize;
+                    else
+                        repoInfo.ChunkSize = 0;
                     return repoInfo;
                 }
             }
@@ -383,6 +462,21 @@ namespace CmisSync.Lib
             public string Name { get; set; }
             [XmlElement("email")]
             public string EMail { get; set; }
+        }
+
+        public class Feature {
+            [XmlElement("getFolderTree", IsNullable=true)]
+            public bool? GetFolderTreeSupport {get; set;}
+            [XmlElement("getDescendants", IsNullable=true)]
+            public bool? GetDescendantsSupport {get; set;}
+            [XmlElement("getContentChanges", IsNullable=true)]
+            public bool? GetContentChangesSupport {get; set;}
+            [XmlElement("fileSystemWatcher", IsNullable=true)]
+            public bool? FileSystemWatcherSupport {get; set;}
+            [XmlElement("maxContentChanges", IsNullable=true)]
+            public int? MaxNumberOfContentChanges {get; set;}
+            [XmlElement("chunkedSupport", IsNullable=true)]
+            public bool? ChunkedSupport {get;set;}
         }
 
         public class XmlUri : IXmlSerializable
