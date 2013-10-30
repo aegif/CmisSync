@@ -18,6 +18,7 @@ SOURCES =  \
 	SyncEventQueueTest.cs \
 	SyncEventManagerTest.cs \
 	EventTypesTest.cs \
+	DebugLoggingHandlerTest.cs \
 	LocalFilesystemActivityGenerator.cs
 
 EXTRA_DIST = TestLibrary.csproj \

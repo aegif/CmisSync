@@ -68,6 +68,7 @@
     <Compile Include="SyncEventQueueTest.cs" />
     <Compile Include="SyncEventManagerTest.cs" />
     <Compile Include="EventTypesTest.cs" />
+    <Compile Include="DebugLoggingHandlerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
