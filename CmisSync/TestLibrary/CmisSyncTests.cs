@@ -843,6 +843,7 @@ namespace TestLibrary
                     string path2 = Path.Combine(localDirectory, name2);
 
                     //  create document
+                    Console.WriteLine(" Remote create file");
                     Assert.IsFalse(File.Exists(path1));
                     IDocument doc1 = CreateDocument(folder, name1, "SyncChangeLog");
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
@@ -852,12 +853,14 @@ namespace TestLibrary
 
                     //TODO: AtomPub does not support copy
                     ////  copy document
+                    //Console.WriteLine(" Remote copy file");
                     //Assert.IsFalse(File.Exists(path2));
                     //IDocument doc2 = CopyDocument(folder, doc1, name2);
                     //synchronizedFolder.Sync();
                     //Assert.IsTrue(File.Exists(path2));
 
                     //  rename document
+                    Console.WriteLine(" Remote rename file");
                     Assert.IsTrue(File.Exists(path1));
                     Assert.IsFalse(File.Exists(path2));
                     IDocument doc2 = RenameDocument(doc1, name2);
@@ -868,6 +871,7 @@ namespace TestLibrary
                     Assert.IsTrue(File.Exists(path2));
 
                     //  create folder
+                    Console.WriteLine(" Remote create folder");
                     Assert.IsFalse(Directory.Exists(path1));
                     IFolder folder1 = CreateFolder(folder, name1);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
@@ -876,6 +880,7 @@ namespace TestLibrary
                     Assert.IsTrue(Directory.Exists(path1));
 
                     //  move document
+                    Console.WriteLine(" Remote move file");
                     string filename = Path.Combine(path1, name2);
                     Assert.IsFalse(File.Exists(filename));
                     doc2.Move(folder, folder1);
@@ -884,6 +889,7 @@ namespace TestLibrary
                     }));
 
                     //  delete document
+                    Console.WriteLine(" Remote delete file");
                     Assert.IsTrue(File.Exists(filename));
                     doc2.DeleteAllVersions();
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
@@ -892,6 +898,7 @@ namespace TestLibrary
                     Assert.IsFalse(File.Exists(filename));
 
                     //  rename folder
+                    Console.WriteLine(" Remote rename folder");
                     Assert.IsTrue(Directory.Exists(path1));
                     Assert.IsFalse(Directory.Exists(path2));
                     IFolder folder2 = RenameFolder(folder1, name2);
@@ -902,6 +909,7 @@ namespace TestLibrary
                     Assert.IsTrue(Directory.Exists(path2));
 
                     //  move folder
+                    Console.WriteLine(" Remote move folder");
                     Assert.IsFalse(Directory.Exists(path1));
                     folder1 = CreateFolder(folder, name1);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
@@ -917,6 +925,7 @@ namespace TestLibrary
                     Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1)));
 
                     //  move folder with sub folder and sub file
+                    Console.WriteLine(" Remote move folder with subfolder and subfile");
                     Assert.IsFalse(File.Exists(Path.Combine(path2, name1, name1)));
                     Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1, name2)));
                     CreateDocument(folder1, name1, "SyncChangeLog");
@@ -934,6 +943,7 @@ namespace TestLibrary
                     Assert.IsTrue(Directory.Exists(Path.Combine(path1, name2)));
 
                     //  delete folder tree
+                    Console.WriteLine(" Remote delete folder tree");
                     Assert.IsTrue(Directory.Exists(path1));
                     folder1.DeleteTree(true, null, true);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
