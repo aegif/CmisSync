@@ -20,6 +20,10 @@ namespace CmisSync.Lib.Events
             SyncEventHandler other = obj as SyncEventHandler;
             return this.CompareTo(other);
         }
+
+        public override string ToString() {
+            return this.GetType() + " with Priority " + Priority.ToString();
+        }
     }
 }
 

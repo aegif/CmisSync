@@ -57,13 +57,6 @@ namespace CmisSync.Lib
         /// </summary>
         public Action<SyncStatus> SyncStatusChanged { get; set; }
 
-
-        /// <summary>
-        /// Local changes have been detected.
-        /// </summary>
-        public Action ChangesDetected { get; set; }
-
-
         /// <summary>
         /// Path of the local synchronized folder.
         /// </summary>
@@ -177,8 +170,6 @@ namespace CmisSync.Lib
                 // Synchronize.
                 SyncInBackground();
             };
-            
-            ChangesDetected += delegate { };
         }
 
 
@@ -222,30 +213,14 @@ namespace CmisSync.Lib
         /// <summary>
         /// Initialize the watcher.
         /// </summary>
-        public void Initialize()
+        public virtual void Initialize()
         {
-            this.Watcher.ChangeEvent += OnFileActivity;
-
             // Sync up everything that changed
             // since we've been offline
             SyncInBackground();
 
             this.remote_timer.Start();
         }
-
-
-        /// <summary>
-        /// Some file activity has been detected, sync changes.
-        /// </summary>
-        public void OnFileActivity(object sender, FileSystemEventArgs args)
-        {
-            ChangesDetected();
-
-            this.Watcher.EnableEvent = false;
-            // TODO
-            this.Watcher.EnableEvent = true;
-        }
-
 
         /// <summary>
         /// A conflict has been resolved.

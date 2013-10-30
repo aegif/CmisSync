@@ -153,6 +153,7 @@ namespace CmisSync.Lib.Sync
                 this.repoinfo = repoInfo;
 
                 var eventManager = new SyncEventManager(); 
+                eventManager.AddEventHandler(new DebugLoggingHandler());
                 Queue = new SyncEventQueue(eventManager);
 
                 // Database is the user's AppData/Roaming

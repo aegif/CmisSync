@@ -29,6 +29,8 @@ namespace CmisSync.Lib.Events
         public virtual void Handle(ISyncEvent e) {
             for(int i = handler.Count-1; i >= 0; i--)
             {
+                var h = handler[i];
+                logger.Debug("Forwarding to Handler " + h);
                 if(handler[i].Handle(e)){
                     return;
                 }
