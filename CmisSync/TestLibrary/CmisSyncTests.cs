@@ -365,14 +365,14 @@ namespace TestLibrary
         // /////////////////////////// TESTS ///////////////////////////
 
 
-        [Test]
+        [Test, Category("Fast")]
         public void Placebo()
         {
             Assert.AreEqual(4, 2 + 2);
         }
 
 
-        [Test]
+        [Test, Category("Fast")]
         public void TestCrypto()
         {
             String[] test_pws = { "", "test", "Whatever", "Something to try" };
@@ -384,7 +384,7 @@ namespace TestLibrary
         }
 
 
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -397,7 +397,7 @@ namespace TestLibrary
         }
 
 
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void Sync(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -435,7 +435,7 @@ namespace TestLibrary
         }
 
 
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -498,7 +498,8 @@ namespace TestLibrary
         }
 
 
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        [Ignore]
         public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -561,7 +562,8 @@ namespace TestLibrary
         }
 
 
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        [Ignore]
         public void ResumeBigFile(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -701,7 +703,7 @@ namespace TestLibrary
 
 
         // Goal: Make sure that CmisSync works for uploading modified files.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncUploads(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -797,7 +799,7 @@ namespace TestLibrary
         }
 
         // Goal: Make sure that CmisSync works for remote changes.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncRemote(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -958,7 +960,8 @@ namespace TestLibrary
 
 
         // Goal: Make sure that CmisSync works for remote heavy folder changes.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        [Ignore]
         public void SyncRemoteHeavyFolder(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1054,9 +1057,127 @@ namespace TestLibrary
             }
         }
 
+                // Goal: Make sure that CmisSync works for equality.
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void SyncRenamedFiles(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            string canonical_name2 = canonical_name + ".equality";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            CleanDirectory(localDirectory);
+            CleanDirectory(localDirectory2);
+            Console.WriteLine("Synced to clean state.");
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            RepoInfo repoInfo2 = new RepoInfo(
+                    canonical_name2,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000);
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+                repoInfo,
+                activityListener,
+                cmis))
+            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
+                repoInfo2,
+                activityListener,
+                cmis2))
+            using (Watcher watcher = new Watcher(localDirectory))
+            using (Watcher watcher2 = new Watcher(localDirectory2))
+            {
+                synchronizedFolder.resetFailedOperationsCounter();
+                synchronizedFolder2.resetFailedOperationsCounter();
+                synchronizedFolder.Sync();
+                synchronizedFolder2.Sync();
+                CleanAll(localDirectory);
+                CleanAll(localDirectory2);
+                WatcherTest.WaitWatcher();
+                synchronizedFolder.Sync();
+                synchronizedFolder2.Sync();
+                Console.WriteLine("Synced to clean state.");
+
+                //  create file
+                // remote filename = /SyncEquality.File
+                Console.WriteLine("create file test.");
+                string filename = "SyncRename.File";
+                string file = Path.Combine(localDirectory, filename);
+                string file2 = Path.Combine(localDirectory2, filename);
+                int localFilesCount = 0;
+                int localFilesCount2 = 0;
+                Assert.IsFalse(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                watcher.EnableRaisingEvents = true;
+                int length = 1024;
+                using (Stream stream = File.OpenWrite(file))
+                {
+                    byte[] content = new byte[length];
+                    stream.Write(content, 0, content.Length);
+                }
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                WatcherTest.WaitWatcher((int)repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsFalse(File.Exists(file2));
+                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate {
+                    synchronizedFolder.Sync();
+                    FileInfo info = new FileInfo(file2);
+                    return info.Exists && info.Length == length;
+                }));
+                Assert.IsTrue(File.Exists(file));
+                Assert.IsTrue(File.Exists(file2));
+                localFilesCount = Directory.GetFiles(localDirectory).Length;
+                localFilesCount2 = Directory.GetFiles(localDirectory2).Length;
+                Assert.AreEqual(localFilesCount, localFilesCount2, String.Format("Both local folder should contain one file before renaming a file, but there are {0} and {1} files", localFilesCount, localFilesCount2));
+                // Only one file should exist
+                Assert.AreEqual(1, localFilesCount2, String.Format("There should exist only one file in the local folder before renaming, but there are {0}", localFilesCount2));
+                string renamedfilename = "SyncRenameTarget.File";
+                string renamedfile = Path.Combine(localDirectory, renamedfilename);
+                string renamedfile2 = Path.Combine(localDirectory2, renamedfilename);
+                watcher.EnableRaisingEvents = true;
+                File.Move(file, renamedfile);
+                WatcherTest.WaitWatcher((int) repoInfo2.PollInterval, watcher, 1);
+                watcher.EnableRaisingEvents = false;
+                watcher.RemoveAll();
+                Assert.IsTrue(File.Exists(renamedfile));
+                Assert.IsTrue(!File.Exists(renamedfile2));
+                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate {
+                    synchronizedFolder.Sync();
+                    FileInfo info = new FileInfo(renamedfile2);
+                    return info.Exists && info.Length == length;
+                }));
+                localFilesCount = Directory.GetFiles(localDirectory).Length;
+                localFilesCount2 = Directory.GetFiles(localDirectory2).Length;
+                Assert.AreEqual(localFilesCount, localFilesCount2, String.Format("Both local folder should contain one file, but there are {0} and {1} files", localFilesCount, localFilesCount2));
+                // Only one file should exist
+                Assert.AreEqual(1, localFilesCount2, String.Format("There should exist only one file in the local folder, but there are {0}", localFilesCount2));
+            }
+        }
+
+
 
         // Goal: Make sure that CmisSync works for equality.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncEquality(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1332,7 +1453,7 @@ namespace TestLibrary
         }
 
         // Goal: Make sure that CmisSync works for empty files without creating conflict files.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncEmptyFileEquality(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1411,7 +1532,8 @@ namespace TestLibrary
 
 
         // Goal: Make sure that CmisSync works for heavy folder.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        [Ignore]
         public void SyncEqualityHeavyFolder(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1531,7 +1653,8 @@ namespace TestLibrary
 
 
         // Goal: Make sure that CmisSync works for concurrent heavy folder.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        [Ignore]
         public void SyncConcurrentHeavyFolder(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1641,7 +1764,7 @@ namespace TestLibrary
         }
 
 
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1688,7 +1811,7 @@ namespace TestLibrary
 
 
         // Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncWhileModifyingFiles(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1763,7 +1886,7 @@ namespace TestLibrary
 
 
         // Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncWhileModifyingFolders(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1841,7 +1964,7 @@ namespace TestLibrary
 
         // Write a file and immediately check whether it has been created.
         // Should help to find out whether CMIS servers are synchronous or not.
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void WriteThenRead(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1897,7 +2020,8 @@ namespace TestLibrary
         }
 
 
-        [Test, TestCaseSource("TestServers")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        [Ignore]
         public void DotCmisToIBMConnections(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1934,13 +2058,31 @@ namespace TestLibrary
         }
 
 
-        [Test, TestCaseSource("TestServersFuzzy")]
+        [Test, TestCaseSource("TestServersFuzzy"), Category("Slow")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
             Tuple<CmisServer, Exception> server = CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
             Assert.NotNull(server.Item1);
         }
 
+        /// <summary>
+        /// Waits the until sync is done.
+        /// </summary>
+        /// <returns>
+        /// True, if checkStop has been true, otherwise false.
+        /// </returns>
+        /// <param name='synchronizedFolder'>
+        /// Synchronized folder, which should be used for sync and waiting.
+        /// </param>
+        /// <param name='checkStop'>
+        /// If returns <c>true</c> wait returns true, otherwise a retry will be executed until reaching maxTries.
+        /// </param>
+        /// <param name='maxTries'>
+        /// Number of retries, until false is returned, if checkStop could not be true.
+        /// </param>
+        /// <param name='pollInterval'>
+        /// Sleep interval duration in miliseconds between synchronization calls.
+        /// </param>
         public static bool WaitUntilSyncIsDone(CmisRepo.SynchronizedFolder synchronizedFolder, Func<bool> checkStop, int maxTries = 4,  int pollInterval = 5000)
         {
             int i = 0;
@@ -1963,6 +2105,21 @@ namespace TestLibrary
             return false;
         }
 
+        /// <summary>
+        /// Waits until checkStop is true or waiting duration is reached.
+        /// </summary>
+        /// <returns>
+        /// True if checkStop is true, otherwise waits for pollInterval miliseconds and checks again until the wait threshold is reached.
+        /// </returns>
+        /// <param name='checkStop'>
+        /// Checks if the condition, which is waited for is <c>true</c>.
+        /// </param>
+        /// <param name='wait'>
+        /// Waiting threshold. If this is reached, <c>false</c> will be returned.
+        /// </param>
+        /// <param name='pollInterval'>
+        /// Sleep duration between two condition validations by calling checkStop.
+        /// </param>
         public static bool WaitUntilDone(Func<bool> checkStop, int wait = 300000, int pollInterval = 1000)
         {
             while (wait > 0)

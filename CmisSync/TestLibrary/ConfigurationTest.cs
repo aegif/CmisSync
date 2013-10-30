@@ -12,7 +12,7 @@ namespace TestLibrary
     class ConfigurationTest
     {
 
-        [Test]
+        [Test, Category("Slow")]
         public void TestConfig()
         {
             string configpath = Path.GetFullPath("testconfig.conf");

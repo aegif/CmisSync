@@ -9,7 +9,7 @@ namespace TestLibrary
     [TestFixture]
     public class EncodingTest
     {
-        [Test]
+        [Test, Category("Fast")]
         public void IsoEncodingTest()
         {
             Assert.IsTrue(CmisSync.Lib.Utils.IsValidISO88591("abcdefghijklmnopqrstuvwxyz"));
@@ -26,7 +26,7 @@ namespace TestLibrary
             Assert.IsFalse(CmisSync.Lib.Utils.IsValidISO88591("–€"));
         }
 
-        [Test]
+        [Test, Category("Fast")]
         public void ValidFileNameTest()
         {
             Assert.IsFalse(CmisSync.Lib.Utils.IsInvalidFileName("abcdefghijklmnopqrstuvwxyz"));
@@ -49,10 +49,10 @@ namespace TestLibrary
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName(">"), ">");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("*"), "*");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("|"), "|");
-            Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("–€"));
+            Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("–€"), "Non Valid ISO 8859-1 Character accepted");
         }
 
-        [Test]
+        [Test, Category("Fast")]
         public void ValidFolderNameTest()
         {
             Assert.IsFalse(CmisSync.Lib.Utils.IsInvalidFolderName("abcdefghijklmnopqrstuvwxyz"));
