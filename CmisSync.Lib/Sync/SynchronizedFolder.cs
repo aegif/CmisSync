@@ -130,12 +130,12 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Link to parent object.
             /// </summary>
-
             private RepoBase repo;
+            
             /// <summary>
-            /// Link to parent object.
+            /// EventQueue
             /// </summary>
-            private SyncEventQueue queue;
+            public SyncEventQueue Queue {get; private set;}
             
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
@@ -153,7 +153,7 @@ namespace CmisSync.Lib.Sync
                 this.repoinfo = repoInfo;
 
                 var eventManager = new SyncEventManager(); 
-                this.queue = new SyncEventQueue(eventManager);
+                Queue = new SyncEventQueue(eventManager);
 
                 // Database is the user's AppData/Roaming
                 database = new Database(repoinfo.CmisDatabase);
@@ -207,7 +207,7 @@ namespace CmisSync.Lib.Sync
                         if (disposing)
                         {
                             this.database.Dispose();
-                            this.queue.Dispose();
+                            Queue.Dispose();
                         }
                         this.disposed = true;
                     }
