@@ -1,3 +1,5 @@
+using log4net;
+
 using System;
 using System.Collections.Generic;
 
@@ -5,6 +7,7 @@ namespace CmisSync.Lib.Events
 {
     public class SyncEventManager
     {
+        private static readonly ILog logger = LogManager.GetLogger(typeof(SyncEventManager));
         private List<SyncEventHandler> handler = new List<SyncEventHandler>();
         public SyncEventManager()
         {
@@ -24,10 +27,11 @@ namespace CmisSync.Lib.Events
         }
 
         public virtual void Handle(ISyncEvent e) {
-            foreach ( SyncEventHandler h in handler)
+            for(int i = handler.Count-1; i >= 0; i--)
             {
-                if(h.Handle(e))
+                if(handler[i].Handle(e)){
                     return;
+                }
             }
         }
 
