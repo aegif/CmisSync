@@ -716,11 +716,8 @@ namespace CmisSync
                                     }
                                     if (selectedRepo != null)
                                     {
-                                        foreach (Folder child in selectedRepo.Folder)
-                                        {
-                                            ignored.AddRange(getIgnoredFolder(child));
-                                            selectedFolder.AddRange(getSelectedFolder(child));
-                                        }
+                                        ignored.AddRange(selectedRepo.GetIgnoredFolder());
+                                        selectedFolder.AddRange(selectedRepo.GetSelectedFolder());
                                         Controller.saved_repository = selectedRepo.Id;
                                         Controller.saved_remote_path = selectedRepo.Path;
                                         Controller.Add2PageCompleted(
@@ -1066,34 +1063,6 @@ namespace CmisSync
 
             Controller.PageCancelled();
             Logger.Info("Exiting constructor.");
-        }
-
-        private List<string> getIgnoredFolder(Folder f)
-        {
-            List<string> result = new List<string>();
-            if (f.IsIgnored)
-            {
-                result.Add(f.Path);
-            }
-            else
-            {
-                foreach (Folder child in f.SubFolder)
-                    result.AddRange(getIgnoredFolder(child));
-            }
-            return result;
-        }
-
-        private List<string> getSelectedFolder(Folder f)
-        {
-            List<string> result = new List<string>();
-            if (f.Selected == true)
-                result.Add(f.Path);
-            else
-            {
-                foreach (Folder child in f.SubFolder)
-                    result.AddRange(getSelectedFolder(child));
-            }
-            return result;
         }
     }
 

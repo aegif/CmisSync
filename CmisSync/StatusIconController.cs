@@ -272,6 +272,13 @@ namespace CmisSync {
             Program.Controller.RemoveRepositoryFromSync(reponame);
         }
 
+        /// <summary>
+        /// Edit a particular folder.
+        /// </summary>
+        public void EditFolderClicked(string reponame)
+        {
+            Program.Controller.EditRepositoryFolder(reponame);
+        }
 
         /// <summary>
         /// Start the tray icon animation.

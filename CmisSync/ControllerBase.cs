@@ -1,4 +1,4 @@
-//   CmisSync, a collaboration and sharing tool.
+﻿//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -62,6 +62,14 @@ namespace CmisSync
         /// List of the CmisSync synchronized folders.
         /// </summary>
         private List<RepoBase> repositories = new List<RepoBase>();
+
+
+        /// <summary>
+        /// Dictionary of the edit folder diaglogs
+        /// Key: synchronized folder name
+        /// Value: <c>Edit</c>
+        /// </summary>
+        private Dictionary<string, Edit> edits = new Dictionary<string, Edit>();
 
 
         /// <summary>
@@ -273,6 +281,11 @@ namespace CmisSync
                 Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
                 if (f != null)
                 {
+                    Edit edit = null;
+                    if (edits.TryGetValue(reponame, out edit))
+                    {
+                        edit.Close();
+                    }
                     RemoveRepository(f);
                     ConfigManager.CurrentConfig.Folder.Remove(f);
                     ConfigManager.CurrentConfig.Save();
@@ -285,7 +298,92 @@ namespace CmisSync
             }
         }
 
-        
+        public void EditRepositoryFolder(string reponame)
+        {
+            Config.SyncConfig.Folder folder;
+
+            lock (this.repo_lock)
+            {
+                folder = ConfigManager.CurrentConfig.getFolder(reponame);
+                if (folder == null)
+                {
+                    Logger.Warn("Reponame \"" + reponame + "\" could not be found: Editing Repository failed");
+                    return;
+                }
+
+                Edit edit = null;
+                if (edits.TryGetValue(reponame, out edit))
+                {
+                    edit.Show();
+                    return;
+                }
+
+                RepoInfo.CmisPassword password = new RepoInfo.CmisPassword();
+                password.ObfuscatedPassword = folder.ObfuscatedPassword;
+                Uri address = folder.RemoteUrl;
+                List<string> oldIgnores = new List<string>();
+                foreach (Config.IgnoredFolder ignore in folder.IgnoredFolders)
+                {
+                    oldIgnores.Add(ignore.Path);
+                }
+                edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath, oldIgnores, folder.LocalPath);
+                edits.Add(reponame, edit);
+
+                edit.Controller.SaveFolderEvent += delegate
+                {
+                    lock (this.repo_lock)
+                    {
+                        folder.IgnoredFolders.Clear();
+                        foreach (string ignore in edit.Ignores)
+                        {
+                            folder.IgnoredFolders.Add(new Config.IgnoredFolder() { Path = ignore });
+                        }
+                        ConfigManager.CurrentConfig.Save();
+                        foreach (string oldIgnore in oldIgnores)
+                        {
+                            if (String.IsNullOrEmpty(edit.Ignores.Find(
+                                delegate(string ignore)
+                                {
+                                    if (ignore == oldIgnore || oldIgnore.StartsWith(ignore + "/"))
+                                    {
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                })))
+                            {
+                                Logger.Info(String.Format("The remote folder {0} should be synced after editing ignore folders", oldIgnore));
+                                lock (this.repo_lock)
+                                {
+                                    foreach (RepoBase repo in this.repositories)
+                                    {
+                                        if (repo.Name == reponame)
+                                        {
+                                            //  force a full tree work sync
+                                            repo.Watcher.EnableRaisingEvents = false;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                };
+
+                edit.Controller.CloseWindowEvent += delegate
+                {
+                    lock (this.repo_lock)
+                    {
+                        edits.Remove(reponame);
+                    }
+                };
+
+                edit.Show();
+            }
+        }
+
         /// <summary>
         /// Remove a synchronized folder from the CmisSync configuration.
         /// This happens after the user removes the folder.

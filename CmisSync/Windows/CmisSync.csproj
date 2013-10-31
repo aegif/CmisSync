@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
@@ -84,6 +84,9 @@
     <Compile Include="..\ControllerBase.cs">
       <Link>ControllerBase.cs</Link>
     </Compile>
+    <Compile Include="..\EditController.cs">
+      <Link>EditController.cs</Link>
+    </Compile>
     <Compile Include="..\SetupController.cs">
       <Link>SetupController.cs</Link>
     </Compile>
@@ -95,6 +98,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Edit.cs" />
     <Compile Include="FolderTreeView.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">

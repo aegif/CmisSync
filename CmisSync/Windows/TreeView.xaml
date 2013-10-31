@@ -13,8 +13,9 @@
         <local:LoadingStatusToTextConverter x:Key="StatusText" />
         <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
         <local:IgnoreToTextDecoration x:Key="IgnoreTextDecoration" />
+        <local:FolderTypeToBrushConverter x:Key="FolderType"/>
         <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
-            <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
+            <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                     <TextBlock Text="{Binding Name, Mode=OneTime}" />
 <!--                    <CheckBox Content="Automatically sync new folder" IsChecked="{Binding SyncAllSubFolder, Mode=TwoWay}" FlowDirection="RightToLeft" Margin="20,0,0,0" Foreground="DarkGray"/> -->
@@ -23,25 +24,24 @@
             </RadioButton>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding SubFolder}" >
-            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
+            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
                 <StackPanel Orientation="Horizontal">
-<!--
-                    <StackPanel.ContextMenu>
+                    <!--<StackPanel.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="{Binding Converter={StaticResource IgnoreText}, Path=IsIgnored}" IsCheckable="True" IsChecked="{Binding IsIgnored}">
 
                             </MenuItem>
                         </ContextMenu>
-                    </StackPanel.ContextMenu>
--->
-                    <TextBlock Text="{Binding Name, Mode=OneTime}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
+                    </StackPanel.ContextMenu>-->
+                    <TextBlock Text="{Binding Name, Mode=OneTime}" Foreground="{Binding Converter={StaticResource FolderType}, Path=Type}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
                     <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
                 </StackPanel>
             </CheckBox>
         </HierarchicalDataTemplate>
-        </TreeView.Resources>
+    </TreeView.Resources>
     <TreeView.ItemContainerStyle>
         <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=OneWayToSource}"/>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="White" />
