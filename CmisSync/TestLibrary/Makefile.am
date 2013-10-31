@@ -19,6 +19,7 @@ SOURCES =  \
 	SyncEventQueueTest.cs \
 	SyncEventManagerTest.cs \
 	EventTypesTest.cs \
+	FSDeletionHandlerTest.cs \
 	DebugLoggingHandlerTest.cs \
 	LocalFilesystemActivityGenerator.cs \
 	ConfigurationTest.cs \

@@ -69,6 +69,7 @@
     <Compile Include="SyncEventManagerTest.cs" />
     <Compile Include="EventTypesTest.cs" />
     <Compile Include="DebugLoggingHandlerTest.cs" />
+    <Compile Include="FSDeletionHandlerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">

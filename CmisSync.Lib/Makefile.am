@@ -22,6 +22,7 @@ SOURCES =  \
 	Events/FSEvent.cs \
 	Events/SyncEventHandler.cs \
 	Events/DebugLoggingHandler.cs \
+	Events/FSDeletionHandler.cs \
 	Events/SyncEventManager.cs \
 	Events/SyncEventQueue.cs \
 	Fetcher.cs \

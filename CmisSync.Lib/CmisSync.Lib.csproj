@@ -80,6 +80,7 @@
     <Compile Include="Events\SyncEventManager.cs" />
     <Compile Include="Events\SyncEventHandler.cs" />
     <Compile Include="Events\DebugLoggingHandler.cs" />
+    <Compile Include="Events\FSDeletionHandler.cs" />
     <Compile Include="Events\SyncEventQueue.cs" />
   </ItemGroup>
   <ItemGroup>
