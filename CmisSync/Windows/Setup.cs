@@ -639,7 +639,7 @@ namespace CmisSync
                                 Header = Properties_Resources.Which;
 
                                 // A tree allowing the user to browse CMIS repositories/folders.
-                                System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/TreeView.xaml", System.UriKind.Relative);
+                                System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/FolderTreeMVC/TreeView.xaml", System.UriKind.Relative);
                                 System.Windows.Controls.TreeView treeView = System.Windows.Application.LoadComponent(resourceLocater) as TreeView;
 
                                 ObservableCollection<CmisRepo> repos = new ObservableCollection<CmisRepo>();

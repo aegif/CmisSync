@@ -65,7 +65,7 @@ namespace CmisSync
         /// </summary>
         private void CreateEdit()
         {
-            System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/TreeView.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/FolderTreeMVC/TreeView.xaml", System.UriKind.Relative);
             TreeView treeView = Application.LoadComponent(resourceLocater) as TreeView;
 
             CmisSync.CmisTree.CmisRepo repo = new CmisSync.CmisTree.CmisRepo(username, password, address, Ignores, localPath)
