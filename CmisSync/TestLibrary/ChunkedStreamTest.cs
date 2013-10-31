@@ -51,12 +51,13 @@ namespace TestLibrary
         }
 
         [Test]
+        [Ignore]
         public void TestSeek()
         {
             //Assert.Fail("TODO");
         }
 
-        [Test]
+        [Test, Category("Fast")]
         public void TestWrite()
         {
             //using (Database database = new Database(DatabasePath))
@@ -147,7 +148,7 @@ namespace TestLibrary
             }
         }
 
-        [Test]
+        [Test, Category("Fast")]
         public void TestRead()
         {
             //using (Database database = new Database(DatabasePath))
@@ -231,12 +232,14 @@ namespace TestLibrary
         }
 
         [Test]
+        [Ignore]
         public void TestWriteResume()
         {
             //Assert.Fail("TODO");
         }
 
         [Test]
+        [Ignore]
         public void TestReadResume()
         {
             //Assert.Fail("TODO");

@@ -201,6 +201,22 @@ namespace CmisSync.Lib
             return true;
         }
 
+        /// <summary>
+        /// Determines whether this instance is valid ISO-8859-1 specified input.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if this instance is valid ISO-8859-1 specified input; otherwise, <c>false</c>.
+        /// </returns>
+        /// <param name='input'>
+        /// If set to <c>true</c> input.
+        /// </param>
+        public static bool IsValidISO88591(string input)
+        {
+            byte[] bytes = Encoding.GetEncoding(28591).GetBytes(input);
+            String result = Encoding.GetEncoding(28591).GetString(bytes);
+            return String.Equals(input, result);
+        }
+
 
         /// <summary>
         /// Check whether a file name is valid or not.
@@ -208,8 +224,15 @@ namespace CmisSync.Lib
         public static bool IsInvalidFileName(string name)
         {
             bool ret = invalidFileNameRegex.IsMatch(name);
-            if (ret) {
-                Logger.Debug("Invalid filename: " + name);
+            if (ret)
+            {
+                Logger.Debug(String.Format("The given file name {0} contains invalid patterns", name));
+                return ret;
+            }
+            ret = !IsValidISO88591(name);
+            if (ret)
+            {
+                Logger.Debug(String.Format("The given file name {0} contains invalid characters", name));
             }
             return ret;
         }
@@ -219,7 +242,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a file name is valid or not.
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:") + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:/\\|<>*") + "]");
 
 
         /// <summary>
@@ -228,8 +251,15 @@ namespace CmisSync.Lib
         public static bool IsInvalidFolderName(string name)
         {
             bool ret = invalidFolderNameRegex.IsMatch(name);
-            if (ret) {
-                Logger.Debug("Invalid dirname: " + name);
+            if (ret)
+            {
+                Logger.Debug(String.Format("The given directory name {0} contains invalid patterns", name));
+                return ret;
+            }
+            ret = !IsValidISO88591(name);
+            if (ret)
+            {
+                Logger.Debug(String.Format("The given directory name {0} contains invalid characters", name));
             }
             return ret;
         }
@@ -239,7 +269,7 @@ namespace CmisSync.Lib
         /// Regular expression to check whether a filename is valid or not.
         /// </summary>
         private static Regex invalidFolderNameRegex = new Regex(
-            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?:") + "]");
+            "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?:/\\|<>*") + "]");
 
 
         /// <summary>
