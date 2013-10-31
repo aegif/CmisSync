@@ -1143,17 +1143,17 @@ namespace CmisSync
             /// Color of FolderType.NONE
             /// </summary>
             public Brush NocalFolderBrush { get { return noneFolderBrush; } set { localFolderBrush = value; } }
-            private Brush localFolderBrush = Brushes.LightGray;
+            private Brush localFolderBrush = Brushes.Gray;
             /// <summary>
             /// Color of FolderType.LOCAL
             /// </summary>
             public Brush LocalFolderBrush { get { return localFolderBrush; } set { localFolderBrush = value; } }
-            private Brush remoteFolderBrush = Brushes.LightBlue;
+            private Brush remoteFolderBrush = Brushes.Blue;
             /// <summary>
             /// Color of FolderType.REMOTE
             /// </summary>
             public Brush RemoteFolderBrush { get { return remoteFolderBrush; } set { remoteFolderBrush = value; } }
-            private Brush bothFolderBrush = Brushes.LightGreen;
+            private Brush bothFolderBrush = Brushes.Green;
             /// <summary>
             /// Color of FolderType.BOTH
             /// </summary>
