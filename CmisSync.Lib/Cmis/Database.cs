@@ -8,6 +8,7 @@ using Mono.Data.Sqlite;
 #else
 using System.Data.SQLite;
 #endif
+using System.Data.Common;
 using System.IO;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
@@ -77,7 +78,7 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
-        /// Destructor.
+        /// Finalizer.
         /// </summary>
         ~Database()
         {
@@ -272,6 +273,13 @@ namespace CmisSync.Lib.Cmis
         // 
         // 
         //
+
+        /// <summary>
+        /// Begins a Database transaction
+        /// </summary>
+        public DbTransaction BeginTransaction() {
+            return GetSQLiteConnection().BeginTransaction();
+        }
 
         /// <summary>
         /// Add a file to the database. And calculate the checksum of the file
