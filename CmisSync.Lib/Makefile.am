@@ -14,6 +14,7 @@ SOURCES =  \
 	Cmis/CmisUtils.cs \
 	Cmis/Crypto.cs \
 	Cmis/Database.cs \
+	Cmis/IDatabase.cs \
 	Cmis/MimeType.cs \
 	Config.cs \
 	ConfigManager.cs \

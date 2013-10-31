@@ -28,7 +28,7 @@ namespace CmisSync.Lib.Cmis
     /// Database to cache remote information from the CMIS server.
     /// Implemented with SQLite.
     /// </summary>
-    public class Database : IDisposable
+    public class Database : IDatabase, IDisposable
     {
         /// <summary>
         /// Log.
@@ -884,6 +884,11 @@ namespace CmisSync.Lib.Cmis
             }
         }
 
+        public enum OperationType 
+        {
+            UPLOAD, DOWNLOAD, CHANGE, DELETE
+        }
+
 
         /// <summary>
         /// Helper method to fill the parameters inside an SQL command.
@@ -901,11 +906,6 @@ namespace CmisSync.Lib.Cmis
                     command.Parameters.AddWithValue(pair.Key, pair.Value);
                 }
             }
-        }
-
-        public enum OperationType 
-        {
-            UPLOAD, DOWNLOAD, CHANGE, DELETE
         }
 
         private string operationTypeToString(OperationType type)

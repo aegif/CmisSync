@@ -3,11 +3,19 @@ using System.IO;
 
 using log4net;
 
+using CmisSync.Lib.Cmis;
+using DotCMIS.Client;
+
 namespace CmisSync.Lib.Events
 {
     public class FSDeletionHandler : SyncEventHandler
     {
+        private IDatabase database;
+
+        private ISession session;
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(FSDeletionHandler));
+
         private static readonly int FSDELETIONPRIORITY = 100;
 
         public override bool Handle(ISyncEvent e)
@@ -25,6 +33,18 @@ namespace CmisSync.Lib.Events
         public override int Priority
         {
             get {return FSDELETIONPRIORITY;}
+        }
+
+        public FSDeletionHandler (IDatabase database, ISession session){
+
+            if(database == null) {
+                throw new ArgumentNullException("Argument null in FSDeletionHandler Constructor","database");
+            }
+            if(session == null) {
+                throw new ArgumentNullException("Argument null in FSDeletionHandler Constructor","session");
+            }
+            this.database = database;
+            this.session = session;
         }
     }
 }
