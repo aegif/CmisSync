@@ -192,17 +192,6 @@ namespace CmisSync.Lib.Sync
 
             private void WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
-                if (Directory.Exists(pathname))
-                {
-                    Logger.Info(String.Format("A new folder {0} is created, ignore for the delete action", pathname));
-                    return;
-                }
-                if (File.Exists(pathname))
-                {
-                    Logger.Info(String.Format("A new file {0} is created, ignore for the delete action", pathname));
-                    return;
-                }
-
                 string name = pathname.Substring(localFolder.Length + 1);
                 string remoteName = Path.Combine(remoteFolder,name).Replace('\\','/');
 
