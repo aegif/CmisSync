@@ -10,6 +10,9 @@ namespace CmisSync.Lib.Events
         public string Path { get; private set; }
 
         public FSEvent(WatcherChangeTypes type, string path) {
+            if(path == null) {
+                throw new ArgumentNullException("Argument null in FSEvent Constructor","path");
+            }
             Type = type;
             Path = path;
         }
