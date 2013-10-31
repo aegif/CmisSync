@@ -4,9 +4,16 @@ using log4net;
 
 namespace CmisSync.Lib.Events
 {
+    ///<summary>
+    ///Base class for all Event-Handlers
+    ///</summary>
     public abstract class SyncEventHandler : IComparable<SyncEventHandler>, IComparable
     {
         public abstract bool Handle(ISyncEvent e);
+
+        ///<summary>
+        ///May not be changed during runtime
+        ///</summary>
         public abstract int Priority {get;}
 
         public int CompareTo(SyncEventHandler other) {
