@@ -34,24 +34,25 @@ namespace CmisSync.Lib
         public string RemotePath { get; set; }
 
 
+        private Credentials.CmisRepoCredentials credentials = new Credentials.CmisRepoCredentials();
         /// <summary>
         /// Address of the server's CMIS endpoint.
         /// For instance: http://192.168.0.1:8080/alfresco/cmisatom
         /// </summary>
-        public Uri Address { get; set; }
+        public Uri Address { get { return credentials.Address; } set { credentials.Address = value; } }
 
 
         /// <summary>
         /// CMIS user.
         /// </summary>
-        public string User { get; set; }
+        public string User { get { return credentials.UserName; } set { credentials.UserName = value; } }
 
 
         /// <summary>
         /// CMIS password, hashed.
         /// For instance: AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAtiSvUCYn...
         /// </summary>
-        public CmisPassword Password { get; set; }
+        public Credentials.Password Password { get { return credentials.Password; } set { credentials.Password = value; } }
 
 
         /// <summary>
@@ -169,31 +170,6 @@ namespace CmisSync.Lib
             {
                 return path.StartsWith(ignore);
             }));
-        }
-
-        public class CmisPassword
-        {
-            private string password = null;
-            public CmisPassword(string password)
-            {
-                this.password = Crypto.Obfuscate(password);
-            }
-
-            public CmisPassword(){}
-
-            public static implicit operator CmisPassword(string value)
-            {
-                return new CmisPassword(value);
-            }
-            override
-            public string ToString()
-            {
-                if(password == null)
-                    return null;
-                return Crypto.Deobfuscate(password);
-            }
-
-            public string ObfuscatedPassword { get { return password; } set { password = value; } }
         }
     }
 }

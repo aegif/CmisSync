@@ -318,15 +318,20 @@ namespace CmisSync
                     return;
                 }
 
-                RepoInfo.CmisPassword password = new RepoInfo.CmisPassword();
-                password.ObfuscatedPassword = folder.ObfuscatedPassword;
-                Uri address = folder.RemoteUrl;
+
+                CmisSync.Lib.Credentials.CmisRepoCredentials credentials = new CmisSync.Lib.Credentials.CmisRepoCredentials()
+                {
+                    Address = folder.RemoteUrl,
+                    UserName = folder.UserName,
+                    Password = folder.ObfuscatedPassword.ToString(),
+                    RepoId = folder.RepositoryId
+                };
                 List<string> oldIgnores = new List<string>();
                 foreach (Config.IgnoredFolder ignore in folder.IgnoredFolders)
                 {
                     oldIgnores.Add(ignore.Path);
                 }
-                edit = new Edit(folder.DisplayName, folder.UserName, password.ToString(), address.ToString(), folder.RepositoryId, folder.RemotePath, oldIgnores, folder.LocalPath);
+                edit = new Edit(credentials, folder.DisplayName, folder.RemotePath, oldIgnores, folder.LocalPath);
                 edits.Add(reponame, edit);
 
                 edit.Controller.SaveFolderEvent += delegate

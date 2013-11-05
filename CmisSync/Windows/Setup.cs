@@ -57,7 +57,7 @@ namespace CmisSync
         /// </summary>
         public SetupController Controller = new SetupController();
 
-        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, RepoInfo.CmisPassword password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(ServerCredentials credentials);
 
         /// <summary>
         /// Constructor.
@@ -576,8 +576,13 @@ namespace CmisSync
                                     // Try to find the CMIS server (asynchronously)
                                     GetRepositoriesFuzzyDelegate dlgt =
                                         new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
-                                    IAsyncResult ar = dlgt.BeginInvoke(new Uri(address_box.Text), user_box.Text,
-                                        password_box.Password, null, null);
+                                    ServerCredentials credentials = new ServerCredentials()
+                                    {
+                                        UserName = user_box.Text,
+                                        Password = password_box.Password,
+                                        Address = new Uri(address_box.Text)
+                                    };
+                                    IAsyncResult ar = dlgt.BeginInvoke(credentials, null, null);
                                     while (!ar.AsyncWaitHandle.WaitOne(100)) {
                                         System.Windows.Forms.Application.DoEvents();
                                     }
