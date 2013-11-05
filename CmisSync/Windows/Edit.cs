@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.ComponentModel;
+using CmisSync.Lib.Credentials;
+using CmisSync.CmisTree;
 
 namespace CmisSync
 {
@@ -28,10 +30,7 @@ namespace CmisSync
         /// </summary>
         public List<string> Ignores;
 
-        private string username;
-        private string password;
-        private string address;
-        private string id;
+        private CmisRepoCredentials credentials;
         private string remotePath;
         private string localPath;
 
@@ -39,13 +38,10 @@ namespace CmisSync
         /// <summary>
         /// Constructor
         /// </summary>
-        public Edit(string name, string username, string password, string address, string id, string remotePath, List<string> ignores, string localPath)
+        public Edit(CmisRepoCredentials credentials, string name, string remotePath, List<string> ignores, string localPath)
         {
             Name = name;
-            this.username = username;
-            this.password = password;
-            this.address = address;
-            this.id = id;
+            this.credentials = credentials;
             this.remotePath = remotePath;
             this.Ignores = new List<string>(ignores);
             this.localPath = localPath;
@@ -68,14 +64,14 @@ namespace CmisSync
             System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/FolderTreeMVC/TreeView.xaml", System.UriKind.Relative);
             TreeView treeView = Application.LoadComponent(resourceLocater) as TreeView;
 
-            CmisSync.CmisTree.CmisRepo repo = new CmisSync.CmisTree.CmisRepo(username, password, address, Ignores, localPath)
+            CmisSync.CmisTree.RootFolder repo = new CmisSync.CmisTree.RootFolder()
             {
                 Name = Name,
-                Id = id
+                Id = credentials.RepoId
             };
-            repo.LoadingSubfolderAsync();
+            BackgroundWorker loader = CmisRepoUtils.LoadingSubfolderAsync(repo, credentials);
 
-            List<CmisSync.CmisTree.CmisRepo> repos = new List<CmisSync.CmisTree.CmisRepo>();
+            List<CmisSync.CmisTree.RootFolder> repos = new List<CmisSync.CmisTree.RootFolder>();
             repos.Add(repo);
             repo.Selected = true;
 
@@ -87,7 +83,7 @@ namespace CmisSync
 
             Controller.CloseWindowEvent += delegate
             {
-                repo.cancelLoadingAsync();
+                loader.CancelAsync();
             };
 
 
@@ -110,7 +106,7 @@ namespace CmisSync
 
             finish_button.Click += delegate
             {
-                Ignores = repo.GetIgnoredFolder();
+                Ignores = CmisRepoUtils.GetIgnoredFolder(repo);
                 Controller.SaveFolder();
                 Close();
             };

@@ -20,128 +20,25 @@ namespace CmisSync
         /// <summary>
         /// Data Model for the WPF UI representing a CMIS repository
         /// </summary>
-        public class CmisRepo : INotifyPropertyChanged
+        public class CmisRepoUtils
         {
             private BackgroundWorker worker = new BackgroundWorker();
             private BackgroundWorker folderworker = new BackgroundWorker();
-            private ObservableCollection<Folder> _folder = new ObservableCollection<Folder>();
-            private string name;
-            /// <summary>
-            /// Gets and sets the name of the repository. PropertyChangeListener will be notified on change
-            /// </summary>
-            public string Name { get { return name; } set { SetField(ref name, value, "Name"); } }
-            /// <summary>
-            /// Gets and sets the unique repository id. A change would not be propagated to listener
-            /// </summary>
-            public string Id { get; set; }
-            /// <summary>
-            /// Readonly Path of the repository.
-            /// </summary>
-            public string Path { get { return "/"; } }
 
-
-            private string username;
-            private string password;
-            private string address;
-
-            /// <summary>
-            /// The URL of the repository. 
-            /// </summary>
-            public string Address { get { return address; } }
 
             private Folder currentWorkingObject;
             private List<Folder> queue = new List<Folder>();
-
-            private LoadingStatus status = LoadingStatus.START;
-            /// <summary>
-            /// Status of the asynchronous loading process. If it is done, the direct sub folder of the repository has been loaded 
-            /// </summary>
-            public LoadingStatus Status { get { return status; } set { SetField(ref status, value, "Status"); } }
-            private bool threestate = false;
-            /// <summary>
-            /// The repo can be set to be able to have three selection states. This enables/disables this support.
-            /// </summary>
-            public bool ThreeState { get { return threestate; } set { SetField(ref threestate, value, "ThreeState"); } }
-            /// <summary>
-            /// Tooltip informations about this repository. It returns the URL and the repository id
-            /// </summary>
-            public string ToolTip { get { return "URL: \"" + address + "\"\r\nRepository ID: \"" + Id + "\""; } }
-            private bool selected = false;
-            /// <summary>
-            /// Sets this repository as selected or not. PropertyChangeListener will be informed about any changes
-            /// </summary>
-            public bool Selected
-            {
-                get { return selected; }
-                set
-                {
-                    if (SetField(ref selected, value, "Selected"))
-                    {
-                        foreach (Folder child in Folder)
-                        {
-                            child.Enabled = selected;
-                        }
-                    }
-                }
-            }
-            private bool automaticSyncAllNewSubfolder = true;
-            /// <summary>
-            /// If all subfolder should be synchronized, this is true, if not, new folder on the the root directory
-            /// must be selected manually. 
-            /// TODO this feature is whether tested not correctly implemented. Please do not set it, or fix it.
-            /// </summary>
-            public bool SyncAllSubFolder { get { return automaticSyncAllNewSubfolder; } set {
-                if (SetField(ref automaticSyncAllNewSubfolder, value, "SyncAllSubFolder"))
-                {
-                    if (automaticSyncAllNewSubfolder)
-                    {
-                        foreach (Folder subfolder in Folder)
-                        {
-                            if (subfolder.Selected == false)
-                            {
-                                subfolder.IsIgnored = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (Folder subfolder in Folder)
-                        {
-                            if (subfolder.IsIgnored)
-                            {
-                                subfolder.IsIgnored = false;
-                                subfolder.Selected = false;
-                            }
-                        }
-                    }
-                }
-            } }
-            /// <summary>
-            /// Collection contains all folder, which are loaded. If the loading is in process, this could be empty or not in the final state
-            /// </summary>
-            public ObservableCollection<Folder> Folder
-            {
-                get { return _folder; }
-            }
-            /// <summary>
-            /// The folder that is selected by user
-            /// </summary>
-            public Folder SelectFolder
-            {
-                get;
-                set;
-            }
 
             /// <summary>
             /// Get the ignored folder list
             /// </summary>
             /// <returns></returns>
-            public List<string> GetIgnoredFolder()
+            public static List<string> GetIgnoredFolder(RootFolder repo)
             {
                 List<string> result = new List<string>();
-                foreach (Folder child in Folder)
+                foreach (Folder child in repo.Children)
                 {
-                    result.AddRange(child.GetIgnoredFolder());
+                    result.AddRange(Folder.GetIgnoredFolder(child));
                 }
                 return result;
             }
@@ -150,12 +47,12 @@ namespace CmisSync
             /// Get the selected folder list
             /// </summary>
             /// <returns></returns>
-            public List<string> GetSelectedFolder()
+            public static List<string> GetSelectedFolder(RootFolder repo)
             {
                 List<string> result = new List<string>();
-                foreach (Folder child in Folder)
+                foreach (Folder child in repo.Children)
                 {
-                    result.AddRange(child.GetSelectedFolder());
+                    result.AddRange(Folder.GetSelectedFolder(child));
                 }
                 return result;
             }
@@ -163,27 +60,27 @@ namespace CmisSync
             /// <summary>
             /// Constructor
             /// </summary>
-            /// <param name="username">login username</param>
-            /// <param name="password">password</param>
-            /// <param name="address">URL of the repo location</param>
             /// <param name="ignores">ignore folder list</param>
             /// <param name="localFolder">local repository folder</param>
-            public CmisRepo(string username, string password, string address, List<string> ignores = null, string localFolder = null)
+            private CmisRepoUtils( List<string> ignores = null, string localFolder = null)
             {
-                this.username = username;
-                this.password = password;
-                this.address = address;
                 worker.DoWork += new DoWorkEventHandler(DoWork);
                 worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Finished);
                 worker.WorkerSupportsCancellation = true;
                 folderworker.DoWork += new DoWorkEventHandler(SubFolderWork);
                 folderworker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(SubfolderFinished);
                 folderworker.WorkerSupportsCancellation = true;
-                BuildIgnoreFolder(ignores);
-                BuildLocalFolder(localFolder, "/");
             }
 
-            private Folder BuildFolder(string path)
+            public static BackgroundWorker LoadingSubfolderAsync(RootFolder targetRepo, CmisSync.Lib.Credentials.CmisRepoCredentials credentials , List<string> ignores = null, string localFolder = null)
+            {
+                BackgroundWorker worker = new BackgroundWorker();
+                worker.DoWork += new DoWorkEventHandler(DoWork);
+                worker.RunWorkerAsync(credentials);
+                return worker;
+            }
+
+            private static Folder BuildFolder(Node node, string path)
             {
                 if (String.IsNullOrEmpty(path))
                 {
@@ -201,9 +98,9 @@ namespace CmisSync
                     if (current == null)
                     {
                         //  Folder in CmisRepo.Folder
-                        foreach (Folder folder in Folder)
+                        foreach (Folder folder in node.Children)
                         {
-                            if (folder.Name == name)
+                            if (folder.Name.Equals(name))
                             {
                                 current = folder;
                                 break;
@@ -213,21 +110,20 @@ namespace CmisSync
                         {
                             current = new Folder()
                             {
-                                Repo = this,
+                                Parent = node,
                                 Path = "/" + name,
                                 Name = name,
-                                Parent = this,
                                 Type = CmisTree.Folder.FolderType.NONE,
-                                Enabled = this.selected
+                                Enabled = node.Selected==true
                             };
-                            Folder.Add(current);
+                            node.Children.Add(current);
                         }
                     }
                     else
                     {
                         //  Folder in Folder.SubFolder
                         string pathSub = current.Path + "/" + name;
-                        Folder folder = current.GetSubFolder(pathSub);
+                        Folder folder = Folder.GetSubFolder(pathSub, current);
                         if (folder == null)
                         {
                             folder = SubfolderHandleFolder(pathSub, current, CmisTree.Folder.FolderType.NONE);
@@ -239,7 +135,7 @@ namespace CmisSync
                 return current;
             }
 
-            private void BuildIgnoreFolder(List<string> ignores)
+            public static void BuildIgnoreFolder(RootFolder root, List<string> ignores)
             {
                 if (null == ignores)
                 {
@@ -248,12 +144,12 @@ namespace CmisSync
 
                 foreach (string ignore in ignores)
                 {
-                    Folder folder = BuildFolder(ignore);
+                    Folder folder = BuildFolder(root, ignore);
                     folder.Selected = false;
                 }
             }
 
-            private void BuildLocalFolder(string localFolder,string path)
+            public static void BuildLocalFolder(Node node, string localFolder, string path)
             {
                 if (null == localFolder)
                 {
@@ -263,9 +159,9 @@ namespace CmisSync
                 foreach (DirectoryInfo dir in (new DirectoryInfo(localFolder)).GetDirectories())
                 {
                     string pathSub = (path + "/" + dir.Name).Replace("//", "/");
-                    Folder folder = BuildFolder(pathSub);
+                    Folder folder = BuildFolder(node, pathSub);
                     folder.AddType(CmisTree.Folder.FolderType.LOCAL);
-                    BuildLocalFolder(dir.FullName, pathSub);
+                    BuildLocalFolder(node, dir.FullName, pathSub);
                 }
             }
 
@@ -290,7 +186,7 @@ namespace CmisSync
                 this.folderworker.CancelAsync();
             }
 
-            private void DoWork(object sender, DoWorkEventArgs e)
+            private static void DoWork(object sender, DoWorkEventArgs e)
             {
                 BackgroundWorker worker = sender as BackgroundWorker;
                 //try
@@ -315,7 +211,7 @@ namespace CmisSync
                 {
                     //  adjust the queue to handle the subfolders for the selected folder
                     int index = 0;
-                    foreach (Folder subfolder in f.SubFolder)
+                    foreach (Folder subfolder in f.Children)
                     {
                         if (subfolder.Status == LoadingStatus.START)
                         {
@@ -372,7 +268,7 @@ namespace CmisSync
                 {
                     folder.Status = LoadingStatus.DONE;
                 }
-                foreach (Folder f in folder.SubFolder)
+                foreach (Folder f in folder.Children)
                 {
                     if (folder.Type == CmisTree.Folder.FolderType.LOCAL || folder.Type == CmisTree.Folder.FolderType.NONE)
                     {
@@ -405,14 +301,14 @@ namespace CmisSync
 
                 foreach (CmisUtils.FolderTree child in tree.children)
                 {
-                    Folder current = parent.GetSubFolder(child.path);
+                    Folder current = Folder.GetSubFolder(child.path, parent);
                     SubfolderHandleTree(child, current);
                 }
             }
 
             private Folder SubfolderHandleFolder(string path, Folder parent, CmisTree.Folder.FolderType type)
             {
-                Folder folder = parent.GetSubFolder(path);
+                Folder folder = Folder.GetSubFolder(path, parent);
                 if (folder != null)
                 {
                     folder.AddType(type);
@@ -421,7 +317,6 @@ namespace CmisSync
 
                 folder = new Folder()
                 {
-                    Repo = this,
                     Path = path,
                     Name = path.Split('/')[path.Split('/').Length - 1],
                     Parent = parent,
@@ -430,7 +325,7 @@ namespace CmisSync
                     Selected = (parent.Selected == false) ? false : true,
                     Enabled = parent.Enabled
                 };
-                parent.SubFolder.Add(folder);
+                parent.Children.Add(folder);
                 return folder;
             }
 
@@ -549,22 +444,6 @@ namespace CmisSync
                         }
                     }
                 }
-            }
-
-            // boiler-plate
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected virtual void OnPropertyChanged(string propertyName)
-            {
-                PropertyChangedEventHandler handler = PropertyChanged;
-                if (handler != null)
-                    handler(this, new PropertyChangedEventArgs(propertyName));
-            }
-            protected bool SetField<T>(ref T field, T value, string propertyName)
-            {
-                if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-                field = value;
-                OnPropertyChanged(propertyName);
-                return true;
             }
         }
     }

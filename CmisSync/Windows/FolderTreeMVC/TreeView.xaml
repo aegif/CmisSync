@@ -14,7 +14,7 @@
         <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
         <local:IgnoreToTextDecorationConverter x:Key="IgnoreTextDecoration" />
         <local:FolderTypeToBrushConverter x:Key="FolderType"/>
-        <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
+        <HierarchicalDataTemplate DataType="{x:Type local:RootFolder}" ItemsSource="{Binding Folder}" >
             <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                     <TextBlock Text="{Binding Name, Mode=OneTime}" />

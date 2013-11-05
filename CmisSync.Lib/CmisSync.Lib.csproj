@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="Cmis\Crypto.cs" />
     <Compile Include="Cmis\Database.cs" />
+    <Compile Include="Credentials.cs" />
+    <Compile Include="Events\SyncEventQueue.cs" />
     <Compile Include="LoggingStream.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />

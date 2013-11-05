@@ -41,6 +41,7 @@ using log4net;
 using System.Collections.ObjectModel;
 using CmisSync.CmisTree;
 using System.Windows.Input;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync
 {
@@ -642,24 +643,31 @@ namespace CmisSync
                                 System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/FolderTreeMVC/TreeView.xaml", System.UriKind.Relative);
                                 System.Windows.Controls.TreeView treeView = System.Windows.Application.LoadComponent(resourceLocater) as TreeView;
 
-                                ObservableCollection<CmisRepo> repos = new ObservableCollection<CmisRepo>();
-
+                                ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
+                                List<BackgroundWorker> loader = new List<BackgroundWorker>();
                                 // Some CMIS servers hold several repositories (ex:Nuxeo). Show one root per repository.
                                 bool firstRepo = true;
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
-                                    CmisRepo repo = new CmisRepo(Controller.saved_user, Controller.saved_password, Controller.saved_address.ToString())
+                                    RootFolder repo = new RootFolder()
                                     {
                                         Name = repository.Value,
                                         Id = repository.Key
                                     };
                                     repos.Add(repo);
-                                    repo.LoadingSubfolderAsync();
                                     if (firstRepo)
                                     {
                                         repo.Selected = true;
                                         firstRepo = false;
                                     }
+                                    CmisRepoCredentials cred = new CmisRepoCredentials()
+                                    {
+                                        UserName = Controller.saved_user,
+                                        Password = Controller.saved_password,
+                                        Address = Controller.saved_address,
+                                        RepoId = repository.Key
+                                    };
+                                    loader.Add(CmisRepoUtils.LoadingSubfolderAsync(repo, cred));
                                 }
                                 treeView.DataContext = repos;
 
@@ -703,12 +711,12 @@ namespace CmisSync
                                     List<string> ignored = new List<string>();
                                     List<string> selectedFolder = new List<string>();
                                     ItemCollection items = treeView.Items;
-                                    CmisRepo selectedRepo = null;
+                                    RootFolder selectedRepo = null;
                                     foreach (var item in items)
                                     {
-                                        CmisRepo repo = item as CmisRepo;
+                                        RootFolder repo = item as RootFolder;
                                         if (repo != null)
-                                            if (repo.Selected)
+                                            if (repo.Selected == true)
                                             {
                                                 selectedRepo = repo;
                                                 break;
@@ -716,14 +724,14 @@ namespace CmisSync
                                     }
                                     if (selectedRepo != null)
                                     {
-                                        ignored.AddRange(selectedRepo.GetIgnoredFolder());
-                                        selectedFolder.AddRange(selectedRepo.GetSelectedFolder());
+                                        ignored.AddRange(CmisRepoUtils.GetIgnoredFolder(selectedRepo));
+                                        selectedFolder.AddRange(CmisRepoUtils.GetSelectedFolder(selectedRepo));
                                         Controller.saved_repository = selectedRepo.Id;
                                         Controller.saved_remote_path = selectedRepo.Path;
                                         Controller.Add2PageCompleted(
                                             Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray(), selectedFolder.ToArray());
-                                        foreach (CmisRepo repo in repos)
-                                            repo.cancelLoadingAsync();
+                                        foreach (BackgroundWorker task in loader)
+                                            task.CancelAsync();
                                     }
                                     else
                                     {
@@ -734,14 +742,14 @@ namespace CmisSync
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
-                                    foreach (CmisRepo repo in repos)
-                                        repo.cancelLoadingAsync();
+                                    foreach (BackgroundWorker task in loader)
+                                        task.CancelAsync();
                                 };
 
                                 Controller.HideWindowEvent += delegate
                                 {
-                                    foreach (CmisRepo repo in repos)
-                                        repo.cancelLoadingAsync();
+                                    foreach (BackgroundWorker task in loader)
+                                        task.CancelAsync();
                                 };
                                 break;
                             }

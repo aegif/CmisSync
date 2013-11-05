@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
@@ -99,7 +99,12 @@
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Edit.cs" />
-    <Compile Include="FolderTreeView.cs" />
+    <Compile Include="FolderTreeMVC\NodeModel.cs" />
+    <Compile Include="FolderTreeMVC\FolderTreeView.cs" />
+    <Compile Include="FolderTreeMVC\FolderTypeConverter.cs" />
+    <Compile Include="FolderTreeMVC\IgnoreStatusConverter.cs" />
+    <Compile Include="FolderTreeMVC\LoadingStatusModel.cs" />
+    <Compile Include="FolderTreeMVC\LoadingStatusConverter.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
       <SubType>Form</SubType>
@@ -278,7 +283,7 @@
     <Folder Include="Plugins\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="TreeView.xaml">
+    <Resource Include="FolderTreeMVC\TreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Resource>
