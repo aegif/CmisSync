@@ -54,7 +54,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cmissync", "config.xml");
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "oris4sync", "config.xml");
             }
         }
     }

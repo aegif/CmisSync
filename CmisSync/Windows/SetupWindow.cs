@@ -89,7 +89,7 @@ namespace CmisSync {
 			
             // Taskbar
 			TaskbarItemInfo = new TaskbarItemInfo () {
-				Description = "CmisSync"
+				Description = "Oris4Sync"
 			};
 
             // Separation and background for the line of buttons.
