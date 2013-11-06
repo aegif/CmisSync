@@ -123,6 +123,17 @@ namespace CmisSync {
                     process.WaitForExit ();
                 }
 
+                string kde_directory_path = Path.Combine(FoldersPath, ".directory");
+                string kde_directory_content = "[Desktop entry]\nIcon=folder-cmissync\n";
+                try
+                {
+                    File.WriteAllText(kde_directory_path, kde_directory_content);
+                }
+                catch (IOException e)
+                {
+                    Logger.Info("Config | Failed setting kde icon for '" + FoldersPath + "': " + e.Message);
+                }
+
                 return true;
             }
 
