@@ -267,12 +267,15 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Move to second page of the tutorial.
+        /// Move to the add repository page...
         /// </summary>
         public void SetupPageCompleted()
         {
-            TutorialCurrentPage = 1;
-            ChangePageEvent(PageType.Tutorial);
+            // If requested, add CmisSync to the list of programs to be started up when the user logs into Windows.
+            if (this.create_startup_item)
+                new Thread(() => Program.Controller.CreateStartupItem()).Start();
+
+            ChangePageEvent(PageType.Add1);
         }
 
 
@@ -299,14 +302,12 @@ namespace CmisSync
                 TutorialCurrentPage = 0;
                 this.FolderAdditionWizardCurrentPage = PageType.None;
 
-                //WindowIsOpen = false;
-                //HideWindowEvent();
+                WindowIsOpen = false;
+                HideWindowEvent();
 
                 // If requested, add CmisSync to the list of programs to be started up when the user logs into Windows.
                 if (this.create_startup_item)
                     new Thread(() => Program.Controller.CreateStartupItem()).Start();
-
-                ChangePageEvent(PageType.Add1);
             }
             else
             {

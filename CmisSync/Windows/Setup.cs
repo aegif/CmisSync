@@ -122,6 +122,16 @@ namespace CmisSync
                                     IsEnabled = false
                                 };
 
+                                CheckBox check_box = new CheckBox()
+                                {
+                                    Content = Properties_Resources.Startup,
+                                    IsChecked = true
+                                };
+
+                                ContentCanvas.Children.Add(check_box);
+                                Canvas.SetLeft(check_box, 185);
+                                Canvas.SetBottom(check_box, 12);
+
                                 Buttons.Add(continue_button);
                                 Buttons.Add(cancel_button);
 
@@ -135,6 +145,11 @@ namespace CmisSync
                                     {
                                         continue_button.IsEnabled = enabled;
                                     });
+                                };
+
+                                check_box.Click += delegate
+                                {
+                                    Controller.StartupItemChanged(check_box.IsChecked.Value);
                                 };
 
                                 cancel_button.Click += delegate
