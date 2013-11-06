@@ -299,12 +299,14 @@ namespace CmisSync
                 TutorialCurrentPage = 0;
                 this.FolderAdditionWizardCurrentPage = PageType.None;
 
-                WindowIsOpen = false;
-                HideWindowEvent();
+                //WindowIsOpen = false;
+                //HideWindowEvent();
 
                 // If requested, add CmisSync to the list of programs to be started up when the user logs into Windows.
                 if (this.create_startup_item)
                     new Thread(() => Program.Controller.CreateStartupItem()).Start();
+
+                ChangePageEvent(PageType.Add1);
             }
             else
             {

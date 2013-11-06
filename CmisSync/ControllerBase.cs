@@ -276,6 +276,18 @@ namespace CmisSync
                 Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
         }
 
+        public void ManualSync(string reponame)
+        {
+            foreach (RepoBase aRepo in this.repositories)
+            {
+                if (aRepo.Name == reponame && aRepo.Status == SyncStatus.Idle)
+                {
+                    
+                    aRepo.ManualSync();
+                    Logger.Debug("Requested to manually sync " + aRepo.Name);
+                }
+            }
+        }
         
         /// <summary>
         /// Remove a synchronized folder from the CmisSync configuration.

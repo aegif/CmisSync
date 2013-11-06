@@ -136,7 +136,7 @@
     <value>Cancel</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>Oris4Sync creates a special folder on your computer where the documents are synchronized.</value>
+    <value>Oris4 Sync creates a special folder on your computer where the documents are synchronized.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Continue</value>
@@ -169,13 +169,13 @@
     <value>Finish</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>A folder already in the Oris4Sync root folder</value>
+    <value>A folder already in the Oris4 Sync root folder</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>Oris4Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+    <value>Oris4 Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
 
 It is like Dropbox for Enterprise Content Management!</value>
   </data>
@@ -210,19 +210,19 @@ It is like Dropbox for Enterprise Content Management!</value>
     <value>Skip Tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, Oris4Sync can not find a CMIS server at this address.
+    <value>Sorry, Oris4 Sync can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
 If you are sure about the address, open it in a browser and send
 the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Add Oris4Sync to startup items</value>
+    <value>Add Oris4 Sync to startup items</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>The status icon is here to help</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>Oris4Sync's status icon shows the syncing progress, and provides easy access to your folders.</value>
+    <value>Oris4 Sync's status icon shows the syncing progress, and provides easy access to your folders.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronization</value>
@@ -234,7 +234,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>User</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Welcome to Oris4Sync!</value>
+    <value>Welcome to Oris4 Sync!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>What's happening next?</value>
@@ -252,7 +252,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>You can easily add a new CMIS folder at any time.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>You can find them in your Oris4Sync folder.</value>
+    <value>You can find them in your Oris4 Sync folder.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Change the local path of this repository:</value>
@@ -273,7 +273,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Open local folder</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>About Oris4Sync</value>
+    <value>About Oris4 Sync</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>View Log</value>
@@ -315,5 +315,8 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   </data>
   <data name="UntrustedCertificate" xml:space="preserve">
     <value>Untrusted Certificate</value>
+  </data>
+  <data name="ManualSync" xml:space="preserve">
+    <value>Run Sync</value>
   </data>
 </root>

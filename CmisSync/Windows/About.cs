@@ -48,7 +48,7 @@ namespace CmisSync {
         /// </summary>
         public About ()
         {
-            Title      = "About Oris4Sync";
+            Title      = "About Oris4 Sync";
             ResizeMode = ResizeMode.NoResize;
             Height     = 288;
             Width      = 640;
@@ -125,7 +125,7 @@ namespace CmisSync {
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227)),
                 Text         = "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
                     "\n" +
-                    "Oris4Sync is Open Source software. You are free to use, modify, " +
+                    "Oris4 Sync is Open Source software. You are free to use, modify, " +
                     "and redistribute it under the GNU General Public License version 3 or later.",
                 TextWrapping = TextWrapping.Wrap,
                 Width        = 318

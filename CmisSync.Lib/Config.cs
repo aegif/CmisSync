@@ -34,7 +34,7 @@ namespace CmisSync.Lib
         /// Default poll interval.
         /// It is used for any newly created synchronized folder.
         /// </summary>
-        public static readonly int DEFAULT_POLL_INTERVAL = 5000;
+        public static readonly int DEFAULT_POLL_INTERVAL = 15 * 60 * 1000; //15 minutes
 
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(HomePath, "Oris4Sync");
+                return Path.Combine(HomePath, "Oris4");
             }
         }
 

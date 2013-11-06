@@ -57,7 +57,7 @@ namespace CmisSync
 
             // Setup the status icon.
             this.trayicon.Icon = animationFrames[0];
-            this.trayicon.Text = "Oris4Sync";
+            this.trayicon.Text = "Oris4 Sync";
             this.trayicon.ContextMenuStrip = this.traymenu;
             this.trayicon.Visible = true;
             this.trayicon.MouseClick += NotifyIcon1_MouseClick;
@@ -108,7 +108,7 @@ namespace CmisSync
                     BeginInvoke((Action)delegate
                     {
                         this.stateItem.Text = state_text;
-                        this.trayicon.Text = "Oris4Sync\n" + state_text;
+                        this.trayicon.Text = "Oris4 Sync\n" + state_text;
                     });
                 }
             };
@@ -193,7 +193,7 @@ namespace CmisSync
                 Enabled = false
             };
             this.traymenu.Items.Add(stateItem);
-            this.trayicon.Text = "Oris4Sync\n" + Controller.StateText;
+            this.trayicon.Text = "Oris4 Sync\n" + Controller.StateText;
 
             // Create a menu item per synchronized folder.
             if (Controller.Folders.Length > 0)
@@ -243,17 +243,34 @@ namespace CmisSync
                         Text = Properties_Resources.RemoveFolderFromSync,
                         Tag = "remove",
                         // TODO if remove folder from sync is supported, enable this entry
-                        Enabled = false
+                        Enabled = true
                     };
                     removeFolderFromSyncItem.Click += RemoveFolderFromSyncDelegate(folderName);
+
+                    // Sub-item: remove folder from sync
+                    ToolStripMenuItem manualSyncItem = new ToolStripMenuItem()
+                    {
+                        Text = Properties_Resources.ManualSync,
+                        Tag = "sync",
+                        Enabled = true
+                    };
+                    manualSyncItem.Click += ManualSyncDelegate(folderName);
 
                     // Add the sub-items.
                     subfolderItem.DropDownItems.Add(openLocalFolderItem);
                     subfolderItem.DropDownItems.Add(openRemoteFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
-                    subfolderItem.DropDownItems.Add(new ToolStripSeparator());
-                    subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
+
+                    //Removed for Oris4
+                    //subfolderItem.DropDownItems.Add(new ToolStripSeparator());
+                    //subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
+
+                    //Manual sync
+                    subfolderItem.DropDownItems.Add(manualSyncItem);
+
+                    //todo add frequency setting
+
                     // Add the main item.
                     this.traymenu.Items.Add(subfolderItem);
                 }
@@ -281,7 +298,8 @@ namespace CmisSync
             {
                 Controller.LogClicked();
             };
-            this.traymenu.Items.Add(log_item);
+            //Removed for Oris4
+            //this.traymenu.Items.Add(log_item);
 
             // Create the About menu.
             ToolStripMenuItem about_item = new ToolStripMenuItem()
@@ -373,6 +391,14 @@ namespace CmisSync
             return delegate
             {
                 Controller.RemoveFolderFromSyncClicked(reponame);
+            };
+        }
+
+        private EventHandler ManualSyncDelegate(string reponame)
+        {
+            return delegate
+            {
+                Controller.ManualSyncClicked(reponame);
             };
         }
     }

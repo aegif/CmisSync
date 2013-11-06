@@ -61,7 +61,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to About Oris4Sync.
+        ///   Looks up a localized string similar to About Oris4 Sync.
         /// </summary>
         internal static string About {
             get {
@@ -142,7 +142,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4Sync creates a special folder on your computer where the documents are synchronized..
+        ///   Looks up a localized string similar to Oris4 Sync creates a special folder on your computer where the documents are synchronized..
         /// </summary>
         internal static string CmisSyncCreates {
             get {
@@ -271,7 +271,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A folder already in the Oris4Sync root folder.
+        ///   Looks up a localized string similar to A folder already in the Oris4 Sync root folder.
         /// </summary>
         internal static string FolderAlreadyExist {
             get {
@@ -298,7 +298,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+        ///   Looks up a localized string similar to Oris4 Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
         ///
         ///It is like Dropbox for Enterprise Content Management!.
         /// </summary>
@@ -360,6 +360,15 @@ namespace CmisSync {
         internal static string LoginFailedForbidden {
             get {
                 return ResourceManager.GetString("LoginFailedForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run Sync.
+        /// </summary>
+        internal static string ManualSync {
+            get {
+                return ResourceManager.GetString("ManualSync", resourceCulture);
             }
         }
         
@@ -482,7 +491,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorry, Oris4Sync can not find a CMIS server at this address.
+        ///   Looks up a localized string similar to Sorry, Oris4 Sync can not find a CMIS server at this address.
         ///Please ask your server administrator for the CMIS endpoint URL.
         ///If you are sure about the address, open it in a browser and send
         ///the resulting XML to cmissync@aegif.jp.
@@ -494,7 +503,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add Oris4Sync to startup items.
+        ///   Looks up a localized string similar to Add Oris4 Sync to startup items.
         /// </summary>
         internal static string Startup {
             get {
@@ -512,7 +521,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4Sync&apos;s status icon shows the syncing progress, and provides easy access to your folders..
+        ///   Looks up a localized string similar to Oris4 Sync&apos;s status icon shows the syncing progress, and provides easy access to your folders..
         /// </summary>
         internal static string StatusIconShows {
             get {
@@ -575,7 +584,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Welcome to Oris4Sync!.
+        ///   Looks up a localized string similar to Welcome to Oris4 Sync!.
         /// </summary>
         internal static string Welcome {
             get {
@@ -629,7 +638,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can find them in your Oris4Sync folder..
+        ///   Looks up a localized string similar to You can find them in your Oris4 Sync folder..
         /// </summary>
         internal static string YouCanFind {
             get {

@@ -45,7 +45,7 @@ namespace CmisSync
         /// <summary>
         /// Mutex checking whether CmisSync is already running or not.
         /// </summary>
-        private static Mutex program_mutex = new Mutex(false, "Oris4Sync");
+        private static Mutex program_mutex = new Mutex(false, "Oris4 Sync");
 
         /// <summary>
         /// Logging.
@@ -80,7 +80,7 @@ namespace CmisSync
                 string n = Environment.NewLine;
 
                 Console.WriteLine(n +
-                    "Oris4Sync is a collaboration and sharing tool that is" + n +
+                    "Oris4 Sync is a collaboration and sharing tool that is" + n +
                     "designed to keep things simple and to stay out of your way." + n +
                     n +
                     "Version: " + CmisSync.Lib.Backend.Version + n +
@@ -97,7 +97,7 @@ namespace CmisSync
             // Only allow one instance of CmisSync (on Windows)
             if (!program_mutex.WaitOne(0, false))
             {
-                Logger.Error("Oris4Sync is already running.");
+                Logger.Error("Oris4 Sync is already running.");
                 Environment.Exit(-1);
             }
 

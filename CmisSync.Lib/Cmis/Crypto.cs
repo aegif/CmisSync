@@ -201,7 +201,7 @@ namespace CmisSync.Lib.Cmis
         public static byte[] GetCryptoKey()
         {
             return System.Text.Encoding.UTF8.GetBytes(
-                "Thou art so farth away, I miss you my dear files❥, with Oris4Sync be forever by my side!");
+                "Thou art so farth away, I miss you my dear files❥, with Oris4 Sync be forever by my side!");
         }
     }
 }

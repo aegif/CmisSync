@@ -233,6 +233,18 @@ namespace CmisSync.Lib
             this.remote_timer.Start();
         }
 
+        /// <summary>
+        /// Manual sync.
+        /// </summary>
+        public void ManualSync()
+        {
+            this.remote_timer.Stop();
+
+            SyncInBackground();
+
+            this.remote_timer.Start();
+        }
+
 
         /// <summary>
         /// Some file activity has been detected, sync changes.

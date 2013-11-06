@@ -267,6 +267,11 @@ namespace CmisSync {
             Program.Controller.RemoveRepositoryFromSync(reponame);
         }
 
+        public void ManualSyncClicked(string reponame)
+        {
+            Program.Controller.ManualSync(reponame);
+        }
+
 
         /// <summary>
         /// Start the tray icon animation.
