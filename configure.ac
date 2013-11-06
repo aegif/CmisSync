@@ -248,7 +248,7 @@ if test "$OSNAME" = "Darwin" ; then
         if test "$log4net_dll" != "no" ; then
             LOG4NET_LIBS='[$](LOG4NETLIBS)'
         else
-		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+    		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
         fi
 	fi
 	AC_SUBST(LOG4NET_LIBS)
@@ -258,7 +258,17 @@ if test "$OSNAME" = "Darwin" ; then
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
     AC_SUBST(DRAWING, [-r:System.Drawing.dll])
-    PKG_CHECK_MODULES(MONOMAC, xammac)
+    PKG_CHECK_MODULES(MONOMAC, xammac, have_xammac=yes, have_xammac=no)
+    if test "x$have_xammac" = "xno" ; then
+        PKG_CHECK_MODULES(MONOMAC, monomac, have_monomac=yes, have_monomac=no)
+        if test "x$have_monomac" = "xno" ; then
+    		    AC_ERROR([xammac or monomac are required dependency: you need to install the appropriate lib before you can compile])
+    		else
+            AM_CONDITIONAL([HAVE_MONOMAC], true)
+        fi
+    else
+        AM_CONDITIONAL([HAVE_XAMMAC], true)
+	  fi
     AC_SUBST(MONOMAC_LIBS)
 
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES} -define:__COCOA__")
