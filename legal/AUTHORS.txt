@@ -1,11 +1,9 @@
-﻿Points of contact:
+Points of contact:
 
-	Maintainer:
-	Nicolas Raoul <nicolas.raoul@aegif.jp>
-
+Maintainer:
+	Keith Harrison <keithharrison@oris4.com>
 
 Code:
-
 	Alejandro Serrano <trupill@gmail.com>
 	Alexandre Saiz Verdaguer <a@alexandresaiz.com>
 	Alex Hudson <home@alexhudson.com>
@@ -22,6 +20,7 @@ Code:
 	Łukasz Jernaś <deejay1@srem.org>
 	Michael Monreal <michael.monreal@gmail.com>
 	Nick Richards <nick@nickr.org>
+	Nicolas Raoul <nicolas.raoul@aegif.jp>
 	Oleg Khlystov <pktfag@gmail.com>
 	Paul Cutler <pcutler@gnome.org>
 	Philipp Gildein <rmbl@openspeak-project.org>

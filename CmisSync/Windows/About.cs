@@ -109,7 +109,7 @@ namespace CmisSync {
             
             
             Label version = new Label () {
-                Content    = "version " + Controller.RunningVersion,
+                Content    = "Version " + Controller.RunningVersion,
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
@@ -123,7 +123,8 @@ namespace CmisSync {
             TextBlock credits = new TextBlock () {
                 FontSize     = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227)),
-                Text         = "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
+                Text         = "Copyright ©" + DateTime.Now.Year.ToString() + 
+                    " 2ndAct Innovations Inc. All rights reserved. .\n" +
                     "\n" +
                     "Oris4 Sync is Open Source software. You are free to use, modify, " +
                     "and redistribute it under the GNU General Public License version 3 or later.",
