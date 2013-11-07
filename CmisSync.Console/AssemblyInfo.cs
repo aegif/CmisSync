@@ -4,12 +4,12 @@ using System.Runtime.CompilerServices;
 // Information about this assembly is defined by the following attributes. 
 // Change them to the values specific to your project.
 
-[assembly: AssemblyTitle("CmisSyncOnce")]
-[assembly: AssemblyDescription("Command-line tool for CmisSync")]
+[assembly: AssemblyTitle("Oris4SyncOnce")]
+[assembly: AssemblyDescription("Command-line tool for Oris4 Sync")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Aegif")]
-[assembly: AssemblyProduct("CmisSyncOnce")]
-[assembly: AssemblyCopyright("Aegif")]
+[assembly: AssemblyCompany("Oris4")]
+[assembly: AssemblyProduct("Oris4SyncOnce")]
+[assembly: AssemblyCopyright("Oris4")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
