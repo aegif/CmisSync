@@ -1,13 +1,9 @@
-![CmisSync logo](https://github.com/nicolas-raoul/CmisSync/raw/master/CmisSync/Windows/Pixmaps/WixUIBanner.bmp)
+![Oris4 Sync Logo](https://github.com/keithwharrison/Oris4Sync/raw/master/CmisSync/Windows/Pixmaps/WixUIBanner.bmp)
 
-[CmisSync](http://CmisSync.com) allows you to keep in sync with your CMIS repository. It is like Dropbox for Enterprise Content Management!  
-See: http://CmisSync.com
+[Oris4 Sync](http://www.oris4.com) allows you to keep in sync with Oris4.
+
+See: http://www.oris4.com
 
 ### License
 
-CmisSync is Open Source software and licensed under the `GNU General Public License version 3 or later`. You are welcome to change and redistribute it under certain conditions. For more information see the `legal/LICENSE` file.
-
-### Development
-
-We are looking for volunteers!  
-See [how to get started developing CmisSync](https://github.com/nicolas-raoul/CmisSync/wiki/Getting-started-with-CmisSync-development)
+Oris4 Sync is Open Source software and licensed under the `GNU General Public License version 3 or later`. You are welcome to change and redistribute it under certain conditions. For more information see the `legal/LICENSE` file.
