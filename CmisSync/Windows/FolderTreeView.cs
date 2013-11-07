@@ -1,4 +1,4 @@
-﻿using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Cmis;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
