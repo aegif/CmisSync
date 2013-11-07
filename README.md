@@ -1,6 +1,6 @@
 ![Oris4 Sync Logo](https://github.com/keithwharrison/Oris4Sync/raw/master/CmisSync/Windows/Pixmaps/Oris4_Logo.png)
 
-[oris4 sync](http://www.oris4.com) allows you to keep in sync with oris4.
+[Oris4 Sync](http://www.oris4.com) allows you to keep files on your desktop in sync with oris4.
 
 see: http://www.oris4.com
 
