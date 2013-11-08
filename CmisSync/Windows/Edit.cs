@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.ComponentModel;
 using CmisSync.Lib.Credentials;
 using CmisSync.CmisTree;
+using System.Collections.ObjectModel;
 
 namespace CmisSync
 {
@@ -69,9 +70,13 @@ namespace CmisSync
                 Name = Name,
                 Id = credentials.RepoId
             };
-            BackgroundWorker loader = CmisRepoUtils.LoadingSubfolderAsync(repo, credentials);
+            AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, credentials, PredefinedNodeLoader.LoadSubFolderDelegate);
+            LocalFolderLoader.AddLocalFolderToRootNode(repo, localPath);
 
-            List<CmisSync.CmisTree.RootFolder> repos = new List<CmisSync.CmisTree.RootFolder>();
+            IgnoredFolderLoader.AddIgnoredFolderToRootNode(repo, Ignores);
+            asyncLoader.Load(repo);
+
+            ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
             repos.Add(repo);
             repo.Selected = true;
 
@@ -83,7 +88,7 @@ namespace CmisSync
 
             Controller.CloseWindowEvent += delegate
             {
-                loader.CancelAsync();
+                asyncLoader.Cancel();
             };
 
 

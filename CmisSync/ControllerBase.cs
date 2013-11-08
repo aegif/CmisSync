@@ -323,7 +323,9 @@ namespace CmisSync
                 {
                     Address = folder.RemoteUrl,
                     UserName = folder.UserName,
-                    Password = folder.ObfuscatedPassword.ToString(),
+                    Password = new Lib.Credentials.Password(){
+                        ObfuscatedPassword = folder.ObfuscatedPassword
+                    },
                     RepoId = folder.RepositoryId
                 };
                 List<string> oldIgnores = new List<string>();

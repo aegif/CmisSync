@@ -13,7 +13,7 @@ namespace CmisSync.CmisTree
     /// <summary>
     /// Converter for FolderType to Color convertion
     /// </summary>
-    [ValueConversion(typeof(Folder.FolderType), typeof(Brush))]
+    [ValueConversion(typeof(Folder.NodeLocationType), typeof(Brush))]
     public class FolderTypeToBrushConverter : IValueConverter
     {
         private Brush noneFolderBrush = Brushes.Red;
@@ -46,16 +46,16 @@ namespace CmisSync.CmisTree
         /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Folder.FolderType type = (Folder.FolderType)value;
+            Folder.NodeLocationType type = (Folder.NodeLocationType)value;
             switch (type)
             {
-                case Folder.FolderType.NONE:
+                case Folder.NodeLocationType.NONE:
                     return noneFolderBrush;
-                case Folder.FolderType.LOCAL:
+                case Folder.NodeLocationType.LOCAL:
                     return localFolderBrush;
-                case Folder.FolderType.REMOTE:
+                case Folder.NodeLocationType.REMOTE:
                     return remoteFolderBrush;
-                case Folder.FolderType.BOTH:
+                case Folder.NodeLocationType.BOTH:
                     return bothFolderBrush;
                 default:
                     return Brushes.White;

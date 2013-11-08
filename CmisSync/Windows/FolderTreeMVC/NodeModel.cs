@@ -174,6 +174,42 @@ namespace CmisSync.CmisTree
             set { expanded = value; }
         }
 
+        private NodeLocationType locationType = NodeLocationType.REMOTE;
+        /// <summary>
+        /// The location type of a folder can be any NodeLocationType
+        /// </summary>
+        public NodeLocationType LocationType { get { return locationType; } set { SetField(ref locationType, value, "LocationType"); } }
+        /// <summary>
+        /// Add a location type
+        /// <c>NodeLocationType.REMOTE</c> + <c>NodeLocationType.LOCAL</c> = <c>NodeLocationType.BOTH</c>
+        /// </summary>
+        /// <param name="type"></param>
+        public void AddType(NodeLocationType type)
+        {
+            switch (locationType)
+            {
+                case NodeLocationType.NONE:
+                    LocationType = type;
+                    break;
+                case NodeLocationType.LOCAL:
+                    if (type == NodeLocationType.REMOTE || type == NodeLocationType.BOTH)
+                        LocationType = NodeLocationType.BOTH;
+                    break;
+                case NodeLocationType.REMOTE:
+                    if (type == NodeLocationType.LOCAL || type == NodeLocationType.BOTH)
+                        LocationType = NodeLocationType.BOTH;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Enumaration of all possible location Types for a Node. It can be Remote, Local, or Both.
+        /// </summary>
+        public enum NodeLocationType
+        {
+            NONE, LOCAL, REMOTE, BOTH
+        }
+
         // boiler-plate
         /// <summary>
         /// If any property changes, this event will be informed
@@ -346,57 +382,6 @@ namespace CmisSync.CmisTree
                     result.AddRange(GetSelectedFolder(child));
             }
             return result;
-        }
-        private FolderType folderType = FolderType.REMOTE;
-        /// <summary>
-        /// The Type of a folder can be any FolderType
-        /// </summary>
-        public FolderType Type { get { return folderType; } set { SetField(ref folderType, value, "Type"); } }
-        /// <summary>
-        /// Add a type
-        /// <c>FolderType.REMOTE</c> + <c>FolderType.LOCAL</c> = <c>FolderType.BOTH</c>
-        /// </summary>
-        /// <param name="type"></param>
-        public void AddType(FolderType type)
-        {
-            if (folderType == FolderType.BOTH)
-            {
-                return;
-            }
-            if (folderType == FolderType.NONE)
-            {
-                Type = type;
-                return;
-            }
-            if (type == FolderType.BOTH)
-            {
-                Type = type;
-                return;
-            }
-            if (folderType == FolderType.LOCAL)
-            {
-                if (type == FolderType.REMOTE)
-                {
-                    Type = FolderType.BOTH;
-                }
-                return;
-            }
-            if (folderType == FolderType.REMOTE)
-            {
-                if (type == FolderType.LOCAL)
-                {
-                    Type = FolderType.BOTH;
-                }
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Enumaration of all possible Folder Types. It can be Remote, Local, or Both.
-        /// </summary>
-        public enum FolderType
-        {
-            NONE, LOCAL, REMOTE, BOTH
         }
     }
 

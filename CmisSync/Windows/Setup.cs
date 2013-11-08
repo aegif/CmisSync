@@ -649,7 +649,7 @@ namespace CmisSync
                                 System.Windows.Controls.TreeView treeView = System.Windows.Application.LoadComponent(resourceLocater) as TreeView;
 
                                 ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
-                                List<BackgroundWorker> loader = new List<BackgroundWorker>();
+                                List<AsyncNodeLoader> loader = new List<AsyncNodeLoader>();
                                 // Some CMIS servers hold several repositories (ex:Nuxeo). Show one root per repository.
                                 bool firstRepo = true;
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
@@ -672,7 +672,9 @@ namespace CmisSync
                                         Address = Controller.saved_address,
                                         RepoId = repository.Key
                                     };
-                                    loader.Add(CmisRepoUtils.LoadingSubfolderAsync(repo, cred));
+                                    AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate);
+                                    asyncLoader.Load(repo);
+                                    loader.Add(asyncLoader);
                                 }
                                 treeView.DataContext = repos;
 
@@ -691,8 +693,6 @@ namespace CmisSync
                                 {
                                     Content = Properties_Resources.Cancel
                                 };
-
-
 
                                 Button back_button = new Button()
                                 {
@@ -735,8 +735,8 @@ namespace CmisSync
                                         Controller.saved_remote_path = selectedRepo.Path;
                                         Controller.Add2PageCompleted(
                                             Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray(), selectedFolder.ToArray());
-                                        foreach (BackgroundWorker task in loader)
-                                            task.CancelAsync();
+                                        foreach (AsyncNodeLoader task in loader)
+                                            task.Cancel();
                                     }
                                     else
                                     {
@@ -747,14 +747,14 @@ namespace CmisSync
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
-                                    foreach (BackgroundWorker task in loader)
-                                        task.CancelAsync();
+                                    foreach (AsyncNodeLoader task in loader)
+                                        task.Cancel();
                                 };
 
                                 Controller.HideWindowEvent += delegate
                                 {
-                                    foreach (BackgroundWorker task in loader)
-                                        task.CancelAsync();
+                                    foreach (AsyncNodeLoader task in loader)
+                                        task.Cancel();
                                 };
                                 break;
                             }

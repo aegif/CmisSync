@@ -14,7 +14,7 @@
         <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
         <local:IgnoreToTextDecorationConverter x:Key="IgnoreTextDecoration" />
         <local:FolderTypeToBrushConverter x:Key="FolderType"/>
-        <HierarchicalDataTemplate DataType="{x:Type local:RootFolder}" ItemsSource="{Binding Folder}" >
+        <HierarchicalDataTemplate DataType="{x:Type local:RootFolder}" ItemsSource="{Binding Children}" >
             <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                     <TextBlock Text="{Binding Name, Mode=OneTime}" />
@@ -23,7 +23,7 @@
                 </StackPanel>
             </RadioButton>
         </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding SubFolder}" >
+        <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding Children}" >
             <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
                 <StackPanel Orientation="Horizontal">
                     <!--<StackPanel.ContextMenu>
@@ -33,7 +33,7 @@
                             </MenuItem>
                         </ContextMenu>
                     </StackPanel.ContextMenu>-->
-                    <TextBlock Text="{Binding Name, Mode=OneTime}" Foreground="{Binding Converter={StaticResource FolderType}, Path=Type}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
+                    <TextBlock Text="{Binding Name, Mode=OneTime}" Foreground="{Binding Converter={StaticResource FolderType}, Path=LocationType}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
                     <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
                 </StackPanel>
             </CheckBox>

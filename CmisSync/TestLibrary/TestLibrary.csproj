@@ -61,8 +61,10 @@
     <Compile Include="CmisDatabaseTest.cs" />
     <Compile Include="CmisSyncTests.cs" />
     <Compile Include="ConfigurationTest.cs" />
+    <Compile Include="EncodingTest.cs" />
     <Compile Include="LocalFilesystemActivityGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SyncEventQueueTest.cs" />
     <Compile Include="WatcherTest.cs" />
     <Compile Include="ChunkedStreamTest.cs" />
   </ItemGroup>

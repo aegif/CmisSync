@@ -246,16 +246,16 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        public class FolderTree
+        public class NodeTree
         {
-            public List<FolderTree> children = new List<FolderTree>();
-            public string path;
+            public List<NodeTree> Children = new List<NodeTree>();
+            public string Path { get; set; }
             public string Name { get; set; }
-            public bool Finished;
+            public bool Finished { get; set; }
 
-            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder, int depth)
+            public NodeTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder, int depth)
             {
-                this.path = folder.Path;
+                this.Path = folder.Path;
                 this.Name = folder.Name;
                 if (depth == 0)
                 {
@@ -271,7 +271,7 @@ namespace CmisSync.Lib.Cmis
                     {
                         Folder f = tree.Item as Folder;
                         if (f != null)
-                            this.children.Add(new FolderTree(tree.Children, f, depth - 1));
+                            this.Children.Add(new NodeTree(tree.Children, f, depth - 1));
                     }
             }
         }
@@ -280,17 +280,16 @@ namespace CmisSync.Lib.Cmis
         /// Get the sub-folders of a particular CMIS folder.
         /// </summary>
         /// <returns>Full path of each sub-folder, including leading slash.</returns>
-        static public FolderTree GetSubfolderTree(string repositoryId, string path,
-            string address, string user, string password, int depth)
+        static public NodeTree GetSubfolderTree(Credentials.CmisRepoCredentials credentials, string path, int depth)
         {
 
             // Connect to the CMIS repository.
             Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = address;
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password;
-            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+            cmisParameters[SessionParameter.AtomPubUrl] = credentials.Address.ToString();
+            cmisParameters[SessionParameter.User] = credentials.UserName;
+            cmisParameters[SessionParameter.Password] = credentials.Password.ToString();
+            cmisParameters[SessionParameter.RepositoryId] = credentials.RepoId;
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.CreateSession(cmisParameters);
 
@@ -312,7 +311,7 @@ namespace CmisSync.Lib.Cmis
             try
             {
                 IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
-                return new FolderTree(trees, folder, depth);
+                return new NodeTree(trees, folder, depth);
             }
             catch (Exception e)
             {
