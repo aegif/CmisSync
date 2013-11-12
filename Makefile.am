@@ -34,3 +34,5 @@ debian-package:
 	make DESTDIR=$(abs_top_builddir)/debian install
 	make VERSION=`git describe --match linux* | cut -d - -f 2` -C debian build
 
+dist-hook: debian-package
+
