@@ -95,6 +95,8 @@ namespace CmisSync.CmisTree
                     return Properties_Resources.LoadingStatusLOADING;
                 case LoadingStatus.START:
                     return Properties_Resources.LoadingStatusSTART;
+                case LoadingStatus.ABORTED:
+                    return Properties_Resources.LoadingStatusABORTED;
                 default:
                     return "";
             }

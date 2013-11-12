@@ -13,6 +13,7 @@
         <local:LoadingStatusToTextConverter x:Key="StatusText" />
         <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
         <local:IgnoreToTextDecorationConverter x:Key="IgnoreTextDecoration" />
+        <local:InvalidPatternConverter x:Key="InvalidPattern" />
         <local:FolderTypeToBrushConverter x:Key="FolderType"/>
         <HierarchicalDataTemplate DataType="{x:Type local:RootFolder}" ItemsSource="{Binding Children}" >
             <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
@@ -33,7 +34,7 @@
                             </MenuItem>
                         </ContextMenu>
                     </StackPanel.ContextMenu>-->
-                    <TextBlock Text="{Binding Name, Mode=OneTime}" Foreground="{Binding Converter={StaticResource FolderType}, Path=LocationType}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
+                    <TextBlock Text="{Binding Name, Mode=OneTime}" Foreground="{Binding Converter={StaticResource FolderType}, Path=LocationType}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" FontStyle="{Binding Path=IsIllegalFileNameInPath, Converter={StaticResource InvalidPattern}}" />
                     <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
                 </StackPanel>
             </CheckBox>

@@ -68,7 +68,8 @@ namespace CmisSync
             CmisSync.CmisTree.RootFolder repo = new CmisSync.CmisTree.RootFolder()
             {
                 Name = Name,
-                Id = credentials.RepoId
+                Id = credentials.RepoId,
+                Address = credentials.Address.ToString()
             };
             AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, credentials, PredefinedNodeLoader.LoadSubFolderDelegate);
             IgnoredFolderLoader.AddIgnoredFolderToRootNode(repo, Ignores);
@@ -105,13 +106,13 @@ namespace CmisSync
 
             Button finish_button = new Button()
             {
-                Content = Properties_Resources.Finish,
+                Content = Properties_Resources.SaveChanges,
                 IsDefault = true
             };
 
             Button cancel_button = new Button()
             {
-                Content = Properties_Resources.Cancel,
+                Content = Properties_Resources.DiscardChanges,
                 IsDefault = false
             };
 
@@ -131,7 +132,7 @@ namespace CmisSync
             {
                 Close();
             };
-
+            this.Title = Properties_Resources.EditTitle;
             this.ShowAll();
         }
     }

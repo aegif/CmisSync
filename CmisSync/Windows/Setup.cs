@@ -657,7 +657,8 @@ namespace CmisSync
                                     RootFolder repo = new RootFolder()
                                     {
                                         Name = repository.Value,
-                                        Id = repository.Key
+                                        Id = repository.Key,
+                                        Address = Controller.saved_address.ToString()
                                     };
                                     repos.Add(repo);
                                     if (firstRepo)

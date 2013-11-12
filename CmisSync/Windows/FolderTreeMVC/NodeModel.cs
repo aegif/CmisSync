@@ -123,11 +123,7 @@ namespace CmisSync.CmisTree
         /// <summary>
         /// The name of the folder
         /// </summary>
-        public string Name { get { return name; } 
-            set {
-                SetField(ref name, value, "Name");
-            }
-        }
+        public string Name { get { return name; } set { SetField(ref name, value, "Name"); } }
         private string path;
         /// <summary>
         /// The absolut path of the folder
@@ -136,12 +132,12 @@ namespace CmisSync.CmisTree
         /// <summary>
         /// Sets and gets the Ignored status of a folder
         /// </summary>
-        public bool IsIgnored
-        {
-            get { return Selected==false; }
-        }
+        public bool IsIgnored { get { return Selected == false; } }
 
         private bool illegalFileNameInPath = false;
+        /// <summary>
+        /// If the path or name contains any illegal Pattern, switch prevends from synchronization, this property is set to true
+        /// </summary>
         public bool IsIllegalFileNameInPath { get { return illegalFileNameInPath; } 
             set {
                 SetField(ref illegalFileNameInPath, value, "IsIllegalFileNameInPath");
@@ -285,7 +281,7 @@ namespace CmisSync.CmisTree
         /// <summary>
         /// The URL of the repository. 
         /// </summary>
-        public string Address { get { return address; } }
+        public string Address { get { return address; } set { SetField(ref address, value, "Address"); } }
         /// <summary>
         /// Tooltip informations about this repo. It returns the Id and the address of the repo
         /// </summary>

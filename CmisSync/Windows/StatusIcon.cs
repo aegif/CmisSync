@@ -228,7 +228,7 @@ namespace CmisSync
                     // Sub-item: edit ignore folder.
                     ToolStripMenuItem editFolderItem = new ToolStripMenuItem()
                     {
-                        Text = CmisSync.Properties_Resources.AddingFolder
+                        Text = CmisSync.Properties_Resources.EditTitle
                     };
                     editFolderItem.Click += EditFolderDelegate(folderName);
 

@@ -303,4 +303,22 @@ Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ä
   <data name="InvalidRepoName" xml:space="preserve">
     <value>Der angegebene Name {0} enthält verbotene Zeichen.</value>
   </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Änderungen verwerfen</value>
+  </data>
+  <data name="EditTitle" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="LoadingStatusABORTED" xml:space="preserve">
+    <value>Ladevorgang abgebrochen</value>
+  </data>
+  <data name="LoadingStatusLOADING" xml:space="preserve">
+    <value>läd ...</value>
+  </data>
+  <data name="LoadingStatusSTART" xml:space="preserve">
+    <value>wird geladen ...</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Änderungen übernehmen</value>
+  </data>
 </root>

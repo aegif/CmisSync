@@ -99,6 +99,7 @@
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Edit.cs" />
+    <Compile Include="FolderTreeMVC\InvalidPatternConverter.cs" />
     <Compile Include="FolderTreeMVC\NodeLoader.cs" />
     <Compile Include="FolderTreeMVC\IgnoredFolderLoader.cs" />
     <Compile Include="FolderTreeMVC\LocalFolderLoader.cs" />

@@ -346,4 +346,16 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="InvalidRepoName" xml:space="preserve">
     <value>The repository name {0} contains illegal characters</value>
   </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Discard changes</value>
+  </data>
+  <data name="EditTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="LoadingStatusABORTED" xml:space="preserve">
+    <value>loading aborted</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
 </root>
