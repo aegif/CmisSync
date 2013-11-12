@@ -225,7 +225,7 @@
   <data name="SyncingChanges" xml:space="preserve">
     <value>Synchronisieren die Änderungen...</value>
   </data>
-  <data name="User" xml:space="preserve">
+  <data name="Username" xml:space="preserve">
     <value>Benutzer</value>
   </data>
   <data name="Welcome" xml:space="preserve">
@@ -234,10 +234,10 @@
   <data name="WhatsNext" xml:space="preserve">
     <value>Was passiert als nächstes?</value>
   </data>
-  <data name="Where" xml:space="preserve">
+  <data name="Connect" xml:space="preserve">
     <value>Serveradresse Ihrer Organisation?</value>
   </data>
-  <data name="WhereToFind" xml:space="preserve">
+  <data name="ExampleUrl" xml:space="preserve">
     <value>Wo ist diese Adresse zu finden</value>
   </data>
   <data name="Which" xml:space="preserve">

@@ -154,7 +154,7 @@
     <value>Enter a name for the local folder where the documents are synchronized</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Enter a Web address where the documents can be seen:</value>
+    <value>Enter the Web address of an Oris4 server:</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
@@ -175,9 +175,9 @@
     <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>Oris4 Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+    <value>Oris4 Sync allows you to keep your files in sync with Oris4, and use your documents even when offline.
 
-It is like Dropbox for Enterprise Content Management!</value>
+Stop Searching. Start Finding.</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
     <value>The folder name is invalid. Special characters are not allowed.</value>
@@ -230,8 +230,8 @@ the resulting XML to cmissync@aegif.jp</value>
   <data name="SyncingChanges" xml:space="preserve">
     <value>Syncing changes…</value>
   </data>
-  <data name="User" xml:space="preserve">
-    <value>User</value>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to Oris4 Sync!</value>
@@ -239,11 +239,11 @@ the resulting XML to cmissync@aegif.jp</value>
   <data name="WhatsNext" xml:space="preserve">
     <value>What's happening next?</value>
   </data>
-  <data name="Where" xml:space="preserve">
-    <value>Where is your organization's server?</value>
+  <data name="Connect" xml:space="preserve">
+    <value>Connect to Oris4...</value>
   </data>
-  <data name="WhereToFind" xml:space="preserve">
-    <value>Where to find this address</value>
+  <data name="ExampleUrl" xml:space="preserve">
+    <value>Oris4 URL should be in the format https://yourcompany.oris4.net/ </value>
   </data>
   <data name="Which" xml:space="preserve">
     <value>Which remote folder do you want to sync?</value>

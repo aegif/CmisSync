@@ -368,7 +368,7 @@ namespace CmisSync
                             {
                                 // UI elements.
 
-                                Header = Properties_Resources.Where;
+                                Header = Properties_Resources.Connect;
 
                                 // Address input UI.
                                 TextBlock address_label = new TextBlock()
@@ -385,17 +385,9 @@ namespace CmisSync
 
                                 TextBlock address_help_label = new TextBlock()
                                 {
-                                    Text = Properties_Resources.Help + ": ",
+                                    Text = Properties_Resources.Help + ": " + Properties_Resources.ExampleUrl,
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
-                                };
-                                Run run = new Run(Properties_Resources.WhereToFind);
-                                Hyperlink link = new Hyperlink(run);
-                                link.NavigateUri = new Uri("https://github.com/nicolas-raoul/CmisSync/wiki/What-address");
-                                address_help_label.Inlines.Add(link);
-                                link.RequestNavigate += (sender, e) =>
-                                {
-                                    System.Diagnostics.Process.Start(e.Uri.ToString());
                                 };
 
                                 // Rather than a TextBlock, we use a textBox so that users can copy/paste the error message and Google it.
@@ -414,7 +406,7 @@ namespace CmisSync
                                 // User input UI.
                                 TextBlock user_label = new TextBlock()
                                 {
-                                    Text = Properties_Resources.User + ":",
+                                    Text = Properties_Resources.Username + ":",
                                     FontWeight = FontWeights.Bold,
                                     Width = 200
                                 };
@@ -790,12 +782,12 @@ namespace CmisSync
                                     TextWrapping = TextWrapping.Wrap,
                                     Width = 420
                                 };
-                                string localfoldername = Controller.saved_address.Host.ToString();
+                                string localfoldername = ""; //Controller.saved_address.Host.ToString();
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
                                     if (repository.Key == Controller.saved_repository)
                                     {
-                                        localfoldername += "\\" + repository.Value;
+                                        localfoldername = repository.Value;
                                         break;
                                     }
                                 }
