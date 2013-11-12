@@ -24,7 +24,7 @@ namespace CmisSync
         /// <summary>
         /// Synchronized folder name
         /// </summary>
-        public string Name;
+        public string FolderName;
 
         /// <summary>
         /// Ignore folder list
@@ -41,7 +41,7 @@ namespace CmisSync
         /// </summary>
         public Edit(CmisRepoCredentials credentials, string name, string remotePath, List<string> ignores, string localPath)
         {
-            Name = name;
+            FolderName = name;
             this.credentials = credentials;
             this.remotePath = remotePath;
             this.Ignores = new List<string>(ignores);
@@ -67,7 +67,7 @@ namespace CmisSync
 
             CmisSync.CmisTree.RootFolder repo = new CmisSync.CmisTree.RootFolder()
             {
-                Name = Name,
+                Name = FolderName,
                 Id = credentials.RepoId,
                 Address = credentials.Address.ToString()
             };

@@ -20,8 +20,20 @@ namespace CmisSync.CmisTree
         private Stack<Node> toBeLoaded = new Stack<Node>();
         private LoadChildrenDelegate method;
 
+        /// <summary>
+        /// Function for loading children of the given node
+        /// </summary>
+        /// <param name="credentials">Needed to authenticate on the server</param>
+        /// <param name="root">Parent node, which children should be loaded</param>
+        /// <returns>List of the found children nodes</returns>
         public delegate List<Node> LoadChildrenDelegate(CmisRepoCredentials credentials, Node root );
 
+        /// <summary>
+        /// This class can be used to load children nodes asynchronous in another thread
+        /// </summary>
+        /// <param name="root">The repository Node</param>
+        /// <param name="credentials">The server crendentials to load children for the given Cmis Repo</param>
+        /// <param name="method">Function for loading nodes</param>
         public AsyncNodeLoader(RootFolder root, CmisRepoCredentials credentials, LoadChildrenDelegate method)
         {
             this.root = root;

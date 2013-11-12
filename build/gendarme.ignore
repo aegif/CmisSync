@@ -52,6 +52,10 @@ R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
 M: System.Collections.ObjectModel.Collection`1<System.String> CmisSync.Lib.Config::get_Folders()
 M: System.Void CmisSync.Lib.Config::RemoveFolder(System.String)
 
+#Ignore dispose pattern for BackgroundWorker of AsyncNodeLoader
+R: Gendarme.Rules:Design.TypesWithDisposableFiledsShouldBeDisposableRule
+T: CmisSync.CmisTree.AsyncNodeLoader
+
 #Ignore DotCMIS based rule
 R: Gendarme.Rules.Design.Generic.DoNotExposeNestedGenericSignaturesRule
 M: System.Void CmisSync.Lib.Cmis.CmisUtils/FolderTree::.ctor(System.Collections.Generic.IList`1<DotCMIS.Client.ITree`1<DotCMIS.Client.IFileableCmisObject>>,DotCMIS.Client.IFolder)

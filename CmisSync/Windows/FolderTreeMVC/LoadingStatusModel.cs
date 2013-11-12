@@ -10,6 +10,25 @@ namespace CmisSync.CmisTree
     /// </summary>
     public enum LoadingStatus
     {
-        START, LOADING, ABORTED, REQUEST_FAILURE, DONE
+        /// <summary>
+        /// Status before loading
+        /// </summary>
+        START,
+        /// <summary>
+        /// Status while loading is in progress
+        /// </summary>
+        LOADING,
+        /// <summary>
+        /// Status for aborted loading progresses
+        /// </summary>
+        ABORTED,
+        /// <summary>
+        /// Failure status for failed requests while loading
+        /// </summary>
+        REQUEST_FAILURE,
+        /// <summary>
+        /// Status if loaded correctly
+        /// </summary>
+        DONE
     }
 }

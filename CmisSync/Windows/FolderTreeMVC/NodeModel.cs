@@ -212,7 +212,22 @@ namespace CmisSync.CmisTree
         /// </summary>
         public enum NodeLocationType
         {
-            NONE, LOCAL, REMOTE, BOTH
+            /// <summary>
+            /// The node does not exists remote or local
+            /// </summary>
+            NONE,
+            /// <summary>
+            /// The node exists locally
+            /// </summary>
+            LOCAL,
+            /// <summary>
+            /// The node exists remotely
+            /// </summary>
+            REMOTE,
+            /// <summary>
+            /// The node exists locally and remotely
+            /// </summary>
+            BOTH
         }
 
         // boiler-plate

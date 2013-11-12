@@ -86,6 +86,14 @@ namespace CmisSync.CmisTree
     [ValueConversion(typeof(LoadingStatus), typeof(string))]
     public class LoadingStatusToTextConverter : IValueConverter
     {
+        /// <summary>
+        /// Converts the LoadingStatus to a translated string
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             LoadingStatus status = (LoadingStatus)value;
