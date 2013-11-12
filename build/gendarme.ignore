@@ -53,7 +53,7 @@ M: System.Collections.ObjectModel.Collection`1<System.String> CmisSync.Lib.Confi
 M: System.Void CmisSync.Lib.Config::RemoveFolder(System.String)
 
 #Ignore dispose pattern for BackgroundWorker of AsyncNodeLoader
-R: Gendarme.Rules:Design.TypesWithDisposableFiledsShouldBeDisposableRule
+R: Gendarme.Rules.Design.TypesWithDisposableFiledsShouldBeDisposableRule
 T: CmisSync.CmisTree.AsyncNodeLoader
 
 #Ignore DotCMIS based rule
