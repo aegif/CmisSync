@@ -20,6 +20,7 @@ namespace CmisSync.CmisTree
                     Parent = parent,
                     LocationType = Node.NodeLocationType.LOCAL
                 };
+                f.IsIllegalFileNameInPath = CmisSync.Lib.Utils.IsInvalidFolderName(f.Name);
                 List<Node> children = CreateNodesFromLocalFolder(subdir, f);
                 foreach (Node child in children)
                     f.Children.Add(child);

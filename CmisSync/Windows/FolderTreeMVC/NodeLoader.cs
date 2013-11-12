@@ -43,7 +43,7 @@ namespace CmisSync.CmisTree
                 {
                     Node next = this.toBeLoaded.Pop();
                     this.actualNode = next;
-                    this.actualNode.Status = LoadingStatus.LOADING;
+                    this.actualNode.Status = actualNode.Status!= LoadingStatus.DONE?LoadingStatus.LOADING:LoadingStatus.DONE;
                     this.worker.RunWorkerAsync();
                 }
                 catch (InvalidOperationException)
@@ -57,7 +57,7 @@ namespace CmisSync.CmisTree
         /// <param name="node">to be loaded next</param>
         public void Load(Node node)
         {
-            if(node.Status != LoadingStatus.DONE)
+            if(node.Path != null)
                 toBeLoaded.Push(node);
             if (!this.worker.IsBusy)
                 Load();
@@ -108,10 +108,13 @@ namespace CmisSync.CmisTree
             {
                 try {
                     Node equalNode = node.Children.First(x => x.Name.Equals(newChild.Name));
-                    MergeNewNodeIntoOldNode(equalNode, newChild);
                     MergeFolderTrees(equalNode, newChild.Children.ToList());
+                    MergeNewNodeIntoOldNode(equalNode, newChild);
                 } catch ( InvalidOperationException ) {
+                    if (node.Selected == false)
+                        newChild.Selected = false;
                     node.Children.Add(newChild);
+                    newChild.Parent = node;
                 }
             }
         }
@@ -124,8 +127,11 @@ namespace CmisSync.CmisTree
         public static void MergeNewNodeIntoOldNode(Node oldNode, Node newNode)
         {
             oldNode.AddType(newNode.LocationType);
-            oldNode.IsIgnored = oldNode.IsIgnored || newNode.IsIgnored;
-            oldNode.Status = newNode.Status;
+            oldNode.IsIllegalFileNameInPath = oldNode.IsIllegalFileNameInPath || newNode.IsIllegalFileNameInPath;
+            oldNode.Path = oldNode.Path != null? oldNode.Path : newNode.Path;
+            oldNode.Status = oldNode.Status != LoadingStatus.DONE? newNode.Status: LoadingStatus.DONE;
+            oldNode.ThreeStates = oldNode.ThreeStates != newNode.ThreeStates ? true : newNode.ThreeStates;
+//            oldNode.Selected = (oldNode.Selected == false || newNode.Selected == false) ? false : oldNode.Selected;
         }
     }
 

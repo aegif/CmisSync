@@ -71,9 +71,9 @@ namespace CmisSync
                 Id = credentials.RepoId
             };
             AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, credentials, PredefinedNodeLoader.LoadSubFolderDelegate);
+            IgnoredFolderLoader.AddIgnoredFolderToRootNode(repo, Ignores);
             LocalFolderLoader.AddLocalFolderToRootNode(repo, localPath);
 
-            IgnoredFolderLoader.AddIgnoredFolderToRootNode(repo, Ignores);
             asyncLoader.Load(repo);
 
             ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
@@ -81,6 +81,17 @@ namespace CmisSync
             repo.Selected = true;
 
             treeView.DataContext = repos;
+
+            treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
+            {
+                TreeViewItem expandedItem = e.OriginalSource as TreeViewItem;
+                Node expandedNode = expandedItem.Header as Folder;
+                if (expandedNode != null)
+                {
+                    asyncLoader.Load(expandedNode);
+                }
+            }));
+
 
             ContentCanvas.Children.Add(treeView);
             Canvas.SetTop(treeView, 70);

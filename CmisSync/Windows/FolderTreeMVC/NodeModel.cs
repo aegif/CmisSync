@@ -15,16 +15,23 @@ namespace CmisSync.CmisTree
     /// </summary>
     public class Node : INotifyPropertyChanged
     {
+        private Node parent;
         /// <summary>
         /// Parent Node
         /// </summary>
         [DefaultValue(null)]
-        public Node Parent { get; set; }
+        public Node Parent { get { return parent; }
+            set {
+                parent = value;
+                if (parent != null && parent.IsIllegalFileNameInPath)
+                    this.IsIllegalFileNameInPath = true;
+            }
+        }
         private bool threestates = false;
         /// <summary>
         /// Gets and sets the ThreeStates capability of Selected Property.
         /// </summary>
-        public bool ThreeStates { get { return threestates; } set { SetField(ref threestates, value, "ThreeStates"); } }
+        public virtual bool ThreeStates { get { return threestates; } set { SetField(ref threestates, value, "ThreeStates"); } }
         private LoadingStatus status = LoadingStatus.START;
         /// <summary>
         /// Loading status of a folder
@@ -56,7 +63,6 @@ namespace CmisSync.CmisTree
                     }
                     else if (selected == true)
                     {
-                        this.IsIgnored = false;
                         this.ThreeStates = false;
                         foreach (Node child in Children)
                         {
@@ -84,7 +90,6 @@ namespace CmisSync.CmisTree
                                     {
                                         p.ThreeStates = true;
                                         p.Selected = null;
-                                        p.IsIgnored = false;
                                     }
                                     else
                                     {
@@ -93,20 +98,22 @@ namespace CmisSync.CmisTree
                                 }
                                 p = p.Parent;
                             }
+                        OnPropertyChanged("IsIgnored");
                     }
                     else
                     {
                         this.ThreeStates = false;
                         Node p = Parent;
-                        while (p != null)
+                        while (p != null && p.Selected == true)
                         {
-                            if (p.Selected == true)
-                            {
-                                IsIgnored = true;
-                                p.Selected = null;
-                            }
+                            p.Selected = null;
                             p = p.Parent;
                         }
+                        foreach (Node child in Children)
+                        {
+                            child.Selected = selected;
+                        }
+                        OnPropertyChanged("IsIgnored");
                     }
                 }
             }
@@ -116,30 +123,32 @@ namespace CmisSync.CmisTree
         /// <summary>
         /// The name of the folder
         /// </summary>
-        public string Name { get { return name; } set { SetField(ref name, value, "Name"); } }
+        public string Name { get { return name; } 
+            set {
+                SetField(ref name, value, "Name");
+            }
+        }
         private string path;
         /// <summary>
         /// The absolut path of the folder
         /// </summary>
         public virtual string Path { get { return path; } set { SetField(ref path, value, "Path"); } }
-        private bool ignored = false;
         /// <summary>
         /// Sets and gets the Ignored status of a folder
         /// </summary>
         public bool IsIgnored
         {
-            get { return ignored; }
-            set
-            {
-                if (SetField(ref ignored, value, "IsIgnored"))
+            get { return Selected==false; }
+        }
+
+        private bool illegalFileNameInPath = false;
+        public bool IsIllegalFileNameInPath { get { return illegalFileNameInPath; } 
+            set {
+                SetField(ref illegalFileNameInPath, value, "IsIllegalFileNameInPath");
+                if(illegalFileNameInPath)
                 {
-                    if (ignored)
-                    {
-                        foreach (Node child in Children)
-                        {
-                            child.Selected = false;
-                        }
-                    }
+                    foreach (Node child in children)
+                        child.IsIllegalFileNameInPath = true;
                 }
             }
         }
@@ -170,7 +179,7 @@ namespace CmisSync.CmisTree
         /// </summary>
         public bool Expanded
         {
-            get { return enabled; }
+            get { return expanded; }
             set { expanded = value; }
         }
 
@@ -282,43 +291,10 @@ namespace CmisSync.CmisTree
         /// </summary>
         public override string ToolTip { get { return "URL: \"" + Address + "\"\r\nRepository ID: \"" + Id + "\""; } }
 
-        private bool automaticSyncAllNewSubfolder = true;
         /// <summary>
-        /// If all subfolder should be synchronized, this is true, if not, new folder on the the root directory
-        /// must be selected manually. 
-        /// TODO this feature is whether tested not correctly implemented. Please do not set it, or fix it.
+        /// Overrides the ThreeStates base method to read only
         /// </summary>
-        public bool SyncAllSubFolder
-        {
-            get { return automaticSyncAllNewSubfolder; }
-            set
-            {
-                if (SetField(ref automaticSyncAllNewSubfolder, value, "SyncAllSubFolder"))
-                {
-                    if (automaticSyncAllNewSubfolder)
-                    {
-                        foreach (Node subfolder in Children)
-                        {
-                            if (subfolder.Selected == false)
-                            {
-                                subfolder.IsIgnored = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (Node subfolder in Children)
-                        {
-                            if (subfolder.IsIgnored)
-                            {
-                                subfolder.IsIgnored = false;
-                                subfolder.Selected = false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        public override bool ThreeStates { get { return false; } set { base.ThreeStates = false; } }
     }
 
     /// <summary>

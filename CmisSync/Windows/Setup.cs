@@ -649,7 +649,7 @@ namespace CmisSync
                                 System.Windows.Controls.TreeView treeView = System.Windows.Application.LoadComponent(resourceLocater) as TreeView;
 
                                 ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
-                                List<AsyncNodeLoader> loader = new List<AsyncNodeLoader>();
+                                Dictionary<string, AsyncNodeLoader> loader = new Dictionary<string, AsyncNodeLoader>();
                                 // Some CMIS servers hold several repositories (ex:Nuxeo). Show one root per repository.
                                 bool firstRepo = true;
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
@@ -674,10 +674,31 @@ namespace CmisSync
                                     };
                                     AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate);
                                     asyncLoader.Load(repo);
-                                    loader.Add(asyncLoader);
+                                    loader.Add(repo.Id, asyncLoader);
                                 }
                                 treeView.DataContext = repos;
-
+                                treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
+                                {
+                                    TreeViewItem expandedItem = e.OriginalSource as TreeViewItem;
+                                    Node expandedNode = expandedItem.Header as Folder;
+                                    if (expandedNode != null)
+                                    {
+                                        Node parent = expandedNode.Parent;
+                                        while (parent is Folder)
+                                        {
+                                            parent = parent.Parent;
+                                        }
+                                        if (parent is RootFolder)
+                                        {
+                                            AsyncNodeLoader l;
+                                            RootFolder r = parent as RootFolder;
+                                            if (loader.TryGetValue(r.Id, out l))
+                                            {
+                                                l.Load(expandedNode);
+                                            }
+                                        }
+                                    }
+                                }));
                                 ContentCanvas.Children.Add(treeView);
                                 Canvas.SetTop(treeView, 70);
                                 Canvas.SetLeft(treeView, 185);
@@ -735,7 +756,7 @@ namespace CmisSync
                                         Controller.saved_remote_path = selectedRepo.Path;
                                         Controller.Add2PageCompleted(
                                             Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray(), selectedFolder.ToArray());
-                                        foreach (AsyncNodeLoader task in loader)
+                                        foreach (AsyncNodeLoader task in loader.Values)
                                             task.Cancel();
                                     }
                                     else
@@ -747,13 +768,13 @@ namespace CmisSync
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
-                                    foreach (AsyncNodeLoader task in loader)
+                                    foreach (AsyncNodeLoader task in loader.Values)
                                         task.Cancel();
                                 };
 
                                 Controller.HideWindowEvent += delegate
                                 {
-                                    foreach (AsyncNodeLoader task in loader)
+                                    foreach (AsyncNodeLoader task in loader.Values)
                                         task.Cancel();
                                 };
                                 break;
@@ -1109,5 +1130,4 @@ namespace CmisSync
             this.fullPath = fullPath;
         }
     }
-    
 }

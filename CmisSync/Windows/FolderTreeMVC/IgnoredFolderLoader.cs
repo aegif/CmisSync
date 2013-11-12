@@ -23,7 +23,7 @@ namespace CmisSync.CmisTree
                 Folder f = new Folder()
                 {
                     Name = parts[i],
-                    Path = path,
+//                    Path = path,
                     LocationType = Node.NodeLocationType.NONE,
                     Status = LoadingStatus.DONE
                 };
@@ -36,7 +36,9 @@ namespace CmisSync.CmisTree
                 if (i < nodes.Length - 1)
                     nodes[i].Children.Add(nodes[i + 1]);
                 if (i == nodes.Length - 1)
-                    nodes[i].IsIgnored = true;
+                {
+                    nodes[i].Selected = false;
+                }
             }
             return nodes[0];
         }
