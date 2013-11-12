@@ -28,3 +28,9 @@ MAINTAINERCLEANFILES = \
 
 bootstrap:
 	autoreconf -f -s -i
+
+debian-package:
+	rm -rf $(top_builddir)/debian/usr
+	make DESTDIR=$(abs_top_builddir)/debian install
+	make VERSION=`git describe --match linux* | cut -d - -f 2` -C debian build
+
