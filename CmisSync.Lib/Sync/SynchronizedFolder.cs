@@ -1076,7 +1076,6 @@ namespace CmisSync.Lib.Sync
                                         ContentStream contentStream = new ContentStream();
                                         contentStream.FileName = fileName;
                                         contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                                        contentStream.Length = file.Length;
                                         contentStream.Stream = logstream;
 
                                         // Upload
@@ -1301,7 +1300,6 @@ namespace CmisSync.Lib.Sync
                             using(LoggingStream logstream = new LoggingStream(localfile, "Updating ContentStream", filePath, localfile.Length)) {
                                 ContentStream contentStream = new ContentStream();
                                 contentStream.FileName = remoteFile.Name;
-                                contentStream.Length = localfile.Length;
                                 contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
                                 contentStream.Stream = logstream;
                                 Logger.Debug(String.Format("before SetContentStream to remote object ({0})", remoteFile.Id));
