@@ -201,7 +201,7 @@ if test "$OSNAME" = "Linux" ; then
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
         if test "$log4net_dll" != "no" ; then
-            LOG4NET_LIBS = ['[$](LOG4NETLIBS)']
+            LOG4NET_LIBS=['[$](LOG4NETLIBS)']
         else
 		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
         fi
@@ -243,10 +243,11 @@ if test "$OSNAME" = "Darwin" ; then
 	AC_SUBST(NOTIFY_SHARP_LIBS)
 
 	dnl check for log4net
+        LOG4NET_LIBS=
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
         if test "x$log4net_dll" != "xno" ; then
-            LOG4NET_LIBS = ['[$](LOG4NETLIBS)']
+            LOG4NET_LIBS=$LOG4NETLIBS
         else
             AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
         fi
@@ -262,7 +263,7 @@ if test "$OSNAME" = "Darwin" ; then
     AC_ARG_WITH([monomac],
         AS_HELP_STRING([--with-monomac=PATH],[Specify path to MonoMac.dll]),
             [monomac_dll=${withval}],[monomac_dll=no])
-    if test "x$monoma_dll" = "xno" ; then
+    if test "x$monomac_dll" = "xno" ; then
         PKG_CHECK_MODULES(MONOMAC, xammac, have_xammac=yes, have_xammac=no)
         if test "x$have_xammac" = "xno" ; then
             AM_CONDITIONAL([HAVE_XAMMAC], false)
@@ -272,14 +273,17 @@ if test "$OSNAME" = "Darwin" ; then
                 AC_ERROR([xammac or monomac are required dependency: you need to install the appropriate lib before you can compile])
                 else
                 AM_CONDITIONAL([HAVE_MONOMAC], true)
+		AC_MSG_RESULT([HAVE_MONOMAC=true])
             fi
         else
         AM_CONDITIONAL([HAVE_XAMMAC], true)
         AM_CONDITIONAL([HAVE_MONOMAC], false)
+	AC_MSG_RESULT([HAVE_MONOMAC=false])
         fi
     else
         AM_CONDITIONAL([HAVE_XAMMAC], false)
         AM_CONDITIONAL([HAVE_MONOMAC], true)
+        AC_MSG_RESULT([HAVE_MONOMAC=true])
         if test -f ${monomac_dll} ; then
             case ${monomac_dll} in
                 /*)

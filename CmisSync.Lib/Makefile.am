@@ -19,11 +19,11 @@ SOURCES =  \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
-	Events/ISyncEvent.cs \
-	Events/FSEvent.cs \
-	Events/SyncEventHandler.cs \
 	Events/DebugLoggingHandler.cs \
 	Events/FSDeletionHandler.cs \
+	Events/FSEvent.cs \
+	Events/ISyncEvent.cs \
+	Events/SyncEventHandler.cs \
 	Events/SyncEventManager.cs \
 	Events/SyncEventQueue.cs \
 	Fetcher.cs \
