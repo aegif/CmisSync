@@ -245,10 +245,10 @@ if test "$OSNAME" = "Darwin" ; then
 	dnl check for log4net
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
-        if test "$log4net_dll" != "no" ; then
-            LOG4NET_LIBS='[$](LOG4NETLIBS)'
+        if test "x$log4net_dll" != "xno" ; then
+            LOG4NET_LIBS = ['[$](LOG4NETLIBS)']
         else
-    		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+            AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
         fi
 	fi
 	AC_SUBST(LOG4NET_LIBS)
