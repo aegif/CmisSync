@@ -82,21 +82,20 @@ namespace CmisSync {
                 });
             };
 
-			/*
-            Controller.ChangePageEvent += delegate (PageType type, string [] warnings) {
+            Controller.ChangePageEvent += delegate (PageType type) {
                 using (var a = new NSAutoreleasePool ())
                 {
                     InvokeOnMainThread (delegate {
                         Reset ();
-                        ShowPage (type, warnings);
+                        ShowPage (type);
                         ShowAll ();
                     });
                 }
-            };*/
+            };
         }
 
 
-        public void ShowPage (PageType type, string [] warnings)
+        public void ShowPage (PageType type)
         {
             if (type == PageType.Setup) {
                 Header      = "Welcome to CmisSync!";
@@ -254,7 +253,7 @@ namespace CmisSync {
             }*/
 
 			if (type == PageType.Add1) {
-				Header      = "Where's your project hosted?";
+				Header      = CmisSync.Properties_Resources.Where;
 				Description = "";
 				
 				
@@ -264,7 +263,7 @@ namespace CmisSync {
 					Bordered        = false,
 					Editable        = false,
 					Frame           = new RectangleF (190, Frame.Height - 308, 160, 17),
-					StringValue     = "Address:",
+					StringValue     = Properties_Resources.EnterWebAddress,
 					Font            = UI.BoldFont
 				};
 				
@@ -284,7 +283,7 @@ namespace CmisSync {
 					Bordered        = false,
 					Editable        = false,
 					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 308, 160, 17),
-					StringValue     = "Remote Path:",
+					StringValue     = Properties_Resources.User,
 					Font            = UI.BoldFont
 				};
 				
@@ -370,12 +369,12 @@ namespace CmisSync {
 //				HistoryCheckButton.SetButtonType (NSButtonType.Switch);
 				
 				AddButton = new NSButton () {
-					Title = "Add",
+					Title = Properties_Resources.Add,
 					Enabled = false
 				};
 				
 				CancelButton = new NSButton () {
-					Title = "Cancel"
+					Title = Properties_Resources.Cancel
 				};
 				
 				
@@ -441,7 +440,7 @@ namespace CmisSync {
 				ContentView.AddSubview (PathLabel);
 				ContentView.AddSubview (PathTextField);
 				ContentView.AddSubview (PathHelpLabel);
-				ContentView.AddSubview (HistoryCheckButton);
+				//ContentView.AddSubview (HistoryCheckButton);
 				
 				Buttons.Add (AddButton);
 				Buttons.Add (CancelButton);
@@ -960,30 +959,6 @@ namespace CmisSync {
             if (type == PageType.Finished) {
                 Header      = "Your shared project is ready!";
                 Description = "You can find the files in your CmisSync folder.";
-
-
-                if (warnings.Length > 0) {
-                    WarningImage = NSImage.ImageNamed ("NSInfo");
-                    WarningImage.Size = new SizeF (24, 24);
-
-                    WarningImageView = new NSImageView () {
-                        Image = WarningImage,
-                        Frame = new RectangleF (200, Frame.Height - 175, 24, 24)
-                    };
-
-                    WarningTextField = new NSTextField () {
-                        Frame           = new RectangleF (235, Frame.Height - 245, 325, 100),
-                        StringValue     = warnings [0],
-                        BackgroundColor = NSColor.WindowBackground,
-                        Bordered        = false,
-                        Editable        = false,
-                        Font            = UI.Font
-                    };
-
-                    ContentView.AddSubview (WarningImageView);
-                    ContentView.AddSubview (WarningTextField);
-                }
-
 
                 OpenFolderButton = new NSButton () {
                     Title = string.Format ("Open {0}", Path.GetFileName (Controller.PreviousPath))
