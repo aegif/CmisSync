@@ -51,7 +51,7 @@ namespace CmisSync.Lib.Cmis
         /// Users can provide the URL of the web interface, and we have to return the CMIS URL
         /// Returns the list of repositories as well.
         /// </summary>
-        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(Uri url, string user, string password)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(Uri url, string user, RepoInfo.CmisPassword password)
         {
             Dictionary<string, string> repositories = null;
             Exception firstException = null;
@@ -133,7 +133,7 @@ namespace CmisSync.Lib.Cmis
         /// Each item contains id + 
         /// </summary>
         /// <returns>The list of repositories. Each item contains the identifier and the human-readable name of the repository.</returns>
-        static public Dictionary<string,string> GetRepositories(Uri url, string user, string password)
+        static public Dictionary<string,string> GetRepositories(Uri url, string user, RepoInfo.CmisPassword password)
         {
             Dictionary<string,string> result = new Dictionary<string,string>();
 
@@ -150,7 +150,7 @@ namespace CmisSync.Lib.Cmis
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url.ToString();
             cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
+            cmisParameters[SessionParameter.Password] = password.ToString();
 
             IList<IRepository> repositories;
             try
@@ -245,17 +245,27 @@ namespace CmisSync.Lib.Cmis
             public List<FolderTree> children = new List<FolderTree>();
             public string path;
             public string Name { get; set; }
+            public bool Finished;
 
-            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder)
+            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder, int depth)
             {
                 this.path = folder.Path;
                 this.Name = folder.Name;
+                if (depth == 0)
+                {
+                    this.Finished = false;
+                }
+                else
+                {
+                    this.Finished = true;
+                }
+
                 if(trees != null)
                     foreach (ITree<IFileableCmisObject> tree in trees)
                     {
                         Folder f = tree.Item as Folder;
-                        if(f!=null)
-                            this.children.Add(new FolderTree(tree.Children, f));
+                        if (f != null)
+                            this.children.Add(new FolderTree(tree.Children, f, depth - 1));
                     }
             }
         }
@@ -296,7 +306,7 @@ namespace CmisSync.Lib.Cmis
             try
             {
                 IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
-                return new FolderTree(trees, folder);
+                return new FolderTree(trees, folder, depth);
             }
             catch (Exception e)
             {

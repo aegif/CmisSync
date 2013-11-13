@@ -63,7 +63,7 @@ namespace CmisSync {
         /// <summary>
         /// URL to the AUTHORS file
         /// </summary>
-        public readonly string CreditsLinkAddress       = "https://raw.github.com/OpenDataSpace/CmisSync/master/legal/AUTHORS.tx";
+        public readonly string CreditsLinkAddress       = "https://raw.github.com/OpenDataSpace/CmisSync/master/legal/AUTHORS.txt";
         /// <summary>
         /// URL for Issue reports
         /// </summary>

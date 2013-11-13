@@ -45,3 +45,4 @@ cmissync-*.zip
 cmissync-*.tar*
 build/cmissync.spec
 DataSpaceSync.Console/dsscli
+TestResult.xml

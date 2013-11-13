@@ -1,7 +1,8 @@
 ASSEMBLY = TestLibrary
 TARGET = library
 
-ASSEMBLY_INFO_SOURCE = Properties/AssemblyInfo.cs
+ASSEMBLY_INFO_SOURCE =  \
+	Properties/AssemblyInfo.cs
 
 LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) \
 	   $(LIBS_CMISSYNCLIB_DEPS) \
@@ -16,7 +17,13 @@ SOURCES =  \
 	CmisDatabaseTest.cs \
 	ChunkedStreamTest.cs \
 	SyncEventQueueTest.cs \
-	LocalFilesystemActivityGenerator.cs
+	SyncEventManagerTest.cs \
+	EventTypesTest.cs \
+	FSDeletionHandlerTest.cs \
+	DebugLoggingHandlerTest.cs \
+	LocalFilesystemActivityGenerator.cs \
+	ConfigurationTest.cs \
+	EncodingTest.cs
 
 EXTRA_DIST = TestLibrary.csproj \
 	lib/Moq.dll \

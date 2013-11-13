@@ -252,11 +252,6 @@ namespace CmisSync
             RepoBase repo = null;
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
 
-            repo.ChangesDetected += delegate
-            {
-                UpdateState();
-            };
-
             repo.SyncStatusChanged += delegate(SyncStatus status)
             {
                 UpdateState();
