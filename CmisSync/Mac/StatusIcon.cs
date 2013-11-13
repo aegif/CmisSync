@@ -42,9 +42,8 @@ namespace CmisSync {
         private NSMenuItem more_item;
         private NSMenuItem add_item;
         private NSMenuItem about_item;
-        private NSMenuItem notify_item;
-        private NSMenuItem recent_events_item;
         private NSMenuItem quit_item;
+        private NSMenuItem log_item;
 
         private NSImage [] animation_frames;
         private NSImage [] animation_frames_active;
@@ -72,10 +71,6 @@ namespace CmisSync {
                 this.status_item.Image.Size          = new SizeF (16, 16);
                 this.status_item.AlternateImage      = this.animation_frames_active [0];
                 this.status_item.AlternateImage.Size = new SizeF (16, 16);
-
-                this.folder_image       = NSImage.ImageNamed ("cmissync-folder.icns");
-                this.caution_image      = NSImage.ImageNamed ("cmissync-folder.icns");
-                this.cmissync_image     = NSImage.ImageNamed ("cmissync-folder.icns");
 
                 CreateMenu ();
             }
@@ -116,24 +111,6 @@ namespace CmisSync {
                     InvokeOnMainThread (() => CreateMenu ());
                 }
             };
-
-/*            Controller.UpdateQuitItemEvent += delegate (bool quit_item_enabled) {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        this.quit_item.Enabled = quit_item_enabled;
-                    });
-                }
-            };
-
-            Controller.UpdateOpenRecentEventsItemEvent += delegate (bool events_item_enabled) {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        this.recent_events_item.Enabled = events_item_enabled;
-                    });
-                }
-            };*/
         }
 
 
@@ -149,20 +126,17 @@ namespace CmisSync {
                     Enabled = false
                 };
 
-                this.folder_item = new NSMenuItem () {
-                    Title = "DataSpace Sync"
+                this.log_item = new NSMenuItem () {
+                    Title = CmisSync.Properties_Resources.ViewLog
                 };
 
-                this.folder_item.Activated += delegate {
-                    Controller.AboutClicked ();
+                this.log_item.Activated += delegate
+                {
+                    Controller.LogClicked();
                 };
-
-                this.folder_item.Image      = this.cmissync_image;
-                this.folder_item.Image.Size = new SizeF (16, 16);
-                this.folder_item.Enabled    = true;
 
                 this.add_item = new NSMenuItem () {
-                    Title   = "Add Hosted Project…",
+                    Title   = CmisSync.Properties_Resources.AddARemoteFolder,
                     Enabled = true
                 };
 
@@ -170,39 +144,8 @@ namespace CmisSync {
                     Controller.AddRemoteFolderClicked ();
                 };
 
-                this.recent_events_item = new NSMenuItem () {
-                    Title   = "Recent Changes…",
-					Enabled = false
-                };
-
-                if (Controller.Folders.Length > 0) {
-                    this.recent_events_item.Activated += delegate {
-                        //Controller.OpenRecentEventsClicked ();
-                    };
-                }
-				/*
-                this.notify_item = new NSMenuItem () {
-                    Enabled = (Controller.Folders.Length > 0)
-                };
-
-                if (Program.Controller.NotificationsEnabled)
-                    this.notify_item.Title = "Turn Notifications Off";
-                else
-                    this.notify_item.Title = "Turn Notifications On";
-
-                this.notify_item.Activated += delegate {
-                    Program.Controller.ToggleNotifications ();
-
-                    InvokeOnMainThread (delegate {
-                        if (Program.Controller.NotificationsEnabled)
-                            this.notify_item.Title = "Turn Notifications Off";
-                        else
-                            this.notify_item.Title = "Turn Notifications On";
-                    });
-                };*/
-
                 this.about_item = new NSMenuItem () {
-                    Title   = "About DataSpace Sync",
+                    Title   = CmisSync.Properties_Resources.About,
                     Enabled = true
                 };
 
@@ -211,18 +154,13 @@ namespace CmisSync {
                 };
 
                 this.quit_item = new NSMenuItem () {
-                    Title   = "Quit",
+                    Title   = CmisSync.Properties_Resources.Exit,
                     Enabled = true
                 };
 
                 this.quit_item.Activated += delegate {
                     Controller.QuitClicked ();
                 };
-
-
-                this.menu.AddItem (this.state_item);
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.folder_item);
 
                 this.folder_menu_items = new NSMenuItem [Controller.Folders.Length];
                 this.submenu_items     = new NSMenuItem [Controller.OverflowFolders.Length];
@@ -256,14 +194,14 @@ namespace CmisSync {
                     foreach (string folder_name in Controller.OverflowFolders) {
                         NSMenuItem item = new NSMenuItem ();
                         item.Title      = folder_name;
-						item.Image		= folder_image;
+                        item.Image      = folder_image;
 
-						foreach (CmisSync.Lib.RepoBase repo in Program.Controller.Repositories) {
+                        foreach (CmisSync.Lib.RepoBase repo in Program.Controller.Repositories) {
 							if (repo.Name.Equals (folder_name) && repo.Status == CmisSync.Lib.SyncStatus.Warning) {
 								item.Image = this.caution_image;
 								break;
 							}
-						}
+                        }
 
                         item.Image.Size   = new SizeF (16, 16);
                         this.overflow_tasks [i] = OpenFolderDelegate (folder_name);
@@ -273,9 +211,10 @@ namespace CmisSync {
 
                         i++;
                     };
-
                 }
 
+				this.menu.AddItem (this.state_item);
+				this.menu.AddItem (NSMenuItem.SeparatorItem);
 
                 foreach (NSMenuItem item in this.folder_menu_items)
                     this.menu.AddItem (item);
@@ -287,20 +226,17 @@ namespace CmisSync {
                         this.submenu.AddItem (item);
 
                     this.more_item = new NSMenuItem () {
-                        Title = "More Projects",
+						Title = "More Folders",
                         Submenu = this.submenu
                     };
 
-                    this.menu.AddItem (NSMenuItem.SeparatorItem);
                     this.menu.AddItem (this.more_item);
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 }
 
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.add_item);
-                this.menu.AddItem (this.recent_events_item);
-//                this.menu.AddItem (NSMenuItem.SeparatorItem);
-//                this.menu.AddItem (this.notify_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
+                this.menu.AddItem (this.log_item);
                 this.menu.AddItem (this.about_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.quit_item);
@@ -343,7 +279,11 @@ namespace CmisSync {
                 Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
 
             this.error_image_active = new NSImage (
-                Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
+				Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error-active.png"));
+
+            this.folder_image       = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "cmissync-folder.icns"));
+			this.caution_image      = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.icns"));
+            this.cmissync_image     = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "cmissync-app.icns"));
         }
     }
     

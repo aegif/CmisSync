@@ -195,7 +195,7 @@ namespace CmisSync {
 
 		public void ShowLog (string str)
 		{
-			throw new NotImplementedException ();
+			System.Diagnostics.Process.Start("/Applications/Utilities/Console.app/Contents/MacOS/Console", str);
 		}
 
 		public void LocalFolderClicked (string path)
