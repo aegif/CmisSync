@@ -66,10 +66,16 @@ namespace CmisSync
             if ( ! firstRun )
                 ConfigMigration.Migrate();
 
-            // Clear log file.
-            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
+            FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));
+            if(alternativeLog4NetConfigFile.Exists)
+            {
+                log4net.Config.XmlConfigurator.ConfigureAndWatch(alternativeLog4NetConfigFile);
+            }
+            else
+            {
+                log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            }
 
-            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             Logger.Info("Starting.");
 
             if (args.Length != 0 && !args[0].Equals("start") &&

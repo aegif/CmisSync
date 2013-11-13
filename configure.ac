@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-m4_define([cmissync_version], [1.0.0])
+m4_define([cmissync_version], [1.1.0])
 
 AC_PREREQ([2.54])
 AC_INIT([DataSpace Sync], cmissync_version)
@@ -248,7 +248,7 @@ if test "$OSNAME" = "Darwin" ; then
         if test "$log4net_dll" != "no" ; then
             LOG4NET_LIBS='[$](LOG4NETLIBS)'
         else
-		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+    		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
         fi
 	fi
 	AC_SUBST(LOG4NET_LIBS)
@@ -258,7 +258,43 @@ if test "$OSNAME" = "Darwin" ; then
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
     AC_SUBST(DRAWING, [-r:System.Drawing.dll])
-    PKG_CHECK_MODULES(MONOMAC, xammac)
+
+    AC_ARG_WITH([monomac],
+        AS_HELP_STRING([--with-monomac=PATH],[Specify path to MonoMac.dll]),
+            [monomac_dll=${withval}],[monomac_dll=no])
+    if test "x$monoma_dll" = "xno" ; then
+        PKG_CHECK_MODULES(MONOMAC, xammac, have_xammac=yes, have_xammac=no)
+        if test "x$have_xammac" = "xno" ; then
+            AM_CONDITIONAL([HAVE_XAMMAC], false)
+            PKG_CHECK_MODULES(MONOMAC, monomac, have_monomac=yes, have_monomac=no)
+            if test "x$have_monomac" = "xno" ; then
+                AM_CONDITIONAL([HAVE_MONOMAC], false)
+                AC_ERROR([xammac or monomac are required dependency: you need to install the appropriate lib before you can compile])
+                else
+                AM_CONDITIONAL([HAVE_MONOMAC], true)
+            fi
+        else
+        AM_CONDITIONAL([HAVE_XAMMAC], true)
+        AM_CONDITIONAL([HAVE_MONOMAC], false)
+        fi
+    else
+        AM_CONDITIONAL([HAVE_XAMMAC], false)
+        AM_CONDITIONAL([HAVE_MONOMAC], true)
+        if test -f ${monomac_dll} ; then
+            case ${monomac_dll} in
+                /*)
+                AC_SUBST(MONOMAC_LIBS,[-r:${monomac_dll}])
+                AC_SUBST(MONOMAC_PATH,[${monomac_dll}])
+                ;;
+                *)
+                AC_SUBST(MONOMAC_LIBS,[[-r:\$\(top_srcdir\)/${monomac_dll}]])
+                AC_SUBST(MONOMAC_PATH,[[\$\(top_srcdir\)/${monomac_dll}]])
+                ;;
+            esac
+        else
+            AC_ERROR([${monomac_dll} not found])
+        fi
+    fi
     AC_SUBST(MONOMAC_LIBS)
 
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES} -define:__COCOA__")

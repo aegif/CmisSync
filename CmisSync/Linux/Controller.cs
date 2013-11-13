@@ -16,6 +16,7 @@
 
 
 using System;
+using System.Reflection;
 using System.Diagnostics;
 using System.IO;
 
@@ -99,6 +100,14 @@ namespace CmisSync {
                 Directory.CreateDirectory (FoldersPath);
                 Logger.Info ("Created '" + FoldersPath + "'");
 
+                string appFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string iconName = "folder-cmissync.png";
+                string iconSrc = Path.Combine(appFolder,"../../share/dataspace-sync/icons/hicolor/256x256/places",iconName);
+                string iconDst = Path.Combine(FoldersPath,iconName);
+                if (File.Exists(iconSrc)) {
+                    File.Copy(iconSrc,iconDst);
+                }
+
                 string gvfs_command_path = Path.Combine (
                     Path.VolumeSeparatorChar.ToString (), "usr", "bin", "gvfs-set-attribute");
 
@@ -121,6 +130,24 @@ namespace CmisSync {
 
                     process.Start ();
                     process.WaitForExit ();
+
+                    if (File.Exists(iconDst)) {
+                        process.StartInfo.Arguments = FoldersPath.Replace(" ", "\\ ") +
+                            " metadata::custom-icon 'folder-cmissync.png'";
+                        process.Start ();
+                        process.WaitForExit ();
+                    }
+                }
+
+                string kde_directory_path = Path.Combine(FoldersPath, ".directory");
+                string kde_directory_content = "[Desktop Entry]\nIcon=folder-cmissync\n";
+                try
+                {
+                    File.WriteAllText(kde_directory_path, kde_directory_content);
+                }
+                catch (IOException e)
+                {
+                    Logger.Info("Config | Failed setting kde icon for '" + FoldersPath + "': " + e.Message);
                 }
 
                 return true;

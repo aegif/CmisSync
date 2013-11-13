@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Cmis\Crypto.cs" />
     <Compile Include="Cmis\Database.cs" />
+    <Compile Include="Cmis\IDatabase.cs" />
     <Compile Include="LoggingStream.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />
@@ -75,9 +76,13 @@
     <Compile Include="Defines.cs" />
     <Compile Include="IActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />
-    <Compile Include="Events\SyncEvent.cs" />
+    <Compile Include="Events\ISyncEvent.cs" />
+    <Compile Include="Events\FSEvent.cs" />
     <Compile Include="Events\SyncEventManager.cs" />
     <Compile Include="Events\SyncEventHandler.cs" />
+    <Compile Include="Events\DebugLoggingHandler.cs" />
+    <Compile Include="Events\FSDeletionHandler.cs" />
+    <Compile Include="Events\SyncEventQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1490179-src\DotCMIS.csproj">

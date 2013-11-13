@@ -275,6 +275,7 @@ namespace TestLibrary
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeCreatedHeavy()
         {
             using (Watcher watcher = new Watcher(TestFolder))
@@ -368,6 +369,7 @@ namespace TestLibrary
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeChangedHeavy()
         {
             //Assert.Fail("TODO");
@@ -409,6 +411,7 @@ namespace TestLibrary
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeDeleteHeavy()
         {
             //Assert.Fail("TODO");
@@ -509,18 +512,21 @@ namespace TestLibrary
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeForMoveHeavy()
         {
             //Assert.Fail("TODO");
         }
 
         [Test, Category("Fast")]
+        [Ignore]
         public void TestChangeTypeMix()
         {
             //Assert.Fail("TODO");
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeMixHeavy()
         {
             //Assert.Fail("TODO");
