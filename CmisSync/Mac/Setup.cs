@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Globalization;
 
 using MonoMac.Foundation;
 using MonoMac.AppKit;
@@ -26,6 +27,8 @@ using MonoMac.ObjCRuntime;
 using MonoMac.WebKit;
 
 using Mono.Unix;
+
+using CmisSync.Lib.Cmis;
 
 namespace CmisSync {
 
@@ -246,8 +249,18 @@ namespace CmisSync {
 					Delegate    = new CmisSyncTextFieldDelegate ()
 				};
 
+				NSTextField ErrorMessageTextField = new NSTextField()
+				{
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					TextColor       = NSColor.Red,
+					Editable        = false,
+					Frame           = new RectangleF (190, 265, 196 + 196 + 16, 17),
+					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
+					NSFontTraitMask.Condensed, 0, 11),
+				};
 
-				AddButton = new NSButton () {
+				ContinueButton = new NSButton () {
 					Title = Properties_Resources.Continue,
 					Enabled = false
 				};
@@ -268,11 +281,46 @@ namespace CmisSync {
 				};
 
 				(AddressTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-					AddressHelpLabel.StringValue = Controller.CheckAddPage (AddressTextField.StringValue);
+					string error = Controller.CheckAddPage ( AddressTextField.StringValue);
+					if(String.IsNullOrEmpty(error))
+						AddressHelpLabel.StringValue = "";
+					else
+						AddressHelpLabel.StringValue = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
 				};
 
-				AddButton.Activated += delegate {
-					Controller.Add1PageCompleted (new Uri(AddressTextField.StringValue), UserTextField.StringValue , PasswordTextField.StringValue);
+				ContinueButton.Activated += delegate {
+					Tuple<CmisServer, Exception> fuzzyResult = 
+						CmisSync.Lib.Cmis.CmisUtils.GetRepositoriesFuzzy(
+							new Uri(AddressTextField.StringValue),
+							UserTextField.StringValue,
+							PasswordTextField.StringValue
+						);
+					CmisServer cmisServer = fuzzyResult.Item1;
+					if(cmisServer!=null) {
+						Controller.repositories = cmisServer.Repositories;
+						AddressTextField.StringValue = cmisServer.Url.ToString();
+					}else {
+						Controller.repositories = null;
+					}
+					if(Controller.repositories == null) {
+						string warning = "";
+						string message = fuzzyResult.Item2.Message;
+						Exception e = fuzzyResult.Item2;
+						if(e is CmisPermissionDeniedException)
+							warning = Properties_Resources.LoginFailedForbidden;
+						else if(e is CmisServerNotFoundException)
+							warning = Properties_Resources.ConnectFailure;
+						else if(e.Message == "SendFailure" && cmisServer.Url.Scheme.StartsWith("https"))
+							warning = Properties_Resources.SendFailureHttps;
+						else if (e.Message == "TrustFailure")
+							warning = Properties_Resources.TrustFailure;
+						else
+							warning = message + Environment.NewLine + Properties_Resources.Sorry;
+						ErrorMessageTextField.StringValue = warning;
+					} else {
+						ErrorMessageTextField.StringValue = "";
+						Controller.Add1PageCompleted (new Uri(AddressTextField.StringValue), UserTextField.StringValue , PasswordTextField.StringValue);
+					}
 				};
 				
 				CancelButton.Activated += delegate {
@@ -281,7 +329,7 @@ namespace CmisSync {
 				
 				Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
 					InvokeOnMainThread (delegate {
-						AddButton.Enabled = button_enabled;
+						ContinueButton.Enabled = button_enabled;
 					});
 				};
 
@@ -292,7 +340,7 @@ namespace CmisSync {
 				ContentView.AddSubview (UserTextField);
 				ContentView.AddSubview (PasswordLabel);
 				ContentView.AddSubview (PasswordTextField);
-				Buttons.Add (AddButton);
+				Buttons.Add (ContinueButton);
 				Buttons.Add (CancelButton);
 
 				Controller.CheckAddPage (AddressTextField.StringValue);
