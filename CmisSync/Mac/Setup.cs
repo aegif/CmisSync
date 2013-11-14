@@ -180,196 +180,75 @@ namespace CmisSync {
                 Controller.CheckSetupPage ();
             }
 
-            /*if (type == PageType.Invite) {
-                Header      = "You've received an invite!";
-                Description = "Do you want to add this project to CmisSync?";
-
-
-                AddressLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Right,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 240, 160, 17),
-                    StringValue     = "Address:",
-                    Font            = UI.Font
-                };
-
-                PathLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Right,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 264, 160, 17),
-                    StringValue     = "Remote Path:",
-                    Font            = UI.Font
-                };
-
-                AddressTextField = new NSTextField () {
-                    Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (330, Frame.Height - 240, 260, 17),
-                    StringValue     = Controller.PendingInvite.Address,
-                    Font            = UI.BoldFont
-                };
-
-                PathTextField = new NSTextField () {
-                    Alignment       = NSTextAlignment.Left,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (330, Frame.Height - 264, 260, 17),
-                    StringValue     = Controller.PendingInvite.RemotePath,
-                    Font            = UI.BoldFont
-                };
-
-                CancelButton = new NSButton () {
-                    Title = "Cancel"
-                };
-
-                AddButton = new NSButton () {
-                    Title = "Add"
-                };
-
-
-                CancelButton.Activated += delegate {
-                    Controller.PageCancelled ();
-                };
-
-                AddButton.Activated += delegate {
-                    Controller.InvitePageCompleted ();
-                };
-
-
-                ContentView.AddSubview (AddressLabel);
-                ContentView.AddSubview (PathLabel);
-                ContentView.AddSubview (AddressTextField);
-                ContentView.AddSubview (PathTextField);
-
-                Buttons.Add (AddButton);
-                Buttons.Add (CancelButton);
-            }*/
-
 			if (type == PageType.Add1) {
 				Header      = CmisSync.Properties_Resources.Where;
 				Description = "";
-				
-				
+
 				AddressLabel = new NSTextField () {
 					Alignment       = NSTextAlignment.Left,
 					BackgroundColor = NSColor.WindowBackground,
 					Bordered        = false,
 					Editable        = false,
-					Frame           = new RectangleF (190, Frame.Height - 308, 160, 17),
+					Frame           = new RectangleF (190, 320 , 196 + 196 + 16, 17),
 					StringValue     = Properties_Resources.EnterWebAddress,
 					Font            = UI.BoldFont
 				};
-				
+
 				AddressTextField = new NSTextField () {
-					Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
+					Frame       = new RectangleF (190, 290, 196 + 196 + 16, 22),
 					Font        = UI.Font,
-//					Enabled     = (Controller.SelectedPlugin.Address == null),
 					Delegate    = new CmisSyncTextFieldDelegate (),
-					StringValue = "" + Controller.PreviousAddress
+					StringValue = (Controller.PreviousAddress == null || String.IsNullOrEmpty(Controller.PreviousAddress.ToString()))? "https://" : Controller.PreviousAddress.ToString() 
 				};
-				
-				AddressTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
-				
-				PathLabel = new NSTextField () {
-					Alignment       = NSTextAlignment.Left,
-					BackgroundColor = NSColor.WindowBackground,
-					Bordered        = false,
-					Editable        = false,
-					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 308, 160, 17),
-					StringValue     = Properties_Resources.User,
-					Font            = UI.BoldFont
-				};
-				
-				PathTextField = new NSTextField () {
-					Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
-//					Enabled     = (Controller.SelectedPlugin.Path == null),
-					Delegate    = new CmisSyncTextFieldDelegate (),
-					StringValue = "" + Controller.PreviousPath
-				};
-				
-				PathTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
-				
-				PathHelpLabel = new NSTextField () {
-					BackgroundColor = NSColor.WindowBackground,
-					Bordered        = false,
-					TextColor       = NSColor.DisabledControlText,
-					Editable        = false,
-					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 355, 204, 17),
-					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
-					                                                                  NSFontTraitMask.Condensed, 0, 11),
-//					StringValue = "" + Controller.SelectedPlugin.PathExample
-				};
-				
+
+				AddressTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingHead;
+
 				AddressHelpLabel = new NSTextField () {
 					BackgroundColor = NSColor.WindowBackground,
 					Bordered        = false,
 					TextColor       = NSColor.DisabledControlText,
 					Editable        = false,
-					Frame           = new RectangleF (190, Frame.Height - 355, 204, 17),
+					Frame           = new RectangleF (190, 265, 196 + 196 + 16, 17),
 					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
 					                                                                  NSFontTraitMask.Condensed, 0, 11),
-//					StringValue = "" + Controller.SelectedPlugin.AddressExample
 				};
-				
-				TableView = new NSTableView () {
-					Frame            = new RectangleF (0, 0, 0, 0),
-					RowHeight        = 34,
-					IntercellSpacing = new SizeF (8, 12),
-					HeaderView       = null,
-					Delegate         = new CmisSyncTableDelegate ()
+
+				NSTextField UserLabel = new NSTextField () {
+					Alignment       = NSTextAlignment.Left,
+					BackgroundColor = NSColor.WindowBackground,
+					Font            = UI.BoldFont,
+					Bordered        = false,
+					Editable        = false,
+					Frame           = new RectangleF(190, 230, 196, 17),
+					StringValue     = Properties_Resources.User
 				};
-				
-				ScrollView = new NSScrollView () {
-					Frame               = new RectangleF (190, Frame.Height - 280, 408, 185),
-					DocumentView        = TableView,
-					HasVerticalScroller = true,
-					BorderType          = NSBorderType.BezelBorder
+
+				NSTextField UserTextField = new NSTextField()
+				{
+					Font = UI.Font,
+					StringValue = String.IsNullOrEmpty(Controller.saved_user) ? Environment.UserName : Controller.saved_user,
+					Frame = new RectangleF(190, 200, 196, 22)
 				};
-				
-				IconColumn = new NSTableColumn (new NSImage ()) {
-					Width = 36,
-					HeaderToolTip = "Icon",
-					DataCell = new NSImageCell () {
-						ImageAlignment = NSImageAlignment.Right
-					}
+				UserTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingHead;
+
+				PasswordLabel = new NSTextField () {
+					Alignment       = NSTextAlignment.Left,
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					Editable        = false,
+					Frame           = new RectangleF (190 + 196 + 16, 230 , 196, 17),
+					StringValue     = Properties_Resources.Password,
+					Font            = UI.BoldFont
 				};
-				
-				DescriptionColumn = new NSTableColumn () {
-					Width         = 350,
-					HeaderToolTip = "Description",
-					Editable      = false
+
+				PasswordTextField = new NSSecureTextField () {
+					Frame       = new RectangleF (190 + 196 + 16, 200, 196, 22),
+					Delegate    = new CmisSyncTextFieldDelegate ()
 				};
-				
-				DescriptionColumn.DataCell.Font = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
-				                                                                                  NSFontTraitMask.Condensed, 0, 11);
-				
-				TableView.AddColumn (IconColumn);
-				TableView.AddColumn (DescriptionColumn);
-				
-//				DataSource = new CmisSyncDataSource (Controller.Plugins);
-				
-//				TableView.DataSource = DataSource;
-//				TableView.ReloadData ();
-				
-//				HistoryCheckButton = new NSButton () {
-//					Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
-//					Title = "Fetch prior revisions"
-//				};
-				
-//				if (Controller.FetchPriorHistory)
-//					HistoryCheckButton.State = NSCellStateValue.On;
-				
-//				HistoryCheckButton.SetButtonType (NSButtonType.Switch);
-				
+
+
 				AddButton = new NSButton () {
-					Title = Properties_Resources.Add,
+					Title = Properties_Resources.Continue,
 					Enabled = false
 				};
 				
@@ -387,39 +266,13 @@ namespace CmisSync {
 						AddressHelpLabel.StringValue = example_text;
 					});
 				};
-				
-				Controller.ChangePathFieldEvent += delegate (string text,
-				                                             string example_text) {
-					
-					InvokeOnMainThread (delegate {
-						PathTextField.StringValue = text;
-						PathTextField.Enabled     = true;
-						PathHelpLabel.StringValue = example_text;
-					});
-				};
-				
-//				TableView.SelectRow (Controller.SelectedPluginIndex, false);
-//				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
-				
+
 				(AddressTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue);
+					AddressHelpLabel.StringValue = Controller.CheckAddPage (AddressTextField.StringValue);
 				};
-				
-				(PathTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue);
-				};
-				
-				(TableView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
-					//Controller.SelectedPluginChanged (TableView.SelectedRow);
-					Controller.CheckAddPage (AddressTextField.StringValue);
-				};
-				
-//				HistoryCheckButton.Activated += delegate {
-//					Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
-//				};
-				
+
 				AddButton.Activated += delegate {
-					Controller.Add1PageCompleted (new Uri(AddressTextField.StringValue), "name" , "password");
+					Controller.Add1PageCompleted (new Uri(AddressTextField.StringValue), UserTextField.StringValue , PasswordTextField.StringValue);
 				};
 				
 				CancelButton.Activated += delegate {
@@ -431,19 +284,17 @@ namespace CmisSync {
 						AddButton.Enabled = button_enabled;
 					});
 				};
-				
-				
-				ContentView.AddSubview (ScrollView);
+
 				ContentView.AddSubview (AddressLabel);
 				ContentView.AddSubview (AddressTextField);
 				ContentView.AddSubview (AddressHelpLabel);
-				ContentView.AddSubview (PathLabel);
-				ContentView.AddSubview (PathTextField);
-				ContentView.AddSubview (PathHelpLabel);
-
+				ContentView.AddSubview (UserLabel);
+				ContentView.AddSubview (UserTextField);
+				ContentView.AddSubview (PasswordLabel);
+				ContentView.AddSubview (PasswordTextField);
 				Buttons.Add (AddButton);
 				Buttons.Add (CancelButton);
-				
+
 				Controller.CheckAddPage (AddressTextField.StringValue);
 			}
 			
