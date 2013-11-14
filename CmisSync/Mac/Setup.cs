@@ -591,17 +591,16 @@ namespace CmisSync {
                 switch (Controller.TutorialCurrentPage) {
 
                     case 1: {
-                        Header      = "What's happening next?";
-                        Description = "CmisSync creates a special folder on your computer " +
-                            "that will keep track of your projects.";
+							Header      = Properties_Resources.WhatsNext;
+							Description = Properties_Resources.CmisSyncCreates;
 
 
                         SkipTutorialButton = new NSButton () {
-                            Title = "Skip Tutorial"
+								Title = Properties_Resources.SkipTutorial
                         };
 
                         ContinueButton = new NSButton () {
-                            Title = "Continue"
+								Title = Properties_Resources.Continue
                         };
 
 
@@ -623,12 +622,11 @@ namespace CmisSync {
                     }
 
                     case 2: {
-                        Header      = "Sharing files with others";
-                        Description = "All files added to your project folders are synced automatically with " +
-                            "the host and your team members.";
+						Header      = Properties_Resources.Synchronization;
+						Description = Properties_Resources.DocumentsAre;
 
                         ContinueButton = new NSButton () {
-                            Title = "Continue"
+							Title = Properties_Resources.Continue
                         };
 
                         ContinueButton.Activated += delegate {
@@ -641,12 +639,11 @@ namespace CmisSync {
                     }
 
                     case 3: {
-                        Header      = "The status icon is here to help";
-                        Description = "It shows the syncing progress, provides easy access to " +
-                            "your projects and let's you view recent changes.";
+						Header      = Properties_Resources.StatusIcon;
+						Description = Properties_Resources.StatusIconShows;
 
                         ContinueButton = new NSButton () {
-                            Title = "Continue"
+							Title = Properties_Resources.Continue
                         };
 
                         ContinueButton.Activated += delegate {
@@ -659,21 +656,20 @@ namespace CmisSync {
                     }
 
                     case 4: {
-                        Header      = "Adding projects to CmisSync";
-                        Description = "You can do this through the status icon menu, or by clicking " +
-                            "magic buttons on webpages that look like this:";
+						Header      = Properties_Resources.AddFolders;
+						Description = Properties_Resources.YouCan;
 
 
                         StartupCheckButton = new NSButton () {
                             Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
-                            Title = "Add CmisSync to startup items",
+							Title = Properties_Resources.Startup,
                             State = NSCellStateValue.On
                         };
 
                         StartupCheckButton.SetButtonType (NSButtonType.Switch);
 
                         FinishButton = new NSButton () {
-                            Title = "Finish"
+							Title = Properties_Resources.Finish
                         };
 
                         SlideImage.Size = new SizeF (350, 64);
