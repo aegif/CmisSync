@@ -255,10 +255,12 @@ namespace CmisSync {
 					Bordered        = false,
 					TextColor       = NSColor.Red,
 					Editable        = false,
-					Frame           = new RectangleF (190, 265, 196 + 196 + 16, 17),
+					Frame           = new RectangleF (190, 30, 196 + 196 + 16, 160),
 					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
 					NSFontTraitMask.Condensed, 0, 11),
 				};
+
+				WarningTextField.Cell.LineBreakMode = NSLineBreakMode.ByWordWrapping;
 
 				ContinueButton = new NSButton () {
 					Title = Properties_Resources.Continue,
@@ -348,71 +350,9 @@ namespace CmisSync {
 			}
 			
 			if (type == PageType.Add2) {
-				Header      = "Where's your project hosted?";
+				Header      = Properties_Resources.Which;
 				Description = "";
-				
-				
-				AddressLabel = new NSTextField () {
-					Alignment       = NSTextAlignment.Left,
-					BackgroundColor = NSColor.WindowBackground,
-					Bordered        = false,
-					Editable        = false,
-					Frame           = new RectangleF (190, Frame.Height - 308, 160, 17),
-					StringValue     = "Address:",
-					Font            = UI.BoldFont
-				};
-				
-				AddressTextField = new NSTextField () {
-					Frame       = new RectangleF (190, Frame.Height - 336, 196, 22),
-					Font        = UI.Font,
-					Enabled     = true,
-					Delegate    = new CmisSyncTextFieldDelegate (),
-					StringValue = "" + Controller.PreviousAddress
-				};
-				
-				AddressTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
-				
-				PathLabel = new NSTextField () {
-					Alignment       = NSTextAlignment.Left,
-					BackgroundColor = NSColor.WindowBackground,
-					Bordered        = false,
-					Editable        = false,
-					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 308, 160, 17),
-					StringValue     = "Remote Path:",
-					Font            = UI.BoldFont
-				};
-				
-				PathTextField = new NSTextField () {
-					Frame       = new RectangleF (190 + 196 + 16, Frame.Height - 336, 196, 22),
-					Enabled     = true,
-					Delegate    = new CmisSyncTextFieldDelegate (),
-					StringValue = "" + Controller.PreviousPath
-				};
-				
-				PathTextField.Cell.LineBreakMode = NSLineBreakMode.TruncatingTail;
-				
-				PathHelpLabel = new NSTextField () {
-					BackgroundColor = NSColor.WindowBackground,
-					Bordered        = false,
-					TextColor       = NSColor.DisabledControlText,
-					Editable        = false,
-					Frame           = new RectangleF (190 + 196 + 16, Frame.Height - 355, 204, 17),
-					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
-					                                                                  NSFontTraitMask.Condensed, 0, 11),
-//					StringValue = "" + Controller.SelectedPlugin.PathExample
-				};
-				
-				AddressHelpLabel = new NSTextField () {
-					BackgroundColor = NSColor.WindowBackground,
-					Bordered        = false,
-					TextColor       = NSColor.DisabledControlText,
-					Editable        = false,
-					Frame           = new RectangleF (190, Frame.Height - 355, 204, 17),
-					Font            = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
-					                                                                  NSFontTraitMask.Condensed, 0, 11),
-//					StringValue = "" + Controller.SelectedPlugin.AddressExample
-				};
-				
+
 				TableView = new NSTableView () {
 					Frame            = new RectangleF (0, 0, 0, 0),
 					RowHeight        = 34,
@@ -422,67 +362,39 @@ namespace CmisSync {
 				};
 				
 				ScrollView = new NSScrollView () {
-					Frame               = new RectangleF (190, Frame.Height - 280, 408, 185),
+					Frame               = new RectangleF (190, Frame.Height - 340, 408, 255),
 					DocumentView        = TableView,
 					HasVerticalScroller = true,
 					BorderType          = NSBorderType.BezelBorder
 				};
-				
-				IconColumn = new NSTableColumn (new NSImage ()) {
-					Width = 36,
-					HeaderToolTip = "Icon",
-					DataCell = new NSImageCell () {
-						ImageAlignment = NSImageAlignment.Right
-					}
-				};
-				
-				DescriptionColumn = new NSTableColumn () {
-					Width         = 350,
-					HeaderToolTip = "Description",
-					Editable      = false
-				};
-				
-				DescriptionColumn.DataCell.Font = NSFontManager.SharedFontManager.FontWithFamily ("Lucida Grande",
-				                                                                                  NSFontTraitMask.Condensed, 0, 11);
-				
-				TableView.AddColumn (IconColumn);
-				TableView.AddColumn (DescriptionColumn);
-				
-//				DataSource = new CmisSyncDataSource (Controller.Plugins);
-				
-//				TableView.DataSource = DataSource;
-//				TableView.ReloadData ();
-				
-				HistoryCheckButton = new NSButton () {
-					Frame = new RectangleF (190, Frame.Height - 400, 300, 18),
-					Title = "Fetch prior revisions"
-				};
-				
-//				if (Controller.FetchPriorHistory)
-//					HistoryCheckButton.State = NSCellStateValue.On;
-				
-				HistoryCheckButton.SetButtonType (NSButtonType.Switch);
-				
-				AddButton = new NSButton () {
-					Title = "Add",
+
+				/* DataSource = new CmisSyncDataSource (Controller.Plugins);
+
+				TableView.DataSource = DataSource;
+				TableView.ReloadData ();*/
+
+				ContinueButton = new NSButton () {
+					Title = Properties_Resources.Continue,
 					Enabled = false
 				};
 				
 				CancelButton = new NSButton () {
-					Title = "Cancel"
+					Title = Properties_Resources.Cancel
 				};
-				
-				
+
+				NSButton BackButton = new NSButton () {
+					Title = Properties_Resources.Back
+				};
+
 				Controller.ChangeAddressFieldEvent += delegate (string text,
 				                                                string example_text) {
-					
 					InvokeOnMainThread (delegate {
 						AddressTextField.StringValue = text;
 						AddressTextField.Enabled     = true;
 						AddressHelpLabel.StringValue = example_text;
 					});
 				};
-				
+
 				Controller.ChangePathFieldEvent += delegate (string text,
 				                                             string example_text) {
 					
@@ -492,60 +404,41 @@ namespace CmisSync {
 						PathHelpLabel.StringValue = example_text;
 					});
 				};
-				
-//				TableView.SelectRow (Controller.SelectedPluginIndex, false);
-//				TableView.ScrollRowToVisible (Controller.SelectedPluginIndex);
-				
-				(AddressTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue);
-				};
-				
-				(PathTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue);
-				};
-				
+
 				(TableView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
-//					Controller.SelectedPluginChanged (TableView.SelectedRow);
 					Controller.CheckAddPage (AddressTextField.StringValue);
 				};
-				
-//				HistoryCheckButton.Activated += delegate {
-//					Controller.HistoryItemChanged (HistoryCheckButton.State == NSCellStateValue.On);
-//				};
-				
-				AddButton.Activated += delegate {
+
+				ContinueButton.Activated += delegate {
 					Controller.Add2PageCompleted (AddressTextField.StringValue, PathTextField.StringValue);
 				};
-				
+
 				CancelButton.Activated += delegate {
 					Controller.PageCancelled ();
+				};
+
+				BackButton.Activated += delegate
+				{
+					Controller.BackToPage1 ();
 				};
 				
 				Controller.UpdateAddProjectButtonEvent += delegate (bool button_enabled) {
 					InvokeOnMainThread (delegate {
-						AddButton.Enabled = button_enabled;
+						ContinueButton.Enabled = button_enabled;
 					});
 				};
 				
 				
 				ContentView.AddSubview (ScrollView);
-				ContentView.AddSubview (AddressLabel);
-				ContentView.AddSubview (AddressTextField);
-				ContentView.AddSubview (AddressHelpLabel);
-				ContentView.AddSubview (PathLabel);
-				ContentView.AddSubview (PathTextField);
-				ContentView.AddSubview (PathHelpLabel);
-				ContentView.AddSubview (HistoryCheckButton);
-				
-				Buttons.Add (AddButton);
+
+				Buttons.Add (ContinueButton);
+				Buttons.Add (BackButton);
 				Buttons.Add (CancelButton);
-				
-				Controller.CheckAddPage (AddressTextField.StringValue);
 			}
 			
 			if (type == PageType.Syncing) {
-                //Header      = "Adding project ‘" + Controller.SyncingFolder + "’…";
-                Description = "This may take a while on big projects.\nIsn't it coffee-o'clock?";
+				Header      = Properties_Resources.AddingFolder + " ‘" + Controller.SyncingReponame + "’…";
+				Description = Properties_Resources.MayTakeTime;
 
 
                 ProgressIndicator = new NSProgressIndicator () {
@@ -559,312 +452,25 @@ namespace CmisSync {
 
                 ProgressIndicator.StartAnimation (this);
 
-                CancelButton = new NSButton () {
-                    Title = "Cancel"
-                };
-
-                FinishButton = new NSButton () {
-                    Title = "Finish",
-                    Enabled = false
-                };
-
-
                 Controller.UpdateProgressBarEvent += delegate (double percentage) {
                     InvokeOnMainThread (() => {
                         ProgressIndicator.DoubleValue = percentage;
                     });
                 };
 
-//                CancelButton.Activated += delegate {
-//                    Controller.SyncingCancelled ();
-//                };
-
-
                 ContentView.AddSubview (ProgressIndicator);
-
-                Buttons.Add (FinishButton);
-                Buttons.Add (CancelButton);
             }
-
-/*            if (type == PageType.Error) {
-                Header      = "Oops! Something went wrong…";
-                Description = "Please check the following:";
-
-
-                // Displaying marked up text with Cocoa is
-                // a pain, so we just use a webview instead
-                WebView web_view = new WebView ();
-                web_view.Frame   = new RectangleF (190, Frame.Height - 525, 375, 400);
-
-                string html = "<style>" +
-                    "* {" +
-                    "  font-family: 'Lucida Grande';" +
-                    "  font-size: 12px; cursor: default;" +
-                    "}" +
-                    "body {" +
-                    "  -webkit-user-select: none;" +
-                    "  margin: 0;" +
-                    "  padding: 3px;" +
-                    "}" +
-                    "li {" +
-                    "  margin-bottom: 16px;" +
-                    "  margin-left: 0;" +
-                    "  padding-left: 0;" +
-                    "  line-height: 20px;" +
-                    "}" +
-                    "ul {" +
-                    "  padding-left: 24px;" +
-                    "}" +
-                    "</style>" +
-                    "<ul>" +
-                    "  <li><b>" + Controller.PreviousUrl + "</b> is the address we've compiled. Does this look alright?</li>" +
-                    "  <li>Do you have access rights to this remote project?</li>" +
-                    "</ul>";
-
-                if (warnings.Length > 0) {
-                    string warnings_markup = "";
-
-                    foreach (string warning in warnings)
-                        warnings_markup += "<br><b>" + warning + "</b>";
-
-                    html = html.Replace ("</ul>", "<li>Here's the raw error message: " + warnings_markup + "</li></ul>");
-                }
-
-                web_view.MainFrame.LoadHtmlString (html, new NSUrl (""));
-                web_view.DrawsBackground = false;
-
-                CancelButton = new NSButton () {
-                    Title = "Cancel"
-                };
-
-                TryAgainButton = new NSButton () {
-                    Title = "Try again…"
-                };
-
-
-                CancelButton.Activated += delegate {
-                    Controller.PageCancelled ();
-                };
-
-                TryAgainButton.Activated += delegate {
-                    Controller.ErrorPageCompleted ();
-                };
-
-
-                ContentView.AddSubview (web_view);
-
-                Buttons.Add (TryAgainButton);
-                Buttons.Add (CancelButton);
-            }
-
-            if (type == PageType.CryptoSetup) {
-                Header      = "Set up file encryption";
-                Description = "This project is supposed to be encrypted, but it doesn't yet have a password set. Please provide one below:";
-
-
-                PasswordLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Right,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (155, Frame.Height - 204, 160, 17),
-                    StringValue     = "Password:",
-                    Font            = UI.BoldFont
-                };
-
-                PasswordTextField = new NSSecureTextField () {
-                    Frame       = new RectangleF (320, Frame.Height - 208, 196, 22),
-                    Delegate    = new CmisSyncTextFieldDelegate ()
-                };
-
-                VisiblePasswordTextField = new NSTextField () {
-                    Frame       = new RectangleF (320, Frame.Height - 208, 196, 22),
-                    Delegate    = new CmisSyncTextFieldDelegate ()
-                };
-
-                ShowPasswordCheckButton = new NSButton () {
-                    Frame = new RectangleF (318, Frame.Height - 235, 300, 18),
-                    Title = "Show password",
-                    State = NSCellStateValue.Off
-                };
-
-                ShowPasswordCheckButton.SetButtonType (NSButtonType.Switch);
-
-                WarningImage = NSImage.ImageNamed ("NSInfo");
-                WarningImage.Size = new SizeF (24, 24);
-
-                WarningImageView = new NSImageView () {
-                    Image = WarningImage,
-                    Frame = new RectangleF (200, Frame.Height - 320, 24, 24)
-                };
-
-                WarningTextField = new NSTextField () {
-                    Frame           = new RectangleF (235, Frame.Height - 390, 325, 100),
-                    StringValue     = "This password can't be changed later, and your files can't be recovered if it's forgotten.",
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Font            = UI.Font
-                };
-
-                CancelButton = new NSButton () {
-                    Title = "Cancel"
-                };
-
-                ContinueButton = new NSButton () {
-                    Title    = "Continue",
-                    Enabled  = false
-                };
-
-
-                ShowPasswordCheckButton.Activated += delegate {
-                    if (PasswordTextField.Superview == ContentView) {
-                        PasswordTextField.RemoveFromSuperview ();
-                        ContentView.AddSubview (VisiblePasswordTextField);
-
-                    } else {
-                        VisiblePasswordTextField.RemoveFromSuperview ();
-                        ContentView.AddSubview (PasswordTextField);
-                    }
-                };
-
-                (PasswordTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-                    VisiblePasswordTextField.StringValue = PasswordTextField.StringValue;
-                    Controller.CheckCryptoSetupPage (PasswordTextField.StringValue);
-                };
-
-                (VisiblePasswordTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-                    PasswordTextField.StringValue = VisiblePasswordTextField.StringValue;
-                    Controller.CheckCryptoSetupPage (PasswordTextField.StringValue);
-                };
-
-
-                Controller.UpdateCryptoSetupContinueButtonEvent += delegate (bool button_enabled) {
-                    InvokeOnMainThread (() => {
-                        ContinueButton.Enabled = button_enabled;
-                    });
-                };
-
-                ContinueButton.Activated += delegate {
-                   Controller.CryptoSetupPageCompleted (PasswordTextField.StringValue);
-                };
-
-                CancelButton.Activated += delegate {
-                    Controller.CryptoPageCancelled ();
-                };
-
-
-                ContentView.AddSubview (PasswordLabel);
-                ContentView.AddSubview (PasswordTextField);
-                ContentView.AddSubview (ShowPasswordCheckButton);
-                ContentView.AddSubview (WarningImageView);
-                ContentView.AddSubview (WarningTextField);
-
-                Buttons.Add (ContinueButton);
-                Buttons.Add (CancelButton);
-
-                NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
-            }
-
-            if (type == PageType.CryptoPassword) {
-                Header      = "This project contains encrypted files";
-                Description = "Please enter the password to see their contents.";
-
-                PasswordLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Right,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (155, Frame.Height - 224, 160, 17),
-                    StringValue     = "Password:",
-                    Font            = UI.BoldFont
-                };
-
-                PasswordTextField = new NSSecureTextField () {
-                    Frame       = new RectangleF (320, Frame.Height - 228, 196, 22),
-                    Delegate    = new CmisSyncTextFieldDelegate ()
-                };
-
-                VisiblePasswordTextField = new NSTextField () {
-                    Frame       = new RectangleF (320, Frame.Height - 228, 196, 22),
-                    Delegate    = new CmisSyncTextFieldDelegate ()
-                };
-
-                ShowPasswordCheckButton = new NSButton () {
-                    Frame = new RectangleF (318, Frame.Height - 255, 300, 18),
-                    Title = "Show password",
-                    State = NSCellStateValue.Off
-                };
-
-                ShowPasswordCheckButton.SetButtonType (NSButtonType.Switch);
-
-                CancelButton = new NSButton () {
-                    Title = "Cancel"
-                };
-
-                ContinueButton = new NSButton () {
-                    Title    = "Continue",
-                    Enabled  = false
-                };
-
-
-                Controller.UpdateCryptoPasswordContinueButtonEvent += delegate (bool button_enabled) {
-                    InvokeOnMainThread (() => {
-                        ContinueButton.Enabled = button_enabled;
-                    });
-                };
-
-                ShowPasswordCheckButton.Activated += delegate {
-                    if (PasswordTextField.Superview == ContentView) {
-                        PasswordTextField.RemoveFromSuperview ();
-                        ContentView.AddSubview (VisiblePasswordTextField);
-
-                    } else {
-                        VisiblePasswordTextField.RemoveFromSuperview ();
-                        ContentView.AddSubview (PasswordTextField);
-                    }
-                };
-
-                (PasswordTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-                    VisiblePasswordTextField.StringValue = PasswordTextField.StringValue;
-                    Controller.CheckCryptoPasswordPage (PasswordTextField.StringValue);
-                };
-
-                (VisiblePasswordTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-                    PasswordTextField.StringValue = VisiblePasswordTextField.StringValue;
-                    Controller.CheckCryptoPasswordPage (PasswordTextField.StringValue);
-                };
-
-                ContinueButton.Activated += delegate {
-                   Controller.CryptoPasswordPageCompleted (PasswordTextField.StringValue);
-                };
-
-                CancelButton.Activated += delegate {
-                    Controller.CryptoPageCancelled ();
-                };
-
-
-                ContentView.AddSubview (PasswordLabel);
-                ContentView.AddSubview (PasswordTextField);
-                ContentView.AddSubview (ShowPasswordCheckButton);
-
-                Buttons.Add (ContinueButton);
-                Buttons.Add (CancelButton);
-
-                NSApplication.SharedApplication.RequestUserAttention (NSRequestUserAttentionType.CriticalRequest);
-            }*/
-
 
             if (type == PageType.Finished) {
-                Header      = "Your shared project is ready!";
-                Description = "You can find the files in your CmisSync folder.";
+				Header      = Properties_Resources.Ready;
+				Description = Properties_Resources.YouCanFind;
 
                 OpenFolderButton = new NSButton () {
                     Title = string.Format ("Open {0}", Path.GetFileName (Controller.PreviousPath))
                 };
 
                 FinishButton = new NSButton () {
-                    Title = "Finish"
+					Title = Properties_Resources.Finish
                 };
 
 
