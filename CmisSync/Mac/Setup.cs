@@ -249,7 +249,7 @@ namespace CmisSync {
 					Delegate    = new CmisSyncTextFieldDelegate ()
 				};
 
-				NSTextField ErrorMessageTextField = new NSTextField()
+				WarningTextField = new NSTextField()
 				{
 					BackgroundColor = NSColor.WindowBackground,
 					Bordered        = false,
@@ -290,7 +290,7 @@ namespace CmisSync {
 
 				ContinueButton.Activated += delegate {
 					Tuple<CmisServer, Exception> fuzzyResult = 
-						CmisSync.Lib.Cmis.CmisUtils.GetRepositoriesFuzzy(
+						CmisUtils.GetRepositoriesFuzzy(
 							new Uri(AddressTextField.StringValue),
 							UserTextField.StringValue,
 							PasswordTextField.StringValue
@@ -316,9 +316,9 @@ namespace CmisSync {
 							warning = Properties_Resources.TrustFailure;
 						else
 							warning = message + Environment.NewLine + Properties_Resources.Sorry;
-						ErrorMessageTextField.StringValue = warning;
+						WarningTextField.StringValue = warning;
 					} else {
-						ErrorMessageTextField.StringValue = "";
+						WarningTextField.StringValue = "";
 						Controller.Add1PageCompleted (new Uri(AddressTextField.StringValue), UserTextField.StringValue , PasswordTextField.StringValue);
 					}
 				};
@@ -340,6 +340,7 @@ namespace CmisSync {
 				ContentView.AddSubview (UserTextField);
 				ContentView.AddSubview (PasswordLabel);
 				ContentView.AddSubview (PasswordTextField);
+				ContentView.AddSubview (WarningTextField);
 				Buttons.Add (ContinueButton);
 				Buttons.Add (CancelButton);
 

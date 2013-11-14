@@ -98,12 +98,6 @@
   <ItemGroup>
     <Folder Include="Pixmaps\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
-      <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
-      <Name>CmisSync.Lib</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
@@ -231,5 +225,11 @@
     <BundleResource Include="..\Common\Pixmaps\avatar-k.png">
       <Link>Pixmaps\avatar-k.png</Link>
     </BundleResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
+      <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
+      <Name>CmisSync.Lib</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
