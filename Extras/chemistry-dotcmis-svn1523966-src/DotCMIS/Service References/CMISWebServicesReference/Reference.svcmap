@@ -18,12 +18,12 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="C:\projects\chemistry\dotcmis\trunk\DotCMIS\wsdl\CMISWS-Service.wsdl" Protocol="file" SourceId="1" />
+    <MetadataSource Address="http://docs.oasis-open.org/cmis/CMIS/v1.1/os/schema/CMISWS-Service.wsdl" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="CMIS-Core.xsd" MetadataType="Schema" ID="1ce69293-969b-477e-b7ed-e15f0e0e0599" SourceId="1" SourceUrl="file:///C:/projects/chemistry/dotcmis/trunk/DotCMIS/wsdl/CMIS-Core.xsd" />
-    <MetadataFile FileName="CMISWebServices.wsdl" MetadataType="Wsdl" ID="2cf0a7f6-98fb-46d6-bd81-99177e4e2be7" SourceId="1" SourceUrl="file:///C:/projects/chemistry/dotcmis/trunk/DotCMIS/wsdl/CMISWS-Service.wsdl" />
-    <MetadataFile FileName="CMIS-Messaging.xsd" MetadataType="Schema" ID="d1d8296f-df93-4ac6-8bf7-cf4db4f1e405" SourceId="1" SourceUrl="file:///C:/projects/chemistry/dotcmis/trunk/DotCMIS/wsdl/CMIS-Messaging.xsd" />
+    <MetadataFile FileName="CMIS-Messaging2.xsd" MetadataType="Schema" ID="11fa66a0-2332-47ef-909e-25a3ce9b4b3a" SourceId="1" SourceUrl="http://docs.oasis-open.org/cmis/CMIS/v1.1/os/schema/CMIS-Messaging.xsd" />
+    <MetadataFile FileName="CMISWebServices2.wsdl" MetadataType="Wsdl" ID="f6cd42d0-b242-4e67-9718-4d97c96cc38a" SourceId="1" SourceUrl="http://docs.oasis-open.org/cmis/CMIS/v1.1/os/schema/CMISWS-Service.wsdl" />
+    <MetadataFile FileName="CMIS-Core2.xsd" MetadataType="Schema" ID="35d50f63-bc8d-40cd-90e2-a351a08bdc4f" SourceId="1" SourceUrl="http://docs.oasis-open.org/cmis/CMIS/v1.1/os/schema/CMIS-Core.xsd" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
