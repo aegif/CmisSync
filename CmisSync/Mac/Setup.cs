@@ -440,8 +440,7 @@ namespace CmisSync {
 				ContentView.AddSubview (PathLabel);
 				ContentView.AddSubview (PathTextField);
 				ContentView.AddSubview (PathHelpLabel);
-				//ContentView.AddSubview (HistoryCheckButton);
-				
+
 				Buttons.Add (AddButton);
 				Buttons.Add (CancelButton);
 				
