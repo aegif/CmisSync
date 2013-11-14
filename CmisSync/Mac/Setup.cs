@@ -435,6 +435,89 @@ namespace CmisSync {
 				Buttons.Add (BackButton);
 				Buttons.Add (CancelButton);
 			}
+
+			if (type == PageType.Customize)
+			{
+				Header = Properties_Resources.Customize;
+				string localfoldername = Controller.saved_address.Host.ToString();
+				foreach (KeyValuePair<String, String> repository in Controller.repositories)
+				{
+					if (repository.Key == Controller.saved_repository)
+					{
+						localfoldername += "/" + repository.Value;
+						break;
+					}
+				}
+				NSTextField LocalFolderLabel = new NSTextField()
+				{
+					Alignment       = NSTextAlignment.Left,
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					Editable        = false,
+					Frame           = new RectangleF (190, 320 , 196 + 196 + 16, 17),
+					Font            = UI.BoldFont,
+					StringValue     = Properties_Resources.EnterLocalFolderName
+				};
+
+				NSTextField LocalFolderTextField = new NSTextField () {
+					Frame       = new RectangleF (190, 290, 196 + 196 + 16, 22),
+					Font        = UI.Font,
+					StringValue = localfoldername
+				};
+
+				NSTextField LocalRepoPathLabel = new NSTextField()
+				{
+					Alignment       = NSTextAlignment.Left,
+					BackgroundColor = NSColor.WindowBackground,
+					Bordered        = false,
+					Editable        = false,
+					Frame           = new RectangleF (190, 220 , 196 + 196 + 16, 17),
+					Font            = UI.BoldFont,
+					StringValue     = Properties_Resources.ChangeRepoPath
+				};
+
+				NSTextField LocalRepoPathTextField = new NSTextField () {
+					Frame       = new RectangleF (190, 190, 196 + 196 + 16, 22),
+					Font        = UI.Font,
+					StringValue = Path.Combine(Controller.DefaultRepoPath, LocalFolderTextField.StringValue)
+				};
+
+				ContinueButton = new NSButton()
+				{
+					Title = Properties_Resources.Add,
+					Enabled = false
+				};
+
+				NSButton BackButton = new NSButton() {
+					Title = Properties_Resources.Back
+				};
+
+				CancelButton = new NSButton() {
+					Title = Properties_Resources.Cancel
+				};
+
+				BackButton.Activated += delegate
+				{
+					Controller.BackToPage2 ();
+				};
+
+				CancelButton.Activated += delegate {
+					Controller.PageCancelled ();
+				};
+
+				ContinueButton.Activated += delegate {
+					Controller.CustomizePageCompleted (AddressTextField.StringValue, PathTextField.StringValue);
+				};
+
+				ContentView.AddSubview(LocalFolderLabel);
+				ContentView.AddSubview(LocalFolderTextField);
+				ContentView.AddSubview(LocalRepoPathLabel);
+				ContentView.AddSubview(LocalRepoPathTextField);
+
+				Buttons.Add (ContinueButton);
+				Buttons.Add (BackButton);
+				Buttons.Add (CancelButton);
+			}
 			
 			if (type == PageType.Syncing) {
 				Header      = Properties_Resources.AddingFolder + " ‘" + Controller.SyncingReponame + "’…";
