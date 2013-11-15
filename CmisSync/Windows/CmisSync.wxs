@@ -96,7 +96,7 @@
                       Target="[INSTALLDIR]Oris4Sync.exe"
                       WorkingDirectory="INSTALLDIR"/>
             <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
-            <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="ApplicationShortcut" Type="integer" Value="1" KeyPath="yes"/>
           </Component>
       </Directory>
       
@@ -105,9 +105,16 @@
           <Component Id="Oris4AppData" DiskId="1" Guid="C75496CB-DF13-42C7-8520-DB4574411B14">
             <RemoveFile Id="CleanDataDirectory" Name="*" On="both"/>
             <RemoveFolder Id="RemoveDataDirectory" On="both"/>
-            <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="datainstalled" Type="integer" Value="1" KeyPath="yes"/>
+            <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="Oris4AppData" Type="integer" Value="1" KeyPath="yes"/>
           </Component>
         </Directory>
+      </Directory>
+
+      <Directory Id="StartupFolder" Name="Startup">
+        <Component Id="StartupMenuItem" Guid="46C6E4A6-74C4-4D1B-AD7E-38F2F92144F6">
+          <RemoveFile Id="RemoveStartupItem" Name="Oris4 Sync.lnk" On="uninstall"/>
+          <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="StartupMenuItem" Type="integer" Value="1" KeyPath="yes"/>
+        </Component>
       </Directory>
     </Directory>
 
@@ -119,6 +126,7 @@
       <ComponentRef Id="COMP_x64" />
       <ComponentRef Id="ApplicationShortcut" />
       <ComponentRef Id="Oris4AppData" />
+      <ComponentRef Id="StartupMenuItem" />
       <ComponentRef Id="localeComponentDE" />
       <ComponentRef Id="localeComponentES" />
       <ComponentRef Id="localeComponentFR" />
