@@ -224,6 +224,15 @@ namespace CmisSync
                     };
                     openRemoteFolderItem.Click += OpenRemoteFolderDelegate(folderName);
                     */
+
+                    // Sub-item: edit ignore folder.
+                    ToolStripMenuItem editFolderItem = new ToolStripMenuItem()
+                    {
+                        Text = CmisSync.Properties_Resources.EditTitle
+                    };
+                    editFolderItem.Click += EditFolderDelegate(folderName);
+
+
                     // Sub-item: suspend sync.
                     ToolStripMenuItem suspendFolderItem = new ToolStripMenuItem();
                     setSyncItemState(suspendFolderItem, SyncStatus.Idle);
@@ -250,6 +259,8 @@ namespace CmisSync
                     //subfolderItem.DropDownItems.Add(openRemoteFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
+                    subfolderItem.DropDownItems.Add(new ToolStripSeparator());
+                    subfolderItem.DropDownItems.Add(editFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
                     // Add the main item.
@@ -380,6 +391,14 @@ namespace CmisSync
                 {
                     Controller.RemoveFolderFromSyncClicked(reponame);
                 }
+            };
+        }
+
+        private EventHandler EditFolderDelegate(string reponame)
+        {
+            return delegate
+            {
+                Controller.EditFolderClicked(reponame);
             };
         }
     }

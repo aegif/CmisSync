@@ -391,7 +391,13 @@ namespace TestLibrary
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
+            CmisSync.Lib.Credentials.ServerCredentials credentials = new CmisSync.Lib.Credentials.ServerCredentials()
+            {
+                Address = new Uri(url),
+                UserName = user,
+                Password = password
+            };
+            Dictionary<string, string> repos = CmisUtils.GetRepositories(credentials);
             foreach (KeyValuePair<string, string> pair in repos)
             {
                 Console.WriteLine(pair.Key + " : " + pair.Value);
@@ -2074,7 +2080,13 @@ namespace TestLibrary
         [Test, TestCaseSource("TestServersFuzzy"), Category("Slow")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
-            Tuple<CmisServer, Exception> server = CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
+            CmisSync.Lib.Credentials.ServerCredentials credentials = new CmisSync.Lib.Credentials.ServerCredentials()
+            {
+                Address = new Uri(url),
+                UserName = user,
+                Password = password
+            };
+            Tuple<CmisServer, Exception> server = CmisUtils.GetRepositoriesFuzzy(credentials);
             Assert.NotNull(server.Item1);
         }
 

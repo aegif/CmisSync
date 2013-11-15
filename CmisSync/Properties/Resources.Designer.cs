@@ -189,6 +189,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Discard changes.
+        /// </summary>
+        internal static string DiscardChanges {
+            get {
+                return ResourceManager.GetString("DiscardChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server automatically too..
         /// </summary>
         internal static string DocumentsAre {
@@ -213,6 +222,15 @@ namespace CmisSync {
         internal static string DoYouTrustTheCertificate {
             get {
                 return ResourceManager.GetString("DoYouTrustTheCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        internal static string EditTitle {
+            get {
+                return ResourceManager.GetString("EditTitle", resourceCulture);
             }
         }
         
@@ -350,6 +368,15 @@ namespace CmisSync {
         internal static string InvalidURL {
             get {
                 return ResourceManager.GetString("InvalidURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to loading aborted.
+        /// </summary>
+        internal static string LoadingStatusABORTED {
+            get {
+                return ResourceManager.GetString("LoadingStatusABORTED", resourceCulture);
             }
         }
         
@@ -522,6 +549,15 @@ namespace CmisSync {
         internal static string RunningLatestVersion {
             get {
                 return ResourceManager.GetString("RunningLatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save changes.
+        /// </summary>
+        internal static string SaveChanges {
+            get {
+                return ResourceManager.GetString("SaveChanges", resourceCulture);
             }
         }
         

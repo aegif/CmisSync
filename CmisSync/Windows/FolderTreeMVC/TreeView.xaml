@@ -12,9 +12,11 @@
         <local:LoadingStatusToBrushConverter x:Key="LoadingStatus" />
         <local:LoadingStatusToTextConverter x:Key="StatusText" />
         <local:IgnoreStatusToTextConverter x:Key="IgnoreText" />
-        <local:IgnoreToTextDecoration x:Key="IgnoreTextDecoration" />
-        <HierarchicalDataTemplate DataType="{x:Type local:CmisRepo}" ItemsSource="{Binding Folder}" >
-            <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
+        <local:IgnoreToTextDecorationConverter x:Key="IgnoreTextDecoration" />
+        <local:InvalidPatternConverter x:Key="InvalidPattern" />
+        <local:FolderTypeToBrushConverter x:Key="FolderType"/>
+        <HierarchicalDataTemplate DataType="{x:Type local:RootFolder}" ItemsSource="{Binding Children}" >
+            <RadioButton IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" GroupName="repo" Padding="5,0,0,0" ToolTip="{Binding ToolTip, Mode=OneTime}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                     <TextBlock Text="{Binding Name, Mode=OneTime}" />
 <!--                    <CheckBox Content="Automatically sync new folder" IsChecked="{Binding SyncAllSubFolder, Mode=TwoWay}" FlowDirection="RightToLeft" Margin="20,0,0,0" Foreground="DarkGray"/> -->
@@ -22,8 +24,8 @@
                 </StackPanel>
             </RadioButton>
         </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding SubFolder}" >
-            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeState}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
+        <HierarchicalDataTemplate DataType="{x:Type local:Folder}" ItemsSource="{Binding Children}" >
+            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" IsThreeState="{Binding ThreeStates}" Padding="5,0,0,0" IsEnabled="{Binding Enabled}">
                 <StackPanel Orientation="Horizontal">
                     <!--<StackPanel.ContextMenu>
                         <ContextMenu>
@@ -32,7 +34,7 @@
                             </MenuItem>
                         </ContextMenu>
                     </StackPanel.ContextMenu>-->
-                    <TextBlock Text="{Binding Name, Mode=OneTime}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" />
+                    <TextBlock Text="{Binding Name, Mode=OneTime}" Foreground="{Binding Converter={StaticResource FolderType}, Path=LocationType}" TextDecorations="{Binding Path=IsIgnored, Converter={StaticResource IgnoreTextDecoration}}" FontStyle="{Binding Path=IsIllegalFileNameInPath, Converter={StaticResource InvalidPattern}}" />
                     <TextBlock Margin="20,0" Text="{Binding Converter={StaticResource StatusText}, Path=Status}" Foreground="{Binding Converter={StaticResource LoadingStatus}, Path=Status}" />
                 </StackPanel>
             </CheckBox>

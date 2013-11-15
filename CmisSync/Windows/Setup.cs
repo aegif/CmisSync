@@ -41,6 +41,7 @@ using log4net;
 using System.Collections.ObjectModel;
 using CmisSync.CmisTree;
 using System.Windows.Input;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync
 {
@@ -56,7 +57,7 @@ namespace CmisSync
         /// </summary>
         public SetupController Controller = new SetupController();
 
-        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, RepoInfo.CmisPassword password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(ServerCredentials credentials);
 
         /// <summary>
         /// Constructor.
@@ -575,8 +576,13 @@ namespace CmisSync
                                     // Try to find the CMIS server (asynchronously)
                                     GetRepositoriesFuzzyDelegate dlgt =
                                         new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
-                                    IAsyncResult ar = dlgt.BeginInvoke(new Uri(address_box.Text), user_box.Text,
-                                        password_box.Password, null, null);
+                                    ServerCredentials credentials = new ServerCredentials()
+                                    {
+                                        UserName = user_box.Text,
+                                        Password = password_box.Password,
+                                        Address = new Uri(address_box.Text)
+                                    };
+                                    IAsyncResult ar = dlgt.BeginInvoke(credentials, null, null);
                                     while (!ar.AsyncWaitHandle.WaitOne(100)) {
                                         System.Windows.Forms.Application.DoEvents();
                                     }
@@ -639,30 +645,61 @@ namespace CmisSync
                                 Header = Properties_Resources.Which;
 
                                 // A tree allowing the user to browse CMIS repositories/folders.
-                                System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/TreeView.xaml", System.UriKind.Relative);
+                                System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/FolderTreeMVC/TreeView.xaml", System.UriKind.Relative);
                                 System.Windows.Controls.TreeView treeView = System.Windows.Application.LoadComponent(resourceLocater) as TreeView;
 
-                                ObservableCollection<CmisRepo> repos = new ObservableCollection<CmisRepo>();
-
+                                ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
+                                Dictionary<string, AsyncNodeLoader> loader = new Dictionary<string, AsyncNodeLoader>();
                                 // Some CMIS servers hold several repositories (ex:Nuxeo). Show one root per repository.
                                 bool firstRepo = true;
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
-                                    CmisRepo repo = new CmisRepo(Controller.saved_user, Controller.saved_password, Controller.saved_address.ToString())
+                                    RootFolder repo = new RootFolder()
                                     {
                                         Name = repository.Value,
-                                        Id = repository.Key
+                                        Id = repository.Key,
+                                        Address = Controller.saved_address.ToString()
                                     };
                                     repos.Add(repo);
-                                    repo.LoadingSubfolderAsync();
                                     if (firstRepo)
                                     {
                                         repo.Selected = true;
                                         firstRepo = false;
                                     }
+                                    CmisRepoCredentials cred = new CmisRepoCredentials()
+                                    {
+                                        UserName = Controller.saved_user,
+                                        Password = Controller.saved_password,
+                                        Address = Controller.saved_address,
+                                        RepoId = repository.Key
+                                    };
+                                    AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate);
+                                    asyncLoader.Load(repo);
+                                    loader.Add(repo.Id, asyncLoader);
                                 }
                                 treeView.DataContext = repos;
-
+                                treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
+                                {
+                                    TreeViewItem expandedItem = e.OriginalSource as TreeViewItem;
+                                    Node expandedNode = expandedItem.Header as Folder;
+                                    if (expandedNode != null)
+                                    {
+                                        Node parent = expandedNode.Parent;
+                                        while (parent is Folder)
+                                        {
+                                            parent = parent.Parent;
+                                        }
+                                        if (parent is RootFolder)
+                                        {
+                                            AsyncNodeLoader l;
+                                            RootFolder r = parent as RootFolder;
+                                            if (loader.TryGetValue(r.Id, out l))
+                                            {
+                                                l.Load(expandedNode);
+                                            }
+                                        }
+                                    }
+                                }));
                                 ContentCanvas.Children.Add(treeView);
                                 Canvas.SetTop(treeView, 70);
                                 Canvas.SetLeft(treeView, 185);
@@ -678,8 +715,6 @@ namespace CmisSync
                                 {
                                     Content = Properties_Resources.Cancel
                                 };
-
-
 
                                 Button back_button = new Button()
                                 {
@@ -703,12 +738,12 @@ namespace CmisSync
                                     List<string> ignored = new List<string>();
                                     List<string> selectedFolder = new List<string>();
                                     ItemCollection items = treeView.Items;
-                                    CmisRepo selectedRepo = null;
+                                    RootFolder selectedRepo = null;
                                     foreach (var item in items)
                                     {
-                                        CmisRepo repo = item as CmisRepo;
+                                        RootFolder repo = item as RootFolder;
                                         if (repo != null)
-                                            if (repo.Selected)
+                                            if (repo.Selected == true)
                                             {
                                                 selectedRepo = repo;
                                                 break;
@@ -716,17 +751,14 @@ namespace CmisSync
                                     }
                                     if (selectedRepo != null)
                                     {
-                                        foreach (Folder child in selectedRepo.Folder)
-                                        {
-                                            ignored.AddRange(getIgnoredFolder(child));
-                                            selectedFolder.AddRange(getSelectedFolder(child));
-                                        }
+                                        ignored.AddRange(CmisRepoUtils.GetIgnoredFolder(selectedRepo));
+                                        selectedFolder.AddRange(CmisRepoUtils.GetSelectedFolder(selectedRepo));
                                         Controller.saved_repository = selectedRepo.Id;
                                         Controller.saved_remote_path = selectedRepo.Path;
                                         Controller.Add2PageCompleted(
                                             Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray(), selectedFolder.ToArray());
-                                        foreach (CmisRepo repo in repos)
-                                            repo.cancelLoadingAsync();
+                                        foreach (AsyncNodeLoader task in loader.Values)
+                                            task.Cancel();
                                     }
                                     else
                                     {
@@ -737,14 +769,14 @@ namespace CmisSync
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
-                                    foreach (CmisRepo repo in repos)
-                                        repo.cancelLoadingAsync();
+                                    foreach (AsyncNodeLoader task in loader.Values)
+                                        task.Cancel();
                                 };
 
                                 Controller.HideWindowEvent += delegate
                                 {
-                                    foreach (CmisRepo repo in repos)
-                                        repo.cancelLoadingAsync();
+                                    foreach (AsyncNodeLoader task in loader.Values)
+                                        task.Cancel();
                                 };
                                 break;
                             }
@@ -1067,34 +1099,6 @@ namespace CmisSync
             Controller.PageCancelled();
             Logger.Info("Exiting constructor.");
         }
-
-        private List<string> getIgnoredFolder(Folder f)
-        {
-            List<string> result = new List<string>();
-            if (f.IsIgnored)
-            {
-                result.Add(f.Path);
-            }
-            else
-            {
-                foreach (Folder child in f.SubFolder)
-                    result.AddRange(getIgnoredFolder(child));
-            }
-            return result;
-        }
-
-        private List<string> getSelectedFolder(Folder f)
-        {
-            List<string> result = new List<string>();
-            if (f.Selected == true)
-                result.Add(f.Path);
-            else
-            {
-                foreach (Folder child in f.SubFolder)
-                    result.AddRange(getSelectedFolder(child));
-            }
-            return result;
-        }
     }
 
     /// <summary>
@@ -1127,5 +1131,4 @@ namespace CmisSync
             this.fullPath = fullPath;
         }
     }
-    
 }

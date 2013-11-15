@@ -17,7 +17,7 @@ namespace CmisSync.Lib
         {
             this.stream = stream;
             this.length = streamlength;
-            this.prefix = String.Format("{0} {1}: ", prefix, filename, Utils.FormatSize(this.length));
+            this.prefix = String.Format("{0} {1}: ", prefix, filename, Utils.FormatSize(Length));
         }
         public override bool CanRead
         {
@@ -44,7 +44,12 @@ namespace CmisSync.Lib
         {
             get
             {
-                return this.stream.Length;
+                try{
+                    return Math.Max(this.stream.Length, this.length);
+                }catch(System.NotSupportedException) {
+                    return this.length;
+                }
+
             }
         }
         public override long Position
@@ -81,11 +86,11 @@ namespace CmisSync.Lib
             if(isDebuggingEnabled) {
                 int result = this.stream.Read(buffer,offset,count);
                 readpos+=result;
-                long percentage = (readpos * 100)/ (this.length>0?this.length:100);
+                long percentage = (readpos * 100)/ (Length>0?Length:100);
                 Logger.Debug(String.Format("{0}% {1} of {2}",
                                            percentage,
                                            Utils.FormatSize(this.readpos),
-                                           Utils.FormatSize(this.length)));
+                                           Utils.FormatSize(Length)));
                 return result;
             }
             else
@@ -95,6 +100,7 @@ namespace CmisSync.Lib
         {
             if(isDebuggingEnabled)
                 Logger.Debug(String.Format("{0}SetLength(long value={1})", prefix, value));
+            this.length = value;
             this.stream.SetLength(value);
         }
         public override void Write(byte[] buffer, int offset, int count)
@@ -103,11 +109,11 @@ namespace CmisSync.Lib
             if(isDebuggingEnabled)
             {
                 writepos += count;
-                long percentage = (writepos * 100)/ (this.length>0?this.length:100);
+                long percentage = (writepos * 100)/ (Length>0?Length:100);
                 Logger.Debug(String.Format("{0}% {1} of {2})",
                                            percentage,
                                            Utils.FormatSize(this.writepos),
-                                           Utils.FormatSize(this.length)));
+                                           Utils.FormatSize(Length)));
             }
         }
         protected override void Dispose(bool disposing)

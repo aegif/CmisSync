@@ -51,13 +51,13 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="Mono.Posix" />
-    <Reference Include="log4net">
-      <HintPath>..\..\Extras\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="XamMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065">
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="log4net">
+      <HintPath>..\..\Extras\log4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.cs">
@@ -84,6 +84,28 @@
     <Compile Include="..\CertPolicyHandler.cs" />
     <Compile Include="..\ControllerBase.cs" />
     <Compile Include="..\SetupController.cs" />
+    <Compile Include="..\Windows\FolderTreeMVC\IgnoredFolderLoader.cs">
+      <Link>IgnoredFolderLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\Windows\FolderTreeMVC\LoadingStatusModel.cs">
+      <Link>LoadingStatusModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Windows\FolderTreeMVC\LocalFolderLoader.cs">
+      <Link>LocalFolderLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\Windows\FolderTreeMVC\NodeLoader.cs">
+      <Link>NodeLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\Windows\FolderTreeMVC\NodeModel.cs">
+      <Link>NodeModel.cs</Link>
+    </Compile>
+    <Compile Include="..\EditController.cs">
+      <Link>EditController.cs</Link>
+    </Compile>
+    <Compile Include="Edit.cs" />
+    <Compile Include="..\Windows\FolderTreeMVC\FolderTreeView.cs">
+      <Link>FolderTreeView.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

@@ -10,6 +10,7 @@ EXTRA_DIST =  \
 	AboutController.cs \
 	BubblesController.cs \
 	ControllerBase.cs \
+	EditController.cs \
 	SetupController.cs \
 	StatusIconController.cs \
 	CertPolicyHandler.cs \

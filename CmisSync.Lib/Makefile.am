@@ -19,6 +19,7 @@ SOURCES =  \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
+	Credentials.cs \
 	Events/DebugLoggingHandler.cs \
 	Events/FSDeletionHandler.cs \
 	Events/FSEvent.cs \

@@ -213,7 +213,7 @@ namespace CmisSync {
         /// <summary>
         /// Close the window.
         /// </summary>
-        private void Close (object sender, CancelEventArgs args)
+        protected virtual void Close (object sender, CancelEventArgs args)
         {
             args.Cancel = true;    
         }

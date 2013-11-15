@@ -24,6 +24,7 @@ using System.Threading;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync
 {
@@ -127,13 +128,11 @@ namespace CmisSync
         /// <summary>
         /// Load repositories information from a CMIS endpoint.
         /// </summary>
-        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(string url, string user, string password)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(ServerCredentials credentials)
         {
-            Uri uri;
             try
             {
-                uri = new Uri(url);
-                return CmisUtils.GetRepositoriesFuzzy(uri, user, password);
+                return CmisUtils.GetRepositoriesFuzzy(credentials);
             }
             catch(Exception e) {
                 return new Tuple<CmisServer,Exception>(null,e);

@@ -401,14 +401,17 @@ namespace CmisSync.Lib.Sync
                             }
                             catch (CmisBaseException e)
                             {
+                                this.ForceFullSyncAtNextSync();
                                 Logger.Error("CMIS exception while syncing:", e);
                             }
                             catch(ObjectDisposedException e)
                             {
+                                this.ForceFullSyncAtNextSync();
                                 Logger.Warn("Object disposed while syncing:", e);
                             }
                             catch(Exception e)
                             {
+                                this.ForceFullSyncAtNextSync();
                                 Logger.Warn("Execption thrown while syncing:", e);
                             }
                         }
@@ -1083,7 +1086,6 @@ namespace CmisSync.Lib.Sync
                                         ContentStream contentStream = new ContentStream();
                                         contentStream.FileName = fileName;
                                         contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                                        contentStream.Length = file.Length;
                                         contentStream.Stream = logstream;
 
                                         // Upload
@@ -1097,6 +1099,9 @@ namespace CmisSync.Lib.Sync
                                                 remoteDocument = remoteFolder.CreateDocument(properties, null, null);
                                                 Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
                                                                            remoteDocument.Id, fileName));
+                                                Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+                                                // Create database entry for this empty file to force content update if setContentStream will fail.
+                                                database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, new byte[hashAlg.HashSize]);
                                             } catch(Exception e) {
                                                 string reason = Utils.IsValidISO88591(fileName)?String.Empty:" Reason: Upload perhaps failed because of an invalid ISO 8859-1 character";
                                                 Logger.Info(String.Format("Could not create the remote document {0} as target for local document {1}{2}", fileName, filePath, reason));
@@ -1305,7 +1310,6 @@ namespace CmisSync.Lib.Sync
                             using(LoggingStream logstream = new LoggingStream(localfile, "Updating ContentStream", filePath, localfile.Length)) {
                                 ContentStream contentStream = new ContentStream();
                                 contentStream.FileName = remoteFile.Name;
-                                contentStream.Length = localfile.Length;
                                 contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
                                 contentStream.Stream = logstream;
                                 Logger.Debug(String.Format("before SetContentStream to remote object ({0})", remoteFile.Id));

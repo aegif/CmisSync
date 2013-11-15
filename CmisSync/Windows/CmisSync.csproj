@@ -84,6 +84,9 @@
     <Compile Include="..\ControllerBase.cs">
       <Link>ControllerBase.cs</Link>
     </Compile>
+    <Compile Include="..\EditController.cs">
+      <Link>EditController.cs</Link>
+    </Compile>
     <Compile Include="..\SetupController.cs">
       <Link>SetupController.cs</Link>
     </Compile>
@@ -95,7 +98,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="FolderTreeView.cs" />
+    <Compile Include="Edit.cs" />
+    <Compile Include="FolderTreeMVC\InvalidPatternConverter.cs" />
+    <Compile Include="FolderTreeMVC\NodeLoader.cs" />
+    <Compile Include="FolderTreeMVC\IgnoredFolderLoader.cs" />
+    <Compile Include="FolderTreeMVC\LocalFolderLoader.cs" />
+    <Compile Include="FolderTreeMVC\NodeModel.cs" />
+    <Compile Include="FolderTreeMVC\FolderTreeView.cs" />
+    <Compile Include="FolderTreeMVC\FolderTypeConverter.cs" />
+    <Compile Include="FolderTreeMVC\IgnoreStatusConverter.cs" />
+    <Compile Include="FolderTreeMVC\LoadingStatusModel.cs" />
+    <Compile Include="FolderTreeMVC\LoadingStatusConverter.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
       <SubType>Form</SubType>
@@ -274,7 +287,7 @@
     <Folder Include="Plugins\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="TreeView.xaml">
+    <Resource Include="FolderTreeMVC\TreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Resource>

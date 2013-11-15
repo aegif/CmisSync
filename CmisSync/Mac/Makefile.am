@@ -9,14 +9,22 @@ SOURCES =  \
 	../AboutController.cs \
 	../CertPolicyHandler.cs \
 	../ControllerBase.cs \
+	../EditController.cs \
 	../Program.cs \
 	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
+	../Windows/FolderTreeMVC/FolderTreeView.cs \
+	../Windows/FolderTreeMVC/IgnoredFolderLoader.cs \
+	../Windows/FolderTreeMVC/LoadingStatusModel.cs \
+	../Windows/FolderTreeMVC/LocalFolderLoader.cs \
+	../Windows/FolderTreeMVC/NodeLoader.cs \
+	../Windows/FolderTreeMVC/NodeModel.cs \
 	About.cs \
 	AppDelegate.cs \
 	Badger.cs \
 	Controller.cs \
+	Edit.cs \
 	MacWatcher.cs \
 	Setup.cs \
 	SetupWindow.cs \

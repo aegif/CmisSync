@@ -52,6 +52,8 @@
     <Compile Include="Cmis\Crypto.cs" />
     <Compile Include="Cmis\Database.cs" />
     <Compile Include="Cmis\IDatabase.cs" />
+    <Compile Include="Credentials.cs" />
+    <Compile Include="Events\SyncEventQueue.cs" />
     <Compile Include="LoggingStream.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />
@@ -82,7 +84,12 @@
     <Compile Include="Events\SyncEventHandler.cs" />
     <Compile Include="Events\DebugLoggingHandler.cs" />
     <Compile Include="Events\FSDeletionHandler.cs" />
-    <Compile Include="Events\SyncEventQueue.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
+      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+      <Name>DotCMIS</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
@@ -104,10 +111,4 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
-      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
-      <Name>DotCMIS</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

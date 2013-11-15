@@ -29,6 +29,7 @@ using MonoMac.WebKit;
 using Mono.Unix;
 
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync {
 
@@ -239,12 +240,13 @@ namespace CmisSync {
 				};
 
 				ContinueButton.Activated += delegate {
+					ServerCredentials credentials = new ServerCredentials() {
+						UserName = UserTextField.StringValue,
+						Password = PasswordTextField.StringValue,
+						Address  = new Uri(AddressTextField.StringValue)
+					};
 					Tuple<CmisServer, Exception> fuzzyResult = 
-						CmisUtils.GetRepositoriesFuzzy(
-							new Uri(AddressTextField.StringValue),
-							UserTextField.StringValue,
-							PasswordTextField.StringValue
-						);
+						CmisUtils.GetRepositoriesFuzzy(credentials);
 					CmisServer cmisServer = fuzzyResult.Item1;
 					if(cmisServer!=null) {
 						Controller.repositories = cmisServer.Repositories;
