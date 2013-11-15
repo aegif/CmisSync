@@ -28,6 +28,18 @@ RESOURCES = $(RESOURCES_RESOURCES)
 RESOURCES_RESX = $(wildcard $(srcdir)/../Properties/*.resx)
 RESOURCES_RESOURCES = $(addprefix CmisSync.,$(patsubst %.resx,%.resources,$(notdir $(RESOURCES_RESX))))
 
+RESOURCES_RESX_XAMARIN =  \
+	CmisSync../Properties/Properties.Resources.cs.resx,CmisSync.Properties.Resources.cs.resources \
+	CmisSync../Properties/Properties.Resources.de.resx,CmisSync.Properties.Resources.de.resources \
+	CmisSync../Properties/Properties.Resources.es-ES.resx,CmisSync.Properties.Resources.es-ES.resources \
+	CmisSync../Properties/Properties.Resources.fr.resx,CmisSync.Properties.Resources.fr.resources \
+	CmisSync../Properties/Properties.Resources.ja.resx,CmisSync.Properties.Resources.ja.resources \
+	CmisSync../Properties/Properties.Resources.nl.resx,CmisSync.Properties.Resources.nl.resources \
+	CmisSync../Properties/Properties.Resources.resx,CmisSync.Properties.Resources.resources \
+	CmisSync../Properties/Properties.Resources.tlh-AA.resx,CmisSync.Properties.Resources.tlh-AA.resources \
+	CmisSync../Properties/Properties.Resources.tlh-KX.resx,CmisSync.Properties.Resources.tlh-KX.resources \
+	CmisSync../Properties/Properties.Resources.uk.resx,CmisSync.Properties.Resources.uk.resources      
+
 CmisSync.%.resources: $(srcdir)/../Properties/%.resx
 	resgen2 $< $@
 
