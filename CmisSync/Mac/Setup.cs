@@ -101,63 +101,19 @@ namespace CmisSync {
         public void ShowPage (PageType type)
         {
             if (type == PageType.Setup) {
-                Header      = "Welcome to CmisSync!";
-                Description = "First off, what's your name and email?\n(visible only to team members)";
-
-
-                FullNameLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Right,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 234, 160, 17),
-                    StringValue     = "Full Name:",
-                    Font            = UI.Font
-                };
-
-                FullNameTextField = new NSTextField () {
-                    Frame       = new RectangleF (330, Frame.Height - 238, 196, 22),
-                    StringValue = UnixUserInfo.GetRealUser ().RealName,
-                    Delegate    = new CmisSyncTextFieldDelegate ()
-                };
-
-                EmailLabel = new NSTextField () {
-                    Alignment       = NSTextAlignment.Right,
-                    BackgroundColor = NSColor.WindowBackground,
-                    Bordered        = false,
-                    Editable        = false,
-                    Frame           = new RectangleF (165, Frame.Height - 264, 160, 17),
-                    StringValue     = "Email:",
-                    Font            = UI.Font
-                };
-
-                EmailTextField = new NSTextField () {
-                    Frame       = new RectangleF (330, Frame.Height - 268, 196, 22),
-                    Delegate    = new CmisSyncTextFieldDelegate ()
-                };
+				Header      = Properties_Resources.Welcome;
+				Description = Properties_Resources.Intro;
 
                 CancelButton = new NSButton () {
-                    Title = "Cancel"
+					Title = Properties_Resources.Cancel
                 };
 
                 ContinueButton = new NSButton () {
-                    Title    = "Continue",
+					Title    = Properties_Resources.Continue,
                     Enabled  = false
                 };
 
-
-                (FullNameTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-                    Controller.CheckSetupPage ();
-                };
-
-                (EmailTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
-                    Controller.CheckSetupPage ();
-                };
-
                 ContinueButton.Activated += delegate {
-                    string full_name = FullNameTextField.StringValue.Trim ();
-                    string email     = EmailTextField.StringValue.Trim ();
-
                     Controller.SetupPageCompleted ();
                 };
 
@@ -170,12 +126,6 @@ namespace CmisSync {
                         ContinueButton.Enabled = button_enabled;
                     });
                 };
-
-
-                ContentView.AddSubview (FullNameLabel);
-                ContentView.AddSubview (FullNameTextField);
-                ContentView.AddSubview (EmailLabel);
-                ContentView.AddSubview (EmailTextField);
 
                 Buttons.Add (ContinueButton);
                 Buttons.Add (CancelButton);
@@ -671,9 +621,6 @@ namespace CmisSync {
                         FinishButton = new NSButton () {
 							Title = Properties_Resources.Finish
                         };
-
-                        SlideImage.Size = new SizeF (350, 64);
-
 
                         StartupCheckButton.Activated += delegate {
                             Controller.StartupItemChanged (StartupCheckButton.State == NSCellStateValue.On);
