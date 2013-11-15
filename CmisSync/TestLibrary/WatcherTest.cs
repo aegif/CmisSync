@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
@@ -482,7 +482,14 @@ namespace TestLibrary
                 CreateTestFile(oldname, 1);
                 WaitWatcher(40000,watcher,(w) => 
                 {
+#if __MonoCS__
+                    List<Watcher.ChangeTypes> types = new List<Watcher.ChangeTypes>();
+                    types.Add(Watcher.ChangeTypes.Created);
+                    types.Add(Watcher.ChangeTypes.Changed);
+                    return types.Contains(w.GetChangeType(oldname));
+#else
                     return w.GetChangeType(oldname) == Watcher.ChangeTypes.Changed;
+#endif
                 });
                 File.Move(oldname, newnameOut);
                 Console.WriteLine("moved:"+oldname);
