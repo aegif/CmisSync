@@ -385,7 +385,7 @@ namespace CmisSync
 
                                 TextBlock address_help_label = new TextBlock()
                                 {
-                                    Text = Properties_Resources.Help + ": " + Properties_Resources.ExampleUrl,
+                                    Text = Properties_Resources.Hint + ": " + Properties_Resources.ExampleUrl,
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
                                 };

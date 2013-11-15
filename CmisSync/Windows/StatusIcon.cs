@@ -243,7 +243,7 @@ namespace CmisSync
                         Text = Properties_Resources.RemoveFolderFromSync,
                         Tag = "remove",
                         // TODO if remove folder from sync is supported, enable this entry
-                        Enabled = true
+                        Enabled = false
                     };
                     removeFolderFromSyncItem.Click += RemoveFolderFromSyncDelegate(folderName);
 
@@ -252,7 +252,7 @@ namespace CmisSync
                     {
                         Text = Properties_Resources.ManualSync,
                         Tag = "sync",
-                        Enabled = true
+                        Image = UIHelpers.GetBitmap("media_playback_refresh"),
                     };
                     manualSyncItem.Click += ManualSyncDelegate(folderName);
 

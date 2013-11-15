@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -121,7 +121,7 @@
     <value>Add</value>
   </data>
   <data name="AddARemoteFolder" xml:space="preserve">
-    <value>Add a remote folder…</value>
+    <value>Connect to Oris4…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
     <value>Adding synchronized folders to Ori4Sync</value>
@@ -171,11 +171,11 @@
   <data name="FolderAlreadyExist" xml:space="preserve">
     <value>A folder already in the Oris4 Sync root folder</value>
   </data>
-  <data name="Help" xml:space="preserve">
-    <value>Help</value>
+  <data name="Hint" xml:space="preserve">
+    <value>Hint</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>Oris4 Sync allows you to keep your files in sync with Oris4, and use your documents even when offline.
+    <value>Oris4 Sync allows you to keep your workstation’s folders and files in sync with Oris4. Sync allows you to access the most up to date versions of your documents in Oris4 or offline. 
 
 Stop Searching. Start Finding.</value>
   </data>
@@ -267,7 +267,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Resume sync</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
-    <value>Browse remote folder</value>
+    <value>Launch Oris4 website</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>Open local folder</value>
@@ -317,6 +317,6 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Untrusted Certificate</value>
   </data>
   <data name="ManualSync" xml:space="preserve">
-    <value>Run Sync</value>
+    <value>Run sync now</value>
   </data>
 </root>

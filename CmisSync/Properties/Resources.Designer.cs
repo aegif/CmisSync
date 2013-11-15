@@ -79,7 +79,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add a remote folder….
+        ///   Looks up a localized string similar to Connect to Oris4….
         /// </summary>
         internal static string AddARemoteFolder {
             get {
@@ -115,7 +115,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Browse remote folder.
+        ///   Looks up a localized string similar to Launch Oris4 website.
         /// </summary>
         internal static string BrowseRemoteFolder {
             get {
@@ -298,11 +298,11 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Help.
+        ///   Looks up a localized string similar to Hint.
         /// </summary>
-        internal static string Help {
+        internal static string Hint {
             get {
-                return ResourceManager.GetString("Help", resourceCulture);
+                return ResourceManager.GetString("Hint", resourceCulture);
             }
         }
         
@@ -316,7 +316,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4 Sync allows you to keep your files in sync with Oris4, and use your documents even when offline.
+        ///   Looks up a localized string similar to Oris4 Sync allows you to keep your workstation’s folders and files in sync with Oris4. Sync allows you to access the most up to date versions of your documents in Oris4 or offline. 
         ///
         ///Stop Searching. Start Finding..
         /// </summary>
@@ -382,7 +382,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Run Sync.
+        ///   Looks up a localized string similar to Run sync now.
         /// </summary>
         internal static string ManualSync {
             get {

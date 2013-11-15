@@ -266,6 +266,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\media_playback_pause.png" />
+    <EmbeddedResource Include="Pixmaps\media_playback_refresh.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
     <Content Include="Pixmaps\cmissync-folder.ico">

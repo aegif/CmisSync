@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -171,7 +171,7 @@
   <data name="FolderAlreadyExist" xml:space="preserve">
     <value>Der Ordner existiert bereits im Stammordner Oris4 Sync</value>
   </data>
-  <data name="Help" xml:space="preserve">
+  <data name="Hint" xml:space="preserve">
     <value>Hilfe</value>
   </data>
   <data name="Intro" xml:space="preserve">
