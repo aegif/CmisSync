@@ -303,4 +303,7 @@ Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ä
   <data name="InvalidRepoName" xml:space="preserve">
     <value>Der angegebene Name {0} enthält verbotene Zeichen.</value>
   </data>
+  <data name="NameResolutionFailure" xml:space="preserve">
+    <value>Der angegebene Servername konnte nicht gefunden werden. Bitte überprüfen Sie den Servernamen und Ihre Internetverbindung.</value>
+  </data>
 </root>

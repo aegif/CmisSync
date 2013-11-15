@@ -65,7 +65,7 @@ namespace CmisSync {
         private NSTextField WarningTextField;
         private NSImage WarningImage;
         private NSImageView WarningImageView;
-        private NSTableView TableView;
+		private NSOutlineView OutlineView;
         private NSScrollView ScrollView;
         private NSTableColumn IconColumn;
         private NSTableColumn DescriptionColumn;
@@ -96,7 +96,6 @@ namespace CmisSync {
                 }
             };
         }
-
 
         public void ShowPage (PageType type)
         {
@@ -224,7 +223,6 @@ namespace CmisSync {
 				
 				Controller.ChangeAddressFieldEvent += delegate (string text,
 				                                                string example_text) {
-					
 					InvokeOnMainThread (delegate {
 						AddressTextField.StringValue = text;
 						AddressTextField.Enabled     = true;
@@ -251,24 +249,11 @@ namespace CmisSync {
 					if(cmisServer!=null) {
 						Controller.repositories = cmisServer.Repositories;
 						AddressTextField.StringValue = cmisServer.Url.ToString();
-					}else {
+					} else {
 						Controller.repositories = null;
 					}
 					if(Controller.repositories == null) {
-						string warning = "";
-						string message = fuzzyResult.Item2.Message;
-						Exception e = fuzzyResult.Item2;
-						if(e is CmisPermissionDeniedException)
-							warning = Properties_Resources.LoginFailedForbidden;
-						else if(e is CmisServerNotFoundException)
-							warning = Properties_Resources.ConnectFailure;
-						else if(e.Message == "SendFailure" && cmisServer.Url.Scheme.StartsWith("https"))
-							warning = Properties_Resources.SendFailureHttps;
-						else if (e.Message == "TrustFailure")
-							warning = Properties_Resources.TrustFailure;
-						else
-							warning = message + Environment.NewLine + Properties_Resources.Sorry;
-						WarningTextField.StringValue = warning;
+						WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
 					} else {
 						WarningTextField.StringValue = "";
 						Controller.Add1PageCompleted (new Uri(AddressTextField.StringValue), UserTextField.StringValue , PasswordTextField.StringValue);
@@ -303,7 +288,7 @@ namespace CmisSync {
 				Header      = Properties_Resources.Which;
 				Description = "";
 
-				TableView = new NSTableView () {
+				OutlineView = new NSOutlineView () {
 					Frame            = new RectangleF (0, 0, 0, 0),
 					RowHeight        = 34,
 					IntercellSpacing = new SizeF (8, 12),
@@ -313,7 +298,7 @@ namespace CmisSync {
 				
 				ScrollView = new NSScrollView () {
 					Frame               = new RectangleF (190, Frame.Height - 340, 408, 255),
-					DocumentView        = TableView,
+					DocumentView        = OutlineView,
 					HasVerticalScroller = true,
 					BorderType          = NSBorderType.BezelBorder
 				};
@@ -355,8 +340,9 @@ namespace CmisSync {
 					});
 				};
 
-				(TableView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
-					Controller.CheckAddPage (AddressTextField.StringValue);
+				(OutlineView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
+					NSCell selection = OutlineView.SelectedCell;
+					ContinueButton.Enabled = true;
 				};
 
 				ContinueButton.Activated += delegate {
@@ -499,7 +485,7 @@ namespace CmisSync {
 				Description = Properties_Resources.YouCanFind;
 
                 OpenFolderButton = new NSButton () {
-                    Title = string.Format ("Open {0}", Path.GetFileName (Controller.PreviousPath))
+					Title = String.Format ("Open {0}", Path.GetFileName (Controller.PreviousPath))
                 };
 
                 FinishButton = new NSButton () {
@@ -541,8 +527,8 @@ namespace CmisSync {
                 switch (Controller.TutorialCurrentPage) {
 
                     case 1: {
-							Header      = Properties_Resources.WhatsNext;
-							Description = Properties_Resources.CmisSyncCreates;
+						Header      = Properties_Resources.WhatsNext;
+						Description = Properties_Resources.CmisSyncCreates;
 
 
                         SkipTutorialButton = new NSButton () {
@@ -641,20 +627,14 @@ namespace CmisSync {
         }
     }
 
-	/*
-    [Register("CmisSyncDataSource")]
-    public class CmisSyncDataSource : NSTableViewDataSource {
+	/*    [Register("CmisSyncDataSource")]
+	public class CmisSyncDataSource : NSOutlineViewDataSource {
 
-        public List<object> Items ;
-        public NSAttributedString [] Cells;
-        public NSAttributedString [] SelectedCells;
+		public List<RootFolder> Repositories ;
 
-
-        public CmisSyncDataSource (List<SparklePlugin> plugins)
+		public CmisSyncDataSource (List<RootFolder> repositories)
         {
-            Items         = new List <object> ();
-            Cells         = new NSAttributedString [plugins.Count];
-            SelectedCells = new NSAttributedString [plugins.Count];
+			Repositories  = new List <object> ();
 
             int i = 0;
             foreach (SparklePlugin plugin in plugins) {
@@ -761,7 +741,7 @@ namespace CmisSync {
     }
 
 
-    public class CmisSyncTableDelegate : NSTableViewDelegate {
+	public class CmisSyncTableDelegate : NSOutlineViewDelegate {
 
         public event SelectionChangedHandler SelectionChanged;
         public delegate void SelectionChangedHandler ();

@@ -44,9 +44,6 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Mono.Data.Sqlite" />
-    <Reference Include="DotCMIS">
-      <HintPath>..\Extras\DotCMIS.dll</HintPath>
-    </Reference>
     <Reference Include="log4net">
       <HintPath>..\Extras\log4net.dll</HintPath>
     </Reference>
@@ -107,4 +104,10 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
+      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+      <Name>DotCMIS</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

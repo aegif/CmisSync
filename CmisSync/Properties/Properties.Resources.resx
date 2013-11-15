@@ -346,4 +346,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="InvalidRepoName" xml:space="preserve">
     <value>The repository name {0} contains illegal characters</value>
   </data>
+  <data name="NameResolutionFailure" xml:space="preserve">
+    <value>The given host name could not be found. Please check the host name and your internet connection.</value>
+  </data>
 </root>
