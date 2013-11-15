@@ -5,9 +5,9 @@ using System.Text;
 using log4net;
 using System.IO;
 using System.Text.RegularExpressions;
-#if __MonoCS__
-using Mono.Unix.Native;
-#endif
+//#if __MonoCS__
+//using Mono.Unix.Native;
+//#endif
 
 namespace CmisSync.Lib
 {
@@ -59,9 +59,9 @@ namespace CmisSync.Lib
             }
             catch (System.PlatformNotSupportedException)
             {
-#if __MonoCS__
-                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
-#endif
+//#if __MonoCS__
+//                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
+//#endif
             }
 
             return writeAllow && !writeDeny;

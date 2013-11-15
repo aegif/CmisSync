@@ -19,11 +19,6 @@
     <OutputPath>..\..\bin</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="AfterBuild" command="mkdir -p ${TargetDir}/${SolutionName}.app/Contents/Frameworks; cp -R Growl.framework ${TargetDir}/${SolutionName}.app/Contents/Frameworks; cp -R git ${TargetDir}/${SolutionName}.app/Contents/Resources" />
-      </CustomCommands>
-    </CustomCommands>
     <EnableCodeSigning>False</EnableCodeSigning>
     <CreatePackage>False</CreatePackage>
     <EnablePackageSigning>False</EnablePackageSigning>
@@ -34,6 +29,7 @@
     <I18n>
     </I18n>
     <UseSGen>true</UseSGen>
+    <DefineConstants>__COCOA__</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
@@ -44,7 +40,7 @@
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
     <EnablePackageSigning>false</EnablePackageSigning>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG,__COCOA__</DefineConstants>
     <DebugSymbols>true</DebugSymbols>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
@@ -90,9 +86,6 @@
     <Compile Include="..\SetupController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <InterfaceDefinition Include="MainMenu.xib" xmlns="" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Info.plist" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -103,10 +96,10 @@
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
-        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am" IsAutotoolsProject="True" RelativeConfigureInPath="../..">
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am" BuildTargetName="" CleanTargetName="" IsAutotoolsProject="True" RelativeConfigureInPath="../..">
           <BuildFilesVar Sync="True" Name="SOURCES" />
           <DeployFilesVar />
-          <ResourcesVar Sync="True" Name="RESOURCES_RESOURCES" Prefix="CmisSync" />
+          <ResourcesVar Sync="True" Name="RESOURCES_RESX_XAMARIN" Prefix="CmisSync" />
           <OthersVar />
           <GacRefVar />
           <AsmRefVar />
@@ -126,8 +119,6 @@
       <DeployService-Deploy>True</DeployService-Deploy>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </BundleResource>
-    <BundleResource Include="Resources\MainMenu.nib\designable.nib" />
-    <BundleResource Include="Resources\MainMenu.nib\keyedobjects.nib" />
     <BundleResource Include="..\Common\Pixmaps\side-splash.png">
       <Link>Pixmaps\side-splash.png</Link>
     </BundleResource>
@@ -233,5 +224,20 @@
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>CmisSync.Lib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="MainMenu.xib" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Properties\Properties.Resources.cs.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.de.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.es-ES.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.fr.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.ja.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.nl.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.tlh-AA.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.tlh-KX.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.uk.resx" />
   </ItemGroup>
 </Project>
