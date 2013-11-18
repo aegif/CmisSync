@@ -335,22 +335,31 @@ namespace CmisSync
         public string CheckAddPage(string address)
         {
             address = address.Trim();
- 
 
+
+            bool emptyAddress = string.IsNullOrEmpty(address);
+            bool rejexMatch = this.UrlRegex.IsMatch(address);
             // Check address validity.
-            bool fields_valid = ((!string.IsNullOrEmpty(address)) && (this.UrlRegex.IsMatch(address)));
-            if (fields_valid)
+            if (!emptyAddress && rejexMatch)
             {
-                this.saved_address = new Uri(address);
+                try
+                {
+                    this.saved_address = new Uri(address);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Debug("Error creating URI: " + ex.Message, ex);
+                    rejexMatch = false;
+                }
             }
             // Enable button to next step.
-            UpdateAddProjectButtonEvent(fields_valid);
+            UpdateAddProjectButtonEvent(!emptyAddress && rejexMatch);
 
             // Return validity error, or empty string if valid.
-            if (String.IsNullOrEmpty(address)) {
+            if (emptyAddress) {
                 return "EmptyURLNotAllowed";
             }
-            if (!this.UrlRegex.IsMatch(address)) {
+            if (!rejexMatch) {
                 return "InvalidURL";
             }
             return String.Empty;
