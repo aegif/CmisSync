@@ -123,7 +123,7 @@ namespace CmisSync
 
             finish_button.Click += delegate
             {
-                Ignores = CmisRepoUtils.GetIgnoredFolder(repo);
+                Ignores = NodeModelUtils.GetIgnoredFolder(repo);
                 Controller.SaveFolder();
                 Close();
             };

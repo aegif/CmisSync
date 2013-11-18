@@ -751,8 +751,8 @@ namespace CmisSync
                                     }
                                     if (selectedRepo != null)
                                     {
-                                        ignored.AddRange(CmisRepoUtils.GetIgnoredFolder(selectedRepo));
-                                        selectedFolder.AddRange(CmisRepoUtils.GetSelectedFolder(selectedRepo));
+                                        ignored.AddRange(NodeModelUtils.GetIgnoredFolder(selectedRepo));
+                                        selectedFolder.AddRange(NodeModelUtils.GetSelectedFolder(selectedRepo));
                                         Controller.saved_repository = selectedRepo.Id;
                                         Controller.saved_remote_path = selectedRepo.Path;
                                         Controller.Add2PageCompleted(
