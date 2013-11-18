@@ -366,7 +366,7 @@ namespace CmisSync {
                     RootFolder root = selectedNode as RootFolder;
                     if(root != null) {
                         Controller.saved_repository = root.Id;
-                        Controller.Add2PageCompleted (root.Id, root.Address);
+                        Controller.Add2PageCompleted (root.Id, root.Path);
                     }
                 };
 
@@ -482,6 +482,9 @@ namespace CmisSync {
                 };
 
                 (LocalFolderTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
+                    try{
+                        LocalRepoPathTextField.StringValue = Path.Combine(Controller.DefaultRepoPath, LocalFolderTextField.StringValue);
+                    }catch(Exception){}
                     string error = Controller.CheckRepoPathAndName(LocalRepoPathTextField.StringValue, LocalFolderTextField.StringValue);
                     if(String.IsNullOrEmpty(error))
                         WarningTextField.StringValue = "";
@@ -545,7 +548,7 @@ namespace CmisSync {
                 Description = Properties_Resources.YouCanFind;
 
                 OpenFolderButton = new NSButton () {
-                    Title = String.Format ("Open {0}", Controller.SyncingReponame)
+                    Title = String.Format ("Open {0}", Path.GetFileName(Controller.PreviousPath))
                 };
 
                 FinishButton = new NSButton () {

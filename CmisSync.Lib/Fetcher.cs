@@ -97,7 +97,6 @@ namespace CmisSync.Lib
             if (!Utils.HasWritePermissionOnDir(ConfigManager.CurrentConfig.FoldersPath))
             {
                 Logger.Fatal(String.Format("Fetcher | ERROR - DataSpace Default Folder {0} is not writable", ConfigManager.CurrentConfig.FoldersPath));
-                throw new UnauthorizedAccessException("Root folder is not writable!");
             }
 
             // Check that the folder exists.
