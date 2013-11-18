@@ -476,7 +476,6 @@ namespace CmisSync
             catch (Exception ex)
             {
                 Logger.Fatal(ex.ToString());
-                System.Windows.Forms.MessageBox.Show("An error occur during first sync, see debug log for details!");
             }
 
         }

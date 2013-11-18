@@ -13,7 +13,7 @@ namespace CmisSync
         /// <summary>
         /// Data Model Utilities for the WPF UI representing a CMIS repository
         /// </summary>
-        public static class CmisRepoUtils
+        public static class NodeModelUtils
         {
             /// <summary>
             /// Get the ignored folder list

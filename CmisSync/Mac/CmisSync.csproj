@@ -104,8 +104,9 @@
     </Compile>
     <Compile Include="Edit.cs" />
     <Compile Include="..\Windows\FolderTreeMVC\FolderTreeView.cs">
-      <Link>FolderTreeView.cs</Link>
+      <Link>NodeModelUtils.cs</Link>
     </Compile>
+    <Compile Include="CmisTree\CmisTreeDataSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -114,6 +115,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
     <Folder Include="Pixmaps\" />
+    <Folder Include="CmisTree\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

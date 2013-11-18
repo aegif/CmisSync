@@ -23,6 +23,7 @@ SOURCES =  \
 	About.cs \
 	AppDelegate.cs \
 	Badger.cs \
+	CmisTree/CmisTreeDataSource.cs \
 	Controller.cs \
 	Edit.cs \
 	MacWatcher.cs \
