@@ -48,6 +48,18 @@ namespace CmisSync
             this.localPath = localPath;
 
             CreateEdit();
+
+
+            // Defines how to show the setup window.
+            Controller.OpenWindowEvent += delegate
+            {
+                Dispatcher.BeginInvoke((Action)delegate
+                {
+                    Show();
+                    Activate();
+                    BringIntoView();
+                });
+            };
         }
 
 
@@ -133,7 +145,6 @@ namespace CmisSync
                 Close();
             };
             this.Title = Properties_Resources.EditTitle;
-            this.ShowAll();
         }
     }
 }
