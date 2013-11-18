@@ -309,7 +309,7 @@ namespace CmisSync
                 Edit edit = null;
                 if (edits.TryGetValue(reponame, out edit))
                 {
-					edit.Controller.OpenWindow();
+                    edit.Controller.OpenWindow();
                     return;
                 }
 
@@ -381,8 +381,7 @@ namespace CmisSync
                         edits.Remove(reponame);
                     }
                 };
-
-				edit.Controller.OpenWindow();
+                edit.Controller.OpenWindow();
             }
         }
 

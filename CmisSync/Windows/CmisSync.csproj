@@ -104,7 +104,7 @@
     <Compile Include="FolderTreeMVC\IgnoredFolderLoader.cs" />
     <Compile Include="FolderTreeMVC\LocalFolderLoader.cs" />
     <Compile Include="FolderTreeMVC\NodeModel.cs" />
-    <Compile Include="FolderTreeMVC\FolderTreeView.cs" />
+    <Compile Include="FolderTreeMVC\NodeModelUtils.cs" />
     <Compile Include="FolderTreeMVC\FolderTypeConverter.cs" />
     <Compile Include="FolderTreeMVC\IgnoreStatusConverter.cs" />
     <Compile Include="FolderTreeMVC\LoadingStatusModel.cs" />

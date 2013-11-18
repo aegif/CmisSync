@@ -352,20 +352,6 @@ namespace CmisSync
                 Controller.LocalFolderClicked("");
         }
 
-
-
-        /// <summary>
-        /// Delegate for opening the remote folder.
-        /// </summary>
-        private EventHandler OpenRemoteFolderDelegate(string reponame)
-        {
-            return delegate
-            {
-                Controller.RemoteFolderClicked(reponame);
-            };
-        }
-
-
         /// <summary>
         /// Delegate for suspending sync.
         /// </summary>
