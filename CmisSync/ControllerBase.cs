@@ -197,8 +197,13 @@ namespace CmisSync
             this.firstRun = firstRun;
 
             // Create the CmisSync folder and add it to the bookmarks
-            if (CreateCmisSyncFolder())
-                AddToBookmarks();
+            bool syncFolderCreated = CreateCmisSyncFolder();
+
+            if (syncFolderCreated)
+            {
+                //Dont add bookmark for Oris4
+                //AddToBookmarks();
+            }
 
             if (firstRun)
             {
