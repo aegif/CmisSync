@@ -269,6 +269,9 @@
     <EmbeddedResource Include="Pixmaps\media_playback_refresh.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
+    <Content Include="CmisSync.wxs">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Pixmaps\cmissync-folder.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
