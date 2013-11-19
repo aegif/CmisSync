@@ -39,38 +39,24 @@ namespace CmisSync {
         public SetupController Controller = new SetupController ();
 
         private NSButton ContinueButton;
-        private NSButton AddButton;
-        private NSButton TryAgainButton;
         private NSButton CancelButton;
         private NSButton SkipTutorialButton;
         private NSButton StartupCheckButton;
-        private NSButton HistoryCheckButton;
-        private NSButton ShowPasswordCheckButton;
         private NSButton OpenFolderButton;
         private NSButton FinishButton;
         private NSImage SlideImage;
         private NSImageView SlideImageView;
         private NSProgressIndicator ProgressIndicator;
-        private NSTextField EmailLabel;
-        private NSTextField EmailTextField;
-        private NSTextField FullNameTextField;
-        private NSTextField FullNameLabel;
         private NSTextField AddressTextField;
         private NSTextField AddressLabel;
         private NSTextField AddressHelpLabel;
-        private NSTextField PathTextField;
-        private NSTextField PathLabel;
-        private NSTextField PathHelpLabel;
         private NSTextField PasswordTextField;
-        private NSTextField VisiblePasswordTextField;
         private NSTextField PasswordLabel;
         private NSTextField WarningTextField;
         private NSImage WarningImage;
         private NSImageView WarningImageView;
         private NSOutlineView OutlineView;
         private NSScrollView ScrollView;
-        private NSTableColumn IconColumn;
-        private NSTableColumn DescriptionColumn;
 
 
         public Setup () : base ()

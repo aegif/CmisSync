@@ -48,15 +48,15 @@ namespace CmisSync
         /// Constructor
         /// </summary>
         public Edit(CmisRepoCredentials credentials, string name, string remotePath, List<string> ignores, string localPath)
-		{
-			FolderName = name;
-			this.credentials = credentials;
-			this.remotePath = remotePath;
-			this.Ignores = new List<string>(ignores);
-			this.localPath = localPath;
+        {
+            FolderName = name;
+            this.credentials = credentials;
+            this.remotePath = remotePath;
+            this.Ignores = new List<string>(ignores);
+            this.localPath = localPath;
 
-			CreateEdit();
-		}
+            CreateEdit();
+        }
 
 
         /// <summary>
@@ -64,7 +64,25 @@ namespace CmisSync
         /// </summary>
         private void CreateEdit()
         {
-			NSOutlineView outlineView = new NSOutlineView();
+            NSOutlineView outlineView = new NSOutlineView () {
+                Frame            = new RectangleF (0, 0, 0, 0),
+                RowHeight        = 34,
+                IntercellSpacing = new SizeF (8, 12),
+                HeaderView       = null,
+                Delegate         = new CmisSyncTableDelegate ()
+            };
+
+            outlineView.AddColumn(new NSTableColumn(){
+                Identifier = "colName",
+                Editable = false
+            });
+
+            NSScrollView ScrollView = new NSScrollView () {
+                Frame               = new RectangleF (190, Frame.Height - 340, 408, 255),
+                DocumentView        = outlineView,
+                HasVerticalScroller = true,
+                BorderType          = NSBorderType.BezelBorder
+            };
 
             RootFolder repo = new RootFolder()
             {
@@ -72,20 +90,19 @@ namespace CmisSync
                 Id = credentials.RepoId,
                 Address = credentials.Address.ToString()
             };
-            AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, credentials, PredefinedNodeLoader.LoadSubFolderDelegate);
+            //AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, credentials, PredefinedNodeLoader.LoadSubFolderDelegate);
             IgnoredFolderLoader.AddIgnoredFolderToRootNode(repo, Ignores);
             LocalFolderLoader.AddLocalFolderToRootNode(repo, localPath);
-
-            asyncLoader.Load(repo);
-
-			/*
-            ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
-            repos.Add(repo);
             repo.Selected = true;
+            //asyncLoader.Load(repo);
+            List<RootFolder> repos = new List<RootFolder>();
+            repos.Add(repo);
+            CmisTree.CmisTreeDataSource DataSource = new CmisTree.CmisTreeDataSource(repos);
+            outlineView.DataSource = DataSource;
+            outlineView.ReloadData ();
 
-			outlineView.DataSource = repos;*/
-			// Add selection handler
-			/*treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
+            // Add selection handler
+            /*treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
             {
                 TreeViewItem expandedItem = e.OriginalSource as TreeViewItem;
                 Node expandedNode = expandedItem.Header as Folder;
@@ -95,41 +112,59 @@ namespace CmisSync
                 }
             }));*/
 
-
-			ContentView.AddSubview(outlineView);
+            ContentView.AddSubview(ScrollView);
 
             Controller.CloseWindowEvent += delegate
             {
-                asyncLoader.Cancel();
+                //asyncLoader.Cancel();
+            };
+
+            Controller.OpenWindowEvent += delegate
+            {
+                InvokeOnMainThread (delegate {
+                    OrderFrontRegardless ();
+                });
             };
 
 
-			NSButton finish_button = new NSButton()
+            NSButton finish_button = new NSButton()
             {
-				Title = Properties_Resources.SaveChanges
+                Title = Properties_Resources.SaveChanges
             };
 
-			NSButton cancel_button = new NSButton()
+            NSButton cancel_button = new NSButton()
             {
-				Title = Properties_Resources.DiscardChanges
+                Title = Properties_Resources.DiscardChanges
             };
 
             Buttons.Add(finish_button);
             Buttons.Add(cancel_button);
 
-			finish_button.Activated += delegate
+            finish_button.Activated += delegate
             {
                 Ignores = NodeModelUtils.GetIgnoredFolder(repo);
                 Controller.SaveFolder();
                 Close();
             };
 
-			cancel_button.Activated += delegate
+            cancel_button.Activated += delegate
             {
                 Close();
             };
 
-            this.Title = Properties_Resources.EditTitle;
+
+            (outlineView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
+                Node selectedNode = ((NSNodeObject)outlineView.ItemAtRow(outlineView.SelectedRow)).Node;
+                while(selectedNode.Parent != null)
+                    selectedNode = selectedNode.Parent;
+                RootFolder root = selectedNode as RootFolder;
+                if(root != null){
+                    finish_button.Enabled = true;
+                }
+            };
+
+            this.Header = Properties_Resources.EditTitle;
+            this.Description = "";
             this.ShowAll();
         }
     }

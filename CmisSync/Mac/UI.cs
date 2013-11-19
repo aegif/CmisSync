@@ -42,16 +42,12 @@ namespace CmisSync {
         {
             using (var a = new NSAutoreleasePool ())
             {
-//                GrowlApplicationBridge.WeakDelegate = this;
-//                GrowlApplicationBridge.Delegate     = new CmisSyncGrowlDelegate ();
-
                 NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("cmissync-app.icns");
 
                 SetFolderIcon ();
     
                 Setup      = new Setup ();
                 About      = new About ();
-//                Bubbles    = new Bubbles ();
                 StatusIcon = new StatusIcon ();
 
                 Program.Controller.UIHasLoaded ();
@@ -86,8 +82,7 @@ namespace CmisSync {
 
         private void HideDockIcon ()
         {
-            // Currently not supported, here for completeness sake (see Apple's docs)
-            // NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.None;
+            NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.Accessory;
         }
 
 

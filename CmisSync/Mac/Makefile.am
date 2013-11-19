@@ -14,12 +14,12 @@ SOURCES =  \
 	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
-	../Windows/FolderTreeMVC/FolderTreeView.cs \
 	../Windows/FolderTreeMVC/IgnoredFolderLoader.cs \
 	../Windows/FolderTreeMVC/LoadingStatusModel.cs \
 	../Windows/FolderTreeMVC/LocalFolderLoader.cs \
 	../Windows/FolderTreeMVC/NodeLoader.cs \
 	../Windows/FolderTreeMVC/NodeModel.cs \
+	../Windows/FolderTreeMVC/NodeModelUtils.cs \
 	About.cs \
 	AppDelegate.cs \
 	Badger.cs \

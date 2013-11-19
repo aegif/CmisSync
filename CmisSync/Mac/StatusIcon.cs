@@ -18,10 +18,13 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Collections.Generic;
 
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
+
+using CmisSync.Lib;
 
 namespace CmisSync {
 
@@ -30,16 +33,10 @@ namespace CmisSync {
         public StatusIconController Controller = new StatusIconController ();
 
         private NSMenu menu;
-        private NSMenu submenu;
 
         private NSStatusItem status_item;
         private NSMenuItem state_item;
-        private NSMenuItem folder_item;
 
-        private NSMenu [] folder_menu_items;
-        private NSMenu [] submenu_items;
-
-        private NSMenuItem more_item;
         private NSMenuItem add_item;
         private NSMenuItem about_item;
         private NSMenuItem quit_item;
@@ -52,11 +49,11 @@ namespace CmisSync {
         private NSImage folder_image;
         private NSImage caution_image;
         private NSImage cmissync_image;
+        private NSImage pause_image;
+        private NSImage resume_image;
 
-        private EventHandler [] folder_tasks;
-        private EventHandler [] overflow_tasks;
+        private Dictionary<String, NSMenuItem> FolderItems;
 
-        
         public StatusIcon () : base ()
         {
             using (var a = new NSAutoreleasePool ())
@@ -111,8 +108,76 @@ namespace CmisSync {
                     InvokeOnMainThread (() => CreateMenu ());
                 }
             };
+
+            Controller.UpdateSuspendSyncFolderEvent += delegate(string reponame)
+            {
+                using (var a = new NSAutoreleasePool()){
+                    InvokeOnMainThread(delegate {
+                        NSMenuItem PauseItem;
+                        if(FolderItems.TryGetValue(reponame,out PauseItem)){
+                            setSyncItemState(PauseItem, getSyncStatus(reponame));
+                        }
+                    });
+                }
+            };
         }
 
+        NSMenuItem CreateFolderMenuItem(string folder_name)
+        {
+            NSMenuItem folderitem = new NSMenuItem();
+            folderitem.Image = this.folder_image;
+            folderitem.Image.Size = new SizeF(16, 16);
+            folderitem.Title = folder_name;
+            NSMenu foldersubmenu = new NSMenu();
+            NSMenuItem openitem = new NSMenuItem();
+            openitem.Title = Properties_Resources.OpenLocalFolder;
+            openitem.Activated += OpenFolderDelegate(folder_name);
+            NSMenuItem pauseitem = new NSMenuItem();
+            setSyncItemState(pauseitem, getSyncStatus(folder_name));
+            FolderItems.Add(folder_name, pauseitem);
+            pauseitem.Activated += PauseFolderDelegate(folder_name);
+            NSMenuItem removeitem = new NSMenuItem();
+            removeitem.Title = Properties_Resources.RemoveFolderFromSync;
+            removeitem.Activated += RemoveFolderDelegate(folder_name);
+            NSMenuItem settingsitem = new NSMenuItem();
+            settingsitem.Title = Properties_Resources.EditTitle;
+            settingsitem.Activated += OpenSettingsDialogDelegate(folder_name);
+            foldersubmenu.AddItem(openitem);
+            foldersubmenu.AddItem(pauseitem);
+            foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
+            foldersubmenu.AddItem(settingsitem);
+            foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
+            foldersubmenu.AddItem(removeitem);
+            folderitem.Submenu = foldersubmenu;
+            return folderitem;
+        }
+
+        private SyncStatus getSyncStatus(string reponame) {
+
+            //DEADLOCK Problem
+            /*foreach (RepoBase repo in Program.Controller.Repositories)
+            {
+                if(repo.Name.Equals(reponame)){
+                    return repo.Status;
+                }
+            }*/
+            return SyncStatus.Idle;
+        }
+
+        private void setSyncItemState(NSMenuItem item, SyncStatus status) {
+            switch (status)
+            {
+                case SyncStatus.Idle:
+                    item.Title = Properties_Resources.PauseSync;
+                    item.Image = this.pause_image;
+                    break;
+                case SyncStatus.Suspend:
+                    item.Title = Properties_Resources.ResumeSync;
+                    item.Image = this.resume_image;
+                    break;
+            }
+            item.Image.Size = new SizeF(16, 16);
+        }
 
         public void CreateMenu ()
         {
@@ -120,6 +185,8 @@ namespace CmisSync {
             {
                 this.menu                  = new NSMenu ();
                 this.menu.AutoEnablesItems = false;
+
+                this.FolderItems = new Dictionary<String, NSMenuItem>();
 
                 this.state_item = new NSMenuItem () {
                     Title   = Controller.StateText,
@@ -162,77 +229,25 @@ namespace CmisSync {
                     Controller.QuitClicked ();
                 };
 
-				this.menu.AddItem (this.state_item);
-				this.menu.AddItem (NSMenuItem.SeparatorItem);
-
-
-                this.folder_menu_items = new NSMenu[Controller.Folders.Length];
-                this.submenu_items     = new NSMenu[Controller.OverflowFolders.Length];
+                this.menu.AddItem (this.state_item);
+                this.menu.AddItem (NSMenuItem.SeparatorItem);
 
                 if (Controller.Folders.Length > 0) {
                     foreach (string folder_name in Controller.Folders) {
-						NSMenuItem folderitem = new NSMenuItem();
-						folderitem.Image = this.folder_image;
-						folderitem.Image.Size = new SizeF(16,16);
-						folderitem.Title      = folder_name;
-						NSMenu foldersubmenu = new NSMenu ();
-
-						NSMenuItem openitem = new NSMenuItem();
-						openitem.Title = Properties_Resources.OpenLocalFolder;
-						openitem.Activated += OpenFolderDelegate(folder_name);
-
-						NSMenuItem pauseitem = new NSMenuItem();
-						pauseitem.Title = Properties_Resources.PauseSync;
-						pauseitem.Activated += PauseFolderDelegate(folder_name);
-
-						NSMenuItem removeitem = new NSMenuItem();
-						removeitem.Title = Properties_Resources.RemoveFolderFromSync;
-						removeitem.Activated += RemoveFolderDelegate(folder_name);
-
-						foldersubmenu.AddItem(openitem);
-						foldersubmenu.AddItem(pauseitem);
-						foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
-						foldersubmenu.AddItem(removeitem);
-
-						folderitem.Submenu = foldersubmenu;
-						this.menu.AddItem(folderitem);
+                        this.menu.AddItem(CreateFolderMenuItem(folder_name));
                     };
-					if (Controller.OverflowFolders.Length > 0)
-					{
-						NSMenuItem moreitem = new NSMenuItem();
-						moreitem.Title = "More Folder";
-						NSMenu moreitemsmenu = new NSMenu();
-						foreach (string folder_name in Controller.OverflowFolders) {
-							NSMenuItem folderitem = new NSMenuItem();
-							folderitem.Image = this.folder_image;
-							folderitem.Image.Size = new SizeF(16,16);
-							folderitem.Title      = folder_name;
-							NSMenu foldersubmenu = new NSMenu ();
-
-							NSMenuItem openitem = new NSMenuItem();
-							openitem.Title = Properties_Resources.OpenLocalFolder;
-							openitem.Activated += OpenFolderDelegate(folder_name);
-
-							NSMenuItem pauseitem = new NSMenuItem();
-							pauseitem.Title = Properties_Resources.PauseSync;
-							pauseitem.Activated += PauseFolderDelegate(folder_name);
-
-							NSMenuItem removeitem = new NSMenuItem();
-							removeitem.Title = Properties_Resources.RemoveFolderFromSync;
-							removeitem.Activated += RemoveFolderDelegate(folder_name);
-
-							foldersubmenu.AddItem(openitem);
-							foldersubmenu.AddItem(pauseitem);
-							foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
-							foldersubmenu.AddItem(removeitem);
-
-							folderitem.Submenu = foldersubmenu;
-							moreitemsmenu.AddItem(folderitem);
-            	        };
-						moreitem.Submenu = moreitemsmenu;
-						this.menu.AddItem(moreitem);
-					}
-					this.menu.AddItem (NSMenuItem.SeparatorItem);
+                    if (Controller.OverflowFolders.Length > 0)
+                    {
+                        NSMenuItem moreitem = new NSMenuItem();
+                        moreitem.Title = "More Folder";
+                        NSMenu moreitemsmenu = new NSMenu();
+                        foreach (string folder_name in Controller.OverflowFolders) {
+                            moreitemsmenu.AddItem(CreateFolderMenuItem(folder_name));
+                        };
+                        moreitem.Submenu = moreitemsmenu;
+                        this.menu.AddItem(moreitem);
+                    }
+                    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 }
 
                 this.menu.AddItem (this.add_item);
@@ -257,25 +272,33 @@ namespace CmisSync {
             };
         }
 
-		private EventHandler PauseFolderDelegate ( string name)
-		{
-			return delegate
-			{
-				Controller.SuspendSyncClicked(name);
-			};
-		}
+        private EventHandler PauseFolderDelegate ( string name)
+        {
+            return delegate
+            {
+                Controller.SuspendSyncClicked(name);
+            };
+        }
 
-		private EventHandler RemoveFolderDelegate(string name)
-		{
-			return delegate
-			{
-				NSAlert alert = NSAlert.WithMessage(Properties_Resources.RemoveSyncQuestion,"No, please continue syncing","Yes, stop syncing",null,"");
-				alert.Icon = this.caution_image;
-				int i = alert.RunModal();
-				if(i == 0)
-					Controller.RemoveFolderFromSyncClicked(name);
-			};
-		}
+        private EventHandler RemoveFolderDelegate(string name)
+        {
+            return delegate
+            {
+                NSAlert alert = NSAlert.WithMessage(Properties_Resources.RemoveSyncQuestion,"No, please continue syncing","Yes, stop syncing",null,"");
+                alert.Icon = this.caution_image;
+                int i = alert.RunModal();
+                if(i == 0)
+                    Controller.RemoveFolderFromSyncClicked(name);
+            };
+        }
+
+        private EventHandler OpenSettingsDialogDelegate(string name)
+        {
+            return delegate
+            {
+                Controller.EditFolderClicked(name);
+            };
+        }
 
 
         private void CreateAnimationFrames ()
@@ -305,6 +328,8 @@ namespace CmisSync {
             this.folder_image       = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "cmissync-folder.icns"));
             this.caution_image      = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.icns"));
             this.cmissync_image     = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "cmissync-app.icns"));
+            this.pause_image        = new NSImage(Path.Combine(NSBundle.MainBundle.ResourcePath, "Pixmaps", "media_playback_pause.png"));
+            this.resume_image       = new NSImage(Path.Combine(NSBundle.MainBundle.ResourcePath, "Pixmaps", "media_playback_start.png"));
         }
     }
     
