@@ -203,9 +203,6 @@
     <BundleResource Include="Pixmaps\tutorial-slide-3.png">
       <Link>Pixmaps\tutorial-slide-3.png</Link>
     </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\tutorial-slide-4.png">
-      <Link>Pixmaps\tutorial-slide-4.png</Link>
-    </BundleResource>
     <BundleResource Include="..\Common\Pixmaps\avatar-a.png">
       <Link>Pixmaps\avatar-a.png</Link>
     </BundleResource>
@@ -239,6 +236,9 @@
     <BundleResource Include="..\Common\Pixmaps\avatar-k.png">
       <Link>Pixmaps\avatar-k.png</Link>
     </BundleResource>
+    <BundleResource Include="Pixmaps\tutorial-slide-4.png" />
+    <BundleResource Include="Pixmaps\media_playback_pause.png" />
+    <BundleResource Include="Pixmaps\media_playback_start.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
