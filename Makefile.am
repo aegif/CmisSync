@@ -38,10 +38,9 @@ apple-package:
 	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Debug
 
 dist-hook:
-if CONFIG_TARGET_LINUX
-	make debian-package
-endif
-if CONFIG_TARGET_APPLE
+if HAVE_MAC_OS
 	make apple-package
+else
+	make debian-package
 endif
 

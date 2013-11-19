@@ -8,13 +8,6 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([foreign dist-bzip2 dist-zip no-dist-gzip])
 AM_MAINTAINER_MODE
 
-AS_CASE([$target],
-    [*-apple-*], [vendor=apple],
-    [*-linux-*], [vendor=linux],
-    [vendor=])
-AM_CONDITIONAL(CONFIG_TARGET_LINUX,[test x$vendor = xlinux])
-AM_CONDITIONAL(CONFIG_TARGET_APPLE,[test x$vendor = xapple])
-
 dnl Export Version Info
 AC_SUBST([ASM_VERSION], [cmissync_version])
 
