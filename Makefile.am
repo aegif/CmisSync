@@ -33,5 +33,14 @@ debian-package:
 	make DESTDIR=$(abs_top_builddir)/debian install
 	make VERSION=`git describe --match linux* | cut -d - -f 2` -C debian build
 
-dist-hook: debian-package
+apple-package:
+	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Debug -t:Clean
+	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Debug
+
+dist-hook:
+if HAVE_MAC_OS
+	make apple-package
+else
+	make debian-package
+endif
 
