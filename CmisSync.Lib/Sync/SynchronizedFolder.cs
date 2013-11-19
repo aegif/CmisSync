@@ -308,13 +308,14 @@ namespace CmisSync.Lib.Sync
             public void Sync()
             {
                 //// If not connected, connect.
-                //if (session == null)
-                //{
-                //    Connect();
-                //}
+                if (session == null)
+                {
+                    Connect();
+                } else {
+                    //  Force to reset the cache for each Sync
+                    session.Clear();
+                }
                 sleepWhileSuspended();
-                //  Force to create the session to reset the cache for each Sync, since DotCMIS uses cache
-                Connect();
 
                 if (session == null)
                 {
