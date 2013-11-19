@@ -315,15 +315,17 @@ if test "$OSNAME" = "Darwin" ; then
 	macos=true
     OSOK=yes
 	AM_CONDITIONAL([HAVE_MAC_OS], true)
+else
+    AM_CONDITIONAL([HAVE_MAC_OS], false)
+    AM_CONDITIONAL([__COCOA__], false)
+    AM_CONDITIONAL([HAVE_XAMMAC], false)
+    AM_CONDITIONAL([HAVE_MONOMAC], false)
 fi
 
 if test "$OSOK" = "no" ; then
 	GUISUBDIRS=
     enable_gtkui=no
 fi
-
-AM_CONDITIONAL([HAVE_MAC_OS],[test x$macos = xtrue])
-AM_CONDITIONAL([__COCOA__], [test x$cocoa = xtrue])
 
 AC_SUBST([GUISUBDIRS])
 
