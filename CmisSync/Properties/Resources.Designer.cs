@@ -189,6 +189,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to day.
+        /// </summary>
+        internal static string Day {
+            get {
+                return ResourceManager.GetString("Day", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server automatically too..
         /// </summary>
         internal static string DocumentsAre {
@@ -235,7 +244,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter the Web address of an Oris4 server:.
+        ///   Looks up a localized string similar to Enter your Oris4 URL.
         /// </summary>
         internal static string EnterWebAddress {
             get {
@@ -303,6 +312,24 @@ namespace CmisSync {
         internal static string Hint {
             get {
                 return ResourceManager.GetString("Hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to hour.
+        /// </summary>
+        internal static string Hour {
+            get {
+                return ResourceManager.GetString("Hour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to hours.
+        /// </summary>
+        internal static string Hours {
+            get {
+                return ResourceManager.GetString("Hours", resourceCulture);
             }
         }
         
@@ -400,6 +427,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to minutes.
+        /// </summary>
+        internal static string Minutes {
+            get {
+                return ResourceManager.GetString("Minutes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the synchronized folder.
         /// </summary>
         internal static string OpenFolder {
@@ -414,6 +450,15 @@ namespace CmisSync {
         internal static string OpenLocalFolder {
             get {
                 return ResourceManager.GetString("OpenLocalFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oris4 Sync.
+        /// </summary>
+        internal static string Oris4Sync {
+            get {
+                return ResourceManager.GetString("Oris4Sync", resourceCulture);
             }
         }
         
@@ -481,6 +526,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to communicate with the given server!
         ///Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https.
         /// </summary>
@@ -496,6 +550,15 @@ namespace CmisSync {
         internal static string SendingChanges {
             get {
                 return ResourceManager.GetString("SendingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings....
+        /// </summary>
+        internal static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
             }
         }
         
@@ -566,6 +629,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sync Interval.
+        /// </summary>
+        internal static string SyncInterval {
+            get {
+                return ResourceManager.GetString("SyncInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to establish a trusted Connection. Please inform your server administrator..
         /// </summary>
         internal static string TrustFailure {
@@ -598,6 +670,15 @@ namespace CmisSync {
         internal static string ViewLog {
             get {
                 return ResourceManager.GetString("ViewLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oris4 URL.
+        /// </summary>
+        internal static string WebAddress {
+            get {
+                return ResourceManager.GetString("WebAddress", resourceCulture);
             }
         }
         

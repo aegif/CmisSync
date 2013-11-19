@@ -216,13 +216,30 @@ namespace CmisSync {
             Program.Controller.OpenRemoteFolder(reponame);
         }
 
+        /// <summary>
+        /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
+        /// </summary>
+        public void SettingsClicked(string reponame)
+        {
+            CmisSync.Lib.Config.SyncConfig.Folder repository = ConfigManager.CurrentConfig.getFolder(reponame);
+            Program.UI.Setup.Controller.saved_repository = reponame;
+            if (repository != null)
+            {
+                Program.UI.Setup.Controller.saved_user = repository.UserName;
+                Program.UI.Setup.Controller.saved_remote_path = repository.RemotePath;
+                Program.UI.Setup.Controller.saved_address = repository.RemoteUrl;
+                Program.UI.Setup.Controller.saved_sync_interval = (int)repository.PollInterval;
+            }
+            Program.Controller.ShowSetupWindow(PageType.Settings);
+        }
+
 
         /// <summary>
         /// Open the remote folder addition wizard.
         /// </summary>
         public void AddRemoteFolderClicked ()
         {
-            Program.Controller.ShowSetupWindow (PageType.Add1);
+            Program.Controller.ShowSetupWindow(PageType.Add1);
         }
 
 

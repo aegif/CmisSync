@@ -247,7 +247,7 @@ namespace CmisSync
                     };
                     removeFolderFromSyncItem.Click += RemoveFolderFromSyncDelegate(folderName);
 
-                    // Sub-item: remove folder from sync
+                    // Sub-item: manual sync
                     ToolStripMenuItem manualSyncItem = new ToolStripMenuItem()
                     {
                         Text = Properties_Resources.ManualSync,
@@ -256,20 +256,26 @@ namespace CmisSync
                     };
                     manualSyncItem.Click += ManualSyncDelegate(folderName);
 
+                    // Sub-item: settings dialog
+                    ToolStripMenuItem settingsItem = new ToolStripMenuItem()
+                    {
+                        Text = Properties_Resources.Settings,
+                        Tag = "settings",
+                    };
+                    settingsItem.Click += SettingsDelegate(folderName);
+
                     // Add the sub-items.
                     subfolderItem.DropDownItems.Add(openLocalFolderItem);
                     subfolderItem.DropDownItems.Add(openRemoteFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
-
                     //Removed for Oris4
                     //subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     //subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
-
                     //Manual sync
                     subfolderItem.DropDownItems.Add(manualSyncItem);
-
-                    //todo add frequency setting
+                    subfolderItem.DropDownItems.Add(new ToolStripSeparator());
+                    subfolderItem.DropDownItems.Add(settingsItem);
 
                     // Add the main item.
                     this.traymenu.Items.Add(subfolderItem);
@@ -399,6 +405,14 @@ namespace CmisSync
             return delegate
             {
                 Controller.ManualSyncClicked(reponame);
+            };
+        }
+
+        private EventHandler SettingsDelegate(string reponame)
+        {
+            return delegate
+            {
+                Controller.SettingsClicked(reponame);
             };
         }
     }

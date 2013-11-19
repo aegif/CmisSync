@@ -40,7 +40,8 @@ namespace CmisSync
         Customize,
         Syncing,
         Finished,
-        Tutorial // This particular one contains sub-steps that are tracked via a number.
+        Tutorial, // This particular one contains sub-steps that are tracked via a number.
+        Settings,
     }
 
     /// <summary>
@@ -114,6 +115,7 @@ namespace CmisSync
         public string saved_user = "";
         public string saved_password = "";
         public string saved_repository = "";
+        public int saved_sync_interval = 15;
         public List<string> ignoredPaths = new List<string>();
 
         /// <summary>
@@ -184,7 +186,7 @@ namespace CmisSync
         /// </summary>
         public SetupController()
         {
-            Logger.Info("Entering constructor.");
+            Logger.Debug("Entering constructor.");
 
             TutorialCurrentPage = 0;
             PreviousAddress = null;
@@ -235,7 +237,7 @@ namespace CmisSync
                 ChangePageEvent(page);
                 ShowWindowEvent();
             };
-            Logger.Info("Exiting constructor.");
+            Logger.Debug("Exiting constructor.");
         }
 
 
@@ -575,6 +577,24 @@ namespace CmisSync
 
             this.FolderAdditionWizardCurrentPage = PageType.None;
             HideWindowEvent();
+        }
+
+        /// <summary>
+        /// Repository settings page.
+        /// </summary>
+        public void SettingsPageCompleted(string password, int pollInterval)
+        {
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder repository = config.getFolder(saved_repository);
+            if (!String.IsNullOrEmpty(password))
+            {
+                repository.ObfuscatedPassword = new CmisSync.Lib.RepoInfo.CmisPassword(password.TrimEnd()).ObfuscatedPassword;
+            }
+            repository.PollInterval = pollInterval;
+
+            config.Save();
+
+            FinishPageCompleted();
         }
     }
 }

@@ -154,7 +154,7 @@
     <value>Enter a name for the local folder where the documents are synchronized</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Enter the Web address of an Oris4 server:</value>
+    <value>Enter your Oris4 URL</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
@@ -318,5 +318,32 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   </data>
   <data name="ManualSync" xml:space="preserve">
     <value>Run sync now</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings...</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Oris4Sync" xml:space="preserve">
+    <value>Oris4 Sync</value>
+  </data>
+  <data name="SyncInterval" xml:space="preserve">
+    <value>Sync Interval</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>hours</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>minutes</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>day</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>hour</value>
+  </data>
+  <data name="WebAddress" xml:space="preserve">
+    <value>Oris4 URL</value>
   </data>
 </root>

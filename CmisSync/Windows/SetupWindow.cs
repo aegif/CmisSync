@@ -77,14 +77,14 @@ namespace CmisSync {
         public SetupWindow ()
         {
             // Window properties.
-            Title      = CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture);
-            Width      = 640;
-            Height     = 440;
+            Title = CmisSync.Properties_Resources.Oris4Sync;
+            Width = 640;
+            Height = 440;
             ResizeMode = ResizeMode.NoResize;
             Background = new SolidColorBrush (Colors.WhiteSmoke);
-            Icon       = UIHelpers.GetImageSource("cmissync-app", "ico");
+            Icon = UIHelpers.GetImageSource("cmissync-app", "ico");
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Content    = ContentCanvas;
+            Content = ContentCanvas;
             Closing += Close;
 			
             // Taskbar

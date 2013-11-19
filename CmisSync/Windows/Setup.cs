@@ -15,32 +15,31 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+using CmisSync.CmisTree;
+using CmisSync.Lib;
+using CmisSync.Lib.Cmis;
+using log4net;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Media;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shell;
-
 using Drawing = System.Drawing;
 using Imaging = System.Windows.Interop.Imaging;
 using WPF = System.Windows.Controls;
-
-using CmisSync.Lib.Cmis;
-using CmisSync.Lib;
-using System.Globalization;
-using log4net;
-using System.Collections.ObjectModel;
-using CmisSync.CmisTree;
-using System.Windows.Input;
 
 namespace CmisSync
 {
@@ -66,18 +65,18 @@ namespace CmisSync
         /// </summary>
         public Setup()
         {
-            Logger.Info("Entering constructor.");
+            Logger.Debug("Entering constructor.");
 
             // Defines how to show the setup window.
             Controller.ShowWindowEvent += delegate
             {
                 Dispatcher.BeginInvoke((Action)delegate
                 {
-                    Logger.Info("Entering ShowWindowEvent.");
+                    Logger.Debug("Entering ShowWindowEvent.");
                     Show();
                     Activate();
                     BringIntoView();
-                    Logger.Info("Exiting ShowWindowEvent.");
+                    Logger.Debug("Exiting ShowWindowEvent.");
                 });
             };
 
@@ -96,7 +95,7 @@ namespace CmisSync
             {
                 Dispatcher.BeginInvoke((Action)delegate
                 {
-                    Logger.Info("Entering ChangePageEvent.");
+                    Logger.Debug("Entering ChangePageEvent.");
                     Reset();
 
                     // Show appropriate setup page.
@@ -488,11 +487,11 @@ namespace CmisSync
                                 Canvas.SetLeft(user_label, 185);
 
                                 ContentCanvas.Children.Add(user_box);
-                                Canvas.SetTop(user_box, 330);
+                                Canvas.SetTop(user_box, 320);
                                 Canvas.SetLeft(user_box, 185);
 
                                 ContentCanvas.Children.Add(user_help_label);
-                                Canvas.SetTop(user_help_label, 355);
+                                Canvas.SetTop(user_help_label, 345);
                                 Canvas.SetLeft(user_help_label, 185);
 
                                 // Password
@@ -501,11 +500,11 @@ namespace CmisSync
                                 Canvas.SetRight(password_label, 30);
 
                                 ContentCanvas.Children.Add(password_box);
-                                Canvas.SetTop(password_box, 330);
+                                Canvas.SetTop(password_box, 320);
                                 Canvas.SetRight(password_box, 30);
 
                                 ContentCanvas.Children.Add(password_help_label);
-                                Canvas.SetTop(password_help_label, 355);
+                                Canvas.SetTop(password_help_label, 345);
                                 Canvas.SetRight(password_help_label, 30);
 
                                 TaskbarItemInfo.ProgressValue = 0.0;
@@ -1062,10 +1061,255 @@ namespace CmisSync
                                 break;
                             }
                         #endregion
+
+                        // Settings Dialog...
+                        #region Page Settings
+                        case PageType.Settings:
+                            {
+                                // UI elements.
+
+                                Header = Properties_Resources.Settings;
+
+                                // Address input UI.
+                                TextBlock address_label = new TextBlock()
+                                {
+                                    Text = Properties_Resources.WebAddress,
+                                    FontWeight = FontWeights.Bold
+                                };
+
+                                TextBox address_box = new TextBox()
+                                {
+                                    Width = 420,
+                                    Text = Controller.saved_address.ToString(),
+                                    IsEnabled = false,
+                                };
+                                
+                                // User input UI.
+                                TextBlock user_label = new TextBlock()
+                                {
+                                    Text = Properties_Resources.Username + ":",
+                                    FontWeight = FontWeights.Bold,
+                                    Width = 200
+                                };
+
+                                TextBox user_box = new TextBox()
+                                {
+                                    Width = 200,
+                                    Text = Controller.saved_user,
+                                    IsEnabled = false,
+                                };
+
+                                // Password input UI.
+                                TextBlock password_label = new TextBlock()
+                                {
+                                    Text = Properties_Resources.Password + ":",
+                                    FontWeight = FontWeights.Bold,
+                                    Width = 200
+                                };
+
+                                PasswordBox password_box = new PasswordBox()
+                                {
+                                    Width = 200
+                                };
+
+                                // Rather than a TextBlock, we use a textBox so that users can copy/paste the error message and Google it.
+                                TextBox authentication_error_label = new TextBox()
+                                {
+                                    FontSize = 11,
+                                    Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
+                                    Visibility = Visibility.Hidden,
+                                    IsReadOnly = true,
+                                    Background = Brushes.Transparent,
+                                    BorderThickness = new Thickness(0),
+                                    TextWrapping = TextWrapping.Wrap,
+                                    MaxWidth = 420
+                                };
+
+                                // Sync duration input UI.
+                                TextBlock slider_label = new TextBlock()
+                                {
+                                    Text = Properties_Resources.SyncInterval + ":",
+                                    FontWeight = FontWeights.Bold,
+                                    Width = 200,
+                                };
+
+                                CustomSlider slider = new CustomSlider()
+                                {
+                                    Width = 400,
+                                    PollInterval = Controller.saved_sync_interval,
+                                };
+
+                                TextBlock slider_min_label = new TextBlock()
+                                {
+                                    Text = slider.FormattedMinimum(),
+                                    Width = 200,
+                                };
+
+                                TextBlock slider_max_label = new TextBlock()
+                                {
+                                    Text = slider.FormattedMaximum(),
+                                    Width = 200,
+                                    TextAlignment = TextAlignment.Right,
+                                };
+
+                                // Buttons.
+                                Button cancel_button = new Button()
+                                {
+                                    Content = Properties_Resources.Cancel
+                                };
+
+                                Button save_button = new Button()
+                                {
+                                    Content = Properties_Resources.Save
+                                };
+
+                                Buttons.Add(save_button);
+                                Buttons.Add(cancel_button);
+
+                                // Address
+                                ContentCanvas.Children.Add(address_label);
+                                Canvas.SetTop(address_label, 50);
+                                Canvas.SetLeft(address_label, 185);
+
+                                ContentCanvas.Children.Add(address_box);
+                                Canvas.SetTop(address_box, 70);
+                                Canvas.SetLeft(address_box, 185);
+
+                                // User
+                                ContentCanvas.Children.Add(user_label);
+                                Canvas.SetTop(user_label, 110);
+                                Canvas.SetLeft(user_label, 185);
+
+                                ContentCanvas.Children.Add(user_box);
+                                Canvas.SetTop(user_box, 130);
+                                Canvas.SetLeft(user_box, 185);
+
+                                // Password
+                                ContentCanvas.Children.Add(password_label);
+                                Canvas.SetTop(password_label, 170);
+                                Canvas.SetLeft(password_label, 185);
+
+                                ContentCanvas.Children.Add(password_box);
+                                Canvas.SetTop(password_box, 190);
+                                Canvas.SetLeft(password_box, 185);
+
+                                // Error label
+                                ContentCanvas.Children.Add(authentication_error_label);
+                                Canvas.SetTop(authentication_error_label, 215);
+                                Canvas.SetLeft(authentication_error_label, 185);
+
+                                // Sync Interval
+                                ContentCanvas.Children.Add(slider_label);
+                                Canvas.SetTop(slider_label, 250);
+                                Canvas.SetLeft(slider_label, 185);
+
+                                ContentCanvas.Children.Add(slider);
+                                Canvas.SetTop(slider, 270);
+                                Canvas.SetLeft(slider, 185);
+
+                                ContentCanvas.Children.Add(slider_min_label);
+                                Canvas.SetTop(slider_min_label, 300);
+                                Canvas.SetLeft(slider_min_label, 185);
+                                
+                                ContentCanvas.Children.Add(slider_max_label);
+                                Canvas.SetTop(slider_max_label, 300);
+                                Canvas.SetLeft(slider_max_label, 385);
+                                
+                                TaskbarItemInfo.ProgressValue = 0.0;
+                                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+
+                                user_box.Focus();
+
+
+                                // Actions.
+                                Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
+                                {
+                                    Dispatcher.BeginInvoke((Action)delegate
+                                    {
+                                        save_button.IsEnabled = button_enabled;
+                                    });
+                                };
+
+                                cancel_button.Click += delegate
+                                {
+                                    Controller.PageCancelled();
+                                };
+
+                                save_button.Click += delegate
+                                {
+                                    bool updatePassword = false;
+                                    if (!String.IsNullOrEmpty(password_box.Password))
+                                    {
+                                        // Show wait cursor
+                                        System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+
+                                        // Try to find the CMIS server (asynchronously)
+                                        GetRepositoriesFuzzyDelegate dlgt =
+                                            new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
+                                        IAsyncResult ar = dlgt.BeginInvoke(Controller.saved_address, Controller.saved_user,
+                                            password_box.Password, null, null);
+                                        while (!ar.AsyncWaitHandle.WaitOne(100))
+                                        {
+                                            System.Windows.Forms.Application.DoEvents();
+                                        }
+                                        Tuple<CmisServer, Exception> result = dlgt.EndInvoke(ar);
+                                        CmisServer cmisServer = result.Item1;
+
+                                        Controller.repositories = cmisServer != null ? cmisServer.Repositories : null;
+
+                                        // Hide wait cursor
+                                        System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+
+                                        if (Controller.repositories == null)
+                                        {
+                                            // Could not retrieve repositories list from server, show warning.
+                                            string warning = "";
+                                            string message = result.Item2.Message;
+                                            Exception e = result.Item2;
+                                            if (e is CmisPermissionDeniedException)
+                                            {
+                                                warning = Properties_Resources.LoginFailedForbidden;
+                                            }
+                                            else if (e is CmisServerNotFoundException)
+                                            {
+                                                warning = Properties_Resources.ConnectFailure;
+                                            }
+                                            else if (e.Message == "SendFailure" && cmisServer.Url.Scheme.StartsWith("https"))
+                                            {
+                                                warning = Properties_Resources.SendFailureHttps;
+                                            }
+                                            else if (e.Message == "TrustFailure")
+                                            {
+                                                warning = Properties_Resources.TrustFailure;
+                                            }
+                                            else
+                                            {
+                                                warning = message + Environment.NewLine + Properties_Resources.Sorry;
+                                            }
+                                            authentication_error_label.Text = warning;
+                                            authentication_error_label.Visibility = Visibility.Visible;
+                                        }
+                                        else
+                                        {
+                                            // Continue to next step, which is choosing a particular folder.
+                                            Controller.SettingsPageCompleted(password_box.Password, slider.PollInterval);
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        Controller.SettingsPageCompleted(null, slider.PollInterval);
+                                    }
+
+                                };
+                                break;
+                            }
+                        #endregion
+                    
                     }
 
                     ShowAll();
-                    Logger.Info("Exiting ChangePageEvent.");
+                    Logger.Debug("Exiting ChangePageEvent.");
                 });
             };
             this.Closing += delegate
@@ -1074,7 +1318,7 @@ namespace CmisSync
             };
 
             Controller.PageCancelled();
-            Logger.Info("Exiting constructor.");
+            Logger.Debug("Exiting constructor.");
         }
 
         private List<string> getIgnoredFolder(Folder f)
