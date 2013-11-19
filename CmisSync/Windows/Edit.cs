@@ -145,6 +145,8 @@ namespace CmisSync
                 Close();
             };
             this.Title = Properties_Resources.EditTitle;
+            this.Description = "";
+            this.ShowAll();
         }
     }
 }
