@@ -153,14 +153,12 @@ namespace CmisSync {
         }
 
         private SyncStatus getSyncStatus(string reponame) {
-
-            //DEADLOCK Problem
-            /*foreach (RepoBase repo in Program.Controller.Repositories)
+            foreach (RepoBase repo in Program.Controller.Repositories)
             {
                 if(repo.Name.Equals(reponame)){
                     return repo.Status;
                 }
-            }*/
+            }
             return SyncStatus.Idle;
         }
 
