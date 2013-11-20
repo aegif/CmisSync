@@ -188,6 +188,9 @@ AC_SUBST(TEST_REPOID)
 
 OSNAME=`uname -s`
 OSOK=no
+
+PACKAGE_TARGET=none
+
 if test "$OSNAME" = "Linux" ; then
 
 	dnl check for notify-sharp
@@ -235,6 +238,7 @@ if test "$OSNAME" = "Linux" ; then
 	cocoa=false
 	macos=false
     OSOK=yes
+    PACKAGE_TARGET=debian-package
 fi
 
 if test "$OSNAME" = "Darwin" ; then
@@ -307,11 +311,13 @@ if test "$OSNAME" = "Darwin" ; then
 	cocoa=true
 	macos=true
     OSOK=yes
-	AM_CONDITIONAL([HAVE_MAC_OS], true)
+    PACKAGE_TARGET=apple-package
 else
     AM_CONDITIONAL([HAVE_XAMMAC], false)
     AM_CONDITIONAL([HAVE_MONOMAC], false)
 fi
+
+AC_SUBST(PACKAGE_TARGET)
 
 AM_CONDITIONAL([HAVE_MAC_OS],[test x$macos = xtrue])
 AM_CONDITIONAL([__COCOA__], [test x$cocoa = xtrue])
