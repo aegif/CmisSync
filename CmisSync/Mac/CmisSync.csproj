@@ -9,7 +9,7 @@
     <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <RootNamespace>CmisSync</RootNamespace>
-    <AssemblyName>CmisSync</AssemblyName>
+    <AssemblyName>DataSpace Sync</AssemblyName>
     <ReleaseVersion>
     </ReleaseVersion>
   </PropertyGroup>
@@ -202,39 +202,6 @@
     </BundleResource>
     <BundleResource Include="Pixmaps\tutorial-slide-3.png">
       <Link>Pixmaps\tutorial-slide-3.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-a.png">
-      <Link>Pixmaps\avatar-a.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-b.png">
-      <Link>Pixmaps\avatar-b.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-c.png">
-      <Link>Pixmaps\avatar-c.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-d.png">
-      <Link>Pixmaps\avatar-d.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-e.png">
-      <Link>Pixmaps\avatar-e.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-f.png">
-      <Link>Pixmaps\avatar-f.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-g.png">
-      <Link>Pixmaps\avatar-g.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-h.png">
-      <Link>Pixmaps\avatar-h.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-i.png">
-      <Link>Pixmaps\avatar-i.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-j.png">
-      <Link>Pixmaps\avatar-j.png</Link>
-    </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\avatar-k.png">
-      <Link>Pixmaps\avatar-k.png</Link>
     </BundleResource>
     <BundleResource Include="Pixmaps\tutorial-slide-4.png" />
     <BundleResource Include="Pixmaps\media_playback_pause.png" />
