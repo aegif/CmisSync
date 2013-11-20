@@ -1237,7 +1237,6 @@ namespace CmisSync
 
                                 save_button.Click += delegate
                                 {
-                                    bool updatePassword = false;
                                     if (!String.IsNullOrEmpty(password_box.Password))
                                     {
                                         // Show wait cursor
