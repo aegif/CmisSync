@@ -144,12 +144,16 @@ namespace CmisSync
             {
                 Ignores = NodeModelUtils.GetIgnoredFolder(repo);
                 Controller.SaveFolder();
-                Close();
+                InvokeOnMainThread (delegate {
+                    PerformClose (this);
+                });
             };
 
             cancel_button.Activated += delegate
             {
-                Close();
+                InvokeOnMainThread (delegate {
+                    PerformClose (this);
+                });
             };
 
 
