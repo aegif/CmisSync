@@ -10,9 +10,9 @@ using System.Windows.Media;
 
 namespace CmisSync
 {
-    class CustomSlider : Slider
+    class PollIntervalSlider : Slider
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof(CustomSlider));
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(PollIntervalSlider));
 
         private ToolTip _autoToolTip;
 
@@ -24,17 +24,21 @@ namespace CmisSync
                 this.Value = value / (60 * 1000);
             }
         }
-        
-        public CustomSlider() 
+
+        public PollIntervalSlider() 
         {
             this.IsSnapToTickEnabled = true;
             this.Minimum = 15;
+            //this.Minimum = 1; //testing
             this.Maximum = 1440;
             this.TickPlacement = TickPlacement.BottomRight;
             this.AutoToolTipPlacement = AutoToolTipPlacement.BottomRight;
 
             // Manually add ticks to the slider.
             DoubleCollection tickMarks = new DoubleCollection();
+            //tickMarks.Add(1); //testing
+            //tickMarks.Add(2); //testing
+            //tickMarks.Add(5); //testing
             tickMarks.Add(15);
             tickMarks.Add(30);
             tickMarks.Add(60);

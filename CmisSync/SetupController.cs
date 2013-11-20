@@ -584,15 +584,7 @@ namespace CmisSync
         /// </summary>
         public void SettingsPageCompleted(string password, int pollInterval)
         {
-            Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder repository = config.getFolder(saved_repository);
-            if (!String.IsNullOrEmpty(password))
-            {
-                repository.ObfuscatedPassword = new CmisSync.Lib.RepoInfo.CmisPassword(password.TrimEnd()).ObfuscatedPassword;
-            }
-            repository.PollInterval = pollInterval;
-
-            config.Save();
+            Program.Controller.UpdateRepositorySettings(saved_repository, password, pollInterval);
 
             FinishPageCompleted();
         }

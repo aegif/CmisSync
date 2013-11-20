@@ -1133,7 +1133,7 @@ namespace CmisSync
                                     Width = 200,
                                 };
 
-                                CustomSlider slider = new CustomSlider()
+                                PollIntervalSlider slider = new PollIntervalSlider()
                                 {
                                     Width = 400,
                                     PollInterval = Controller.saved_sync_interval,

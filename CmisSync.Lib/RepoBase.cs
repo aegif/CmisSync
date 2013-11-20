@@ -233,6 +233,39 @@ namespace CmisSync.Lib
             this.remote_timer.Start();
         }
 
+        public void UpdateSettings(string password, int pollInterval)
+        {
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+
+            //Pause sync
+            bool idle = Status == SyncStatus.Idle;
+            this.remote_timer.Stop();
+            if (idle) Suspend();
+
+            //Update password...
+            if (!String.IsNullOrEmpty(password))
+            {
+                this.RepoInfo.Password = new Lib.RepoInfo.CmisPassword(password.TrimEnd());
+                syncConfig.ObfuscatedPassword = RepoInfo.Password.ObfuscatedPassword;
+                Logger.Debug("Updated \"" + this.Name + "\" password");
+            }
+
+            //Update poll interval
+            this.RepoInfo.PollInterval = pollInterval;
+            this.remote_timer.Interval = pollInterval;
+            syncConfig.PollInterval = pollInterval;
+            Logger.Debug("Updated \"" + this.Name + "\" poll interval: " + pollInterval);
+
+            //Save configuration
+            config.Save();
+
+            //Resume sync...
+            if (idle) Resume();
+            this.remote_timer.Start();
+        }
+
         /// <summary>
         /// Manual sync.
         /// </summary>

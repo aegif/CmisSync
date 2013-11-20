@@ -272,6 +272,17 @@ namespace CmisSync
             repo.Initialize();
         }
 
+        public void UpdateRepositorySettings(string repoName, string password, int pollInterval)
+        {
+            foreach (RepoBase repoBase in this.repositories)
+            {
+                if (repoBase.Name == repoName)
+                {
+                    repoBase.UpdateSettings(password, pollInterval);
+                }
+            }
+        }
+
         public void RemoveRepositoryFromSync(string reponame)
         {
             Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
