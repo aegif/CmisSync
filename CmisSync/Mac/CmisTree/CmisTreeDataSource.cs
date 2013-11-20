@@ -79,6 +79,11 @@ namespace CmisSync.CmisTree
                 return (NSString)node.Node.Name;
             return (NSString)"No Node found";
         }
+
+        /*[Export("outlineView:setObjectValue:forTableColumn:byItem:")]
+        public virtual void SetObjectValue(NSOutlineView outlineView, NSObject theObject, NSTableColumn tableColumn, NSObject item)
+        {
+        }*/
     }
 }
 

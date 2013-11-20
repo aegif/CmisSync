@@ -129,7 +129,8 @@ namespace CmisSync
 
             NSButton finish_button = new NSButton()
             {
-                Title = Properties_Resources.SaveChanges
+                Title = Properties_Resources.SaveChanges,
+                Enabled = false
             };
 
             NSButton cancel_button = new NSButton()
@@ -158,13 +159,22 @@ namespace CmisSync
 
 
             (outlineView.Delegate as OutlineViewDelegate).SelectionChanged += delegate {
-                Node selectedNode = ((NSNodeObject)outlineView.ItemAtRow(outlineView.SelectedRow)).Node;
-                while(selectedNode.Parent != null)
-                    selectedNode = selectedNode.Parent;
-                RootFolder root = selectedNode as RootFolder;
-                if(root != null){
-                    finish_button.Enabled = true;
-                }
+                InvokeOnMainThread (delegate {
+                    if(outlineView.SelectedRow >= 0)
+                    {
+                    NSNodeObject node = outlineView.ItemAtRow(outlineView.SelectedRow) as NSNodeObject;
+                    if(node != null) {
+                        Node selectedNode = node.Node;
+                        while(selectedNode.Parent != null)
+                        selectedNode = selectedNode.Parent;
+                        RootFolder root = selectedNode as RootFolder;
+                        if(root != null){
+                            finish_button.Enabled = true;
+                        }
+                    }
+                    }else
+                        finish_button.Enabled = false;
+                });
             };
 
             this.Header = Properties_Resources.EditTitle;

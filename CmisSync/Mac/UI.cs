@@ -29,14 +29,14 @@ namespace CmisSync {
 
         public StatusIcon StatusIcon;
         public Setup Setup;
-		public About About;
-		
-		public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
-			"Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
-		
+        public About About;
+        
+        public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
+            "Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
+        
         public static NSFont BoldFont = NSFontManager.SharedFontManager.FontWithFamily (
-			"Lucida Grande", NSFontTraitMask.Bold, 0, 13);
-		
+            "Lucida Grande", NSFontTraitMask.Bold, 0, 13);
+        
 
         public UI ()
         {
@@ -82,7 +82,7 @@ namespace CmisSync {
 
         private void HideDockIcon ()
         {
-			NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.Prohibited;
+            NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.Prohibited;
         }
 
 

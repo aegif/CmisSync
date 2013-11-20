@@ -312,11 +312,14 @@ namespace CmisSync {
             };
             (AddressTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate
             {
-                string error = Controller.CheckAddPage(AddressTextField.StringValue);
-                if (String.IsNullOrEmpty(error))
-                    AddressHelpLabel.StringValue = "";
-                else
-                    AddressHelpLabel.StringValue = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                InvokeOnMainThread(delegate
+                {
+                    string error = Controller.CheckAddPage(AddressTextField.StringValue);
+                    if (String.IsNullOrEmpty(error))
+                        AddressHelpLabel.StringValue = "";
+                    else
+                        AddressHelpLabel.StringValue = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                });
             };
             ContinueButton.Activated += delegate
             {
@@ -422,34 +425,51 @@ namespace CmisSync {
             };
             (OutlineView.Delegate as OutlineViewDelegate).SelectionChanged += delegate
             {
-                Node selectedNode = ((NSNodeObject)OutlineView.ItemAtRow(OutlineView.SelectedRow)).Node;
-                while (selectedNode.Parent != null)
-                    selectedNode = selectedNode.Parent;
-                RootFolder root = selectedNode as RootFolder;
-                if (root != null)
-                    ContinueButton.Enabled = true;
-                else
-                    ContinueButton.Enabled = false;
+                InvokeOnMainThread(delegate
+                {
+                    if(OutlineView.SelectedRow >= 0)
+                    {
+                        Node selectedNode = ((NSNodeObject)OutlineView.ItemAtRow(OutlineView.SelectedRow)).Node;
+                        while (selectedNode.Parent != null)
+                        selectedNode = selectedNode.Parent;
+                        RootFolder root = selectedNode as RootFolder;
+                        if (root != null)
+                            ContinueButton.Enabled = true;
+                        else
+                            ContinueButton.Enabled = false;
+                    } else {
+                        ContinueButton.Enabled = false;
+                    }
+                });
             };
             ContinueButton.Activated += delegate
             {
-                Node selectedNode = ((NSNodeObject)OutlineView.ItemAtRow(OutlineView.SelectedRow)).Node;
-                while (selectedNode.Parent != null)
-                    selectedNode = selectedNode.Parent;
-                RootFolder root = selectedNode as RootFolder;
-                if (root != null)
+                InvokeOnMainThread(delegate
                 {
-                    Controller.saved_repository = root.Id;
-                    Controller.Add2PageCompleted(root.Id, root.Path);
-                }
+                    Node selectedNode = ((NSNodeObject)OutlineView.ItemAtRow(OutlineView.SelectedRow)).Node;
+                    while (selectedNode.Parent != null)
+                        selectedNode = selectedNode.Parent;
+                    RootFolder root = selectedNode as RootFolder;
+                    if (root != null)
+                    {
+                        Controller.saved_repository = root.Id;
+                        Controller.Add2PageCompleted(root.Id, root.Path);
+                    }
+                });
             };
             CancelButton.Activated += delegate
             {
-                Controller.PageCancelled();
+                InvokeOnMainThread(delegate
+                {
+                    Controller.PageCancelled();
+                });
             };
             BackButton.Activated += delegate
             {
-                Controller.BackToPage1();
+                InvokeOnMainThread(delegate
+                {
+                    Controller.BackToPage1();
+                });
             };
             Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
             {
@@ -479,7 +499,7 @@ namespace CmisSync {
             ProgressIndicator.StartAnimation(this);
             Controller.UpdateProgressBarEvent += delegate(double percentage)
             {
-                InvokeOnMainThread(() => 
+                InvokeOnMainThread(delegate 
                 {
                     ProgressIndicator.DoubleValue = percentage;
                 });
@@ -499,11 +519,17 @@ namespace CmisSync {
             };
             OpenFolderButton.Activated += delegate
             {
-                Controller.OpenFolderClicked();
+                InvokeOnMainThread(delegate
+                {
+                    Controller.OpenFolderClicked();
+                });
             };
             FinishButton.Activated += delegate
             {
-                Controller.FinishPageCompleted();
+                InvokeOnMainThread(delegate
+                {
+                    Controller.FinishPageCompleted();
+                });
             };
             Buttons.Add(FinishButton);
             Buttons.Add(OpenFolderButton);
