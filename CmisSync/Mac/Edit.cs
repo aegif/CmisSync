@@ -69,7 +69,7 @@ namespace CmisSync
                 RowHeight        = 34,
                 IntercellSpacing = new SizeF (8, 12),
                 HeaderView       = null,
-                Delegate         = new CmisSyncTableDelegate ()
+                Delegate         = new OutlineViewDelegate ()
             };
 
             outlineView.AddColumn(new NSTableColumn(){
@@ -157,7 +157,7 @@ namespace CmisSync
             };
 
 
-            (outlineView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
+            (outlineView.Delegate as OutlineViewDelegate).SelectionChanged += delegate {
                 Node selectedNode = ((NSNodeObject)outlineView.ItemAtRow(outlineView.SelectedRow)).Node;
                 while(selectedNode.Parent != null)
                     selectedNode = selectedNode.Parent;

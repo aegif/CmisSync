@@ -104,6 +104,8 @@
     <Compile Include="..\Windows\FolderTreeMVC\NodeModelUtils.cs">
       <Link>CmisTree\NodeModelUtils.cs</Link>
     </Compile>
+    <Compile Include="OutlineViewDelegate.cs" />
+    <Compile Include="TextFieldDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

@@ -137,7 +137,7 @@ namespace CmisSync {
                 AddressTextField = new NSTextField () {
                     Frame       = new RectangleF (190, 290, 196 + 196 + 16, 22),
                     Font        = UI.Font,
-                    Delegate    = new CmisSyncTextFieldDelegate (),
+                    Delegate    = new TextFieldDelegate (),
                     StringValue = (Controller.PreviousAddress == null || String.IsNullOrEmpty(Controller.PreviousAddress.ToString()))? "https://" : Controller.PreviousAddress.ToString() 
                 };
 
@@ -183,7 +183,7 @@ namespace CmisSync {
 
                 PasswordTextField = new NSSecureTextField () {
                     Frame       = new RectangleF (190 + 196 + 16, 200, 196, 22),
-                    Delegate    = new CmisSyncTextFieldDelegate ()
+                    Delegate    = new TextFieldDelegate ()
                 };
 
                 WarningTextField = new NSTextField()
@@ -218,7 +218,7 @@ namespace CmisSync {
                     });
                 };
 
-                (AddressTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
+                (AddressTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate {
                     string error = Controller.CheckAddPage ( AddressTextField.StringValue);
                     if(String.IsNullOrEmpty(error))
                         AddressHelpLabel.StringValue = "";
@@ -282,7 +282,7 @@ namespace CmisSync {
                     RowHeight        = 34,
                     IntercellSpacing = new SizeF (8, 12),
                     HeaderView       = null,
-                    Delegate         = new CmisSyncTableDelegate ()
+                    Delegate         = new OutlineViewDelegate ()
                 };
 
                 OutlineView.AddColumn(new NSTableColumn(){
@@ -332,17 +332,15 @@ namespace CmisSync {
                     Title = Properties_Resources.Back
                 };
 
-                (OutlineView.Delegate as CmisSyncTableDelegate).SelectionChanged += delegate {
+                (OutlineView.Delegate as OutlineViewDelegate).SelectionChanged += delegate {
                     Node selectedNode = ((NSNodeObject)OutlineView.ItemAtRow(OutlineView.SelectedRow)).Node;
                     while(selectedNode.Parent != null)
                         selectedNode = selectedNode.Parent;
                     RootFolder root = selectedNode as RootFolder;
-                    if(root != null){
+                    if(root != null)
                         ContinueButton.Enabled = true;
-                    }
                     else
                         ContinueButton.Enabled = false;
-
                 };
 
                 ContinueButton.Activated += delegate {
@@ -405,7 +403,7 @@ namespace CmisSync {
                 NSTextField LocalFolderTextField = new NSTextField () {
                     Frame       = new RectangleF (190, 290, 196 + 196 + 16, 22),
                     Font        = UI.Font,
-                    Delegate    = new CmisSyncTextFieldDelegate (),
+                    Delegate    = new TextFieldDelegate (),
                     StringValue = localfoldername
                 };
 
@@ -423,7 +421,7 @@ namespace CmisSync {
                 NSTextField LocalRepoPathTextField = new NSTextField () {
                     Frame       = new RectangleF (190, 190, 196 + 196 + 16, 22),
                     Font        = UI.Font,
-                    Delegate    = new CmisSyncTextFieldDelegate (),
+                    Delegate    = new TextFieldDelegate (),
                     StringValue = Path.Combine(Controller.DefaultRepoPath, LocalFolderTextField.StringValue)
                 };
 
@@ -467,7 +465,7 @@ namespace CmisSync {
                     Controller.CustomizePageCompleted (LocalFolderTextField.StringValue, LocalRepoPathTextField.StringValue);
                 };
 
-                (LocalFolderTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
+                (LocalFolderTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate {
                     try{
                         LocalRepoPathTextField.StringValue = Path.Combine(Controller.DefaultRepoPath, LocalFolderTextField.StringValue);
                     }catch(Exception){}
@@ -478,7 +476,7 @@ namespace CmisSync {
                         WarningTextField.StringValue = error;
                 };
 
-                (LocalRepoPathTextField.Delegate as CmisSyncTextFieldDelegate).StringValueChanged += delegate {
+                (LocalRepoPathTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate {
                     string error = Controller.CheckRepoPathAndName(LocalRepoPathTextField.StringValue, LocalFolderTextField.StringValue);
                     if(String.IsNullOrEmpty(error))
                         WarningTextField.StringValue = "";
@@ -673,33 +671,6 @@ namespace CmisSync {
                     }
                 }
             }
-        }
-    }
-
-    public class CmisSyncTextFieldDelegate : NSTextFieldDelegate {
-
-        public event StringValueChangedHandler StringValueChanged;
-        public delegate void StringValueChangedHandler ();
-
-
-        public override void Changed (NSNotification notification)
-        {
-            if (StringValueChanged != null)
-                StringValueChanged ();
-        }
-    }
-
-
-    public class CmisSyncTableDelegate : NSOutlineViewDelegate {
-
-        public event SelectionChangedHandler SelectionChanged;
-        public delegate void SelectionChangedHandler ();
-
-
-        public override void SelectionDidChange (NSNotification notification)
-        {
-            if (SelectionChanged != null)
-                SelectionChanged ();
         }
     }
 }

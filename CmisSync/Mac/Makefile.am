@@ -27,9 +27,11 @@ SOURCES =  \
 	Controller.cs \
 	Edit.cs \
 	MacWatcher.cs \
+	OutlineViewDelegate.cs \
 	Setup.cs \
 	SetupWindow.cs \
 	StatusIcon.cs \
+	TextFieldDelegate.cs \
 	UI.cs
 
 RESOURCES = $(RESOURCES_RESOURCES)
