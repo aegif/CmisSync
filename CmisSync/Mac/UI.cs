@@ -82,7 +82,7 @@ namespace CmisSync {
 
         private void HideDockIcon ()
         {
-            NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.Accessory;
+			NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.Prohibited;
         }
 
 
