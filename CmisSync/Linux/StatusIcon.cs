@@ -272,14 +272,6 @@ namespace CmisSync {
             };
         }
 
-        private EventHandler OpenRemoteFolderDelegate(string reponame)
-        {
-            return delegate
-            {
-                Controller.RemoteFolderClicked(reponame);
-            };
-        }
-
         private EventHandler SuspendSyncFolderDelegate(string reponame)
         {
             return delegate

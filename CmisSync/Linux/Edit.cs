@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync
 {
@@ -26,10 +27,7 @@ namespace CmisSync
         /// </summary>
         public List<string> Ignores;
 
-        private string username;
-        private string password;
-        private string address;
-        private string id;
+        private CmisRepoCredentials credentials;
         private string remotePath;
         private string localPath;
 
@@ -37,25 +35,22 @@ namespace CmisSync
         /// <summary>
         /// Constructor
         /// </summary>
-        public Edit(string name, string username, string password, string address, string id, string remotePath, List<string> ignores, string localPath)
+        public Edit(CmisRepoCredentials credentials, string name, string remotePath, List<string> ignores, string localPath)
         {
             Name = name;
-            this.username = username;
-            this.password = password;
-            this.address = address;
-            this.id = id;
+            this.credentials = credentials;
             this.remotePath = remotePath;
             this.Ignores = ignores;
             this.localPath = localPath;
 
             CreateEdit();
 
-			Deletable      = true;
+            Deletable      = true;
 
-			DeleteEvent += delegate
-			{
-				Controller.CloseWindow();
-			};
+            DeleteEvent += delegate
+            {
+                Controller.CloseWindow();
+            };
         }
 
 
