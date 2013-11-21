@@ -1,0 +1,43 @@
+diff -rupN chemistry-dotcmis-svn1523966-src/DotCMIS/binding/http.cs chemistry-dotcmis-svn1523966-src-patched-for-no-chunking/DotCMIS/binding/http.cs
+--- chemistry-dotcmis-svn1523966-src/DotCMIS/binding/http.cs	2013-11-21 14:41:34.347771700 -0400
++++ chemistry-dotcmis-svn1523966-src-patched-for-no-chunking/DotCMIS/binding/http.cs	2013-11-21 14:40:57.654082000 -0400
+@@ -1,4 +1,4 @@
+-﻿/*
++/*
+  * Licensed to the Apache Software Foundation (ASF) under one
+  * or more contributor license agreements.  See the NOTICE file
+  * distributed with this work for additional information
+@@ -162,9 +162,14 @@ namespace DotCMIS.Binding.Impl
+                 // send data
+                 if (writer != null)
+                 {
+-                    conn.SendChunked = true;
++                    //Write to memory stream
++                    MemoryStream memoryStream = new MemoryStream();
++                    writer(memoryStream);
++                    memoryStream.Position = 0;
++                    conn.ContentLength = memoryStream.Length;
+                     Stream requestStream = conn.GetRequestStream();
+-                    writer(requestStream);
++                    StreamCopy(memoryStream, requestStream);
++                    memoryStream.Close();
+                     requestStream.Close();
+                 }
+                 else
+@@ -204,6 +209,16 @@ namespace DotCMIS.Binding.Impl
+             }
+         }
+ 
++        private static void StreamCopy(Stream input, Stream output)
++        {
++            byte[] buffer = new byte[short.MaxValue];
++            int read;
++            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
++            {
++                output.Write(buffer, 0, read);
++            }
++        }
++
+         internal class Response
+         {
+             private readonly WebResponse response;

@@ -76,8 +76,8 @@
     <Compile Include="ActivityListenerAggregator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1523966-src\DotCMIS\DotCMIS.csproj">
-      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+    <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1523966-src-patched-for-no-chunking\DotCMIS\DotCMIS.csproj">
+      <Project>{14c47fbd-983b-4f3f-a70c-062fb20ec340}</Project>
       <Name>DotCMIS</Name>
     </ProjectReference>
     <ProjectReference Include="..\Extras\log4net-1.2.11\src\log4net.vs2010.csproj">
