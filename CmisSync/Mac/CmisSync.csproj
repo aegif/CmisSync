@@ -26,8 +26,7 @@
     <ConsolePause>False</ConsolePause>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
-    <I18n>
-    </I18n>
+    <I18n>cjk,mideast,other,rare,west</I18n>
     <UseSGen>true</UseSGen>
     <DefineConstants>__COCOA__</DefineConstants>
   </PropertyGroup>

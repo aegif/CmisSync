@@ -603,11 +603,26 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Show info about CmisSync
+        /// Show info about DataSpace Sync
         /// </summary>
         public void ShowAboutWindow()
         {
             ShowAboutWindowEvent();
+        }
+
+        public bool IsEditWindowVisible
+        {
+            get
+            {
+                lock (this.repo_lock)
+                {
+                    foreach (Edit editView in this.edits.Values)
+                        if (editView.IsVisible)
+                            return true;
+                }
+                return false;
+            }
+            private set { }
         }
 
         /// <summary>

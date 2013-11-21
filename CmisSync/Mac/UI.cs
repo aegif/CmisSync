@@ -73,7 +73,7 @@ namespace CmisSync {
 
         public void UpdateDockIconVisibility ()
         {
-            if (Setup.IsVisible || About.IsVisible)
+            if (Setup.IsVisible || About.IsVisible || Program.Controller.IsEditWindowVisible)
                 ShowDockIcon ();
             else
                 HideDockIcon ();
