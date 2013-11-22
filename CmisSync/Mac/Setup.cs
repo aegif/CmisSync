@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Globalization;
+using System.Threading;
 
 using MonoMac.Foundation;
 using MonoMac.AppKit;
@@ -328,26 +329,35 @@ namespace CmisSync {
                     Password = PasswordTextField.StringValue,
                     Address = new Uri(AddressTextField.StringValue)
                 };
-                Tuple<CmisServer, Exception> fuzzyResult = CmisUtils.GetRepositoriesFuzzy(credentials);
-                CmisServer cmisServer = fuzzyResult.Item1;
-                if (cmisServer != null)
-                {
-                    Controller.repositories = cmisServer.Repositories;
-                    AddressTextField.StringValue = cmisServer.Url.ToString();
-                }
-                else
-                {
-                    Controller.repositories = null;
-                }
-                if (Controller.repositories == null)
-                {
-                    WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
-                }
-                else
-                {
-                    WarningTextField.StringValue = "";
-                    Controller.Add1PageCompleted(new Uri(AddressTextField.StringValue), UserTextField.StringValue, PasswordTextField.StringValue);
-                }
+                Thread check = new Thread(() => {
+                    Tuple<CmisServer, Exception> fuzzyResult = CmisUtils.GetRepositoriesFuzzy(credentials);
+                    CmisServer cmisServer = fuzzyResult.Item1;
+                    if (cmisServer != null)
+                    {
+                        Controller.repositories = cmisServer.Repositories;
+                    }
+                    else
+                    {
+                        Controller.repositories = null;
+                    }
+                    InvokeOnMainThread(delegate {
+                        if (Controller.repositories == null)
+                        {
+                            WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
+                        }
+                        else
+                        {
+                            AddressTextField.StringValue = cmisServer.Url.ToString();
+                            WarningTextField.StringValue = "";
+                            Controller.Add1PageCompleted(new Uri(AddressTextField.StringValue), UserTextField.StringValue, PasswordTextField.StringValue);
+                        }
+                        ContinueButton.Enabled = true;
+                        CancelButton.Enabled = true;
+                    });
+                });
+                ContinueButton.Enabled = false;
+                CancelButton.Enabled = false;
+                check.Start();
             };
             CancelButton.Activated += delegate
             {

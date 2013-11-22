@@ -29,6 +29,8 @@ using log4net.Config;
 #if __MonoCS__
 #if __COCOA__
 using MonoMac;
+using MonoMac.Foundation;
+using MonoMac.AppKit;
 #else
 using Gtk;
 #endif
@@ -45,7 +47,11 @@ namespace CmisSync
      * It Presents the user with a dialog, asking if the cert should be trusted.
      */
 
+#if __COCOA__
+    class CertPolicyHandler : NSObject, ICertificatePolicy
+#else
     class CertPolicyHandler : ICertificatePolicy
+#endif
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CertPolicyHandler));
 
@@ -97,8 +103,24 @@ namespace CmisSync
             ManualResetEvent ev = new ManualResetEvent(false);
 #if __MonoCS__
 #if __COCOA__
-//TODO Implement a COCOA dialog
-
+            BeginInvokeOnMainThread(delegate {
+                NSAlert alert = NSAlert.WithMessage("Untrusted Certificate", "No", "Always", "Just now", msg + "\n\nDo you trust this certificate?");
+                switch (alert.RunModal()) {
+                case 1:
+                    ret = UserResponse.CertDeny;
+                    break;
+                case 0:
+                    ret = UserResponse.CertAcceptAlways;
+                    break;
+                case -1:
+                    ret = UserResponse.CertAcceptSession;
+                    break;
+                default:
+                    ret = UserResponse.CertDeny;
+                    break;
+                }
+                ev.Set();
+            });
 #else
             Application.Invoke(delegate {
                     MessageDialog md = new MessageDialog (null, DialogFlags.Modal,
