@@ -16,27 +16,9 @@
 
 
 using System;
-using System.IO;
 using System.Net;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using System.Security.Cryptography.X509Certificates;
-
-using log4net;
-using log4net.Config;
-
-#if __MonoCS__
-#if __COCOA__
-using MonoMac;
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-#else
-using Gtk;
-#endif
-#else
-using System.Windows;
-#endif
 
 namespace CmisSync
 {
@@ -47,14 +29,8 @@ namespace CmisSync
      * It Presents the user with a dialog, asking if the cert should be trusted.
      */
 
-#if __COCOA__
-    class CertPolicyHandler : NSObject, ICertificatePolicy
-#else
     class CertPolicyHandler : ICertificatePolicy
-#endif
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(CertPolicyHandler));
-
         private enum CertificateProblem : long {
             CertEXPIRED                   = 0x800B0101,
             CertVALIDITYPERIODNESTING     = 0x800B0102,
@@ -74,15 +50,45 @@ namespace CmisSync
             CertUNTRUSTEDCA               = 0x800B0112
         }
 
+        public CertPolicyHandler()
+        {
+            Window = new CertPolicyWindow (this);
+        }
+
+        private CertPolicyWindow Window { get; set; }
+
+        //===== Actions =====
+        /// <summary>
+        /// Show User Interaction Action
+        /// </summary>
+        public event Action ShowWindowEvent = delegate { };
+
+        /// <summary>
+        /// Show User Interaction Window
+        /// </summary>
+        public void ShowWindow()
+        {
+            ShowWindowEvent();
+        }
+
         /**
          * The user interaction method must return these values.
          */
-        public enum UserResponse : int {
+        public enum Response : int {
             None,
             CertDeny,
             CertAcceptSession,
             CertAcceptAlways
         }
+
+        /// <summary>
+        /// Gets the message to display for user.
+        /// </summary>
+        public string UserMessage { get; private set; }
+        /// <summary>
+        /// Gets or sets the user response.
+        /// </summary>
+        public Response UserResponse { get; set; }
 
         /// <summary>
         /// List of temporarily accepted certs.
@@ -96,67 +102,6 @@ namespace CmisSync
         /// Persistent store of saved certificates
         /// </summary>
         private static X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-
-        public UserResponse ShowCertDialog(String msg) {
-            Logger.Debug("Showing Cert Dialog: " + msg);
-            UserResponse ret = UserResponse.None;
-            ManualResetEvent ev = new ManualResetEvent(false);
-#if __MonoCS__
-#if __COCOA__
-            BeginInvokeOnMainThread(delegate {
-                NSAlert alert = NSAlert.WithMessage("Untrusted Certificate", "No", "Always", "Just now", msg + "\n\nDo you trust this certificate?");
-                switch (alert.RunModal()) {
-                case 1:
-                    ret = UserResponse.CertDeny;
-                    break;
-                case 0:
-                    ret = UserResponse.CertAcceptAlways;
-                    break;
-                case -1:
-                    ret = UserResponse.CertAcceptSession;
-                    break;
-                default:
-                    ret = UserResponse.CertDeny;
-                    break;
-                }
-                ev.Set();
-            });
-#else
-            Application.Invoke(delegate {
-                    MessageDialog md = new MessageDialog (null, DialogFlags.Modal,
-                        MessageType.Warning, ButtonsType.None, msg +
-                        "\n\nDo you trust this certificate?") {
-                        Title = "Untrusted Certificate"
-                    };
-                    md.AddButton("No", (int)UserResponse.CertDeny);
-                    md.AddButton("Just now", (int)UserResponse.CertAcceptSession);
-                    md.AddButton("Always", (int)UserResponse.CertAcceptAlways);
-                    ret = (UserResponse)md.Run();
-                    md.Destroy();
-                    ev.Set();
-            });
-#endif
-#else
-                    var r = MessageBox.Show(msg +
-                        "\n\n"+ Properties_Resources.DoYouTrustTheCertificate,
-                        Properties_Resources.UntrustedCertificate, MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-                    switch (r) {
-                        case MessageBoxResult.Yes:
-                            ret = UserResponse.CertAcceptAlways;
-                            break;
-                        case MessageBoxResult.No:
-                            ret = UserResponse.CertDeny;
-                            break;
-                        case MessageBoxResult.Cancel:
-                            ret = UserResponse.CertAcceptSession;
-                            break;
-                    }
-                    ev.Set();
-#endif
-            ev.WaitOne();
-            Logger.Debug("Cert Dialog return:" + ret.ToString());
-            return ret;
-        }
 
         /**
          * Verification callback.
@@ -189,20 +134,20 @@ namespace CmisSync
                 return false;
             }
 
-            string msg = GetCertificateHR(certificate) +
+            UserMessage = GetCertificateHR(certificate) +
                 GetProblemMessage((CertificateProblem)error);
-
-            switch (ShowCertDialog(msg))
+            ShowWindow ();
+            switch (UserResponse)
             {
-                case UserResponse.CertDeny:
+                case Response.CertDeny:
                     // Deny this cert for the actual session
                     deniedCerts.Add(cert);
                     return false;
-                case UserResponse.CertAcceptSession:
+                case Response.CertAcceptSession:
                     // Just accept this cert for the actual session
                     acceptedCerts.Add(cert);
                     return true;
-                case UserResponse.CertAcceptAlways:
+                case Response.CertAcceptAlways:
                     // Write the newly accepted cert to the persistent store
                     store.Open(OpenFlags.ReadWrite);
                     store.Add(cert);

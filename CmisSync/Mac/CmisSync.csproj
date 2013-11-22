@@ -105,6 +105,7 @@
     </Compile>
     <Compile Include="OutlineViewDelegate.cs" />
     <Compile Include="TextFieldDelegate.cs" />
+    <Compile Include="CertPolicyWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
