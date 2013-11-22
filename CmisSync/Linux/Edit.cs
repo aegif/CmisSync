@@ -69,5 +69,20 @@ namespace CmisSync
         {
             this.Destroy();
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this window is visible.
+        /// TODO Should be implemented with the correct Windows property,
+        /// at the moment, it always returns false
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this window is visible; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsVisible {
+            get {
+                // TODO Please change it to the correct Window property if this method is needed
+                return false;
+            } private set{}
+        }
     }
 }
