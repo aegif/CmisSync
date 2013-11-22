@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Windows;
 using System.Globalization;
 using CmisSync.Lib;
+using System.Reflection;
 
 namespace CmisSync
 {
@@ -60,7 +61,8 @@ namespace CmisSync
             this.trayicon.Text = "Oris4 Sync";
             this.trayicon.ContextMenuStrip = this.traymenu;
             this.trayicon.Visible = true;
-            this.trayicon.MouseClick += NotifyIcon1_MouseClick;
+            //this.trayicon.MouseClick += NotifyIcon1_MouseClick; //Open Root sync folder (Oris4)
+            //this.trayicon.MouseClick += TrayIcon_MouseClick; //Open context menu
         }
 
 
@@ -367,7 +369,17 @@ namespace CmisSync
                 Controller.LocalFolderClicked("");
         }
 
-
+        /// <summary>
+        /// MouseEventListener function for popping up context menu.
+        /// </summary>
+        private void TrayIcon_MouseClick(Object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+                mi.Invoke(trayicon, null);
+            }
+        }
 
         /// <summary>
         /// Delegate for opening the remote folder.
