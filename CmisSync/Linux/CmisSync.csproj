@@ -58,24 +58,25 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
+    <Compile Include="About.cs" />
+    <Compile Include="CertPolicyWindow.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="Edit.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SetupWindow.cs" />
     <Compile Include="Spinner.cs" />
     <Compile Include="StatusIcon.cs" />
     <Compile Include="UI.cs" />
     <Compile Include="UIHelpers.cs" />
-    <Compile Include="About.cs" />
-    <Compile Include="..\Program.cs" />
-    <Compile Include="..\AboutController.cs" />
-    <Compile Include="..\SetupController.cs" />
-    <Compile Include="..\StatusIconController.cs" />
-    <Compile Include="..\CertPolicyHandler.cs" />
-    <Compile Include="..\Properties\Resources.Designer.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="Edit.cs" />
+    <Compile Include="..\AboutController.cs" />
+    <Compile Include="..\CertPolicyHandler.cs" />
     <Compile Include="..\ControllerBase.cs" />
     <Compile Include="..\EditController.cs">
+    <Compile Include="..\Program.cs" />
+    <Compile Include="..\Properties\Resources.Designer.cs" />
+    <Compile Include="..\SetupController.cs" />
+    <Compile Include="..\StatusIconController.cs" />
       <Link>EditController.cs</Link>
     </Compile>
   </ItemGroup>
