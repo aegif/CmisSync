@@ -86,6 +86,7 @@ namespace CmisSync.Lib.Cmis
             // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
             string[] suffixes = {
                 "/cmis/atom",
+                /* We don't need all these for oris4
                 "/alfresco/cmisatom",
                 "/alfresco/service/cmis",
                 "/cmis/resources/",
@@ -100,6 +101,7 @@ namespace CmisSync.Lib.Cmis
                 "/_vti_bin/cmis/rest?getRepositories",
                 "/Nemaki/atom/bedroom",
                 "/nuxeo/atom/cmis"
+                */
             };
             string bestUrl = null;
             // Try all suffixes
