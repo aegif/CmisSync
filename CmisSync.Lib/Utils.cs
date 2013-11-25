@@ -156,11 +156,24 @@ namespace CmisSync.Lib
             "thumbs.db", "desktop.ini", // Windows
             "cvs", ".svn", ".git", ".hg", ".bzr", // Version control local settings
             ".directory", // KDE
-            ".ds_store", ".icon\r", ".spotlight-V100", ".trashes", // Mac OS X
+            ".ds_store", ".icon\r", ".spotlight-v100", ".trashes", // Mac OS X
             ".cvsignore", ".~cvsignore", ".bzrignore", ".gitignore", // Version control ignore list
             "$~"
         };
 
+        /// <summary>
+        /// A regular expression to detemine ignored filenames.
+        /// </summary>
+        private static Regex ignoredFilenamesRegex = new Regex(
+            "(" + "^~" + // Microsoft Office temporary files start with ~
+            "|" + "^\\._" + // Mac OS X files starting with ._
+            "|" + "~$" + // gedit and emacs
+            "|" + "^\\.~lock\\." +  // LibreOffice
+            "|" + "^\\..*\\.sw[a-z]$" + // vi(m)
+            "|" + "\\(autosaved\\).graffle$" + // Omnigraffle
+            "|" + "\\(conflict copy \\d\\d\\d\\d-\\d\\d-\\d\\d\\)" + //Oris4 sync conflict
+            ")"
+        );
 
         /// <summary>
         /// Extensions of files that must be excluded from synchronization.
@@ -172,7 +185,8 @@ namespace CmisSync.Lib
             ".un~", ".swp", ".swo", // vi(m)
             ".tmp", // Microsoft Office
             ".sync", // CmisSync download
-            ".cmissync" // CmisSync database
+            ".cmissync", // CmisSync database
+            ".oris4" // Oris4
         };
 
 
@@ -187,18 +201,16 @@ namespace CmisSync.Lib
                 return false;
             }
 
-            // TODO: Consider these ones as well:
-            //    "*~", // gedit and emacs
-            //    ".~lock.*", // LibreOffice
-            //    ".*.sw[a-z]", // vi(m)
-            //    "*(Autosaved).graffle", // Omnigraffle
+            if (Path.IsPathRooted(filename))
+            {
+                filename = Path.GetFileName(filename);
+            }
 
             filename = filename.ToLower();
 
             if (ignoredFilenames.Contains(filename)
                 || ignoredExtensions.Contains(Path.GetExtension(filename))
-                || filename[0] == '~' // Microsoft Office temporary files start with ~
-                || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
+                || ignoredFilenamesRegex.IsMatch(filename) ) 
             {
                 Logger.Debug("Unworth syncing: " + filename);
                 return false;
@@ -248,6 +260,16 @@ namespace CmisSync.Lib
         private static Regex invalidFolderNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]");
 
+        /// <summary>
+        /// Get the name of the conflicted file.
+        /// </summary>
+        public static string ConflictPath(String filePath)
+        {
+            String path = Path.GetDirectoryName(filePath);
+            String filename = Path.GetFileNameWithoutExtension(filePath) + " (Conflict Copy " + DateTime.Today.ToString("yyyy-MM-dd") + ")";
+            String ext = Path.GetExtension(filePath);
+            return SuffixIfExists(path, filename, ext);
+        }
 
         /// <summary>
         /// Find an available name (potentially suffixed) for this file.
@@ -257,23 +279,23 @@ namespace CmisSync.Lib
         /// - if /dir/file (1) also exists, return /dir/file (2)
         /// - etc
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string SuffixIfExists(String path)
+        private static string SuffixIfExists(String path, String filename, String extension)
         {
-            if (!File.Exists(path))
+            string fullPath = Path.Combine(path, filename + extension);
+
+            if (!File.Exists(fullPath))
             {
-                return path;
+                return fullPath;
             }
             else
             {
                 int index = 1;
                 do
                 {
-                    string ret = path + " (" + index.ToString() + ")";
-                    if (!File.Exists(ret))
+                    fullPath = Path.Combine(path, filename + " (" + index.ToString() + ")" + extension);
+                    if (!File.Exists(fullPath))
                     {
-                        return ret;
+                        return fullPath;
                     }
                     index++;
                 }

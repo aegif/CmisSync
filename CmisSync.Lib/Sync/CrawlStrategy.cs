@@ -217,12 +217,7 @@ namespace CmisSync.Lib.Sync
                                         {
                                             Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
                                             // Rename locally modified file.
-                                            String ext = Path.GetExtension(filePath);
-                                            String filename = Path.GetFileNameWithoutExtension(filePath);
-                                            String path = Path.GetDirectoryName(filePath);
-
-                                            String NewFileName = Utils.SuffixIfExists(filename + "_" + repoinfo.User + "-version");
-                                            String newFilePath = Path.Combine(path, NewFileName);
+                                            String newFilePath = Utils.ConflictPath(filePath);
                                             File.Move(filePath, newFilePath);
 
                                             // Download server version
