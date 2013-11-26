@@ -62,7 +62,7 @@ namespace CmisSync
             this.trayicon.ContextMenuStrip = this.traymenu;
             this.trayicon.Visible = true;
             //this.trayicon.MouseClick += NotifyIcon1_MouseClick; //Open Root sync folder (Oris4)
-            //this.trayicon.MouseClick += TrayIcon_MouseClick; //Open context menu
+            this.trayicon.MouseClick += TrayIcon_MouseClick; //Open context menu
         }
 
 
