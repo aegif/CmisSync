@@ -1162,7 +1162,7 @@ namespace TestLibrary
                     synchronizedFolder.Sync();
                     FileInfo info = new FileInfo(file2);
                     return info.Exists && info.Length == length;
-                }));
+                }), String.Format("The new file \"{0}\"should exist and it should have got the length \"{1}\"", file2, length));
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
                 localFilesCount = Directory.GetFiles(localDirectory).Length;
