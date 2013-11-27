@@ -62,26 +62,35 @@ namespace CmisSync.Lib.Sync
 
 
         /// <summary>
-        /// Sync for the first time.
-        /// This will create a database and download all files.
+        /// Synchronize.
+        /// The synchronization is performed in the background, so that the UI stays usable.
         /// </summary>
-        public void DoFirstSync()
+        public override void SyncInBackground(bool syncFull)
         {
-            Logger.Info("First sync of " + this.Name);
-            if (this.synchronizedFolder != null)
+            if (this.synchronizedFolder != null) // Because it is sometimes called before the object's constructor has completed.
             {
-                this.synchronizedFolder.Sync();
+                this.synchronizedFolder.SyncInBackground(syncFull, remote_timer);
             }
         }
 
+        
         /// <summary>
         /// Synchronize.
         /// The synchronization is performed in the background, so that the UI stays usable.
         /// </summary>
         public override void SyncInBackground()
         {
-            if (this.synchronizedFolder != null) // Because it is sometimes called before the object's constructor has completed.
-                this.synchronizedFolder.SyncInBackground();
+            SyncInBackground(true);
+        }
+
+        /// <summary>
+        /// Update repository settings.
+        /// </summary>
+        public override void UpdateSettings(string password, int pollInterval, IActivityListener activityListener)
+        {
+            base.UpdateSettings(password, pollInterval, activityListener);
+            this.synchronizedFolder = new SynchronizedFolder(RepoInfo, activityListener, this);
+            Logger.Info(synchronizedFolder);
         }
 
         /// <summary>

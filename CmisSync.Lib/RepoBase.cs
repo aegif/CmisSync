@@ -47,6 +47,12 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Perform a synchronization if one is not running already.
+        /// </summary>
+        public abstract void SyncInBackground(bool syncFull);
+
+
+        /// <summary>
         /// Local disk size taken by the repository.
         /// </summary>
         public abstract double Size { get; }
@@ -132,7 +138,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Timer for watching the local and remote filesystems.
         /// </summary>
-        private Timers.Timer remote_timer = new Timers.Timer();
+        protected Timers.Timer remote_timer = new Timers.Timer();
 
 
         /// <summary>
@@ -233,7 +239,10 @@ namespace CmisSync.Lib
             this.remote_timer.Start();
         }
 
-        public void UpdateSettings(string password, int pollInterval)
+        /// <summary>
+        /// Update repository settings.
+        /// </summary>
+        public virtual void UpdateSettings(string password, int pollInterval, IActivityListener activityListener)
         {
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
@@ -271,11 +280,7 @@ namespace CmisSync.Lib
         /// </summary>
         public void ManualSync()
         {
-            this.remote_timer.Stop();
-
             SyncInBackground();
-
-            this.remote_timer.Start();
         }
 
 

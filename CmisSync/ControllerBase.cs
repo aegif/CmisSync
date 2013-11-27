@@ -278,7 +278,7 @@ namespace CmisSync
             {
                 if (repoBase.Name == repoName)
                 {
-                    repoBase.UpdateSettings(password, pollInterval);
+                    repoBase.UpdateSettings(password, pollInterval, activityListenerAggregator);
                 }
             }
         }
@@ -422,7 +422,7 @@ namespace CmisSync
 
             foreach (RepoBase repo in Repositories)
             {
-                repo.SyncInBackground();
+                repo.SyncInBackground(false);
             }
 
             if (has_unsynced_repos)

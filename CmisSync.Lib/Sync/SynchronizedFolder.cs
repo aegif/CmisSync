@@ -106,6 +106,13 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private RepoBase repo;
 
+            /// <summary>
+            /// Set for first sync.
+            /// </summary>
+            private bool firstSync = false;
+
+
+
 
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
@@ -224,6 +231,7 @@ namespace CmisSync.Lib.Sync
                 if (session == null)
                 {
                     Connect();
+                    firstSync = true;
                 }
                 if (session == null)
                 {
@@ -234,31 +242,39 @@ namespace CmisSync.Lib.Sync
                 IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
                 string localFolder = repoinfo.TargetDirectory;
 
-                //            if (ChangeLogCapability)              Disabled ChangeLog algorithm until this issue is solved: https://jira.nuxeo.com/browse/NXP-10844
-                //            {
-                //                ChangeLogSync(remoteFolder);
-                //            }
-                //            else
-                //            {
-                // No ChangeLog capability, so we have to crawl remote and local folders.
-                // CrawlSync(remoteFolder, localFolder);
-
-                if (!repo.Watcher.EnableRaisingEvents)
+                if (firstSync)
                 {
+                    CrawlSync(remoteFolder, localFolder);
                     repo.Watcher.RemoveAll();
                     repo.Watcher.EnableRaisingEvents = true;
-                    syncFull = false;
+                    firstSync = false;
                 }
-
-                syncFull = CrawlSync(remoteFolder, localFolder);
-
-                if (syncFull)
+                else
                 {
-                    WatcherSync(remoteFolderPath, localFolder);
-                    foreach (string name in repo.Watcher.GetChangeList())
-                    {
-                        Logger.Debug(String.Format("Change name {0} type {1}", name, repo.Watcher.GetChangeType(name)));
-                    }
+                    //if (ChangeLogCapability) //ChangeLog not supported at this time...
+                    //{
+                    //    if (syncFull)
+                    //    {
+                    //        ChangeLogSync(remoteFolder);
+                    //    }
+                    //    else
+                    //    {
+                    //        ChangeLogSync(remoteFolder);
+                    //        WatcherSync(remoteFolderPath, localFolder);
+                    //    }
+                    //}
+                    //else
+                    //{
+                        // No ChangeLog capability, so we have to crawl remote and local folders.
+                        if (syncFull)
+                        {
+                            CrawlSync(remoteFolder, localFolder);
+                        }
+                        else
+                        {
+                            WatcherSync(remoteFolderPath, localFolder);
+                        }
+                    //}
                 }
             }
 
@@ -266,39 +282,45 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Sync in the background.
             /// </summary>
-            public void SyncInBackground()
+            public void SyncInBackground(bool fullSync, System.Timers.Timer timer)
             {
                 if (this.syncing)
                 {
-                    //Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
+                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
                     return;
                 }
                 this.syncing = true;
+                this.syncFull = fullSync;
 
                 using (BackgroundWorker bw = new BackgroundWorker())
                 {
                     bw.DoWork += new DoWorkEventHandler(
                         delegate(Object o, DoWorkEventArgs args)
                         {
+                            if (fullSync)
+                            {
+                                timer.Stop();
+                            }
                             Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
-#if !DEBUG
-                        try
-                        {
-#endif
-                            Sync();
-#if !DEBUG
-                        }
-                        catch (CmisBaseException e)
-                        {
-                            Logger.Error("CMIS exception while syncing:", e);
-                        }
-#endif
+                            try
+                            {
+                                Sync();
+                            }
+                            catch (CmisBaseException e)
+                            {
+                                Logger.Error("CMIS exception while syncing:", e);
+                            }
                         }
                     );
                     bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
                         delegate(object o, RunWorkerCompletedEventArgs args)
                         {
                             this.syncing = false;
+                            Logger.Info("Sync Complete: " + repoinfo.TargetDirectory);
+                            if (fullSync)
+                            {
+                                timer.Start();
+                            }
                         }
                     );
                     bw.RunWorkerAsync();
