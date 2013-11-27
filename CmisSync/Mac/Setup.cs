@@ -57,7 +57,11 @@ namespace CmisSync {
         private NSImage WarningImage;
         private NSImageView WarningImageView;
         private NSOutlineView OutlineView;
+        private CmisTreeDataSource DataSource;
+        private List<RootFolder> Repositories;
         private NSScrollView ScrollView;
+        private CmisOutlineController OutlineController;
+        private OutlineViewDelegate DataDelegate;
 
 
         public Setup () : base ()
@@ -349,10 +353,13 @@ namespace CmisSync {
                         {
                             AddressTextField.StringValue = cmisServer.Url.ToString();
                             WarningTextField.StringValue = "";
-                            Controller.Add1PageCompleted(new Uri(AddressTextField.StringValue), UserTextField.StringValue, PasswordTextField.StringValue);
                         }
+                    });
+                    Thread.Sleep(1000); //TODO workaround for COCOA thread issue to crash
+                    InvokeOnMainThread(delegate {
                         ContinueButton.Enabled = true;
                         CancelButton.Enabled = true;
+                        Controller.Add1PageCompleted(cmisServer.Url, credentials.UserName, credentials.Password.ToString());
                     });
                 });
                 ContinueButton.Enabled = false;
@@ -387,25 +394,9 @@ namespace CmisSync {
         {
             Header = Properties_Resources.Which;
             Description = "";
-            OutlineView = new NSOutlineView() {
-                Frame = new RectangleF(0, 0, 0, 0),
-                RowHeight = 34,
-                IntercellSpacing = new SizeF(8, 12),
-                HeaderView = null,
-                Delegate = new OutlineViewDelegate()
-            };
-            OutlineView.AddColumn(new NSTableColumn() {
-                Identifier = "colName",
-                Editable = false
-            });
-            ScrollView = new NSScrollView() {
-                Frame = new RectangleF(190, Frame.Height - 340, 408, 255),
-                DocumentView = OutlineView,
-                HasVerticalScroller = true,
-                BorderType = NSBorderType.BezelBorder
-            };
             bool firstRepo = true;
-            List<RootFolder> repos = new List<RootFolder>();
+            Repositories = new List<RootFolder>();
+            Dictionary<string,AsyncNodeLoader> loader = new Dictionary<string,AsyncNodeLoader> ();
             foreach (KeyValuePair<String, String> repository in Controller.repositories)
             {
                 RootFolder repo = new RootFolder() {
@@ -413,16 +404,46 @@ namespace CmisSync {
                     Id = repository.Key,
                     Address = Controller.saved_address.ToString()
                 };
+                Repositories.Add(repo);
                 if (firstRepo)
                 {
                     repo.Selected = true;
                     firstRepo = false;
                 }
-                repos.Add(repo);
+                CmisRepoCredentials cred = new CmisRepoCredentials()
+                {
+                    UserName = Controller.saved_user,
+                    Password = Controller.saved_password,
+                    Address = Controller.saved_address,
+                    RepoId = repository.Key
+                };
+                AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate);
+                asyncLoader.Load(repo);
+                loader.Add(repo.Id, asyncLoader);
             }
-            CmisTree.CmisTreeDataSource DataSource = new CmisTree.CmisTreeDataSource(repos);
-            OutlineView.DataSource = DataSource;
-            OutlineView.ReloadData();
+            DataSource = new CmisTree.CmisTreeDataSource(Repositories);
+            DataDelegate = new OutlineViewDelegate ();
+//            OutlineView = new NSOutlineView() {
+//                Frame = new RectangleF(0, 0, 0, 0),
+//                RowHeight = 34,
+//                IntercellSpacing = new SizeF(8, 12),
+//                HeaderView = null,
+//                Delegate = DataDelegate,
+//                DataSource = DataSource,
+//                AutoresizesOutlineColumn = true
+//            };
+//            OutlineView.AddColumn(new NSTableColumn() {
+//                Identifier = "1",
+//                Editable = false
+//            });
+//            ScrollView = new NSScrollView() {
+//                Frame = new RectangleF(190, Frame.Height - 340, 408, 255),
+//                DocumentView = OutlineView,
+//                HasVerticalScroller = true,
+//                BorderType = NSBorderType.BezelBorder
+//            };
+//            OutlineView.ReloadData();
+            OutlineController = new CmisOutlineController (DataSource,DataDelegate);
             ContinueButton = new NSButton() {
                 Title = Properties_Resources.Continue,
                 Enabled = false
@@ -433,20 +454,16 @@ namespace CmisSync {
             NSButton BackButton = new NSButton() {
                 Title = Properties_Resources.Back
             };
-            (OutlineView.Delegate as OutlineViewDelegate).SelectionChanged += delegate
+            DataDelegate.SelectionChanged += delegate
             {
-                InvokeOnMainThread(delegate
-                {
-                    if(OutlineView.SelectedRow >= 0)
-                    {
-                        Node selectedNode = ((NSNodeObject)OutlineView.ItemAtRow(OutlineView.SelectedRow)).Node;
-                        while (selectedNode.Parent != null)
-                        selectedNode = selectedNode.Parent;
-                        RootFolder root = selectedNode as RootFolder;
-                        if (root != null)
-                            ContinueButton.Enabled = true;
-                        else
-                            ContinueButton.Enabled = false;
+                InvokeOnMainThread(delegate {
+                    foreach(RootFolder root in Repositories) {
+                        DataSource.UpdateCmisTree(root);
+                    }
+                    OutlineController.OutlineView().ReloadData();
+                    NSOutlineView view = OutlineController.OutlineView();
+                    if(view.SelectedRow >=0) {
+                        ContinueButton.Enabled = true;
                     } else {
                         ContinueButton.Enabled = false;
                     }
@@ -454,12 +471,12 @@ namespace CmisSync {
             };
             ContinueButton.Activated += delegate
             {
-                InvokeOnMainThread(delegate
-                {
-                    Node selectedNode = ((NSNodeObject)OutlineView.ItemAtRow(OutlineView.SelectedRow)).Node;
-                    while (selectedNode.Parent != null)
-                        selectedNode = selectedNode.Parent;
-                    RootFolder root = selectedNode as RootFolder;
+                InvokeOnMainThread(delegate {
+                    NSOutlineView view = OutlineController.OutlineView();
+                    NSCmisTree cmis = (NSCmisTree)(view.ItemAtRow(view.SelectedRow));
+                    while (cmis.Parent != null)
+                        cmis = cmis.Parent;
+                    RootFolder root = Repositories.Find(x=>x.Name.Equals(cmis.Name));
                     if (root != null)
                     {
                         Controller.saved_repository = root.Id;
@@ -488,7 +505,8 @@ namespace CmisSync {
                     ContinueButton.Enabled = button_enabled;
                 });
             };
-            ContentView.AddSubview(ScrollView);
+            OutlineController.View.Frame = new RectangleF (190, 60, 400, 240);
+            ContentView.AddSubview(OutlineController.View);
             Buttons.Add(ContinueButton);
             Buttons.Add(BackButton);
             Buttons.Add(CancelButton);

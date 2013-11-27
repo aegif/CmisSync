@@ -106,6 +106,11 @@
     <Compile Include="OutlineViewDelegate.cs" />
     <Compile Include="TextFieldDelegate.cs" />
     <Compile Include="CertPolicyWindow.cs" />
+    <Compile Include="CmisTree\CmisOutline.cs" />
+    <Compile Include="CmisTree\CmisOutlineController.cs" />
+    <Compile Include="CmisTree\CmisOutline.designer.cs">
+      <DependentUpon>CmisOutline.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -221,6 +226,7 @@
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainMenu.xib" />
+    <InterfaceDefinition Include="CmisTree\CmisOutline.xib" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Properties\Properties.Resources.cs.resx" />
