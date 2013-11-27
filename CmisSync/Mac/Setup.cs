@@ -359,7 +359,10 @@ namespace CmisSync {
                     InvokeOnMainThread(delegate {
                         ContinueButton.Enabled = true;
                         CancelButton.Enabled = true;
-                        Controller.Add1PageCompleted(cmisServer.Url, credentials.UserName, credentials.Password.ToString());
+                        if (Controller.repositories != null)
+                        {
+                            Controller.Add1PageCompleted(cmisServer.Url, credentials.UserName, credentials.Password.ToString());
+                        }
                     });
                 });
                 ContinueButton.Enabled = false;
