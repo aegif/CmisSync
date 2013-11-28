@@ -56,11 +56,9 @@ namespace CmisSync {
         private NSTextField WarningTextField;
         private NSImage WarningImage;
         private NSImageView WarningImageView;
-        private NSOutlineView OutlineView;
-        private CmisTreeDataSource DataSource;
         private List<RootFolder> Repositories;
-        private NSScrollView ScrollView;
         private CmisOutlineController OutlineController;
+        private CmisTreeDataSource DataSource;
         private OutlineViewDelegate DataDelegate;
 
 
@@ -420,32 +418,18 @@ namespace CmisSync {
                     Address = Controller.saved_address,
                     RepoId = repository.Key
                 };
-                AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate);
+                AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate, PredefinedNodeLoader.CheckSubFolderDelegate);
+                asyncLoader.UpdateNodeEvent += delegate {
+                    InvokeOnMainThread(delegate {
+                        DataSource.UpdateCmisTree(repo);
+                        OutlineController.OutlineView().ReloadData();
+                    });
+                };
                 asyncLoader.Load(repo);
                 loader.Add(repo.Id, asyncLoader);
             }
             DataSource = new CmisTree.CmisTreeDataSource(Repositories);
             DataDelegate = new OutlineViewDelegate ();
-//            OutlineView = new NSOutlineView() {
-//                Frame = new RectangleF(0, 0, 0, 0),
-//                RowHeight = 34,
-//                IntercellSpacing = new SizeF(8, 12),
-//                HeaderView = null,
-//                Delegate = DataDelegate,
-//                DataSource = DataSource,
-//                AutoresizesOutlineColumn = true
-//            };
-//            OutlineView.AddColumn(new NSTableColumn() {
-//                Identifier = "1",
-//                Editable = false
-//            });
-//            ScrollView = new NSScrollView() {
-//                Frame = new RectangleF(190, Frame.Height - 340, 408, 255),
-//                DocumentView = OutlineView,
-//                HasVerticalScroller = true,
-//                BorderType = NSBorderType.BezelBorder
-//            };
-//            OutlineView.ReloadData();
             OutlineController = new CmisOutlineController (DataSource,DataDelegate);
             ContinueButton = new NSButton() {
                 Title = Properties_Resources.Continue,
@@ -460,16 +444,39 @@ namespace CmisSync {
             DataDelegate.SelectionChanged += delegate
             {
                 InvokeOnMainThread(delegate {
-                    foreach(RootFolder root in Repositories) {
-                        DataSource.UpdateCmisTree(root);
-                    }
-                    OutlineController.OutlineView().ReloadData();
                     NSOutlineView view = OutlineController.OutlineView();
-                    if(view.SelectedRow >=0) {
+                    if (view.SelectedRow >= 0) {
                         ContinueButton.Enabled = true;
                     } else {
                         ContinueButton.Enabled = false;
                     }
+                });
+            };
+            DataDelegate.ItemExpanded += delegate(NSNotification notification)
+            {
+                InvokeOnMainThread(delegate {
+                    NSCmisTree cmis = notification.UserInfo["NSObject"] as NSCmisTree;
+                    if (cmis == null) {
+                        Console.WriteLine("ItemExpanded Error");
+                        return;
+                    }
+
+                    NSCmisTree cmisRoot = cmis;
+                    while (cmisRoot.Parent != null) {
+                        cmisRoot = cmisRoot.Parent;
+                    }
+                    RootFolder root = Repositories.Find(x=>x.Name.Equals(cmisRoot.Name));
+                    if (root == null) {
+                        Console.WriteLine("ItemExpanded find root Error");
+                        return;
+                    }
+
+                    Node node = cmis.GetNode(root);
+                    if (node == null) {
+                        Console.WriteLine("ItemExpanded find node Error");
+                        return;
+                    }
+                    loader[root.Id].Load(node);
                 });
             };
             ContinueButton.Activated += delegate

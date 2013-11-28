@@ -12,6 +12,7 @@ namespace CmisSync.CmisTree
 {
     public class NSCmisTree : NSObject {
         public string Name = string.Empty;
+        public LoadingStatus Status = LoadingStatus.START;
         public NSCmisTree Parent = null;
         public IList<NSCmisTree> Children = new List<NSCmisTree> ();
         public override string ToString()
@@ -27,6 +28,7 @@ namespace CmisSync.CmisTree
         public NSCmisTree(Node root)
         {
             Name = root.Name;
+            Status = root.Status;
             Parent = null;
             foreach (Node node in root.Children) {
                 NSCmisTree child = new NSCmisTree (node);
@@ -36,6 +38,27 @@ namespace CmisSync.CmisTree
         }
         public NSCmisTree()
         {
+        }
+        public Node GetNode(Node root)
+        {
+            NSCmisTree cmis = this;
+            Stack<string> paths = new Stack<string> ();
+            do {
+                paths.Push(cmis.Name);
+                cmis = cmis.Parent;
+            } while (cmis != null);
+
+            Node node = root;
+            do {
+                string current = paths.Pop ();
+                if (current != node.Name) {
+                    return null;
+                }
+                if (paths.Count == 0) {
+                    return node;
+                }
+                node = node.Children.First (x => x.Name.Equals (paths.Peek()));
+            } while (true);
         }
     }
 
@@ -161,14 +184,21 @@ namespace CmisSync.CmisTree
                 UpdateItem (ref item);
                 Console.WriteLine ("GetObjectValue " + item);
                 if (item == null) {
-                    return (NSString)"remote";
+                    return (NSString)"";
                 }
                 NSCmisTree cmis = item as NSCmisTree;
                 if (cmis == null) {
                     Console.WriteLine ("GetObjectValue Error");
                     return (NSString)"";
                 }
-                return (NSString)cmis.Name;
+                if (tableColumn.Identifier == "Name") {
+                    return (NSString)cmis.Name;
+                }
+                if (tableColumn.Identifier == "Status") {
+                    return (NSString)cmis.Status.ToString ();
+                }
+                Console.WriteLine ("GetObjectValue Error");
+                return (NSString)"";
             }
         }
 

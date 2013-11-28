@@ -673,7 +673,7 @@ namespace CmisSync
                                         Address = Controller.saved_address,
                                         RepoId = repository.Key
                                     };
-                                    AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate);
+                                    AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate, PredefinedNodeLoader.CheckSubFolderDelegate);
                                     asyncLoader.Load(repo);
                                     loader.Add(repo.Id, asyncLoader);
                                 }

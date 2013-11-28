@@ -30,7 +30,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn width="101" minWidth="16" maxWidth="1000" id="rK7-yF-3dU">
+                                    <tableColumn identifier="Name" width="101" minWidth="16" maxWidth="1000" id="rK7-yF-3dU">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -43,7 +43,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                     </tableColumn>
-                                    <tableColumn width="291" minWidth="40" maxWidth="1000" id="XAp-Gr-ovM">
+                                    <tableColumn identifier="Status" width="291" minWidth="40" maxWidth="1000" id="XAp-Gr-ovM">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -76,5 +76,6 @@
                 </scrollView>
             </subviews>
         </customView>
+        <userDefaultsController representsSharedInstance="YES" id="THt-vp-Eaz"/>
     </objects>
 </document>
