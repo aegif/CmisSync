@@ -43,6 +43,7 @@ namespace CmisSync
         private string remotePath;
         private string localPath;
 
+        private CmisOutlineController OutlineController;
 
         /// <summary>
         /// Constructor
@@ -64,25 +65,26 @@ namespace CmisSync
         /// </summary>
         private void CreateEdit()
         {
-            NSOutlineView outlineView = new NSOutlineView () {
-                Frame            = new RectangleF (0, 0, 0, 0),
-                RowHeight        = 34,
-                IntercellSpacing = new SizeF (8, 12),
-                HeaderView       = null,
-                Delegate         = new OutlineViewDelegate ()
-            };
-
-            outlineView.AddColumn(new NSTableColumn(){
-                Identifier = "colName",
-                Editable = false
-            });
-
-            NSScrollView ScrollView = new NSScrollView () {
-                Frame               = new RectangleF (190, Frame.Height - 340, 408, 255),
-                DocumentView        = outlineView,
-                HasVerticalScroller = true,
-                BorderType          = NSBorderType.BezelBorder
-            };
+            OutlineViewDelegate DataDelegate = new OutlineViewDelegate ();
+//            NSOutlineView outlineView = new NSOutlineView () {
+//                Frame            = new RectangleF (0, 0, 0, 0),
+//                RowHeight        = 34,
+//                IntercellSpacing = new SizeF (8, 12),
+//                HeaderView       = null,
+//                Delegate         = DataDelegate
+//            };
+//
+//            outlineView.AddColumn(new NSTableColumn(){
+//                Identifier = "colName",
+//                Editable = false
+//            });
+//
+//            NSScrollView ScrollView = new NSScrollView () {
+//                Frame               = new RectangleF (190, Frame.Height - 340, 408, 255),
+//                DocumentView        = outlineView,
+//                HasVerticalScroller = true,
+//                BorderType          = NSBorderType.BezelBorder
+//            };
 
             RootFolder repo = new RootFolder()
             {
@@ -98,8 +100,9 @@ namespace CmisSync
             List<RootFolder> repos = new List<RootFolder>();
             repos.Add(repo);
             CmisTree.CmisTreeDataSource DataSource = new CmisTree.CmisTreeDataSource(repos);
-            outlineView.DataSource = DataSource;
-            outlineView.ReloadData ();
+//            outlineView.DataSource = DataSource;
+//            outlineView.ReloadData ();
+            OutlineController = new CmisOutlineController (DataSource, DataDelegate);
 
             // Add selection handler
             /*treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
@@ -112,7 +115,8 @@ namespace CmisSync
                 }
             }));*/
 
-            ContentView.AddSubview(ScrollView);
+//            ContentView.AddSubview(ScrollView);
+            ContentView.AddSubview (OutlineController.View);
 
             Controller.CloseWindowEvent += delegate
             {
@@ -158,22 +162,16 @@ namespace CmisSync
             };
 
 
-            (outlineView.Delegate as OutlineViewDelegate).SelectionChanged += delegate {
+            DataDelegate.SelectionChanged += delegate {
                 InvokeOnMainThread (delegate {
-                    if(outlineView.SelectedRow >= 0)
+                    NSOutlineView view = OutlineController.OutlineView();
+                    if(view.SelectedRow>=0)
                     {
-                    NSNodeObject node = outlineView.ItemAtRow(outlineView.SelectedRow) as NSNodeObject;
-                    if(node != null) {
-                        Node selectedNode = node.Node;
-                        while(selectedNode.Parent != null)
-                        selectedNode = selectedNode.Parent;
-                        RootFolder root = selectedNode as RootFolder;
-                        if(root != null){
-                            finish_button.Enabled = true;
-                        }
-                    }
-                    }else
+                        finish_button.Enabled = true;
+                    } else 
+                    {
                         finish_button.Enabled = false;
+                    }
                 });
             };
 

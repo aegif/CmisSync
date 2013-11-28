@@ -18,7 +18,9 @@ namespace CmisSync.CmisTree
         private BackgroundWorker worker;
         private Node actualNode;
         private Stack<Node> toBeLoaded = new Stack<Node>();
+        private Object lockToBeLoaded = new object();
         private LoadChildrenDelegate method;
+        private CheckChildrenDelegate check;
 
         /// <summary>
         /// Function for loading children of the given node
@@ -29,18 +31,29 @@ namespace CmisSync.CmisTree
         public delegate List<Node> LoadChildrenDelegate(CmisRepoCredentials credentials, Node root );
 
         /// <summary>
+        /// Function for check load children finished of the given node
+        /// </summary>
+        public delegate bool CheckChildrenDelegate(Node root);
+
+        /// <summary>
+        /// Action after one Node is updated
+        /// </summary>
+        public event Action UpdateNodeEvent = delegate { };
+
+        /// <summary>
         /// This class can be used to load children nodes asynchronous in another thread
         /// </summary>
         /// <param name="root">The repository Node</param>
         /// <param name="credentials">The server crendentials to load children for the given Cmis Repo</param>
         /// <param name="method">Function for loading nodes</param>
-        public AsyncNodeLoader(RootFolder root, CmisRepoCredentials credentials, LoadChildrenDelegate method)
+        public AsyncNodeLoader(RootFolder root, CmisRepoCredentials credentials, LoadChildrenDelegate method, CheckChildrenDelegate check)
         {
             this.root = root;
             repoCredentials = credentials;
             this.actualNode = null;
             this.worker = new BackgroundWorker();
             this.method = method;
+            this.check = check;
             this.worker.WorkerReportsProgress = false;
             this.worker.WorkerSupportsCancellation = true;
             this.worker.DoWork += new DoWorkEventHandler(DoWork);
@@ -53,7 +66,12 @@ namespace CmisSync.CmisTree
             {
                 try
                 {
-                    Node next = this.toBeLoaded.Pop();
+                    Node next = null;
+                    lock(lockToBeLoaded) {
+                        do {
+                            next = this.toBeLoaded.Pop();
+                        } while (check(next));
+                    }
                     this.actualNode = next;
                     this.actualNode.Status = actualNode.Status!= LoadingStatus.DONE?LoadingStatus.LOADING:LoadingStatus.DONE;
                     this.worker.RunWorkerAsync();
@@ -69,8 +87,10 @@ namespace CmisSync.CmisTree
         /// <param name="node">to be loaded next</param>
         public void Load(Node node)
         {
-            if(node.Path != null)
-                toBeLoaded.Push(node);
+            if (node.Path != null)
+                lock (lockToBeLoaded) {
+                    toBeLoaded.Push (node);
+                }
             if (!this.worker.IsBusy)
                 Load();
         }
@@ -106,6 +126,7 @@ namespace CmisSync.CmisTree
                 this.actualNode.Status = LoadingStatus.DONE;
                 MergeFolderTrees(this.actualNode, e.Result as List<Node>);
             }
+            UpdateNodeEvent ();
             Load();
         }
 
@@ -165,6 +186,31 @@ namespace CmisSync.CmisTree
             foreach (Node child in children)
                 child.Parent = root;
             return children;
+        }
+
+        /// <summary>
+        /// Check if the tree for remote <c>root</c> is load finished for the depth of 2
+        /// </summary>
+        /// <returns><c>true</c>, if sub folder delegate was checked, <c>false</c> otherwise.</returns>
+        public static bool CheckSubFolderDelegate(Node root)
+        {
+            return CheckSubFolder (root, 2);
+        }
+
+        private static bool CheckSubFolder(Node root, int level)
+        {
+            if (root.Status != LoadingStatus.DONE) {
+                return false;
+            }
+            --level;
+            if (level > 0) {
+                foreach (Node child in root.Children) {
+                    if (!CheckSubFolder (child, level - 1)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         /*

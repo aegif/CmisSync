@@ -24,6 +24,9 @@ SOURCES =  \
 	AppDelegate.cs \
 	Badger.cs \
 	CertPolicyWindow.cs \
+	CmisTree/CmisOutline.cs \
+	CmisTree/CmisOutline.designer.cs \
+	CmisTree/CmisOutlineController.cs \
 	CmisTree/CmisTreeDataSource.cs \
 	Controller.cs \
 	Edit.cs \

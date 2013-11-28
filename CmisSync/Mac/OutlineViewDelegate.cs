@@ -31,13 +31,18 @@ namespace CmisSync {
 
     public class OutlineViewDelegate : NSOutlineViewDelegate {
 
-        public event SelectionChangedHandler SelectionChanged;
-        public delegate void SelectionChangedHandler ();
+        public delegate void NotificationDelegate (NSNotification notification);
+        public event NotificationDelegate SelectionChanged = delegate {};
+        public event NotificationDelegate ItemExpanded = delegate {};
 
         public override void SelectionDidChange (NSNotification notification)
         {
-            if (SelectionChanged != null)
-                SelectionChanged ();
+            SelectionChanged (notification);
+        }
+
+        public override void ItemDidExpand(NSNotification notification)
+        {
+            ItemExpanded (notification);
         }
     }
 }
