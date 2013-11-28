@@ -20,67 +20,67 @@
       <Directory Id="ProgramFilesFolder" Name="PFiles">
           <Directory Id="INSTALLDIR" Name="Oris4 Sync">
             <Component Id="Oris4Sync.exe" Guid="bab5a922-b5c4-4958-ab79-5e303b767a61">
-              <File Id="Oris4Sync.exe" Name="Oris4Sync.exe" Source="!(wix.root)\CmisSync\Windows\bin\Debug\Oris4Sync.exe" KeyPath="yes" DiskId="1" />
+              <File Id="Oris4Sync.exe" Name="Oris4Sync.exe" Source="!(wix.root)\bin\Oris4Sync.exe" KeyPath="yes" DiskId="1" />
             </Component>
             <Component Id="Oris4Sync.Console.exe" Guid="ee872f29-46a0-469a-82f4-b4047957fd7a">
-              <File Id="Oris4Sync.Console.exe" Name="Oris4Sync.Console.exe" Source="!(wix.root)\CmisSync.Console\bin\Debug\Oris4Sync.Console.exe" KeyPath="yes" DiskId="1" />
+              <File Id="Oris4Sync.Console.exe" Name="Oris4Sync.Console.exe" Source="!(wix.root)\bin\Oris4Sync.Console.exe" KeyPath="yes" DiskId="1" />
             </Component>
             <Component Id="Libraries" Guid="f982a0bb-824d-4835-921d-e51b47b8598b">
-              <File Id="CmisSync.Lib.dll" Name="CmisSync.Lib.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\CmisSync.Lib.dll" DiskId="1" />
-              <File Id="DotCMIS.dll" Name="DotCMIS.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\DotCMIS.dll" DiskId="1" />
-              <File Id="log4net.dll" Name="log4net.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\log4net.dll" DiskId="1" />
-              <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\Newtonsoft.Json.dll" DiskId="1" />
-              <!--<File Id="SQLite.Interop.dll" Name="SQLite.Interop.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\SQLite.Interop.dll" DiskId="1" />-->
-              <File Id="System.Data.SQLite.dll" Name="System.Data.SQLite.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\System.Data.SQLite.dll" DiskId="1" />
-              <File Id="cmissync_app.ico" Name="cmissync.ico" Source="!(wix.root)\CmisSync\Windows\Pixmaps\cmissync-app.ico" DiskId="1" />
+              <File Id="CmisSync.Lib.dll" Name="CmisSync.Lib.dll" Source="!(wix.root)\bin\CmisSync.Lib.dll" DiskId="1" />
+              <File Id="DotCMIS.dll" Name="DotCMIS.dll" Source="!(wix.root)\bin\DotCMIS.dll" DiskId="1" />
+              <File Id="log4net.dll" Name="log4net.dll" Source="!(wix.root)\bin\log4net.dll" DiskId="1" />
+              <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="!(wix.root)\bin\Newtonsoft.Json.dll" DiskId="1" />
+              <!--<File Id="SQLite.Interop.dll" Name="SQLite.Interop.dll" Source="!(wix.root)\bin\SQLite.Interop.dll" DiskId="1" />-->
+              <File Id="System.Data.SQLite.dll" Name="System.Data.SQLite.dll" Source="!(wix.root)\bin\System.Data.SQLite.dll" DiskId="1" />
+              <File Id="cmissync_app.ico" Name="cmissync.ico" Source="!(wix.root)\bin\cmissync-app.ico" DiskId="1" />
             </Component>
             <Directory Id="DIR_x86" Name="x86">
               <Component Id="COMP_x86" Guid="5623a717-035d-45fd-904c-4ed38a3955f1">
                 <CreateFolder />
-                <File Id="FILE_x86" Name="SQLite.Interop.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\x86\SQLite.Interop.dll" DiskId="1" />
+                <File Id="FILE_x86" Name="SQLite.Interop.dll" Source="!(wix.root)\bin\x86\SQLite.Interop.dll" DiskId="1" />
               </Component>
             </Directory>
             <Directory Id="DIR_x64" Name="x64">
               <Component Id="COMP_x64" Guid="378b4152-6ed8-443a-bfb5-109662a9f54e">
                 <CreateFolder />
-                <File Id="FILE_x64" Name="SQLite.Interop.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\x64\SQLite.Interop.dll" DiskId="1" />
+                <File Id="FILE_x64" Name="SQLite.Interop.dll" Source="!(wix.root)\bin\x64\SQLite.Interop.dll" DiskId="1" />
               </Component>
             </Directory>
             <Directory Id="localeDirectoryDE" Name="de">
               <Component Id="localeComponentDE" Guid="2ee0c16c-f4b8-4a8c-8d07-b3a73fc27f59">
                 <CreateFolder />
-                <File Id="localeFileDE" Name="Oris4Sync.resources.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\de\Oris4Sync.resources.dll" DiskId="1" />
+                <File Id="localeFileDE" Name="Oris4Sync.resources.dll" Source="!(wix.root)\bin\de\Oris4Sync.resources.dll" DiskId="1" />
               </Component>
             </Directory>
             <Directory Id="localeDirectoryES" Name="es-ES">
               <Component Id="localeComponentES" Guid="7f2303c0-a119-49d1-be73-17acb9637c76">
                 <CreateFolder />
-                <File Id="localeFileES" Name="Oris4Sync.resources.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\es-ES\Oris4Sync.resources.dll" DiskId="1" />
+                <File Id="localeFileES" Name="Oris4Sync.resources.dll" Source="!(wix.root)\bin\es-ES\Oris4Sync.resources.dll" DiskId="1" />
               </Component>
             </Directory>
             <Directory Id="localeDirectoryFR" Name="fr">
               <Component Id="localeComponentFR" Guid="01612d5d-6c9d-46e9-96c5-7105bbbea7db">
                 <CreateFolder />
-                <File Id="localeFileFR" Name="Oris4Sync.resources.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\fr\Oris4Sync.resources.dll" DiskId="1" />
+                <File Id="localeFileFR" Name="Oris4Sync.resources.dll" Source="!(wix.root)\bin\fr\Oris4Sync.resources.dll" DiskId="1" />
               </Component>
             </Directory>
             <Directory Id="localeDirectoryJA" Name="ja">
               <Component Id="localeComponentJA" Guid="8d77c457-54b0-41d6-9f1c-c91338b25505">
                 <CreateFolder />
-                <File Id="localeFileJA" Name="Oris4Sync.resources.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\ja\Oris4Sync.resources.dll" DiskId="1" />
+                <File Id="localeFileJA" Name="Oris4Sync.resources.dll" Source="!(wix.root)\bin\ja\Oris4Sync.resources.dll" DiskId="1" />
               </Component>
             </Directory>
             <Directory Id="localeDirectoryUK" Name="uk">
               <Component Id="localeComponentUK" Guid="6de4a765-0904-421b-b71c-8c7bef136a92">
                 <CreateFolder />
-                <File Id="localeFileUK" Name="Oris4Sync.resources.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\uk\Oris4Sync.resources.dll" DiskId="1" />
+                <File Id="localeFileUK" Name="Oris4Sync.resources.dll" Source="!(wix.root)\bin\uk\Oris4Sync.resources.dll" DiskId="1" />
               </Component>
             </Directory>
             <!-- TODO Somehow the following is not generated by Visual C#
             <Directory Id="localeDirectoryTLH" Name="tlh-KX">
               <Component Id="localeComponentTLH" Guid="340e5758-5420-4fe4-a291-5d920a63ca70">
                 <CreateFolder />
-                <File Id="localeFileTLH" Name="Oris4Sync.resources.dll" Source="!(wix.root)\CmisSync\Windows\bin\Debug\tlh-KX\Oris4Sync.resources.dll" DiskId="1" />
+                <File Id="localeFileTLH" Name="Oris4Sync.resources.dll" Source="!(wix.root)\bin\tlh-KX\Oris4Sync.resources.dll" DiskId="1" />
               </Component>
             </Directory>
             -->
@@ -155,7 +155,7 @@
     
     <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
     
-    <Icon Id="Oris4Sync.exe_Icon" SourceFile="!(wix.root)\CmisSync\Windows\Pixmaps\cmissync-app.ico" />
+    <Icon Id="Oris4Sync.exe_Icon" SourceFile="!(wix.root)\bin\cmissync-app.ico" />
     <Property Id="ARPPRODUCTICON" Value="Oris4Sync.exe_Icon" />
     <MajorUpgrade
       Schedule="afterInstallInitialize"
