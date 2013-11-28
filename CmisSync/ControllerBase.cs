@@ -459,7 +459,7 @@ namespace CmisSync
             repoInfo = new RepoInfo(name, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = address;
             repoInfo.User = user;
-            repoInfo.Password = password;
+            repoInfo.Password = new CmisSync.Auth.CmisPassword(password);
             repoInfo.RepoID = repository;
             repoInfo.RemotePath = remote_path;
             repoInfo.TargetDirectory = local_path;

@@ -375,7 +375,7 @@ namespace CmisSync.Lib
                 {
                     RepoInfo repoInfo = new RepoInfo(DisplayName, ConfigManager.CurrentConfig.ConfigPath);
                     repoInfo.User = UserName;
-                    repoInfo.Password = new CmisSync.Lib.RepoInfo.CmisPassword();
+                    repoInfo.Password = new CmisSync.Auth.CmisPassword();
                     repoInfo.Password.ObfuscatedPassword = ObfuscatedPassword;
                     repoInfo.Address = RemoteUrl;
                     repoInfo.RepoID = RepositoryId;

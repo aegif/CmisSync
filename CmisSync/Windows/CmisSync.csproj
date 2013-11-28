@@ -255,6 +255,10 @@
     <EmbeddedResource Include="Pixmaps\tutorial-slide-3.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">
+      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
+      <Name>CmisSync.Auth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>CmisSync.Lib</Name>

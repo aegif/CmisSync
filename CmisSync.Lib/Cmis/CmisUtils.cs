@@ -147,20 +147,11 @@ namespace CmisSync.Lib.Cmis
             {
                 return result;
             }
-            
-            // Create session factory.
-            SessionFactory factory = SessionFactory.NewInstance();
-
-            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = url.ToString();
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
 
             IList<IRepository> repositories;
             try
             {
-                repositories = factory.GetRepositories(cmisParameters);
+                repositories = Auth.Auth.GetCmisRepositories(url, user, password);
             }
             catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
@@ -203,19 +194,12 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         /// <returns>Full path of each sub-folder, including leading slash.</returns>
         static public string[] GetSubfolders(string repositoryId, string path,
-            string address, string user, string password)
+            string url, string user, string password)
         {
             List<string> result = new List<string>();
 
             // Connect to the CMIS repository.
-            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = address;
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password;
-            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
-            SessionFactory factory = SessionFactory.NewInstance();
-            ISession session = factory.CreateSession(cmisParameters);
+            ISession session = Auth.Auth.GetCmisSession(url, repositoryId, user, password);
 
             // Get the folder.
             IFolder folder;
@@ -270,18 +254,10 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         /// <returns>Full path of each sub-folder, including leading slash.</returns>
         static public FolderTree GetSubfolderTree(string repositoryId, string path,
-            string address, string user, string password, int depth)
+            string url, string user, string password, int depth)
         {
-
             // Connect to the CMIS repository.
-            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = address;
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password;
-            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
-            SessionFactory factory = SessionFactory.NewInstance();
-            ISession session = factory.CreateSession(cmisParameters);
+            ISession session = Auth.Auth.GetCmisSession(url, repositoryId, user, password);
 
             // Get the folder.
             IFolder folder;
@@ -365,14 +341,10 @@ namespace CmisSync.Lib.Cmis
             else
             {
                 // If GRAU DATA AG server was detected, try to open the thinclient url, otherwise try to open the repo path
-                Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-                cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-                cmisParameters[SessionParameter.AtomPubUrl] = repo.Address.ToString();
-                cmisParameters[SessionParameter.User] = repo.User;
-                cmisParameters[SessionParameter.Password] = repo.Password.ToString();
-                cmisParameters[SessionParameter.RepositoryId] = repo.RepoID;
-                SessionFactory factory = SessionFactory.NewInstance();
-                ISession session = factory.CreateSession(cmisParameters);
+                
+                // Connect to the CMIS repository.
+                ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.RepoID, repo.User, repo.Password.ToString());
+
                 if (!String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
                     return session.RepositoryInfo.ThinClientUri;
                 else
