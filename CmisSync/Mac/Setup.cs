@@ -422,7 +422,10 @@ namespace CmisSync {
                 asyncLoader.UpdateNodeEvent += delegate {
                     InvokeOnMainThread(delegate {
                         DataSource.UpdateCmisTree(repo);
-                        OutlineController.OutlineView().ReloadData();
+                        NSOutlineView view = OutlineController.OutlineView();
+                        for (int i = 0; i < view.RowCount; ++i) {
+                            view.ReloadItem(view.ItemAtRow(i));
+                        }
                     });
                 };
                 asyncLoader.Load(repo);
