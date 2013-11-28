@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync
 {
@@ -26,10 +27,7 @@ namespace CmisSync
         /// </summary>
         public List<string> Ignores;
 
-        private string username;
-        private string password;
-        private string address;
-        private string id;
+        private CmisRepoCredentials credentials;
         private string remotePath;
         private string localPath;
 
@@ -37,25 +35,22 @@ namespace CmisSync
         /// <summary>
         /// Constructor
         /// </summary>
-        public Edit(string name, string username, string password, string address, string id, string remotePath, List<string> ignores, string localPath)
+        public Edit(CmisRepoCredentials credentials, string name, string remotePath, List<string> ignores, string localPath)
         {
             Name = name;
-            this.username = username;
-            this.password = password;
-            this.address = address;
-            this.id = id;
+            this.credentials = credentials;
             this.remotePath = remotePath;
             this.Ignores = ignores;
             this.localPath = localPath;
 
             CreateEdit();
 
-			Deletable      = true;
+            Deletable      = true;
 
-			DeleteEvent += delegate
-			{
-				Controller.CloseWindow();
-			};
+            DeleteEvent += delegate
+            {
+                Controller.CloseWindow();
+            };
         }
 
 
@@ -73,6 +68,21 @@ namespace CmisSync
         public void Close()
         {
             this.Destroy();
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this window is visible.
+        /// TODO Should be implemented with the correct Windows property,
+        /// at the moment, it always returns false
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this window is visible; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsVisible {
+            get {
+                // TODO Please change it to the correct Window property if this method is needed
+                return false;
+            } private set{}
         }
     }
 }

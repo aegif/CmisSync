@@ -244,8 +244,8 @@ namespace CmisSync
                 {
                     CheckRepositories();
                     RepositoriesLoaded = true;
+                    // Update UI.
                     FolderListChanged();
-
                 }).Start();
             }
         }
@@ -284,13 +284,15 @@ namespace CmisSync
                     RemoveRepository(f);
                     ConfigManager.CurrentConfig.Folder.Remove(f);
                     ConfigManager.CurrentConfig.Save();
-                    FolderListChanged();
                 }
                 else
                 {
                     Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
                 }
             }
+
+            // Update UI.
+            FolderListChanged();
         }
 
         public void EditRepositoryFolder(string reponame)
@@ -483,9 +485,10 @@ namespace CmisSync
                 }
                 if(toBeDeleted.Count>0)
                     ConfigManager.CurrentConfig.Save();
-                // Update UI.
-                FolderListChanged();
             }
+
+            // Update UI.
+            FolderListChanged();
         }
 
 
@@ -580,11 +583,13 @@ namespace CmisSync
 
                 // Initialize in the UI.
                 AddRepository(repoInfo);
-                FolderListChanged();
 
                 this.fetcher.Dispose();
                 this.fetcher = null;
             }
+
+            // Update UI.
+            FolderListChanged();
         }
 
 
@@ -598,11 +603,26 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Show info about CmisSync
+        /// Show info about DataSpace Sync
         /// </summary>
         public void ShowAboutWindow()
         {
             ShowAboutWindowEvent();
+        }
+
+        public bool IsEditWindowVisible
+        {
+            get
+            {
+                lock (this.repo_lock)
+                {
+                    foreach (Edit editView in this.edits.Values)
+                        if (editView.IsVisible)
+                            return true;
+                }
+                return false;
+            }
+            private set { }
         }
 
         /// <summary>
