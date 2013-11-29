@@ -302,16 +302,6 @@ namespace CmisSync.Lib
             }
             Watcher.EnableRaisingEvents = false; //Disable events while syncing...
             Watcher.EnableEvent = false;
-
-
-            if (Watcher.GetChangeList().Count > 0)
-            {
-                Logger.Debug("Detected Changes...");
-                foreach (string name in Watcher.GetChangeList())
-                {
-                    Logger.Debug(Watcher.GetChangeType(name) + ": " + name );
-                }
-            }
         }
 
         /// <summary>
@@ -329,15 +319,9 @@ namespace CmisSync.Lib
                 last_partial_sync = DateTime.Now;
             }
 
-
-
-            if (Watcher.GetChangeList().Count > 0)
+            if (Watcher.GetChangeCount() > 0)
             {
                 //Watcher was stopped (due to error) so empty queue and restart sync
-                foreach (string name in Watcher.GetChangeList())
-                {
-                    Logger.Debug("Remove change left after sync: " + name);
-                }
                 Watcher.RemoveAll();
             }
 

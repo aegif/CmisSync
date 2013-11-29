@@ -20,12 +20,15 @@ namespace CmisSync.Lib.Sync
         {
             private void WatcherSync(string remoteFolder, string localFolder)
             {
-                foreach (string pathname in repo.Watcher.GetChangeList())
+                while (repo.Watcher.GetChangeCount() > 0)
                 {
+                    Tuple<string, Watcher.ChangeTypes> earliestChange = repo.Watcher.RemoveEarliestChange();
+                    string pathname = earliestChange.Item1;
+                    Watcher.ChangeTypes change = earliestChange.Item2;
+
                     string name = Path.GetFileName(pathname);
                     if (!Utils.WorthSyncing(name))
                     {
-                        repo.Watcher.RemoveChange(pathname);
                         continue;
                     }
 
@@ -36,12 +39,10 @@ namespace CmisSync.Lib.Sync
 
                     if (pathname == localFolder)
                     {
-                        repo.Watcher.RemoveChange(pathname);
                         continue;
                     }
 
-                    Watcher.ChangeTypes change = repo.Watcher.GetChangeType(pathname);
-                    Logger.Debug(String.Format("Detect change '{0}' for {1}.", change, pathname));
+                    Logger.Debug(String.Format("Processing '{0}': {1}.", change, pathname));
                     switch (change)
                     {
                         case Watcher.ChangeTypes.Created:
@@ -52,12 +53,15 @@ namespace CmisSync.Lib.Sync
                             WatchSyncDelete(remoteFolder, localFolder, pathname);
                             break;
                         default:
-                            Debug.Assert(false, String.Format("Invalid change {0} for pathname {1}.", change, pathname));
+                            Debug.Assert(false, String.Format("Invalid change -> '{0}': {1}.", change, pathname));
                             break;
                     }
                 }
             }
 
+            /// <summary>
+            /// Sync updates.
+            /// </summary>
             private void WatchSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
                 string name = pathname.Substring(localFolder.Length + 1);
@@ -90,8 +94,6 @@ namespace CmisSync.Lib.Sync
                 if (File.Exists(pathname))
                 {
                     bool success = false;
-                    repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Created);
-                    repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Changed);
                     if (database.ContainsFile(pathname))
                     {
                         if (database.LocalFileHasChanged(pathname))
@@ -113,7 +115,6 @@ namespace CmisSync.Lib.Sync
                     if (!success)
                     {
                         Logger.Warn("Failure to update: " + pathname);
-                        repo.Watcher.InsertChange(pathname, Watcher.ChangeTypes.Changed);
                     }
                     return;
                 }
@@ -122,24 +123,19 @@ namespace CmisSync.Lib.Sync
                 {
                     if (repoinfo.isPathIgnored(remoteName))
                     {
-                        repo.Watcher.RemoveChange(pathname);
                         return;
                     }
 
                     if (database.ContainsFolder(pathname))
                     {
                         Logger.Info(String.Format("Database exists for {0}, ignore for the update action", pathname));
-                        repo.Watcher.RemoveChange(pathname);
                     }
                     else
                     {
-                        Dictionary<string, object> properties = new Dictionary<string, object>();
-                        properties.Add(PropertyIds.Name, Path.GetFileName(pathname));
-                        properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
-                        if (null != remoteBase.CreateFolder(properties))
+                        bool success = UploadFolderRecursively(remoteBase, pathname);
+                        if (success)
                         {
                             Logger.Info("Create locally created folder on server: " + pathname);
-                            repo.Watcher.RemoveChange(pathname);
                         }
                         else
                         {
@@ -148,10 +144,12 @@ namespace CmisSync.Lib.Sync
                     }
                     return;
                 }
-
                 Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
             }
 
+            /// <summary>
+            /// Sync deletions.
+            /// </summary>
             private void WatchSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
                 if (Directory.Exists(pathname))
@@ -166,7 +164,7 @@ namespace CmisSync.Lib.Sync
                 }
 
                 string name = pathname.Substring(localFolder.Length + 1);
-                string remoteName = Path.Combine(remoteFolder,name).Replace('\\','/');
+                string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
 
                 if (database.ContainsFile(pathname))
                 {
@@ -206,10 +204,6 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info("Ignore the delete action for the local created and deleted file/folder: " + pathname);
                 }
-
-                repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Deleted);
-
-                return;
             }
         }
     }

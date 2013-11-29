@@ -40,7 +40,7 @@ namespace TestLibrary
         public void TestInit()
         {
         }
-
+/*
         [Test, Category("Fast")]
         public void TestEnableRaisingEvents()
         {
@@ -623,5 +623,6 @@ namespace TestLibrary
             Console.WriteLine("Timeout");
         }
 
+*/
     }
 }
