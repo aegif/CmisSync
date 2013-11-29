@@ -276,7 +276,7 @@ namespace CmisSync.Lib
         
         private void OnError(object source, ErrorEventArgs e)
         {
-            Logger.Warn("Error occurred for FileSystemWatcher");
+            Logger.Error("Error occurred for FileSystemWatcher");
             EnableRaisingEvents = false;
         }
 

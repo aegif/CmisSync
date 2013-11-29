@@ -196,6 +196,21 @@ namespace CmisSync {
 
                 this.animation.Start ();
             };
+
+
+            // Error.
+            Program.Controller.OnError += delegate
+            {
+                CurrentState = IconState.Error;
+                StateText = Properties_Resources.SyncingChanges; //TODO ERROR MESSAGE
+
+                UpdateStatusItemEvent(StateText);
+
+                this.animation.Stop();
+
+                UpdateIconEvent(0);
+                UpdateMenuEvent(CurrentState);
+            };
         }
 
 

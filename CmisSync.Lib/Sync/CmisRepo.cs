@@ -69,7 +69,7 @@ namespace CmisSync.Lib.Sync
         {
             if (this.synchronizedFolder != null) // Because it is sometimes called before the object's constructor has completed.
             {
-                this.synchronizedFolder.SyncInBackground(syncFull, remote_timer);
+                this.synchronizedFolder.SyncInBackground(syncFull);
             }
         }
 

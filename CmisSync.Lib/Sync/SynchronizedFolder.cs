@@ -33,7 +33,12 @@ namespace CmisSync.Lib.Sync
         {
             // Log
             private static readonly ILog Logger = LogManager.GetLogger(typeof(SynchronizedFolder));
-            
+
+            /// <summary>
+            /// An object for locking the sync method (one thread at a time can run sync).
+            /// </summary>
+            private Object syncLock = new Object();
+
             /// <summary>
             /// Whether sync is bidirectional or only from server to client.
             /// TODO make it a CMIS folder - specific setting
@@ -217,54 +222,68 @@ namespace CmisSync.Lib.Sync
             }
 
 
-            /// <summary>
-            /// Track whether a full sync is done
-            /// </summary>
-            private bool syncFull = false;
 
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
             /// </summary>
             public void Sync()
             {
-                // If not connected, connect.
-                if (session == null)
+                Sync(true);
+            }
+
+            /// <summary>
+            /// Synchronize between CMIS folder and local folder.
+            /// </summary>
+            public void Sync(bool syncFull)
+            {
+                if (this.syncing)
                 {
-                    Connect();
-                    firstSync = true;
-                }
-                if (session == null)
-                {
-                    Logger.Error("Could not connect to: " + cmisParameters[SessionParameter.AtomPubUrl]);
-                    return; // Will try again at next sync. 
+                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
+                    return;
                 }
 
-                IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
-                string localFolder = repoinfo.TargetDirectory;
+                lock (syncLock)
+                {
+                    this.syncing = true;
+                    repo.OnSyncStart(syncFull);
+                    
+                    // If not connected, connect.
+                    if (session == null)
+                    {
+                        Connect();
+                        firstSync = true;
+                    }
+                    if (session == null)
+                    {
+                        Logger.Error("Could not connect to: " + cmisParameters[SessionParameter.AtomPubUrl]);
+                        //TODO Error event
+                        return; // Will try again at next sync. 
+                    }
 
-                if (firstSync)
-                {
-                    CrawlSync(remoteFolder, localFolder);
-                    repo.Watcher.RemoveAll();
-                    repo.Watcher.EnableRaisingEvents = true;
-                    firstSync = false;
-                }
-                else
-                {
-                    //if (ChangeLogCapability) //ChangeLog not supported at this time...
-                    //{
-                    //    if (syncFull)
-                    //    {
-                    //        ChangeLogSync(remoteFolder);
-                    //    }
-                    //    else
-                    //    {
-                    //        ChangeLogSync(remoteFolder);
-                    //        WatcherSync(remoteFolderPath, localFolder);
-                    //    }
-                    //}
-                    //else
-                    //{
+                    IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                    string localFolder = repoinfo.TargetDirectory;
+
+                    if (firstSync)
+                    {
+                        CrawlSync(remoteFolder, localFolder);
+                        firstSync = false;
+                    }
+                    else
+                    {
+                        //if (ChangeLogCapability) //ChangeLog not supported at this time...
+                        //{
+                        //    if (syncFull)
+                        //    {
+                        //        ChangeLogSync(remoteFolder);
+                        //    }
+                        //    else
+                        //    {
+                        //        ChangeLogSync(remoteFolder);
+                        //        WatcherSync(remoteFolderPath, localFolder);
+                        //    }
+                        //}
+                        //else
+                        //{
                         // No ChangeLog capability, so we have to crawl remote and local folders.
                         if (syncFull)
                         {
@@ -274,53 +293,49 @@ namespace CmisSync.Lib.Sync
                         {
                             WatcherSync(remoteFolderPath, localFolder);
                         }
-                    //}
+                        //}
+                    }
                 }
             }
 
+            /// <summary>
+            /// Synchronize has completed.
+            /// </summary>
+            public void SyncComplete(bool syncFull)
+            {
+                lock (syncLock)
+                {
+                    this.syncing = false;
+                    repo.OnSyncComplete(syncFull);
+                }
+            }
 
             /// <summary>
             /// Sync in the background.
             /// </summary>
-            public void SyncInBackground(bool fullSync, System.Timers.Timer timer)
+            public void SyncInBackground(bool syncFull)
             {
-                if (this.syncing)
-                {
-                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
-                    return;
-                }
-                this.syncing = true;
-                this.syncFull = fullSync;
 
                 using (BackgroundWorker bw = new BackgroundWorker())
                 {
                     bw.DoWork += new DoWorkEventHandler(
                         delegate(Object o, DoWorkEventArgs args)
                         {
-                            if (fullSync)
-                            {
-                                timer.Stop();
-                            }
-                            Logger.Info("Launching sync: " + repoinfo.TargetDirectory);
                             try
                             {
-                                Sync();
+                                Sync(syncFull);
                             }
                             catch (CmisBaseException e)
                             {
                                 Logger.Error("CMIS exception while syncing:", e);
+                                //TODO error event
                             }
                         }
                     );
                     bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
                         delegate(object o, RunWorkerCompletedEventArgs args)
                         {
-                            this.syncing = false;
-                            Logger.Info("Sync Complete: " + repoinfo.TargetDirectory);
-                            if (fullSync)
-                            {
-                                timer.Start();
-                            }
+                            SyncComplete(syncFull);
                         }
                     );
                     bw.RunWorkerAsync();

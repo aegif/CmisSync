@@ -20,7 +20,6 @@ namespace CmisSync.Lib.Sync
         {
             private void WatcherSync(string remoteFolder, string localFolder)
             {
-                Logger.Debug(remoteFolder + " : " + localFolder);
                 foreach (string pathname in repo.Watcher.GetChangeList())
                 {
                     string name = Path.GetFileName(pathname);
@@ -42,7 +41,7 @@ namespace CmisSync.Lib.Sync
                     }
 
                     Watcher.ChangeTypes change = repo.Watcher.GetChangeType(pathname);
-                    Logger.Debug(String.Format("Detect change {0} for {1}.", change, pathname));
+                    Logger.Debug(String.Format("Detect change '{0}' for {1}.", change, pathname));
                     switch (change)
                     {
                         case Watcher.ChangeTypes.Created:

@@ -59,18 +59,6 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// Affect a new <c>SyncStatus</c> value.
-        /// </summary>
-        public Action<SyncStatus> SyncStatusChanged { get; set; }
-
-
-        /// <summary>
-        /// Local changes have been detected.
-        /// </summary>
-        public Action ChangesDetected { get; set; }
-
-
-        /// <summary>
         /// Path of the local synchronized folder.
         /// </summary>
         public readonly string LocalPath;
@@ -122,34 +110,30 @@ namespace CmisSync.Lib
         /// </summary>
         public Watcher Watcher { get; private set; }
 
-
-        /// <summary>
-        /// Interval at which the local and remote filesystems should be polled.
-        /// </summary>
-        private TimeSpan poll_interval = PollInterval.Short;
-
-
-        /// <summary>
-        /// When the local and remote filesystems were last checked for modifications.
-        /// </summary>
-        private DateTime last_poll = DateTime.Now;
-
-
         /// <summary>
         /// Timer for watching the local and remote filesystems.
         /// </summary>
-        protected Timers.Timer remote_timer = new Timers.Timer();
-
+        private Timers.Timer remote_timer = new Timers.Timer();
 
         /// <summary>
-        /// Intervals for local and remote filesystems polling.
-        /// Currently the polling interval is fixed.
+        /// Timer to delay syncing after local change is made.
         /// </summary>
-        private static class PollInterval
-        {
-            public static readonly TimeSpan Short = new TimeSpan(0, 0, 5, 0);
-        }
+        private Timers.Timer local_timer = new Timers.Timer();
 
+        /// <summary>
+        /// Timer for syncing after local change is made.
+        /// </summary>
+        private readonly double delay_interval = 15 * 1000; //15 seconds.
+
+        /// <summary>
+        /// When the last full sync completed.
+        /// </summary>
+        private DateTime last_sync;
+
+        /// <summary>
+        /// When the last partial sync completed.
+        /// </summary>
+        private DateTime last_partial_sync;
 
         /// <summary>
         /// Track whether <c>Dispose</c> has been called.
@@ -167,24 +151,28 @@ namespace CmisSync.Lib
             Name = repoInfo.Name;
             RemoteUrl = repoInfo.Address;
 
-            Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
-            this.remote_timer.Interval = repoInfo.PollInterval;
+            Watcher = new Watcher(LocalPath);
+            Watcher.EnableRaisingEvents = true;
 
-            SyncStatusChanged += delegate(SyncStatus status)
-            {
-                Status = status;
-            };
-
-            this.Watcher = new Watcher(LocalPath);
 
             // Main loop syncing every X seconds.
-            this.remote_timer.Elapsed += delegate
+            remote_timer.Elapsed += delegate
             {
                 // Synchronize.
                 SyncInBackground();
             };
-            
-            ChangesDetected += delegate { };
+            remote_timer.AutoReset = true;
+            Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
+            remote_timer.Interval = repoInfo.PollInterval;
+
+            //Partial sync interval..
+            local_timer.Elapsed += delegate
+            {
+                // Run partial sync.
+                SyncInBackground(false);
+            };
+            local_timer.AutoReset = false;
+            local_timer.Interval = delay_interval;
         }
 
 
@@ -218,6 +206,8 @@ namespace CmisSync.Lib
                 {
                     this.remote_timer.Stop();
                     this.remote_timer.Dispose();
+                    this.local_timer.Stop();
+                    this.local_timer.Dispose();
                     this.Watcher.Dispose();
                 }
                 this.disposed = true;
@@ -235,8 +225,6 @@ namespace CmisSync.Lib
             // Sync up everything that changed
             // since we've been offline
             SyncInBackground();
-
-            this.remote_timer.Start();
         }
 
         /// <summary>
@@ -289,11 +277,8 @@ namespace CmisSync.Lib
         /// </summary>
         public void OnFileActivity(object sender, FileSystemEventArgs args)
         {
-            ChangesDetected();
-
-            this.Watcher.EnableEvent = false;
-            // TODO
-            this.Watcher.EnableEvent = true;
+            local_timer.Stop();
+            local_timer.Start(); //Restart the local timer...
         }
 
 
@@ -305,6 +290,61 @@ namespace CmisSync.Lib
             // ConflictResolved(); TODO
         }
 
+        /// <summary>
+        /// Called when sync starts.
+        /// </summary>
+        public void OnSyncStart(bool syncFull)
+        {
+            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Started: " + LocalPath);
+            if (syncFull)
+            {
+                remote_timer.Stop();
+            }
+            Watcher.EnableRaisingEvents = false; //Disable events while syncing...
+            Watcher.EnableEvent = false;
+
+
+            if (Watcher.GetChangeList().Count > 0)
+            {
+                Logger.Debug("Detected Changes...");
+                foreach (string name in Watcher.GetChangeList())
+                {
+                    Logger.Debug(Watcher.GetChangeType(name) + ": " + name );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when sync completes.
+        /// </summary>
+        public void OnSyncComplete(bool syncFull)
+        {
+            if (syncFull)
+            {
+                remote_timer.Start();
+                last_sync = DateTime.Now;
+            }
+            else
+            {
+                last_partial_sync = DateTime.Now;
+            }
+
+
+
+            if (Watcher.GetChangeList().Count > 0)
+            {
+                //Watcher was stopped (due to error) so empty queue and restart sync
+                foreach (string name in Watcher.GetChangeList())
+                {
+                    Logger.Debug("Remove change left after sync: " + name);
+                }
+                Watcher.RemoveAll();
+            }
+
+            Watcher.EnableRaisingEvents = true;
+            Watcher.EnableEvent = true;
+            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+        }
 
         /// <summary>
         /// Recursively gets a folder's size in bytes.

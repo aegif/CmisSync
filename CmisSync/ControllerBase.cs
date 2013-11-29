@@ -166,12 +166,6 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Watches the local filesystem for modifications.
-        /// </summary>
-        private FileSystemWatcher watcher;
-
-
-        /// <summary>
         /// Concurrency locks.
         /// </summary>
         private Object repo_lock = new Object();
@@ -202,27 +196,13 @@ namespace CmisSync
             if (syncFolderCreated)
             {
                 //Dont add bookmark for Oris4
-                //AddToBookmarks();
+                AddToBookmarks();
             }
 
             if (firstRun)
             {
                 ConfigManager.CurrentConfig.Notifications = true;
             }
-
-            // Watch the CmisSync folder
-            this.watcher = new FileSystemWatcher()
-            {
-                Filter = "*",
-                IncludeSubdirectories = false,
-                Path = FoldersPath
-            };
-
-            watcher.Deleted += OnFolderActivity;
-            watcher.Created += OnFolderActivity;
-            watcher.Renamed += OnFolderActivity;
-
-            watcher.EnableRaisingEvents = true;
         }
 
 
@@ -257,16 +237,6 @@ namespace CmisSync
         {
             RepoBase repo = null;
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
-
-            repo.ChangesDetected += delegate
-            {
-                UpdateState();
-            };
-
-            repo.SyncStatusChanged += delegate(SyncStatus status)
-            {
-                UpdateState();
-            };
 
             this.repositories.Add(repo);
             repo.Initialize();
@@ -412,26 +382,6 @@ namespace CmisSync
             }
         }
 
-
-        /// <summary>
-        /// Fires events for the current syncing state.
-        /// </summary>
-        private void UpdateState()
-        {
-            bool has_unsynced_repos = false;
-
-            foreach (RepoBase repo in Repositories)
-            {
-                repo.SyncInBackground(false);
-            }
-
-            if (has_unsynced_repos)
-                OnError();
-            else
-                OnIdle();
-        }
-
-
         /// <summary>
         /// Fix the file attributes of a folder, recursively.
         /// </summary>
@@ -461,20 +411,6 @@ namespace CmisSync
         {
             FileAttributes attributes = File.GetAttributes(file);
             return ((attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
-        }
-
-
-        /// <summary>
-        /// Reacts when a local change occurs.
-        /// Not implemented yet, see https://github.com/nicolas-raoul/CmisSync/issues/122
-        /// </summary>
-        /// <param name="o">File that has changed</param>
-        /// <param name="args">Nature of the change</param>
-        public void OnFolderActivity(object o, FileSystemEventArgs args)
-        {
-            // TODO
-            if (Directory.Exists(args.FullPath) && args.ChangeType == WatcherChangeTypes.Created)
-                return;
         }
 
 
