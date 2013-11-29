@@ -199,7 +199,7 @@ namespace CmisSync.Lib.Cmis
             List<string> result = new List<string>();
 
             // Connect to the CMIS repository.
-            ISession session = Auth.Auth.GetCmisSession(url, repositoryId, user, password);
+            ISession session = Auth.Auth.GetCmisSession(url, user, password, repositoryId);
 
             // Get the folder.
             IFolder folder;
@@ -257,7 +257,7 @@ namespace CmisSync.Lib.Cmis
             string url, string user, string password, int depth)
         {
             // Connect to the CMIS repository.
-            ISession session = Auth.Auth.GetCmisSession(url, repositoryId, user, password);
+            ISession session = Auth.Auth.GetCmisSession(url, user, password, repositoryId);
 
             // Get the folder.
             IFolder folder;
@@ -343,7 +343,7 @@ namespace CmisSync.Lib.Cmis
                 // If GRAU DATA AG server was detected, try to open the thinclient url, otherwise try to open the repo path
                 
                 // Connect to the CMIS repository.
-                ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.RepoID, repo.User, repo.Password.ToString());
+                ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
 
                 if (!String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
                     return session.RepositoryInfo.ThinClientUri;
