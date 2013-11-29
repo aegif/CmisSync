@@ -16,14 +16,15 @@ namespace CmisSync.Auth
     {
         /// <summary>
         /// Connect to a CMIS server and get the list of repositories.
+        /// This method takes a obfuscated password, unlike the next method.
         /// </summary>
-        public static IList<IRepository> GetCmisRepositories(Uri url, string user, string password)
+        public static IList<IRepository> GetCmisRepositories(Uri url, string user, string obfuscatedPassword)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             parameters[SessionParameter.BindingType] = BindingType.AtomPub;
             parameters[SessionParameter.AtomPubUrl] = url.ToString();
             parameters[SessionParameter.User] = user;
-            parameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
+            parameters[SessionParameter.Password] = Crypto.Deobfuscate(obfuscatedPassword);
 
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
