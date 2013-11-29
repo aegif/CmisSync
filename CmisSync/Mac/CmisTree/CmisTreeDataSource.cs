@@ -13,6 +13,7 @@ namespace CmisSync.CmisTree
     public class NSCmisTree : NSObject {
         public string Name = string.Empty;
         public LoadingStatus Status = LoadingStatus.START;
+        public bool? Selected = true;
         public NSCmisTree Parent = null;
         public IList<NSCmisTree> Children = new List<NSCmisTree> ();
         public override string ToString()
@@ -29,6 +30,7 @@ namespace CmisSync.CmisTree
         {
             Name = root.Name;
             Status = root.Status;
+            Selected = root.Selected;
             Parent = null;
             foreach (Node node in root.Children) {
                 NSCmisTree child = new NSCmisTree (node);
@@ -192,6 +194,14 @@ namespace CmisSync.CmisTree
                     return (NSString)"";
                 }
                 if (tableColumn.Identifier == "Name") {
+                    switch (cmis.Selected) {
+                    case true:
+                        return new NSNumber (1);
+                    case false:
+                        return new NSNumber (0);
+                    case null:
+                        return new NSNumber (-1);
+                    }
                     return (NSString)cmis.Name;
                 }
                 if (tableColumn.Identifier == "Status") {

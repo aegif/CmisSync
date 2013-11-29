@@ -44,5 +44,28 @@ namespace CmisSync {
         {
             ItemExpanded (notification);
         }
+
+        public override NSCell GetCell(NSOutlineView view, NSTableColumn column, MonoMac.Foundation.NSObject item)
+        {
+            NSCmisTree cmis = item as NSCmisTree;
+            if (cmis == null) {
+                Console.WriteLine ("GetCell Error");
+                return null;
+            }
+            if (column == null) {
+                return null;
+            } else if (column.Identifier == "Name") {
+                Console.WriteLine ("GetCell " + cmis);
+                NSButtonCell cell = new NSButtonCell ();
+                cell.SetButtonType (NSButtonType.Switch);
+                cell.AllowsMixedState = true;
+                cell.Title = cmis.Name;
+                cell.Editable = true;
+                return cell;
+            } else {
+                NSTextFieldCell cell = new NSTextFieldCell ();
+                return cell;
+            }
+        }
     }
 }
