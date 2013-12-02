@@ -158,7 +158,7 @@ namespace CmisSync.Lib.Sync
                                         // Create local folder.remoteDocument.Name
                                         Directory.CreateDirectory(localSubFolder);
 
-                                        // Create database entry for this folder.
+                                        // Create database entry f(or this folder.
                                         // TODO - Yannick - Add metadata
                                         database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
@@ -297,15 +297,40 @@ namespace CmisSync.Lib.Sync
                             // check whether it used invalidFolderNameRegex to exist on server or not.
                             if (database.ContainsFile(filePath))
                             {
-                                // If file has changed locally, move to 'your_version' and warn about conflict
-                                // TODO
+                                if (database.LocalFileHasChanged(filePath))
+                                {
+                                    // If file has changed locally, move to 'your_version' and warn about conflict
+                                    if (BIDIRECTIONAL)
+                                    {
+                                        // Local file was updated, sync up.
+                                        Logger.Info("Uploading locally edited remotely removed file from the repository: " + filePath);
+                                        if (Utils.WorthSyncing(filePath))
+                                        {
+                                            success = success && UploadFile(filePath, remoteFolder);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Logger.Info("Conflict with file: " + filePath + ", backing up locally modified version.");
+                                        // Rename locally modified file.
+                                        String newFilePath = Utils.ConflictPath(filePath);
+                                        File.Move(filePath, newFilePath);
 
-                                // File has been deleted on server, so delete it locally.
-                                Logger.Info("Removing remotely deleted file: " + filePath);
-                                File.Delete(filePath);
+                                        // Delete file from database.
+                                        database.RemoveFile(filePath);
 
-                                // Delete file from database.
-                                database.RemoveFile(filePath);
+                                        repo.OnConflictResolved();
+                                    }
+                                }
+                                else
+                                {
+                                    // File has been deleted on server, so delete it locally.
+                                    Logger.Info("Removing remotely deleted file: " + filePath);
+                                    File.Delete(filePath);
+
+                                    // Delete file from database.
+                                    database.RemoveFile(filePath);
+                                }
                             }
                             else
                             {
