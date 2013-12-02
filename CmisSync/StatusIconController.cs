@@ -25,6 +25,7 @@ using CmisSync.Lib;
 using System.Globalization;
 
 using System.Diagnostics;
+using log4net;
 
 namespace CmisSync {
 
@@ -44,6 +45,11 @@ namespace CmisSync {
     /// MVC controller for the CmisSync status icon.
     /// </summary>
     public class StatusIconController {
+
+        /// <summary>
+        /// Log.
+        /// </summary>
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StatusIconController));
 
         // Event handlers.
 
@@ -313,7 +319,7 @@ namespace CmisSync {
             this.animation_frame_number = 0;
 
             this.animation = new Timer () {
-                Interval = 100
+                Interval = 200
             };
 
             this.animation.Elapsed += delegate {

@@ -95,12 +95,6 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
-            /// Listener we inform about activity (used by spinner).
-            /// </summary>
-            private IActivityListener activityListener;
-
-
-            /// <summary>
             /// Configuration of the CmisSync synchronized folder, as defined in the XML configuration file.
             /// </summary>
             private RepoInfo repoinfo;
@@ -122,8 +116,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
             /// </summary>
-            public SynchronizedFolder(RepoInfo repoInfo,
-                IActivityListener listener, RepoBase repoCmis)
+            public SynchronizedFolder(RepoInfo repoInfo, RepoBase repoCmis)
             {
                 if (null == repoInfo || null == repoCmis)
                 {
@@ -131,7 +124,6 @@ namespace CmisSync.Lib.Sync
                 }
 
                 this.repo = repoCmis;
-                this.activityListener = listener;
                 this.repoinfo = repoInfo;
 
                 // Database is the user's AppData/Roaming
@@ -305,8 +297,8 @@ namespace CmisSync.Lib.Sync
             {
                 lock (syncLock)
                 {
-                    this.syncing = false;
                     repo.OnSyncComplete(syncFull);
+                    this.syncing = false;
                 }
             }
 
@@ -348,9 +340,8 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
             {
-                activityListener.ActivityStarted();
-
                 bool success = true;
+
                 // List all children.
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
@@ -378,9 +369,6 @@ namespace CmisSync.Lib.Sync
                             success = success && DownloadFile((IDocument)cmisObject, localFolder);
                     }
                 }
-
-                activityListener.ActivityStopped();
-
                 return success;
             }
 
@@ -390,8 +378,6 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool DownloadFile(IDocument remoteDocument, string localFolder)
             {
-                activityListener.ActivityStarted();
-
                 string fileName = remoteDocument.ContentStreamFileName;
                 Logger.Info("Downloading: " + fileName);
 
@@ -399,7 +385,6 @@ namespace CmisSync.Lib.Sync
                 if (Utils.IsInvalidFileName(fileName))
                 {
                     Logger.Info("Skipping download of file with illegal filename: " + fileName);
-                    activityListener.ActivityStopped();
                     return true;
                 }
 
@@ -433,7 +418,6 @@ namespace CmisSync.Lib.Sync
                         if (contentStream == null)
                         {
                             Logger.Warn("Skipping download of file with null content stream: " + fileName);
-                            activityListener.ActivityStopped();
                             return true;
                         }
                         // Skip downloading the content, just go on with an empty file
@@ -476,7 +460,6 @@ namespace CmisSync.Lib.Sync
                             Logger.Info("Exception while fetching metadata: " + fileName + " " + Utils.ToLogString(e));
                             // Remove temporary local document to avoid it being considered a new document.
                             File.Delete(tmpfilepath);
-                            activityListener.ActivityStopped();
                             return false;
                         }
 
@@ -488,14 +471,11 @@ namespace CmisSync.Lib.Sync
 
                         Logger.Info("Added to database: " + fileName);
                     }
-
-                    activityListener.ActivityStopped();
                     return success;
                 }
                 catch (IOException e)
                 {
                     Logger.Warn("Exception while file operation: " + Utils.ToLogString(e));
-                    activityListener.ActivityStopped();
                     return false;
                 }
             }
@@ -530,8 +510,6 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UploadFile(string filePath, IFolder remoteFolder)
             {
-                activityListener.ActivityStarted();
-
                 IDocument remoteDocument = null;
                 Boolean success = false;
                 byte[] filehash = { };
@@ -588,7 +566,7 @@ namespace CmisSync.Lib.Sync
                         //throw;
                     }
                 }
-                    
+
                 // Metadata.
                 if (success)
                 {
@@ -600,8 +578,6 @@ namespace CmisSync.Lib.Sync
                     // Create database entry for this file.
                     database.AddFile(filePath, remoteDocument.LastModificationDate, metadata, filehash);
                 }
-
-                activityListener.ActivityStopped();
                 return success;
             }
 
@@ -714,11 +690,6 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UpdateFile(string filePath, IFolder remoteFolder)
             {
-                Logger.Info("# Updating " + filePath);
-
-                // Tell the tray icon to start spinning.
-                activityListener.ActivityStarted();
-                
                 // Find the document within the folder.
                 string fileName = Path.GetFileName(filePath);
                 IDocument document = null;
@@ -755,12 +726,6 @@ namespace CmisSync.Lib.Sync
 
                     // TODO Update metadata?
                 }
-
-                // Tell the tray icon to stop spinning.
-                activityListener.ActivityStopped();
-
-                Logger.Info("# Updated " + filePath);
-
                 return success;
             }
 

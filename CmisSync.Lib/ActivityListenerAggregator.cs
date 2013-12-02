@@ -25,6 +25,11 @@ namespace CmisSync.Lib
     public class ActivityListenerAggregator : IActivityListener
     {
         /// <summary>
+        /// Lock for activity.
+        /// </summary>
+        private Object activityLock = new Object();
+        
+        /// <summary>
         /// The listener to which overall activity messages are sent.
         /// </summary>
         private IActivityListener overall;
@@ -51,8 +56,11 @@ namespace CmisSync.Lib
         /// </summary>
         public void ActivityStarted()
         {
-            numberOfActiveProcesses++;
-            overall.ActivityStarted();
+            lock (activityLock)
+            {
+                numberOfActiveProcesses++;
+                overall.ActivityStarted();
+            }
         }
 
 
@@ -61,10 +69,13 @@ namespace CmisSync.Lib
         /// </summary>
         public void ActivityStopped()
         {
-            numberOfActiveProcesses--;
-            if (numberOfActiveProcesses == 0)
+            lock (activityLock)
             {
-                overall.ActivityStopped();
+                numberOfActiveProcesses--;
+                if (numberOfActiveProcesses <= 0)
+                {
+                    overall.ActivityStopped();
+                }
             }
         }
     }

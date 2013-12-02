@@ -37,9 +37,9 @@ namespace CmisSync.Lib.Sync
         /// Constructor.
         /// </summary>
         public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
-            : base(repoInfo)
+            : base(repoInfo, activityListener)
         {
-            this.synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);
+            this.synchronizedFolder = new SynchronizedFolder(repoInfo, this);
             Logger.Info(synchronizedFolder);
         }
 
@@ -86,10 +86,10 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Update repository settings.
         /// </summary>
-        public override void UpdateSettings(string password, int pollInterval, IActivityListener activityListener)
+        public override void UpdateSettings(string password, int pollInterval)
         {
-            base.UpdateSettings(password, pollInterval, activityListener);
-            this.synchronizedFolder = new SynchronizedFolder(RepoInfo, activityListener, this);
+            base.UpdateSettings(password, pollInterval);
+            this.synchronizedFolder = new SynchronizedFolder(RepoInfo, this);
             Logger.Info(synchronizedFolder);
         }
 

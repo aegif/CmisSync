@@ -248,7 +248,7 @@ namespace CmisSync
             {
                 if (repoBase.Name == repoName)
                 {
-                    repoBase.UpdateSettings(password, pollInterval, activityListenerAggregator);
+                    repoBase.UpdateSettings(password, pollInterval);
                 }
             }
         }

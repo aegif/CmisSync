@@ -259,7 +259,6 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    activityListener,
                     cmis))
                 {
                     synchronizedFolder.Sync();
@@ -297,7 +296,6 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    activityListener,
                     cmis))
                 {
                     synchronizedFolder.Sync();
@@ -345,7 +343,6 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    activityListener,
                     cmis))
                 {
                     synchronizedFolder.Sync();
@@ -393,7 +390,6 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    activityListener,
                     cmis))
                 {
                     synchronizedFolder.Sync();
@@ -439,7 +435,6 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    activityListener,
                     cmis))
                 {
                     synchronizedFolder.Sync();
@@ -515,7 +510,6 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    activityListener,
                     cmis))
                 {
                     synchronizedFolder.Sync();

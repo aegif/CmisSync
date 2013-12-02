@@ -106,6 +106,12 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Listener we inform about activity (used by spinner).
+        /// </summary>
+        protected IActivityListener activityListener;
+
+
+        /// <summary>
         /// Watches the local filesystem for changes.
         /// </summary>
         public Watcher Watcher { get; private set; }
@@ -144,12 +150,14 @@ namespace CmisSync.Lib
         /// <summary>
         /// Constructor.
         /// </summary>
-        public RepoBase(RepoInfo repoInfo)
+        public RepoBase(RepoInfo repoInfo, IActivityListener activityListener)
         {
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = repoInfo.Name;
             RemoteUrl = repoInfo.Address;
+
+            this.activityListener = activityListener;
 
             Watcher = new Watcher(LocalPath);
             Watcher.EnableRaisingEvents = true;
@@ -230,7 +238,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Update repository settings.
         /// </summary>
-        public virtual void UpdateSettings(string password, int pollInterval, IActivityListener activityListener)
+        public virtual void UpdateSettings(string password, int pollInterval)
         {
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
@@ -296,6 +304,7 @@ namespace CmisSync.Lib
         public void OnSyncStart(bool syncFull)
         {
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Started: " + LocalPath);
+            activityListener.ActivityStarted();
             if (syncFull)
             {
                 remote_timer.Stop();
@@ -327,6 +336,7 @@ namespace CmisSync.Lib
 
             Watcher.EnableRaisingEvents = true;
             Watcher.EnableEvent = true;
+            activityListener.ActivityStopped();
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
         }
 
