@@ -1,5 +1,4 @@
 dist_pixmaps_DATA = \
-    tutorial-slide-4.png \
     side-splash.png \
     avatar-a.png \
     avatar-b.png \
