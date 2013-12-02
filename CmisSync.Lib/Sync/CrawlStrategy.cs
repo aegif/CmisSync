@@ -26,6 +26,8 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder
         {
+            private static readonly int SYNC_SUSPEND_SLEEP_INTERVAL = 60 * 1000; //one minute
+
             /// <summary>
             /// Synchronize by checking all folders/files one-by-one.
             /// This strategy is used if the CMIS server does not support the ChangeLog feature.
@@ -339,10 +341,15 @@ namespace CmisSync.Lib.Sync
 
             private void sleepWhileSuspended()
             {
-                while (repo.Status == SyncStatus.Suspend)
+                if (repo.Status == SyncStatus.Suspend)
                 {
-                    Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
-                    System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
+                    repo.OnSyncSuspend();
+                    while (repo.Status == SyncStatus.Suspend)
+                    {
+                        Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, SYNC_SUSPEND_SLEEP_INTERVAL));
+                        System.Threading.Thread.Sleep(SYNC_SUSPEND_SLEEP_INTERVAL);
+                    }
+                    repo.OnSyncResume();
                 }
             }
 

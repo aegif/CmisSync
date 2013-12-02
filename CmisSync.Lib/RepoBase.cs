@@ -108,7 +108,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Listener we inform about activity (used by spinner).
         /// </summary>
-        protected IActivityListener activityListener;
+        private IActivityListener activityListener;
 
 
         /// <summary>
@@ -311,6 +311,24 @@ namespace CmisSync.Lib
             }
             Watcher.EnableRaisingEvents = false; //Disable events while syncing...
             Watcher.EnableEvent = false;
+        }
+
+        /// <summary>
+        /// Called when sync is suspended.
+        /// </summary>
+        public void OnSyncSuspend()
+        {
+            Logger.Info("Sync Suspended: " + LocalPath);
+            activityListener.ActivityStopped();
+        }
+
+        /// <summary>
+        /// Called when sync is resumed.
+        /// </summary>
+        public void OnSyncResume()
+        {
+            activityListener.ActivityStarted();
+            Logger.Info("Sync Resumed: " + LocalPath);
         }
 
         /// <summary>
