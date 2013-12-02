@@ -17,7 +17,7 @@ SOURCES =  \
 	../SetupController.cs \
 	../StatusIconController.cs \
 	About.cs \
-    CertPolicyWindow.cs \
+	CertPolicyWindow.cs \
 	Controller.cs \
 	Edit.cs \
 	Setup.cs \

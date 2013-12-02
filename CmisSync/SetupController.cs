@@ -85,6 +85,9 @@ namespace CmisSync
         public event ChangePasswordFieldEventHandler ChangePasswordFieldEvent = delegate { };
         public delegate void ChangePasswordFieldEventHandler(string text, string example_text);
 
+        public event LocalPathExistsEventHandler LocalPathExists;
+        public delegate bool LocalPathExistsEventHandler(string path);
+
         /// <summary>
         /// Whether the window is currently open.
         /// </summary>
@@ -377,8 +380,9 @@ namespace CmisSync
                     localpath = localpath.Substring(0,localpath.Length-1);
                 if (CmisSync.Lib.Utils.IsInvalidFolderName(Path.GetFileName(localpath)))
                     throw new ArgumentException(String.Format(Properties_Resources.InvalidFolderName, Path.GetFileName(localpath)));
-                if (Directory.Exists(localpath))
-                    throw new ArgumentException(String.Format(Properties_Resources.LocalDirectoryExist));
+                // If no warning handler is registered, handle warning as error
+                if (LocalPathExists == null)
+                    CheckRepoPathExists(localpath);
                 UpdateAddProjectButtonEvent(true);
                 return String.Empty;
             }
@@ -389,6 +393,12 @@ namespace CmisSync
             }
         }
 
+
+        public void CheckRepoPathExists(string localpath)
+        {
+            if (Directory.Exists(localpath))
+                throw new ArgumentException(String.Format(Properties_Resources.LocalDirectoryExist));
+        }
 
         /// <summary>
         /// First step of remote folder addition wizard is complete, switch to second step
@@ -451,6 +461,17 @@ namespace CmisSync
         /// </summary>
         public void CustomizePageCompleted(String repoName, String localrepopath)
         {
+            try
+            {
+                CheckRepoPathExists(localrepopath);
+            }
+            catch (ArgumentException)
+            {
+                if (LocalPathExists != null && ! LocalPathExists(localrepopath))
+                {
+                    return;
+                }
+            }
             SyncingReponame = repoName;
 
             ChangePageEvent(PageType.Syncing);
