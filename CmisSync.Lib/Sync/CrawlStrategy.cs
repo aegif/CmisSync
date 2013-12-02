@@ -158,7 +158,7 @@ namespace CmisSync.Lib.Sync
                                         // Create local folder.remoteDocument.Name
                                         Directory.CreateDirectory(localSubFolder);
 
-                                        // Create database entry f(or this folder.
+                                        // Create database entry for this folder.
                                         // TODO - Yannick - Add metadata
                                         database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
 
