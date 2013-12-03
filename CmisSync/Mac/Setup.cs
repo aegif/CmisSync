@@ -432,6 +432,25 @@ namespace CmisSync {
                 loader.Add(repo.Id, asyncLoader);
             }
             DataSource = new CmisTree.CmisTreeDataSource(Repositories);
+            DataSource.SelectedEvent += delegate (NSCmisTree cmis, int selected) {
+                InvokeOnMainThread(delegate {
+                    foreach (RootFolder root in Repositories) {
+                        Node node = cmis.GetNode(root);
+                        if (node != null) {
+                            node.Selected = (selected != 0);
+                            DataSource.UpdateCmisTree(root);
+                        }
+                    }
+                    NSOutlineView view = OutlineController.OutlineView();
+                    for (int i = 0; i < view.RowCount; ++i) {
+                        try{
+                        view.ReloadItem(view.ItemAtRow(i));
+                        }catch(Exception e) {
+                            Console.WriteLine(e);
+                        }
+                    }
+                });
+            };
             DataDelegate = new OutlineViewDelegate ();
             OutlineController = new CmisOutlineController (DataSource,DataDelegate);
             ContinueButton = new NSButton() {
@@ -493,7 +512,9 @@ namespace CmisSync {
                     if (root != null)
                     {
                         Controller.saved_repository = root.Id;
-                        Controller.Add2PageCompleted(root.Id, root.Path);
+                        List<string> ignored = NodeModelUtils.GetIgnoredFolder(root);
+                        List<string> selected = NodeModelUtils.GetSelectedFolder(root);
+                        Controller.Add2PageCompleted(root.Id, root.Path, ignored.ToArray(), selected.ToArray());
                     }
                 });
             };
