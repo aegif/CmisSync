@@ -57,7 +57,10 @@ namespace CmisSync {
             } else if (column.Identifier == "Name") {
 //                Console.WriteLine ("GetCell " + cmis);
                 NSButtonCell cell = new NSButtonCell ();
-                cell.SetButtonType (NSButtonType.Switch);
+                if (cmis.Parent != null)
+                    cell.SetButtonType (NSButtonType.Switch);
+                else
+                    cell.SetButtonType (NSButtonType.Radio);
                 cell.AllowsMixedState = true;
                 cell.Title = cmis.Name;
                 cell.Editable = true;
