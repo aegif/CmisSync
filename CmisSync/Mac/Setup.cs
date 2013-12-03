@@ -411,6 +411,10 @@ namespace CmisSync {
                     repo.Selected = true;
                     firstRepo = false;
                 }
+                else
+                {
+                    repo.Selected = false;
+                }
                 CmisRepoCredentials cred = new CmisRepoCredentials()
                 {
                     UserName = Controller.saved_user,
