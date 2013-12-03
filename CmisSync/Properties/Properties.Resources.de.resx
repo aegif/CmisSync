@@ -253,7 +253,7 @@
     <value>Ändern Sie den lokalen Pfad dieses Ordners:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Ein lokaler Ordner mit demselben Namen ist bereits vorhanden, bitte benutzen Sie einen anderen Namen.</value>
+    <value>Ein lokaler Ordner mit demselben Namen ist bereits vorhanden, bitte benutzen Sie einen anderen Namen um Konflikte mit bereits vorhandenen Dateien zu vermeiden.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
     <value>Synchronisation anhalten</value>
@@ -323,5 +323,12 @@ Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ä
   </data>
   <data name="SaveChanges" xml:space="preserve">
     <value>Änderungen übernehmen</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderText" xml:space="preserve">
+    <value>Möchten Sie wirklich den bereits lokal vorhandenen Ordner "{0}" synchronisieren?
+Dies kann bei der Synchronisation zu Konfliktdateien führen.</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderTitle" xml:space="preserve">
+    <value>Lokales Synchronisationsziel "{0}"</value>
   </data>
 </root>

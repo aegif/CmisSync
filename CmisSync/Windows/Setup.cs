@@ -966,6 +966,8 @@ namespace CmisSync
                                 {
                                     Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text);
                                 };
+
+                                Controller.LocalPathExists += LocalPathExistsHandler;
                                 break;
                             }
                         #endregion
@@ -1073,6 +1075,16 @@ namespace CmisSync
 
             Controller.PageCancelled();
             Logger.Info("Exiting constructor.");
+        }
+
+        private static bool LocalPathExistsHandler(string path) {
+            return System.Windows.MessageBox.Show(String.Format(
+                    Properties_Resources.ConfirmExistingLocalFolderText, path),
+                    String.Format(Properties_Resources.ConfirmExistingLocalFolderTitle, path),
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question,
+                    MessageBoxResult.No
+                    ) == MessageBoxResult.Yes;
         }
 
         private void CheckCustomizeInput(TextBox localfolder_box, TextBox localrepopath_box, TextBlock localfolder_error_label)
