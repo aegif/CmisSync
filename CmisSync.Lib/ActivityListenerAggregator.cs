@@ -78,5 +78,13 @@ namespace CmisSync.Lib
                 }
             }
         }
+
+        /// <summary>
+        /// Call this method to indicate that is in error state.
+        /// </summary>
+        public void ActivityError(Tuple<string, Exception> error)
+        {
+            overall.ActivityError(error);
+        }
     }
 }

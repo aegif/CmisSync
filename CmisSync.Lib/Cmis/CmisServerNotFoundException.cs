@@ -7,7 +7,7 @@ namespace CmisSync.Lib.Cmis
     /// Exception launched when the CMIS server can not be found.
     /// </summary>
     [Serializable]
-    public class CmisServerNotFoundException : Exception
+    public class CmisServerNotFoundException : CmisBaseException
     {
         /// <summary>
         /// Constructor.
@@ -26,6 +26,10 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public CmisServerNotFoundException(string message, Exception inner) : base(message, inner) { }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public CmisServerNotFoundException(Exception inner) : base(inner) { }
 
         /// <summary>
         /// Constructor.

@@ -34,8 +34,6 @@ namespace CmisSync {
     /// </summary>
     public enum IconState {
         Idle,
-        SyncingUp,
-        SyncingDown,
         Syncing,
         Error
     }
@@ -171,7 +169,8 @@ namespace CmisSync {
                 }
 
                 UpdateStatusItemEvent (StateText);
-                UpdateMenuEvent (CurrentState);
+                UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
+                UpdateMenuEvent(CurrentState);
             };
 
             // No more download/upload.
@@ -189,7 +188,7 @@ namespace CmisSync {
 
                 this.animation.Stop ();
 
-                UpdateIconEvent (0);
+                UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
                 UpdateMenuEvent (CurrentState);
             };
 
@@ -205,17 +204,36 @@ namespace CmisSync {
 
 
             // Error.
-            Program.Controller.OnError += delegate
+            Program.Controller.OnError += delegate (Tuple<string, Exception> error)
             {
+                Logger.Error(String.Format("Error syncing '{0}': {1}", error.Item1, error.Item2.Message), error.Item2);
+                //TODO: Use resources...
+                string message = String.Format("Could not sync '{0}': {1}", error.Item1, error.Item2.Message);
+
                 CurrentState = IconState.Error;
-                StateText = Properties_Resources.SyncingChanges; //TODO ERROR MESSAGE
+                StateText = message;
 
                 UpdateStatusItemEvent(StateText);
 
                 this.animation.Stop();
 
-                UpdateIconEvent(0);
+                UpdateIconEvent(-1);
                 UpdateMenuEvent(CurrentState);
+                
+                if (error.Item2 is CmisSync.Lib.Cmis.CmisPermissionDeniedException)
+                {
+                    //Suspend sync...
+                    SuspendSyncClicked(error.Item1);
+                    
+                    System.Windows.Forms.MessageBox.Show(message, "Error",
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Error);
+                }
+            };
+
+            Program.Controller.OnErrorResolved += delegate
+            {
+                CurrentState = IconState.Idle;
             };
         }
 

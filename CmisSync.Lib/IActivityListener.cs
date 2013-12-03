@@ -23,5 +23,11 @@ namespace CmisSync.Lib
         /// Call this method to indicate that activity has stopped.
         /// </summary>
         void ActivityStopped();
+
+
+        /// <summary>
+        /// Call this method to indicate that is in error state.
+        /// </summary>
+        void ActivityError(Tuple<string, Exception> error);
     }
 }

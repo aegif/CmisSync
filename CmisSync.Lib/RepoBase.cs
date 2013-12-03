@@ -245,9 +245,8 @@ namespace CmisSync.Lib
             CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
 
             //Pause sync
-            bool idle = Status == SyncStatus.Idle;
             this.remote_timer.Stop();
-            if (idle) Suspend();
+            if (Status == SyncStatus.Idle) Suspend();
 
             //Update password...
             if (!String.IsNullOrEmpty(password))
@@ -266,8 +265,8 @@ namespace CmisSync.Lib
             //Save configuration
             config.Save();
 
-            //Resume sync...
-            if (idle) Resume();
+            //Always resume sync...
+            Resume();
             this.remote_timer.Start();
         }
 
@@ -356,6 +355,15 @@ namespace CmisSync.Lib
             Watcher.EnableEvent = true;
             activityListener.ActivityStopped();
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+        }
+
+        /// <summary>
+        /// Called when sync encounters an error.
+        /// </summary>
+        public void OnSyncError(Exception exception)
+        {
+            Logger.Info("Sync Error: " + exception.Message);
+            activityListener.ActivityError(new Tuple<string, Exception>(Name, exception));
         }
 
         /// <summary>

@@ -187,30 +187,14 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             public void Connect()
             {
-                try
-                {
-                    // Create session factory.
-                    SessionFactory factory = SessionFactory.NewInstance();
-                    session = factory.CreateSession(cmisParameters);
-                    // Detect whether the repository has the ChangeLog capability.
-                    ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
-                            || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-                    Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
-                    Logger.Info("Created CMIS session: " + session.ToString());
-                }
-                //TODO Implement error handling -> informing user about connection problems by showing status
-                catch (CmisRuntimeException e)
-                {
-                    Logger.Error("Connection to repository failed: ", e);
-                }
-                catch (CmisObjectNotFoundException e)
-                {
-                    Logger.Error("Failed to find cmis object: ", e);
-                }
-                catch (CmisBaseException e)
-                {
-                    Logger.Error("Failed to create session to remote " + this.repoinfo.Address.ToString() + ": ", e);
-                }
+                // Create session factory.
+                SessionFactory factory = SessionFactory.NewInstance();
+                session = factory.CreateSession(cmisParameters);
+                // Detect whether the repository has the ChangeLog capability.
+                ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
+                        || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
+                Logger.Info("ChangeLog capability: " + ChangeLogCapability.ToString());
+                Logger.Info("Created CMIS session: " + session.ToString());
             }
 
 
@@ -244,12 +228,6 @@ namespace CmisSync.Lib.Sync
                     {
                         Connect();
                         firstSync = true;
-                    }
-                    if (session == null)
-                    {
-                        Logger.Error("Could not connect to: " + cmisParameters[SessionParameter.AtomPubUrl]);
-                        //TODO Error event
-                        return; // Will try again at next sync. 
                     }
 
                     IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
@@ -317,10 +295,17 @@ namespace CmisSync.Lib.Sync
                             {
                                 Sync(syncFull);
                             }
-                            catch (CmisBaseException e)
+                            catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
                             {
-                                Logger.Error("CMIS exception while syncing:", e);
-                                //TODO error event
+                                repo.OnSyncError( new CmisSync.Lib.Cmis.CmisPermissionDeniedException("Authentication failed.", e));
+                            }
+                            catch (DotCMIS.Exceptions.CmisBaseException e)
+                            {
+                                repo.OnSyncError(new CmisSync.Lib.Cmis.CmisBaseException(e));
+                            }
+                            catch (Exception e)
+                            {
+                                repo.OnSyncError(e);
                             }
                         }
                     );

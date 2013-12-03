@@ -37,6 +37,11 @@ namespace CmisSync
         private Icon[] animationFrames;
 
         /// <summary>
+        /// Icon to show when a cmis error has occured.
+        /// </summary>
+        private Icon errorIcon;
+
+        /// <summary>
         /// Menu item that shows the state of CmisSync (up-to-date, etc).
         /// </summary>
         private ToolStripMenuItem stateItem;
@@ -53,7 +58,7 @@ namespace CmisSync
         public StatusIcon()
         {
             // Create the menu.
-            CreateAnimationFrames();
+            CreateIcons();
             CreateMenu();
 
             // Setup the status icon.
@@ -96,7 +101,7 @@ namespace CmisSync
                         if (icon_frame > -1)
                             this.trayicon.Icon = animationFrames[icon_frame];
                         else
-                            this.trayicon.Icon = SystemIcons.Error;
+                            this.trayicon.Icon = errorIcon;
                     });
                 }
             };
@@ -110,7 +115,7 @@ namespace CmisSync
                     BeginInvoke((Action)delegate
                     {
                         this.stateItem.Text = state_text;
-                        this.trayicon.Text = "Oris4 Sync\n" + state_text;
+                        this.trayicon.Text = Utils.Ellipsis("Oris4 Sync\n" + state_text, 63);
                     });
                 }
             };
@@ -191,11 +196,17 @@ namespace CmisSync
             // Create the state menu item.
             this.stateItem = new ToolStripMenuItem()
             {
-                Text = Controller.StateText,
+                Text = Utils.Ellipsis(Controller.StateText, 32),
                 Enabled = false
             };
+
+            if (Controller.StateText.Length > 32)
+            {
+                this.stateItem.ToolTipText = Utils.WordWrap(Controller.StateText, 63);
+            }
+
             this.traymenu.Items.Add(stateItem);
-            this.trayicon.Text = "Oris4 Sync\n" + Controller.StateText;
+            this.trayicon.Text = Utils.Ellipsis("Oris4 Sync\n" + Controller.StateText, 63); //TODO Resources
 
             // Create a menu item per synchronized folder.
             if (Controller.Folders.Length > 0)
@@ -337,7 +348,7 @@ namespace CmisSync
         /// <summary>
         /// Create the animation frames from image files.
         /// </summary>
-        private void CreateAnimationFrames()
+        private void CreateIcons()
         {
             this.animationFrames = new Icon[] {
 	            UIHelpers.GetIcon ("process-syncing-i"),
@@ -346,6 +357,7 @@ namespace CmisSync
 	            UIHelpers.GetIcon ("process-syncing-iiii"),
 	            UIHelpers.GetIcon ("process-syncing-iiiii")
 			};
+            this.errorIcon = UIHelpers.GetIcon("process-syncing-error");
         }
 
 

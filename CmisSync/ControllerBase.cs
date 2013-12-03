@@ -83,11 +83,10 @@ namespace CmisSync
 
         public event Action FolderListChanged = delegate { };
 
-
         public event Action OnIdle = delegate { };
         public event Action OnSyncing = delegate { };
-        public event Action OnError = delegate { };
-
+        public event Action<Tuple<string, Exception>> OnError = delegate { };
+        public event Action OnErrorResolved = delegate { };
 
         public event AlertNotificationRaisedEventHandler AlertNotificationRaised = delegate { };
         public delegate void AlertNotificationRaisedEventHandler(string title, string message);
@@ -249,6 +248,8 @@ namespace CmisSync
                 if (repoBase.Name == repoName)
                 {
                     repoBase.UpdateSettings(password, pollInterval);
+                    OnErrorResolved();
+                    FolderListChanged();
                 }
             }
         }
@@ -499,6 +500,14 @@ namespace CmisSync
         public void ActivityStopped()
         {
             OnIdle();
+        }
+
+        /// <summary>
+        /// Error occured.
+        /// </summary>
+        public void ActivityError(Tuple<string, Exception> error)
+        {
+            OnError(error);
         }
     }
 }

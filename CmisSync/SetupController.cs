@@ -140,10 +140,11 @@ namespace CmisSync
                 uri = new Uri(url);
                 return CmisUtils.GetRepositoriesFuzzy(uri, user, password);
             }
-            catch(Exception e) {
-                return new Tuple<CmisServer,Exception>(null,e);
+            catch (Exception e)
+            {
+                return new Tuple<CmisServer, Exception>(null, e);
             }
-            
+
         }
 
 
@@ -361,10 +362,12 @@ namespace CmisSync
             UpdateAddProjectButtonEvent(!emptyAddress && rejexMatch);
 
             // Return validity error, or empty string if valid.
-            if (emptyAddress) {
+            if (emptyAddress)
+            {
                 return "EmptyURLNotAllowed";
             }
-            if (!rejexMatch) {
+            if (!rejexMatch)
+            {
                 return "InvalidURL";
             }
             return String.Empty;

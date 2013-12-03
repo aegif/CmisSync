@@ -7,7 +7,7 @@ namespace CmisSync.Lib.Cmis
     /// Exception launched when the CMIS repository denies an action.
     /// </summary>
     [Serializable]
-    public class CmisPermissionDeniedException : Exception
+    public class CmisPermissionDeniedException : CmisBaseException
     {
         /// <summary>
         /// Constructor.
@@ -23,6 +23,11 @@ namespace CmisSync.Lib.Cmis
         /// Constructor.
         /// </summary>
         public CmisPermissionDeniedException(string message, Exception inner) : base(message, inner) { }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public CmisPermissionDeniedException(Exception inner) : base(inner) { }
 
         /// <summary>
         /// Constructor.
