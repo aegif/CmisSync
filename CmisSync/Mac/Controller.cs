@@ -136,7 +136,7 @@ namespace CmisSync {
 
 		public void ShowLog (string str)
 		{
-			System.Diagnostics.Process.Start("/Applications/Utilities/Console.app/Contents/MacOS/Console", str);
+			System.Diagnostics.Process.Start("/usr/bin/open", "-a Console " + str);
 		}
 
 		public void LocalFolderClicked (string path)
