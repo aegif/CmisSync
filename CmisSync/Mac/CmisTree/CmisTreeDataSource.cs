@@ -156,6 +156,9 @@ namespace CmisSync.CmisTree
                 return false;
             }
 //            Console.WriteLine ("ItemExpandable " + cmis.Name + " " + cmis.Children.Count);
+            if (cmis.Parent == null && cmis.Selected == false) {
+                return false;
+            }
             return cmis.Children.Count > 0;
         }
 

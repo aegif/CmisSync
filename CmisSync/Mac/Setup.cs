@@ -442,13 +442,15 @@ namespace CmisSync {
                     foreach (RootFolder root in Repositories) {
                         Node node = cmis.GetNode(root);
                         if (node != null) {
-                            node.Selected = (selected != 0);
-                            DataSource.UpdateCmisTree(root);
-                            if (node.Parent == null) {
+                            if (node.Parent == null && node.Selected == false) {
                                 selectedRoot = root;
                             }
+                            node.Selected = (selected != 0);
+                            DataSource.UpdateCmisTree(root);
                         }
                     }
+
+                    NSOutlineView view = OutlineController.OutlineView();
                     if (selectedRoot != null) {
                         foreach (RootFolder root in Repositories) {
                             if (root != selectedRoot) {
@@ -456,14 +458,10 @@ namespace CmisSync {
                                 DataSource.UpdateCmisTree(root);
                             }
                         }
-                    }
-
-                    NSOutlineView view = OutlineController.OutlineView();
-                    for (int i = 0; i < view.RowCount; ++i) {
-                        try{
-                        view.ReloadItem(view.ItemAtRow(i));
-                        }catch(Exception e) {
-                            Console.WriteLine(e);
+                        view.ReloadData();
+                    } else {
+                        for (int i = 0; i < view.RowCount; ++i) {
+                            view.ReloadItem(view.ItemAtRow(i));
                         }
                     }
                 });
