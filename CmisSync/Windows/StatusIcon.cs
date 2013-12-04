@@ -243,7 +243,7 @@ namespace CmisSync
                         Text = Properties_Resources.RemoveFolderFromSync,
                         Tag = "remove",
                         // TODO if remove folder from sync is supported, enable this entry
-                        Enabled = false
+                        Enabled = true
                     };
                     removeFolderFromSyncItem.Click += RemoveFolderFromSyncDelegate(folderName);
 
