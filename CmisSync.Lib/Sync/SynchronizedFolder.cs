@@ -63,7 +63,7 @@ namespace CmisSync.Lib.Sync
 
             /// <summary>
             /// Path of the root in the remote repository.
-            // Example: "/User Homes/nicolas.raoul/demos"
+            /// Example: "/User Homes/nicolas.raoul/demos"
             /// </summary>
             private string remoteFolderPath;
 
