@@ -11,7 +11,6 @@ namespace CmisSync
     /// </summary>
     public static class Utils
     {
-        private static readonly string NEWLINE = "\n";
         private static char[] splitChars = new char[] { ' ', '-', '\t', '\\' };
 
         /// <summary>

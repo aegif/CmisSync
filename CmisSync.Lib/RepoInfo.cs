@@ -141,20 +141,36 @@ namespace CmisSync.Lib
             return ignoredPaths.Contains(path);
         }
 
+        /// <summary>
+        /// CMIS Password object.
+        /// </summary>
         public class CmisPassword
         {
             private string password = null;
+            /// <summary>
+            /// Constructor.
+            /// </summary>
             public CmisPassword(string password)
             {
                 this.password = Crypto.Obfuscate(password);
             }
 
-            public CmisPassword(){}
+            /// <summary>
+            /// Default constructor.
+            /// </summary>
+            public CmisPassword() { }
 
+            /// <summary>
+            /// Implicit operator.
+            /// </summary>
             public static implicit operator CmisPassword(string value)
             {
                 return new CmisPassword(value);
             }
+
+            /// <summary>
+            /// Convert to string.
+            /// </summary>
             override
             public string ToString()
             {
@@ -163,6 +179,9 @@ namespace CmisSync.Lib
                 return Crypto.Deobfuscate(password);
             }
 
+            /// <summary>
+            /// Obfuscated password.
+            /// </summary>
             public string ObfuscatedPassword { get { return password; } set { password = value; } }
         }
     }

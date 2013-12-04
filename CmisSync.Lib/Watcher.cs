@@ -107,7 +107,7 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// insert <param name="name">the file/folder</param> for <param name="change"/> in changes
-        /// It should do nothing if <param name="name">the file/folder</param> exists in changes
+        /// It should do nothing if the file/folder exists in changes
         /// </summary>
         public void AddChange(string name, ChangeTypes change)
         {

@@ -185,7 +185,10 @@ namespace CmisSync {
     /// </summary>
 	public class Link : Label {
 
-		public Link (string title, string address)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public Link(string title, string address)
 		{
 			FontSize   = 11;
 			Cursor     = Cursors.Hand;

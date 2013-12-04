@@ -33,14 +33,41 @@ namespace CmisSync
     /// </summary>
     public enum PageType
     {
+        /// <summary>
+        /// No page.
+        /// </summary>
         None,
+        /// <summary>
+        /// Setup page (add to startup items).
+        /// </summary>
         Setup,
+        /// <summary>
+        /// Add repository page.
+        /// </summary>
         Add1,
+        /// <summary>
+        /// Select remote folder.
+        /// </summary>
         Add2,
+        /// <summary>
+        /// Select name/local folder.
+        /// </summary>
         Customize,
+        /// <summary>
+        /// Syncing progress.
+        /// </summary>
         Syncing,
+        /// <summary>
+        /// Add complete.
+        /// </summary>
         Finished,
-        Tutorial, // This particular one contains sub-steps that are tracked via a number.
+        /// <summary>
+        /// Tutorial - contains sub-steps that are tracked via a number.
+        /// </summary>
+        Tutorial,
+        /// <summary>
+        /// Settings page.
+        /// </summary>
         Settings,
     }
 
@@ -51,41 +78,99 @@ namespace CmisSync
     /// </summary>
     public class SetupController
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof(SetupController));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(SetupController));
 
         private static readonly String MY_FILES = "My Files";
         private static readonly String ROOT_PATH = "/";
 
-        // Delegates.
-
+        /// <summary>
+        /// Show window event.
+        /// </summary>
         public event Action ShowWindowEvent = delegate { };
+        /// <summary>
+        /// Hide window event.
+        /// </summary>
         public event Action HideWindowEvent = delegate { };
 
+        /// <summary>
+        /// Change page event.
+        /// </summary>
         public event ChangePageEventHandler ChangePageEvent = delegate { };
+        /// <summary>
+        /// Change page event.
+        /// </summary>
         public delegate void ChangePageEventHandler(PageType page);
 
+        /// <summary>
+        /// Update progress bar event.
+        /// </summary>
         public event UpdateProgressBarEventHandler UpdateProgressBarEvent = delegate { };
+        /// <summary>
+        /// Update progress bar event.
+        /// </summary>
         public delegate void UpdateProgressBarEventHandler(double percentage);
 
+        /// <summary>
+        /// Update setup continue button.
+        /// </summary>
         public event UpdateSetupContinueButtonEventHandler UpdateSetupContinueButtonEvent = delegate { };
+        /// <summary>
+        /// Update setup continue button.
+        /// </summary>
         public delegate void UpdateSetupContinueButtonEventHandler(bool button_enabled);
 
+        /// <summary>
+        /// Update add project button event.
+        /// </summary>
         public event UpdateAddProjectButtonEventHandler UpdateAddProjectButtonEvent = delegate { };
+        /// <summary>
+        /// Update add project button event.
+        /// </summary>
         public delegate void UpdateAddProjectButtonEventHandler(bool button_enabled);
 
+        /// <summary>
+        /// Change address field event.
+        /// </summary>
         public event ChangeAddressFieldEventHandler ChangeAddressFieldEvent = delegate { };
+        /// <summary>
+        /// Change address field event.
+        /// </summary>
         public delegate void ChangeAddressFieldEventHandler(string text, string example_text);
 
+        /// <summary>
+        /// Change repository field event.
+        /// </summary>
         public event ChangeRepositoryFieldEventHandler ChangeRepositoryFieldEvent = delegate { };
+        /// <summary>
+        /// Change repository field event.
+        /// </summary>
         public delegate void ChangeRepositoryFieldEventHandler(string text, string example_text);
 
+        /// <summary>
+        /// Change path field event.
+        /// </summary>
         public event ChangePathFieldEventHandler ChangePathFieldEvent = delegate { };
+        /// <summary>
+        /// Change path field event.
+        /// </summary>
         public delegate void ChangePathFieldEventHandler(string text, string example_text);
 
+        /// <summary>
+        /// Change user field.
+        /// </summary>
         public event ChangeUserFieldEventHandler ChangeUserFieldEvent = delegate { };
+        /// <summary>
+        /// Change user field.
+        /// </summary>
         public delegate void ChangeUserFieldEventHandler(string text, string example_text);
 
+        /// <summary>
+        /// Change password event.
+        /// </summary>
         public event ChangePasswordFieldEventHandler ChangePasswordFieldEvent = delegate { };
+        /// <summary>
+        /// Change password event.
+        /// </summary>
         public delegate void ChangePasswordFieldEventHandler(string text, string example_text);
 
         /// <summary>
@@ -103,19 +188,58 @@ namespace CmisSync
         /// </summary>
         private PageType FolderAdditionWizardCurrentPage;
 
+        /// <summary>
+        /// Previous address.
+        /// </summary>
         public Uri PreviousAddress { get; private set; }
+        /// <summary>
+        /// Event.
+        /// </summary>
         public string PreviousPath { get; private set; }
+        /// <summary>
+        /// Previous repository.
+        /// </summary>
         public string PreviousRepository { get; private set; }
+        /// <summary>
+        /// Syncing repository name.
+        /// </summary>
         public string SyncingReponame { get; private set; }
+        /// <summary>
+        /// Default repository path..
+        /// </summary>
         public string DefaultRepoPath { get; private set; }
+        /// <summary>
+        /// Progress bar percentage.
+        /// </summary>
         public double ProgressBarPercentage { get; private set; }
 
+        /// <summary>
+        /// Saved address.
+        /// </summary>
         public Uri saved_address = null;
+        /// <summary>
+        /// Saved remote path.
+        /// </summary>
         public string saved_remote_path = "";
+        /// <summary>
+        /// Saved user.
+        /// </summary>
         public string saved_user = "";
+        /// <summary>
+        /// Saved password.
+        /// </summary>
         public string saved_password = "";
+        /// <summary>
+        /// Saved repository.
+        /// </summary>
         public string saved_repository = "";
+        /// <summary>
+        /// Saved sync interval.
+        /// </summary>
         public int saved_sync_interval = 15;
+        /// <summary>
+        /// Ignored paths.
+        /// </summary>
         public List<string> ignoredPaths = new List<string>();
 
         /// <summary>
@@ -156,7 +280,6 @@ namespace CmisSync
         {
             return CmisUtils.GetSubfolders(repositoryId, path, address, user, password);
         }
-
 
         /// <summary>
         /// Regex to check an HTTP/HTTPS URL.
@@ -257,6 +380,9 @@ namespace CmisSync
         }
 
 
+        /// <summary>
+        /// Check setup page.
+        /// </summary>
         public void CheckSetupPage()
         {
             UpdateSetupContinueButtonEvent(true);

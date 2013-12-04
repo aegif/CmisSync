@@ -29,7 +29,9 @@ using System.Net;
 
 namespace CmisSync
 {
-    // The CmisSync main class.
+    /// <summary>
+    /// The CmisSync main class.
+    /// </summary>
     public class Program
     {
         /// <summary>
@@ -52,9 +54,9 @@ namespace CmisSync
         /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
-        //
-        // Main method for CmisSync.
-        //
+        /// <summary>
+        /// Main method for CmisSync.
+        /// </summary>
         [STAThread]
         public static void Main(string[] args)
         {

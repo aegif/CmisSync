@@ -70,25 +70,67 @@ namespace CmisSync
         public string FoldersPath { get; private set; }
 
 
+        /// <summary>
+        /// Show setup window event.
+        /// </summary>
         public event ShowSetupWindowEventHandler ShowSetupWindowEvent = delegate { };
+        /// <summary>
+        /// Show setup window event.
+        /// </summary>
         public delegate void ShowSetupWindowEventHandler(PageType page_type);
 
+        /// <summary>
+        /// Show about window event.
+        /// </summary>
         public event Action ShowAboutWindowEvent = delegate { };
 
+        /// <summary>
+        /// Folder fetched event.
+        /// </summary>
         public event FolderFetchedEventHandler FolderFetched = delegate { };
+        /// <summary>
+        /// Folder fetched event.
+        /// </summary>
         public delegate void FolderFetchedEventHandler(string remote_url);
 
+        /// <summary>
+        /// Folder fetching event.
+        /// </summary>
         public event FolderFetchingHandler FolderFetching = delegate { };
+        /// <summary>
+        /// Folder fetching event.
+        /// </summary>
         public delegate void FolderFetchingHandler(double percentage);
 
+        /// <summary>
+        /// Folder list changed.
+        /// </summary>
         public event Action FolderListChanged = delegate { };
 
+        /// <summary>
+        /// Called with status changes to idle.
+        /// </summary>
         public event Action OnIdle = delegate { };
+        /// <summary>
+        /// Called with status changes to syncing.
+        /// </summary>
         public event Action OnSyncing = delegate { };
+        /// <summary>
+        /// Called with status changes to error.
+        /// </summary>
         public event Action<Tuple<string, Exception>> OnError = delegate { };
+        /// <summary>
+        /// Called with status changes to error resolved.
+        /// </summary>
         public event Action OnErrorResolved = delegate { };
 
+        /// <summary>
+        /// Alert notification.
+        /// </summary>
         public event AlertNotificationRaisedEventHandler AlertNotificationRaised = delegate { };
+        /// <summary>
+        /// Alert notification.
+        /// </summary>
         public delegate void AlertNotificationRaisedEventHandler(string title, string message);
 
 
@@ -231,7 +273,7 @@ namespace CmisSync
         /// <summary>
         /// Initialize (in the UI and syncing mechanism) an existing CmisSync synchronized folder.
         /// </summary>
-        /// <param name="folderPath">Synchronized folder path</param>
+        /// <param name="repositoryInfo">Synchronized folder path</param>
         private void AddRepository(RepoInfo repositoryInfo)
         {
             RepoBase repo = null;
@@ -241,6 +283,9 @@ namespace CmisSync
             repo.Initialize();
         }
 
+        /// <summary>
+        /// Update settings for repository.
+        /// </summary>
         public void UpdateRepositorySettings(string repoName, string password, int pollInterval)
         {
             foreach (RepoBase repoBase in this.repositories)
@@ -254,6 +299,9 @@ namespace CmisSync
             }
         }
 
+        /// <summary>
+        /// Remove repository from sync.
+        /// </summary>
         public void RemoveRepositoryFromSync(string reponame)
         {
             Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
@@ -263,6 +311,9 @@ namespace CmisSync
                 Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
         }
 
+        /// <summary>
+        /// Run a sync manually.
+        /// </summary>
         public void ManualSync(string reponame)
         {
             foreach (RepoBase aRepo in this.repositories)
@@ -280,7 +331,7 @@ namespace CmisSync
         /// Remove a synchronized folder from the CmisSync configuration.
         /// This happens after the user removes the folder.
         /// </summary>
-        /// <param name="folder_path">The synchronized folder to remove</param>
+        /// <param name="folder">The synchronized folder to remove</param>
         private void RemoveRepository(Config.SyncConfig.Folder folder)
         {
             if (this.repositories.Count > 0)

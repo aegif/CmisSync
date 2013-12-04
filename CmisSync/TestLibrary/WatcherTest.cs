@@ -15,11 +15,11 @@ namespace TestLibrary
     {
         private static readonly string TestFolderParent = Directory.GetCurrentDirectory();
         private static readonly string TestFolder = Path.Combine(TestFolderParent, "test");
-        private static readonly int NormalNumber = 10;
-        private static readonly int HeavyNumber = 10000;
-        private static readonly int FileInFolderNumber = 1000;
+        //private static readonly int NormalNumber = 10;
+        //private static readonly int HeavyNumber = 10000;
+        //private static readonly int FileInFolderNumber = 1000;
 
-        private static int TestNumber;
+        //private static int TestNumber;
 
         [TestFixtureSetUp]
         public void ClassInit()

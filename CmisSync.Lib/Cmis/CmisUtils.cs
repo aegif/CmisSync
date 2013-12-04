@@ -247,12 +247,27 @@ namespace CmisSync.Lib.Cmis
         }
 
 
+        /// <summary>
+        /// Folder tree.
+        /// </summary>
         public class FolderTree
         {
+            /// <summary>
+            /// Children.
+            /// </summary>
             public List<FolderTree> children = new List<FolderTree>();
+            /// <summary>
+            /// Folder path.
+            /// </summary>
             public string path;
+            /// <summary>
+            /// Folder name.
+            /// </summary>
             public string Name { get; set; }
 
+            /// <summary>
+            /// Constructor.
+            /// </summary>
             public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder)
             {
                 this.path = folder.Path;

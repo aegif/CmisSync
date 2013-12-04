@@ -48,7 +48,7 @@ namespace CmisSync
     /// </summary>
     public class Setup : SetupWindow
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof(Setup));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Setup));
 
         /// <summary>
         /// MVC controller.

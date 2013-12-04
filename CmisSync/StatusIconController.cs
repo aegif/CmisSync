@@ -33,8 +33,17 @@ namespace CmisSync {
     /// State of the CmisSync status icon.
     /// </summary>
     public enum IconState {
+        /// <summary>
+        /// Sync is idle.
+        /// </summary>
         Idle,
+        /// <summary>
+        /// Sync is running.
+        /// </summary>
         Syncing,
+        /// <summary>
+        /// Sync is in error state.
+        /// </summary>
         Error
     }
 
@@ -49,18 +58,40 @@ namespace CmisSync {
         /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(StatusIconController));
 
-        // Event handlers.
-
+        /// <summary>
+        /// Update icon event.
+        /// </summary>
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
-        public delegate void UpdateIconEventHandler (int icon_frame);
+        /// <summary>
+        /// Update icon event.
+        /// </summary>
+        public delegate void UpdateIconEventHandler(int icon_frame);
 
+        /// <summary>
+        /// Update menu event.
+        /// </summary>
         public event UpdateMenuEventHandler UpdateMenuEvent = delegate { };
-        public delegate void UpdateMenuEventHandler (IconState state);
+        /// <summary>
+        /// Update menu event.
+        /// </summary>
+        public delegate void UpdateMenuEventHandler(IconState state);
 
+        /// <summary>
+        /// Update status event.
+        /// </summary>
         public event UpdateStatusItemEventHandler UpdateStatusItemEvent = delegate { };
-        public delegate void UpdateStatusItemEventHandler (string state_text);
+        /// <summary>
+        /// Update status event.
+        /// </summary>
+        public delegate void UpdateStatusItemEventHandler(string state_text);
 
+        /// <summary>
+        /// Update suspended sync folder event.
+        /// </summary>
         public event UpdateSuspendSyncFolderEventHandler UpdateSuspendSyncFolderEvent = delegate { };
+        /// <summary>
+        /// Update suspended sync folder event.
+        /// </summary>
         public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
 		
 
@@ -318,11 +349,17 @@ namespace CmisSync {
             UpdateSuspendSyncFolderEvent(reponame);
         }
 
+        /// <summary>
+        /// Remove folder from sync clicked.
+        /// </summary>
         public void RemoveFolderFromSyncClicked(string reponame)
         {
             Program.Controller.RemoveRepositoryFromSync(reponame);
         }
 
+        /// <summary>
+        /// Manual sync clicked.
+        /// </summary>
         public void ManualSyncClicked(string reponame)
         {
             Program.Controller.ManualSync(reponame);
