@@ -61,10 +61,19 @@ namespace CmisSync.Lib
         /// </summary>
         public string ConfigPath { get; private set; }
 
+        /// <summary>
+        /// Notifications.
+        /// </summary>
         public bool Notifications { get { return configXml.Notifications; } set { configXml.Notifications = value; } }
 
+        /// <summary>
+        /// Folder.
+        /// </summary>
         public List<SyncConfig.Folder> Folder { get { return configXml.Folders; } }
 
+        /// <summary>
+        /// Get folder based on name.
+        /// </summary>
         public SyncConfig.Folder getFolder(string name)
         {
             foreach (SyncConfig.Folder folder in configXml.Folders)
@@ -259,6 +268,15 @@ namespace CmisSync.Lib
             return Path.Combine(ConfigPath, "debug_log.txt");
         }
 
+        private string GetLogLevel()
+        {
+#if (DEBUG)
+            return "DEBUG";
+#else
+            return "INFO";
+#endif
+        }
+
 
         /// <summary>
         /// Save the currently loaded (in memory) configuration back to the XML file.
@@ -299,7 +317,7 @@ namespace CmisSync.Lib
       </layout>
     </appender>
     <root>
-      <level value=""DEBUG"" />
+      <level value=""" + GetLogLevel() + @""" />
       <appender-ref ref=""CmisSyncFileAppender"" />
     </root>
   </log4net>"))
@@ -309,10 +327,19 @@ namespace CmisSync.Lib
             }
         }
 
-        [XmlRoot("CmisSync", Namespace=null)]
+        /// <summary>
+        /// Sync configuration.
+        /// </summary>
+        [XmlRoot("CmisSync", Namespace = null)]
         public class SyncConfig {
+            /// <summary>
+            /// Notifications.
+            /// </summary>
             [XmlElement("notifications")]
             public Boolean Notifications { get; set; }
+            /// <summary>
+            /// Logging config.
+            /// </summary>
             [XmlAnyElement("log4net")]
             public XmlNode Log4Net { get; set; }
             /// <summary>
@@ -321,33 +348,65 @@ namespace CmisSync.Lib
             [XmlArray("folders")]
             [XmlArrayItem("folder")]
             public List<SyncConfig.Folder> Folders { get; set; }
+            /// <summary>
+            /// User.
+            /// </summary>
             [XmlElement("user", typeof(User))]
             public User User { get; set; }
 
-            public class Folder {
-            
+            /// <summary>
+            /// Folder definition.
+            /// </summary>
+            public class Folder
+            {
+
+                /// <summary>
+                /// Name.
+                /// </summary>
                 [XmlElement("name")]
                 public string DisplayName { get; set; }
 
+                /// <summary>
+                /// Path.
+                /// </summary>
                 [XmlElement("path")]
                 public string LocalPath { get; set; }
- 
+
+                /// <summary>
+                /// URL.
+                /// </summary>
                 [XmlElement("url")]
                 public XmlUri RemoteUrl { get; set; }
-                
+
+                /// <summary>
+                /// Repository ID.
+                /// </summary>
                 [XmlElement("repository")]
                 public string RepositoryId { get; set; }
-                
+
+                /// <summary>
+                /// Remote path.
+                /// </summary>
                 [XmlElement("remoteFolder")]
                 public string RemotePath { get; set; }
 
+                /// <summary>
+                /// Username.
+                /// </summary>
                 [XmlElement("user")]
-                public string UserName { get; set; } 
-                
+                public string UserName { get; set; }
+
+                /// <summary>
+                /// Password.
+                /// </summary>
                 [XmlElement("password")]
                 public string ObfuscatedPassword { get; set; }
 
                 private double pollInterval = DEFAULT_POLL_INTERVAL;
+
+                /// <summary>
+                /// Poll interval.
+                /// </summary>
                 [XmlElement("pollinterval")]
                 public double PollInterval {
                     get { return pollInterval; }
@@ -365,7 +424,10 @@ namespace CmisSync.Lib
                     }
                 }
 
-                [XmlElement("ignoreFolder",IsNullable=true)]
+                /// <summary>
+                /// Ingored folders.
+                /// </summary>
+                [XmlElement("ignoreFolder", IsNullable = true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
                 /// <summary>
@@ -393,46 +455,86 @@ namespace CmisSync.Lib
             }
         }
 
+        /// <summary>
+        /// Ignored folder.
+        /// </summary>
         public class IgnoredFolder
         {
+            /// <summary>
+            /// Folder path.
+            /// </summary>
             [XmlAttribute("path")]
             public string Path { get; set; }
         }
 
-        public class User {
+        /// <summary>
+        /// User details.
+        /// </summary>
+        public class User
+        {
+            /// <summary>
+            /// Name.
+            /// </summary>
             [XmlElement("name")]
             public string Name { get; set; }
+            /// <summary>
+            /// Email.
+            /// </summary>
             [XmlElement("email")]
             public string EMail { get; set; }
         }
 
+        /// <summary>
+        /// XML URI.
+        /// </summary>
         public class XmlUri : IXmlSerializable
         {
             private Uri _Value;
 
+            /// <summary>
+            /// Constructor.
+            /// </summary>
             public XmlUri() { }
+            /// <summary>
+            /// Constructor.
+            /// </summary>
             public XmlUri(Uri source) { _Value = source; }
 
+            /// <summary>
+            /// implicit.
+            /// </summary>
             public static implicit operator Uri(XmlUri o)
             {
                 return o == null ? null : o._Value;
             }
 
+            /// <summary>
+            /// implicit.
+            /// </summary>
             public static implicit operator XmlUri(Uri o)
             {
                 return o == null ? null : new XmlUri(o);
             }
 
+            /// <summary>
+            /// Get schema.
+            /// </summary>
             public System.Xml.Schema.XmlSchema GetSchema()
             {
                 return null;
             }
 
+            /// <summary>
+            /// Read XML.
+            /// </summary>
             public void ReadXml(XmlReader reader)
             {
                 _Value = new Uri(reader.ReadElementContentAsString());
             }
 
+            /// <summary>
+            /// Write XML.
+            /// </summary>
             public void WriteXml(XmlWriter writer)
             {
                 writer.WriteValue(_Value.ToString());
