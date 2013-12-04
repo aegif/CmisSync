@@ -1,21 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using DotCMIS.Client;
-using DotCMIS;
-using DotCMIS.Client.Impl;
-using DotCMIS.Exceptions;
-using DotCMIS.Enums;
-using System.ComponentModel;
-using System.Collections;
-using DotCMIS.Data.Impl;
-
-using System.Net;
 using CmisSync.Lib.Cmis;
+using DotCMIS;
+using DotCMIS.Client;
+using DotCMIS.Client.Impl;
 using DotCMIS.Data;
+using DotCMIS.Data.Impl;
+using DotCMIS.Enums;
+using DotCMIS.Exceptions;
 using log4net;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace CmisSync.Lib.Sync
@@ -140,10 +136,10 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
                 cmisParameters[SessionParameter.ConnectTimeout] = "-1";
 
-				foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
-				{
-					Logger.Info("The folder \""+ignoredFolder+"\" will be ignored");
-				}
+                foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
+                {
+                    Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
+                }
             }
 
 
@@ -222,7 +218,7 @@ namespace CmisSync.Lib.Sync
                 {
                     this.syncing = true;
                     repo.OnSyncStart(syncFull);
-                    
+
                     // If not connected, connect.
                     if (session == null)
                     {
@@ -295,13 +291,13 @@ namespace CmisSync.Lib.Sync
                             {
                                 Sync(syncFull);
                             }
-                            catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
+                            catch (CmisPermissionDeniedException e)
                             {
-                                repo.OnSyncError( new CmisSync.Lib.Cmis.CmisPermissionDeniedException("Authentication failed.", e));
+                                repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
                             }
-                            catch (DotCMIS.Exceptions.CmisBaseException e)
+                            catch (CmisBaseException e)
                             {
-                                repo.OnSyncError(new CmisSync.Lib.Cmis.CmisBaseException(e));
+                                repo.OnSyncError(new BaseException(e));
                             }
                             catch (Exception e)
                             {
@@ -323,10 +319,8 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download all content from a CMIS folder.
             /// </summary>
-            private bool RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
+            private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
             {
-                bool success = true;
-
                 // List all children.
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
@@ -342,19 +336,21 @@ namespace CmisSync.Lib.Sync
                             // Create database entry for this folder
                             // TODO Add metadata
                             database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
+                            Logger.Info("Added folder to database: " + localSubFolder);
 
                             // Recurse into folder.
-                            success = success && RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                            RecursiveFolderCopy(remoteSubFolder, localSubFolder);
                         }
                     }
                     else
                     {
                         if (Utils.WorthSyncing(cmisObject.Name))
+                        {
                             // It is a file, just download it.
-                            success = success && DownloadFile((IDocument)cmisObject, localFolder);
+                            DownloadFile((IDocument)cmisObject, localFolder);
+                        }
                     }
                 }
-                return success;
             }
 
 
@@ -421,9 +417,9 @@ namespace CmisSync.Lib.Sync
                         }
                         success = true;
                     }
-                    catch (Exception ex)
+                    catch (CmisBaseException e)
                     {
-                        Logger.Error("Download failed: " + fileName + " " + ex);
+                        Logger.Error("Download failed: " + fileName, e);
                         if (contentStream != null) contentStream.Stream.Close();
                         success = false;
                         File.Delete(tmpfilepath);
@@ -440,7 +436,7 @@ namespace CmisSync.Lib.Sync
                         {
                             metadata = FetchMetadata(remoteDocument);
                         }
-                        catch (Exception e)
+                        catch (CmisBaseException e)
                         {
                             Logger.Info("Exception while fetching metadata: " + fileName, e);
                             // Remove temporary local document to avoid it being considered a new document.
@@ -453,14 +449,13 @@ namespace CmisSync.Lib.Sync
 
                         // Create database entry for this file.
                         database.AddFile(filepath, remoteDocument.LastModificationDate, metadata, filehash);
-
-                        Logger.Info("Added to database: " + fileName);
+                        Logger.Info("Added file to database: " + filepath);
                     }
                     return success;
                 }
-                catch (IOException e)
+                catch (Exception e)
                 {
-                    Logger.Warn("Exception while file operation: " + e.Message, e);
+                    Logger.Error("Exception while downloading file: " + e.Message, e);
                     return false;
                 }
             }
@@ -471,7 +466,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private byte[] DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
             {
-                byte[] hash = {};
+                byte[] hash = { };
                 using (Stream file = File.OpenWrite(filePath))
                 using (SHA1 hashAlg = new SHA1Managed())
                 using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
@@ -495,12 +490,13 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UploadFile(string filePath, IFolder remoteFolder)
             {
-                IDocument remoteDocument = null;
-                Boolean success = false;
-                byte[] filehash = { };
+                Logger.Info("Uploading: " + filePath);
+
                 try
                 {
-                    Logger.Info("Uploading: " + filePath);
+                    IDocument remoteDocument = null;
+                    bool success = false;
+                    byte[] filehash = { };
 
                     // Prepare properties
                     string fileName = Path.GetFileName(filePath);
@@ -509,7 +505,7 @@ namespace CmisSync.Lib.Sync
                     properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
 
                     // Prepare content stream
-                    using (Stream file = File.OpenRead(filePath))
+                    using (Stream file = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     using (SHA1 hashAlg = new SHA1Managed())
                     using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                     {
@@ -526,44 +522,32 @@ namespace CmisSync.Lib.Sync
                             filehash = hashAlg.Hash;
                             success = true;
                         }
-                        catch (Exception ex)
+                        catch (CmisBaseException e)
                         {
-                            Logger.Fatal("Upload failed: " + filePath + " " + ex);
+                            Logger.Error("Upload failed: " + filePath, e);
+                            success = false;
                         }
                     }
+
+                    // Metadata.
+                    if (success)
+                    {
+                        Logger.Info("Uploaded: " + filePath);
+
+                        // Get metadata. Some metadata has probably been automatically added by the server.
+                        Dictionary<string, string[]> metadata = metadata = FetchMetadata(remoteDocument);
+
+                        // Create database entry for this file.
+                        database.AddFile(filePath, remoteDocument.LastModificationDate, metadata, filehash);
+                        Logger.Info("Added file to database: " + filePath);
+                    }
+                    return success;
                 }
                 catch (Exception e)
                 {
-                    if (e is FileNotFoundException ||
-                        e is IOException)
-                    {
-                        Logger.Warn("File deleted while trying to upload it, reverting.");
-                        // File has been deleted while we were trying to upload/checksum/add.
-                        // This can typically happen in Windows Explore when creating a new text file and giving it a name.
-                        // In this case, revert the upload.
-                        if (remoteDocument != null)
-                        {
-                            remoteDocument.DeleteAllVersions();
-                        }
-                    }
-                    else
-                    {
-                        //throw;
-                    }
+                    Logger.Error("Exception while uploading file: " + e.Message, e);
+                    return false;
                 }
-
-                // Metadata.
-                if (success)
-                {
-                    Logger.Info("Uploaded: " + filePath);
-
-                    // Get metadata. Some metadata has probably been automatically added by the server.
-                    Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-
-                    // Create database entry for this file.
-                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata, filehash);
-                }
-                return success;
             }
 
 
@@ -571,58 +555,49 @@ namespace CmisSync.Lib.Sync
             /// Upload folder recursively.
             /// After execution, the hierarchy on server will be: .../remoteBaseFolder/localFolder/...
             /// </summary>
-            private bool UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
+            private void UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
             {
-                // Create remote folder.
-                Dictionary<string, object> properties = new Dictionary<string, object>();
-                properties.Add(PropertyIds.Name, Path.GetFileName(localFolder));
-                properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
-                IFolder folder = remoteBaseFolder.CreateFolder(properties);
-
-                // Create database entry for this folder
-                // TODO Add metadata
-                database.AddFolder(localFolder, folder.LastModificationDate);
-
-                bool success = true;
+                IFolder folder;
                 try
                 {
-                    // Upload each file in this folder.
-                    foreach (string file in Directory.GetFiles(localFolder))
-                    {
-                        if (Utils.WorthSyncing(file))
-                        {
-                            success = success && UploadFile(file, folder);
-                        }
-                    }
+                    // Create remote folder.
+                    Dictionary<string, object> properties = new Dictionary<string, object>();
+                    properties.Add(PropertyIds.Name, Path.GetFileName(localFolder));
+                    properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
+                    folder = remoteBaseFolder.CreateFolder(properties);
 
-                    // Recurse for each subfolder in this folder.
-                    foreach (string subfolder in Directory.GetDirectories(localFolder))
-                    {
-                        string path = subfolder.Substring(repoinfo.TargetDirectory.Length);
-                        path = path.Replace("\\\\","/");
-                        if (Utils.WorthSyncing(subfolder) && !repoinfo.isPathIgnored(path))
-                        {
-                            success = success && UploadFolderRecursively(folder, subfolder);
-                        }
-                    }
+                    // Create database entry for this folder
+                    // TODO Add metadata
+                    database.AddFolder(localFolder, folder.LastModificationDate);
+                    Logger.Info("Added folder to database: " + localFolder);
                 }
-                catch (Exception e)
+                catch (CmisBaseException e)
                 {
-                    if (e is System.IO.DirectoryNotFoundException ||
-                        e is IOException)
+                    Logger.Error("Could not create remote directory: " + remoteBaseFolder.Path + "/" + Path.GetFileName(localFolder), e);
+                    return;
+                }
+
+
+                // Upload each file in this folder.
+                foreach (string file in Directory.GetFiles(localFolder))
+                {
+                    if (Utils.WorthSyncing(file))
                     {
-                        Logger.Warn("Folder deleted while trying to upload it, reverting.");
-                        // Folder has been deleted while we were trying to upload/checksum/add.
-                        // In this case, revert the upload.
-                        folder.DeleteTree(true, null, true);
-                    }
-                    else
-                    {
-                        return false;
+                        UploadFile(file, folder);
                     }
                 }
 
-                return success;
+                // Recurse for each subfolder in this folder.
+                foreach (string subfolder in Directory.GetDirectories(localFolder))
+                {
+                    string path = subfolder.Substring(repoinfo.TargetDirectory.Length);
+                    path = path.Replace("\\\\", "/");
+                    if (Utils.WorthSyncing(subfolder) && !repoinfo.isPathIgnored(path))
+                    {
+                        UploadFolderRecursively(folder, subfolder);
+                    }
+                }
+
             }
 
 
@@ -633,8 +608,8 @@ namespace CmisSync.Lib.Sync
             {
                 try
                 {
-                    Logger.Info("## Updating " + filePath);
-                    using (Stream localfile = File.OpenRead(filePath))
+                    Logger.Info("Updating: " + filePath);
+                    using (Stream localfile = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         // Ignore files with null or empty content stream.
                         if ((localfile == null) && (localfile.Length == 0))
@@ -659,13 +634,13 @@ namespace CmisSync.Lib.Sync
                         remoteFile.SetContentStream(remoteStream, true, true);
 
                         Logger.Debug("after SetContentStream");
-                        Logger.Info("## Updated " + filePath);
+                        Logger.Info("Updated: " + filePath);
                         return true;
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while update file {0}: {1}", filePath, e));
+                    Logger.Error(String.Format("Exception while updating file: {0}", filePath), e);
                     return false;
                 }
             }
@@ -675,43 +650,51 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UpdateFile(string filePath, IFolder remoteFolder)
             {
-                // Find the document within the folder.
-                string fileName = Path.GetFileName(filePath);
-                IDocument document = null;
-                bool found = false;
-                foreach (ICmisObject obj in remoteFolder.GetChildren())
+                try
                 {
-                    if (null != (document = obj as IDocument))
+                    // Find the document within the folder.
+                    string fileName = Path.GetFileName(filePath);
+                    IDocument document = null;
+                    bool found = false;
+                    foreach (ICmisObject obj in remoteFolder.GetChildren())
                     {
-                        if (document.Name == fileName)
+                        if (null != (document = obj as IDocument))
                         {
-                            found = true;
-                            break;
+                            if (document.Name == fileName)
+                            {
+                                found = true;
+                                break;
+                            }
                         }
                     }
-                }
 
-                // If not found, it means the document has been deleted.
-                if (!found)
+                    // If not found, it means the document has been deleted.
+                    if (!found)
+                    {
+                        Logger.Info(filePath + " not found on server, must be uploaded instead of updated");
+                        return UploadFile(filePath, remoteFolder);
+                    }
+
+                    // Update the document itself.
+                    bool success = UpdateFile(filePath, document);
+
+                    if (success)
+                    {
+                        // Update timestamp in database.
+                        database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
+
+                        // Update checksum
+                        database.RecalculateChecksum(filePath);
+
+                        // TODO Update metadata?
+                    }
+                    return success;
+                }
+                catch (Exception e)
                 {
-                    Logger.Info(filePath + " not found on server, must be uploaded instead of updated");
-                    return UploadFile(filePath, remoteFolder);
+                    Logger.Error("Exception while updating file: " + filePath, e);
+                    return false;
                 }
-
-                // Update the document itself.
-                bool success = UpdateFile(filePath, document);
-
-                if (success)
-                {
-                    // Update timestamp in database.
-                    database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
-
-                    // Update checksum
-                    database.RecalculateChecksum(filePath);
-
-                    // TODO Update metadata?
-                }
-                return success;
             }
 
 

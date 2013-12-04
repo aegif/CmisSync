@@ -175,7 +175,7 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         private string Checksum(string filePath)
         {
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var bs = new BufferedStream(fs))
             {
                 using (var sha1 = new SHA1Managed())

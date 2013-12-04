@@ -132,15 +132,8 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        bool success = UploadFolderRecursively(remoteBase, pathname);
-                        if (success)
-                        {
-                            Logger.Info("Create locally created folder on server: " + pathname);
-                        }
-                        else
-                        {
-                            Logger.Warn("Failure to create locally created folder on server: " + pathname);
-                        }
+                        Logger.Info("Create locally created folder on server: " + pathname);
+                        UploadFolderRecursively(remoteBase, pathname);
                     }
                     return;
                 }

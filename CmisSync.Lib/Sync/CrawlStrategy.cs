@@ -1,18 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using DotCMIS.Client;
-using DotCMIS;
-using DotCMIS.Client.Impl;
-using DotCMIS.Exceptions;
-using DotCMIS.Enums;
-using System.ComponentModel;
+using System;
 using System.Collections;
-using DotCMIS.Data.Impl;
+using System.IO;
 
-using System.Net;
 
 namespace CmisSync.Lib.Sync
 {
@@ -174,6 +164,7 @@ namespace CmisSync.Lib.Sync
                                 // Create database entry for this folder.
                                 // TODO - Yannick - Add metadata
                                 database.AddFolder(localSubFolder, remoteSubFolder.LastModificationDate);
+                                Logger.Info("Added folder to database: " + localSubFolder);
 
                                 // Recursive copy of the whole folder.
                                 RecursiveFolderCopy(remoteSubFolder, localSubFolder);
