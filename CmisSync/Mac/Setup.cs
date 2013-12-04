@@ -438,13 +438,26 @@ namespace CmisSync {
             DataSource = new CmisTree.CmisTreeDataSource(Repositories);
             DataSource.SelectedEvent += delegate (NSCmisTree cmis, int selected) {
                 InvokeOnMainThread(delegate {
+                    RootFolder selectedRoot = null;
                     foreach (RootFolder root in Repositories) {
                         Node node = cmis.GetNode(root);
                         if (node != null) {
                             node.Selected = (selected != 0);
                             DataSource.UpdateCmisTree(root);
+                            if (node.Parent == null) {
+                                selectedRoot = root;
+                            }
                         }
                     }
+                    if (selectedRoot != null) {
+                        foreach (RootFolder root in Repositories) {
+                            if (root != selectedRoot) {
+                                root.Selected = false;
+                                DataSource.UpdateCmisTree(root);
+                            }
+                        }
+                    }
+
                     NSOutlineView view = OutlineController.OutlineView();
                     for (int i = 0; i < view.RowCount; ++i) {
                         try{
