@@ -747,7 +747,7 @@ namespace CmisSync
                                     {
                                         RootFolder repo = item as RootFolder;
                                         if (repo != null)
-                                            if (repo.Selected == true)
+                                            if (repo.Selected != false)
                                             {
                                                 selectedRepo = repo;
                                                 break;

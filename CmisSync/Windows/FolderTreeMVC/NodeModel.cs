@@ -306,6 +306,12 @@ namespace CmisSync.CmisTree
         /// Overrides the ThreeStates base method to read only
         /// </summary>
         public override bool ThreeStates { get { return false; } set { base.ThreeStates = false; } }
+
+        /// <summary>
+        /// Overrides the selection mode of node by returning only false and true
+        /// Other possiblities could be possible in the future, but at the moment, only selected or not are valid results
+        /// </summary>
+        public override bool? Selected { get { return base.Selected != false; } set { base.Selected = value; } }
     }
 
     /// <summary>
