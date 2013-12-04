@@ -7,34 +7,34 @@ namespace CmisSync.Lib.Cmis
     /// Exception launched when the CMIS server errors.
     /// </summary>
     [Serializable]
-    public class CmisBaseException : Exception
+    public class BaseException : Exception
     {
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisBaseException() { }
+        public BaseException() { }
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisBaseException(string message) : base(message) { }
+        public BaseException(string message) : base(message) { }
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisBaseException(string message, Exception inner) : base(message, inner) { }
+        public BaseException(string message, Exception inner) : base(message, inner) { }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisBaseException(Exception inner) : base(inner.Message, inner) { }
+        public BaseException(Exception inner) : base(inner.Message, inner) { }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CmisBaseException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected BaseException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 
 }

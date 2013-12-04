@@ -7,31 +7,31 @@ namespace CmisSync.Lib.Cmis
     /// Exception launched when the CMIS repository denies an action.
     /// </summary>
     [Serializable]
-    public class CmisPermissionDeniedException : CmisBaseException
+    public class PermissionDeniedException : BaseException
     {
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisPermissionDeniedException() { }
+        public PermissionDeniedException() { }
         
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisPermissionDeniedException(string message) : base(message) { }
+        public PermissionDeniedException(string message) : base(message) { }
         
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisPermissionDeniedException(string message, Exception inner) : base(message, inner) { }
+        public PermissionDeniedException(string message, Exception inner) : base(message, inner) { }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisPermissionDeniedException(Exception inner) : base(inner) { }
+        public PermissionDeniedException(Exception inner) : base(inner) { }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CmisPermissionDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected PermissionDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

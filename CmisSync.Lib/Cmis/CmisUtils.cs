@@ -1,14 +1,12 @@
+using DotCMIS;
+using DotCMIS.Client;
+using DotCMIS.Client.Impl;
+using DotCMIS.Exceptions;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using DotCMIS.Client;
-using DotCMIS.Client.Impl;
-using DotCMIS;
-using DotCMIS.Exceptions;
-using log4net;
 using System.Web;
-using DotCMIS.Data;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -61,10 +59,10 @@ namespace CmisSync.Lib.Cmis
             {
                 repositories = GetRepositories(url, user, password);
             }
-            catch (DotCMIS.Exceptions.CmisRuntimeException e)
+            catch (CmisRuntimeException e)
             {
                 if (e.Message == "ConnectFailure")
-                    return new Tuple<CmisServer, Exception>(new CmisServer(url, null), new CmisServerNotFoundException(e.Message, e));
+                    return new Tuple<CmisServer, Exception>(new CmisServer(url, null), new ServerNotFoundException(e.Message, e));
                 firstException = e;
 
             }
@@ -113,9 +111,9 @@ namespace CmisSync.Lib.Cmis
                 {
                     repositories = GetRepositories(new Uri(fuzzyUrl), user, password);
                 }
-                catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
+                catch (CmisPermissionDeniedException e)
                 {
-                    firstException = new CmisPermissionDeniedException(e.Message, e);
+                    firstException = new PermissionDeniedException(e.Message, e);
                     bestUrl = fuzzyUrl;
                 }
                 catch (Exception e)
@@ -164,7 +162,7 @@ namespace CmisSync.Lib.Cmis
             {
                 repositories = factory.GetRepositories(cmisParameters);
             }
-            catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
+            catch (CmisPermissionDeniedException e)
             {
                 Logger.Error("CMIS server found, but permission denied. Please check username/password. ", e);
                 throw;

@@ -50,15 +50,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cmis\CmisBaseException.cs" />
+    <Compile Include="Cmis\BaseException.cs" />
     <Compile Include="Cmis\Crypto.cs" />
     <Compile Include="Cmis\Database.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />
     <Compile Include="Sync\SynchronizedFolder.cs" />
     <Compile Include="Sync\CrawlStrategy.cs" />
-    <Compile Include="Cmis\CmisPermissionDeniedException.cs" />
-    <Compile Include="Cmis\CmisServerNotFoundException.cs" />
+    <Compile Include="Cmis\PermissionDeniedException.cs" />
+    <Compile Include="Cmis\ServerNotFoundException.cs" />
     <Compile Include="Cmis\CmisUtils.cs" />
     <Compile Include="Cmis\MimeType.cs" />
     <Compile Include="Sync\CmisRepo.cs" />

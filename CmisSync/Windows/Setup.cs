@@ -605,11 +605,11 @@ namespace CmisSync
                                         string warning = "";
                                         string message = result.Item2.Message;
                                         Exception e = result.Item2;
-                                        if (e is CmisPermissionDeniedException)
+                                        if (e is PermissionDeniedException)
                                         {
                                             warning = Properties_Resources.LoginFailedForbidden;
                                         }
-                                        else if (e is CmisServerNotFoundException)
+                                        else if (e is ServerNotFoundException)
                                         {
                                             warning = Properties_Resources.ConnectFailure;
                                         }
@@ -1265,11 +1265,11 @@ namespace CmisSync
                                             string warning = "";
                                             string message = result.Item2.Message;
                                             Exception e = result.Item2;
-                                            if (e is CmisPermissionDeniedException)
+                                            if (e is PermissionDeniedException)
                                             {
                                                 warning = Properties_Resources.LoginFailedForbidden;
                                             }
-                                            else if (e is CmisServerNotFoundException)
+                                            else if (e is ServerNotFoundException)
                                             {
                                                 warning = Properties_Resources.ConnectFailure;
                                             }

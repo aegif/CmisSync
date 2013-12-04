@@ -7,34 +7,34 @@ namespace CmisSync.Lib.Cmis
     /// Exception launched when the CMIS server can not be found.
     /// </summary>
     [Serializable]
-    public class CmisServerNotFoundException : CmisBaseException
+    public class ServerNotFoundException : BaseException
     {
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisServerNotFoundException() { }
+        public ServerNotFoundException() { }
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisServerNotFoundException(string message) : base(message) { }
+        public ServerNotFoundException(string message) : base(message) { }
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisServerNotFoundException(string message, Exception inner) : base(message, inner) { }
+        public ServerNotFoundException(string message, Exception inner) : base(message, inner) { }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisServerNotFoundException(Exception inner) : base(inner) { }
+        public ServerNotFoundException(Exception inner) : base(inner) { }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CmisServerNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected ServerNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 
 }

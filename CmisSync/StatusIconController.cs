@@ -16,6 +16,7 @@
 
 
 using CmisSync.Lib;
+using CmisSync.Lib.Cmis;
 using log4net;
 using System;
 using System.Timers;
@@ -244,7 +245,7 @@ namespace CmisSync {
                 UpdateIconEvent(-1);
                 UpdateMenuEvent(CurrentState);
                 
-                if (error.Item2 is CmisSync.Lib.Cmis.CmisPermissionDeniedException)
+                if (error.Item2 is PermissionDeniedException)
                 {
                     //Suspend sync...
                     SuspendSyncClicked(error.Item1);

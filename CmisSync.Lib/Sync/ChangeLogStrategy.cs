@@ -1,18 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using DotCMIS.Client;
-using DotCMIS;
-using DotCMIS.Client.Impl;
-using DotCMIS.Exceptions;
 using DotCMIS.Enums;
-using System.ComponentModel;
-using System.Collections;
-using DotCMIS.Data.Impl;
+using System.IO;
+using System.Linq;
 
-using System.Net;
 
 namespace CmisSync.Lib.Sync
 {
