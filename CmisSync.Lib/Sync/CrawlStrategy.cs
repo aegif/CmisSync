@@ -284,7 +284,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while get the file list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
+                    Logger.Warn(String.Format("Exception while get the file list from folder {0}", localFolder), e);
                     return;
                 }
 
@@ -394,7 +394,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while get the folder list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
+                    Logger.Warn(String.Format("Exception while get the folder list from folder {0}", localFolder), e);
                     return;
                 }
 

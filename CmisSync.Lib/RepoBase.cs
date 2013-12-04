@@ -404,7 +404,6 @@ namespace CmisSync.Lib
 
     /// <summary>
     /// Current status of the synchronization.
-    /// TODO: It was used in SparkleShare for up/down/error but is not useful anymore, should be removed.
     /// </summary>
     public enum SyncStatus
     {
@@ -415,7 +414,6 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// Synchronization is suspended.
-        /// TODO this should be written in XML configuration instead.
         /// </summary>
         Suspend
     }

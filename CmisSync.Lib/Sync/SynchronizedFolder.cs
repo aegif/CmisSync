@@ -442,7 +442,7 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (Exception e)
                         {
-                            Logger.Info("Exception while fetching metadata: " + fileName + " " + Utils.ToLogString(e));
+                            Logger.Info("Exception while fetching metadata: " + fileName, e);
                             // Remove temporary local document to avoid it being considered a new document.
                             File.Delete(tmpfilepath);
                             return false;
@@ -460,7 +460,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (IOException e)
                 {
-                    Logger.Warn("Exception while file operation: " + Utils.ToLogString(e));
+                    Logger.Warn("Exception while file operation: " + e.Message, e);
                     return false;
                 }
             }
@@ -728,7 +728,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (IOException e)
                 {
-                    Logger.Warn(String.Format("Exception while delete tree {0}: {1}", folderPath, Utils.ToLogString(e)));
+                    Logger.Warn(String.Format("Exception while delete tree {0}", folderPath), e);
                     return false;
                 }
 

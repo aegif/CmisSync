@@ -144,7 +144,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (Exception e)
                 {
-                    Logger.Error("Error creating database: " + Utils.ToLogString(e));
+                    Logger.Error("Error creating database: " + e.Message, e);
                     throw;
                 }
             }
@@ -256,8 +256,7 @@ namespace CmisSync.Lib.Cmis
                 catch (IOException e)
                 {
                     Logger.Warn("IOException while calculating checksum of " + path
-                        + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. "
-                        + Utils.ToLogString(e));
+                        + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. ", e);
                 }
             }
 

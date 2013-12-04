@@ -166,27 +166,27 @@ namespace CmisSync.Lib.Cmis
             }
             catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
-                Logger.Error("CMIS server found, but permission denied. Please check username/password. " + Utils.ToLogString(e));
+                Logger.Error("CMIS server found, but permission denied. Please check username/password. ", e);
                 throw;
             }
             catch (CmisRuntimeException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Error("No CMIS server at this address, or no connection. ", e);
                 throw;
             }
             catch (CmisObjectNotFoundException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Error("No CMIS server at this address, or no connection. ", e);
                 throw;
             }
             catch (CmisConnectionException e)
             {
-                Logger.Error("No CMIS server at this address, or no connection. " + Utils.ToLogString(e));
+                Logger.Error("No CMIS server at this address, or no connection. ", e);
                 throw;
             }
             catch (CmisInvalidArgumentException e)
             {
-                Logger.Error("Invalid URL, maybe Alfresco Cloud? " + Utils.ToLogString(e));
+                Logger.Error("Invalid URL, maybe Alfresco Cloud? ", e);
                 throw;
             }
 
@@ -227,7 +227,7 @@ namespace CmisSync.Lib.Cmis
             }
             catch (Exception ex)
             {
-                Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}: {1}", path, Utils.ToLogString(ex)));
+                Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}", path), ex);
                 return result.ToArray();
             }
 
@@ -308,7 +308,7 @@ namespace CmisSync.Lib.Cmis
             }
             catch (Exception ex)
             {
-                Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}: {1}", path, Utils.ToLogString(ex)));
+                Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}", path), ex);
                 throw;
             }
 

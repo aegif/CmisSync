@@ -77,7 +77,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(String.Format("Exception when query remote {0}: {1}", remoteBaseName, Utils.ToLogString(ex)));
+                        Logger.Warn(String.Format("Exception when query remote {0}", remoteBaseName), ex);
                     }
                     if (null == remoteBase)
                     {
@@ -179,7 +179,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(String.Format("Exception when operate remote {0}: {1}", remoteName, Utils.ToLogString(ex)));
+                        Logger.Warn(String.Format("Exception when operate remote {0}", remoteName), ex);
                     }
                     database.RemoveFile(pathname);
                 }
@@ -196,7 +196,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn(String.Format("Exception when operate remote {0}: {1}", remoteName, Utils.ToLogString(ex)));
+                        Logger.Warn(String.Format("Exception when operate remote {0}", remoteName), ex);
                     }
                     database.RemoveFolder(pathname);
                 }
