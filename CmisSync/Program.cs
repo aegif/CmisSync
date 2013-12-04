@@ -68,9 +68,6 @@ namespace CmisSync
             if ( ! firstRun )
                 ConfigMigration.Migrate();
 
-            // Clear log file.
-            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
-
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             Logger.Info("Starting.");
 

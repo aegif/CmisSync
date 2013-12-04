@@ -309,8 +309,8 @@ namespace CmisSync.Lib
       <file value=""" + GetLogFilePath() + @""" />
       <appendToFile value=""true"" />
       <rollingStyle value=""Size"" />
-      <maxSizeRollBackups value=""10"" />
-      <maximumFileSize value=""5MB"" />
+      <maxSizeRollBackups value=""5"" />
+      <maximumFileSize value=""1MB"" />
       <staticLogFileName value=""true"" />
       <layout type=""log4net.Layout.PatternLayout"">
         <conversionPattern value=""%date [%thread] %-5level %logger [%property{NDC}] - %message%newline"" />
