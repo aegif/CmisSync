@@ -524,6 +524,14 @@ namespace CmisSync
             ShowAboutWindowEvent();
         }
 
+        /// <summary>
+        /// Show an alert to the user.
+        /// </summary>
+        public void ShowAlert(string title, string message)
+        {
+            AlertNotificationRaised(Properties_Resources.Oris4Sync + " " + title, message);
+        }
+
 
         /// <summary>
         /// Quit CmisSync.
@@ -533,6 +541,7 @@ namespace CmisSync
             foreach (RepoBase repo in Repositories)
                 repo.Dispose();
 
+            Logger.Info("Exiting.");
             Environment.Exit(0);
         }
 

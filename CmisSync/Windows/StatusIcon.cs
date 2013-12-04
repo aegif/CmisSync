@@ -7,6 +7,7 @@ using System.Windows;
 using System.Globalization;
 using CmisSync.Lib;
 using System.Reflection;
+using System.Media;
 
 namespace CmisSync
 {
@@ -152,6 +153,17 @@ namespace CmisSync
                     });
                 }
             };
+
+            Program.Controller.AlertNotificationRaised += delegate(string title, string message)
+            {
+                SystemSounds.Exclamation.Play();
+
+                trayicon.ShowBalloonTip(25000, title, message, ToolTipIcon.Error);
+
+                //System.Windows.Forms.MessageBox.Show(message, title,
+                //    System.Windows.Forms.MessageBoxButtons.OK,
+                //    System.Windows.Forms.MessageBoxIcon.Error);
+            };
         }
 
 
@@ -206,7 +218,7 @@ namespace CmisSync
             }
 
             this.traymenu.Items.Add(stateItem);
-            this.trayicon.Text = Utils.Ellipsis("Oris4 Sync\n" + Controller.StateText, 63); //TODO Resources
+            this.trayicon.Text = Utils.Ellipsis(Properties_Resources.Oris4Sync + "\n" + Controller.StateText, 63);
 
             // Create a menu item per synchronized folder.
             if (Controller.Folders.Length > 0)

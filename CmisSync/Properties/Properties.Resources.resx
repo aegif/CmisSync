@@ -346,4 +346,10 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="WebAddress" xml:space="preserve">
     <value>Oris4 URL</value>
   </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="SyncError" xml:space="preserve">
+    <value>Could not sync "{0}": {1}</value>
+  </data>
 </root>

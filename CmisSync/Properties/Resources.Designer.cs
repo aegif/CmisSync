@@ -253,6 +253,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        internal static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Oris4 URL should be in the format https://yourcompany.oris4.net/ .
         /// </summary>
         internal static string ExampleUrl {
@@ -607,6 +616,15 @@ namespace CmisSync {
         internal static string StatusIconShows {
             get {
                 return ResourceManager.GetString("StatusIconShows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not sync &quot;{0}&quot;: {1}.
+        /// </summary>
+        internal static string SyncError {
+            get {
+                return ResourceManager.GetString("SyncError", resourceCulture);
             }
         }
         

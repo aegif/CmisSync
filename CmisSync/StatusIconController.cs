@@ -15,17 +15,10 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-using System;
-using System.IO;
-using System.Timers;
-
-using Threading = System.Threading;
-
 using CmisSync.Lib;
-using System.Globalization;
-
-using System.Diagnostics;
 using log4net;
+using System;
+using System.Timers;
 
 namespace CmisSync {
 
@@ -238,8 +231,8 @@ namespace CmisSync {
             Program.Controller.OnError += delegate (Tuple<string, Exception> error)
             {
                 Logger.Error(String.Format("Error syncing '{0}': {1}", error.Item1, error.Item2.Message), error.Item2);
-                //TODO: Use resources...
-                string message = String.Format("Could not sync '{0}': {1}", error.Item1, error.Item2.Message);
+
+                string message = String.Format(Properties_Resources.SyncError, error.Item1, error.Item2.Message);
 
                 CurrentState = IconState.Error;
                 StateText = message;
@@ -255,11 +248,9 @@ namespace CmisSync {
                 {
                     //Suspend sync...
                     SuspendSyncClicked(error.Item1);
-                    
-                    System.Windows.Forms.MessageBox.Show(message, "Error",
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Error);
                 }
+
+                Program.Controller.ShowAlert(Properties_Resources.Error, message);
             };
 
             Program.Controller.OnErrorResolved += delegate
