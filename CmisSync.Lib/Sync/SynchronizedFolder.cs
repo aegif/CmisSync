@@ -481,15 +481,15 @@ namespace CmisSync.Lib.Sync
 
             private bool DownloadStreamInChunks(string filePath, Stream fileStream, IDocument remoteDocument)
             {
-                if (repoinfo.ChunkSize <= 0)
+                if (repoinfo.DownloadChunkSize <= 0)
                 {
                     return false;
                 }
-                Logger.Debug(String.Format("Start downloading a chunk (size={0}): {1} from remote document: {2}", repoinfo.ChunkSize, filePath, remoteDocument.Name ));
+                Logger.Debug(String.Format("Start downloading a chunk (size={0}): {1} from remote document: {2}", repoinfo.DownloadChunkSize, filePath, remoteDocument.Name ));
                 long? fileLength = remoteDocument.ContentStreamLength;
                 FileInfo fileInfo = new FileInfo(filePath);
 
-                for (long offset = fileInfo.Length; offset < fileLength; offset += repoinfo.ChunkSize)
+                for (long offset = fileInfo.Length; offset < fileLength; offset += repoinfo.DownloadChunkSize)
                 {
                     lock (disposeLock)
                     {
@@ -497,7 +497,7 @@ namespace CmisSync.Lib.Sync
                         {
                             throw new ObjectDisposedException("Downloading");
                         }
-                        IContentStream contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.ChunkSize);
+                        IContentStream contentStream = remoteDocument.GetContentStream(remoteDocument.ContentStreamId, offset, repoinfo.DownloadChunkSize);
                         using (contentStream.Stream)
                         {
                             byte[] buffer = new byte[8 * 1024];
@@ -822,7 +822,7 @@ namespace CmisSync.Lib.Sync
                                 using (Stream file = new FileStream(tmpfilepath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
                                 using (SHA1 hashAlg = new SHA1Managed())
                                 {
-                                    if (repoinfo.ChunkSize <= 0 )
+                                    if (repoinfo.DownloadChunkSize <= 0 )
                                     {
                                         using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                                         using (LoggingStream logstream = new LoggingStream(hashstream, "Download progress", fileName, (long) fileLength))

@@ -87,6 +87,15 @@ namespace CmisSync.Lib
         public long ChunkSize { get; set; }
 
         /// <summary>
+        /// Gets or sets the size of download chunks
+        /// If size is set to none zero, a download will be chunked by the size.
+        /// </summary>
+        /// <value>
+        /// The size of the download chunk.
+        /// </value>
+        public long DownloadChunkSize { get; set; }
+
+        /// <summary>
         /// Gets or sets the max upload retries.
         /// </summary>
         /// <value>
