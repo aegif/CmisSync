@@ -24,6 +24,7 @@ using System.Threading;
 using log4net;
 
 using Timers = System.Timers;
+using CmisSync.Lib.Events;
 
 namespace CmisSync.Lib
 {
@@ -97,6 +98,17 @@ namespace CmisSync.Lib
             Status = SyncStatus.Idle;
         }
 
+        /// <summary>
+        /// Event Queue for this repository.
+        /// Use this to notifiy events for this repository.
+        /// </summary>
+        public SyncEventQueue Queue { get; private set; }
+
+        /// <summary>
+        /// Event Manager for this repository.
+        /// Use this for adding and removing SyncEventHandler for this repository.
+        /// </summary>
+        public SyncEventManager EventManager { get; private set; }
 
         /// <summary>
         /// Return the synchronized folder's information.
@@ -149,6 +161,10 @@ namespace CmisSync.Lib
         /// </summary>
         public RepoBase(RepoInfo repoInfo)
         {
+            EventManager = new SyncEventManager();
+            EventManager.AddEventHandler(new DebugLoggingHandler());
+            EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(0, RepoInfoChanged));
+            Queue = new SyncEventQueue(EventManager);
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = repoInfo.Name;
@@ -170,6 +186,20 @@ namespace CmisSync.Lib
                 // Synchronize.
                 SyncInBackground();
             };
+        }
+
+        private bool RepoInfoChanged(ISyncEvent e)
+        {
+            if (e is RepoConfigChangedEvent)
+            {
+                this.RepoInfo = (e as RepoConfigChangedEvent).RepoInfo;
+                return true;
+            }
+            else
+            {
+                // This should never ever happen!
+                return false;
+            }
         }
 
 
@@ -204,6 +234,7 @@ namespace CmisSync.Lib
                     this.remote_timer.Stop();
                     this.remote_timer.Dispose();
                     this.Watcher.Dispose();
+                    this.Queue.Dispose();
                 }
                 this.disposed = true;
             }

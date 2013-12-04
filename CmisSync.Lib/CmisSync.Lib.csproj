@@ -55,8 +55,10 @@
     <Compile Include="Cmis\Database.cs" />
     <Compile Include="Cmis\IDatabase.cs" />
     <Compile Include="Credentials.cs" />
+    <Compile Include="Events\ConfigChangedEvent.cs" />
     <Compile Include="Events\FileConflictEvent.cs" />
     <Compile Include="Events\FileTransmissionEvent.cs" />
+    <Compile Include="Events\GenericSyncEventHandler.cs" />
     <Compile Include="Events\SyncEventQueue.cs" />
     <Compile Include="LoggingStream.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
