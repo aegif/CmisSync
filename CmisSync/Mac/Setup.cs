@@ -331,6 +331,8 @@ namespace CmisSync {
                     Password = PasswordTextField.StringValue,
                     Address = new Uri(AddressTextField.StringValue)
                 };
+                ContinueButton.Enabled = false;
+                CancelButton.Enabled = false;
                 Thread check = new Thread(() => {
                     Tuple<CmisServer, Exception> fuzzyResult = CmisUtils.GetRepositoriesFuzzy(credentials);
                     CmisServer cmisServer = fuzzyResult.Item1;
@@ -346,25 +348,15 @@ namespace CmisSync {
                         if (Controller.repositories == null)
                         {
                             WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
+                            ContinueButton.Enabled = true;
+                            CancelButton.Enabled = true;
                         }
                         else
-                        {
-                            AddressTextField.StringValue = cmisServer.Url.ToString();
-                            WarningTextField.StringValue = "";
-                        }
-                    });
-                    Thread.Sleep(1000); //TODO workaround for COCOA thread issue to crash
-                    InvokeOnMainThread(delegate {
-                        ContinueButton.Enabled = true;
-                        CancelButton.Enabled = true;
-                        if (Controller.repositories != null)
                         {
                             Controller.Add1PageCompleted(cmisServer.Url, credentials.UserName, credentials.Password.ToString());
                         }
                     });
                 });
-                ContinueButton.Enabled = false;
-                CancelButton.Enabled = false;
                 check.Start();
             };
             CancelButton.Activated += delegate
@@ -470,7 +462,7 @@ namespace CmisSync {
             OutlineController = new CmisOutlineController (DataSource,DataDelegate);
             ContinueButton = new NSButton() {
                 Title = Properties_Resources.Continue,
-                Enabled = false
+                Enabled = (Repositories.Count > 0)
             };
             CancelButton = new NSButton() {
                 Title = Properties_Resources.Cancel
@@ -478,17 +470,17 @@ namespace CmisSync {
             NSButton BackButton = new NSButton() {
                 Title = Properties_Resources.Back
             };
-            DataDelegate.SelectionChanged += delegate
-            {
-                InvokeOnMainThread(delegate {
-                    NSOutlineView view = OutlineController.OutlineView();
-                    if (view.SelectedRow >= 0) {
-                        ContinueButton.Enabled = true;
-                    } else {
-                        ContinueButton.Enabled = false;
-                    }
-                });
-            };
+//            DataDelegate.SelectionChanged += delegate
+//            {
+//                InvokeOnMainThread(delegate {
+//                    NSOutlineView view = OutlineController.OutlineView();
+//                    if (view.SelectedRow >= 0) {
+//                        ContinueButton.Enabled = true;
+//                    } else {
+//                        ContinueButton.Enabled = false;
+//                    }
+//                });
+//            };
             DataDelegate.ItemExpanded += delegate(NSNotification notification)
             {
                 InvokeOnMainThread(delegate {
@@ -520,12 +512,15 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate {
                     NSOutlineView view = OutlineController.OutlineView();
-                    NSCmisTree cmis = (NSCmisTree)(view.ItemAtRow(view.SelectedRow));
-                    while (cmis.Parent != null)
-                        cmis = cmis.Parent;
-                    RootFolder root = Repositories.Find(x=>x.Name.Equals(cmis.Name));
+//                    NSCmisTree cmis = (NSCmisTree)(view.ItemAtRow(view.SelectedRow));
+//                    while (cmis.Parent != null)
+//                        cmis = cmis.Parent;
+//                    RootFolder root = Repositories.Find(x=>x.Name.Equals(cmis.Name));
+                    RootFolder root = Repositories.Find(x=>(x.Selected != false));
                     if (root != null)
                     {
+                        foreach (AsyncNodeLoader task in loader.Values)
+                            task.Cancel();
                         Controller.saved_repository = root.Id;
                         List<string> ignored = NodeModelUtils.GetIgnoredFolder(root);
                         List<string> selected = NodeModelUtils.GetSelectedFolder(root);
@@ -537,6 +532,8 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate
                 {
+                    foreach (AsyncNodeLoader task in loader.Values)
+                        task.Cancel();
                     Controller.PageCancelled();
                 });
             };
@@ -544,6 +541,8 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate
                 {
+                    foreach (AsyncNodeLoader task in loader.Values)
+                        task.Cancel();
                     Controller.BackToPage1();
                 });
             };
