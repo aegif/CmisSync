@@ -12,7 +12,6 @@ using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -1126,7 +1125,7 @@ namespace CmisSync.Lib.Sync
                                                 Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
                                                 // Create database entry for this empty file to force content update if setContentStream will fail.
                                                 database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, new byte[hashAlg.HashSize]);
-                                            } catch(Exception e) {
+                                            } catch(Exception) {
                                                 string reason = Utils.IsValidISO88591(fileName)?String.Empty:" Reason: Upload perhaps failed because of an invalid ISO 8859-1 character";
                                                 Logger.Info(String.Format("Could not create the remote document {0} as target for local document {1}{2}", fileName, filePath, reason));
                                                 throw;
