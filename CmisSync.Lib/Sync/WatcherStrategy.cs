@@ -20,6 +20,8 @@ namespace CmisSync.Lib.Sync
         {
             private void WatcherSync(string remoteFolder, string localFolder)
             {
+                sleepWhileSuspended();
+
                 while (repo.Watcher.GetChangeCount() > 0)
                 {
                     Tuple<string, Watcher.ChangeTypes> earliestChange = repo.Watcher.RemoveEarliestChange();
@@ -64,80 +66,82 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void WatchSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
-                string name = pathname.Substring(localFolder.Length + 1);
-                string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
-
-                IFolder remoteBase = null;
-                if (File.Exists(pathname) || Directory.Exists(pathname))
+                sleepWhileSuspended();
+                try
                 {
-                    string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/');
-                    try
+                    string name = pathname.Substring(localFolder.Length + 1);
+                    string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
+
+                    IFolder remoteBase = null;
+                    if (File.Exists(pathname) || Directory.Exists(pathname))
                     {
+                        string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/');
                         remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
+
+                        if (null == remoteBase)
+                        {
+                            Logger.Warn(String.Format("The remote base folder {0} for local {1} does not exist, ignore for the update action", remoteBaseName, pathname));
+                            return;
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Logger.Warn(String.Format("Exception when query remote {0}", remoteBaseName), ex);
-                    }
-                    if (null == remoteBase)
-                    {
-                        Logger.Warn(String.Format("The remote base folder {0} for local {1} does not exist, ignore for the update action", remoteBaseName, pathname));
+                        Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
                         return;
                     }
-                }
-                else
-                {
-                    Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
-                    return;
-                }
 
-                if (File.Exists(pathname))
-                {
-                    bool success = false;
-                    if (database.ContainsFile(pathname))
+                    if (File.Exists(pathname))
                     {
-                        if (database.LocalFileHasChanged(pathname))
+                        bool success = false;
+                        if (database.ContainsFile(pathname))
                         {
-                            success = UpdateFile(pathname, remoteBase);
-                            Logger.Info(String.Format("Update {0}: {1}", pathname, success));
+                            if (database.LocalFileHasChanged(pathname))
+                            {
+                                success = UpdateFile(pathname, remoteBase);
+                                Logger.Info(String.Format("Update {0}: {1}", pathname, success));
+                            }
+                            else
+                            {
+                                success = true;
+                                Logger.Info(String.Format("File {0} remains unchanged, ignore for the update action", pathname));
+                            }
                         }
                         else
                         {
-                            success = true;
-                            Logger.Info(String.Format("File {0} remains unchanged, ignore for the update action", pathname));
+                            success = UploadFile(pathname, remoteBase);
+                            Logger.Info(String.Format("Upload {0}: {1}", pathname, success));
                         }
-                    }
-                    else
-                    {
-                        success = UploadFile(pathname, remoteBase);
-                        Logger.Info(String.Format("Upload {0}: {1}", pathname, success));
-                    }
-                    if (!success)
-                    {
-                        Logger.Warn("Failure to update: " + pathname);
-                    }
-                    return;
-                }
-
-                if (Directory.Exists(pathname))
-                {
-                    if (repoinfo.isPathIgnored(remoteName))
-                    {
+                        if (!success)
+                        {
+                            Logger.Warn("Failure to update: " + pathname);
+                        }
                         return;
                     }
 
-                    if (database.ContainsFolder(pathname))
+                    if (Directory.Exists(pathname))
                     {
-                        Logger.Info(String.Format("Database exists for {0}, ignore for the update action", pathname));
+                        if (repoinfo.isPathIgnored(remoteName))
+                        {
+                            return;
+                        }
+
+                        if (database.ContainsFolder(pathname))
+                        {
+                            Logger.Info(String.Format("Database exists for {0}, ignore for the update action", pathname));
+                        }
+                        else
+                        {
+                            Logger.Info("Create locally created folder on server: " + pathname);
+                            UploadFolderRecursively(remoteBase, pathname);
+                        }
+                        return;
                     }
-                    else
-                    {
-                        Logger.Info("Create locally created folder on server: " + pathname);
-                        UploadFolderRecursively(remoteBase, pathname);
-                    }
-                    return;
+                    Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
                 }
-                Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
+                catch (Exception e)
+                {
+                    ProcessRecoverableException("Could process watcher sync update: " + pathname, e);
+                }
             }
 
             /// <summary>
@@ -145,57 +149,65 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void WatchSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
-                if (Directory.Exists(pathname))
+                sleepWhileSuspended();
+                try
                 {
-                    Logger.Info(String.Format("A new folder {0} is created, ignore for the delete action", pathname));
-                    return;
-                }
-                if (File.Exists(pathname))
-                {
-                    Logger.Info(String.Format("A new file {0} is created, ignore for the delete action", pathname));
-                    return;
-                }
+                    if (Directory.Exists(pathname))
+                    {
+                        Logger.Info(String.Format("A new folder {0} is created, ignore for the delete action", pathname));
+                        return;
+                    }
+                    if (File.Exists(pathname))
+                    {
+                        Logger.Info(String.Format("A new file {0} is created, ignore for the delete action", pathname));
+                        return;
+                    }
 
-                string name = pathname.Substring(localFolder.Length + 1);
-                string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
+                    string name = pathname.Substring(localFolder.Length + 1);
+                    string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
 
-                if (database.ContainsFile(pathname))
-                {
-                    Logger.Info("Removing locally deleted file on server: " + pathname);
-                    try
+                    if (database.ContainsFile(pathname))
                     {
-                        IDocument remote = (IDocument)session.GetObjectByPath(remoteName);
-                        if (remote != null)
+                        Logger.Info("Removing locally deleted file on server: " + pathname);
+                        try
                         {
-                            remote.DeleteAllVersions();
+                            IDocument remote = (IDocument)session.GetObjectByPath(remoteName);
+                            if (remote != null)
+                            {
+                                remote.DeleteAllVersions();
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Warn(String.Format("Exception when operate remote {0}", remoteName), ex);
-                    }
-                    database.RemoveFile(pathname);
-                }
-                else if (database.ContainsFolder(pathname))
-                {
-                    Logger.Info("Removing locally deleted folder on server: " + pathname);
-                    try
-                    {
-                        IFolder remote = (IFolder)session.GetObjectByPath(remoteName);
-                        if (remote != null)
+                        catch (Exception ex)
                         {
-                            remote.DeleteTree(true, null, true);
+                            Logger.Warn(String.Format("Exception when operate remote {0}", remoteName), ex);
                         }
+                        database.RemoveFile(pathname);
                     }
-                    catch (Exception ex)
+                    else if (database.ContainsFolder(pathname))
                     {
-                        Logger.Warn(String.Format("Exception when operate remote {0}", remoteName), ex);
+                        Logger.Info("Removing locally deleted folder on server: " + pathname);
+                        try
+                        {
+                            IFolder remote = (IFolder)session.GetObjectByPath(remoteName);
+                            if (remote != null)
+                            {
+                                remote.DeleteTree(true, null, true);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Warn(String.Format("Exception when operate remote {0}", remoteName), ex);
+                        }
+                        database.RemoveFolder(pathname);
                     }
-                    database.RemoveFolder(pathname);
+                    else
+                    {
+                        Logger.Info("Ignore the delete action for the local created and deleted file/folder: " + pathname);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    Logger.Info("Ignore the delete action for the local created and deleted file/folder: " + pathname);
+                    ProcessRecoverableException("Could process watcher sync update: " + pathname, e);
                 }
             }
         }

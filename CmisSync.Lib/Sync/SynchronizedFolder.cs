@@ -295,13 +295,9 @@ namespace CmisSync.Lib.Sync
                             {
                                 repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
                             }
-                            catch (CmisBaseException e)
-                            {
-                                repo.OnSyncError(new BaseException(e));
-                            }
                             catch (Exception e)
                             {
-                                repo.OnSyncError(e);
+                                repo.OnSyncError(new BaseException(e));
                             }
                         }
                     );
@@ -315,23 +311,144 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
+            /// <summary>
+            /// Handle CMIS Exception.
+            /// </summary>
+            private void ProcessRecoverableException(string logMessage, Exception exception)
+            {
+                bool recoverable;
+                //Exceptions: http://docs.oasis-open.org/cmis/CMIS/v1.0/cs01/cmis-spec-v1.0.html#_Toc243905433
+                if (exception is CmisInvalidArgumentException)
+                {
+                    //One or more of the input parameters to the service method is missing or invalid (any method)
+                    recoverable = true;
+                }
+                else if (exception is CmisObjectNotFoundException)
+                {
+                    //The service call has specified an object that does not exist in the Repository (any method)
+                    recoverable = true;
+                }
+                else if (exception is CmisNotSupportedException)
+                {
+                    //The service method invoked requires an optional capability not supported by the repository (any method)
+                    recoverable = false;
+                }
+                else if (exception is CmisPermissionDeniedException)
+                {
+                    //The caller of the service method does not have sufficient permissions to perform the operation (any method)
+                    recoverable = false;
+                }
+                else if (exception is CmisRuntimeException)
+                {
+                    //Any other cause not expressible by another CMIS exception (any method)
+                    recoverable = false;
+                }
+                else if (exception is CmisConstraintException)
+                {
+                    //The operation violates a Repository- or Object-level constraint defined in the CMIS domain model (write methods)
+                    recoverable = true;
+                }
+                else if (exception is CmisContentAlreadyExistsException)
+                {
+                    //The operation attempts to set the content stream for a Document that already has a content stream without explicitly specifying the �overwriteFlag� parameter (setContentStream method)
+                    recoverable = true;
+                }
+                else if (exception is CmisFilterNotValidException)
+                {
+                    //The property filter or rendition filter input to the operation is not valid (read methods)
+                    recoverable = true;
+                }
+                else if (exception is CmisNameConstraintViolationException)
+                {
+                    //The repository is not able to store the object that the user is creating/updating due to a name constraint violation (write methods)
+                    recoverable = true;
+                }
+                else if (exception is CmisStorageException)
+                {
+                    //The repository is not able to store the object that the user is creating/updating due to an internal storage problem (write methods)
+                    recoverable = true;
+                }
+                else if (exception is CmisStreamNotSupportedException)
+                {
+                    //The operation is attempting to get or set a contentStream for a Document whose Object-type specifies that a content stream is not allowed for Document�s of that type (write methods)
+                    recoverable = true;
+                }
+                else if (exception is CmisUpdateConflictException)
+                {
+                    //The operation is attempting to update an object that is no longer current (as determined by the repository) (write methods)
+                    recoverable = true;
+                }
+                else if (exception is CmisVersioningException)
+                {
+                    //The operation is attempting to perform an action on a non-current version of a Document that cannot be performed on a non-current version.
+                    recoverable = true;
+                }
+                else if (exception is CmisConnectionException)
+                {
+                    //Client unable to connect to server
+                    recoverable = false;
+                }
+                else if (exception is IOException)
+                {
+                    //IO Exception
+                    recoverable = true;
+                }
+                else if (exception is UnauthorizedAccessException)
+                {
+                    //Unable to access file/directory
+                    recoverable = true;
+                }
+                else
+                {
+                    //All other errors...
+                    recoverable = false;
+                }
+
+                if (recoverable)
+                {
+                    Logger.Error(logMessage, exception);
+                }
+                else
+                {
+                    throw exception;
+                }
+            }
 
             /// <summary>
             /// Download all content from a CMIS folder.
             /// </summary>
             private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
             {
+                IItemEnumerable<ICmisObject> children;
+                try
+                {
+                    children = remoteFolder.GetChildren();
+                }
+                catch (CmisBaseException e)
+                {
+                    ProcessRecoverableException("Could not get children objects: " + remoteFolder.Path, e);
+                    return;
+                }
+
                 // List all children.
-                foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
+                foreach (ICmisObject cmisObject in children)
                 {
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + cmisObject.Name;
+                        string localSubFolder = Path.Combine(localFolder, cmisObject.Name);
                         if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                         {
-                            // Create local folder.
-                            Directory.CreateDirectory(localSubFolder);
+                            try
+                            {
+                                // Create local folder.
+                                Directory.CreateDirectory(localSubFolder);
+                            }
+                            catch (Exception e)
+                            {
+                                ProcessRecoverableException("Could not create directory: " + localSubFolder, e);
+                                continue;
+                            }
 
                             // Create database entry for this folder
                             // TODO Add metadata
@@ -342,13 +459,17 @@ namespace CmisSync.Lib.Sync
                             RecursiveFolderCopy(remoteSubFolder, localSubFolder);
                         }
                     }
-                    else
+                    else if (cmisObject is DotCMIS.Client.Impl.Document)
                     {
                         if (Utils.WorthSyncing(cmisObject.Name))
                         {
                             // It is a file, just download it.
                             DownloadFile((IDocument)cmisObject, localFolder);
                         }
+                    }
+                    else
+                    {
+                        Logger.Warn("Unknown object type: " + cmisObject.ObjectType.DisplayName);
                     }
                 }
             }
@@ -419,7 +540,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (CmisBaseException e)
                     {
-                        Logger.Error("Download failed: " + fileName, e);
+                        ProcessRecoverableException("Download failed: " + fileName, e);
                         if (contentStream != null) contentStream.Stream.Close();
                         success = false;
                         File.Delete(tmpfilepath);
@@ -438,7 +559,7 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (CmisBaseException e)
                         {
-                            Logger.Info("Exception while fetching metadata: " + fileName, e);
+                            ProcessRecoverableException("Could not fetch metadata: " + fileName, e);
                             // Remove temporary local document to avoid it being considered a new document.
                             File.Delete(tmpfilepath);
                             return false;
@@ -455,7 +576,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    Logger.Error("Exception while downloading file: " + e.Message, e);
+                    ProcessRecoverableException("Could not download file: " + Path.Combine(localFolder, fileName), e);
                     return false;
                 }
             }
@@ -495,7 +616,6 @@ namespace CmisSync.Lib.Sync
                 try
                 {
                     IDocument remoteDocument = null;
-                    bool success = false;
                     byte[] filehash = { };
 
                     // Prepare properties
@@ -515,37 +635,24 @@ namespace CmisSync.Lib.Sync
                         contentStream.Length = file.Length;
                         contentStream.Stream = hashstream;
 
-                        // Upload
-                        try
-                        {
-                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                            filehash = hashAlg.Hash;
-                            success = true;
-                        }
-                        catch (CmisBaseException e)
-                        {
-                            Logger.Error("Upload failed: " + filePath, e);
-                            success = false;
-                        }
+                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                        filehash = hashAlg.Hash;
                     }
 
                     // Metadata.
-                    if (success)
-                    {
-                        Logger.Info("Uploaded: " + filePath);
+                    Logger.Info("Uploaded: " + filePath);
 
-                        // Get metadata. Some metadata has probably been automatically added by the server.
-                        Dictionary<string, string[]> metadata = metadata = FetchMetadata(remoteDocument);
+                    // Get metadata. Some metadata has probably been automatically added by the server.
+                    Dictionary<string, string[]> metadata = metadata = FetchMetadata(remoteDocument);
 
-                        // Create database entry for this file.
-                        database.AddFile(filePath, remoteDocument.LastModificationDate, metadata, filehash);
-                        Logger.Info("Added file to database: " + filePath);
-                    }
-                    return success;
+                    // Create database entry for this file.
+                    database.AddFile(filePath, remoteDocument.LastModificationDate, metadata, filehash);
+                    Logger.Info("Added file to database: " + filePath);
+                    return true;
                 }
                 catch (Exception e)
                 {
-                    Logger.Error("Exception while uploading file: " + e.Message, e);
+                    ProcessRecoverableException("Could not upload file: " + filePath, e);
                     return false;
                 }
             }
@@ -573,31 +680,36 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (CmisBaseException e)
                 {
-                    Logger.Error("Could not create remote directory: " + remoteBaseFolder.Path + "/" + Path.GetFileName(localFolder), e);
+                    ProcessRecoverableException("Could not create remote directory: " + remoteBaseFolder.Path + "/" + Path.GetFileName(localFolder), e);
                     return;
                 }
 
-
-                // Upload each file in this folder.
-                foreach (string file in Directory.GetFiles(localFolder))
+                try
                 {
-                    if (Utils.WorthSyncing(file))
+                    // Upload each file in this folder.
+                    foreach (string file in Directory.GetFiles(localFolder))
                     {
-                        UploadFile(file, folder);
+                        if (Utils.WorthSyncing(file))
+                        {
+                            UploadFile(file, folder);
+                        }
+                    }
+
+                    // Recurse for each subfolder in this folder.
+                    foreach (string subfolder in Directory.GetDirectories(localFolder))
+                    {
+                        string path = subfolder.Substring(repoinfo.TargetDirectory.Length);
+                        path = path.Replace("\\\\", "/");
+                        if (Utils.WorthSyncing(subfolder) && !repoinfo.isPathIgnored(path))
+                        {
+                            UploadFolderRecursively(folder, subfolder);
+                        }
                     }
                 }
-
-                // Recurse for each subfolder in this folder.
-                foreach (string subfolder in Directory.GetDirectories(localFolder))
+                catch (Exception e)
                 {
-                    string path = subfolder.Substring(repoinfo.TargetDirectory.Length);
-                    path = path.Replace("\\\\", "/");
-                    if (Utils.WorthSyncing(subfolder) && !repoinfo.isPathIgnored(path))
-                    {
-                        UploadFolderRecursively(folder, subfolder);
-                    }
+                    ProcessRecoverableException("Could not uploading folder: " + localFolder, e);
                 }
-
             }
 
 
@@ -634,13 +746,22 @@ namespace CmisSync.Lib.Sync
                         remoteFile.SetContentStream(remoteStream, true, true);
 
                         Logger.Debug("after SetContentStream");
+
+                        // Update timestamp in database.
+                        database.SetFileServerSideModificationDate(filePath, ((DateTime)remoteFile.LastModificationDate).ToUniversalTime());
+
+                        // Update checksum
+                        database.RecalculateChecksum(filePath);
+
+                        // TODO Update metadata?
+
                         Logger.Info("Updated: " + filePath);
                         return true;
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(String.Format("Exception while updating file: {0}", filePath), e);
+                    ProcessRecoverableException("Could not update file: " + filePath, e);
                     return false;
                 }
             }
@@ -676,23 +797,11 @@ namespace CmisSync.Lib.Sync
                     }
 
                     // Update the document itself.
-                    bool success = UpdateFile(filePath, document);
-
-                    if (success)
-                    {
-                        // Update timestamp in database.
-                        database.SetFileServerSideModificationDate(filePath, ((DateTime)document.LastModificationDate).ToUniversalTime());
-
-                        // Update checksum
-                        database.RecalculateChecksum(filePath);
-
-                        // TODO Update metadata?
-                    }
-                    return success;
+                    return UpdateFile(filePath, document);
                 }
-                catch (Exception e)
+                catch (CmisBaseException e)
                 {
-                    Logger.Error("Exception while updating file: " + filePath, e);
+                    ProcessRecoverableException("Could not update file: " + filePath, e);
                     return false;
                 }
             }
@@ -709,9 +818,9 @@ namespace CmisSync.Lib.Sync
                     Logger.Info("Removing remotely deleted folder: " + folderPath);
                     Directory.Delete(folderPath, true);
                 }
-                catch (IOException e)
+                catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while delete tree {0}", folderPath), e);
+                    ProcessRecoverableException("Could not delete tree:" + folderPath, e);
                     return false;
                 }
 
