@@ -141,7 +141,7 @@ namespace CmisSync {
             removeitem.Activated += RemoveFolderDelegate(folder_name);
             NSMenuItem settingsitem = new NSMenuItem();
             settingsitem.Title = Properties_Resources.EditTitle;
-            //settingsitem.Activated += OpenSettingsDialogDelegate(folder_name);
+            settingsitem.Activated += OpenSettingsDialogDelegate(folder_name);
             foldersubmenu.AddItem(openitem);
             foldersubmenu.AddItem(pauseitem);
             foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
