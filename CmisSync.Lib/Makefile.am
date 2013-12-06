@@ -21,9 +21,13 @@ SOURCES =  \
 	ConfigMigration.cs \
 	Credentials.cs \
 	Defines.cs \
+	Events/ConfigChangedEvent.cs \
 	Events/DebugLoggingHandler.cs \
+	Events/FileConflictEvent.cs \
+	Events/FileTransmissionEvent.cs \
 	Events/FSDeletionHandler.cs \
 	Events/FSEvent.cs \
+	Events/GenericSyncEventHandler.cs \
 	Events/ISyncEvent.cs \
 	Events/SyncEventHandler.cs \
 	Events/SyncEventManager.cs \

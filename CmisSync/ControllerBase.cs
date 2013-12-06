@@ -26,6 +26,7 @@ using System.Threading;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
+using CmisSync.Lib.Events;
 
 namespace CmisSync
 {
@@ -365,8 +366,7 @@ namespace CmisSync
                                     {
                                         if (repo.Name == reponame)
                                         {
-                                            //  force a full tree work sync
-                                            repo.Watcher.EnableRaisingEvents = false;
+                                            repo.Queue.AddEvent(new RepoConfigChangedEvent(folder.GetRepoInfo()));
                                         }
                                     }
                                 }
