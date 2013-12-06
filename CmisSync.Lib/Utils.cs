@@ -67,17 +67,17 @@ namespace CmisSync.Lib
 //                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
 //#endif
             }
-			catch(System.UnauthorizedAccessException) {
-				var permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
-				var permissionSet = new PermissionSet(PermissionState.None);
-				permissionSet.AddPermission(permission);
-				if (permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet))
-				{
-					return true;
-				}
-				else
-					return false;
-			}
+            catch(System.UnauthorizedAccessException) {
+                var permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
+                var permissionSet = new PermissionSet(PermissionState.None);
+                permissionSet.AddPermission(permission);
+                if (permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet))
+                {
+                    return true;
+                }
+                else
+                    return false;
+            }
 
             return writeAllow && !writeDeny;
         }
