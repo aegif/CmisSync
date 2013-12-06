@@ -67,6 +67,11 @@ namespace CmisSync.Lib
         public bool Notifications { get { return configXml.Notifications; } set { configXml.Notifications = value; } }
 
         /// <summary>
+        /// Single Repository Only.
+        /// </summary>
+        public bool SingleRepository { get { return configXml.SingleRepository; } set { configXml.SingleRepository = value; } }
+
+        /// <summary>
         /// Folder.
         /// </summary>
         public List<SyncConfig.Folder> Folder { get { return configXml.Folders; } }
@@ -221,6 +226,7 @@ namespace CmisSync.Lib
                     Name = userName
                 },
                 Notifications = true,
+                SingleRepository = true, //Single repository for Oris4
                 Log4Net = createDefaultLog4NetElement()
             };
 
@@ -355,6 +361,11 @@ namespace CmisSync.Lib
             /// </summary>
             [XmlElement("notifications")]
             public Boolean Notifications { get; set; }
+            /// <summary>
+            /// Single Repository.
+            /// </summary>
+            [XmlElement("singleRepository")]
+            public Boolean SingleRepository { get; set; }
             /// <summary>
             /// Logging config.
             /// </summary>

@@ -327,6 +327,13 @@ namespace CmisSync
                 Name = "add",
                 Image = UIHelpers.GetBitmap("connect"),
             };
+
+            if (ConfigManager.CurrentConfig.SingleRepository && ConfigManager.CurrentConfig.Folder.Count > 0)
+            {
+                //Configured for single repository and repository count 1 or more so disable menu item.
+                addFolderItem.Enabled = false;
+            }
+
             addFolderItem.Click += delegate
             {
                 Controller.AddRemoteFolderClicked();
