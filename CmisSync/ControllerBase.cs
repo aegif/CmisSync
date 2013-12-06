@@ -306,9 +306,17 @@ namespace CmisSync
         {
             Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
             if (f != null)
+            {
                 RemoveRepository(f);
+                ConfigManager.CurrentConfig.Folder.Remove(f);
+                Logger.Info("Removed sync config: " + reponame);
+                ConfigManager.CurrentConfig.Save();
+                FolderListChanged();
+            }
             else
+            {
                 Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
+            }
         }
 
         /// <summary>
@@ -344,6 +352,7 @@ namespace CmisSync
                     {
                         repo.Dispose();
                         this.repositories.Remove(repo);
+                        Logger.Info("Removed Repository: " + repo.Name);
                         repo = null;
                         break;
                     }
@@ -364,7 +373,11 @@ namespace CmisSync
         private void RemoveDatabase(string folder_path)
         {
             string databasefile = Path.Combine(ConfigManager.CurrentConfig.ConfigPath, Path.GetFileName(folder_path) + ".cmissync");
-            if (File.Exists(databasefile)) File.Delete(databasefile);
+            if (File.Exists(databasefile))
+            {
+                File.Delete(databasefile);
+                Logger.Info("Removed database: " + databasefile);
+            }
         }
 
 

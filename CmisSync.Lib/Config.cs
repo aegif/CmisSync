@@ -85,6 +85,22 @@ namespace CmisSync.Lib
         }
 
         /// <summary>
+        /// Get a folder based on RemoteUrl and UserName.
+        /// </summary>
+        public SyncConfig.Folder getFolder(string RemoteUrl, string UserName)
+        {
+            foreach (SyncConfig.Folder folder in configXml.Folders)
+            {
+                Uri RemoteUri = folder.RemoteUrl;
+                if (RemoteUri.ToString().Equals(RemoteUrl) && folder.UserName.Equals(UserName))
+                {
+                    return folder;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Path to the user's home folder.
         /// </summary>
         public string HomePath

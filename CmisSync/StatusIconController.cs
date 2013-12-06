@@ -346,7 +346,17 @@ namespace CmisSync {
         /// </summary>
         public void RemoveFolderFromSyncClicked(string reponame)
         {
-            Program.Controller.RemoveRepositoryFromSync(reponame);
+            System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show(
+                Properties_Resources.RemoveFolderFromSyncConfirm, 
+                Properties_Resources.RemoveFolderFromSync,
+                System.Windows.Forms.MessageBoxButtons.YesNo,
+                System.Windows.Forms.MessageBoxIcon.Question);
+
+            // If the yes button was pressed ... 
+            if (result == System.Windows.Forms.DialogResult.Yes)
+            {
+                Program.Controller.RemoveRepositoryFromSync(reponame);
+            }
         }
 
         /// <summary>

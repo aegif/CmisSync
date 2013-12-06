@@ -304,7 +304,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>pending ...</value>
   </data>
   <data name="RemoveFolderFromSync" xml:space="preserve">
-    <value>Remove the folder from synchronization</value>
+    <value>Disconnect from Oris4...</value>
   </data>
   <data name="DoYouTrustTheCertificate" xml:space="preserve">
     <value>Do you trust this certificate?
@@ -351,5 +351,11 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   </data>
   <data name="SyncError" xml:space="preserve">
     <value>Could not sync "{0}": {1}</value>
+  </data>
+  <data name="DuplicateRepository" xml:space="preserve">
+    <value>You are already connected to Oris4 using this account.</value>
+  </data>
+  <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
+    <value>Are you sure you want to disconnect from Oris4?  No files will be deleted from your system but they will no longer be synchronized with Oris4.</value>
   </data>
 </root>

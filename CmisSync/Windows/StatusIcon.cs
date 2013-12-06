@@ -141,12 +141,13 @@ namespace CmisSync
                     BeginInvoke((Action)delegate
                     {
                         ToolStripMenuItem repoitem = (ToolStripMenuItem)this.traymenu.Items["tsmi" + reponame];
-                        ToolStripMenuItem syncitem = (ToolStripMenuItem)repoitem.DropDownItems[3];
+                        ToolStripMenuItem pauseitem = (ToolStripMenuItem)repoitem.DropDownItems.Find("pause", false)[0];
+                        ToolStripMenuItem syncitem = (ToolStripMenuItem)repoitem.DropDownItems.Find("sync", false)[0];
                         foreach (RepoBase aRepo in Program.Controller.Repositories)
                         {
                             if (aRepo.Name == reponame)
                             {
-                                setSyncItemState(syncitem, aRepo.Status);
+                                setSyncItemState(pauseitem, syncitem, aRepo.Status);
                                 break;
                             }
                         }
@@ -156,28 +157,35 @@ namespace CmisSync
 
             Program.Controller.AlertNotificationRaised += delegate(string title, string message)
             {
-                SystemSounds.Exclamation.Play();
+                if (ConfigManager.CurrentConfig.Notifications)
+                {
+                    //Only show balloon tips when notifications are on
 
-                trayicon.ShowBalloonTip(25000, title, message, ToolTipIcon.Error);
+                    SystemSounds.Exclamation.Play();
 
-                //System.Windows.Forms.MessageBox.Show(message, title,
-                //    System.Windows.Forms.MessageBoxButtons.OK,
-                //    System.Windows.Forms.MessageBoxIcon.Error);
+                    trayicon.ShowBalloonTip(25000, title, message, ToolTipIcon.Error);
+
+                    //System.Windows.Forms.MessageBox.Show(message, title,
+                    //    System.Windows.Forms.MessageBoxButtons.OK,
+                    //    System.Windows.Forms.MessageBoxIcon.Error);
+                }
             };
         }
 
 
-        private void setSyncItemState(ToolStripMenuItem syncitem, SyncStatus status)
+        private void setSyncItemState(ToolStripMenuItem pauseItem, ToolStripMenuItem syncItem, SyncStatus status)
         {
             switch (status)
             {
                 case SyncStatus.Idle:
-                    syncitem.Text = CmisSync.Properties_Resources.PauseSync;
-                    syncitem.Image = UIHelpers.GetBitmap("media_playback_pause");
+                    pauseItem.Text = CmisSync.Properties_Resources.PauseSync;
+                    pauseItem.Image = UIHelpers.GetBitmap("media_playback_pause");
+                    syncItem.Enabled = true;
                     break;
                 case SyncStatus.Suspend:
-                    syncitem.Text = CmisSync.Properties_Resources.ResumeSync;
-                    syncitem.Image = UIHelpers.GetBitmap("media_playback_start");
+                    pauseItem.Text = CmisSync.Properties_Resources.ResumeSync;
+                    pauseItem.Image = UIHelpers.GetBitmap("media_playback_start");
+                    syncItem.Enabled = false;
                     break;
             }
         }
@@ -230,14 +238,15 @@ namespace CmisSync
                     {
                         Text = folderName,
                         Name = "tsmi" + folderName,
-                        Image = UIHelpers.GetBitmap("folder")
+                        Image = UIHelpers.GetBitmap("folder"),
                     };
 
                     // Sub-item: open locally.
                     ToolStripMenuItem openLocalFolderItem = new ToolStripMenuItem()
                     {
                         Text = CmisSync.Properties_Resources.OpenLocalFolder,
-                        Image = UIHelpers.GetBitmap("folder")
+                        Name = "openLocal",
+                        Image = UIHelpers.GetBitmap("folder"),
                     };
                     openLocalFolderItem.Click += OpenLocalFolderDelegate(folderName);
 
@@ -245,30 +254,24 @@ namespace CmisSync
                     ToolStripMenuItem openRemoteFolderItem = new ToolStripMenuItem()
                     {
                         Text = CmisSync.Properties_Resources.BrowseRemoteFolder,
-                        Image = UIHelpers.GetBitmap("classic_folder_web")
+                        Name = "openRemote",
+                        Image = UIHelpers.GetBitmap("classic_folder_web"),
                     };
                     openRemoteFolderItem.Click += OpenRemoteFolderDelegate(folderName);
 
                     // Sub-item: suspend sync.
-                    ToolStripMenuItem suspendFolderItem = new ToolStripMenuItem();
-                    setSyncItemState(suspendFolderItem, SyncStatus.Idle);
-                    foreach (RepoBase aRepo in Program.Controller.Repositories)
+                    ToolStripMenuItem suspendFolderItem = new ToolStripMenuItem()
                     {
-                        if (aRepo.Name.Equals(folderName))
-                        {
-                            setSyncItemState(suspendFolderItem, aRepo.Status);
-                            break;
-                        }
-                    }
+                        Name = "pause",
+                    };
                     suspendFolderItem.Click += SuspendSyncFolderDelegate(folderName);
 
                     // Sub-item: remove folder from sync
                     ToolStripMenuItem removeFolderFromSyncItem = new ToolStripMenuItem()
                     {
                         Text = Properties_Resources.RemoveFolderFromSync,
-                        Tag = "remove",
-                        // TODO if remove folder from sync is supported, enable this entry
-                        Enabled = false
+                        Name = "remove",
+                        Image = UIHelpers.GetBitmap("disconnect"),
                     };
                     removeFolderFromSyncItem.Click += RemoveFolderFromSyncDelegate(folderName);
 
@@ -276,7 +279,7 @@ namespace CmisSync
                     ToolStripMenuItem manualSyncItem = new ToolStripMenuItem()
                     {
                         Text = Properties_Resources.ManualSync,
-                        Tag = "sync",
+                        Name = "sync",
                         Image = UIHelpers.GetBitmap("media_playback_refresh"),
                     };
                     manualSyncItem.Click += ManualSyncDelegate(folderName);
@@ -285,20 +288,29 @@ namespace CmisSync
                     ToolStripMenuItem settingsItem = new ToolStripMenuItem()
                     {
                         Text = Properties_Resources.Settings,
-                        Tag = "settings",
+                        Name = "settings",
                     };
                     settingsItem.Click += SettingsDelegate(folderName);
 
+
+                    setSyncItemState(suspendFolderItem, manualSyncItem, SyncStatus.Idle);
+                    foreach (RepoBase aRepo in Program.Controller.Repositories)
+                    {
+                        if (aRepo.Name.Equals(folderName))
+                        {
+                            setSyncItemState(suspendFolderItem, manualSyncItem, aRepo.Status);
+                            break;
+                        }
+                    }
+                    
                     // Add the sub-items.
                     subfolderItem.DropDownItems.Add(openLocalFolderItem);
                     subfolderItem.DropDownItems.Add(openRemoteFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
-                    //Removed for Oris4
-                    //subfolderItem.DropDownItems.Add(new ToolStripSeparator());
-                    //subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
-                    //Manual sync
                     subfolderItem.DropDownItems.Add(manualSyncItem);
+                    subfolderItem.DropDownItems.Add(new ToolStripSeparator());
+                    subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(settingsItem);
 
@@ -311,7 +323,9 @@ namespace CmisSync
             // Create the menu item that lets the user add a new synchronized folder.
             ToolStripMenuItem addFolderItem = new ToolStripMenuItem()
             {
-                Text = CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture)
+                Text = CmisSync.Properties_Resources.AddARemoteFolder,
+                Name = "add",
+                Image = UIHelpers.GetBitmap("connect"),
             };
             addFolderItem.Click += delegate
             {
@@ -323,7 +337,8 @@ namespace CmisSync
             // Create the menu item that lets the user view the log.
             ToolStripMenuItem log_item = new ToolStripMenuItem()
             {
-                Text = CmisSync.Properties_Resources.ResourceManager.GetString("ViewLog", CultureInfo.CurrentCulture)
+                Text = CmisSync.Properties_Resources.ViewLog,
+                Name = "log",
             };
             log_item.Click += delegate
             {
@@ -335,7 +350,8 @@ namespace CmisSync
             // Create the About menu.
             ToolStripMenuItem about_item = new ToolStripMenuItem()
             {
-                Text = CmisSync.Properties_Resources.ResourceManager.GetString("About", CultureInfo.CurrentCulture)
+                Text = CmisSync.Properties_Resources.About,
+                Name = "about",
             };
             about_item.Click += delegate
             {
@@ -346,7 +362,8 @@ namespace CmisSync
             // Create the exit menu.
             this.exitItem = new ToolStripMenuItem()
             {
-                Text = CmisSync.Properties_Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)
+                Text = CmisSync.Properties_Resources.Exit,
+                Name = "exit",
             };
             this.exitItem.Click += delegate
             {

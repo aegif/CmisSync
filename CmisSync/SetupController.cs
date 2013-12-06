@@ -84,6 +84,11 @@ namespace CmisSync
         private static readonly String ROOT_PATH = "/";
 
         /// <summary>
+        /// Allow user to connect to the same repository (URL/Username) more than once.
+        /// </summary>
+        private static readonly bool ALLOW_DUPLICATE_REPOSITORY = false;
+
+        /// <summary>
         /// Show window event.
         /// </summary>
         public event Action ShowWindowEvent = delegate { };
@@ -497,6 +502,14 @@ namespace CmisSync
                 return "InvalidURL";
             }
             return String.Empty;
+        }
+
+        /// <summary>
+        /// Check for duplicate repository.
+        /// </summary>
+        public bool CheckRepoUrlAndUsername(string RemoteUrl, string UserName)
+        {
+            return ALLOW_DUPLICATE_REPOSITORY || ConfigManager.CurrentConfig.getFolder(RemoteUrl, UserName) == null;
         }
 
         /// <summary>

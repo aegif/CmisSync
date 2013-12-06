@@ -307,6 +307,7 @@ namespace CmisSync.Lib
             if (syncFull)
             {
                 remote_timer.Stop();
+                local_timer.Stop();
             }
             Watcher.EnableRaisingEvents = false; //Disable events while syncing...
             Watcher.EnableEvent = false;

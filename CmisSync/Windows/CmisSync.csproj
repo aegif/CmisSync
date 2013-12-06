@@ -277,6 +277,8 @@
     <EmbeddedResource Include="Pixmaps\media_playback_refresh.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
+    <EmbeddedResource Include="Pixmaps\connect.png" />
+    <EmbeddedResource Include="Pixmaps\disconnect.png" />
     <Content Include="CmisSync.wxs">
       <SubType>Designer</SubType>
     </Content>

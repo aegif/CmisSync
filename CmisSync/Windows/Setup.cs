@@ -630,9 +630,17 @@ namespace CmisSync
                                     }
                                     else
                                     {
-                                        // Continue to next step, which is choosing a particular folder.
-                                        Controller.Add1PageCompleted(
-                                            new Uri(address_box.Text), user_box.Text, password_box.Password);
+                                        if (!Controller.CheckRepoUrlAndUsername(cmisServer.Url.ToString(), user_box.Text))
+                                        {
+                                            address_error_label.Text = Properties_Resources.DuplicateRepository;
+                                            address_error_label.Visibility = Visibility.Visible;
+                                        }
+                                        else
+                                        {
+                                            // Continue to next step, which is choosing a particular folder.
+                                            Controller.Add1PageCompleted(
+                                                new Uri(address_box.Text), user_box.Text, password_box.Password);
+                                        }
                                     }
                                 };
                                 break;

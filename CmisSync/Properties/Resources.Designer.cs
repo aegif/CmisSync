@@ -226,6 +226,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are already connected to Oris4 using this account..
+        /// </summary>
+        internal static string DuplicateRepository {
+            get {
+                return ResourceManager.GetString("DuplicateRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty URL.
         /// </summary>
         internal static string EmptyURLNotAllowed {
@@ -517,11 +526,20 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remove the folder from synchronization.
+        ///   Looks up a localized string similar to Disconnect from Oris4....
         /// </summary>
         internal static string RemoveFolderFromSync {
             get {
                 return ResourceManager.GetString("RemoveFolderFromSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to disconnect from Oris4?  No files will be deleted from your system but they will no longer be synchronized with Oris4..
+        /// </summary>
+        internal static string RemoveFolderFromSyncConfirm {
+            get {
+                return ResourceManager.GetString("RemoveFolderFromSyncConfirm", resourceCulture);
             }
         }
         
