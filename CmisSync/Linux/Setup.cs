@@ -344,8 +344,8 @@ namespace CmisSync {
                 });
             };
 
-            AddButton (continue_button);
             AddButton (cancel_button);
+            AddButton (continue_button);
 
             address_entry.GrabFocus();
         }
@@ -458,8 +458,8 @@ namespace CmisSync {
             layout_vertical.PackStart (sw, true, true, 0);
             Add(layout_vertical);
             AddButton(back_button);
-            AddButton(continue_button);
             AddButton(cancel_button);
+            AddButton(continue_button);
         }
 
         private void ShowCustomizePage()
@@ -589,9 +589,8 @@ namespace CmisSync {
             layout_vertical.PackStart (localfolder_error_label, true, true, 0);
             Add(layout_vertical);
             AddButton(back_button);
-            AddButton(add_button);
             AddButton(cancel_button);
-
+            AddButton(add_button);
             // add_button.GrabFocus();
             localfolder_entry.GrabFocus();
             localfolder_entry.SelectRegion(0, localfolder_entry.Text.Length);
