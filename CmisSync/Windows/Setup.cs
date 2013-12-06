@@ -16,29 +16,18 @@
 
 
 using CmisSync.CmisTree;
-using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Media;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Markup;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shell;
-using Drawing = System.Drawing;
-using Imaging = System.Windows.Interop.Imaging;
 using WPF = System.Windows.Controls;
 
 namespace CmisSync
@@ -59,6 +48,10 @@ namespace CmisSync
 
         delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
             string address, string user, string password);
+
+        delegate void CheckRepoPathAndNameDelegate();
+
+        private EventHandler windowActivatedEventHandler = null;
 
         /// <summary>
         /// Constructor.
@@ -97,6 +90,14 @@ namespace CmisSync
                 {
                     Logger.Debug("Entering ChangePageEvent.");
                     Reset();
+
+                    //Remove window activated event handler if one exists...
+                    if (windowActivatedEventHandler != null)
+                    {
+                        Logger.Debug("Removing window activated event handler");
+                        Activated -= windowActivatedEventHandler;
+                        windowActivatedEventHandler = null;
+                    }
 
                     // Show appropriate setup page.
                     switch (type)
@@ -816,11 +817,6 @@ namespace CmisSync
                                     Text = Path.Combine(parentFolder, localfolder_box.Text)
                                 };
 
-                                localfolder_box.TextChanged += delegate
-                                {
-                                    localrepopath_box.Text = Path.Combine(parentFolder, localfolder_box.Text);
-                                };
-
                                 Button choose_folder_button = new Button()
                                 {
                                     Width = 40,
@@ -904,49 +900,40 @@ namespace CmisSync
                                     });
                                 };
 
-                                // Repo name validity.
-
-                                string error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-
-                                if (!String.IsNullOrEmpty(error))
+                                CheckRepoPathAndNameDelegate checkRepoPathAndNameDelegate = delegate()
                                 {
-                                    localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                                    localfolder_error_label.Visibility = Visibility.Visible;
-                                }
-                                else localfolder_error_label.Visibility = Visibility.Hidden;
+                                    string error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
+
+                                    if (!String.IsNullOrEmpty(error))
+                                    {
+                                        localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+                                        localfolder_error_label.Visibility = Visibility.Visible;
+                                    }
+                                    else
+                                    {
+                                        localfolder_error_label.Visibility = Visibility.Hidden;
+                                    }
+                                };
+
+                                //execute the check on first run...
+                                checkRepoPathAndNameDelegate();
 
                                 localfolder_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                    if (!String.IsNullOrEmpty(error))
-                                    {
-                                        localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                                        localfolder_error_label.Visibility = Visibility.Visible;
-                                    }
-                                    else localfolder_error_label.Visibility = Visibility.Hidden;
+                                    localrepopath_box.Text = Path.Combine(parentFolder, localfolder_box.Text);
                                 };
-
-                                // Repo path validity.
-
-                                error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                if (!String.IsNullOrEmpty(error))
-                                {
-                                    localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                                    localfolder_error_label.Visibility = Visibility.Visible;
-                                }
-                                else localfolder_error_label.Visibility = Visibility.Hidden;
 
                                 localrepopath_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                    if (!String.IsNullOrEmpty(error))
-                                    {
-                                        localfolder_error_label.Text = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                                        localfolder_error_label.Visibility = Visibility.Visible;
-
-                                    }
-                                    else localfolder_error_label.Visibility = Visibility.Hidden;
+                                    checkRepoPathAndNameDelegate();
                                 };
+
+                                windowActivatedEventHandler = new EventHandler( delegate(object sender, EventArgs e)
+                                {
+                                    checkRepoPathAndNameDelegate();
+                                });
+
+                                Activated += windowActivatedEventHandler;
 
                                 // Choose a folder.
                                 choose_folder_button.Click += delegate

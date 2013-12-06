@@ -24,7 +24,6 @@ using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Shell;
-using System.Globalization;
 
 namespace CmisSync {
 
@@ -69,7 +68,6 @@ namespace CmisSync {
         /// Background for the bar line of buttons.
         /// </summary>
         private Rectangle buttonsBackground;
-        
 
         /// <summary>
         /// Constructor.
