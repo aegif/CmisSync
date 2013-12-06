@@ -202,6 +202,12 @@ namespace CmisSync.Lib
                 return false;
             }
 
+            // Ignore meta data stores of MacOS
+            if (filename == ".DS_Store")
+            {
+                Logger.Debug("Unworth syncing MacOS meta data file .DS_Store");
+                return false;
+            }
             filename = filename.ToLower();
 
             if (ignoredExtensions.Contains(Path.GetExtension(filename))
