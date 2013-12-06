@@ -352,9 +352,6 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="SyncError" xml:space="preserve">
     <value>Could not sync "{0}": {1}</value>
   </data>
-  <data name="DuplicateRepository" xml:space="preserve">
-    <value>You are already connected to Oris4 using this account.</value>
-  </data>
   <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
     <value>Are you sure you want to disconnect from Oris4?  No files will be deleted from your system but they will no longer be synchronized with Oris4.</value>
   </data>

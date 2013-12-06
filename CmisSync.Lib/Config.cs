@@ -85,14 +85,16 @@ namespace CmisSync.Lib
         }
 
         /// <summary>
-        /// Get a folder based on RemoteUrl and UserName.
+        /// Get a folder based on RemoteUrl, UserName, and RepositoryId.
         /// </summary>
-        public SyncConfig.Folder getFolder(string RemoteUrl, string UserName)
+        public SyncConfig.Folder getFolder(string RemoteUrl, string UserName, string RepositoryId)
         {
             foreach (SyncConfig.Folder folder in configXml.Folders)
             {
                 Uri RemoteUri = folder.RemoteUrl;
-                if (RemoteUri.ToString().Equals(RemoteUrl) && folder.UserName.Equals(UserName))
+                if (RemoteUri.ToString().Equals(RemoteUrl) && 
+                    folder.UserName.Equals(UserName) &&
+                    folder.RepositoryId.Equals(RepositoryId))
                 {
                     return folder;
                 }

@@ -226,15 +226,6 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are already connected to Oris4 using this account..
-        /// </summary>
-        internal static string DuplicateRepository {
-            get {
-                return ResourceManager.GetString("DuplicateRepository", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Empty URL.
         /// </summary>
         internal static string EmptyURLNotAllowed {
