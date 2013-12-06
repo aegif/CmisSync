@@ -102,12 +102,13 @@ namespace CmisSync.Lib
             // Check that the folder exists.
             if (Directory.Exists(repoInfo.TargetDirectory))
             {
-                Logger.Fatal(String.Format("Fetcher | ERROR - DataSpace Repository Folder {0} already exist", repoInfo.TargetDirectory));
-                throw new UnauthorizedAccessException("Repository folder already exists!");
+                Logger.Info(String.Format("Fetcher | Information - DataSpace Repository Folder {0} already exist, this could lead to sync conflicts", repoInfo.TargetDirectory));
             }
-
-            // Create the local folder.
-            Directory.CreateDirectory(repoInfo.TargetDirectory);
+            else
+            {
+                // Create the local folder.
+                Directory.CreateDirectory(repoInfo.TargetDirectory);
+            }
 
             // Use this folder configuration.
             this.cmisRepo = new CmisRepo(repoInfo, activityListener);

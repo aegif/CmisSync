@@ -12,7 +12,6 @@ using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -150,28 +149,52 @@ namespace CmisSync.Lib.Sync
                 this.activityListener = listener;
                 this.repoinfo = repoInfo;
 
-                var eventManager = new SyncEventManager(); 
-                eventManager.AddEventHandler(new DebugLoggingHandler());
-                Queue = new SyncEventQueue(eventManager);
-
+                Queue = repoCmis.Queue;
                 // Database is the user's AppData/Roaming
                 database = new Database(repoinfo.CmisDatabase);
 
                 // Get path on remote repository.
-                remoteFolderPath = repoInfo.RemotePath;
+                remoteFolderPath = repoinfo.RemotePath;
 
                 cmisParameters = new Dictionary<string, string>();
-                cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-                cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
-                cmisParameters[SessionParameter.User] = repoInfo.User;
-                cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
-                cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
-                cmisParameters[SessionParameter.ConnectTimeout] = "-1";
-
-                foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
+                UpdateCmisParameters();
+                if (Logger.IsInfoEnabled)
                 {
-                    Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
+                    foreach (string ignoredFolder in repoinfo.getIgnoredPaths())
+                    {
+                        Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
+                    }
                 }
+                repoCmis.EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(10, RepoInfoChanged));
+            }
+
+            /// <summary>
+            /// This method is called, every time the config changes
+            /// </summary>
+            /// <param name="e"></param>
+            /// <returns></returns>
+            private bool RepoInfoChanged(ISyncEvent e)
+            {
+                if (e is RepoConfigChangedEvent)
+                {
+                    repoinfo = (e as RepoConfigChangedEvent).RepoInfo;
+                    UpdateCmisParameters();
+                    ForceFullSyncAtNextSync();
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// Loads the CmisParameter from repoinfo. If repoinfo has been changed, this method sets the new informations for the next session
+            /// </summary>
+            private void UpdateCmisParameters()
+            {
+                cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+                cmisParameters[SessionParameter.AtomPubUrl] = repoinfo.Address.ToString();
+                cmisParameters[SessionParameter.User] = repoinfo.User;
+                cmisParameters[SessionParameter.Password] = repoinfo.Password.ToString();
+                cmisParameters[SessionParameter.RepositoryId] = repoinfo.RepoID;
+                cmisParameters[SessionParameter.ConnectTimeout] = "-1";
             }
 
 
@@ -206,7 +229,6 @@ namespace CmisSync.Lib.Sync
                         if (disposing)
                         {
                             this.database.Dispose();
-                            Queue.Dispose();
                         }
                         this.disposed = true;
                     }
@@ -1103,7 +1125,7 @@ namespace CmisSync.Lib.Sync
                                                 Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
                                                 // Create database entry for this empty file to force content update if setContentStream will fail.
                                                 database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, new byte[hashAlg.HashSize]);
-                                            } catch(Exception e) {
+                                            } catch(Exception) {
                                                 string reason = Utils.IsValidISO88591(fileName)?String.Empty:" Reason: Upload perhaps failed because of an invalid ISO 8859-1 character";
                                                 Logger.Info(String.Format("Could not create the remote document {0} as target for local document {1}{2}", fileName, filePath, reason));
                                                 throw;

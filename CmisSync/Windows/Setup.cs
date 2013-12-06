@@ -666,6 +666,10 @@ namespace CmisSync
                                         repo.Selected = true;
                                         firstRepo = false;
                                     }
+                                    else
+                                    {
+                                        repo.Selected = false;
+                                    }
                                     CmisRepoCredentials cred = new CmisRepoCredentials()
                                     {
                                         UserName = Controller.saved_user,
@@ -743,7 +747,7 @@ namespace CmisSync
                                     {
                                         RootFolder repo = item as RootFolder;
                                         if (repo != null)
-                                            if (repo.Selected == true)
+                                            if (repo.Selected != false)
                                             {
                                                 selectedRepo = repo;
                                                 break;
@@ -848,7 +852,8 @@ namespace CmisSync
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
                                     Visibility = Visibility.Hidden,
-                                    TextWrapping = TextWrapping.Wrap
+                                    TextWrapping = TextWrapping.Wrap,
+                                    MaxWidth = 420
                                 };
 
                                 Button cancel_button = new Button()
@@ -902,6 +907,10 @@ namespace CmisSync
                                 localfolder_box.Focus();
                                 localfolder_box.Select(localfolder_box.Text.Length, 0);
 
+                                // Repo path validity.
+
+                                CheckCustomizeInput(localfolder_box, localrepopath_box, localfolder_error_label);
+
                                 // Actions.
 
                                 Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
@@ -920,48 +929,14 @@ namespace CmisSync
                                     });
                                 };
 
-                                // Repo name validity.
-
-                                string error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-
-                                if (!String.IsNullOrEmpty(error))
-                                {
-                                    localfolder_error_label.Text = error;
-                                    localfolder_error_label.Visibility = Visibility.Visible;
-                                }
-                                else localfolder_error_label.Visibility = Visibility.Hidden;
-
                                 localfolder_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                    if (!String.IsNullOrEmpty(error))
-                                    {
-                                        localfolder_error_label.Text = error;
-                                        localfolder_error_label.Visibility = Visibility.Visible;
-                                    }
-                                    else localfolder_error_label.Visibility = Visibility.Hidden;
+                                    CheckCustomizeInput(localfolder_box, localrepopath_box, localfolder_error_label);
                                 };
-
-                                // Repo path validity.
-
-                                error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                if (!String.IsNullOrEmpty(error))
-                                {
-                                    localfolder_error_label.Text = error;
-                                    localfolder_error_label.Visibility = Visibility.Visible;
-                                }
-                                else localfolder_error_label.Visibility = Visibility.Hidden;
 
                                 localrepopath_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                    if (!String.IsNullOrEmpty(error))
-                                    {
-                                        localfolder_error_label.Text = error;
-                                        localfolder_error_label.Visibility = Visibility.Visible;
-                                       
-                                    }
-                                    else localfolder_error_label.Visibility = Visibility.Hidden;
+                                    CheckCustomizeInput(localfolder_box, localrepopath_box, localfolder_error_label);
                                 };
 
                                 // Choose a folder.
@@ -991,6 +966,8 @@ namespace CmisSync
                                 {
                                     Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text);
                                 };
+
+                                Controller.LocalPathExists += LocalPathExistsHandler;
                                 break;
                             }
                         #endregion
@@ -1098,6 +1075,41 @@ namespace CmisSync
 
             Controller.PageCancelled();
             Logger.Info("Exiting constructor.");
+        }
+
+        private static bool LocalPathExistsHandler(string path) {
+            return System.Windows.MessageBox.Show(String.Format(
+                    Properties_Resources.ConfirmExistingLocalFolderText, path),
+                    String.Format(Properties_Resources.ConfirmExistingLocalFolderTitle, path),
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question,
+                    MessageBoxResult.No
+                    ) == MessageBoxResult.Yes;
+        }
+
+        private void CheckCustomizeInput(TextBox localfolder_box, TextBox localrepopath_box, TextBlock localfolder_error_label)
+        {
+            string error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
+            if (!String.IsNullOrEmpty(error))
+            {
+                localfolder_error_label.Text = error;
+                localfolder_error_label.Visibility = Visibility.Visible;
+                localfolder_error_label.Foreground = Brushes.Red;
+            }
+            else
+            {
+                try
+                {
+                    Controller.CheckRepoPathExists(localrepopath_box.Text);
+                    localfolder_error_label.Visibility = Visibility.Hidden;
+                }
+                catch (ArgumentException e)
+                {
+                    localfolder_error_label.Visibility = Visibility.Visible;
+                    localfolder_error_label.Foreground = Brushes.Orange;
+                    localfolder_error_label.Text = e.Message;
+                }
+            }
         }
     }
 

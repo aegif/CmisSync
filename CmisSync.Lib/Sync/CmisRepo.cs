@@ -29,12 +29,10 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private SynchronizedFolder synchronizedFolder;
 
-
         /// <summary>
         /// Track whether <c>Dispose</c> has been called.
         /// </summary>
         private bool disposed = false;
-
 
         /// <summary>
         /// Constructor.
