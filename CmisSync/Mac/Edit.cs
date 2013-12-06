@@ -65,62 +65,87 @@ namespace CmisSync
         /// </summary>
         private void CreateEdit()
         {
-            OutlineViewDelegate DataDelegate = new OutlineViewDelegate ();
-//            NSOutlineView outlineView = new NSOutlineView () {
-//                Frame            = new RectangleF (0, 0, 0, 0),
-//                RowHeight        = 34,
-//                IntercellSpacing = new SizeF (8, 12),
-//                HeaderView       = null,
-//                Delegate         = DataDelegate
-//            };
-//
-//            outlineView.AddColumn(new NSTableColumn(){
-//                Identifier = "colName",
-//                Editable = false
-//            });
-//
-//            NSScrollView ScrollView = new NSScrollView () {
-//                Frame               = new RectangleF (190, Frame.Height - 340, 408, 255),
-//                DocumentView        = outlineView,
-//                HasVerticalScroller = true,
-//                BorderType          = NSBorderType.BezelBorder
-//            };
-
             RootFolder repo = new RootFolder()
             {
                 Name = FolderName,
                 Id = credentials.RepoId,
                 Address = credentials.Address.ToString()
             };
-            //AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, credentials, PredefinedNodeLoader.LoadSubFolderDelegate);
+            repo.Selected = true;
             IgnoredFolderLoader.AddIgnoredFolderToRootNode(repo, Ignores);
             LocalFolderLoader.AddLocalFolderToRootNode(repo, localPath);
-            repo.Selected = true;
-            //asyncLoader.Load(repo);
             List<RootFolder> repos = new List<RootFolder>();
             repos.Add(repo);
+
+            OutlineViewDelegate DataDelegate = new OutlineViewDelegate ();
             CmisTree.CmisTreeDataSource DataSource = new CmisTree.CmisTreeDataSource(repos);
-//            outlineView.DataSource = DataSource;
-//            outlineView.ReloadData ();
-            OutlineController = new CmisOutlineController (DataSource, DataDelegate);
 
-            // Add selection handler
-            /*treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
+            CmisOutlineController OutlineController = new CmisOutlineController (DataSource, DataDelegate);
+
+            AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, credentials, PredefinedNodeLoader.LoadSubFolderDelegate, PredefinedNodeLoader.CheckSubFolderDelegate);
+            asyncLoader.UpdateNodeEvent += delegate {
+                InvokeOnMainThread(delegate {
+                    DataSource.UpdateCmisTree(repo);
+                    NSOutlineView view = OutlineController.OutlineView();
+                    for (int i = 0; i < view.RowCount; ++i) {
+                        view.ReloadItem(view.ItemAtRow(i));
+                    }
+                });
+            };
+            asyncLoader.Load(repo);
+
+            DataDelegate.ItemExpanded += delegate(NSNotification notification)
             {
-                TreeViewItem expandedItem = e.OriginalSource as TreeViewItem;
-                Node expandedNode = expandedItem.Header as Folder;
-                if (expandedNode != null)
-                {
-                    asyncLoader.Load(expandedNode);
-                }
-            }));*/
+                InvokeOnMainThread(delegate {
+                    NSCmisTree cmis = notification.UserInfo["NSObject"] as NSCmisTree;
+                    if (cmis == null) {
+                        Console.WriteLine("ItemExpanded Error");
+                        return;
+                    }
 
-//            ContentView.AddSubview(ScrollView);
+                    NSCmisTree cmisRoot = cmis;
+                    while (cmisRoot.Parent != null) {
+                        cmisRoot = cmisRoot.Parent;
+                    }
+                    if (repo.Name != cmisRoot.Name) {
+                        Console.WriteLine("ItemExpanded find root Error");
+                        return;
+                    }
+
+                    Node node = cmis.GetNode(repo);
+                    if (node == null) {
+                        Console.WriteLine("ItemExpanded find node Error");
+                        return;
+                    }
+                    asyncLoader.Load(node);
+                });
+            };
+            DataSource.SelectedEvent += delegate (NSCmisTree cmis, int selected) {
+                InvokeOnMainThread(delegate {
+                    Node node = cmis.GetNode(repo);
+                    if (node == null) {
+                        Console.WriteLine("SelectedEvent find node Error");
+                    }
+                    node.Selected = (selected != 0);
+                    DataSource.UpdateCmisTree(repo);
+
+                    NSOutlineView view = OutlineController.OutlineView();
+                    for (int i = 0; i < view.RowCount; ++i) {
+                        try{
+                            view.ReloadItem(view.ItemAtRow(i));
+                        }catch(Exception e) {
+                            Console.WriteLine(e);
+                        }
+                    }
+                });
+            };
+
+            OutlineController.View.Frame = new RectangleF (190, 60, 400, 240);
             ContentView.AddSubview (OutlineController.View);
 
             Controller.CloseWindowEvent += delegate
             {
-                //asyncLoader.Cancel();
+                asyncLoader.Cancel();
             };
 
             Controller.OpenWindowEvent += delegate
@@ -134,7 +159,6 @@ namespace CmisSync
             NSButton finish_button = new NSButton()
             {
                 Title = Properties_Resources.SaveChanges,
-                Enabled = false
             };
 
             NSButton cancel_button = new NSButton()
@@ -161,20 +185,6 @@ namespace CmisSync
                 });
             };
 
-
-            DataDelegate.SelectionChanged += delegate {
-                InvokeOnMainThread (delegate {
-                    NSOutlineView view = OutlineController.OutlineView();
-                    if(view.SelectedRow>=0)
-                    {
-                        finish_button.Enabled = true;
-                    } else 
-                    {
-                        finish_button.Enabled = false;
-                    }
-                });
-            };
-
             this.Header = Properties_Resources.EditTitle;
             this.Description = "";
             this.ShowAll();
@@ -198,6 +208,8 @@ namespace CmisSync
 
             if (Program.UI != null)
                 Program.UI.UpdateDockIconVisibility ();
+
+            Controller.CloseWindow ();
 
             return;
         }

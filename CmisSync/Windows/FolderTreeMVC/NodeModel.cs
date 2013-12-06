@@ -86,14 +86,10 @@ namespace CmisSync.CmisTree
                                     {
                                         p.Selected = true;
                                     }
-                                    else if (p.Children.Count > 1)
+                                    else
                                     {
                                         p.ThreeStates = true;
                                         p.Selected = null;
-                                    }
-                                    else
-                                    {
-                                        break;
                                     }
                                 }
                                 p = p.Parent;

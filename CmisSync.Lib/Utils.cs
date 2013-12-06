@@ -67,17 +67,17 @@ namespace CmisSync.Lib
 //                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
 //#endif
             }
-			catch(System.UnauthorizedAccessException) {
-				var permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
-				var permissionSet = new PermissionSet(PermissionState.None);
-				permissionSet.AddPermission(permission);
-				if (permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet))
-				{
-					return true;
-				}
-				else
-					return false;
-			}
+            catch(System.UnauthorizedAccessException) {
+                var permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
+                var permissionSet = new PermissionSet(PermissionState.None);
+                permissionSet.AddPermission(permission);
+                if (permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet))
+                {
+                    return true;
+                }
+                else
+                    return false;
+            }
 
             return writeAllow && !writeDeny;
         }
@@ -202,6 +202,12 @@ namespace CmisSync.Lib
                 return false;
             }
 
+            // Ignore meta data stores of MacOS
+            if (filename == ".DS_Store")
+            {
+                Logger.Debug("Unworth syncing MacOS meta data file .DS_Store");
+                return false;
+            }
             filename = filename.ToLower();
 
             if (ignoredExtensions.Contains(Path.GetExtension(filename))

@@ -156,7 +156,7 @@ namespace CmisSync {
                 StringValue = Properties_Resources.ChangeRepoPath
             };
             NSTextField LocalRepoPathTextField = new NSTextField() {
-                Frame = new RectangleF(190, 190, 196 + 196 + 16, 22),
+                Frame = new RectangleF(190, 190, 196 + 196 + 16 -60, 22),
                 Font = UI.Font,
                 Delegate = new TextFieldDelegate(),
                 StringValue = Path.Combine(Controller.DefaultRepoPath, LocalFolderTextField.StringValue)
@@ -166,7 +166,7 @@ namespace CmisSync {
                 Bordered = false,
                 TextColor = NSColor.Red,
                 Editable = false,
-                Frame = new RectangleF(190, 30, 196 + 196 + 16, 160),
+                Frame = new RectangleF(190, 30, 196 + 196 + 16, 140),
                 Font = NSFontManager.SharedFontManager.FontWithFamily("Lucida Grande", NSFontTraitMask.Condensed, 0, 11),
             };
             WarningTextField.Cell.LineBreakMode = NSLineBreakMode.ByWordWrapping;
@@ -180,6 +180,31 @@ namespace CmisSync {
             CancelButton = new NSButton() {
                 Title = Properties_Resources.Cancel
             };
+            NSButton ChooseFolderButton = new NSButton()
+            {
+                Title = "...",
+                Frame = new RectangleF(190 + 196 + 196 + 16 - 40, 190, 40, 22)
+            };
+
+            ChooseFolderButton.Activated += delegate
+            {
+                NSOpenPanel OpenPanel = NSOpenPanel.OpenPanel;
+                OpenPanel.AllowsMultipleSelection = false;
+                OpenPanel.CanChooseFiles = false;
+                OpenPanel.CanChooseDirectories = true;
+                OpenPanel.CanCreateDirectories = true;
+                OpenPanel.DirectoryUrl = new NSUrl("file://localhost" + Controller.DefaultRepoPath);
+                if(OpenPanel.RunModal() == 1) {
+                    string path = OpenPanel.Urls[0].Path;
+                    try{
+                        LocalRepoPathTextField.StringValue = Path.Combine(path, LocalFolderTextField.StringValue);
+                    } catch(Exception) {
+                        LocalRepoPathTextField.StringValue = path;
+                    }
+                    CheckCustomizeInput(LocalFolderTextField, LocalRepoPathTextField, WarningTextField);
+                }
+            };
+
             BackButton.Activated += delegate
             {
                 Controller.BackToPage2();
@@ -192,6 +217,7 @@ namespace CmisSync {
             {
                 Controller.CustomizePageCompleted(LocalFolderTextField.StringValue, LocalRepoPathTextField.StringValue);
             };
+            Controller.LocalPathExists += LocalPathExistsHandler;
             (LocalFolderTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate
             {
                 try
@@ -201,31 +227,20 @@ namespace CmisSync {
                 catch (Exception)
                 {
                 }
-                string error = Controller.CheckRepoPathAndName(LocalRepoPathTextField.StringValue, LocalFolderTextField.StringValue);
-                if (String.IsNullOrEmpty(error))
-                    WarningTextField.StringValue = "";
-                else
-                    WarningTextField.StringValue = error;
+                CheckCustomizeInput(LocalFolderTextField, LocalRepoPathTextField, WarningTextField);
             };
             (LocalRepoPathTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate
             {
-                string error = Controller.CheckRepoPathAndName(LocalRepoPathTextField.StringValue, LocalFolderTextField.StringValue);
-                if (String.IsNullOrEmpty(error))
-                    WarningTextField.StringValue = "";
-                else
-                    WarningTextField.StringValue = error;
+                CheckCustomizeInput(LocalFolderTextField, LocalRepoPathTextField, WarningTextField);
             };
             {
-                string error = Controller.CheckRepoPathAndName(LocalRepoPathTextField.StringValue, LocalFolderTextField.StringValue);
-                if (String.IsNullOrEmpty(error))
-                    WarningTextField.StringValue = "";
-                else
-                    WarningTextField.StringValue = error;
+                CheckCustomizeInput(LocalFolderTextField, LocalRepoPathTextField, WarningTextField);
             }
             ContentView.AddSubview(LocalFolderLabel);
             ContentView.AddSubview(LocalFolderTextField);
             ContentView.AddSubview(LocalRepoPathLabel);
             ContentView.AddSubview(LocalRepoPathTextField);
+            ContentView.AddSubview(ChooseFolderButton);
             ContentView.AddSubview(WarningTextField);
             Buttons.Add(ContinueButton);
             Buttons.Add(BackButton);
@@ -331,6 +346,8 @@ namespace CmisSync {
                     Password = PasswordTextField.StringValue,
                     Address = new Uri(AddressTextField.StringValue)
                 };
+                ContinueButton.Enabled = false;
+                CancelButton.Enabled = false;
                 Thread check = new Thread(() => {
                     Tuple<CmisServer, Exception> fuzzyResult = CmisUtils.GetRepositoriesFuzzy(credentials);
                     CmisServer cmisServer = fuzzyResult.Item1;
@@ -346,25 +363,15 @@ namespace CmisSync {
                         if (Controller.repositories == null)
                         {
                             WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
+                            ContinueButton.Enabled = true;
+                            CancelButton.Enabled = true;
                         }
                         else
-                        {
-                            AddressTextField.StringValue = cmisServer.Url.ToString();
-                            WarningTextField.StringValue = "";
-                        }
-                    });
-                    Thread.Sleep(1000); //TODO workaround for COCOA thread issue to crash
-                    InvokeOnMainThread(delegate {
-                        ContinueButton.Enabled = true;
-                        CancelButton.Enabled = true;
-                        if (Controller.repositories != null)
                         {
                             Controller.Add1PageCompleted(cmisServer.Url, credentials.UserName, credentials.Password.ToString());
                         }
                     });
                 });
-                ContinueButton.Enabled = false;
-                CancelButton.Enabled = false;
                 check.Start();
             };
             CancelButton.Activated += delegate
@@ -411,6 +418,10 @@ namespace CmisSync {
                     repo.Selected = true;
                     firstRepo = false;
                 }
+                else
+                {
+                    repo.Selected = false;
+                }
                 CmisRepoCredentials cred = new CmisRepoCredentials()
                 {
                     UserName = Controller.saved_user,
@@ -432,11 +443,41 @@ namespace CmisSync {
                 loader.Add(repo.Id, asyncLoader);
             }
             DataSource = new CmisTree.CmisTreeDataSource(Repositories);
+            DataSource.SelectedEvent += delegate (NSCmisTree cmis, int selected) {
+                InvokeOnMainThread(delegate {
+                    RootFolder selectedRoot = null;
+                    foreach (RootFolder root in Repositories) {
+                        Node node = cmis.GetNode(root);
+                        if (node != null) {
+                            if (node.Parent == null && node.Selected == false) {
+                                selectedRoot = root;
+                            }
+                            node.Selected = (selected != 0);
+                            DataSource.UpdateCmisTree(root);
+                        }
+                    }
+
+                    NSOutlineView view = OutlineController.OutlineView();
+                    if (selectedRoot != null) {
+                        foreach (RootFolder root in Repositories) {
+                            if (root != selectedRoot) {
+                                root.Selected = false;
+                                DataSource.UpdateCmisTree(root);
+                            }
+                        }
+                        view.ReloadData();
+                    } else {
+                        for (int i = 0; i < view.RowCount; ++i) {
+                            view.ReloadItem(view.ItemAtRow(i));
+                        }
+                    }
+                });
+            };
             DataDelegate = new OutlineViewDelegate ();
             OutlineController = new CmisOutlineController (DataSource,DataDelegate);
             ContinueButton = new NSButton() {
                 Title = Properties_Resources.Continue,
-                Enabled = false
+                Enabled = (Repositories.Count > 0)
             };
             CancelButton = new NSButton() {
                 Title = Properties_Resources.Cancel
@@ -444,17 +485,17 @@ namespace CmisSync {
             NSButton BackButton = new NSButton() {
                 Title = Properties_Resources.Back
             };
-            DataDelegate.SelectionChanged += delegate
-            {
-                InvokeOnMainThread(delegate {
-                    NSOutlineView view = OutlineController.OutlineView();
-                    if (view.SelectedRow >= 0) {
-                        ContinueButton.Enabled = true;
-                    } else {
-                        ContinueButton.Enabled = false;
-                    }
-                });
-            };
+//            DataDelegate.SelectionChanged += delegate
+//            {
+//                InvokeOnMainThread(delegate {
+//                    NSOutlineView view = OutlineController.OutlineView();
+//                    if (view.SelectedRow >= 0) {
+//                        ContinueButton.Enabled = true;
+//                    } else {
+//                        ContinueButton.Enabled = false;
+//                    }
+//                });
+//            };
             DataDelegate.ItemExpanded += delegate(NSNotification notification)
             {
                 InvokeOnMainThread(delegate {
@@ -486,14 +527,19 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate {
                     NSOutlineView view = OutlineController.OutlineView();
-                    NSCmisTree cmis = (NSCmisTree)(view.ItemAtRow(view.SelectedRow));
-                    while (cmis.Parent != null)
-                        cmis = cmis.Parent;
-                    RootFolder root = Repositories.Find(x=>x.Name.Equals(cmis.Name));
+//                    NSCmisTree cmis = (NSCmisTree)(view.ItemAtRow(view.SelectedRow));
+//                    while (cmis.Parent != null)
+//                        cmis = cmis.Parent;
+//                    RootFolder root = Repositories.Find(x=>x.Name.Equals(cmis.Name));
+                    RootFolder root = Repositories.Find(x=>(x.Selected != false));
                     if (root != null)
                     {
+                        foreach (AsyncNodeLoader task in loader.Values)
+                            task.Cancel();
                         Controller.saved_repository = root.Id;
-                        Controller.Add2PageCompleted(root.Id, root.Path);
+                        List<string> ignored = NodeModelUtils.GetIgnoredFolder(root);
+                        List<string> selected = NodeModelUtils.GetSelectedFolder(root);
+                        Controller.Add2PageCompleted(root.Id, root.Path, ignored.ToArray(), selected.ToArray());
                     }
                 });
             };
@@ -501,6 +547,8 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate
                 {
+                    foreach (AsyncNodeLoader task in loader.Values)
+                        task.Cancel();
                     Controller.PageCancelled();
                 });
             };
@@ -508,6 +556,8 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate
                 {
+                    foreach (AsyncNodeLoader task in loader.Values)
+                        task.Cancel();
                     Controller.BackToPage1();
                 });
             };
@@ -695,6 +745,41 @@ namespace CmisSync {
                     ShowFinishedPage();
                     break;
             }
+        }
+
+        private void CheckCustomizeInput(NSTextField localfolder_box, NSTextField localrepopath_box, NSTextField localfolder_error_label)
+        {
+            string error = Controller.CheckRepoPathAndName(localrepopath_box.StringValue, localfolder_box.StringValue);
+            if (!String.IsNullOrEmpty(error))
+            {
+                localfolder_error_label.StringValue = error;
+                localfolder_error_label.TextColor = NSColor.Red;
+            }
+            else
+            {
+                try
+                {
+                    Controller.CheckRepoPathExists(localrepopath_box.StringValue);
+                    localfolder_error_label.StringValue = "";
+                }
+                catch (ArgumentException e)
+                {
+                    localfolder_error_label.TextColor = NSColor.Orange;
+                    localfolder_error_label.StringValue = e.Message;
+                }
+            }
+        }
+
+        private static bool LocalPathExistsHandler(string path) {
+            NSAlert alert = NSAlert.WithMessage(
+                String.Format( Properties_Resources.ConfirmExistingLocalFolderText, path),
+                "No, I want to choose another target",
+                "Yes, I understand the risk",
+                null,
+                "");
+            alert.Icon = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.icns"));
+            int i = alert.RunModal();
+            return (i == 0);
         }
     }
 }
