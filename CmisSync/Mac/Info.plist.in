@@ -23,6 +23,6 @@
 	<key>CFBundleDisplayName</key>
 	<string>DataSpace Sync</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.0.0</string>
+	<string>@VERSION@</string>
 </dict>
 </plist>
