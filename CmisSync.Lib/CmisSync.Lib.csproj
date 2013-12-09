@@ -53,6 +53,7 @@
     <Compile Include="Cmis\BaseException.cs" />
     <Compile Include="Cmis\Crypto.cs" />
     <Compile Include="Cmis\Database.cs" />
+    <Compile Include="FolderLock.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />
     <Compile Include="Sync\SynchronizedFolder.cs" />
@@ -64,7 +65,6 @@
     <Compile Include="Sync\CmisRepo.cs" />
     <Compile Include="Sync\WatcherStrategy.cs" />
     <Compile Include="ConfigManager.cs" />
-    <Compile Include="Fetcher.cs" />
     <Compile Include="RepoBase.cs" />
     <Compile Include="RepoInfo.cs" />
     <Compile Include="Utils.cs" />

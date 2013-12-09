@@ -15,14 +15,9 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using log4net;
-
+using System;
+using System.IO;
 using Timers = System.Timers;
 
 namespace CmisSync.Lib
@@ -142,6 +137,11 @@ namespace CmisSync.Lib
         private DateTime last_partial_sync;
 
         /// <summary>
+        /// Folder lock.
+        /// </summary>
+        private FolderLock folderLock;
+
+        /// <summary>
         /// Track whether <c>Dispose</c> has been called.
         /// </summary>
         private bool disposed = false;
@@ -158,6 +158,8 @@ namespace CmisSync.Lib
             RemoteUrl = repoInfo.Address;
 
             this.activityListener = activityListener;
+
+            folderLock = new FolderLock(LocalPath);
 
             Watcher = new Watcher(LocalPath);
             Watcher.EnableRaisingEvents = true;
@@ -217,6 +219,7 @@ namespace CmisSync.Lib
                     this.local_timer.Stop();
                     this.local_timer.Dispose();
                     this.Watcher.Dispose();
+                    this.folderLock.Dispose();
                 }
                 this.disposed = true;
             }

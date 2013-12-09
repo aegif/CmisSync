@@ -15,17 +15,12 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+using CmisSync.Lib;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading;
-
-using CmisSync.Lib;
-using CmisSync.Lib.Cmis;
-using log4net;
 
 namespace CmisSync
 {
@@ -83,24 +78,6 @@ namespace CmisSync
         /// Show about window event.
         /// </summary>
         public event Action ShowAboutWindowEvent = delegate { };
-
-        /// <summary>
-        /// Folder fetched event.
-        /// </summary>
-        public event FolderFetchedEventHandler FolderFetched = delegate { };
-        /// <summary>
-        /// Folder fetched event.
-        /// </summary>
-        public delegate void FolderFetchedEventHandler(string remote_url);
-
-        /// <summary>
-        /// Folder fetching event.
-        /// </summary>
-        public event FolderFetchingHandler FolderFetching = delegate { };
-        /// <summary>
-        /// Folder fetching event.
-        /// </summary>
-        public delegate void FolderFetchingHandler(double percentage);
 
         /// <summary>
         /// Folder list changed.
@@ -201,10 +178,9 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Component to create new CmisSync synchronized folders.
+        /// A folder lock for the base directory.
         /// </summary>
-        private Fetcher fetcher;
-
+        private FolderLock folderLock;
 
         /// <summary>
         /// Concurrency locks.
@@ -244,6 +220,8 @@ namespace CmisSync
             {
                 ConfigManager.CurrentConfig.Notifications = true;
             }
+
+            folderLock = new FolderLock(FoldersPath);
         }
 
 
@@ -482,7 +460,7 @@ namespace CmisSync
         /// <summary>
         /// Create a new CmisSync synchronized folder.
         /// </summary>
-        public void StartFetcher(string name, Uri address, string user, string password, string repository, string remote_path, string local_path,
+        public void CreateRepository(string name, Uri address, string user, string password, string repository, string remote_path, string local_path,
             List<string> ignoredPaths)
         {
             repoInfo = new RepoInfo(name, ConfigManager.CurrentConfig.ConfigPath);
@@ -496,29 +474,37 @@ namespace CmisSync
             foreach (string ignore in ignoredPaths)
                 repoInfo.addIgnorePath(ignore);
 
-            fetcher = new Fetcher(repoInfo, activityListenerAggregator);
-            this.FinishFetcher();
-        }
+            // Check that the CmisSync root folder exists.
+            if (!Directory.Exists(ConfigManager.CurrentConfig.FoldersPath))
+            {
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} does not exist", ConfigManager.CurrentConfig.FoldersPath));
+                throw new DirectoryNotFoundException("Root folder don't exist !");
+            }
 
+            // Check that the folder is writable.
+            if (!CmisSync.Lib.Utils.HasWritePermissionOnDir(ConfigManager.CurrentConfig.FoldersPath))
+            {
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", ConfigManager.CurrentConfig.FoldersPath));
+                throw new UnauthorizedAccessException("Root folder is not writable!");
+            }
 
-        /// <summary>
-        /// Finalize the creation of a new CmisSync synchronized folder.
-        /// </summary>
-        public void FinishFetcher()
-        {
+            // Check that the folder exists.
+            if (Directory.Exists(repoInfo.TargetDirectory))
+            {
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
+                throw new UnauthorizedAccessException("Repository folder already exists!");
+            }
+
+            // Create the local folder.
+            Directory.CreateDirectory(repoInfo.TargetDirectory);
+
             // Add folder to XML config file.
             ConfigManager.CurrentConfig.AddFolder(repoInfo);
-
-            FolderFetched(this.fetcher.RemoteUrl.ToString());
 
             // Initialize in the UI.
             AddRepository(repoInfo);
             FolderListChanged();
-
-            this.fetcher.Dispose();
-            this.fetcher = null;
         }
-
 
         /// <summary>
         /// Show first-time wizard.
@@ -553,6 +539,8 @@ namespace CmisSync
         {
             foreach (RepoBase repo in Repositories)
                 repo.Dispose();
+
+            folderLock.Dispose();
 
             Logger.Info("Exiting.");
             Environment.Exit(0);

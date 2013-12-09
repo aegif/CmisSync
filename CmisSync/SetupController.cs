@@ -54,10 +54,6 @@ namespace CmisSync
         /// </summary>
         Customize,
         /// <summary>
-        /// Syncing progress.
-        /// </summary>
-        Syncing,
-        /// <summary>
         /// Add complete.
         /// </summary>
         Finished,
@@ -327,8 +323,7 @@ namespace CmisSync
 
             Program.Controller.ShowSetupWindowEvent += delegate(PageType page)
             {
-                if (this.FolderAdditionWizardCurrentPage == PageType.Syncing ||
-                    this.FolderAdditionWizardCurrentPage == PageType.Finished)
+                if (this.FolderAdditionWizardCurrentPage == PageType.Finished)
                 {
                     ShowWindowEvent();
                     return;
@@ -628,32 +623,28 @@ namespace CmisSync
         {
             SyncingReponame = repoName;
 
-            ChangePageEvent(PageType.Syncing);
-
-            Program.Controller.FolderFetched += AddPageFetchedDelegate;
 
             // Add the remote folder to the configuration and start syncing.
             try
             {
-                new Thread(() =>
-                {
-                    Program.Controller.StartFetcher(
-                        repoName,
-                        saved_address,
-                        saved_user.TrimEnd(),
-                        saved_password.TrimEnd(),
-                        PreviousRepository,
-                        PreviousPath,
-                        localrepopath,
-                        ignoredPaths);
-                }).Start();
+                Program.Controller.CreateRepository(
+                    repoName,
+                    saved_address,
+                    saved_user.TrimEnd(),
+                    saved_password.TrimEnd(),
+                    PreviousRepository,
+                    PreviousPath,
+                    localrepopath,
+                    ignoredPaths);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Logger.Fatal(ex.ToString());
-                System.Windows.Forms.MessageBox.Show("An error occur during first sync, see debug log for details!");
+                Logger.Fatal("Could not create repository.", e);
+                Program.Controller.ShowAlert(Properties_Resources.Error, String.Format(Properties_Resources.SyncError, repoName, e.Message));
+                FinishPageCompleted();
             }
 
+            ChangePageEvent(PageType.Finished);
         }
 
 
@@ -673,17 +664,6 @@ namespace CmisSync
                 ChangePageEvent(PageType.Add2);
             }
         }
-
-        /// <summary>
-        /// Remote folder has been added, switch to the final step of the wizard.
-        /// </summary>
-        private void AddPageFetchedDelegate(string remote_url)
-        {
-            ChangePageEvent(PageType.Finished);
-
-            Program.Controller.FolderFetched -= AddPageFetchedDelegate;
-        }
-
 
         /// <summary>
         /// User clicked on the button to open the newly-created synchronized folder in the local file explorer.

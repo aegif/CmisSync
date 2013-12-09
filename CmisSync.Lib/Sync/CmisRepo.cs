@@ -67,13 +67,20 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public override void SyncInBackground(bool syncFull)
         {
-            if (this.synchronizedFolder != null && this.Status == SyncStatus.Idle) // Because it is sometimes called before the object's constructor has completed.
+            if (this.synchronizedFolder != null)// Because it is sometimes called before the object's constructor has completed.
             {
-                this.synchronizedFolder.SyncInBackground(syncFull);
+                if (this.Status == SyncStatus.Idle)
+                {
+                    this.synchronizedFolder.SyncInBackground(syncFull);
+                }
+                else
+                {
+                    Logger.Info("Sync skipped. Status=" + this.Status);
+                }
             }
         }
 
-        
+
         /// <summary>
         /// Synchronize.
         /// The synchronization is performed in the background, so that the UI stays usable.

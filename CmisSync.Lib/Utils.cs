@@ -157,7 +157,8 @@ namespace CmisSync.Lib
             ".directory", // KDE
             ".ds_store", ".icon\r", ".spotlight-v100", ".trashes", // Mac OS X
             ".cvsignore", ".~cvsignore", ".bzrignore", ".gitignore", // Version control ignore list
-            "$~"
+            "$~",
+            "lock" //Lock file for folder
         };
 
         /// <summary>

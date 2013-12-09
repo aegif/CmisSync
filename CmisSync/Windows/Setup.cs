@@ -958,53 +958,6 @@ namespace CmisSync
                             }
                         #endregion
 
-                        // Fourth page of the remote folder addition dialog: starting to sync.
-                        // TODO: This step should be removed. Now it appears just a brief instant, because sync is asynchronous.
-                        #region Page Syncing
-                        case PageType.Syncing:
-                            {
-                                // UI elements.
-
-                                Header = Properties_Resources.AddingFolder + " ‘" + Controller.SyncingReponame + "’…";
-                                Description = Properties_Resources.MayTakeTime;
-
-                                Button finish_button = new Button()
-                                {
-                                    Content = Properties_Resources.Finish,
-                                    IsEnabled = false
-                                };
-
-                                ProgressBar progress_bar = new ProgressBar()
-                                {
-                                    Width = 414,
-                                    Height = 15,
-                                    Value = Controller.ProgressBarPercentage
-                                };
-
-
-                                ContentCanvas.Children.Add(progress_bar);
-                                Canvas.SetLeft(progress_bar, 185);
-                                Canvas.SetTop(progress_bar, 150);
-
-                                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
-
-                                Buttons.Add(finish_button);
-
-                                // Actions.
-
-                                Controller.UpdateProgressBarEvent += delegate(double percentage)
-                                {
-                                    Dispatcher.BeginInvoke((Action)delegate
-                                    {
-                                        progress_bar.Value = percentage;
-                                        TaskbarItemInfo.ProgressValue = percentage / 100;
-                                    });
-                                };
-
-                                break;
-                            }
-                        #endregion
-
                         // Final page of the remote folder addition dialog: end of the addition wizard.
                         #region Page Finished
                         case PageType.Finished:

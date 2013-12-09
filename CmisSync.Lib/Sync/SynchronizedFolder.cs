@@ -31,6 +31,11 @@ namespace CmisSync.Lib.Sync
             private static readonly ILog Logger = LogManager.GetLogger(typeof(SynchronizedFolder));
 
             /// <summary>
+            /// Interval for which sync will wait while paused before retrying sync.
+            /// </summary>
+            private static readonly int SYNC_SUSPEND_SLEEP_INTERVAL = 5 * 1000; //five seconds
+
+            /// <summary>
             /// An object for locking the sync method (one thread at a time can run sync).
             /// </summary>
             private Object syncLock = new Object();
@@ -208,12 +213,6 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             public void Sync(bool syncFull)
             {
-                if (this.syncing)
-                {
-                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
-                    return;
-                }
-
                 lock (syncLock)
                 {
                     this.syncing = true;
@@ -281,6 +280,11 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             public void SyncInBackground(bool syncFull)
             {
+                if (this.syncing)
+                {
+                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
+                    return;
+                }
 
                 using (BackgroundWorker bw = new BackgroundWorker())
                 {
@@ -419,6 +423,8 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
             {
+                sleepWhileSuspended();
+                
                 IItemEnumerable<ICmisObject> children;
                 try
                 {
@@ -480,6 +486,8 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool DownloadFile(IDocument remoteDocument, string localFolder)
             {
+                sleepWhileSuspended();
+                
                 string fileName = remoteDocument.ContentStreamFileName;
                 Logger.Info("Downloading: " + fileName);
 
@@ -611,6 +619,8 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UploadFile(string filePath, IFolder remoteFolder)
             {
+                sleepWhileSuspended();
+                
                 Logger.Info("Uploading: " + filePath);
 
                 try
@@ -664,6 +674,8 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
             {
+                sleepWhileSuspended();
+                
                 IFolder folder;
                 try
                 {
@@ -718,6 +730,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UpdateFile(string filePath, IDocument remoteFile)
             {
+                sleepWhileSuspended();
                 try
                 {
                     Logger.Info("Updating: " + filePath);
@@ -771,6 +784,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool UpdateFile(string filePath, IFolder remoteFolder)
             {
+                sleepWhileSuspended();
                 try
                 {
                     // Find the document within the folder.
@@ -812,6 +826,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool RemoveFolderLocally(string folderPath)
             {
+                sleepWhileSuspended();
                 // Folder has been deleted on server, delete it locally too.
                 try
                 {
@@ -870,6 +885,23 @@ namespace CmisSync.Lib.Sync
                 }
 
                 return metadata;
+            }
+
+            /// <summary>
+            /// Sleep while suspended.
+            /// </summary>
+            private void sleepWhileSuspended()
+            {
+                if (repo.Status == SyncStatus.Suspend)
+                {
+                    repo.OnSyncSuspend();
+                    while (repo.Status == SyncStatus.Suspend)
+                    {
+                        Logger.Debug(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, SYNC_SUSPEND_SLEEP_INTERVAL));
+                        System.Threading.Thread.Sleep(SYNC_SUSPEND_SLEEP_INTERVAL);
+                    }
+                    repo.OnSyncResume();
+                }
             }
         }
     }
