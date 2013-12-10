@@ -222,8 +222,8 @@ namespace TestLibrary
         {
             String[] test_pws = { "", "test", "Whatever", "Something to try" };
             foreach (String pass in test_pws) {
-                String crypted = Crypto.Obfuscate(pass);
-                Assert.AreEqual(Crypto.Deobfuscate(crypted), pass);
+                String crypted = CmisSync.Auth.Crypto.Obfuscate(pass);
+                Assert.AreEqual(CmisSync.Auth.Crypto.Deobfuscate(crypted), pass);
             }
         }
 
@@ -582,7 +582,7 @@ namespace TestLibrary
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url;
             cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
+            cmisParameters[SessionParameter.Password] = CmisSync.Auth.Crypto.Deobfuscate(password);
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
             SessionFactory factory = SessionFactory.NewInstance();
@@ -638,7 +638,7 @@ namespace TestLibrary
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url;
             cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
+            cmisParameters[SessionParameter.Password] = CmisSync.Auth.Crypto.Deobfuscate(password);
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
             SessionFactory factory = SessionFactory.NewInstance();

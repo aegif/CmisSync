@@ -49,7 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cmis\Crypto.cs" />
     <Compile Include="Cmis\Database.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />
@@ -76,6 +75,10 @@
     <Compile Include="ActivityListenerAggregator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
+      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
+      <Name>CmisSync.Auth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1523966-src\DotCMIS\DotCMIS.csproj">
       <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
       <Name>DotCMIS</Name>

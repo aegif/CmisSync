@@ -53,7 +53,7 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Whether the reporsitories have finished loading.
+        /// Whether the repositories have finished loading.
         /// </summary>
         public bool RepositoriesLoaded { get; private set; }
 
@@ -292,9 +292,37 @@ namespace CmisSync
 
                     if (repo.LocalPath.Equals(folder.LocalPath))
                     {
-                        repo.Dispose();
+                        // Remove the repo from the XML configuration file.
+                        ConfigManager.CurrentConfig.RemoveFolder(repo.Name);
+
+                        // Stop the repo synchronization.
+                        foreach (RepoBase aRepo in this.repositories)
+                        {
+                            if (aRepo.Name == repo.Name)
+                            {
+                                if (aRepo.Status != SyncStatus.Suspend)
+                                {
+                                    aRepo.Suspend();
+                                    Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
+                                }
+                            }
+                        }
+
+                        // Save folder path for removal.
+                        string folderPath = repo.LocalPath;
+
+                        // Delete object.
                         this.repositories.Remove(repo);
+                        repo.Dispose();
                         repo = null;
+
+                        // Delete the folder.
+                        Logger.Info("Removing folder: " + folderPath);
+                        Directory.Delete(folderPath, true);
+
+                        // Reload the GUI.
+                        FolderListChanged();
+
                         break;
                     }
                 }
@@ -331,7 +359,7 @@ namespace CmisSync
                     if (aRepo.Status != SyncStatus.Suspend)
                     {
                         aRepo.Suspend();
-                        Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
+                        Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                     }
                     else
                     {
@@ -439,6 +467,7 @@ namespace CmisSync
         /// <summary>
         /// Reacts when a local change occurs.
         /// Not implemented yet, see https://github.com/nicolas-raoul/CmisSync/issues/122
+        /// TODO Watcher has been implemented, this method can probably be removed.
         /// </summary>
         /// <param name="o">File that has changed</param>
         /// <param name="args">Nature of the change</param>
@@ -459,7 +488,7 @@ namespace CmisSync
             repoInfo = new RepoInfo(name, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = address;
             repoInfo.User = user;
-            repoInfo.Password = password;
+            repoInfo.Password = new CmisSync.Auth.CmisPassword(password);
             repoInfo.RepoID = repository;
             repoInfo.RemotePath = remote_path;
             repoInfo.TargetDirectory = local_path;

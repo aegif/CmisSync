@@ -147,20 +147,11 @@ namespace CmisSync.Lib.Cmis
             {
                 return result;
             }
-            
-            // Create session factory.
-            SessionFactory factory = SessionFactory.NewInstance();
-
-            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = url.ToString();
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = Crypto.Deobfuscate(password);
 
             IList<IRepository> repositories;
             try
             {
-                repositories = factory.GetRepositories(cmisParameters);
+                repositories = Auth.Auth.GetCmisRepositories(url, user, password);
             }
             catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
             {
@@ -203,19 +194,12 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         /// <returns>Full path of each sub-folder, including leading slash.</returns>
         static public string[] GetSubfolders(string repositoryId, string path,
-            string address, string user, string password)
+            string url, string user, string password)
         {
             List<string> result = new List<string>();
 
             // Connect to the CMIS repository.
-            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = address;
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password;
-            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
-            SessionFactory factory = SessionFactory.NewInstance();
-            ISession session = factory.CreateSession(cmisParameters);
+            ISession session = Auth.Auth.GetCmisSession(url, user, password, repositoryId);
 
             // Get the folder.
             IFolder folder;
@@ -270,18 +254,10 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         /// <returns>Full path of each sub-folder, including leading slash.</returns>
         static public FolderTree GetSubfolderTree(string repositoryId, string path,
-            string address, string user, string password, int depth)
+            string url, string user, string password, int depth)
         {
-
             // Connect to the CMIS repository.
-            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = address;
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password;
-            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
-            SessionFactory factory = SessionFactory.NewInstance();
-            ISession session = factory.CreateSession(cmisParameters);
+            ISession session = Auth.Auth.GetCmisSession(url, user, password, repositoryId);
 
             // Get the folder.
             IFolder folder;
@@ -313,7 +289,7 @@ namespace CmisSync.Lib.Cmis
 
         /// <summary>
         /// Guess the web address where files can be seen using a browser.
-        /// Not bulletproof. It depends on the server, and there is no web UI at all.
+        /// Not bulletproof. It depends on the server, and for some servers there is no web UI at all.
         /// </summary>
         static public string GetBrowsableURL(RepoInfo repo)
         {
@@ -322,61 +298,18 @@ namespace CmisSync.Lib.Cmis
                 throw new ArgumentNullException("repo");
             }
             
-            // Case of Alfresco.
-            if (repo.Address.AbsoluteUri.EndsWith("alfresco/cmisatom"))
+            // Connect to the CMIS repository.
+            ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
+
+            // Get the thin client URL.
+            if (!String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
             {
-                string root = repo.Address.AbsoluteUri.Substring(0, repo.Address.AbsoluteUri.Length - "alfresco/cmisatom".Length);
-                if (repo.RemotePath.StartsWith("/Sites"))
-                {
-                    // Case of Alfresco Share.
-
-                    // Example RemotePath: /Sites/thesite
-                    // Result: http://server/share/page/site/thesite/documentlibrary
-                    // Example RemotePath: /Sites/thesite/documentLibrary/somefolder/anotherfolder
-                    // Result: http://server/share/page/site/thesite/documentlibrary#filter=path|%2Fsomefolder%2Fanotherfolder
-                    // Example RemotePath: /Sites/s1/documentLibrary/éß和ệ
-                    // Result: http://server/share/page/site/s1/documentlibrary#filter=path|%2F%25E9%25DF%25u548C%25u1EC7
-                    // Example RemotePath: /Sites/s1/documentLibrary/a#bc/éß和ệ
-                    // Result: http://server/share/page/site/thesite/documentlibrary#filter=path%7C%2Fa%2523bc%2F%25E9%25DF%25u548C%25u1EC7%7C
-
-                    string path = repo.RemotePath.Substring("/Sites/".Length);
-                    if (path.Contains("documentLibrary"))
-                    {
-                        int firstSlashPosition = path.IndexOf('/');
-                        string siteName = path.Substring(0, firstSlashPosition);
-                        string pathWithinSite = path.Substring(firstSlashPosition + "/documentLibrary".Length);
-                        string escapedPathWithinSite = HttpUtility.UrlEncode(pathWithinSite);
-                        string reescapedPathWithinSite = HttpUtility.UrlEncode(escapedPathWithinSite);
-                        string sharePath = reescapedPathWithinSite.Replace("%252f", "%2F");
-                        return root + "share/page/site/" + siteName + "/documentlibrary#filter=path|" + sharePath;
-                    }
-                    else
-                    {
-                        // Site name only.
-                        return root + "share/page/site/" + path + "/documentlibrary";
-                    }
-                }
-                else
-                {
-                    // Case of Alfresco Web Client.
-                    return root;
-                }
+                return session.RepositoryInfo.ThinClientUri;
             }
             else
             {
-                // If GRAU DATA AG server was detected, try to open the thinclient url, otherwise try to open the repo path
-                Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-                cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-                cmisParameters[SessionParameter.AtomPubUrl] = repo.Address.ToString();
-                cmisParameters[SessionParameter.User] = repo.User;
-                cmisParameters[SessionParameter.Password] = repo.Password.ToString();
-                cmisParameters[SessionParameter.RepositoryId] = repo.RepoID;
-                SessionFactory factory = SessionFactory.NewInstance();
-                ISession session = factory.CreateSession(cmisParameters);
-                if (!String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
-                    return session.RepositoryInfo.ThinClientUri;
-                else
-                    return repo.Address.AbsoluteUri + repo.RemotePath;
+                // If no thin client URL is present, guess an URL.
+                return repo.Address.AbsoluteUri + repo.RemotePath;
             }
         }
     }
