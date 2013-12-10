@@ -167,9 +167,8 @@ namespace CmisSync {
 
             // Password
             Entry password_entry = new Entry () {
-                Text = Controller.PreviousPath,
-                     Visibility = false,
-                     ActivatesDefault = true
+                Visibility = false,
+                ActivatesDefault = true
             };
 
             Controller.ChangeAddressFieldEvent += delegate (string text,
@@ -247,7 +246,7 @@ namespace CmisSync {
 
             // Continue button
             Button continue_button = new Button (continueText) {
-                Sensitive = false
+                Sensitive = String.IsNullOrEmpty( Controller.CheckAddPage (address_entry.Text))
             };
 
             continue_button.Clicked += delegate {
@@ -333,7 +332,8 @@ namespace CmisSync {
             AddButton (continue_button);
             AddButton (cancel_button);
 
-            address_entry.GrabFocus();
+            Controller.CheckAddPage (address_entry.Text);
+            address_entry.GrabFocus ();
         }
 
         private void ShowAdd2Page()
@@ -370,7 +370,6 @@ namespace CmisSync {
                 AsyncNodeLoader asyncLoader = new AsyncNodeLoader (root, cred, PredefinedNodeLoader.LoadSubFolderDelegate, PredefinedNodeLoader.CheckSubFolderDelegate);
                 asyncLoader.UpdateNodeEvent += delegate {
                     cmisStore.UpdateCmisTree(root);
-                    treeView.Show();
                 };
                 cmisStore.UpdateCmisTree (root);
                 asyncLoader.Load (root);
@@ -457,13 +456,20 @@ namespace CmisSync {
                     cmisStore.UpdateCmisTree(selectedRoot);
                 }
 
-                if (node.Selected == false)
+                if (node.Parent == null)
                 {
                     node.Selected = true;
                 }
                 else
                 {
-                    node.Selected = false;
+                    if (node.Selected == false)
+                    {
+                        node.Selected = true;
+                    }
+                    else
+                    {
+                        node.Selected = false;
+                    }
                 }
                 cmisStore.UpdateCmisTree(root);
             };
@@ -496,6 +502,17 @@ namespace CmisSync {
             AddButton(back_button);
             AddButton(continue_button);
             AddButton(cancel_button);
+
+            if (repositories.Count > 0)
+            {
+                continue_button.GrabDefault ();
+                continue_button.GrabFocus ();
+            }
+            else
+            {
+                back_button.GrabDefault ();
+                back_button.GrabFocus ();
+            }
         }
 
         private void ShowCustomizePage()
