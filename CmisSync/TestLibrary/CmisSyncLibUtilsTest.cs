@@ -4,23 +4,14 @@ using CmisSync.Lib;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Text;
-using log4net;
-using log4net.Config;
 
 namespace TestLibrary
 {
     [TestFixture]
     class CmisSyncLibUtilsTest
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisSyncLibUtilsTest));
         private static readonly string TestFolderParent = Directory.GetCurrentDirectory();
         private static readonly string TestFolder = Path.Combine(TestFolderParent, "conflicttest");
-
-        [TestFixtureSetUp]
-        public void ClassInit()
-        {
-            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
-        }
 
         [SetUp]
         public void TestInit()
