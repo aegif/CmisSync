@@ -12,8 +12,7 @@ EXTRA_DIST = \
 	legal/AUTHORS.txt \
 	Extras/DotCMIS.dll \
 	Extras/Newtonsoft.Json.dll \
-	Extras/nunit.framework.dll \
-	Extras/DotCMIS.dll
+	Extras/nunit.framework.dll
 
 DISTCLEANFILES = \
 	intltool-extract \
@@ -28,3 +27,18 @@ MAINTAINERCLEANFILES = \
 
 bootstrap:
 	autoreconf -f -s -i
+
+debian-package:
+	rm -rf $(top_builddir)/debian/usr
+	make DESTDIR=$(abs_top_builddir)/debian install
+	make VERSION=`git describe --match linux* | cut -d - -f 2` -C debian build
+
+apple-package:
+	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Debug -t:Clean
+	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Debug
+	(cd build; ./dmg-creator.sh ../bin/DataSpace\ Sync.app/; cd ..)
+
+none:
+
+dist-hook:
+	make $(PACKAGE_TARGET)

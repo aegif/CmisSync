@@ -72,6 +72,9 @@ namespace TestLibrary
         [TestFixtureSetUp]
         public void ClassInit()
         {
+#if __MonoCS__
+            Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
+#endif
             ServicePointManager.CertificatePolicy = new TrustAlways();
             File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
@@ -388,7 +391,13 @@ namespace TestLibrary
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
+            CmisSync.Lib.Credentials.ServerCredentials credentials = new CmisSync.Lib.Credentials.ServerCredentials()
+            {
+                Address = new Uri(url),
+                UserName = user,
+                Password = password
+            };
+            Dictionary<string, string> repos = CmisUtils.GetRepositories(credentials);
             foreach (KeyValuePair<string, string> pair in repos)
             {
                 Console.WriteLine(pair.Key + " : " + pair.Value);
@@ -950,7 +959,7 @@ namespace TestLibrary
                     folder1.DeleteTree(true, null, true);
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
                         return !Directory.Exists(path1);
-                    }));
+                    }, 20));
                     Assert.IsFalse(Directory.Exists(path1));
                     Assert.IsTrue(Directory.Exists(path2));
                     folder2.DeleteTree(true, null, true);
@@ -1153,7 +1162,7 @@ namespace TestLibrary
                     synchronizedFolder.Sync();
                     FileInfo info = new FileInfo(file2);
                     return info.Exists && info.Length == length;
-                }));
+                }), String.Format("The new file \"{0}\"should exist and it should have got the length \"{1}\"", file2, length));
                 Assert.IsTrue(File.Exists(file));
                 Assert.IsTrue(File.Exists(file2));
                 localFilesCount = Directory.GetFiles(localDirectory).Length;
@@ -2071,7 +2080,13 @@ namespace TestLibrary
         [Test, TestCaseSource("TestServersFuzzy"), Category("Slow")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
-            Tuple<CmisServer, Exception> server = CmisUtils.GetRepositoriesFuzzy(new Uri(url), user, password);
+            CmisSync.Lib.Credentials.ServerCredentials credentials = new CmisSync.Lib.Credentials.ServerCredentials()
+            {
+                Address = new Uri(url),
+                UserName = user,
+                Password = password
+            };
+            Tuple<CmisServer, Exception> server = CmisUtils.GetRepositoriesFuzzy(credentials);
             Assert.NotNull(server.Item1);
         }
 

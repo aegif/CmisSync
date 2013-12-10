@@ -1,4 +1,4 @@
-using System;
+﻿﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
@@ -24,6 +24,9 @@ namespace TestLibrary
         [TestFixtureSetUp]
         public void ClassInit()
         {
+#if __MonoCS__
+            Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
+#endif
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
@@ -482,7 +485,14 @@ namespace TestLibrary
                 CreateTestFile(oldname, 1);
                 WaitWatcher(40000,watcher,(w) => 
                 {
+#if __MonoCS__
+                    List<Watcher.ChangeTypes> types = new List<Watcher.ChangeTypes>();
+                    types.Add(Watcher.ChangeTypes.Created);
+                    types.Add(Watcher.ChangeTypes.Changed);
+                    return types.Contains(w.GetChangeType(oldname));
+#else
                     return w.GetChangeType(oldname) == Watcher.ChangeTypes.Changed;
+#endif
                 });
                 File.Move(oldname, newnameOut);
                 Console.WriteLine("moved:"+oldname);

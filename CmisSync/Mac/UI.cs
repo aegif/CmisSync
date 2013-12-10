@@ -29,29 +29,25 @@ namespace CmisSync {
 
         public StatusIcon StatusIcon;
         public Setup Setup;
-		public About About;
-		
-		public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
-			"Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
-		
+        public About About;
+        
+        public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
+            "Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
+        
         public static NSFont BoldFont = NSFontManager.SharedFontManager.FontWithFamily (
-			"Lucida Grande", NSFontTraitMask.Bold, 0, 13);
-		
+            "Lucida Grande", NSFontTraitMask.Bold, 0, 13);
+        
 
         public UI ()
         {
             using (var a = new NSAutoreleasePool ())
             {
-//                GrowlApplicationBridge.WeakDelegate = this;
-//                GrowlApplicationBridge.Delegate     = new CmisSyncGrowlDelegate ();
-
                 NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("cmissync-app.icns");
 
                 SetFolderIcon ();
     
                 Setup      = new Setup ();
                 About      = new About ();
-//                Bubbles    = new Bubbles ();
                 StatusIcon = new StatusIcon ();
 
                 Program.Controller.UIHasLoaded ();
@@ -77,7 +73,7 @@ namespace CmisSync {
 
         public void UpdateDockIconVisibility ()
         {
-            if (Setup.IsVisible || About.IsVisible)
+            if (Setup.IsVisible || About.IsVisible || Program.Controller.IsEditWindowVisible)
                 ShowDockIcon ();
             else
                 HideDockIcon ();
@@ -86,8 +82,7 @@ namespace CmisSync {
 
         private void HideDockIcon ()
         {
-            // Currently not supported, here for completeness sake (see Apple's docs)
-            // NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.None;
+            NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.Prohibited;
         }
 
 

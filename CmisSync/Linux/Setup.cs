@@ -27,6 +27,7 @@ using Mono.Unix;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync {
 
@@ -62,7 +63,7 @@ namespace CmisSync {
         private string backText =
             CmisSync.Properties_Resources.Back;
 
-        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, RepoInfo.CmisPassword password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(ServerCredentials credentials);
 
         delegate string[] GetSubfoldersDelegate(string repositoryId, string path,
             string address, string user, string password);
@@ -270,8 +271,12 @@ namespace CmisSync {
                 // Try to find the CMIS server (asynchronous using a delegate)
                 GetRepositoriesFuzzyDelegate dlgt =
                     new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
-                IAsyncResult ar = dlgt.BeginInvoke(new Uri(address_entry.Text), user_entry.Text,
-                        password_entry.Text, null, null);
+                ServerCredentials credentials = new ServerCredentials() {
+                    UserName = user_entry.Text,
+                    Password = password_entry.Text,
+                    Address = new Uri(address_entry.Text)
+                };
+                IAsyncResult ar = dlgt.BeginInvoke(credentials, null, null);
                 while (!ar.AsyncWaitHandle.WaitOne(100)) {
                     while (Application.EventsPending()) {
                         Application.RunIteration();
@@ -339,8 +344,8 @@ namespace CmisSync {
                 });
             };
 
-            AddButton (continue_button);
             AddButton (cancel_button);
+            AddButton (continue_button);
 
             address_entry.GrabFocus();
         }
@@ -453,8 +458,8 @@ namespace CmisSync {
             layout_vertical.PackStart (sw, true, true, 0);
             Add(layout_vertical);
             AddButton(back_button);
-            AddButton(continue_button);
             AddButton(cancel_button);
+            AddButton(continue_button);
         }
 
         private void ShowCustomizePage()
@@ -584,9 +589,8 @@ namespace CmisSync {
             layout_vertical.PackStart (localfolder_error_label, true, true, 0);
             Add(layout_vertical);
             AddButton(back_button);
-            AddButton(add_button);
             AddButton(cancel_button);
-
+            AddButton(add_button);
             // add_button.GrabFocus();
             localfolder_entry.GrabFocus();
             localfolder_entry.SelectRegion(0, localfolder_entry.Text.Length);

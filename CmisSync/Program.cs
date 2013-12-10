@@ -58,6 +58,10 @@ namespace CmisSync
         [STAThread]
         public static void Main(string[] args)
         {
+#if __MonoCS__
+            Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
+#endif
+
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
             ServicePointManager.CertificatePolicy = new CertPolicyHandler();
@@ -76,7 +80,7 @@ namespace CmisSync
                 log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             }
 
-            Logger.Info("Starting.");
+            Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);
 
             if (args.Length != 0 && !args[0].Equals("start") &&
                 Backend.Platform != PlatformID.MacOSX &&
@@ -90,6 +94,7 @@ namespace CmisSync
                     "designed to keep things simple and to stay out of your way." + n +
                     n +
                     "Version: " + CmisSync.Lib.Backend.Version + n +
+                    "Copyright (C) 2013 GRAU DATA AG" + n +
                     "Copyright (C) 2010 Hylke Bons" + n +
                     "This program comes with ABSOLUTELY NO WARRANTY." + n +
                     n +

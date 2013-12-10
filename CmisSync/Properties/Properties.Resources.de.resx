@@ -253,7 +253,7 @@
     <value>Ändern Sie den lokalen Pfad dieses Ordners:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Ein lokaler Ordner mit demselben Namen ist bereits vorhanden, bitte benutzen Sie einen anderen Namen.</value>
+    <value>Ein lokaler Ordner mit demselben Namen ist bereits vorhanden, bitte benutzen Sie einen anderen Namen um Konflikte mit bereits vorhandenen Dateien zu vermeiden.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
     <value>Synchronisation anhalten</value>
@@ -302,5 +302,33 @@ Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ä
   </data>
   <data name="InvalidRepoName" xml:space="preserve">
     <value>Der angegebene Name {0} enthält verbotene Zeichen.</value>
+  </data>
+  <data name="NameResolutionFailure" xml:space="preserve">
+    <value>Der angegebene Servername konnte nicht gefunden werden. Bitte überprüfen Sie den Servernamen und Ihre Internetverbindung.</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Änderungen verwerfen</value>
+  </data>
+  <data name="EditTitle" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="LoadingStatusABORTED" xml:space="preserve">
+    <value>Ladevorgang abgebrochen</value>
+  </data>
+  <data name="LoadingStatusLOADING" xml:space="preserve">
+    <value>läd ...</value>
+  </data>
+  <data name="LoadingStatusSTART" xml:space="preserve">
+    <value>wird geladen ...</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Änderungen übernehmen</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderText" xml:space="preserve">
+    <value>Möchten Sie wirklich den bereits lokal vorhandenen Ordner "{0}" synchronisieren?
+Dies kann bei der Synchronisation zu Konfliktdateien führen.</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderTitle" xml:space="preserve">
+    <value>Lokales Synchronisationsziel "{0}"</value>
   </data>
 </root>

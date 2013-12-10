@@ -258,7 +258,7 @@ the resulting XML on the cmissync forum.</value>
     <value>Change the local path of this repository:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>A local folder with the same name already exist, please use a different name.</value>
+    <value>A local folder with the same name already exist, please use a different name to prevent sync conflicts.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
     <value>Pause sync</value>
@@ -345,5 +345,27 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   </data>
   <data name="InvalidRepoName" xml:space="preserve">
     <value>The repository name {0} contains illegal characters</value>
+  </data>
+  <data name="NameResolutionFailure" xml:space="preserve">
+    <value>The given host name could not be found. Please check the host name and your internet connection.</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Discard changes</value>
+  </data>
+  <data name="EditTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="LoadingStatusABORTED" xml:space="preserve">
+    <value>loading aborted</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderText" xml:space="preserve">
+    <value>Do you really want to sync the existing local folder "{0}"?
+This could lead to a lot of conflict files!</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderTitle" xml:space="preserve">
+    <value>Selected folder "{0}" as sync target</value>
   </data>
 </root>

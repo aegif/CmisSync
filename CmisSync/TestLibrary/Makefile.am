@@ -17,6 +17,10 @@ SOURCES =  \
 	CmisDatabaseTest.cs \
 	ChunkedStreamTest.cs \
 	SyncEventQueueTest.cs \
+	SyncEventManagerTest.cs \
+	EventTypesTest.cs \
+	FSDeletionHandlerTest.cs \
+	DebugLoggingHandlerTest.cs \
 	LocalFilesystemActivityGenerator.cs \
 	ConfigurationTest.cs \
 	EncodingTest.cs

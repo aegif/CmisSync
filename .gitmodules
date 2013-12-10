@@ -1,3 +1,6 @@
 [submodule "Extras/OpenDataSpaceDotCMIS"]
 	path = Extras/OpenDataSpaceDotCMIS
 	url = git@github.com:OpenDataSpace/chemistry-dotcmis.git
+[submodule "debian"]
+	path = debian
+	url = git@git.dataspace.cc:gds2/DataSpaceSyncDebianTarget.git

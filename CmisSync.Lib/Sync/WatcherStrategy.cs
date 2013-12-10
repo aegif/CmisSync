@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Data.Common;
 
 using DotCMIS;
 using DotCMIS.Client;
@@ -192,22 +193,12 @@ namespace CmisSync.Lib.Sync
 
             private void WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
-                if (Directory.Exists(pathname))
-                {
-                    Logger.Info(String.Format("A new folder {0} is created, ignore for the delete action", pathname));
-                    return;
-                }
-                if (File.Exists(pathname))
-                {
-                    Logger.Info(String.Format("A new file {0} is created, ignore for the delete action", pathname));
-                    return;
-                }
-
                 string name = pathname.Substring(localFolder.Length + 1);
                 string remoteName = Path.Combine(remoteFolder,name).Replace('\\','/');
-
+                DbTransaction transaction = null; 
                 try
                 {
+                    transaction = database.BeginTransaction();
                     if (database.ContainsFile(pathname))
                     {
                         Logger.Info("Removing locally deleted file on server: " + pathname);
@@ -246,11 +237,21 @@ namespace CmisSync.Lib.Sync
                     {
                         Logger.Info("Ignore the delete action for the local created and deleted file/folder: " + pathname);
                     }
+                    transaction.Commit();
                 }
                 catch (Exception e)
                 {
+                    if(transaction != null){
+                        transaction.Rollback();
+                    }
                     Logger.Warn(String.Format("Exception while sync to delete file/folder {0}: {1}", pathname, Utils.ToLogString(e)));
                     return;
+                }
+                finally
+                {
+                    if(transaction != null){
+                        transaction.Dispose();
+                    }
                 }
 
                 repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Deleted);

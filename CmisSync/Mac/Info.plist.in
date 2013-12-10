@@ -22,5 +22,7 @@
 	<string>NSApplication</string>
 	<key>CFBundleDisplayName</key>
 	<string>DataSpace Sync</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@VERSION@</string>
 </dict>
 </plist>

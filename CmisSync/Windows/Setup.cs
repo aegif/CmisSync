@@ -41,6 +41,7 @@ using log4net;
 using System.Collections.ObjectModel;
 using CmisSync.CmisTree;
 using System.Windows.Input;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync
 {
@@ -56,7 +57,7 @@ namespace CmisSync
         /// </summary>
         public SetupController Controller = new SetupController();
 
-        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(Uri url, string user, RepoInfo.CmisPassword password);
+        delegate Tuple<CmisServer, Exception> GetRepositoriesFuzzyDelegate(ServerCredentials credentials);
 
         /// <summary>
         /// Constructor.
@@ -575,8 +576,13 @@ namespace CmisSync
                                     // Try to find the CMIS server (asynchronously)
                                     GetRepositoriesFuzzyDelegate dlgt =
                                         new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
-                                    IAsyncResult ar = dlgt.BeginInvoke(new Uri(address_box.Text), user_box.Text,
-                                        password_box.Password, null, null);
+                                    ServerCredentials credentials = new ServerCredentials()
+                                    {
+                                        UserName = user_box.Text,
+                                        Password = password_box.Password,
+                                        Address = new Uri(address_box.Text)
+                                    };
+                                    IAsyncResult ar = dlgt.BeginInvoke(credentials, null, null);
                                     while (!ar.AsyncWaitHandle.WaitOne(100)) {
                                         System.Windows.Forms.Application.DoEvents();
                                     }
@@ -639,30 +645,65 @@ namespace CmisSync
                                 Header = Properties_Resources.Which;
 
                                 // A tree allowing the user to browse CMIS repositories/folders.
-                                System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/TreeView.xaml", System.UriKind.Relative);
+                                System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/FolderTreeMVC/TreeView.xaml", System.UriKind.Relative);
                                 System.Windows.Controls.TreeView treeView = System.Windows.Application.LoadComponent(resourceLocater) as TreeView;
 
-                                ObservableCollection<CmisRepo> repos = new ObservableCollection<CmisRepo>();
-
+                                ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
+                                Dictionary<string, AsyncNodeLoader> loader = new Dictionary<string, AsyncNodeLoader>();
                                 // Some CMIS servers hold several repositories (ex:Nuxeo). Show one root per repository.
                                 bool firstRepo = true;
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
-                                    CmisRepo repo = new CmisRepo(Controller.saved_user, Controller.saved_password, Controller.saved_address.ToString())
+                                    RootFolder repo = new RootFolder()
                                     {
                                         Name = repository.Value,
-                                        Id = repository.Key
+                                        Id = repository.Key,
+                                        Address = Controller.saved_address.ToString()
                                     };
                                     repos.Add(repo);
-                                    repo.LoadingSubfolderAsync();
                                     if (firstRepo)
                                     {
                                         repo.Selected = true;
                                         firstRepo = false;
                                     }
+                                    else
+                                    {
+                                        repo.Selected = false;
+                                    }
+                                    CmisRepoCredentials cred = new CmisRepoCredentials()
+                                    {
+                                        UserName = Controller.saved_user,
+                                        Password = Controller.saved_password,
+                                        Address = Controller.saved_address,
+                                        RepoId = repository.Key
+                                    };
+                                    AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate, PredefinedNodeLoader.CheckSubFolderDelegate);
+                                    asyncLoader.Load(repo);
+                                    loader.Add(repo.Id, asyncLoader);
                                 }
                                 treeView.DataContext = repos;
-
+                                treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
+                                {
+                                    TreeViewItem expandedItem = e.OriginalSource as TreeViewItem;
+                                    Node expandedNode = expandedItem.Header as Folder;
+                                    if (expandedNode != null)
+                                    {
+                                        Node parent = expandedNode.Parent;
+                                        while (parent is Folder)
+                                        {
+                                            parent = parent.Parent;
+                                        }
+                                        if (parent is RootFolder)
+                                        {
+                                            AsyncNodeLoader l;
+                                            RootFolder r = parent as RootFolder;
+                                            if (loader.TryGetValue(r.Id, out l))
+                                            {
+                                                l.Load(expandedNode);
+                                            }
+                                        }
+                                    }
+                                }));
                                 ContentCanvas.Children.Add(treeView);
                                 Canvas.SetTop(treeView, 70);
                                 Canvas.SetLeft(treeView, 185);
@@ -678,8 +719,6 @@ namespace CmisSync
                                 {
                                     Content = Properties_Resources.Cancel
                                 };
-
-
 
                                 Button back_button = new Button()
                                 {
@@ -703,12 +742,12 @@ namespace CmisSync
                                     List<string> ignored = new List<string>();
                                     List<string> selectedFolder = new List<string>();
                                     ItemCollection items = treeView.Items;
-                                    CmisRepo selectedRepo = null;
+                                    RootFolder selectedRepo = null;
                                     foreach (var item in items)
                                     {
-                                        CmisRepo repo = item as CmisRepo;
+                                        RootFolder repo = item as RootFolder;
                                         if (repo != null)
-                                            if (repo.Selected)
+                                            if (repo.Selected != false)
                                             {
                                                 selectedRepo = repo;
                                                 break;
@@ -716,17 +755,14 @@ namespace CmisSync
                                     }
                                     if (selectedRepo != null)
                                     {
-                                        foreach (Folder child in selectedRepo.Folder)
-                                        {
-                                            ignored.AddRange(getIgnoredFolder(child));
-                                            selectedFolder.AddRange(getSelectedFolder(child));
-                                        }
+                                        ignored.AddRange(NodeModelUtils.GetIgnoredFolder(selectedRepo));
+                                        selectedFolder.AddRange(NodeModelUtils.GetSelectedFolder(selectedRepo));
                                         Controller.saved_repository = selectedRepo.Id;
                                         Controller.saved_remote_path = selectedRepo.Path;
                                         Controller.Add2PageCompleted(
                                             Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray(), selectedFolder.ToArray());
-                                        foreach (CmisRepo repo in repos)
-                                            repo.cancelLoadingAsync();
+                                        foreach (AsyncNodeLoader task in loader.Values)
+                                            task.Cancel();
                                     }
                                     else
                                     {
@@ -737,14 +773,14 @@ namespace CmisSync
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
-                                    foreach (CmisRepo repo in repos)
-                                        repo.cancelLoadingAsync();
+                                    foreach (AsyncNodeLoader task in loader.Values)
+                                        task.Cancel();
                                 };
 
                                 Controller.HideWindowEvent += delegate
                                 {
-                                    foreach (CmisRepo repo in repos)
-                                        repo.cancelLoadingAsync();
+                                    foreach (AsyncNodeLoader task in loader.Values)
+                                        task.Cancel();
                                 };
                                 break;
                             }
@@ -816,7 +852,8 @@ namespace CmisSync
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)),
                                     Visibility = Visibility.Hidden,
-                                    TextWrapping = TextWrapping.Wrap
+                                    TextWrapping = TextWrapping.Wrap,
+                                    MaxWidth = 420
                                 };
 
                                 Button cancel_button = new Button()
@@ -870,6 +907,10 @@ namespace CmisSync
                                 localfolder_box.Focus();
                                 localfolder_box.Select(localfolder_box.Text.Length, 0);
 
+                                // Repo path validity.
+
+                                CheckCustomizeInput(localfolder_box, localrepopath_box, localfolder_error_label);
+
                                 // Actions.
 
                                 Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
@@ -888,48 +929,14 @@ namespace CmisSync
                                     });
                                 };
 
-                                // Repo name validity.
-
-                                string error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-
-                                if (!String.IsNullOrEmpty(error))
-                                {
-                                    localfolder_error_label.Text = error;
-                                    localfolder_error_label.Visibility = Visibility.Visible;
-                                }
-                                else localfolder_error_label.Visibility = Visibility.Hidden;
-
                                 localfolder_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                    if (!String.IsNullOrEmpty(error))
-                                    {
-                                        localfolder_error_label.Text = error;
-                                        localfolder_error_label.Visibility = Visibility.Visible;
-                                    }
-                                    else localfolder_error_label.Visibility = Visibility.Hidden;
+                                    CheckCustomizeInput(localfolder_box, localrepopath_box, localfolder_error_label);
                                 };
-
-                                // Repo path validity.
-
-                                error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                if (!String.IsNullOrEmpty(error))
-                                {
-                                    localfolder_error_label.Text = error;
-                                    localfolder_error_label.Visibility = Visibility.Visible;
-                                }
-                                else localfolder_error_label.Visibility = Visibility.Hidden;
 
                                 localrepopath_box.TextChanged += delegate
                                 {
-                                    error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
-                                    if (!String.IsNullOrEmpty(error))
-                                    {
-                                        localfolder_error_label.Text = error;
-                                        localfolder_error_label.Visibility = Visibility.Visible;
-                                       
-                                    }
-                                    else localfolder_error_label.Visibility = Visibility.Hidden;
+                                    CheckCustomizeInput(localfolder_box, localrepopath_box, localfolder_error_label);
                                 };
 
                                 // Choose a folder.
@@ -959,6 +966,8 @@ namespace CmisSync
                                 {
                                     Controller.CustomizePageCompleted(localfolder_box.Text, localrepopath_box.Text);
                                 };
+
+                                Controller.LocalPathExists += LocalPathExistsHandler;
                                 break;
                             }
                         #endregion
@@ -1068,32 +1077,39 @@ namespace CmisSync
             Logger.Info("Exiting constructor.");
         }
 
-        private List<string> getIgnoredFolder(Folder f)
-        {
-            List<string> result = new List<string>();
-            if (f.IsIgnored)
-            {
-                result.Add(f.Path);
-            }
-            else
-            {
-                foreach (Folder child in f.SubFolder)
-                    result.AddRange(getIgnoredFolder(child));
-            }
-            return result;
+        private static bool LocalPathExistsHandler(string path) {
+            return System.Windows.MessageBox.Show(String.Format(
+                    Properties_Resources.ConfirmExistingLocalFolderText, path),
+                    String.Format(Properties_Resources.ConfirmExistingLocalFolderTitle, path),
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question,
+                    MessageBoxResult.No
+                    ) == MessageBoxResult.Yes;
         }
 
-        private List<string> getSelectedFolder(Folder f)
+        private void CheckCustomizeInput(TextBox localfolder_box, TextBox localrepopath_box, TextBlock localfolder_error_label)
         {
-            List<string> result = new List<string>();
-            if (f.Selected == true)
-                result.Add(f.Path);
+            string error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
+            if (!String.IsNullOrEmpty(error))
+            {
+                localfolder_error_label.Text = error;
+                localfolder_error_label.Visibility = Visibility.Visible;
+                localfolder_error_label.Foreground = Brushes.Red;
+            }
             else
             {
-                foreach (Folder child in f.SubFolder)
-                    result.AddRange(getSelectedFolder(child));
+                try
+                {
+                    Controller.CheckRepoPathExists(localrepopath_box.Text);
+                    localfolder_error_label.Visibility = Visibility.Hidden;
+                }
+                catch (ArgumentException e)
+                {
+                    localfolder_error_label.Visibility = Visibility.Visible;
+                    localfolder_error_label.Foreground = Brushes.Orange;
+                    localfolder_error_label.Text = e.Message;
+                }
             }
-            return result;
         }
     }
 
@@ -1127,5 +1143,4 @@ namespace CmisSync
             this.fullPath = fullPath;
         }
     }
-    
 }

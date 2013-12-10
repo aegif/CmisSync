@@ -9,18 +9,19 @@
     <OutputType>Library</OutputType>
     <RootNamespace>CmisSync.Lib</RootNamespace>
     <AssemblyName>CmisSync.Lib</AssemblyName>
+    <ReleaseVersion>
+    </ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <OutputPath>bin\Debug\</OutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
@@ -34,25 +35,33 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Extras\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.84.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\System.Data.SQLite.dll</HintPath>
-    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
+    <Reference Include="Mono.Data.Sqlite" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>..\Extras\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\Extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cmis\Crypto.cs" />
     <Compile Include="Cmis\Database.cs" />
+    <Compile Include="Cmis\IDatabase.cs" />
+    <Compile Include="Credentials.cs" />
+    <Compile Include="Events\ConfigChangedEvent.cs" />
+    <Compile Include="Events\GenericSyncEventHandler.cs" />
+    <Compile Include="Events\SyncEventQueue.cs" />
     <Compile Include="LoggingStream.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />
+    <Compile Include="Defines.cs" />
     <Compile Include="Sync\SynchronizedFolder.cs" />
     <Compile Include="Sync\CrawlStrategy.cs" />
     <Compile Include="Cmis\CmisPermissionDeniedException.cs" />
@@ -72,29 +81,23 @@
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Defines.cs" />
     <Compile Include="IActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />
-    <Compile Include="Events\SyncEvent.cs" />
+    <Compile Include="Events\ISyncEvent.cs" />
+    <Compile Include="Events\FSEvent.cs" />
     <Compile Include="Events\SyncEventManager.cs" />
     <Compile Include="Events\SyncEventHandler.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1490179-src\DotCMIS.csproj">
-      <Project>{529ef90f-a34c-4426-a4f9-65113ac23841}</Project>
-      <Name>DotCMIS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Extras\log4net-1.2.11\src\log4net.vs2010.csproj">
-      <Project>{181FE707-E161-4722-9F38-6AAAB6FAA106}</Project>
-      <Name>log4net.vs2010</Name>
-    </ProjectReference>
+    <Compile Include="Events\DebugLoggingHandler.cs" />
+    <Compile Include="Events\FSDeletionHandler.cs" />
+    <Compile Include="Events\FileTransmissionEvent.cs" />
+    <Compile Include="Events\FileConflictEvent.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
-        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="true" RelativeMakefileName="Makefile.am">
-          <BuildFilesVar Sync="true" Name="SOURCES" />
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am" BuildTargetName="" CleanTargetName="">
+          <BuildFilesVar Sync="True" Name="SOURCES" />
           <DeployFilesVar />
           <ResourcesVar />
           <OthersVar />
@@ -109,4 +112,14 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
+      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+      <Name>DotCMIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Extras\log4net-1.2.11\src\log4net.vs2010.csproj">
+      <Project>{181FE707-E161-4722-9F38-6AAAB6FAA106}</Project>
+      <Name>log4net.vs2010</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

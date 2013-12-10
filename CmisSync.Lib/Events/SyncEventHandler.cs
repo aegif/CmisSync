@@ -4,41 +4,34 @@ using log4net;
 
 namespace CmisSync.Lib.Events
 {
-    public interface ISyncEventHandler
+    ///<summary>
+    ///Base class for all Event-Handlers
+    ///</summary>
+    public abstract class SyncEventHandler : IComparable<SyncEventHandler>, IComparable
     {
-        bool handle(ISyncEvent e);
-        int getPriority();
-    }
+        public abstract bool Handle(ISyncEvent e);
 
-    abstract public class EventFilter : ISyncEventHandler {
-        private static readonly int EVENTFILTERPRIORITY = 1000;
-        public abstract bool handle(ISyncEvent e);
-        public int getPriority() {
-            return EVENTFILTERPRIORITY;
-        }
-    }
+        ///<summary>
+        ///May not be changed during runtime
+        ///</summary>
+        public abstract int Priority {get;}
 
-    public class IgnoreFolderFilter : EventFilter {
-
-        public override bool handle(ISyncEvent e) {
-            return false;
-        }
-    };
-
-    public class DebugLoggingHandler : ISyncEventHandler
-    {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(DebugLoggingHandler));
-        private static readonly int DEBUGGINGLOGGERPRIORITY = 10000;
-
-        public bool handle(ISyncEvent e)
-        {
-            Logger.Debug("Incomming Event: " + e.ToString());
-            return false;
+        public int CompareTo(SyncEventHandler other) {
+            return Priority.CompareTo(other.Priority);
         }
 
-        public int getPriority()
-        {
-            return DEBUGGINGLOGGERPRIORITY;
+        // CompareTo is implemented for Sorting EventHandlers
+        // Equals is not implemented because EventHandler removal shall work by Object.Equals
+        int IComparable.CompareTo(object obj) {
+            if(!(obj is SyncEventHandler)){
+                throw new ArgumentException("Argument is not a SyncEventHandler", "obj");
+            }
+            SyncEventHandler other = obj as SyncEventHandler;
+            return this.CompareTo(other);
+        }
+
+        public override string ToString() {
+            return this.GetType() + " with Priority " + Priority.ToString();
         }
     }
 }

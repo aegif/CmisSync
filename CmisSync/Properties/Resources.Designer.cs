@@ -151,6 +151,25 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you really want to sync the existing local folder &quot;{0}&quot;?
+        ///This could lead to a lot of conflict files!.
+        /// </summary>
+        internal static string ConfirmExistingLocalFolderText {
+            get {
+                return ResourceManager.GetString("ConfirmExistingLocalFolderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected folder &quot;{0}&quot; as sync target.
+        /// </summary>
+        internal static string ConfirmExistingLocalFolderTitle {
+            get {
+                return ResourceManager.GetString("ConfirmExistingLocalFolderTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to connect to server!
         ///Please check the given URL for misspelled host name.
         ///If the URL is correct, please contact your server administrator!.
@@ -189,6 +208,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Discard changes.
+        /// </summary>
+        internal static string DiscardChanges {
+            get {
+                return ResourceManager.GetString("DiscardChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server automatically too..
         /// </summary>
         internal static string DocumentsAre {
@@ -213,6 +241,15 @@ namespace CmisSync {
         internal static string DoYouTrustTheCertificate {
             get {
                 return ResourceManager.GetString("DoYouTrustTheCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        internal static string EditTitle {
+            get {
+                return ResourceManager.GetString("EditTitle", resourceCulture);
             }
         }
         
@@ -354,6 +391,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to loading aborted.
+        /// </summary>
+        internal static string LoadingStatusABORTED {
+            get {
+                return ResourceManager.GetString("LoadingStatusABORTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to loading ....
         /// </summary>
         internal static string LoadingStatusLOADING {
@@ -372,7 +418,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A local folder with the same name already exist, please use a different name..
+        ///   Looks up a localized string similar to A local folder with the same name already exist, please use a different name to prevent sync conflicts..
         /// </summary>
         internal static string LocalDirectoryExist {
             get {
@@ -396,6 +442,15 @@ namespace CmisSync {
         internal static string MayTakeTime {
             get {
                 return ResourceManager.GetString("MayTakeTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given host name could not be found. Please check the host name and your internet connection..
+        /// </summary>
+        internal static string NameResolutionFailure {
+            get {
+                return ResourceManager.GetString("NameResolutionFailure", resourceCulture);
             }
         }
         
@@ -522,6 +577,15 @@ namespace CmisSync {
         internal static string RunningLatestVersion {
             get {
                 return ResourceManager.GetString("RunningLatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save changes.
+        /// </summary>
+        internal static string SaveChanges {
+            get {
+                return ResourceManager.GetString("SaveChanges", resourceCulture);
             }
         }
         

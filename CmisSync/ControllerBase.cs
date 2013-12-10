@@ -1,4 +1,4 @@
-//   CmisSync, a collaboration and sharing tool.
+﻿//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ using System.Threading;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
+using CmisSync.Lib.Events;
 
 namespace CmisSync
 {
@@ -62,6 +63,14 @@ namespace CmisSync
         /// List of the CmisSync synchronized folders.
         /// </summary>
         private List<RepoBase> repositories = new List<RepoBase>();
+
+
+        /// <summary>
+        /// Dictionary of the edit folder diaglogs
+        /// Key: synchronized folder name
+        /// Value: <c>Edit</c>
+        /// </summary>
+        private Dictionary<string, Edit> edits = new Dictionary<string, Edit>();
 
 
         /// <summary>
@@ -236,8 +245,8 @@ namespace CmisSync
                 {
                     CheckRepositories();
                     RepositoriesLoaded = true;
+                    // Update UI.
                     FolderListChanged();
-
                 }).Start();
             }
         }
@@ -251,11 +260,6 @@ namespace CmisSync
         {
             RepoBase repo = null;
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
-
-            repo.ChangesDetected += delegate
-            {
-                UpdateState();
-            };
 
             repo.SyncStatusChanged += delegate(SyncStatus status)
             {
@@ -273,19 +277,116 @@ namespace CmisSync
                 Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
                 if (f != null)
                 {
+                    Edit edit = null;
+                    if (edits.TryGetValue(reponame, out edit))
+                    {
+                        edit.Close();
+                    }
                     RemoveRepository(f);
                     ConfigManager.CurrentConfig.Folder.Remove(f);
                     ConfigManager.CurrentConfig.Save();
-                    FolderListChanged();
                 }
                 else
                 {
                     Logger.Warn("Reponame \"" + reponame + "\" could not be found: Removing Repository failed");
                 }
             }
+
+            // Update UI.
+            FolderListChanged();
         }
 
-        
+        public void EditRepositoryFolder(string reponame)
+        {
+            Config.SyncConfig.Folder folder;
+
+            lock (this.repo_lock)
+            {
+                folder = ConfigManager.CurrentConfig.getFolder(reponame);
+                if (folder == null)
+                {
+                    Logger.Warn("Reponame \"" + reponame + "\" could not be found: Editing Repository failed");
+                    return;
+                }
+
+                Edit edit = null;
+                if (edits.TryGetValue(reponame, out edit))
+                {
+                    edit.Controller.OpenWindow();
+                    return;
+                }
+
+
+                CmisSync.Lib.Credentials.CmisRepoCredentials credentials = new CmisSync.Lib.Credentials.CmisRepoCredentials()
+                {
+                    Address = folder.RemoteUrl,
+                    UserName = folder.UserName,
+                    Password = new Lib.Credentials.Password(){
+                        ObfuscatedPassword = folder.ObfuscatedPassword
+                    },
+                    RepoId = folder.RepositoryId
+                };
+                List<string> oldIgnores = new List<string>();
+                foreach (Config.IgnoredFolder ignore in folder.IgnoredFolders)
+                {
+                    oldIgnores.Add(ignore.Path);
+                }
+                edit = new Edit(credentials, folder.DisplayName, folder.RemotePath, oldIgnores, folder.LocalPath);
+                edits.Add(reponame, edit);
+
+                edit.Controller.SaveFolderEvent += delegate
+                {
+                    lock (this.repo_lock)
+                    {
+                        folder.IgnoredFolders.Clear();
+                        foreach (string ignore in edit.Ignores)
+                        {
+                            folder.IgnoredFolders.Add(new Config.IgnoredFolder() { Path = ignore });
+                        }
+                        ConfigManager.CurrentConfig.Save();
+                        foreach (string oldIgnore in oldIgnores)
+                        {
+                            if (String.IsNullOrEmpty(edit.Ignores.Find(
+                                delegate(string ignore)
+                                {
+                                    if (ignore == oldIgnore || oldIgnore.StartsWith(ignore + "/"))
+                                    {
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                })))
+                            {
+                                Logger.Info(String.Format("The remote folder {0} should be synced after editing ignore folders", oldIgnore));
+                                lock (this.repo_lock)
+                                {
+                                    foreach (RepoBase repo in this.repositories)
+                                    {
+                                        if (repo.Name == reponame)
+                                        {
+                                            repo.Queue.AddEvent(new RepoConfigChangedEvent(folder.GetRepoInfo()));
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                };
+
+                edit.Controller.CloseWindowEvent += delegate
+                {
+                    lock (this.repo_lock)
+                    {
+                        edits.Remove(reponame);
+                    }
+                };
+                edit.Controller.OpenWindow();
+            }
+        }
+
         /// <summary>
         /// Remove a synchronized folder from the CmisSync configuration.
         /// This happens after the user removes the folder.
@@ -384,9 +485,10 @@ namespace CmisSync
                 }
                 if(toBeDeleted.Count>0)
                     ConfigManager.CurrentConfig.Save();
-                // Update UI.
-                FolderListChanged();
             }
+
+            // Update UI.
+            FolderListChanged();
         }
 
 
@@ -481,11 +583,13 @@ namespace CmisSync
 
                 // Initialize in the UI.
                 AddRepository(repoInfo);
-                FolderListChanged();
 
                 this.fetcher.Dispose();
                 this.fetcher = null;
             }
+
+            // Update UI.
+            FolderListChanged();
         }
 
 
@@ -499,11 +603,26 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Show info about CmisSync
+        /// Show info about DataSpace Sync
         /// </summary>
         public void ShowAboutWindow()
         {
             ShowAboutWindowEvent();
+        }
+
+        public bool IsEditWindowVisible
+        {
+            get
+            {
+                lock (this.repo_lock)
+                {
+                    foreach (Edit editView in this.edits.Values)
+                        if (editView.IsVisible)
+                            return true;
+                }
+                return false;
+            }
+            private set { }
         }
 
         /// <summary>

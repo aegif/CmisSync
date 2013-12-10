@@ -9,42 +9,39 @@
     <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <RootNamespace>CmisSync</RootNamespace>
-    <AssemblyName>CmisSync</AssemblyName>
+    <AssemblyName>DataSpace Sync</AssemblyName>
     <ReleaseVersion>
     </ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="AfterBuild" command="mkdir -p ${TargetDir}/${SolutionName}.app/Contents/Frameworks; cp -R Growl.framework ${TargetDir}/${SolutionName}.app/Contents/Frameworks; cp -R git ${TargetDir}/${SolutionName}.app/Contents/Resources" />
-      </CustomCommands>
-    </CustomCommands>
     <EnableCodeSigning>False</EnableCodeSigning>
-    <CreatePackage>False</CreatePackage>
+    <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>False</EnablePackageSigning>
     <IncludeMonoRuntime>True</IncludeMonoRuntime>
     <ConsolePause>False</ConsolePause>
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
-    <I18n>
-    </I18n>
+    <I18n>cjk,mideast,other,rare,west</I18n>
     <UseSGen>true</UseSGen>
+    <DefineConstants>__COCOA__</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>..\..\bin</OutputPath>
     <WarningLevel>4</WarningLevel>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
     <EnablePackageSigning>false</EnablePackageSigning>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG,__COCOA__</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -53,9 +50,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="Mono.Posix" />
-    <Reference Include="log4net">
-      <HintPath>..\..\Extras\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="XamMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065">
       <Private>False</Private>
     </Reference>
@@ -64,12 +58,6 @@
   <ItemGroup>
     <Compile Include="AppDelegate.cs">
       <DependentUpon>MainMenu.xib</DependentUpon>
-    </Compile>
-    <Compile Include="MainMenu.xib.designer.cs">
-      <DependentUpon>MainMenu.xib</DependentUpon>
-    </Compile>
-    <Compile Include="..\ControllerBase.cs">
-      <Link>ControllerBase.cs</Link>
     </Compile>
     <Compile Include="StatusIcon.cs" />
     <Compile Include="UI.cs" />
@@ -80,26 +68,49 @@
     <Compile Include="Badger.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SetupWindow.cs" />
-    <Compile Include="..\SetupController.cs">
-      <Link>SetupController.cs</Link>
-    </Compile>
     <Compile Include="..\StatusIconController.cs">
       <Link>StatusIconController.cs</Link>
     </Compile>
-    <Compile Include="..\AboutController.cs">
-      <Link>AboutController.cs</Link>
-    </Compile>
     <Compile Include="Controller.cs" />
     <Compile Include="About.cs" />
-    <Compile Include="..\CertPolicyHandler.cs">
-      <Link>CertPolicyHandler.cs</Link>
-    </Compile>
     <Compile Include="..\Properties\Resources.Designer.cs">
       <Link>Resources.Designer.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <InterfaceDefinition Include="MainMenu.xib" xmlns="" />
+    <Compile Include="..\AboutController.cs" />
+    <Compile Include="..\CertPolicyHandler.cs" />
+    <Compile Include="..\ControllerBase.cs" />
+    <Compile Include="..\SetupController.cs" />
+    <Compile Include="..\Windows\FolderTreeMVC\IgnoredFolderLoader.cs">
+      <Link>CmisTree\IgnoredFolderLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\Windows\FolderTreeMVC\LoadingStatusModel.cs">
+      <Link>CmisTree\LoadingStatusModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Windows\FolderTreeMVC\LocalFolderLoader.cs">
+      <Link>CmisTree\LocalFolderLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\Windows\FolderTreeMVC\NodeLoader.cs">
+      <Link>NodeLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\Windows\FolderTreeMVC\NodeModel.cs">
+      <Link>NodeModel.cs</Link>
+    </Compile>
+    <Compile Include="..\EditController.cs">
+      <Link>EditController.cs</Link>
+    </Compile>
+    <Compile Include="Edit.cs" />
+    <Compile Include="CmisTree\CmisTreeDataSource.cs" />
+    <Compile Include="..\Windows\FolderTreeMVC\NodeModelUtils.cs">
+      <Link>CmisTree\NodeModelUtils.cs</Link>
+    </Compile>
+    <Compile Include="OutlineViewDelegate.cs" />
+    <Compile Include="TextFieldDelegate.cs" />
+    <Compile Include="CertPolicyWindow.cs" />
+    <Compile Include="CmisTree\CmisOutline.cs" />
+    <Compile Include="CmisTree\CmisOutlineController.cs" />
+    <Compile Include="CmisTree\CmisOutline.designer.cs">
+      <DependentUpon>CmisOutline.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -107,128 +118,16 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
-    <Content Include="..\Common\Pixmaps\side-splash.png">
-      <Link>Pixmaps\side-splash.png</Link>
-    </Content>
-    <Content Include="Pixmaps\cmissync-folder.icns">
-      <Link>cmissync-folder.icns</Link>
-    </Content>
-    <Content Include="Pixmaps\cmissync-app.icns">
-      <Link>cmissync-app.icns</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-i-active.png">
-      <Link>Pixmaps\process-syncing-i-active.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-i.png">
-      <Link>Pixmaps\process-syncing-i.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-ii-active.png">
-      <Link>Pixmaps\process-syncing-ii-active.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-ii.png">
-      <Link>Pixmaps\process-syncing-ii.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-iii-active.png">
-      <Link>Pixmaps\process-syncing-iii-active.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-iii.png">
-      <Link>Pixmaps\process-syncing-iii.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-iiii-active.png">
-      <Link>Pixmaps\process-syncing-iiii-active.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-iiii.png">
-      <Link>Pixmaps\process-syncing-iiii.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-iiiii-active.png">
-      <Link>Pixmaps\process-syncing-iiiii-active.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-iiiii.png">
-      <Link>Pixmaps\process-syncing-iiiii.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-error.png">
-      <Link>Pixmaps\process-syncing-error.png</Link>
-    </Content>
-    <Content Include="Pixmaps\process-syncing-error-active.png">
-      <Link>Pixmaps\process-syncing-error-active.png</Link>
-    </Content>
-    <Content Include="..\Linux\Pixmaps\icons\document-added-12.png">
-      <Link>Pixmaps\document-added-12.png</Link>
-    </Content>
-    <Content Include="..\Linux\Pixmaps\icons\document-edited-12.png">
-      <Link>Pixmaps\document-edited-12.png</Link>
-    </Content>
-    <Content Include="..\Linux\Pixmaps\icons\document-deleted-12.png">
-      <Link>Pixmaps\document-deleted-12.png</Link>
-    </Content>
-    <Content Include="..\Linux\Pixmaps\icons\document-moved-12.png">
-      <Link>Pixmaps\document-moved-12.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\about.png">
-      <Link>Pixmaps\about.png</Link>
-    </Content>
-    <Content Include="Pixmaps\tutorial-slide-1.png">
-      <Link>Pixmaps\tutorial-slide-1.png</Link>
-    </Content>
-    <Content Include="Pixmaps\tutorial-slide-2.png">
-      <Link>Pixmaps\tutorial-slide-2.png</Link>
-    </Content>
-    <Content Include="Pixmaps\tutorial-slide-3.png">
-      <Link>Pixmaps\tutorial-slide-3.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\tutorial-slide-4.png">
-      <Link>Pixmaps\tutorial-slide-4.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-a.png">
-      <Link>Pixmaps\avatar-a.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-b.png">
-      <Link>Pixmaps\avatar-b.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-c.png">
-      <Link>Pixmaps\avatar-c.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-d.png">
-      <Link>Pixmaps\avatar-d.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-e.png">
-      <Link>Pixmaps\avatar-e.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-f.png">
-      <Link>Pixmaps\avatar-f.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-g.png">
-      <Link>Pixmaps\avatar-g.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-h.png">
-      <Link>Pixmaps\avatar-h.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-i.png">
-      <Link>Pixmaps\avatar-i.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-j.png">
-      <Link>Pixmaps\avatar-j.png</Link>
-    </Content>
-    <Content Include="..\Common\Pixmaps\avatar-k.png">
-      <Link>Pixmaps\avatar-k.png</Link>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Pixmaps\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
-      <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
-      <Name>CmisSync.Lib</Name>
-    </ProjectReference>
+    <Folder Include="CmisTree\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
-        <MonoDevelop.Autotools.MakefileInfo RelativeMakefileName="Makefile.am" IsAutotoolsProject="True" RelativeConfigureInPath="../..">
-          <BuildFilesVar Sync="True" Name="ASSEMBLY_INFO_SOURCE" />
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am" BuildTargetName="" CleanTargetName="" IsAutotoolsProject="True" RelativeConfigureInPath="../..">
+          <BuildFilesVar Sync="True" Name="SOURCES" />
           <DeployFilesVar />
-          <ResourcesVar Sync="True" Name="RESOURCES" />
+          <ResourcesVar Sync="True" Name="RESOURCES_RESX_XAMARIN" Prefix="CmisSync" />
           <OthersVar />
           <GacRefVar />
           <AsmRefVar />
@@ -237,4 +136,108 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <BundleResource Include="Pixmaps\cmissync-app.icns">
+      <Link>cmissync-app.icns</Link>
+      <DeployService-Deploy>True</DeployService-Deploy>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\cmissync-folder.icns">
+      <Link>cmissync-folder.icns</Link>
+      <DeployService-Deploy>True</DeployService-Deploy>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </BundleResource>
+    <BundleResource Include="..\Common\Pixmaps\side-splash.png">
+      <Link>Pixmaps\side-splash.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-i-active.png">
+      <Link>Pixmaps\process-syncing-i-active.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-i.png">
+      <Link>Pixmaps\process-syncing-i.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-ii-active.png">
+      <Link>Pixmaps\process-syncing-ii-active.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-ii.png">
+      <Link>Pixmaps\process-syncing-ii.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-iii-active.png">
+      <Link>Pixmaps\process-syncing-iii-active.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-iii.png">
+      <Link>Pixmaps\process-syncing-iii.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-iiii-active.png">
+      <Link>Pixmaps\process-syncing-iiii-active.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-iiii.png">
+      <Link>Pixmaps\process-syncing-iiii.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-iiiii-active.png">
+      <Link>Pixmaps\process-syncing-iiiii-active.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-iiiii.png">
+      <Link>Pixmaps\process-syncing-iiiii.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-error.png">
+      <Link>Pixmaps\process-syncing-error.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\process-syncing-error-active.png">
+      <Link>Pixmaps\process-syncing-error-active.png</Link>
+    </BundleResource>
+    <BundleResource Include="..\Linux\Pixmaps\icons\document-added-12.png">
+      <Link>Pixmaps\document-added-12.png</Link>
+    </BundleResource>
+    <BundleResource Include="..\Linux\Pixmaps\icons\document-edited-12.png">
+      <Link>Pixmaps\document-edited-12.png</Link>
+    </BundleResource>
+    <BundleResource Include="..\Linux\Pixmaps\icons\document-deleted-12.png">
+      <Link>Pixmaps\document-deleted-12.png</Link>
+    </BundleResource>
+    <BundleResource Include="..\Linux\Pixmaps\icons\document-moved-12.png">
+      <Link>Pixmaps\document-moved-12.png</Link>
+    </BundleResource>
+    <BundleResource Include="..\Common\Pixmaps\about.png">
+      <Link>Pixmaps\about.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\tutorial-slide-1.png">
+      <Link>Pixmaps\tutorial-slide-1.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\tutorial-slide-2.png">
+      <Link>Pixmaps\tutorial-slide-2.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\tutorial-slide-3.png">
+      <Link>Pixmaps\tutorial-slide-3.png</Link>
+    </BundleResource>
+    <BundleResource Include="Pixmaps\tutorial-slide-4.png" />
+    <BundleResource Include="Pixmaps\media_playback_pause.png" />
+    <BundleResource Include="Pixmaps\media_playback_start.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
+      <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
+      <Name>CmisSync.Lib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Extras\log4net-1.2.11\src\log4net.vs2010.csproj">
+      <Project>{181FE707-E161-4722-9F38-6AAAB6FAA106}</Project>
+      <Name>log4net.vs2010</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="MainMenu.xib" />
+    <InterfaceDefinition Include="CmisTree\CmisOutline.xib" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Properties\Properties.Resources.cs.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.de.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.es-ES.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.fr.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.ja.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.nl.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.tlh-AA.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.tlh-KX.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.uk.resx" />
+  </ItemGroup>
 </Project>

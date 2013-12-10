@@ -136,13 +136,13 @@ namespace CmisSync {
 
         public override void OrderFrontRegardless ()
         {
-            NSApplication.SharedApplication.AddWindowsItem (this, "CmisSync Setup", false);
+            NSApplication.SharedApplication.AddWindowsItem (this, "DataSpace Sync", false);
             NSApplication.SharedApplication.ActivateIgnoringOtherApps (true);
             MakeKeyAndOrderFront (this);
 
             if (Program.UI != null)
                 Program.UI.UpdateDockIconVisibility ();
-            
+
             base.OrderFrontRegardless ();
         }
 

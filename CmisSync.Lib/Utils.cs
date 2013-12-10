@@ -4,10 +4,14 @@ using System.Linq;
 using System.Text;
 using log4net;
 using System.IO;
+
+using System.Security;
+using System.Security.Permissions;
+
 using System.Text.RegularExpressions;
-#if __MonoCS__
-using Mono.Unix.Native;
-#endif
+//#if __MonoCS__
+//using Mono.Unix.Native;
+//#endif
 
 namespace CmisSync.Lib
 {
@@ -59,9 +63,20 @@ namespace CmisSync.Lib
             }
             catch (System.PlatformNotSupportedException)
             {
-#if __MonoCS__
-                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
-#endif
+//#if __MonoCS__
+//                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
+//#endif
+            }
+            catch(System.UnauthorizedAccessException) {
+                var permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
+                var permissionSet = new PermissionSet(PermissionState.None);
+                permissionSet.AddPermission(permission);
+                if (permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet))
+                {
+                    return true;
+                }
+                else
+                    return false;
             }
 
             return writeAllow && !writeDeny;
@@ -187,6 +202,12 @@ namespace CmisSync.Lib
                 return false;
             }
 
+            // Ignore meta data stores of MacOS
+            if (filename == ".DS_Store")
+            {
+                Logger.Debug("Unworth syncing MacOS meta data file .DS_Store");
+                return false;
+            }
             filename = filename.ToLower();
 
             if (ignoredExtensions.Contains(Path.GetExtension(filename))
@@ -273,7 +294,7 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// Find an available name (potentially suffixed) for this file.
+        /// Find an available conflict free filename for this file.
         /// For instance:
         /// - if /dir/file does not exist, return the same path
         /// - if /dir/file exists, return /dir/file (1)
@@ -282,7 +303,7 @@ namespace CmisSync.Lib
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string SuffixIfExists(String path)
+        public static string FindNextConflictFreeFilename(String path, String user)
         {
             if (!File.Exists(path))
             {
@@ -290,10 +311,15 @@ namespace CmisSync.Lib
             }
             else
             {
+                string extension = Path.GetExtension(path);
+                string filepath = path.Substring(0, path.Length - extension.Length);
+                string ret = String.Format("{0}_{1}-version{2}", filepath, user, extension);
+                if (!File.Exists(ret))
+                    return ret;
                 int index = 1;
                 do
                 {
-                    string ret = path + " (" + index.ToString() + ")";
+                    ret = String.Format("{0}_{1}-version ({2}){3}", filepath, user, index.ToString(), extension);
                     if (!File.Exists(ret))
                     {
                         return ret;

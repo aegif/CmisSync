@@ -11,12 +11,15 @@ SOURCES =  \
 	../AboutController.cs \
 	../CertPolicyHandler.cs \
 	../ControllerBase.cs \
+	../EditController.cs \
 	../Program.cs \
 	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
 	About.cs \
+	CertPolicyWindow.cs \
 	Controller.cs \
+	Edit.cs \
 	Setup.cs \
 	SetupWindow.cs \
 	Spinner.cs \

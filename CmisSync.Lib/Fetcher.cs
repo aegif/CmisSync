@@ -89,26 +89,26 @@ namespace CmisSync.Lib
             // Check that the CmisSync root folder exists.
             if (!Directory.Exists(ConfigManager.CurrentConfig.FoldersPath))
             {
-                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} does not exist", ConfigManager.CurrentConfig.FoldersPath));
+                Logger.Fatal(String.Format("Fetcher | ERROR - DataSpace Default Folder {0} does not exist", ConfigManager.CurrentConfig.FoldersPath));
                 throw new DirectoryNotFoundException("Root folder don't exist !");
             }
 
             // Check that the folder is writable.
             if (!Utils.HasWritePermissionOnDir(ConfigManager.CurrentConfig.FoldersPath))
             {
-                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", ConfigManager.CurrentConfig.FoldersPath));
-                throw new UnauthorizedAccessException("Root folder is not writable!");
+                Logger.Fatal(String.Format("Fetcher | ERROR - DataSpace Default Folder {0} is not writable", ConfigManager.CurrentConfig.FoldersPath));
             }
 
             // Check that the folder exists.
             if (Directory.Exists(repoInfo.TargetDirectory))
             {
-                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Repository Folder {0} already exist", repoInfo.TargetDirectory));
-                throw new UnauthorizedAccessException("Repository folder already exists!");
+                Logger.Info(String.Format("Fetcher | Information - DataSpace Repository Folder {0} already exist, this could lead to sync conflicts", repoInfo.TargetDirectory));
             }
-
-            // Create the local folder.
-            Directory.CreateDirectory(repoInfo.TargetDirectory);
+            else
+            {
+                // Create the local folder.
+                Directory.CreateDirectory(repoInfo.TargetDirectory);
+            }
 
             // Use this folder configuration.
             this.cmisRepo = new CmisRepo(repoInfo, activityListener);

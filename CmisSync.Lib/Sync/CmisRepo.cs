@@ -15,6 +15,9 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.IO;
+
+using CmisSync.Lib.Events;
 
 namespace CmisSync.Lib.Sync
 {
@@ -26,12 +29,10 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private SynchronizedFolder synchronizedFolder;
 
-
         /// <summary>
         /// Track whether <c>Dispose</c> has been called.
         /// </summary>
         private bool disposed = false;
-
 
         /// <summary>
         /// Constructor.
@@ -40,6 +41,8 @@ namespace CmisSync.Lib.Sync
             : base(repoInfo)
         {
             this.synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);
+            this.Watcher.ChangeEvent += OnFileActivity;
+            this.Watcher.EnableEvent = true;
             Logger.Info(synchronizedFolder);
         }
 
@@ -54,6 +57,13 @@ namespace CmisSync.Lib.Sync
             base.Resume();
         }
 
+        /// <summary>
+        /// Some file activity has been detected, add to queue
+        /// </summary>
+        public void OnFileActivity(object sender, FileSystemEventArgs args)
+        {
+            synchronizedFolder.Queue.AddEvent(new FSEvent(args.ChangeType, args.FullPath));
+        }
 
         /// <summary>
         /// Dispose pattern implementation.

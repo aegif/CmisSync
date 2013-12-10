@@ -26,6 +26,13 @@ namespace CmisSync
 {
 	public partial class AppDelegate : NSApplicationDelegate
 	{
+		public AppDelegate ()
+		{
+		}
 
+		public override void FinishedLaunching 
+		(NSObject notification)
+		{
+		}
 	}
 }

@@ -51,7 +51,7 @@ namespace CmisSync.Lib.Cmis
         /// Users can provide the URL of the web interface, and we have to return the CMIS URL
         /// Returns the list of repositories as well.
         /// </summary>
-        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(Uri url, string user, RepoInfo.CmisPassword password)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(Credentials.ServerCredentials credentials)
         {
             Dictionary<string, string> repositories = null;
             Exception firstException = null;
@@ -59,12 +59,12 @@ namespace CmisSync.Lib.Cmis
             // Try the given URL, maybe user directly entered the CMIS AtomPub endpoint URL.
             try
             {
-                repositories = GetRepositories(url, user, password);
+                repositories = GetRepositories(credentials);
             }
             catch (DotCMIS.Exceptions.CmisRuntimeException e)
             {
                 if (e.Message == "ConnectFailure")
-                    return new Tuple<CmisServer, Exception>(new CmisServer(url, null), new CmisServerNotFoundException(e.Message, e));
+                    return new Tuple<CmisServer, Exception>(new CmisServer(credentials.Address, null), new CmisServerNotFoundException(e.Message, e));
                 firstException = e;
             }
             catch (Exception e)
@@ -75,11 +75,11 @@ namespace CmisSync.Lib.Cmis
             if (repositories != null)
             {
                 // Found!
-                return new Tuple<CmisServer, Exception>(new CmisServer(url, repositories), null);
+                return new Tuple<CmisServer, Exception>(new CmisServer(credentials.Address, repositories), null);
             }
 
             // Extract protocol and server name or IP address
-            string prefix = url.GetLeftPart(UriPartial.Authority);
+            string prefix = credentials.Address.GetLeftPart(UriPartial.Authority);
 
             // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
             // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
@@ -104,7 +104,13 @@ namespace CmisSync.Lib.Cmis
                 Logger.Info("Sync | Trying with " + fuzzyUrl);
                 try
                 {
-                    repositories = GetRepositories(new Uri(fuzzyUrl), user, password);
+                    Credentials.ServerCredentials cred = new Credentials.ServerCredentials()
+                    {
+                        UserName = credentials.UserName,
+                        Password = credentials.Password.ToString(),
+                        Address = new Uri(fuzzyUrl)
+                    };
+                    repositories = GetRepositories(cred);
                 }
                 catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
                 {
@@ -124,7 +130,7 @@ namespace CmisSync.Lib.Cmis
             }
 
             // Not found. Return also the first exception to inform the user correctly
-            return new Tuple<CmisServer,Exception>(new CmisServer(bestUrl==null?url:new Uri(bestUrl), null), firstException);
+            return new Tuple<CmisServer,Exception>(new CmisServer(bestUrl==null?credentials.Address:new Uri(bestUrl), null), firstException);
         }
 
 
@@ -133,12 +139,12 @@ namespace CmisSync.Lib.Cmis
         /// Each item contains id + 
         /// </summary>
         /// <returns>The list of repositories. Each item contains the identifier and the human-readable name of the repository.</returns>
-        static public Dictionary<string,string> GetRepositories(Uri url, string user, RepoInfo.CmisPassword password)
+        static public Dictionary<string,string> GetRepositories(Credentials.ServerCredentials credentials)
         {
             Dictionary<string,string> result = new Dictionary<string,string>();
 
             // If no URL was provided, return empty result.
-            if (null == url)
+            if (credentials.Address == null )
             {
                 return result;
             }
@@ -148,9 +154,9 @@ namespace CmisSync.Lib.Cmis
 
             Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = url.ToString();
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password.ToString();
+            cmisParameters[SessionParameter.AtomPubUrl] = credentials.Address.ToString();
+            cmisParameters[SessionParameter.User] = credentials.UserName;
+            cmisParameters[SessionParameter.Password] = credentials.Password.ToString();
 
             IList<IRepository> repositories;
             try
@@ -240,22 +246,32 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        public class FolderTree
+        public class NodeTree
         {
-            public List<FolderTree> children = new List<FolderTree>();
-            public string path;
+            public List<NodeTree> Children = new List<NodeTree>();
+            public string Path { get; set; }
             public string Name { get; set; }
+            public bool Finished { get; set; }
 
-            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder)
+            public NodeTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder, int depth)
             {
-                this.path = folder.Path;
+                this.Path = folder.Path;
                 this.Name = folder.Name;
+                if (depth == 0)
+                {
+                    this.Finished = false;
+                }
+                else
+                {
+                    this.Finished = true;
+                }
+
                 if(trees != null)
                     foreach (ITree<IFileableCmisObject> tree in trees)
                     {
                         Folder f = tree.Item as Folder;
-                        if(f!=null)
-                            this.children.Add(new FolderTree(tree.Children, f));
+                        if (f != null)
+                            this.Children.Add(new NodeTree(tree.Children, f, depth - 1));
                     }
             }
         }
@@ -264,17 +280,16 @@ namespace CmisSync.Lib.Cmis
         /// Get the sub-folders of a particular CMIS folder.
         /// </summary>
         /// <returns>Full path of each sub-folder, including leading slash.</returns>
-        static public FolderTree GetSubfolderTree(string repositoryId, string path,
-            string address, string user, string password, int depth)
+        static public NodeTree GetSubfolderTree(Credentials.CmisRepoCredentials credentials, string path, int depth)
         {
 
             // Connect to the CMIS repository.
             Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = address;
-            cmisParameters[SessionParameter.User] = user;
-            cmisParameters[SessionParameter.Password] = password;
-            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+            cmisParameters[SessionParameter.AtomPubUrl] = credentials.Address.ToString();
+            cmisParameters[SessionParameter.User] = credentials.UserName;
+            cmisParameters[SessionParameter.Password] = credentials.Password.ToString();
+            cmisParameters[SessionParameter.RepositoryId] = credentials.RepoId;
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.CreateSession(cmisParameters);
 
@@ -296,7 +311,7 @@ namespace CmisSync.Lib.Cmis
             try
             {
                 IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
-                return new FolderTree(trees, folder);
+                return new NodeTree(trees, folder, depth);
             }
             catch (Exception e)
             {

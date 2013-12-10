@@ -1,23 +1,23 @@
-﻿using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using DotCMIS.Client;
-using DotCMIS;
-using DotCMIS.Client.Impl;
-using DotCMIS.Exceptions;
-using DotCMIS.Enums;
-using System.ComponentModel;
-using System.Collections;
-using DotCMIS.Data.Impl;
-
-using System.Net;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Events;
+using DotCMIS.Client.Impl;
+using DotCMIS.Client;
+using DotCMIS.Data.Impl;
 using DotCMIS.Data;
-using log4net;
+using DotCMIS.Enums;
+using DotCMIS.Exceptions;
+using DotCMIS;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
+using System.Text;
+using System;
+using log4net;
 
 namespace CmisSync.Lib.Sync
 {
@@ -128,8 +128,12 @@ namespace CmisSync.Lib.Sync
             /// Link to parent object.
             /// </summary>
             private RepoBase repo;
-
-
+            
+            /// <summary>
+            /// EventQueue
+            /// </summary>
+            public SyncEventQueue Queue {get; private set;}
+            
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
             /// </summary>
@@ -145,24 +149,52 @@ namespace CmisSync.Lib.Sync
                 this.activityListener = listener;
                 this.repoinfo = repoInfo;
 
+                Queue = repoCmis.Queue;
                 // Database is the user's AppData/Roaming
                 database = new Database(repoinfo.CmisDatabase);
 
                 // Get path on remote repository.
-                remoteFolderPath = repoInfo.RemotePath;
+                remoteFolderPath = repoinfo.RemotePath;
 
                 cmisParameters = new Dictionary<string, string>();
-                cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-                cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
-                cmisParameters[SessionParameter.User] = repoInfo.User;
-                cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
-                cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
-                cmisParameters[SessionParameter.ConnectTimeout] = "-1";
-
-                foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
+                UpdateCmisParameters();
+                if (Logger.IsInfoEnabled)
                 {
-                    Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
+                    foreach (string ignoredFolder in repoinfo.getIgnoredPaths())
+                    {
+                        Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
+                    }
                 }
+                repoCmis.EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(10, RepoInfoChanged));
+            }
+
+            /// <summary>
+            /// This method is called, every time the config changes
+            /// </summary>
+            /// <param name="e"></param>
+            /// <returns></returns>
+            private bool RepoInfoChanged(ISyncEvent e)
+            {
+                if (e is RepoConfigChangedEvent)
+                {
+                    repoinfo = (e as RepoConfigChangedEvent).RepoInfo;
+                    UpdateCmisParameters();
+                    ForceFullSyncAtNextSync();
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// Loads the CmisParameter from repoinfo. If repoinfo has been changed, this method sets the new informations for the next session
+            /// </summary>
+            private void UpdateCmisParameters()
+            {
+                cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+                cmisParameters[SessionParameter.AtomPubUrl] = repoinfo.Address.ToString();
+                cmisParameters[SessionParameter.User] = repoinfo.User;
+                cmisParameters[SessionParameter.Password] = repoinfo.Password.ToString();
+                cmisParameters[SessionParameter.RepositoryId] = repoinfo.RepoID;
+                cmisParameters[SessionParameter.ConnectTimeout] = "-1";
             }
 
 
@@ -308,13 +340,14 @@ namespace CmisSync.Lib.Sync
             public void Sync()
             {
                 //// If not connected, connect.
-                //if (session == null)
-                //{
-                //    Connect();
-                //}
+                if (session == null)
+                {
+                    Connect();
+                } else {
+                    //  Force to reset the cache for each Sync
+                    session.Clear();
+                }
                 sleepWhileSuspended();
-                //  Force to create the session to reset the cache for each Sync, since DotCMIS uses cache
-                Connect();
 
                 if (session == null)
                 {
@@ -391,14 +424,17 @@ namespace CmisSync.Lib.Sync
                             }
                             catch (CmisBaseException e)
                             {
+                                this.ForceFullSyncAtNextSync();
                                 Logger.Error("CMIS exception while syncing:", e);
                             }
                             catch(ObjectDisposedException e)
                             {
+                                this.ForceFullSyncAtNextSync();
                                 Logger.Warn("Object disposed while syncing:", e);
                             }
                             catch(Exception e)
                             {
+                                this.ForceFullSyncAtNextSync();
                                 Logger.Warn("Execption thrown while syncing:", e);
                             }
                         }
@@ -907,7 +943,7 @@ namespace CmisSync.Lib.Sync
                                     //String filename = Path.GetFileNameWithoutExtension(filePath);
                                     String dir = Path.GetDirectoryName(filepath);
 
-                                    String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filepath) + "_" + repoinfo.User + "-version");
+                                    String newFileName = Utils.FindNextConflictFreeFilename(filepath, repoinfo.User);
                                     String newFilePath = Path.Combine(dir, newFileName);
                                     Logger.Debug(String.Format("Moving local file {0} file to new file {1}", filepath, newFilePath));
                                     File.Move(filepath, newFilePath);
@@ -1073,7 +1109,6 @@ namespace CmisSync.Lib.Sync
                                         ContentStream contentStream = new ContentStream();
                                         contentStream.FileName = fileName;
                                         contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                                        contentStream.Length = file.Length;
                                         contentStream.Stream = logstream;
 
                                         // Upload
@@ -1087,7 +1122,10 @@ namespace CmisSync.Lib.Sync
                                                 remoteDocument = remoteFolder.CreateDocument(properties, null, null);
                                                 Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
                                                                            remoteDocument.Id, fileName));
-                                            } catch(Exception e) {
+                                                Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+                                                // Create database entry for this empty file to force content update if setContentStream will fail.
+                                                database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, new byte[hashAlg.HashSize]);
+                                            } catch(Exception) {
                                                 string reason = Utils.IsValidISO88591(fileName)?String.Empty:" Reason: Upload perhaps failed because of an invalid ISO 8859-1 character";
                                                 Logger.Info(String.Format("Could not create the remote document {0} as target for local document {1}{2}", fileName, filePath, reason));
                                                 throw;
@@ -1295,7 +1333,6 @@ namespace CmisSync.Lib.Sync
                             using(LoggingStream logstream = new LoggingStream(localfile, "Updating ContentStream", filePath, localfile.Length)) {
                                 ContentStream contentStream = new ContentStream();
                                 contentStream.FileName = remoteFile.Name;
-                                contentStream.Length = localfile.Length;
                                 contentStream.MimeType = MimeType.GetMIMEType(contentStream.FileName);
                                 contentStream.Stream = logstream;
                                 Logger.Debug(String.Format("before SetContentStream to remote object ({0})", remoteFile.Id));

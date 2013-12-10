@@ -24,6 +24,7 @@ using System.Threading;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync
 {
@@ -84,6 +85,9 @@ namespace CmisSync
         public event ChangePasswordFieldEventHandler ChangePasswordFieldEvent = delegate { };
         public delegate void ChangePasswordFieldEventHandler(string text, string example_text);
 
+        public event LocalPathExistsEventHandler LocalPathExists;
+        public delegate bool LocalPathExistsEventHandler(string path);
+
         /// <summary>
         /// Whether the window is currently open.
         /// </summary>
@@ -127,13 +131,11 @@ namespace CmisSync
         /// <summary>
         /// Load repositories information from a CMIS endpoint.
         /// </summary>
-        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(string url, string user, string password)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(ServerCredentials credentials)
         {
-            Uri uri;
             try
             {
-                uri = new Uri(url);
-                return CmisUtils.GetRepositoriesFuzzy(uri, user, password);
+                return CmisUtils.GetRepositoriesFuzzy(credentials);
             }
             catch(Exception e) {
                 return new Tuple<CmisServer,Exception>(null,e);
@@ -378,8 +380,9 @@ namespace CmisSync
                     localpath = localpath.Substring(0,localpath.Length-1);
                 if (CmisSync.Lib.Utils.IsInvalidFolderName(Path.GetFileName(localpath)))
                     throw new ArgumentException(String.Format(Properties_Resources.InvalidFolderName, Path.GetFileName(localpath)));
-                if (Directory.Exists(localpath))
-                    throw new ArgumentException(String.Format(Properties_Resources.LocalDirectoryExist));
+                // If no warning handler is registered, handle warning as error
+                if (LocalPathExists == null)
+                    CheckRepoPathExists(localpath);
                 UpdateAddProjectButtonEvent(true);
                 return String.Empty;
             }
@@ -390,6 +393,12 @@ namespace CmisSync
             }
         }
 
+
+        public void CheckRepoPathExists(string localpath)
+        {
+            if (Directory.Exists(localpath))
+                throw new ArgumentException(String.Format(Properties_Resources.LocalDirectoryExist));
+        }
 
         /// <summary>
         /// First step of remote folder addition wizard is complete, switch to second step
@@ -452,6 +461,17 @@ namespace CmisSync
         /// </summary>
         public void CustomizePageCompleted(String repoName, String localrepopath)
         {
+            try
+            {
+                CheckRepoPathExists(localrepopath);
+            }
+            catch (ArgumentException)
+            {
+                if (LocalPathExists != null && ! LocalPathExists(localrepopath))
+                {
+                    return;
+                }
+            }
             SyncingReponame = repoName;
 
             ChangePageEvent(PageType.Syncing);
@@ -477,7 +497,6 @@ namespace CmisSync
             catch (Exception ex)
             {
                 Logger.Fatal(ex.ToString());
-                System.Windows.Forms.MessageBox.Show("An error occur during first sync, see debug log for details!");
             }
 
         }
@@ -525,5 +544,30 @@ namespace CmisSync
             this.FolderAdditionWizardCurrentPage = PageType.None;
             HideWindowEvent();
         }
+
+		/// <summary>
+		/// Gets the connections problem warning message internationalized.
+		/// </summary>
+		/// <returns>The connections problem warning.</returns>
+		/// <param name="server">Tried server.</param>
+		/// <param name="e">Returned Exception</param>
+		public string getConnectionsProblemWarning(CmisServer server, Exception e)
+		{
+			string warning = "";
+			string message = e.Message;
+			if (e is CmisPermissionDeniedException)
+				warning = Properties_Resources.LoginFailedForbidden;
+			else if (e is CmisServerNotFoundException)
+				warning = Properties_Resources.ConnectFailure;
+			else if (e.Message == "SendFailure" && server.Url.Scheme.StartsWith("https"))
+				warning = Properties_Resources.SendFailureHttps;
+			else if (e.Message == "TrustFailure")
+				warning = Properties_Resources.TrustFailure;
+			/*						else if (e.Message == "NameResolutionFailure")
+				warning = Properties_Resources.NameResolutionFailure;*/
+			else
+				warning = message + Environment.NewLine + Properties_Resources.Sorry;
+			return warning;
+		}
     }
 }

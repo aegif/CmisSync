@@ -8,6 +8,7 @@ using Mono.Data.Sqlite;
 #else
 using System.Data.SQLite;
 #endif
+using System.Data.Common;
 using System.IO;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
@@ -27,7 +28,7 @@ namespace CmisSync.Lib.Cmis
     /// Database to cache remote information from the CMIS server.
     /// Implemented with SQLite.
     /// </summary>
-    public class Database : IDisposable
+    public class Database : IDatabase, IDisposable
     {
         /// <summary>
         /// Log.
@@ -77,7 +78,7 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
-        /// Destructor.
+        /// Finalizer.
         /// </summary>
         ~Database()
         {
@@ -272,6 +273,13 @@ namespace CmisSync.Lib.Cmis
         // 
         // 
         //
+
+        /// <summary>
+        /// Begins a Database transaction
+        /// </summary>
+        public DbTransaction BeginTransaction() {
+            return GetSQLiteConnection().BeginTransaction();
+        }
 
         /// <summary>
         /// Add a file to the database. And calculate the checksum of the file
@@ -876,6 +884,11 @@ namespace CmisSync.Lib.Cmis
             }
         }
 
+        public enum OperationType 
+        {
+            UPLOAD, DOWNLOAD, CHANGE, DELETE
+        }
+
 
         /// <summary>
         /// Helper method to fill the parameters inside an SQL command.
@@ -893,11 +906,6 @@ namespace CmisSync.Lib.Cmis
                     command.Parameters.AddWithValue(pair.Key, pair.Value);
                 }
             }
-        }
-
-        public enum OperationType 
-        {
-            UPLOAD, DOWNLOAD, CHANGE, DELETE
         }
 
         private string operationTypeToString(OperationType type)

@@ -14,11 +14,21 @@ SOURCES =  \
 	Cmis/CmisUtils.cs \
 	Cmis/Crypto.cs \
 	Cmis/Database.cs \
+	Cmis/IDatabase.cs \
 	Cmis/MimeType.cs \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
-	Events/SyncEvent.cs \
+	Credentials.cs \
+	Defines.cs \
+	Events/ConfigChangedEvent.cs \
+	Events/DebugLoggingHandler.cs \
+	Events/FileConflictEvent.cs \
+	Events/FileTransmissionEvent.cs \
+	Events/FSDeletionHandler.cs \
+	Events/FSEvent.cs \
+	Events/GenericSyncEventHandler.cs \
+	Events/ISyncEvent.cs \
 	Events/SyncEventHandler.cs \
 	Events/SyncEventManager.cs \
 	Events/SyncEventQueue.cs \

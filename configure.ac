@@ -1,9 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
-m4_define([cmissync_version], [1.1.0])
+m4_define([cmissync_version], [1.2.0])
 
 AC_PREREQ([2.54])
 AC_INIT([DataSpace Sync], cmissync_version)
 AC_CONFIG_SRCDIR([CmisSync/Program.cs])
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([foreign dist-bzip2 dist-zip no-dist-gzip])
 AM_MAINTAINER_MODE
 
@@ -187,6 +188,9 @@ AC_SUBST(TEST_REPOID)
 
 OSNAME=`uname -s`
 OSOK=no
+
+PACKAGE_TARGET=none
+
 if test "$OSNAME" = "Linux" ; then
 
 	dnl check for notify-sharp
@@ -200,7 +204,7 @@ if test "$OSNAME" = "Linux" ; then
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
         if test "$log4net_dll" != "no" ; then
-            LOG4NET_LIBS = ['[$](LOG4NETLIBS)']
+            LOG4NET_LIBS=['[$](LOG4NETLIBS)']
         else
 		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
         fi
@@ -229,53 +233,94 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
 
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
-	GUISUBDIRS=CmisSync
+    GUISUBDIRS=CmisSync
     enable_gtkui=yes
+	cocoa=false
+	macos=false
     OSOK=yes
+    PACKAGE_TARGET=debian-package
 fi
 
 if test "$OSNAME" = "Darwin" ; then
-    AC_MSG_RESULT([Building on OSX])
+	AC_MSG_RESULT([Building on OSX])
 
 	AC_SUBST(NOTIFY_SHARP_LIBS)
 
-    dnl check for log4net
+	dnl check for log4net
+        LOG4NET_LIBS=
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
-        if test "$log4net_dll" != "no" ; then
-            LOG4NET_LIBS='[$](LOG4NETLIBS)'
+        if test "x$log4net_dll" != "xno" ; then
+            LOG4NET_LIBS=$LOG4NETLIBS
         else
-		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+            AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
         fi
 	fi
 	AC_SUBST(LOG4NET_LIBS)
-
-	APPINDICATOR_REQUIRED=0.0.7
-	if test x$enable_appindicator = xauto ; then
-			PKG_CHECK_EXISTS([appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED],
-							 enable_appindicator="yes",
-							 enable_appindicator="no")
-	fi
-
-	if test x$enable_appindicator = xyes ; then
-			PKG_CHECK_EXISTS([appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED],,
-							 AC_MSG_ERROR([appindicator-sharp-0.1 is not installed]))
-			PKG_CHECK_MODULES(APP_INDICATOR,
-							appindicator-sharp-0.1 >= $APPINDICATOR_REQUIRED)
-			AC_SUBST(APP_INDICATOR_CFLAGS)
-			AC_SUBST(APP_INDICATOR_LIBS)
-            [BUILD_DEFINES="$BUILD_DEFINES -define:HAVE_APP_INDICATOR"]
-	fi
+	
 
     AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
+    AC_SUBST(DRAWING, [-r:System.Drawing.dll])
 
-    AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
-	GUISUBDIRS=CmisSync
-    enable_gtkui=yes
+    AC_ARG_WITH([monomac],
+        AS_HELP_STRING([--with-monomac=PATH],[Specify path to MonoMac.dll]),
+            [monomac_dll=${withval}],[monomac_dll=no])
+    if test "x$monomac_dll" = "xno" ; then
+        PKG_CHECK_MODULES(MONOMAC, xammac, have_xammac=yes, have_xammac=no)
+        if test "x$have_xammac" = "xno" ; then
+            AM_CONDITIONAL([HAVE_XAMMAC], false)
+            PKG_CHECK_MODULES(MONOMAC, monomac, have_monomac=yes, have_monomac=no)
+            if test "x$have_monomac" = "xno" ; then
+                AM_CONDITIONAL([HAVE_MONOMAC], false)
+                AC_ERROR([xammac or monomac are required dependency: you need to install the appropriate lib before you can compile])
+                else
+                AM_CONDITIONAL([HAVE_MONOMAC], true)
+		AC_MSG_RESULT([HAVE_MONOMAC=true])
+            fi
+        else
+        AM_CONDITIONAL([HAVE_XAMMAC], true)
+        AM_CONDITIONAL([HAVE_MONOMAC], false)
+	AC_MSG_RESULT([HAVE_MONOMAC=false])
+        fi
+    else
+        AM_CONDITIONAL([HAVE_XAMMAC], false)
+        AM_CONDITIONAL([HAVE_MONOMAC], true)
+        AC_MSG_RESULT([HAVE_MONOMAC=true])
+        if test -f ${monomac_dll} ; then
+            case ${monomac_dll} in
+                /*)
+                AC_SUBST(MONOMAC_LIBS,[-r:${monomac_dll}])
+                AC_SUBST(MONOMAC_PATH,[${monomac_dll}])
+                ;;
+                *)
+                AC_SUBST(MONOMAC_LIBS,[[-r:\$\(top_srcdir\)/${monomac_dll}]])
+                AC_SUBST(MONOMAC_PATH,[[\$\(top_srcdir\)/${monomac_dll}]])
+                ;;
+            esac
+        else
+            AC_ERROR([${monomac_dll} not found])
+        fi
+    fi
+    AC_SUBST(MONOMAC_LIBS)
+
+    AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES} -define:__COCOA__")
+    GUISUBDIRS=CmisSync
+    enable_gtkui=no
+	cocoa=true
+	macos=true
     OSOK=yes
+    PACKAGE_TARGET=apple-package
+else
+    AM_CONDITIONAL([HAVE_XAMMAC], false)
+    AM_CONDITIONAL([HAVE_MONOMAC], false)
 fi
+
+AC_SUBST(PACKAGE_TARGET)
+
+AM_CONDITIONAL([HAVE_MAC_OS],[test x$macos = xtrue])
+AM_CONDITIONAL([__COCOA__], [test x$cocoa = xtrue])
 
 if test "$OSOK" = "no" ; then
 	GUISUBDIRS=
@@ -300,6 +345,9 @@ CmisSync/Linux/Pixmaps/Makefile
 CmisSync/Linux/Pixmaps/icons/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-dark/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
+CmisSync/Mac/Makefile
+CmisSync/Mac/Info.plist
+CmisSync/Mac/Pixmaps/Makefile
 CmisSync/TestLibrary/Makefile
 CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibraryRunner/Makefile
