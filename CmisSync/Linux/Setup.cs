@@ -339,6 +339,7 @@ namespace CmisSync {
         private void ShowAdd2Page()
         {
             CmisTreeStore cmisStore = new CmisTreeStore ();
+            Gtk.TreeView treeView = new Gtk.TreeView (cmisStore.CmisStore);
 
             bool firstRepo = true;
             List<RootFolder> repositories = new List<RootFolder>();
@@ -369,6 +370,7 @@ namespace CmisSync {
                 AsyncNodeLoader asyncLoader = new AsyncNodeLoader (root, cred, PredefinedNodeLoader.LoadSubFolderDelegate, PredefinedNodeLoader.CheckSubFolderDelegate);
                 asyncLoader.UpdateNodeEvent += delegate {
                     cmisStore.UpdateCmisTree(root);
+                    treeView.Show();
                 };
                 cmisStore.UpdateCmisTree (root);
                 asyncLoader.Load (root);
@@ -381,53 +383,106 @@ namespace CmisSync {
 
             Button cancel_button = new Button (cancelText);
             cancel_button.Clicked += delegate {
+                foreach (AsyncNodeLoader task in loader.Values)
+                    task.Cancel();
                 Controller.PageCancelled ();
             };
 
             Button continue_button = new Button (continueText)
             {
-                Sensitive = false
+                Sensitive = (repositories.Count > 0)
             };
+
             continue_button.Clicked += delegate {
-                Controller.Add2PageCompleted(
-                        Controller.saved_repository, "/", new string[]{}, new string[] {});
+                RootFolder root = repositories.Find (x => (x.Selected != false));
+                if (root != null)
+                {
+                    foreach (AsyncNodeLoader task in loader.Values)
+                        task.Cancel();
+                    Controller.saved_repository = root.Id;
+                    List<string> ignored = NodeModelUtils.GetIgnoredFolder(root);
+                    List<string> selected = NodeModelUtils.GetSelectedFolder(root);
+                    Controller.Add2PageCompleted (root.Id, root.Path, ignored.ToArray(), selected.ToArray());
+                }
             };
 
             Button back_button = new Button (backText)
             {
                 Sensitive = true
             };
+
             back_button.Clicked += delegate {
+                foreach (AsyncNodeLoader task in loader.Values)
+                    task.Cancel();
                 Controller.BackToPage1();
             };
 
             Gtk.TreeIter iter;
-            Gtk.TreeView treeView = new Gtk.TreeView (cmisStore.CmisStore);
             treeView.HeadersVisible = false;
             treeView.Selection.Mode = SelectionMode.Single;
-            treeView.AppendColumn("Name", new CellRendererText(), "text", 0);
-            treeView.CursorChanged += delegate(object o, EventArgs args) {
-                TreeSelection selection = (o as TreeView).Selection;
-                TreeModel model;
-                if (selection.GetSelected(out model, out iter)) {
-                    Node node = model.GetValue(iter, 1) as Node;
-                    Node parent = node;
-                    while (parent.Parent != null)
-                    {
-                        parent = parent.Parent;
-                    }
-                    RootFolder root = parent as RootFolder;
 
-                    Controller.saved_remote_path = root.Address;
-                    Controller.saved_repository = root.Id;
-
-                    loader[root.Id].Load(node);
-
-                    continue_button.Sensitive = true;
-                    continue_button.SetFlag(Gtk.WidgetFlags.CanFocus);
-                    continue_button.SetFlag(Gtk.WidgetFlags.CanDefault);
-                    continue_button.GrabDefault();
+            TreeViewColumn column = new TreeViewColumn ();
+            column.Title = "Name";
+            CellRendererToggle renderToggle = new CellRendererToggle ();
+            column.PackStart (renderToggle, false);
+            renderToggle.Activatable = true;
+            column.AddAttribute (renderToggle, "active", (int)CmisTreeStore.Column.ColumnSelected);
+            column.AddAttribute (renderToggle, "inconsistent", (int)CmisTreeStore.Column.ColumnSelectedThreeState);
+            column.AddAttribute (renderToggle, "radio", (int)CmisTreeStore.Column.ColumnRoot);
+            renderToggle.Toggled += delegate (object render, ToggledArgs args) {
+                TreeIter iterToggled;
+                if (! cmisStore.CmisStore.GetIterFromString (out iterToggled, args.Path))
+                {
+                    Console.WriteLine("Toggled GetIter Error " + args.Path);
+                    return;
                 }
+
+                Node node = cmisStore.CmisStore.GetValue(iterToggled,(int)CmisTreeStore.Column.ColumnNode) as Node;
+                if (node == null)
+                {
+                    Console.WriteLine("Toggled GetValue Error " + args.Path);
+                    return;
+                }
+
+                RootFolder selectedRoot = repositories.Find (x => (x.Selected != false));
+                Node parent = node;
+                while (parent.Parent != null)
+                {
+                    parent = parent.Parent;
+                }
+                RootFolder root = parent as RootFolder;
+                if (root != selectedRoot)
+                {
+                    selectedRoot.Selected = false;
+                    cmisStore.UpdateCmisTree(selectedRoot);
+                }
+
+                if (node.Selected == false)
+                {
+                    node.Selected = true;
+                }
+                else
+                {
+                    node.Selected = false;
+                }
+                cmisStore.UpdateCmisTree(root);
+            };
+            CellRendererText renderText = new CellRendererText ();
+            column.PackStart (renderText, false);
+            column.SetAttributes (renderText, "text", (int)CmisTreeStore.Column.ColumnName);
+            treeView.AppendColumn (column);
+
+            treeView.AppendColumn ("Status", new CellRendererText (), "text", (int)CmisTreeStore.Column.ColumnStatus);
+
+            treeView.RowExpanded += delegate (object o, RowExpandedArgs args) {
+                Node node = cmisStore.CmisStore.GetValue(args.Iter, (int)CmisTreeStore.Column.ColumnNode) as Node;
+                Node parent = node;
+                while (parent.Parent != null)
+                {
+                    parent = parent.Parent;
+                }
+                RootFolder root = parent as RootFolder;
+                loader[root.Id].Load(node);
             };
 
             ScrolledWindow sw = new ScrolledWindow() {
