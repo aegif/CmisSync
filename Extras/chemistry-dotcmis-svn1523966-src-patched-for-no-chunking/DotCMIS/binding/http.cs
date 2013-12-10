@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -162,14 +162,9 @@ namespace DotCMIS.Binding.Impl
                 // send data
                 if (writer != null)
                 {
-                    //Write to memory stream
-                    MemoryStream memoryStream = new MemoryStream();
-                    writer(memoryStream);
-                    memoryStream.Position = 0;
-                    conn.ContentLength = memoryStream.Length;
+                    conn.AllowWriteStreamBuffering = true;
                     Stream requestStream = conn.GetRequestStream();
-                    StreamCopy(memoryStream, requestStream);
-                    memoryStream.Close();
+                    writer(requestStream);
                     requestStream.Close();
                 }
                 else
@@ -206,16 +201,6 @@ namespace DotCMIS.Binding.Impl
             catch (Exception e)
             {
                 throw new CmisConnectionException("Cannot access " + url + ": " + e.Message, e);
-            }
-        }
-
-        private static void StreamCopy(Stream input, Stream output)
-        {
-            byte[] buffer = new byte[short.MaxValue];
-            int read;
-            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                output.Write(buffer, 0, read);
             }
         }
 
