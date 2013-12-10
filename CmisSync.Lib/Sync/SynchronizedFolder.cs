@@ -443,7 +443,7 @@ namespace CmisSync.Lib.Sync
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
                         string localSubFolder = Path.Combine(localFolder, cmisObject.Name);
-                        if (Utils.WorthSyncing(localSubFolder) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                        if (Utils.WorthSyncing(localFolder, remoteSubFolder.Name, repoinfo))
                         {
                             try
                             {
@@ -467,7 +467,7 @@ namespace CmisSync.Lib.Sync
                     }
                     else if (cmisObject is DotCMIS.Client.Impl.Document)
                     {
-                        if (Utils.WorthSyncing(cmisObject.Name))
+                        if (Utils.WorthSyncing(localFolder, cmisObject.Name, repoinfo))
                         {
                             // It is a file, just download it.
                             DownloadFile((IDocument)cmisObject, localFolder);
@@ -701,7 +701,7 @@ namespace CmisSync.Lib.Sync
                     // Upload each file in this folder.
                     foreach (string file in Directory.GetFiles(localFolder))
                     {
-                        if (Utils.WorthSyncing(file))
+                        if (Utils.WorthSyncing(localFolder, Path.GetFileName(file), repoinfo))
                         {
                             UploadFile(file, folder);
                         }
@@ -710,9 +710,7 @@ namespace CmisSync.Lib.Sync
                     // Recurse for each subfolder in this folder.
                     foreach (string subfolder in Directory.GetDirectories(localFolder))
                     {
-                        string path = subfolder.Substring(repoinfo.TargetDirectory.Length);
-                        path = path.Replace("\\\\", "/");
-                        if (Utils.WorthSyncing(subfolder) && !repoinfo.isPathIgnored(path))
+                        if (Utils.WorthSyncing(localFolder, Path.GetFileName(subfolder), repoinfo))
                         {
                             UploadFolderRecursively(folder, subfolder);
                         }

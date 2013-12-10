@@ -5,6 +5,7 @@ using System.Text;
 using log4net;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Reflection;
 #if __MonoCS__
 //using Mono.Unix.Native;
 #endif
@@ -69,85 +70,6 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// <para>Creates a log-string from the Exception.</para>
-        /// <para>The result includes the stacktrace, innerexception et cetera, separated by <seealso cref="Environment.NewLine"/>.</para>
-        /// <para>Code from http://www.extensionmethod.net/csharp/exception/tologstring</para>
-        /// </summary>
-        /// <param name="ex">The exception to create the string from.</param>
-        /// <returns></returns>
-        public static string ToLogString(this Exception ex)
-        {
-            StringBuilder msg = new StringBuilder();
- 
-            if (ex != null)
-            {
-                try
-                {
-                    string newline = Environment.NewLine;
-
-                    Exception orgEx = ex;
- 
-                    msg.Append("Exception:");
-        
-                    msg.Append(newline);
-                    while (orgEx != null)
-                    {
-                        msg.Append(orgEx.Message);
-                        msg.Append(newline);
-                        orgEx = orgEx.InnerException;
-                    }
- 
-                    if (ex.Data != null)
-                    {
-                        foreach (object i in ex.Data)
-                        {
-                            msg.Append("Data :");
-                            msg.Append(i.ToString());
-                            msg.Append(newline);
-                        }
-                    }
- 
-                    if (ex.StackTrace != null)
-                    {
-                        msg.Append("StackTrace:");
-                        msg.Append(newline);
-                        msg.Append(ex.StackTrace);
-                        msg.Append(newline);
-                    }
- 
-                    if (ex.Source != null)
-                    {
-                        msg.Append("Source:");
-                        msg.Append(newline);
-                        msg.Append(ex.Source);
-                        msg.Append(newline);
-                    }
- 
-                    if (ex.TargetSite != null)
-                    {
-                        msg.Append("TargetSite:");
-                        msg.Append(newline);
-                        msg.Append(ex.TargetSite.ToString());
-                        msg.Append(newline);
-                    }
- 
-                    Exception baseException = ex.GetBaseException();
-                    if (baseException != null)
-                    {
-                        msg.Append("BaseException:");
-                        msg.Append(newline);
-                        msg.Append(ex.GetBaseException());
-                    }
-                }
-                finally
-                {
-                }
-            }
-            return msg.ToString();
-        }
-
-
-        /// <summary>
         /// Names of files that must be excluded from synchronization.
         /// </summary>
         private static HashSet<String> ignoredFilenames = new HashSet<String>{
@@ -189,35 +111,145 @@ namespace CmisSync.Lib
             ".oris4" // Oris4
         };
 
-
         /// <summary>
-        /// Check whether the file is worth syncing or not.
+        /// Check whether the filename is worth syncing or not.
         /// Files that are not worth syncing include temp files, locks, etc.
         /// </summary>
-        public static Boolean WorthSyncing(string filename)
+        private static bool IsFilenameWorthSyncing(string localDirectory, string filename)
         {
             if (null == filename)
             {
                 return false;
             }
 
-            if (Path.IsPathRooted(filename))
-            {
-                filename = Path.GetFileName(filename);
-            }
-
             filename = filename.ToLower();
 
-            if (ignoredFilenames.Contains(filename)
-                || ignoredExtensions.Contains(Path.GetExtension(filename))
-                || ignoredFilenamesRegex.IsMatch(filename) ) 
+            if (ignoredFilenames.Contains(filename) ||
+                ignoredFilenamesRegex.IsMatch(filename))
             {
-                Logger.Debug("Unworth syncing: " + filename);
+                Logger.DebugFormat("Skipping {0}: ignored file", filename);
                 return false;
             }
 
-            //Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
+            if (ignoredExtensions.Contains(Path.GetExtension(filename)))
+            {
+                Logger.DebugFormat("Skipping {0}: ignored file extension", filename);
+                return false;
+            }
+
+            //Check filename length
+            String fullPath = Path.Combine(localDirectory, filename);
+
+            // reflection
+            FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
+                BindingFlags.Static |
+                BindingFlags.GetField |
+                BindingFlags.NonPublic);
+
+            if (fullPath.Length > (int)maxPathField.GetValue(null))
+            {
+                Logger.DebugFormat("Skipping {0}: path too long", fullPath);
+                return false;
+            }
+
             return true;
+        }
+
+
+        /// <summary>
+        /// Check whether the directory is worth syncing or not.
+        /// Directories that are not worth syncing include ignored, system, and hidden folders.
+        /// </summary>
+        private static bool IsDirectoryWorthSyncing(string localDirectory, RepoInfo repoInfo)
+        {
+            if (!localDirectory.StartsWith(repoInfo.TargetDirectory))
+            {
+                Logger.WarnFormat("Local directory is outside repo target directory.  local={0}, repo={1}", localDirectory, repoInfo.TargetDirectory);
+                return false;
+            }
+
+            //Check for ignored path...
+            string path = localDirectory.Substring(repoInfo.TargetDirectory.Length).Replace("\\", "/");
+            if (repoInfo.isPathIgnored(path))
+            {
+                Logger.DebugFormat("Skipping {0}: hidden folder", localDirectory);
+                return false;
+            }
+
+            //Check system/hidden
+            DirectoryInfo directoryInfo = new DirectoryInfo(localDirectory);
+            if (directoryInfo.Exists)
+            {
+                if (directoryInfo.Attributes.HasFlag(FileAttributes.Hidden))
+                {
+                    Logger.DebugFormat("Skipping {0}: hidden folder", localDirectory);
+                    return false;
+                }
+                if (directoryInfo.Attributes.HasFlag(FileAttributes.System))
+                {
+                    Logger.DebugFormat("Skipping {0}: system folder", localDirectory);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check whether the file is worth syncing or not.
+        /// Files that are not worth syncing include blank, .
+        /// </summary>
+        private static bool IsFileWorthSyncing(string filepath, RepoInfo repoInfo)
+        {
+            if (File.Exists(filepath))
+            {
+                bool allowBlankFiles = false; //TODO: add a preference repoInfo.allowBlankFiles
+                bool limitFilesize = true; //TODO: add preference for filesize limiting
+                long filesizeLimit = 256 * 1024 * 1024; //TODO: add a preference for filesize limit?
+
+                FileInfo fileInfo = new FileInfo(filepath);
+
+                //Check permissions
+                if (fileInfo.Attributes.HasFlag(FileAttributes.Hidden))
+                {
+                    Logger.DebugFormat("Skipping {0}: hidden file", filepath);
+                    return false;
+                }
+                if (fileInfo.Attributes.HasFlag(FileAttributes.System))
+                {
+                    Logger.DebugFormat("Skipping {0}: system file", filepath);
+                    return false;
+                }
+
+                //Check filesize
+                if (!allowBlankFiles && fileInfo.Length <= 0)
+                {
+                    Logger.DebugFormat("Skipping {0}: blank file", filepath);
+                    return false;
+                }
+                if (limitFilesize && fileInfo.Length > filesizeLimit)
+                {
+                    Logger.DebugFormat("Skipping {0}: file too large {1}mb", filepath, fileInfo.Length / (1024f * 1024f));
+                    return false;
+                }
+
+            }
+            else if (Directory.Exists(filepath))
+            {
+                return IsDirectoryWorthSyncing(filepath, repoInfo);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Check whether the file is worth syncing or not.
+        /// Files that are not worth syncing include temp files, locks, etc.
+        /// </summary>
+        public static Boolean WorthSyncing(string localDirectory, string filename, RepoInfo repoInfo)
+        {
+            return IsFilenameWorthSyncing(localDirectory, filename) &&
+                IsDirectoryWorthSyncing(localDirectory, repoInfo) &&
+                IsFileWorthSyncing(Path.Combine(localDirectory, filename), repoInfo);
         }
 
 
@@ -227,7 +259,8 @@ namespace CmisSync.Lib
         public static bool IsInvalidFileName(string name)
         {
             bool ret = invalidFileNameRegex.IsMatch(name);
-            if (ret) {
+            if (ret)
+            {
                 Logger.Debug("Invalid filename: " + name);
             }
             return ret;
@@ -247,7 +280,8 @@ namespace CmisSync.Lib
         public static bool IsInvalidFolderName(string name)
         {
             bool ret = invalidFolderNameRegex.IsMatch(name);
-            if (ret) {
+            if (ret)
+            {
                 Logger.Debug("Invalid dirname: " + name);
             }
             return ret;

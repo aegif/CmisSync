@@ -125,7 +125,7 @@ namespace CmisSync.Lib.Sync
 
                 try
                 {
-                    if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                    if (Utils.WorthSyncing(localFolder, remoteSubFolder.Name, repoinfo))
                     {
                         //Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
                         remoteFolders.Add(remoteSubFolder.Name);
@@ -160,29 +160,15 @@ namespace CmisSync.Lib.Sync
                             else
                             {
                                 // The folder has been recently created on server, so download it.
+                                Directory.CreateDirectory(localSubFolder);
 
-                                // Skip if invalid folder name. See https://github.com/nicolas-raoul/CmisSync/issues/196
-                                if (Utils.IsInvalidFileName(remoteSubFolder.Name))
-                                {
-                                    Logger.Info("Skipping download of folder with illegal name: " + remoteSubFolder.Name);
-                                }
-                                else if (repoinfo.isPathIgnored(remoteSubFolder.Path))
-                                {
-                                    Logger.Info("Skipping dowload of ignored folder: " + remoteSubFolder.Name);
-                                }
-                                else
-                                {
-                                    // Create local folder.remoteDocument.Name
-                                    Directory.CreateDirectory(localSubFolder);
+                                // Create database entry for this folder.
+                                // TODO - Yannick - Add metadata
+                                database.AddFolder(localSubFolder, remoteSubFolder.LastModificationDate);
+                                Logger.Info("Added folder to database: " + localSubFolder);
 
-                                    // Create database entry for this folder.
-                                    // TODO - Yannick - Add metadata
-                                    database.AddFolder(localSubFolder, remoteSubFolder.LastModificationDate);
-                                    Logger.Info("Added folder to database: " + localSubFolder);
-
-                                    // Recursive copy of the whole folder.
-                                    RecursiveFolderCopy(remoteSubFolder, localSubFolder);
-                                }
+                                // Recursive copy of the whole folder.
+                                RecursiveFolderCopy(remoteSubFolder, localSubFolder);
                             }
                         }
                     }
@@ -203,7 +189,7 @@ namespace CmisSync.Lib.Sync
 
                 try
                 {
-                    if (Utils.WorthSyncing(remoteDocument.Name))
+                    if (Utils.WorthSyncing(localFolder, remoteDocument.Name, repoinfo))
                     {
                         // We use the filename of the document's content stream.
                         // This can be different from the name of the document.
@@ -326,7 +312,7 @@ namespace CmisSync.Lib.Sync
                 {
                     string fileName = Path.GetFileName(filePath);
 
-                    if (Utils.WorthSyncing(fileName))
+                    if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoinfo))
                     {
                         if (!remoteFiles.Contains(fileName))
                         {
@@ -341,10 +327,7 @@ namespace CmisSync.Lib.Sync
                                     {
                                         // Local file was updated, sync up.
                                         Logger.Info("Uploading locally edited remotely removed file from the repository: " + filePath);
-                                        if (Utils.WorthSyncing(filePath))
-                                        {
-                                            UploadFile(filePath, remoteFolder);
-                                        }
+                                        UploadFile(filePath, remoteFolder);
                                     }
                                     else
                                     {
@@ -375,10 +358,7 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // New file, sync up.
                                     Logger.Info("Uploading file absent on repository: " + filePath);
-                                    if (Utils.WorthSyncing(filePath))
-                                    {
-                                        UploadFile(filePath, remoteFolder);
-                                    }
+                                    UploadFile(filePath, remoteFolder);
                                 }
                             }
                         }
@@ -436,9 +416,8 @@ namespace CmisSync.Lib.Sync
                 sleepWhileSuspended();
                 try
                 {
-                    string path = localSubFolder.Substring(repoinfo.TargetDirectory.Length).Replace("\\", "/");
                     string folderName = Path.GetFileName(localSubFolder);
-                    if (Utils.WorthSyncing(folderName) && !repoinfo.isPathIgnored(path))
+                    if (Utils.WorthSyncing(Path.GetDirectoryName(localSubFolder), folderName, repoinfo))
                     {
                         if (!remoteFolders.Contains(folderName))
                         {

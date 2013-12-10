@@ -28,18 +28,18 @@ namespace CmisSync.Lib.Sync
                     string pathname = earliestChange.Item1;
                     Watcher.ChangeTypes change = earliestChange.Item2;
 
-                    string name = Path.GetFileName(pathname);
-                    if (!Utils.WorthSyncing(name))
-                    {
-                        continue;
-                    }
-
                     if (!pathname.StartsWith(localFolder))
                     {
                         Debug.Assert(false, String.Format("Invalid pathname {0} for target {1}.", pathname, localFolder));
                     }
 
                     if (pathname == localFolder)
+                    {
+                        continue;
+                    }
+
+                    string name = Path.GetFileName(pathname);
+                    if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), name, repoinfo))
                     {
                         continue;
                     }
@@ -120,11 +120,6 @@ namespace CmisSync.Lib.Sync
 
                     if (Directory.Exists(pathname))
                     {
-                        if (repoinfo.isPathIgnored(remoteName))
-                        {
-                            return;
-                        }
-
                         if (database.ContainsFolder(pathname))
                         {
                             Logger.Info(String.Format("Database exists for {0}, ignore for the update action", pathname));
