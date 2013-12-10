@@ -47,7 +47,7 @@ namespace TestLibrary
             Assert.AreEqual(path, conflictFilePath, "There is no testfile.txt but another conflict file is created");
             for (int i = 0; i < 10; i++)
             {
-                File.Create(conflictFilePath);
+                using (FileStream s = File.Create(conflictFilePath)){};
                 conflictFilePath = Utils.FindNextConflictFreeFilename(path, user);
                 Assert.AreNotEqual(path, conflictFilePath, "The conflict file must differ from original file");
                 Assert.True(conflictFilePath.Contains(user), "The username should be added to the conflict file name");
