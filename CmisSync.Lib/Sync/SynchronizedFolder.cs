@@ -943,7 +943,7 @@ namespace CmisSync.Lib.Sync
                                     //String filename = Path.GetFileNameWithoutExtension(filePath);
                                     String dir = Path.GetDirectoryName(filepath);
 
-                                    String newFileName = Utils.SuffixIfExists(Path.GetFileNameWithoutExtension(filepath) + "_" + repoinfo.User + "-version");
+                                    String newFileName = Utils.FindNextConflictFreeFilename(filepath, repoinfo.User);
                                     String newFilePath = Path.Combine(dir, newFileName);
                                     Logger.Debug(String.Format("Moving local file {0} file to new file {1}", filepath, newFilePath));
                                     File.Move(filepath, newFilePath);
