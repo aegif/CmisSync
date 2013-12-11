@@ -155,9 +155,10 @@ namespace CmisSync
             CellRendererText renderText = new CellRendererText ();
             column.PackStart (renderText, false);
             column.SetAttributes (renderText, "text", (int)CmisTreeStore.Column.ColumnName);
+            column.Expand = true;
             treeView.AppendColumn (column);
 
-            treeView.AppendColumn ("Status", new CellRendererText (), "text", (int)CmisTreeStore.Column.ColumnStatus);
+            treeView.AppendColumn ("Status", new StatusCellRenderer (), "text", (int)CmisTreeStore.Column.ColumnStatus);
 
             treeView.RowExpanded += delegate (object o, RowExpandedArgs args) {
                 Node node = cmisStore.CmisStore.GetValue(args.Iter, (int)CmisTreeStore.Column.ColumnNode) as Node;

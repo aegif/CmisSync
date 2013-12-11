@@ -25,6 +25,7 @@ SOURCES =  \
 	About.cs \
 	CertPolicyWindow.cs \
 	CmisTree/CmisTreeStore.cs \
+	CmisTree/StatusCellRenderer.cs \
 	Controller.cs \
 	Edit.cs \
 	Setup.cs \

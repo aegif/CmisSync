@@ -98,6 +98,7 @@
       <Link>CmisTree\NodeModelUtils.cs</Link>
     </Compile>
     <Compile Include="CmisTree\CmisTreeStore.cs" />
+    <Compile Include="CmisTree\StatusCellRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
