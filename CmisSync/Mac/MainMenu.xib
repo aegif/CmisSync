@@ -89,6 +89,6 @@
             </items>
         </menu>
         <customObject id="420" customClass="NSFontManager"/>
-        <customObject id="533" customClass="AppDelegate"/>
+        <customObject id="533"/>
     </objects>
 </document>
