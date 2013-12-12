@@ -40,8 +40,8 @@ echo "$device"
 mkdir "/Volumes/$title/.background"
 
 cp "../CmisSync/Mac/Pixmaps/dmgBackground.png" "/Volumes/$title/.background/"
-cp "../CmisSync/Mac/Pixmaps/$volumeIcon" "/Volumes/$title/.VolumeIcon.icns"
-SetFile -c icnC "/Volumes/$title/.VolumeIcon.icns"
+#cp "../CmisSync/Mac/Pixmaps/$volumeIcon" "/Volumes/$title/.VolumeIcon.icns"
+#SetFile -c icnC "/Volumes/$title/.VolumeIcon.icns"
 SetFile -a C "/Volumes/$title"
 
 echo '
@@ -57,8 +57,8 @@ echo '
            set icon size of theViewOptions to 72
            set background picture of theViewOptions to file ".background:'${backgroundPictureName}'"
            make new alias file at container window to POSIX file "/Applications" with properties {name:"Applications"}
-           set position of item "'${applicationName}'" of container window to {100, 100}
-           set position of item "Applications" of container window to {375, 100}
+           set position of item "'${applicationName}'" of container window to {150, 125}
+           set position of item "Applications" of container window to {325, 125}
            close
            open
            update without registering applications

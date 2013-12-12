@@ -79,6 +79,12 @@ namespace CmisSync {
         {
             string bookmarks_file_path   = Path.Combine (
                     Environment.GetFolderPath (Environment.SpecialFolder.Personal), ".gtk-bookmarks");
+            // newer nautilus version using a different path then older ones
+            string bookmarks_file_path_gtk3 = Path.Combine (
+                    Environment.GetFolderPath (Environment.SpecialFolder.Personal), ".config", "gtk-3.0" ,"bookmarks");
+            // if the new path is found, take the new one, otherwise the old one
+            if(File.Exists(bookmarks_file_path_gtk3))
+                bookmarks_file_path = bookmarks_file_path_gtk3;
             string cmissync_bookmark = "file://" + FoldersPath.Replace(" ", "%20");
 
             if (File.Exists (bookmarks_file_path)) {

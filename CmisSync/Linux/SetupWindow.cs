@@ -47,7 +47,7 @@ namespace CmisSync {
         {
             Title          = Catalog.GetString ("DataSpace Sync Setup");
             BorderWidth    = 0;
-            IconName       = "folder-cmissync";
+            IconName       = "app-cmissync";
             Resizable      = false;
             WindowPosition = WindowPosition.Center;
             Deletable      = false;
