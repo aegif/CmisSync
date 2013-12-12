@@ -60,6 +60,7 @@ namespace CmisSync {
         private CmisOutlineController OutlineController;
         private CmisTreeDataSource DataSource;
         private OutlineViewDelegate DataDelegate;
+        Dictionary<string,AsyncNodeLoader> Loader;
 
 
         public Setup () : base ()
@@ -267,6 +268,18 @@ namespace CmisSync {
             Buttons.Add(CancelButton);
         }
 
+        void CheckAddressTextField()
+        {
+            InvokeOnMainThread(delegate
+            {
+                string error = Controller.CheckAddPage(AddressTextField.StringValue);
+                if (String.IsNullOrEmpty(error))
+                    AddressHelpLabel.StringValue = "";
+                else
+                    AddressHelpLabel.StringValue = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+            });
+        }
+
         void ShowLoginPage()
         {
             Header = CmisSync.Properties_Resources.Where;
@@ -339,17 +352,7 @@ namespace CmisSync {
             CancelButton = new NSButton() {
                 Title = Properties_Resources.Cancel
             };
-            (AddressTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate
-            {
-                InvokeOnMainThread(delegate
-                {
-                    string error = Controller.CheckAddPage(AddressTextField.StringValue);
-                    if (String.IsNullOrEmpty(error))
-                        AddressHelpLabel.StringValue = "";
-                    else
-                        AddressHelpLabel.StringValue = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                });
-            };
+            (AddressTextField.Delegate as TextFieldDelegate).StringValueChanged += CheckAddressTextField;
             ContinueButton.Activated += delegate
             {
                 ServerCredentials credentials = null;
@@ -411,7 +414,7 @@ namespace CmisSync {
             Description = "";
             bool firstRepo = true;
             Repositories = new List<RootFolder>();
-            Dictionary<string,AsyncNodeLoader> loader = new Dictionary<string,AsyncNodeLoader> ();
+            Loader = new Dictionary<string,AsyncNodeLoader> ();
             foreach (KeyValuePair<String, String> repository in Controller.repositories)
             {
                 RootFolder repo = new RootFolder() {
@@ -447,7 +450,7 @@ namespace CmisSync {
                     });
                 };
                 asyncLoader.Load(repo);
-                loader.Add(repo.Id, asyncLoader);
+                Loader.Add(repo.Id, asyncLoader);
             }
             DataSource = new CmisTree.CmisTreeDataSource(Repositories);
             DataSource.SelectedEvent += delegate (NSCmisTree cmis, int selected) {
@@ -527,7 +530,7 @@ namespace CmisSync {
                         Console.WriteLine("ItemExpanded find node Error");
                         return;
                     }
-                    loader[root.Id].Load(node);
+                    Loader[root.Id].Load(node);
                 });
             };
             ContinueButton.Activated += delegate
@@ -541,7 +544,7 @@ namespace CmisSync {
                     RootFolder root = Repositories.Find(x=>(x.Selected != false));
                     if (root != null)
                     {
-                        foreach (AsyncNodeLoader task in loader.Values)
+                        foreach (AsyncNodeLoader task in Loader.Values)
                             task.Cancel();
                         Controller.saved_repository = root.Id;
                         List<string> ignored = NodeModelUtils.GetIgnoredFolder(root);
@@ -554,7 +557,7 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate
                 {
-                    foreach (AsyncNodeLoader task in loader.Values)
+                    foreach (AsyncNodeLoader task in Loader.Values)
                         task.Cancel();
                     Controller.PageCancelled();
                 });
@@ -563,7 +566,7 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate
                 {
-                    foreach (AsyncNodeLoader task in loader.Values)
+                    foreach (AsyncNodeLoader task in Loader.Values)
                         task.Cancel();
                     Controller.BackToPage1();
                 });
