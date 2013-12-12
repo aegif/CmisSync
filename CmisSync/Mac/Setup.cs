@@ -108,6 +108,12 @@ namespace CmisSync {
             };
 
             Controller.LocalPathExists += LocalPathExistsHandler;
+
+            Controller.UpdateProgressBarEvent += delegate(double percentage) {
+                InvokeOnMainThread(delegate {
+                    ProgressIndicator.DoubleValue = percentage;
+                });
+            };
         }
 
         private void ShowWelcomePage()
@@ -583,13 +589,6 @@ namespace CmisSync {
                 DoubleValue = Controller.ProgressBarPercentage
             };
             ProgressIndicator.StartAnimation(this);
-            Controller.UpdateProgressBarEvent += delegate(double percentage)
-            {
-                InvokeOnMainThread(delegate 
-                {
-                    ProgressIndicator.DoubleValue = percentage;
-                });
-            };
             ContentView.AddSubview(ProgressIndicator);
         }
 
