@@ -236,6 +236,7 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// Some file activity has been detected, sync changes.
+        /// TODO is this used?
         /// </summary>
         public void OnFileActivity(object sender, FileSystemEventArgs args)
         {
@@ -244,15 +245,6 @@ namespace CmisSync.Lib
             this.Watcher.EnableEvent = false;
             // TODO
             this.Watcher.EnableEvent = true;
-        }
-
-
-        /// <summary>
-        /// A conflict has been resolved.
-        /// </summary>
-        protected internal void OnConflictResolved()
-        {
-            // ConflictResolved(); TODO
         }
 
 

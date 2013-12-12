@@ -252,6 +252,16 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Remove a synchronized folder from the configuration.
+        /// </summary>
+        public void RemoveFolder(string repoName)
+        {
+            this.configXml.Folders.Remove(getFolder(repoName));
+            Save();
+        }
+
+
+        /// <summary>
         /// Get the configured path to the log file.
         /// </summary>
         public string GetLogFilePath()
