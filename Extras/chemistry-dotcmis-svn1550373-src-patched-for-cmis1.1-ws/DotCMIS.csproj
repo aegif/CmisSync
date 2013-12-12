@@ -91,6 +91,11 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="dotcmis.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\CMISWebServicesReference\" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="Service References\CMISWebServicesReference\CMIS-Core.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -98,6 +103,12 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\CMISWebServicesReference\CMISWebServices.wsdl" />
+    <None Include="Service References\CMISWebServicesReference\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\CMISWebServicesReference\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="Service References\CMISWebServicesReference\DotCMIS.CMISWebServicesReference.cmisACLType.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -108,6 +119,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CMISWebServicesReference\DotCMIS.CMISWebServicesReference.cmisExtensionType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CMISWebServicesReference\DotCMIS.CMISWebServicesReference.cmisObjectIdAndChangeTokenType.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CMISWebServicesReference\DotCMIS.CMISWebServicesReference.cmisObjectInFolderContainerType.datasource">
@@ -149,17 +163,6 @@
     <None Include="Service References\CMISWebServicesReference\DotCMIS.CMISWebServicesReference.deleteTreeResponseFailedToDelete.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\CMISWebServicesReference\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\CMISWebServicesReference\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\CMISWebServicesReference\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Service References\CMISWebServicesReference\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
