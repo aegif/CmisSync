@@ -1,4 +1,4 @@
-using CmisSync.Lib.Cmis;
+﻿using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Events;
 using DotCMIS.Client.Impl;
 using DotCMIS.Client;
@@ -662,7 +662,7 @@ namespace CmisSync.Lib.Sync
                                 Logger.Info("Downloading modified file: " + fileName);
                                 success = DownloadFile(remoteDocument, localFolder);
                             }
-                            else if(serverSideModificationDate == lastDatabaseUpdate)
+                            else if (serverSideModificationDate == lastDatabaseUpdate)
                             {
                                 //  check chunked upload
                                 FileInfo fileInfo = new FileInfo(filePath);
@@ -670,6 +670,10 @@ namespace CmisSync.Lib.Sync
                                 {
                                     success = ResumeUploadFile(filePath, remoteDocument);
                                 }
+                            }
+                            else
+                            {
+                                UpdateFile(filePath, remoteDocument);
                             }
                         }
                     }
@@ -1100,8 +1104,8 @@ namespace CmisSync.Lib.Sync
                             using (Stream file = File.OpenRead(filePath))
                             {
                                 //  disable the chunk upload
-                                //if (repoinfo.ChunkSize <= 0 || file.Length <= repoinfo.ChunkSize)
-                                //{
+                                if (repoinfo.ChunkSize <= 0 || file.Length <= repoinfo.ChunkSize)
+                                {
                                     using (SHA1 hashAlg = new SHA1Managed())
                                     using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                                     using(LoggingStream logstream = new LoggingStream(hashstream, "Upload progress", fileName, file.Length))
@@ -1140,32 +1144,32 @@ namespace CmisSync.Lib.Sync
                                             throw;
                                         }
                                     }
-                                //}
-                                //else
-                                //{
-                                //    filehash = new SHA1Managed().ComputeHash(file);
-                                //    file.Position = 0;
+                                }
+                                else
+                                {
+                                    filehash = new SHA1Managed().ComputeHash(file);
+                                    file.Position = 0;
 
-                                //    ContentStream contentStream = new ContentStream();
-                                //    contentStream.FileName = fileName;
-                                //    contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                                //    contentStream.Length = 0;
-                                //    contentStream.Stream = new MemoryStream(0);
-                                //    Logger.Debug("CMIS::CreateDocument()");
-                                //    lock (disposeLock)
-                                //    {
-                                //        if (disposed)
-                                //        {
-                                //            throw new ObjectDisposedException("Uploading");
-                                //        }
-                                //        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                                //        Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
-                                //                                       remoteDocument.Id, fileName));
-                                //        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
-                                //        database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
-                                //    }
-                                //    success = UploadStreamInTrunk(filePath, file, remoteDocument);
-                                //}
+                                    ContentStream contentStream = new ContentStream();
+                                    contentStream.FileName = fileName;
+                                    contentStream.MimeType = MimeType.GetMIMEType(fileName);
+                                    contentStream.Length = 0;
+                                    contentStream.Stream = new MemoryStream(0);
+                                    Logger.Debug("CMIS::CreateDocument()");
+                                    lock (disposeLock)
+                                    {
+                                        if (disposed)
+                                        {
+                                            throw new ObjectDisposedException("Uploading");
+                                        }
+                                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                                        Logger.Debug(String.Format("CMIS::Document Id={0} Name={1}",
+                                                                       remoteDocument.Id, fileName));
+                                        Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
+                                        database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                                    }
+                                    success = UploadStreamInTrunk(filePath, file, remoteDocument);
+                                }
                             }
                         }
                         catch (Exception e)
