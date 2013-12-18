@@ -445,24 +445,7 @@ namespace CmisSync.Lib.Sync
                         string localSubFolder = Path.Combine(localFolder, cmisObject.Name);
                         if (Utils.WorthSyncing(localFolder, remoteSubFolder.Name, repoinfo))
                         {
-                            try
-                            {
-                                // Create local folder.
-                                Directory.CreateDirectory(localSubFolder);
-                            }
-                            catch (Exception e)
-                            {
-                                ProcessRecoverableException("Could not create directory: " + localSubFolder, e);
-                                continue;
-                            }
-
-                            // Create database entry for this folder
-                            // TODO Add metadata
-                            database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
-                            Logger.Info("Added folder to database: " + localSubFolder);
-
-                            // Recurse into folder.
-                            RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                            DownloadDirectory(remoteSubFolder, localSubFolder);
                         }
                     }
                     else if (cmisObject is DotCMIS.Client.Impl.Document)
@@ -478,6 +461,42 @@ namespace CmisSync.Lib.Sync
                         Logger.Warn("Unknown object type: " + cmisObject.ObjectType.DisplayName);
                     }
                 }
+            }
+
+            /// <summary>
+            /// Download a single folder from the CMIS server.
+            /// </summary>
+            private bool DownloadDirectory(IFolder remoteFolder, string localFolder)
+            {
+                sleepWhileSuspended();
+                try
+                {
+                    // Create local folder.
+                    Directory.CreateDirectory(localFolder);
+
+                    if (remoteFolder.CreationDate != null)
+                    {
+                        Directory.SetCreationTime(localFolder, (DateTime)remoteFolder.CreationDate);
+                    }
+                    if (remoteFolder.LastModificationDate != null)
+                    {
+                        Directory.SetLastWriteTime(localFolder, (DateTime)remoteFolder.LastModificationDate);
+                    }
+                }
+                catch (Exception e)
+                {
+                    ProcessRecoverableException("Could not create directory: " + localFolder, e);
+                    return false;
+                }
+
+                // Create database entry for this folder
+                database.AddFolder(localFolder, remoteFolder.LastModificationDate);
+                Logger.Info("Added folder to database: " + localFolder);
+
+                // Recurse into folder.
+                RecursiveFolderCopy(remoteFolder, localFolder);
+
+                return true;
             }
 
 
@@ -576,6 +595,15 @@ namespace CmisSync.Lib.Sync
                         // Remove the ".sync" suffix.
                         File.Move(tmpfilepath, filepath);
 
+                        if (null != remoteDocument.CreationDate)
+                        {
+                            File.SetCreationTime(filepath, (DateTime)remoteDocument.CreationDate);
+                        }
+                        if (null != remoteDocument.LastModificationDate)
+                        {
+                            File.SetLastWriteTime(filepath, (DateTime)remoteDocument.LastModificationDate);
+                        }
+
                         // Create database entry for this file.
                         database.AddFile(filepath, remoteDocument.LastModificationDate, metadata, filehash);
                         Logger.Info("Added file to database: " + filepath);
@@ -633,6 +661,8 @@ namespace CmisSync.Lib.Sync
                     Dictionary<string, object> properties = new Dictionary<string, object>();
                     properties.Add(PropertyIds.Name, fileName);
                     properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
+                    properties.Add(PropertyIds.CreationDate, File.GetCreationTime(filePath));
+                    properties.Add(PropertyIds.LastModificationDate, File.GetLastWriteTime(filePath)); 
 
                     // Prepare content stream
                     using (Stream file = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -683,10 +713,11 @@ namespace CmisSync.Lib.Sync
                     Dictionary<string, object> properties = new Dictionary<string, object>();
                     properties.Add(PropertyIds.Name, Path.GetFileName(localFolder));
                     properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
+                    properties.Add(PropertyIds.CreationDate, Directory.GetCreationTime(localFolder));
+                    properties.Add(PropertyIds.LastModificationDate, Directory.GetLastWriteTime(localFolder));
                     folder = remoteBaseFolder.CreateFolder(properties);
 
                     // Create database entry for this folder
-                    // TODO Add metadata
                     database.AddFolder(localFolder, folder.LastModificationDate);
                     Logger.Info("Added folder to database: " + localFolder);
                 }
