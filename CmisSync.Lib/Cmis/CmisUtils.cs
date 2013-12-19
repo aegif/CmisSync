@@ -299,17 +299,25 @@ namespace CmisSync.Lib.Cmis
             }
             
             // Connect to the CMIS repository.
-            ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
+            try
+            {
+                ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
 
-            // Get the thin client URL.
-            if (!String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
-            {
-                return session.RepositoryInfo.ThinClientUri;
+                // Get the thin client URL.
+                if (!String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
+                {
+                    return session.RepositoryInfo.ThinClientUri;
+                }
+                else
+                {
+                    // If no thin client URL is present, guess an URL.
+                    return repo.Address.AbsoluteUri + repo.RemotePath;
+                }
             }
-            else
+            catch (CmisRuntimeException e)
             {
-                // If no thin client URL is present, guess an URL.
-                return repo.Address.AbsoluteUri + repo.RemotePath;
+                // Server down or authentication problem, no way to know the right URL, so just open at CMIS endpoint URL.
+                return repo.Address.AbsoluteUri;
             }
         }
     }
