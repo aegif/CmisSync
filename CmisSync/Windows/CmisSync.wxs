@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:netfx='http://schemas.microsoft.com/wix/NetFxExtension' >
 
-  <Product Name='CmisSync' Id='a215c85f-d9a4-4b34-87a6-13cc457db24f' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
-    Language='1033' Codepage='1252' Version='1.0.9' Manufacturer='CmisSync'>
+  <Product Name='CmisSync' Id='a315c85f-d9a4-4b34-87a6-13cc457db24f' UpgradeCode='4c725498-9d2d-43bf-8966-feeace102830'
+    Language='1033' Codepage='1252' Version='1.0.10' Manufacturer='CmisSync'>
 
-    <Package Id='*' Keywords='Installer' Description="CmisSync Setup" Manufacturer='CmisSync'
+    <Package Id='*' Keywords='Installer' Description="CmisSync Setup" Manufacturer='Aegif'
       InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
 
     <!-- Check for .NET 4.5 -->
