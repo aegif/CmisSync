@@ -34,20 +34,21 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\bin</OutputPath>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>x86</PlatformTarget>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>..\..\bin\Oris4Sync.XML</DocumentationFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DocumentationFile>bin\$(Configuration)\Oris4Sync.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>CmisSync.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -57,7 +58,7 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\Debug\Oris4Sync.xml</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\Oris4Sync.XML</DocumentationFile>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
@@ -65,6 +66,26 @@
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>bin\Release\Oris4Sync.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DocumentationFile>bin\Debug\Oris4Sync.XML</DocumentationFile>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -279,12 +300,6 @@
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
     <EmbeddedResource Include="Pixmaps\connect.png" />
     <EmbeddedResource Include="Pixmaps\disconnect.png" />
-    <Content Include="CmisSync.wxs">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Oris4Sync.wxs">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Pixmaps\cmissync-folder.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

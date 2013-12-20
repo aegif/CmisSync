@@ -66,14 +66,14 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\build\bin\net\2.0\debug\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE;DEBUG;NET;NET_2_0;NET_4_0</DefineConstants>
-    <DocumentationFile>log4net.xml</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\log4net.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <Optimize>false</Optimize>
@@ -86,14 +86,14 @@
     <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\build\bin\net\1.0\release\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;STRONG;NET;NET_1_0;</DefineConstants>
-    <DocumentationFile>log4net.xml</DocumentationFile>
+    <DefineConstants>STRONG;NET;NET_1_0;</DefineConstants>
+    <DocumentationFile>bin\$(Configuration)\log4net.XML</DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <Optimize>true</Optimize>
