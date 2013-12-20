@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Bundle UpgradeCode="12F52B78-05B3-4A20-9BAE-2211A807A3E7" Version="1.0">
+    <BootstrapperApplicationRef Id="ManagedBootstrapperApplicationHost">
+      <Payload Name="BootstrapperCore.config" SourceFile="!(wix.root)\CmisSync\Windows\BootstrapperCore.config"/>
+    </BootstrapperApplicationRef>
+    
+    <Chain>
+      <PackageGroupRef Id="NetFx45Web"/>
+      <MsiPackage Id="MyApplication" SourceFile="!(wix.root)\bin\Oris4Sync.msi"/>
+    </Chain>
+  </Bundle>
+</Wix>
