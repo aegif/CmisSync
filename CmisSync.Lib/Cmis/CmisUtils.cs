@@ -289,7 +289,7 @@ namespace CmisSync.Lib.Cmis
 
         /// <summary>
         /// Guess the web address where files can be seen using a browser.
-        /// Not bulletproof. It depends on the server, and for some servers there is no web UI at all.
+        /// Not bulletproof. It depends on the server, and on some servers there is no web UI at all.
         /// </summary>
         static public string GetBrowsableURL(RepoInfo repo)
         {
@@ -298,28 +298,82 @@ namespace CmisSync.Lib.Cmis
                 throw new ArgumentNullException("repo");
             }
             
-            // Connect to the CMIS repository.
-            try
+            // Case of Alfresco.
+            string suffix1 = "alfresco/cmisatom";
+            string suffix2 = "alfresco/service/cmis";
+            if (repo.Address.AbsoluteUri.EndsWith(suffix1) || repo.Address.AbsoluteUri.EndsWith(suffix2))
             {
-                ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
+                // Detect suffix length.
+                int suffixLength = 0;
+                if (repo.Address.AbsoluteUri.EndsWith(suffix1))
+                    suffixLength = suffix1.Length;
+                if (repo.Address.AbsoluteUri.EndsWith(suffix2))
+                    suffixLength = suffix2.Length;
 
-                // Get the thin client URL.
-                if (!String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
+                string root = repo.Address.AbsoluteUri.Substring(0, repo.Address.AbsoluteUri.Length - suffixLength);
+                if (repo.RemotePath.StartsWith("/Sites"))
                 {
-                    return session.RepositoryInfo.ThinClientUri;
+                    // Case of Alfresco Share.
+
+                    // Example RemotePath: /Sites/thesite
+                    // Result: http://server/share/page/site/thesite/documentlibrary
+                    // Example RemotePath: /Sites/thesite/documentLibrary/somefolder/anotherfolder
+                    // Result: http://server/share/page/site/thesite/documentlibrary#filter=path|%2Fsomefolder%2Fanotherfolder
+                    // Example RemotePath: /Sites/s1/documentLibrary/éß和ệ
+                    // Result: http://server/share/page/site/s1/documentlibrary#filter=path|%2F%25E9%25DF%25u548C%25u1EC7
+                    // Example RemotePath: /Sites/s1/documentLibrary/a#bc/éß和ệ
+                    // Result: http://server/share/page/site/thesite/documentlibrary#filter=path%7C%2Fa%2523bc%2F%25E9%25DF%25u548C%25u1EC7%7C
+
+                    string path = repo.RemotePath.Substring("/Sites/".Length);
+                    if (path.Contains("documentLibrary"))
+                    {
+                        int firstSlashPosition = path.IndexOf('/');
+                        string siteName = path.Substring(0, firstSlashPosition);
+                        string pathWithinSite = path.Substring(firstSlashPosition + "/documentLibrary".Length);
+                        string escapedPathWithinSite = HttpUtility.UrlEncode(pathWithinSite);
+                        string reescapedPathWithinSite = HttpUtility.UrlEncode(escapedPathWithinSite);
+                        string sharePath = reescapedPathWithinSite.Replace("%252f", "%2F");
+                        return root + "share/page/site/" + siteName + "/documentlibrary#filter=path|" + sharePath;
+                    }
+                    else
+                    {
+                        // Site name only.
+                        return root + "share/page/site/" + path + "/documentlibrary";
+                    }
                 }
                 else
                 {
-                    // If no thin client URL is present, guess an URL.
-                    return repo.Address.AbsoluteUri + repo.RemotePath;
+                    // Case of Alfresco Web Client. Difficult to build a direct URL, so return root.
+                    return root;
                 }
             }
-            catch (Exception e)
+            else
             {
-                Logger.Error("CmisUtils GetBrowsableURL | Exception " + e.Message, e);
+                // Another server was detected, try to open the thinclient url, otherwise try to open the repo path
 
-                // Server down or authentication problem, no way to know the right URL, so just open at CMIS endpoint URL.
-                return repo.Address.AbsoluteUri;
+                try
+                {
+                    // Connect to the CMIS repository.
+                    ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
+
+                    if (session.RepositoryInfo.ThinClientUri == null
+                        || String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
+                    {
+                        Logger.Error("CmisUtils GetBrowsableURL | Repository does not implement ThinClientUri: " + repo.Address.AbsoluteUri);
+                        return repo.Address.AbsoluteUri + repo.RemotePath;
+                    }
+                    else
+                    {
+                        // Return CmisServer-provided thin URL.
+                        return session.RepositoryInfo.ThinClientUri.ToString();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("CmisUtils GetBrowsableURL | Exception " + e.Message, e);
+                    // Server down or authentication problem, no way to know the right URL, so just open server.
+                    return repo.Address.AbsoluteUri + repo.RemotePath;
+                }
             }
         }
     }
