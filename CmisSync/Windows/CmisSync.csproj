@@ -282,6 +282,9 @@
     <Content Include="CmisSync.wxs">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Oris4Sync.wxs">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Pixmaps\cmissync-folder.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
