@@ -314,8 +314,10 @@ namespace CmisSync.Lib.Cmis
                     return repo.Address.AbsoluteUri + repo.RemotePath;
                 }
             }
-            catch (CmisRuntimeException e)
+            catch (Exception e)
             {
+                Logger.Error("CmisUtils GetBrowsableURL | Exception " + e.Message, e);
+
                 // Server down or authentication problem, no way to know the right URL, so just open at CMIS endpoint URL.
                 return repo.Address.AbsoluteUri;
             }
