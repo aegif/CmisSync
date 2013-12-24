@@ -106,9 +106,8 @@ namespace CmisSync {
                 Directory.CreateDirectory (FoldersPath);
                 Logger.Info ("Created '" + FoldersPath + "'");
 
-                string appFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string iconName = "folder-cmissync.png";
-                string iconSrc = Path.Combine(appFolder,"../../share/dataspace-sync/icons/hicolor/256x256/places",iconName);
+                string iconSrc = Path.Combine(Defines.ASSETS_DIR,"icons/hicolor/256x256/places",iconName);
                 string iconDst = Path.Combine(FoldersPath,iconName);
                 if (File.Exists(iconSrc)) {
                     File.Copy(iconSrc,iconDst);

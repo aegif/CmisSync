@@ -21,7 +21,7 @@ namespace CmisSync
         private void ShowCertDialog() {
             Logger.Debug("Showing Cert Dialog: " + Handler.UserMessage);
             CertPolicyHandler.Response ret = CertPolicyHandler.Response.None;
-            Application.Invoke(delegate {
+//            Application.Invoke(delegate {
                     MessageDialog md = new MessageDialog (null, DialogFlags.Modal,
                         MessageType.Warning, ButtonsType.None, Handler.UserMessage +
                         "\n\nDo you trust this certificate?") {
@@ -32,7 +32,7 @@ namespace CmisSync
                     md.AddButton("Always", (int)CertPolicyHandler.Response.CertAcceptAlways);
                     ret = (CertPolicyHandler.Response)md.Run();
                     md.Destroy();
-            });
+//            });
             Logger.Debug("Cert Dialog return:" + ret.ToString());
             Handler.UserResponse = ret;
         }
