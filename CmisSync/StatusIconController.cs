@@ -160,8 +160,8 @@ namespace CmisSync {
 
                     if (Program.Controller.Folders.Count == 0)
                         StateText = Properties_Resources.Welcome;
-                    else
-                        StateText = Properties_Resources.FilesUpToDate;
+                    // else
+                    //     StateText = Properties_Resources.FilesUpToDate; TODO message is misleading in the current state, see https://github.com/nicolas-raoul/CmisSync/issues/260
                 }
 
                 UpdateStatusItemEvent (StateText);
@@ -175,8 +175,8 @@ namespace CmisSync {
 
                     if (Program.Controller.Folders.Count == 0)
                         StateText = Properties_Resources.Welcome;
-                    else
-                        StateText = Properties_Resources.FilesUpToDate;
+                    // else
+                    //     StateText = Properties_Resources.FilesUpToDate; TODO message is misleading in the current state, see https://github.com/nicolas-raoul/CmisSync/issues/260
                 }
 
                 UpdateStatusItemEvent (StateText);
