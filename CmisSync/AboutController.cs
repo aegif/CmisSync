@@ -42,7 +42,7 @@ namespace CmisSync {
         /// <summary>
         /// URL addresses to display in the About dialog.
         /// </summary>
-        public readonly string WebsiteLinkAddress       = "https://github.com/nicolas-raoul/CmisSync";
+        public readonly string WebsiteLinkAddress       = "http://CmisSync.com";
         public readonly string CreditsLinkAddress       = "https://raw.github.com/nicolas-raoul/CmisSync/master/legal/AUTHORS.txt";
         public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
 
