@@ -290,6 +290,7 @@ namespace CmisSync.Lib
         public void RemoveFolder(string repoName)
         {
             this.configXml.Folders.Remove(getFolder(repoName));
+            Logger.Info("Removed sync config: " + repoName);
             Save();
         }
 
