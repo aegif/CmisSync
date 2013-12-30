@@ -254,7 +254,7 @@ namespace CmisSync.Lib
             //Update password...
             if (!String.IsNullOrEmpty(password))
             {
-                this.RepoInfo.Password = new Lib.RepoInfo.CmisPassword(password.TrimEnd());
+                this.RepoInfo.Password = new CmisSync.Auth.CmisPassword(password.TrimEnd());
                 syncConfig.ObfuscatedPassword = RepoInfo.Password.ObfuscatedPassword;
                 Logger.Debug("Updated \"" + this.Name + "\" password");
             }

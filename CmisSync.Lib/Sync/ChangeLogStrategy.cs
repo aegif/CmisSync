@@ -29,14 +29,11 @@ namespace CmisSync.Lib.Sync
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just copy everything.
-                    bool success = RecursiveFolderCopy(remoteFolder, repoinfo.TargetDirectory);
+                    RecursiveFolderCopy(remoteFolder, repoinfo.TargetDirectory);
 
                     // Update ChangeLog token.
-                    if (success)
-                    {
-                        Logger.Info("Sync | Updating ChangeLog token: " + lastTokenOnServer);
-                        database.SetChangeLogToken(lastTokenOnServer);
-                    }
+                    Logger.Info("Sync | Updating ChangeLog token: " + lastTokenOnServer);
+                    database.SetChangeLogToken(lastTokenOnServer);
                 }
                 else
                 {

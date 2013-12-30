@@ -47,6 +47,7 @@
       </Component>
       <Component Id="Libraries" Guid="00062076-DE98-41BD-A0E4-CA3BD1A6AB41">
         <File Id="CmisSync.Lib.dll" Name="CmisSync.Lib.dll" Source="$(var.CmisSync.TargetDir)\CmisSync.Lib.dll" KeyPath="yes" DiskId="1" />
+        <File Id="CmisSync.Auth.dll" Name="CmisSync.Auth.dll" Source="$(var.CmisSync.TargetDir)\CmisSync.Auth.dll" DiskId="1" />
         <File Id="DotCMIS.dll" Name="DotCMIS.dll" Source="$(var.CmisSync.TargetDir)\DotCMIS.dll" DiskId="1" />
         <File Id="log4net.dll" Name="log4net.dll" Source="$(var.CmisSync.TargetDir)\log4net.dll" DiskId="1" />
         <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.CmisSync.TargetDir)\Newtonsoft.Json.dll" DiskId="1" />
