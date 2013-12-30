@@ -286,9 +286,7 @@ namespace CmisSync
             if (f != null)
             {
                 RemoveRepository(f);
-                ConfigManager.CurrentConfig.Folder.Remove(f);
-                Logger.Info("Removed sync config: " + reponame);
-                ConfigManager.CurrentConfig.Save();
+                ConfigManager.CurrentConfig.RemoveFolder(reponame);
                 FolderListChanged();
             }
             else
