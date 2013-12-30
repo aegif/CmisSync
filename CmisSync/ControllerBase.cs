@@ -306,13 +306,13 @@ namespace CmisSync
             {
                 if (aRepo.Name == reponame && aRepo.Status == SyncStatus.Idle)
                 {
-                    
+
                     aRepo.ManualSync();
                     Logger.Debug("Requested to manually sync " + aRepo.Name);
                 }
             }
         }
-        
+
         /// <summary>
         /// Remove a synchronized folder from the CmisSync configuration.
         /// This happens after the user removes the folder.
@@ -466,7 +466,7 @@ namespace CmisSync
             repoInfo = new RepoInfo(name, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = address;
             repoInfo.User = user;
-            repoInfo.Password = password;
+            repoInfo.Password = new CmisSync.Auth.CmisPassword(password);
             repoInfo.RepoID = repository;
             repoInfo.RemotePath = remote_path;
             repoInfo.TargetDirectory = local_path;

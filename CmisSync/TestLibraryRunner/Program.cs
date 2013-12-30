@@ -30,7 +30,6 @@ namespace TestLibraryRunner
 
     class Program
     {
-
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
         static int serverId = 0; // Which server in the JSON file (first=0)
 
@@ -40,7 +39,7 @@ namespace TestLibraryRunner
                     File.ReadAllText(path));
             object[] server = servers.ElementAt(serverId);
 
-            new CmisSyncTests().SyncWhileModifyingFolders((string)server[0], (string)server[1],
+            new CmisSyncTests().ClientSideBigFileAddition((string)server[0], (string)server[1],
                     (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
         }
 

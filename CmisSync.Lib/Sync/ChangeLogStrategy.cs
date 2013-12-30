@@ -19,18 +19,24 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void ChangeLogSync(IFolder remoteFolder)
             {
-                // Get last change log token on server side.
+                // Get last ChangeLog token on server side.
                 string lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
 
-                // Get last change token that had been saved on client side.
+                // Get last ChangeLog token that had been saved on client side.
                 // TODO catch exception invalidArgument which means that changelog has been truncated and this token is not found anymore.
                 string lastTokenOnClient = database.GetChangeLogToken();
 
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just copy everything.
-                    // RecursiveFolderCopy(remoteFolder, localRootFolder);
-                    RecursiveFolderCopy(remoteFolder, repoinfo.TargetDirectory);
+                    bool success = RecursiveFolderCopy(remoteFolder, repoinfo.TargetDirectory);
+
+                    // Update ChangeLog token.
+                    if (success)
+                    {
+                        Logger.Info("Sync | Updating ChangeLog token: " + lastTokenOnServer);
+                        database.SetChangeLogToken(lastTokenOnServer);
+                    }
                 }
                 else
                 {
@@ -51,7 +57,7 @@ namespace CmisSync.Lib.Sync
                             ApplyRemoteChange(change);
                         }
 
-                        // Save change log token locally.
+                        // Save ChangeLog token locally.
                         // TODO only if successful
                         Logger.Info("Sync | Updating ChangeLog token: " + lastTokenOnServer);
                         database.SetChangeLogToken(lastTokenOnServer);

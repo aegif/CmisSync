@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using CmisSync.Lib.Cmis;
+using CmisSync.Auth;
 
 namespace CmisSync.Lib
 {
@@ -139,50 +140,6 @@ namespace CmisSync.Lib
         public bool isPathIgnored(string path)
         {
             return ignoredPaths.Contains(path);
-        }
-
-        /// <summary>
-        /// CMIS Password object.
-        /// </summary>
-        public class CmisPassword
-        {
-            private string password = null;
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            public CmisPassword(string password)
-            {
-                this.password = Crypto.Obfuscate(password);
-            }
-
-            /// <summary>
-            /// Default constructor.
-            /// </summary>
-            public CmisPassword() { }
-
-            /// <summary>
-            /// Implicit operator.
-            /// </summary>
-            public static implicit operator CmisPassword(string value)
-            {
-                return new CmisPassword(value);
-            }
-
-            /// <summary>
-            /// Convert to string.
-            /// </summary>
-            override
-            public string ToString()
-            {
-                if(password == null)
-                    return null;
-                return Crypto.Deobfuscate(password);
-            }
-
-            /// <summary>
-            /// Obfuscated password.
-            /// </summary>
-            public string ObfuscatedPassword { get { return password; } set { password = value; } }
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
 
-namespace CmisSync.Lib.Cmis
+namespace CmisSync.Auth
 {
     /// <summary>
     /// Obfuscation for sensitive data, making password harvesting a little less straightforward.
