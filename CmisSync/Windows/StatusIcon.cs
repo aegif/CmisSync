@@ -64,7 +64,7 @@ namespace CmisSync
 
             // Setup the status icon.
             this.trayicon.Icon = animationFrames[0];
-            this.trayicon.Text = "Oris4 Sync";
+            this.trayicon.Text = Properties_Resources.Oris4Sync;
             this.trayicon.ContextMenuStrip = this.traymenu;
             this.trayicon.Visible = true;
             //this.trayicon.MouseClick += NotifyIcon1_MouseClick; //Open Root sync folder (Oris4)
@@ -116,7 +116,7 @@ namespace CmisSync
                     BeginInvoke((Action)delegate
                     {
                         this.stateItem.Text = state_text;
-                        this.trayicon.Text = Utils.Ellipsis("Oris4 Sync\n" + state_text, 63);
+                        this.trayicon.Text = Utils.Ellipsis(Properties_Resources.Oris4Sync + "\n" + state_text, 63);
                     });
                 }
             };
