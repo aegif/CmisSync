@@ -90,7 +90,7 @@
     <GetAssemblyIdentity AssemblyFiles="..\..\..\CmisSync.Lib\bin\$(Configuration)\CmisSync.Lib.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
-    <Copy SourceFiles=".\bin\$(Configuration)\$(OutputName).exe" DestinationFiles=".\bin\$(Configuration)\$(OutputName).v%(AssemblyVersion.Version).exe" />
+    <Copy SourceFiles=".\bin\$(Configuration)\$(OutputName).exe" DestinationFiles=".\bin\$(Configuration)\$(OutputName).%(AssemblyVersion.Version).exe" />
     <Delete Files=".\bin\$(Configuration)\$(OutputName).exe" />
 	</Target>
 </Project>
