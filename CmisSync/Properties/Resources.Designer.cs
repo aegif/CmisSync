@@ -427,6 +427,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to minute.
+        /// </summary>
+        internal static string Minute {
+            get {
+                return ResourceManager.GetString("Minute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to minutes.
         /// </summary>
         internal static string Minutes {

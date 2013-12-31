@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" >
 
   <Product Name="CmisSync" Id="C7E5E77C-EC7B-4CF2-8B25-A8A69A8E2A55" UpgradeCode="00CAC8B4-6592-4038-807D-846959F4BD69"
-    Language="1033" Codepage="1252" Version="$(var.BuildVersion)" Manufacturer="2nd Act Innovations">
+    Language="1033" Codepage="1252" Version="$(var.BuildVersion)" Manufacturer="Aegif">
 
     <Package Id="*" Keywords="Installer" Description="CmisSync Setup" Manufacturer="CmisSync"
       InstallerVersion="100" Languages="1033" Compressed="yes" SummaryCodepage="1252" InstallScope="perMachine" />

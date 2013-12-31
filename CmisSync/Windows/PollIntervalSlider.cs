@@ -78,7 +78,11 @@ namespace CmisSync
         private string FormatToolTip(int value)
         {
             TimeSpan timeSpan = new TimeSpan(0, value, 0);
-            if (value < 60)
+            if (value <= 1)
+            {
+                return timeSpan.ToString("%m") + " " + Properties_Resources.Minute;
+            }
+            else if (value < 60)
             {
                 return timeSpan.ToString("%m") + " " + Properties_Resources.Minutes;
             }
@@ -86,13 +90,13 @@ namespace CmisSync
             {
                 return timeSpan.ToString("%h") + " " + Properties_Resources.Hour;
             }
-            else if (value == 1440)
+            else if (value > 60 && value < 1440)
             {
-                return timeSpan.ToString("%d") + " " + Properties_Resources.Day;
+                return timeSpan.ToString("%h") + " " + Properties_Resources.Hours;
             }
             else
             {
-                return timeSpan.ToString("%h") + " " + Properties_Resources.Hours;
+                return timeSpan.ToString("%d") + " " + Properties_Resources.Day;
             }
         }
 
