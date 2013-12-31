@@ -34,9 +34,9 @@ namespace CmisSync.Console
             // Check arguments.
             if (args.Length < 1)
             {
-                System.Console.WriteLine("Usage: Oris4SyncOnce.exe mysyncedfolder");
-                System.Console.WriteLine("Example: Oris4SyncOnce.exe \"192.168.0.22\\Main Repository\"");
-                System.Console.WriteLine("See your folders names in C:\\Users\\you\\AppData\\Roaming\\oris4sync\\config.xml or similar");
+                System.Console.WriteLine("Usage: CmisSyncOnce.exe mysyncedfolder");
+                System.Console.WriteLine("Example: CmisSyncOnce.exe \"192.168.0.22\\Main Repository\"");
+                System.Console.WriteLine("See your folders names in C:\\Users\\you\\AppData\\Roaming\\cmissync\\config.xml or similar");
                 return;
             }
 
@@ -59,10 +59,10 @@ namespace CmisSync.Console
                 return;
             }
 			RepoInfo repoInfo = folder.GetRepoInfo();
-			
+
 			ConsoleController controller = new ConsoleController ();
 			cmisRepo = new CmisRepo (repoInfo, controller);
-			
+
 			cmisRepo.Initialize ();
 		}
 

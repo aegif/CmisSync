@@ -212,7 +212,6 @@ namespace CmisSync
 
             if (syncFolderCreated)
             {
-                //Dont add bookmark for Oris4
                 AddToBookmarks();
             }
 
@@ -526,7 +525,7 @@ namespace CmisSync
         /// </summary>
         public void ShowAlert(string title, string message)
         {
-            AlertNotificationRaised(Properties_Resources.Oris4Sync + " " + title, message);
+            AlertNotificationRaised(Properties_Resources.CmisSync + " " + title, message);
         }
 
 

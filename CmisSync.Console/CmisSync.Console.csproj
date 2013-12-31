@@ -8,7 +8,7 @@
     <ProjectGuid>{A37D5F2B-AD95-44A6-9301-7532359D1A6F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>CmisSync.Console</RootNamespace>
-    <AssemblyName>Oris4Sync.Console</AssemblyName>
+    <AssemblyName>CmisSync.Console</AssemblyName>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>

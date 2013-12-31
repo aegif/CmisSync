@@ -97,7 +97,7 @@ namespace CmisSync.Lib
             foreach (SyncConfig.Folder folder in configXml.Folders)
             {
                 Uri RemoteUri = folder.RemoteUrl;
-                if (RemoteUri.ToString().Equals(RemoteUrl) && 
+                if (RemoteUri.ToString().Equals(RemoteUrl) &&
                     folder.UserName.Equals(UserName) &&
                     folder.RepositoryId.Equals(RepositoryId))
                 {
@@ -129,7 +129,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(HomePath, "Oris4");
+                return Path.Combine(HomePath, "CmisSync");
             }
         }
 
@@ -226,7 +226,7 @@ namespace CmisSync.Lib
                     Name = userName
                 },
                 Notifications = true,
-                SingleRepository = true, //Single repository for Oris4
+                SingleRepository = false, //Multiple repository for CmisSync
                 Log4Net = createDefaultLog4NetElement()
             };
 

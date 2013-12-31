@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
@@ -64,16 +64,16 @@ namespace CmisSync
 
             // Setup the status icon.
             this.trayicon.Icon = animationFrames[0];
-            this.trayicon.Text = "Oris4 Sync";
+            this.trayicon.Text = Properties_Resources.CmisSync;
             this.trayicon.ContextMenuStrip = this.traymenu;
             this.trayicon.Visible = true;
-            //this.trayicon.MouseClick += NotifyIcon1_MouseClick; //Open Root sync folder (Oris4)
-            this.trayicon.MouseClick += TrayIcon_MouseClick; //Open context menu
+            this.trayicon.MouseClick += NotifyIcon1_MouseClick; //Open Root sync folder
+            //this.trayicon.MouseClick += TrayIcon_MouseClick; //Open context menu
         }
 
 
         /// <summary>
-        /// When form is loaded, 
+        /// When form is loaded,
         /// </summary>
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
@@ -116,7 +116,7 @@ namespace CmisSync
                     BeginInvoke((Action)delegate
                     {
                         this.stateItem.Text = state_text;
-                        this.trayicon.Text = Utils.Ellipsis("Oris4 Sync\n" + state_text, 63);
+                        this.trayicon.Text = Utils.Ellipsis(Properties_Resources.CmisSync + "\n" + state_text, 63);
                     });
                 }
             };
@@ -226,7 +226,7 @@ namespace CmisSync
             }
 
             this.traymenu.Items.Add(stateItem);
-            this.trayicon.Text = Utils.Ellipsis(Properties_Resources.Oris4Sync + "\n" + Controller.StateText, 63);
+            this.trayicon.Text = Utils.Ellipsis(Properties_Resources.CmisSync + "\n" + Controller.StateText, 63);
 
             // Create a menu item per synchronized folder.
             if (Controller.Folders.Length > 0)
@@ -302,7 +302,7 @@ namespace CmisSync
                             break;
                         }
                     }
-                    
+
                     // Add the sub-items.
                     subfolderItem.DropDownItems.Add(openLocalFolderItem);
                     subfolderItem.DropDownItems.Add(openRemoteFolderItem);
@@ -351,8 +351,7 @@ namespace CmisSync
             {
                 Controller.LogClicked();
             };
-            //Removed for Oris4
-            //this.traymenu.Items.Add(log_item);
+            this.traymenu.Items.Add(log_item);
 
             // Create the About menu.
             ToolStripMenuItem about_item = new ToolStripMenuItem()

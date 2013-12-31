@@ -16,7 +16,7 @@
 
 
 using System;
-using System.ComponentModel; 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -48,12 +48,12 @@ namespace CmisSync {
         /// </summary>
         public About ()
         {
-            Title      = "About Oris4 Sync";
+            Title      = "About CmisSync";
             ResizeMode = ResizeMode.NoResize;
             Height     = 288;
             Width      = 640;
             Icon = UIHelpers.GetImageSource("cmissync-app", "ico");
-            
+
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Closing += Close;
 
@@ -104,10 +104,10 @@ namespace CmisSync {
                 Width  = 640,
                 Height = 260
             };
-        
+
             image.Source = UIHelpers.GetImageSource ("about");
-            
-            
+
+
             Label version = new Label () {
                 Content    = "Version " + Controller.RunningVersion,
                 FontSize   = 11,
@@ -115,29 +115,28 @@ namespace CmisSync {
             };
 
             this.updates = new Label () {
-                Content    = "Please check for updates at oris4.com", //"Checking for updates...",
+                Content    = "Please check for updates at CmisSync.com", //"Checking for updates...",
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
-            
+
             TextBlock credits = new TextBlock () {
                 FontSize     = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227)),
-                Text         = "Copyright ©" + DateTime.Now.Year.ToString() + 
-                    " 2ndAct Innovations Inc. All rights reserved. .\n" +
+                Text         = "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
                     "\n" +
-                    "Oris4 Sync is Open Source software. You are free to use, modify, " +
+                    "CmisSync is Open Source software. You are free to use, modify, " +
                     "and redistribute it under the GNU General Public License version 3 or later.",
                 TextWrapping = TextWrapping.Wrap,
                 Width        = 318
             };
-            
+
 			Link website_link = new Link ("Website", Controller.WebsiteLinkAddress);
 			Link credits_link = new Link ("Credits", Controller.CreditsLinkAddress);
 			Link report_problem_link = new Link ("Report a problem", Controller.ReportProblemLinkAddress);
 
             Canvas canvas = new Canvas ();
-            
+
             canvas.Children.Add (image);
             Canvas.SetLeft (image, 0);
             Canvas.SetTop (image, 0);
@@ -145,18 +144,18 @@ namespace CmisSync {
             canvas.Children.Add (version);
             Canvas.SetLeft (version, 289);
             Canvas.SetTop (version, 92);
-            
+
             canvas.Children.Add (this.updates);
             Canvas.SetLeft (this.updates, 289);
             Canvas.SetTop (this.updates, 109);
-            
+
             canvas.Children.Add (credits);
             Canvas.SetLeft (credits, 294);
-            Canvas.SetTop (credits, 142);   
+            Canvas.SetTop (credits, 142);
 
 			canvas.Children.Add (website_link);
             Canvas.SetLeft (website_link, 289);
-            Canvas.SetTop (website_link, 222);   
+            Canvas.SetTop (website_link, 222);
 
 			canvas.Children.Add (credits_link);
             Canvas.SetLeft (credits_link, 289 + website_link.ActualWidth + 60);
@@ -164,18 +163,18 @@ namespace CmisSync {
 
 			canvas.Children.Add (report_problem_link);
             Canvas.SetLeft (report_problem_link, 289 + website_link.ActualWidth + credits_link.ActualWidth + 115);
-            Canvas.SetTop (report_problem_link, 222);   
-            
+            Canvas.SetTop (report_problem_link, 222);
+
             Content = canvas;
         }
-        
+
         /// <summary>
         /// Close the dialog.
         /// </summary>
         private void Close (object sender, CancelEventArgs args)
         {
             Controller.WindowClosed ();
-            args.Cancel = true;    
+            args.Cancel = true;
         }
     }
 
@@ -211,7 +210,7 @@ namespace CmisSync {
 
 			MouseUp += delegate {
 				Process.Start (new ProcessStartInfo (address));
-			};            
+			};
 		}
 	}
 }

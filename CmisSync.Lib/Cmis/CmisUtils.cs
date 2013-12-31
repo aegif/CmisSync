@@ -43,7 +43,7 @@ namespace CmisSync.Lib.Cmis
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
-        
+
         /// <summary>
         /// Try to find the CMIS server associated to any URL.
         /// Users can provide the URL of the web interface, and we have to return the CMIS URL
@@ -84,7 +84,6 @@ namespace CmisSync.Lib.Cmis
             // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
             string[] suffixes = {
                 "/cmis/atom",
-                /* We don't need all these for oris4
                 "/alfresco/cmisatom",
                 "/alfresco/service/cmis",
                 "/cmis/resources/",
@@ -99,7 +98,6 @@ namespace CmisSync.Lib.Cmis
                 "/_vti_bin/cmis/rest?getRepositories",
                 "/Nemaki/atom/bedroom",
                 "/nuxeo/atom/cmis"
-                */
             };
             string bestUrl = null;
             // Try all suffixes
@@ -135,7 +133,7 @@ namespace CmisSync.Lib.Cmis
 
         /// <summary>
         /// Get the list of repositories of a CMIS server
-        /// Each item contains id + 
+        /// Each item contains id +
         /// </summary>
         /// <returns>The list of repositories. Each item contains the identifier and the human-readable name of the repository.</returns>
         static public Dictionary<string,string> GetRepositories(Uri url, string user, string password)
@@ -184,7 +182,7 @@ namespace CmisSync.Lib.Cmis
             {
                 result.Add(repo.Id, repo.Name);
             }
-            
+
             return result;
         }
 
@@ -312,7 +310,7 @@ namespace CmisSync.Lib.Cmis
             {
                 throw new ArgumentNullException("repo");
             }
-            
+
             // Case of Alfresco.
             string suffix1 = "alfresco/cmisatom";
             string suffix2 = "alfresco/service/cmis";

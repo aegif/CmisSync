@@ -6,7 +6,7 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <ProjectGuid>{728483AA-E34B-4441-BF2C-C8BC2901E4E0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>Oris4Sync</AssemblyName>
+    <AssemblyName>CmisSync</AssemblyName>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace>CmisSync</RootNamespace>
     <FileUpgradeFlags>
@@ -42,7 +42,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <DefineConstants>
     </DefineConstants>
-    <DocumentationFile>bin\$(Configuration)\Oris4Sync.XML</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\CmisSync.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>CmisSync.Program</StartupObject>
@@ -58,7 +58,7 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\$(Configuration)\Oris4Sync.XML</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\CmisSync.XML</DocumentationFile>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
@@ -69,7 +69,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
-    <DocumentationFile>bin\Release\Oris4Sync.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\CmisSync.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -79,7 +79,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>bin\Debug\Oris4Sync.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\CmisSync.XML</DocumentationFile>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>

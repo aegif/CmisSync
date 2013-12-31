@@ -37,6 +37,7 @@ Code:
 	Vincent Untz <vuntz@gnome.org>
 	Will Thompson <will@willthompson.co.uk>
 	Yannick Molinet <yannick.molinet@dixinfor.com>
+	Keith Harrison <keithharrison@oris4.com>
 
 
 Artwork:

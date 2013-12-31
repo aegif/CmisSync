@@ -93,7 +93,7 @@ namespace CmisSync.Lib
             "|" + "^\\.~lock\\." +  // LibreOffice
             "|" + "^\\..*\\.sw[a-z]$" + // vi(m)
             "|" + "\\(autosaved\\).graffle$" + // Omnigraffle
-            "|" + "\\(conflict copy \\d\\d\\d\\d-\\d\\d-\\d\\d\\)" + //Oris4 sync conflict
+            "|" + "\\(conflict copy \\d\\d\\d\\d-\\d\\d-\\d\\d\\)" + //CmisSync conflict
             ")"
         );
 
@@ -108,7 +108,6 @@ namespace CmisSync.Lib
             ".tmp", // Microsoft Office
             ".sync", // CmisSync download
             ".cmissync", // CmisSync database
-            ".oris4" // Oris4
         };
 
         /// <summary>

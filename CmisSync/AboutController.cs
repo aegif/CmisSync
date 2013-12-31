@@ -61,17 +61,17 @@ namespace CmisSync {
         /// <summary>
         /// Website URL.
         /// </summary>
-        public readonly string WebsiteLinkAddress       = "http://www.oris4.com";
+        public readonly string WebsiteLinkAddress       = "http://CmisSync.com";
 
         /// <summary>
         /// Credits link URL.
         /// </summary>
-        public readonly string CreditsLinkAddress = "https://raw.github.com/keithwharrison/Oris4Sync/master/legal/AUTHORS.txt";
+        public readonly string CreditsLinkAddress       = "https://raw.github.com/nicolas-raoul/CmisSync/master/legal/AUTHORS.txt";
 
         /// <summary>
         /// Report problem URL.
         /// </summary>
-        public readonly string ReportProblemLinkAddress = "http://www.github.com/keithwharrison/Oris4Sync/issues";
+        public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
 
 
         /// <summary>
@@ -82,8 +82,7 @@ namespace CmisSync {
             Program.Controller.ShowAboutWindowEvent += delegate
             {
                 ShowWindowEvent();
-                //Don't check for new versions for now...
-                //CheckForNewVersion();
+                CheckForNewVersion();
             };
         }
 
@@ -115,7 +114,7 @@ namespace CmisSync {
             CheckingForNewVersionEvent ();
 
             WebClient web_client = new WebClient ();
-            Uri uri = new Uri ("http://www.oris4.com/someurl");
+            Uri uri = new Uri ("http://www.CmisSync.org/version");
 
             web_client.DownloadStringCompleted += delegate (object o, DownloadStringCompletedEventArgs args) {
                 if (args.Error != null)

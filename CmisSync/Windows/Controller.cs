@@ -56,7 +56,7 @@ namespace CmisSync
         public override void CreateStartupItem()
         {
             string startup_folder_path = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-            string shortcut_path = Path.Combine(startup_folder_path, "Oris4 Sync.lnk");
+            string shortcut_path = Path.Combine(startup_folder_path, "CmisSync.lnk");
 
             if (File.Exists(shortcut_path))
                 File.Delete(shortcut_path);
@@ -74,7 +74,7 @@ namespace CmisSync
         public override void AddToBookmarks()
         {
             string user_profile_path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string shortcut_path = Path.Combine(user_profile_path, "Links", "Oris4 Sync.lnk");
+            string shortcut_path = Path.Combine(user_profile_path, "Links", "CmisSync.lnk");
 
             if (File.Exists(shortcut_path))
                 File.Delete(shortcut_path);
@@ -112,7 +112,7 @@ namespace CmisSync
             string ini_file = "[.ShellClassInfo]\r\n" +
                     "IconFile=" + icon_file_path + "\r\n" +
                     "IconIndex=0\r\n" +
-                    "InfoTip=Oris4\r\n" +
+                    "InfoTip=CmisSync\r\n" +
                     "IconResource=" + icon_file_path + ",0\r\n" +
                     "[ViewState]\r\n" +
                     "Mode=\r\n" +

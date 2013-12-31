@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
   <Bundle
-    Name="Oris4 Sync"
+    Name="CmisSync"
     Version="$(var.BuildVersion)"
     Manufacturer="2nd Act Innovations"
     IconSourceFile="$(var.CmisSync.ProjectDir)\Pixmaps\cmissync-app.ico"
     UpgradeCode="12F52B78-05B3-4A20-9BAE-2211A807A3E7">
 
-    <Variable Name="InstallFolder" Type="string" Value="[ProgramFilesFolder]Oris4 Sync"/>
+    <Variable Name="InstallFolder" Type="string" Value="[ProgramFilesFolder]CmisSync"/>
 
     <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLargeLicense">
       <bal:WixStandardBootstrapperApplication
-          LaunchTarget="[InstallFolder]\Oris4Sync.exe"
+          LaunchTarget="[InstallFolder]\CmisSync.exe"
           LicenseFile="license.rtf"
           LogoFile="logo.png"
           ShowVersion="yes"
@@ -27,7 +27,7 @@
       <PackageGroupRef Id="NetFx40ClientWeb" />
       <RollbackBoundary />
       <MsiPackage
-          DisplayName="Oris4 Sync Application"
+          DisplayName="CmisSync Application"
           SourceFile="$(var.Installer.TargetPath)"
           DisplayInternalUI="no"
           Visible="no"

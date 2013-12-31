@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" >
 
-  <Product Name="Oris4 Sync" Id="C7E5E77C-EC7B-4CF2-8B25-A8A69A8E2A55" UpgradeCode="00CAC8B4-6592-4038-807D-846959F4BD69"
+  <Product Name="CmisSync" Id="C7E5E77C-EC7B-4CF2-8B25-A8A69A8E2A55" UpgradeCode="00CAC8B4-6592-4038-807D-846959F4BD69"
     Language="1033" Codepage="1252" Version="$(var.BuildVersion)" Manufacturer="2nd Act Innovations">
 
-    <Package Id="*" Keywords="Installer" Description="Oris4 Sync Setup" Manufacturer="Oris4Sync"
+    <Package Id="*" Keywords="Installer" Description="CmisSync Setup" Manufacturer="CmisSync"
       InstallerVersion="100" Languages="1033" Compressed="yes" SummaryCodepage="1252" InstallScope="perMachine" />
 
     <PropertyRef Id="NETFRAMEWORK40CLIENT" />
@@ -12,11 +12,11 @@
       <![CDATA[Installed OR NETFRAMEWORK40CLIENT]]>
     </Condition>
 
-    <Media Id="1" Cabinet="Oris4Sync.cab" EmbedCab="yes"/>
+    <Media Id="1" Cabinet="CmisSync.cab" EmbedCab="yes"/>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLDIR" Name="Oris4 Sync">
+        <Directory Id="INSTALLDIR" Name="CmisSync">
           <Directory Id="DIR_x86" Name="x86"/>
           <Directory Id="DIR_x64" Name="x64"/>
           <Directory Id="localeDirectoryDE" Name="de"/>
@@ -29,21 +29,21 @@
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="Oris4ProgramsFolder" Name="Oris4 Sync"/>
+        <Directory Id="CmisSyncProgramsFolder" Name="CmisSync"/>
       </Directory>
       <Directory Id="DesktopFolder"/>
       <Directory Id="AppDataFolder">
-        <Directory Id="Oris4AppDataFolder" Name="oris4sync"/>
+        <Directory Id="CmisSyncAppDataFolder" Name="cmissync"/>
       </Directory>
       <Directory Id="StartupFolder"/>
     </Directory>
 
     <DirectoryRef Id="INSTALLDIR">
-      <Component Id="Oris4Sync.exe" Guid="A4C9FAFF-7698-4B7A-A055-5EC4847CA133">
-        <File Id="Oris4Sync.exe" Name="Oris4Sync.exe" Source="$(var.CmisSync.TargetPath)" KeyPath="yes" DiskId="1" />
+      <Component Id="CmisSync.exe" Guid="A4C9FAFF-7698-4B7A-A055-5EC4847CA133">
+        <File Id="CmisSync.exe" Name="CmisSync.exe" Source="$(var.CmisSync.TargetPath)" KeyPath="yes" DiskId="1" />
       </Component>
-      <Component Id="Oris4Sync.Console.exe" Guid="4F59D72E-28DE-4B09-98B9-92E440ED2BC9">
-        <File Id="Oris4Sync.Console.exe" Name="Oris4Sync.Console.exe" Source="$(var.CmisSync.Console.TargetPath)" KeyPath="yes" DiskId="1" />
+      <Component Id="CmisSync.Console.exe" Guid="4F59D72E-28DE-4B09-98B9-92E440ED2BC9">
+        <File Id="CmisSync.Console.exe" Name="CmisSync.Console.exe" Source="$(var.CmisSync.Console.TargetPath)" KeyPath="yes" DiskId="1" />
       </Component>
       <Component Id="Libraries" Guid="00062076-DE98-41BD-A0E4-CA3BD1A6AB41">
         <File Id="CmisSync.Lib.dll" Name="CmisSync.Lib.dll" Source="$(var.CmisSync.TargetDir)\CmisSync.Lib.dll" KeyPath="yes" DiskId="1" />
@@ -73,34 +73,34 @@
     <DirectoryRef Id="localeDirectoryDE">
       <Component Id="localeComponentDE" Guid="FC474E35-94BC-4B57-9541-03551DF14642">
         <CreateFolder />
-        <File Id="localeFileDE" Name="Oris4Sync.resources.dll" Source="$(var.CmisSync.TargetDir)\de\Oris4Sync.resources.dll" KeyPath="yes" DiskId="1" />
+        <File Id="localeFileDE" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\de\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
 
     <DirectoryRef Id="localeDirectoryES">
       <Component Id="localeComponentES" Guid="5808008D-7471-4529-AED4-6289743B3611">
         <CreateFolder />
-        <File Id="localeFileES" Name="Oris4Sync.resources.dll" Source="$(var.CmisSync.TargetDir)\es-ES\Oris4Sync.resources.dll" KeyPath="yes" DiskId="1" />
+        <File Id="localeFileES" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\es-ES\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
 
     <DirectoryRef Id="localeDirectoryFR">
       <Component Id="localeComponentFR" Guid="4E49C03E-F595-4C83-B2C5-A2E73C97E327">
         <CreateFolder />
-        <File Id="localeFileFR" Name="Oris4Sync.resources.dll" Source="$(var.CmisSync.TargetDir)\fr\Oris4Sync.resources.dll" KeyPath="yes" DiskId="1" />
+        <File Id="localeFileFR" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\fr\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
     <DirectoryRef Id="localeDirectoryJA">
       <Component Id="localeComponentJA" Guid="953D63DF-E558-4D50-9F73-7DD51E64D8DA">
         <CreateFolder />
-        <File Id="localeFileJA" Name="Oris4Sync.resources.dll" Source="$(var.CmisSync.TargetDir)\ja\Oris4Sync.resources.dll" KeyPath="yes" DiskId="1" />
+        <File Id="localeFileJA" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\ja\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
 
     <DirectoryRef Id="localeDirectoryUK">
       <Component Id="localeComponentUK" Guid="DEBFFC43-1334-4409-9132-4678D76C19E0">
         <CreateFolder />
-        <File Id="localeFileUK" Name="Oris4Sync.resources.dll" Source="$(var.CmisSync.TargetDir)\uk\Oris4Sync.resources.dll" KeyPath="yes" DiskId="1" />
+        <File Id="localeFileUK" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\uk\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
 
@@ -108,57 +108,57 @@
     <DirectoryRef Id="localeDirectoryTLH">
       <Component Id="localeComponentTLH" Guid="F2251FC8-832D-4B30-80E4-0C05285ABE3A">
         <CreateFolder />
-        <File Id="localeFileTLH" Name="Oris4Sync.resources.dll" Source="$(var.CmisSync.TargetDir)\tlh-KX\Oris4Sync.resources.dll" KeyPath="yes" DiskId="1" />
+        <File Id="localeFileTLH" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\tlh-KX\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
     -->
 
-    <DirectoryRef Id="Oris4ProgramsFolder">
+    <DirectoryRef Id="CmisSyncProgramsFolder">
       <Component Id="StartMenuShortcut" Guid="FCFFE059-4D1F-4E0C-AFE7-8F5B77390EE3">
         <Shortcut Id="ApplicationStartMenuShortcut"
-                  Name="Oris4 Sync"
-                  Target="[INSTALLDIR]Oris4Sync.exe"
+                  Name="CmisSync"
+                  Target="[INSTALLDIR]CmisSync.exe"
                   WorkingDirectory="INSTALLDIR"/>
-        <RemoveFolder Id="Oris4ProgramsFolder" On="uninstall"/>
-        <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes"/>
+        <RemoveFolder Id="CmisSyncProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </DirectoryRef>
 
     <DirectoryRef Id="DesktopFolder">
       <Component Id="DesktopShortcut" Guid="34192850-2445-4C0B-A0A2-2EEDC2BE03DF">
         <Shortcut Id="ApplicationDesktopShortcut"
-                  Name="Oris4 Sync"
-                  Target="[INSTALLDIR]Oris4Sync.exe"
+                  Name="CmisSync"
+                  Target="[INSTALLDIR]CmisSync.exe"
                   WorkingDirectory="INSTALLDIR"/>
-        <RemoveFile Id="DesktopFolder" Name="Oris4 Sync.lnk" On="uninstall"/>
-        <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes"/>
+        <RemoveFile Id="DesktopFolder" Name="CmisSync.lnk" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </DirectoryRef>
 
-    <DirectoryRef Id="Oris4AppDataFolder">
-      <Component Id="Oris4AppData" DiskId="1" Guid="C75496CB-DF13-42C7-8520-DB4574411B14">
+    <DirectoryRef Id="CmisSyncAppDataFolder">
+      <Component Id="CmisSyncAppData" DiskId="1" Guid="C75496CB-DF13-42C7-8520-DB4574411B14">
         <RemoveFile Id="CleanDataDirectory" Name="*" On="both"/>
         <RemoveFolder Id="RemoveDataDirectory" On="both"/>
-        <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="Oris4AppData" Type="integer" Value="1" KeyPath="yes"/>
+        <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="CmisSyncAppData" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </DirectoryRef>
 
     <DirectoryRef Id="StartupFolder">
       <Component Id="StartupMenuItem" Guid="46C6E4A6-74C4-4D1B-AD7E-38F2F92144F6">
-        <RemoveFile Id="RemoveStartupItem" Name="Oris4 Sync.lnk" On="uninstall"/>
-        <RegistryValue Root="HKCU" Key="Software\Oris4Sync" Name="StartupMenuItem" Type="integer" Value="1" KeyPath="yes"/>
+        <RemoveFile Id="RemoveStartupItem" Name="CmisSync.lnk" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="StartupMenuItem" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </DirectoryRef>
 
-    <Feature Id="Oris4SyncFeature" Title="Oris4Sync" Description="Oris4Sync" Level="1" AllowAdvertise="no">
-      <ComponentRef Id="Oris4Sync.exe" />
-      <ComponentRef Id="Oris4Sync.Console.exe" />
+    <Feature Id="CmisSyncFeature" Title="CmisSync" Description="CmisSync" Level="1" AllowAdvertise="no">
+      <ComponentRef Id="CmisSync.exe" />
+      <ComponentRef Id="CmisSync.Console.exe" />
       <ComponentRef Id="Libraries" />
       <ComponentRef Id="COMP_x86" />
       <ComponentRef Id="COMP_x64" />
       <ComponentRef Id="StartMenuShortcut" />
       <ComponentRef Id="DesktopShortcut" />
-      <ComponentRef Id="Oris4AppData" />
+      <ComponentRef Id="CmisSyncAppData" />
       <ComponentRef Id="StartupMenuItem" />
       <ComponentRef Id="localeComponentDE" />
       <ComponentRef Id="localeComponentES" />
@@ -182,6 +182,6 @@
 
     <MajorUpgrade
       Schedule="afterInstallInitialize"
-      DowngradeErrorMessage="A later version of Oris4 Sync is already installed. Setup will now exit." />
+      DowngradeErrorMessage="A later version of CmisSync is already installed. Setup will now exit." />
   </Product>
 </Wix>
