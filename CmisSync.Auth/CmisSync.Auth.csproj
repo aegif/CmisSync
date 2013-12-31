@@ -50,12 +50,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1523966-src-patched-for-no-chunking\DotCMIS\DotCMIS.csproj">
-      <Project>{14c47fbd-983b-4f3f-a70c-062fb20ec340}</Project>
+    <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1550373-src-patched-for-cmis1.1-ws\DotCMIS.csproj">
+      <Project>{529ef90f-a34c-4426-a4f9-65113ac23841}</Project>
       <Name>DotCMIS</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

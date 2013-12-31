@@ -87,7 +87,7 @@ namespace CmisSync {
         /// Update suspended sync folder event.
         /// </summary>
         public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
-		
+
 
         /// <summary>
         /// Current state of the CmisSync tray icon.
@@ -189,8 +189,8 @@ namespace CmisSync {
 
                     if (Program.Controller.Folders.Count == 0)
                         StateText = Properties_Resources.Welcome;
-                    // else
-                    //     StateText = Properties_Resources.FilesUpToDate; TODO message is misleading in the current state, see https://github.com/nicolas-raoul/CmisSync/issues/260
+                    else
+                        StateText = Properties_Resources.FilesUpToDate;
                 }
 
                 UpdateStatusItemEvent (StateText);
@@ -205,8 +205,8 @@ namespace CmisSync {
 
                     if (Program.Controller.Folders.Count == 0)
                         StateText = Properties_Resources.Welcome;
-                    // else
-                    //     StateText = Properties_Resources.FilesUpToDate; TODO message is misleading in the current state, see https://github.com/nicolas-raoul/CmisSync/issues/260
+                    else
+                        StateText = Properties_Resources.FilesUpToDate;
                 }
 
                 UpdateStatusItemEvent (StateText);
@@ -244,7 +244,7 @@ namespace CmisSync {
 
                 UpdateIconEvent(-1);
                 UpdateMenuEvent(CurrentState);
-                
+
                 if (error.Item2 is PermissionDeniedException)
                 {
                     //Suspend sync...
@@ -347,12 +347,12 @@ namespace CmisSync {
         public void RemoveFolderFromSyncClicked(string reponame)
         {
             System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show(
-                Properties_Resources.RemoveFolderFromSyncConfirm, 
+                Properties_Resources.RemoveFolderFromSyncConfirm,
                 Properties_Resources.RemoveFolderFromSync,
                 System.Windows.Forms.MessageBoxButtons.YesNo,
                 System.Windows.Forms.MessageBoxIcon.Question);
 
-            // If the yes button was pressed ... 
+            // If the yes button was pressed ...
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
                 Program.Controller.RemoveRepositoryFromSync(reponame);

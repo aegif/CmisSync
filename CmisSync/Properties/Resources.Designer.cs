@@ -61,7 +61,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to About Oris4 Sync.
+        ///   Looks up a localized string similar to About CmisSync.
         /// </summary>
         internal static string About {
             get {
@@ -79,7 +79,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connect to Oris4….
+        ///   Looks up a localized string similar to Add a remote folder….
         /// </summary>
         internal static string AddARemoteFolder {
             get {
@@ -88,7 +88,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adding synchronized folders to Ori4Sync.
+        ///   Looks up a localized string similar to Adding synchronized folders to CmisSync.
         /// </summary>
         internal static string AddFolders {
             get {
@@ -115,7 +115,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Launch Oris4 website.
+        ///   Looks up a localized string similar to Browse remote folder.
         /// </summary>
         internal static string BrowseRemoteFolder {
             get {
@@ -142,20 +142,20 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4 Sync creates a special folder on your computer where the documents are synchronized..
+        ///   Looks up a localized string similar to CmisSync.
         /// </summary>
-        internal static string CmisSyncCreates {
+        internal static string CmisSync {
             get {
-                return ResourceManager.GetString("CmisSyncCreates", resourceCulture);
+                return ResourceManager.GetString("CmisSync", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connect to Oris4....
+        ///   Looks up a localized string similar to CmisSync creates a special folder on your computer where the documents are synchronized..
         /// </summary>
-        internal static string Connect {
+        internal static string CmisSyncCreates {
             get {
-                return ResourceManager.GetString("Connect", resourceCulture);
+                return ResourceManager.GetString("CmisSyncCreates", resourceCulture);
             }
         }
         
@@ -244,7 +244,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter your Oris4 URL.
+        ///   Looks up a localized string similar to Enter a Web address where the documents can be seen:.
         /// </summary>
         internal static string EnterWebAddress {
             get {
@@ -258,15 +258,6 @@ namespace CmisSync {
         internal static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Oris4 URL should be in the format https://yourcompany.oris4.net/ .
-        /// </summary>
-        internal static string ExampleUrl {
-            get {
-                return ResourceManager.GetString("ExampleUrl", resourceCulture);
             }
         }
         
@@ -307,7 +298,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A folder already in the Oris4 Sync root folder.
+        ///   Looks up a localized string similar to A folder already in the CmisSync root folder.
         /// </summary>
         internal static string FolderAlreadyExist {
             get {
@@ -316,11 +307,11 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hint.
+        ///   Looks up a localized string similar to Help.
         /// </summary>
-        internal static string Hint {
+        internal static string Help {
             get {
-                return ResourceManager.GetString("Hint", resourceCulture);
+                return ResourceManager.GetString("Help", resourceCulture);
             }
         }
         
@@ -352,9 +343,9 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4 Sync allows you to keep your workstation’s folders and files in sync with Oris4. Sync allows you to access the most up to date versions of your documents in Oris4 or offline. 
+        ///   Looks up a localized string similar to CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
         ///
-        ///Stop Searching. Start Finding..
+        ///It is like Dropbox for Enterprise Content Management!.
         /// </summary>
         internal static string Intro {
             get {
@@ -463,15 +454,6 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4 Sync.
-        /// </summary>
-        internal static string Oris4Sync {
-            get {
-                return ResourceManager.GetString("Oris4Sync", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Password.
         /// </summary>
         internal static string Password {
@@ -517,7 +499,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Disconnect from Oris4....
+        ///   Looks up a localized string similar to Remove the folder from synchronization.
         /// </summary>
         internal static string RemoveFolderFromSync {
             get {
@@ -526,7 +508,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to disconnect from Oris4?  No files will be deleted from your system but they will no longer be synchronized with Oris4..
+        ///   Looks up a localized string similar to Are you sure you want to disconnect this repository?  No files will be deleted from your system but they will no longer be synchronized..
         /// </summary>
         internal static string RemoveFolderFromSyncConfirm {
             get {
@@ -590,7 +572,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorry, Oris4 Sync can not find a CMIS server at this address.
+        ///   Looks up a localized string similar to Sorry, CmisSync can not find a CMIS server at this address.
         ///Please ask your server administrator for the CMIS endpoint URL.
         ///If you are sure about the address, open it in a browser and send
         ///the resulting XML to cmissync@aegif.jp.
@@ -602,7 +584,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add Oris4 Sync to startup items.
+        ///   Looks up a localized string similar to Add CmisSync to startup items.
         /// </summary>
         internal static string Startup {
             get {
@@ -620,7 +602,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4 Sync&apos;s status icon shows the syncing progress, and provides easy access to your folders..
+        ///   Looks up a localized string similar to CmisSync&apos;s status icon shows the syncing progress, and provides easy access to your folders..
         /// </summary>
         internal static string StatusIconShows {
             get {
@@ -683,11 +665,11 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Username.
+        ///   Looks up a localized string similar to User.
         /// </summary>
-        internal static string Username {
+        internal static string User {
             get {
-                return ResourceManager.GetString("Username", resourceCulture);
+                return ResourceManager.GetString("User", resourceCulture);
             }
         }
         
@@ -701,7 +683,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Oris4 URL.
+        ///   Looks up a localized string similar to Repository URL.
         /// </summary>
         internal static string WebAddress {
             get {
@@ -710,7 +692,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Welcome to Oris4 Sync!.
+        ///   Looks up a localized string similar to Welcome to CmisSync!.
         /// </summary>
         internal static string Welcome {
             get {
@@ -724,6 +706,24 @@ namespace CmisSync {
         internal static string WhatsNext {
             get {
                 return ResourceManager.GetString("WhatsNext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Where is your organization&apos;s server?.
+        /// </summary>
+        internal static string Where {
+            get {
+                return ResourceManager.GetString("Where", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Where to find this address.
+        /// </summary>
+        internal static string WhereToFind {
+            get {
+                return ResourceManager.GetString("WhereToFind", resourceCulture);
             }
         }
         
@@ -746,7 +746,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can find them in your Oris4 Sync folder..
+        ///   Looks up a localized string similar to You can find them in your CmisSync folder..
         /// </summary>
         internal static string YouCanFind {
             get {

@@ -25,20 +25,21 @@ namespace CmisSync
             }
         }
 
-        public PollIntervalSlider() 
+        public PollIntervalSlider()
         {
             this.IsSnapToTickEnabled = true;
-            this.Minimum = 15;
-            //this.Minimum = 1; //testing
+            this.Minimum = 1;
             this.Maximum = 1440;
             this.TickPlacement = TickPlacement.BottomRight;
             this.AutoToolTipPlacement = AutoToolTipPlacement.BottomRight;
 
             // Manually add ticks to the slider.
             DoubleCollection tickMarks = new DoubleCollection();
-            //tickMarks.Add(1); //testing
-            //tickMarks.Add(2); //testing
-            //tickMarks.Add(5); //testing
+            tickMarks.Add(1);
+            tickMarks.Add(2);
+            tickMarks.Add(3);
+            tickMarks.Add(5);
+            tickMarks.Add(10);
             tickMarks.Add(15);
             tickMarks.Add(30);
             tickMarks.Add(60);
@@ -47,10 +48,10 @@ namespace CmisSync
             tickMarks.Add(480);
             tickMarks.Add(720);
             tickMarks.Add(1440);
-            this.Ticks = tickMarks;        
+            this.Ticks = tickMarks;
         }
 
-        
+
 
         protected override void OnThumbDragStarted(DragStartedEventArgs e)
         {

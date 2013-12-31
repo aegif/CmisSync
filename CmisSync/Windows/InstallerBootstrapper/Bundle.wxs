@@ -3,7 +3,7 @@
   <Bundle
     Name="CmisSync"
     Version="$(var.BuildVersion)"
-    Manufacturer="2nd Act Innovations"
+    Manufacturer="Aegif"
     IconSourceFile="$(var.CmisSync.ProjectDir)\Pixmaps\cmissync-app.ico"
     UpgradeCode="12F52B78-05B3-4A20-9BAE-2211A807A3E7">
 

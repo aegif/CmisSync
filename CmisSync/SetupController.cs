@@ -76,9 +76,6 @@ namespace CmisSync
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SetupController));
 
-        private static readonly String MY_FILES = "My Files";
-        private static readonly String ROOT_PATH = "/";
-
         /// <summary>
         /// Show window event.
         /// </summary>
@@ -394,15 +391,12 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Move to the add repository page...
+        /// Move to second page of the tutorial.
         /// </summary>
         public void SetupPageCompleted()
         {
-            // If requested, add CmisSync to the list of programs to be started up when the user logs into Windows.
-            if (this.create_startup_item)
-                new Thread(() => Program.Controller.CreateStartupItem()).Start();
-
-            ChangePageEvent(PageType.Add1);
+            TutorialCurrentPage = 1;
+            ChangePageEvent(PageType.Tutorial);
         }
 
 
@@ -540,28 +534,8 @@ namespace CmisSync
             saved_user = user;
             saved_password = password;
 
-            //Automatic repository selection
-            String repositorySelection = null;
-            foreach (KeyValuePair<String, String> repository in this.repositories)
-            {
-                if (repository.Key == MY_FILES)
-                {
-                    repositorySelection = repository.Key;
-                    break;
-                }
-            }
-
-            if (repositorySelection != null)
-            {
-                this.saved_repository = repositorySelection;
-                this.saved_remote_path = ROOT_PATH; //Automatic selection selects root folder
-                Add2PageCompleted(this.saved_repository, this.saved_remote_path);
-            }
-            else
-            {
-                ChangePageEvent(PageType.Add2);
-            }
-        }
+			ChangePageEvent(PageType.Add2);
+		}
 
 
         /// <summary>
@@ -583,6 +557,8 @@ namespace CmisSync
             SyncingReponame = Path.GetFileName(remote_path);
             ProgressBarPercentage = 1.0;
 
+            ChangePageEvent(PageType.Customize);
+
             Uri address = saved_address;
             repository = repository.Trim();
             remote_path = remote_path.Trim();
@@ -593,18 +569,6 @@ namespace CmisSync
 
             foreach (string ignore in ignoredPaths)
                 this.ignoredPaths.Add(ignore);
-
-            //Automatically Select Default location...
-            String localRepoPath = Path.Combine(DefaultRepoPath, repository);
-            String error = CheckRepoPathAndName(localRepoPath, repository);
-            if (String.IsNullOrEmpty(error))
-            {
-                CustomizePageCompleted(repository, localRepoPath);
-            }
-            else
-            {
-                ChangePageEvent(PageType.Customize);
-            }
         }
 
         /// <summary>
@@ -654,15 +618,7 @@ namespace CmisSync
         public void BackToPage2()
         {
             ignoredPaths.Clear();
-
-            if (saved_repository == MY_FILES)
-            {
-                BackToPage1();
-            }
-            else
-            {
-                ChangePageEvent(PageType.Add2);
-            }
+            ChangePageEvent(PageType.Add2);
         }
 
         /// <summary>

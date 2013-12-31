@@ -122,16 +122,6 @@ namespace CmisSync
                                     IsEnabled = false
                                 };
 
-                                CheckBox check_box = new CheckBox()
-                                {
-                                    Content = Properties_Resources.Startup,
-                                    IsChecked = true
-                                };
-
-                                ContentCanvas.Children.Add(check_box);
-                                Canvas.SetLeft(check_box, 185);
-                                Canvas.SetBottom(check_box, 12);
-
                                 Buttons.Add(continue_button);
                                 Buttons.Add(cancel_button);
 
@@ -145,11 +135,6 @@ namespace CmisSync
                                     {
                                         continue_button.IsEnabled = enabled;
                                     });
-                                };
-
-                                check_box.Click += delegate
-                                {
-                                    Controller.StartupItemChanged(check_box.IsChecked.Value);
                                 };
 
                                 cancel_button.Click += delegate
@@ -368,7 +353,7 @@ namespace CmisSync
                             {
                                 // UI elements.
 
-                                Header = Properties_Resources.Connect;
+                                Header = Properties_Resources.Where;
 
                                 // Address input UI.
                                 TextBlock address_label = new TextBlock()
@@ -385,9 +370,17 @@ namespace CmisSync
 
                                 TextBlock address_help_label = new TextBlock()
                                 {
-                                    Text = Properties_Resources.Hint + ": " + Properties_Resources.ExampleUrl,
+                                    Text = Properties_Resources.Help + ": ",
                                     FontSize = 11,
                                     Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
+                                };
+                                Run run = new Run(Properties_Resources.WhereToFind);
+                                Hyperlink link = new Hyperlink(run);
+                                link.NavigateUri = new Uri("https://github.com/nicolas-raoul/CmisSync/wiki/What-address");
+                                address_help_label.Inlines.Add(link);
+                                link.RequestNavigate += (sender, e) =>
+                                {
+                                    System.Diagnostics.Process.Start(e.Uri.ToString());
                                 };
 
                                 // Rather than a TextBlock, we use a textBox so that users can copy/paste the error message and Google it.
@@ -406,7 +399,7 @@ namespace CmisSync
                                 // User input UI.
                                 TextBlock user_label = new TextBlock()
                                 {
-                                    Text = Properties_Resources.Username + ":",
+                                    Text = Properties_Resources.User + ":",
                                     FontWeight = FontWeights.Bold,
                                     Width = 200
                                 };
@@ -488,11 +481,11 @@ namespace CmisSync
                                 Canvas.SetLeft(user_label, 185);
 
                                 ContentCanvas.Children.Add(user_box);
-                                Canvas.SetTop(user_box, 320);
+                                Canvas.SetTop(user_box, 330);
                                 Canvas.SetLeft(user_box, 185);
 
                                 ContentCanvas.Children.Add(user_help_label);
-                                Canvas.SetTop(user_help_label, 345);
+                                Canvas.SetTop(user_help_label, 355);
                                 Canvas.SetLeft(user_help_label, 185);
 
                                 // Password
@@ -501,11 +494,11 @@ namespace CmisSync
                                 Canvas.SetRight(password_label, 30);
 
                                 ContentCanvas.Children.Add(password_box);
-                                Canvas.SetTop(password_box, 320);
+                                Canvas.SetTop(password_box, 330);
                                 Canvas.SetRight(password_box, 30);
 
                                 ContentCanvas.Children.Add(password_help_label);
-                                Canvas.SetTop(password_help_label, 345);
+                                Canvas.SetTop(password_help_label, 355);
                                 Canvas.SetRight(password_help_label, 30);
 
                                 TaskbarItemInfo.ProgressValue = 0.0;
@@ -782,12 +775,12 @@ namespace CmisSync
                                     TextWrapping = TextWrapping.Wrap,
                                     Width = 420
                                 };
-                                string localfoldername = ""; //Controller.saved_address.Host.ToString();
+                                string localfoldername = Controller.saved_address.Host.ToString();
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
                                     if (repository.Key == Controller.saved_repository)
                                     {
-                                        localfoldername = repository.Value;
+                                        localfoldername += "\\" + repository.Value;
                                         break;
                                     }
                                 }
@@ -1023,11 +1016,11 @@ namespace CmisSync
                                     Text = Controller.saved_address.ToString(),
                                     IsEnabled = false,
                                 };
-                                
+
                                 // User input UI.
                                 TextBlock user_label = new TextBlock()
                                 {
-                                    Text = Properties_Resources.Username + ":",
+                                    Text = Properties_Resources.User + ":",
                                     FontWeight = FontWeights.Bold,
                                     Width = 200
                                 };
@@ -1150,11 +1143,11 @@ namespace CmisSync
                                 ContentCanvas.Children.Add(slider_min_label);
                                 Canvas.SetTop(slider_min_label, 300);
                                 Canvas.SetLeft(slider_min_label, 185);
-                                
+
                                 ContentCanvas.Children.Add(slider_max_label);
                                 Canvas.SetTop(slider_max_label, 300);
                                 Canvas.SetLeft(slider_max_label, 385);
-                                
+
                                 TaskbarItemInfo.ProgressValue = 0.0;
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 
@@ -1244,7 +1237,7 @@ namespace CmisSync
                                 break;
                             }
                         #endregion
-                    
+
                     }
 
                     ShowAll();
