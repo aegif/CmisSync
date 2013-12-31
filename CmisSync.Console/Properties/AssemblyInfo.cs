@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CmisSync.Auth")]
+[assembly: AssemblyTitle("CmisSync.Console")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CmisSync.Auth")]
+[assembly: AssemblyProduct("CmisSync.Console")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("45fdc5a4-1996-46c4-9b98-aacb5bd14c16")]
+[assembly: Guid("066127da-33b8-46bc-8b6c-550bd464cf34")]
 
 // Version information for an assembly consists of the following four values:
 //

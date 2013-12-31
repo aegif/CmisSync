@@ -66,8 +66,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmisSyncOnce.cs" />
-    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ConsoleController.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -109,4 +109,5 @@
   <ItemGroup>
     <None Include="config\config.xml" />
   </ItemGroup>
+  <ItemGroup />
 </Project>
