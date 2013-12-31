@@ -34,7 +34,7 @@ namespace CmisSync.Lib
         /// Default poll interval.
         /// It is used for any newly created synchronized folder.
         /// </summary>
-        public static readonly int DEFAULT_POLL_INTERVAL = 5000;
+        public static readonly int DEFAULT_POLL_INTERVAL = 15 * 60 * 1000; //15 minutes
 
 
         /// <summary>
@@ -61,16 +61,48 @@ namespace CmisSync.Lib
         /// </summary>
         public string ConfigPath { get; private set; }
 
+        /// <summary>
+        /// Notifications.
+        /// </summary>
         public bool Notifications { get { return configXml.Notifications; } set { configXml.Notifications = value; } }
 
+        /// <summary>
+        /// Single Repository Only.
+        /// </summary>
+        public bool SingleRepository { get { return configXml.SingleRepository; } set { configXml.SingleRepository = value; } }
+
+        /// <summary>
+        /// Folder.
+        /// </summary>
         public List<SyncConfig.Folder> Folder { get { return configXml.Folders; } }
 
+        /// <summary>
+        /// Get folder based on name.
+        /// </summary>
         public SyncConfig.Folder getFolder(string name)
         {
             foreach (SyncConfig.Folder folder in configXml.Folders)
             {
                 if( folder.DisplayName.Equals(name))
                     return folder;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get a folder based on RemoteUrl, UserName, and RepositoryId.
+        /// </summary>
+        public SyncConfig.Folder getFolder(string RemoteUrl, string UserName, string RepositoryId)
+        {
+            foreach (SyncConfig.Folder folder in configXml.Folders)
+            {
+                Uri RemoteUri = folder.RemoteUrl;
+                if (RemoteUri.ToString().Equals(RemoteUrl) && 
+                    folder.UserName.Equals(UserName) &&
+                    folder.RepositoryId.Equals(RepositoryId))
+                {
+                    return folder;
+                }
             }
             return null;
         }
@@ -97,7 +129,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(HomePath, "CmisSync");
+                return Path.Combine(HomePath, "Oris4");
             }
         }
 
@@ -194,6 +226,7 @@ namespace CmisSync.Lib
                     Name = userName
                 },
                 Notifications = true,
+                SingleRepository = true, //Single repository for Oris4
                 Log4Net = createDefaultLog4NetElement()
             };
 
@@ -252,11 +285,31 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Remove a synchronized folder from the configuration.
+        /// </summary>
+        public void RemoveFolder(string repoName)
+        {
+            this.configXml.Folders.Remove(getFolder(repoName));
+            Logger.Info("Removed sync config: " + repoName);
+            Save();
+        }
+
+
+        /// <summary>
         /// Get the configured path to the log file.
         /// </summary>
         public string GetLogFilePath()
         {
             return Path.Combine(ConfigPath, "debug_log.txt");
+        }
+
+        private string GetLogLevel()
+        {
+#if (DEBUG)
+            return "DEBUG";
+#else
+            return "INFO";
+#endif
         }
 
 
@@ -291,15 +344,15 @@ namespace CmisSync.Lib
       <file value=""" + GetLogFilePath() + @""" />
       <appendToFile value=""true"" />
       <rollingStyle value=""Size"" />
-      <maxSizeRollBackups value=""10"" />
-      <maximumFileSize value=""5MB"" />
+      <maxSizeRollBackups value=""5"" />
+      <maximumFileSize value=""1MB"" />
       <staticLogFileName value=""true"" />
       <layout type=""log4net.Layout.PatternLayout"">
         <conversionPattern value=""%date [%thread] %-5level %logger [%property{NDC}] - %message%newline"" />
       </layout>
     </appender>
     <root>
-      <level value=""DEBUG"" />
+      <level value=""" + GetLogLevel() + @""" />
       <appender-ref ref=""CmisSyncFileAppender"" />
     </root>
   </log4net>"))
@@ -309,10 +362,24 @@ namespace CmisSync.Lib
             }
         }
 
-        [XmlRoot("CmisSync", Namespace=null)]
+        /// <summary>
+        /// Sync configuration.
+        /// </summary>
+        [XmlRoot("CmisSync", Namespace = null)]
         public class SyncConfig {
+            /// <summary>
+            /// Notifications.
+            /// </summary>
             [XmlElement("notifications")]
             public Boolean Notifications { get; set; }
+            /// <summary>
+            /// Single Repository.
+            /// </summary>
+            [XmlElement("singleRepository")]
+            public Boolean SingleRepository { get; set; }
+            /// <summary>
+            /// Logging config.
+            /// </summary>
             [XmlAnyElement("log4net")]
             public XmlNode Log4Net { get; set; }
             /// <summary>
@@ -321,33 +388,65 @@ namespace CmisSync.Lib
             [XmlArray("folders")]
             [XmlArrayItem("folder")]
             public List<SyncConfig.Folder> Folders { get; set; }
+            /// <summary>
+            /// User.
+            /// </summary>
             [XmlElement("user", typeof(User))]
             public User User { get; set; }
 
-            public class Folder {
-            
+            /// <summary>
+            /// Folder definition.
+            /// </summary>
+            public class Folder
+            {
+
+                /// <summary>
+                /// Name.
+                /// </summary>
                 [XmlElement("name")]
                 public string DisplayName { get; set; }
 
+                /// <summary>
+                /// Path.
+                /// </summary>
                 [XmlElement("path")]
                 public string LocalPath { get; set; }
- 
+
+                /// <summary>
+                /// URL.
+                /// </summary>
                 [XmlElement("url")]
                 public XmlUri RemoteUrl { get; set; }
-                
+
+                /// <summary>
+                /// Repository ID.
+                /// </summary>
                 [XmlElement("repository")]
                 public string RepositoryId { get; set; }
-                
+
+                /// <summary>
+                /// Remote path.
+                /// </summary>
                 [XmlElement("remoteFolder")]
                 public string RemotePath { get; set; }
 
+                /// <summary>
+                /// Username.
+                /// </summary>
                 [XmlElement("user")]
-                public string UserName { get; set; } 
-                
+                public string UserName { get; set; }
+
+                /// <summary>
+                /// Password.
+                /// </summary>
                 [XmlElement("password")]
                 public string ObfuscatedPassword { get; set; }
 
                 private double pollInterval = DEFAULT_POLL_INTERVAL;
+
+                /// <summary>
+                /// Poll interval.
+                /// </summary>
                 [XmlElement("pollinterval")]
                 public double PollInterval {
                     get { return pollInterval; }
@@ -365,7 +464,10 @@ namespace CmisSync.Lib
                     }
                 }
 
-                [XmlElement("ignoreFolder",IsNullable=true)]
+                /// <summary>
+                /// Ingored folders.
+                /// </summary>
+                [XmlElement("ignoreFolder", IsNullable = true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
                 /// <summary>
@@ -375,7 +477,7 @@ namespace CmisSync.Lib
                 {
                     RepoInfo repoInfo = new RepoInfo(DisplayName, ConfigManager.CurrentConfig.ConfigPath);
                     repoInfo.User = UserName;
-                    repoInfo.Password = new CmisSync.Lib.RepoInfo.CmisPassword();
+                    repoInfo.Password = new CmisSync.Auth.CmisPassword();
                     repoInfo.Password.ObfuscatedPassword = ObfuscatedPassword;
                     repoInfo.Address = RemoteUrl;
                     repoInfo.RepoID = RepositoryId;
@@ -393,46 +495,86 @@ namespace CmisSync.Lib
             }
         }
 
+        /// <summary>
+        /// Ignored folder.
+        /// </summary>
         public class IgnoredFolder
         {
+            /// <summary>
+            /// Folder path.
+            /// </summary>
             [XmlAttribute("path")]
             public string Path { get; set; }
         }
 
-        public class User {
+        /// <summary>
+        /// User details.
+        /// </summary>
+        public class User
+        {
+            /// <summary>
+            /// Name.
+            /// </summary>
             [XmlElement("name")]
             public string Name { get; set; }
+            /// <summary>
+            /// Email.
+            /// </summary>
             [XmlElement("email")]
             public string EMail { get; set; }
         }
 
+        /// <summary>
+        /// XML URI.
+        /// </summary>
         public class XmlUri : IXmlSerializable
         {
             private Uri _Value;
 
+            /// <summary>
+            /// Constructor.
+            /// </summary>
             public XmlUri() { }
+            /// <summary>
+            /// Constructor.
+            /// </summary>
             public XmlUri(Uri source) { _Value = source; }
 
+            /// <summary>
+            /// implicit.
+            /// </summary>
             public static implicit operator Uri(XmlUri o)
             {
                 return o == null ? null : o._Value;
             }
 
+            /// <summary>
+            /// implicit.
+            /// </summary>
             public static implicit operator XmlUri(Uri o)
             {
                 return o == null ? null : new XmlUri(o);
             }
 
+            /// <summary>
+            /// Get schema.
+            /// </summary>
             public System.Xml.Schema.XmlSchema GetSchema()
             {
                 return null;
             }
 
+            /// <summary>
+            /// Read XML.
+            /// </summary>
             public void ReadXml(XmlReader reader)
             {
                 _Value = new Uri(reader.ReadElementContentAsString());
             }
 
+            /// <summary>
+            /// Write XML.
+            /// </summary>
             public void WriteXml(XmlWriter writer)
             {
                 writer.WriteValue(_Value.ToString());

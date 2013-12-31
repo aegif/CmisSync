@@ -29,22 +29,49 @@ namespace CmisSync {
     public class AboutController {
 
         /// <summary>
-        /// Actions.
+        /// Show window event.
         /// </summary>
         public event Action ShowWindowEvent = delegate { };
-        public event Action HideWindowEvent = delegate { };
-        public event Action VersionUpToDateEvent = delegate { };
-        public event Action CheckingForNewVersionEvent = delegate { };
-
-        public event NewVersionEventDelegate NewVersionEvent = delegate { };
-        public delegate void NewVersionEventDelegate (string new_version_string);
 
         /// <summary>
-        /// URL addresses to display in the About dialog.
+        /// HIde window event.
         /// </summary>
-        public readonly string WebsiteLinkAddress       = "https://github.com/nicolas-raoul/CmisSync";
-        public readonly string CreditsLinkAddress       = "https://raw.github.com/nicolas-raoul/CmisSync/master/legal/AUTHORS.txt";
-        public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
+        public event Action HideWindowEvent = delegate { };
+
+        /// <summary>
+        /// Version up to date.
+        /// </summary>
+        public event Action VersionUpToDateEvent = delegate { };
+
+        /// <summary>
+        /// Checking for new version.
+        /// </summary>
+        public event Action CheckingForNewVersionEvent = delegate { };
+
+        /// <summary>
+        /// New version.
+        /// </summary>
+        public event NewVersionEventDelegate NewVersionEvent = delegate { };
+
+        /// <summary>
+        /// New Version delegate.
+        /// </summary>
+        public delegate void NewVersionEventDelegate(string new_version_string);
+
+        /// <summary>
+        /// Website URL.
+        /// </summary>
+        public readonly string WebsiteLinkAddress       = "http://www.oris4.com";
+
+        /// <summary>
+        /// Credits link URL.
+        /// </summary>
+        public readonly string CreditsLinkAddress = "https://raw.github.com/keithwharrison/Oris4Sync/master/legal/AUTHORS.txt";
+
+        /// <summary>
+        /// Report problem URL.
+        /// </summary>
+        public readonly string ReportProblemLinkAddress = "http://www.github.com/keithwharrison/Oris4Sync/issues";
 
 
         /// <summary>
@@ -55,7 +82,8 @@ namespace CmisSync {
             Program.Controller.ShowAboutWindowEvent += delegate
             {
                 ShowWindowEvent();
-                CheckForNewVersion();
+                //Don't check for new versions for now...
+                //CheckForNewVersion();
             };
         }
 
@@ -87,7 +115,7 @@ namespace CmisSync {
             CheckingForNewVersionEvent ();
 
             WebClient web_client = new WebClient ();
-            Uri uri = new Uri ("http://www.CmisSync.org/version");
+            Uri uri = new Uri ("http://www.oris4.com/someurl");
 
             web_client.DownloadStringCompleted += delegate (object o, DownloadStringCompletedEventArgs args) {
                 if (args.Error != null)

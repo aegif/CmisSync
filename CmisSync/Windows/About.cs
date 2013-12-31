@@ -48,7 +48,7 @@ namespace CmisSync {
         /// </summary>
         public About ()
         {
-            Title      = "About CmisSync";
+            Title      = "About Oris4 Sync";
             ResizeMode = ResizeMode.NoResize;
             Height     = 288;
             Width      = 640;
@@ -109,13 +109,13 @@ namespace CmisSync {
             
             
             Label version = new Label () {
-                Content    = "version " + Controller.RunningVersion,
+                Content    = "Version " + Controller.RunningVersion,
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
 
             this.updates = new Label () {
-                Content    = "Please check for updates at CmisSync.com", //"Checking for updates...",
+                Content    = "Please check for updates at oris4.com", //"Checking for updates...",
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
@@ -123,9 +123,10 @@ namespace CmisSync {
             TextBlock credits = new TextBlock () {
                 FontSize     = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227)),
-                Text         = "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
+                Text         = "Copyright ©" + DateTime.Now.Year.ToString() + 
+                    " 2ndAct Innovations Inc. All rights reserved. .\n" +
                     "\n" +
-                    "CmisSync is Open Source software. You are free to use, modify, " +
+                    "Oris4 Sync is Open Source software. You are free to use, modify, " +
                     "and redistribute it under the GNU General Public License version 3 or later.",
                 TextWrapping = TextWrapping.Wrap,
                 Width        = 318
@@ -184,7 +185,10 @@ namespace CmisSync {
     /// </summary>
 	public class Link : Label {
 
-		public Link (string title, string address)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public Link(string title, string address)
 		{
 			FontSize   = 11;
 			Cursor     = Cursors.Hand;

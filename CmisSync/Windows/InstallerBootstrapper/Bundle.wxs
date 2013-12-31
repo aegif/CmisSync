@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <Bundle
+    Name="Oris4 Sync"
+    Version="$(var.BuildVersion)"
+    Manufacturer="2nd Act Innovations"
+    IconSourceFile="$(var.CmisSync.ProjectDir)\Pixmaps\cmissync-app.ico"
+    UpgradeCode="12F52B78-05B3-4A20-9BAE-2211A807A3E7">
+
+    <Variable Name="InstallFolder" Type="string" Value="[ProgramFilesFolder]Oris4 Sync"/>
+
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLargeLicense">
+      <bal:WixStandardBootstrapperApplication
+          LaunchTarget="[InstallFolder]\Oris4Sync.exe"
+          LicenseFile="license.rtf"
+          LogoFile="logo.png"
+          ShowVersion="yes"
+          SuppressDowngradeFailure="no"
+          SuppressOptionsUI="no"
+          SuppressRepair="no"
+          ThemeFile="CustomTheme.xml"
+          LocalizationFile="CustomTheme.wxl"
+      />
+    </BootstrapperApplicationRef>
+
+    <Chain>
+      <PackageGroupRef Id="NetFx40ClientWeb" />
+      <RollbackBoundary />
+      <MsiPackage
+          DisplayName="Oris4 Sync Application"
+          SourceFile="$(var.Installer.TargetPath)"
+          DisplayInternalUI="no"
+          Visible="no"
+          Vital="yes"
+          Permanent="no">
+        <MsiProperty Name="INSTALLDIR" Value="[InstallFolder]" />
+      </MsiPackage>
+    </Chain>
+  </Bundle>
+</Wix>

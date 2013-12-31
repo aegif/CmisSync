@@ -41,7 +41,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// the file/folder pathname (relative to <c>Path</c>) list for changes
         /// </summary>
-        private List<string> changeList = new List<string>();
+        private Queue<Tuple<string, ChangeTypes>> changeQueue = new Queue<Tuple<string, ChangeTypes>>();
 
         /// <summary>
         /// supported change type
@@ -70,84 +70,46 @@ namespace CmisSync.Lib
             Deleted
         };
 
-        /// <summary>
-        /// key is the element in <c>changeList</c>
-        /// </summary>
-        private Dictionary<string, ChangeTypes> changes = new Dictionary<string, ChangeTypes>();
-
 
         /// <summary>
-        /// <returns>the file/folder pathname (relative to <c>Path</c>) list for changes</returns>
+        /// Get the change queue.
         /// </summary>
-        public List<string> GetChangeList()
+        public int GetChangeCount()
         {
             lock (changeLock)
             {
-                return new List<string>(changeList);
+                return changeQueue.Count;
             }
         }
 
 
         /// <summary>
-        /// <returns><c>ChangeTypes</c> for <param name="name">the file/folder</param></returns>
+        /// Get the earliest change from the queue.
         /// </summary>
-        public ChangeTypes GetChangeType(string name)
+        public Tuple<string, ChangeTypes> GetEarliestChange()
         {
             lock (changeLock)
             {
-                ChangeTypes type;
-                if (changes.TryGetValue(name, out type))
-                {
-                    return type;
-                }
-                else
-                {
-                    return ChangeTypes.None;
-                }
+                return changeQueue.Peek();
             }
         }
-
 
         /// <summary>
-        /// remove <param name="name">the file/folder</param> from changes
+        /// Remove the earliest change from the queue.
         /// </summary>
-        public void RemoveChange(string name)
+        public Tuple<string, ChangeTypes> RemoveEarliestChange()
         {
             lock (changeLock)
             {
-                if (changes.Remove(name))
-                {
-                    changeList.Remove(name);
-                }
+                return changeQueue.Dequeue();
             }
         }
-
-
-        /// <summary>
-        /// remove <param name="name">the file/folder</param> from changes for <param name="change"/>
-        /// </summary>
-        public void RemoveChange(string name, ChangeTypes change)
-        {
-            lock (changeLock)
-            {
-                ChangeTypes type;
-                if (changes.TryGetValue(name, out type))
-                {
-                    if (type == change)
-                    {
-                        changes.Remove(name);
-                        changeList.Remove(name);
-                    }
-                }
-            }
-        }
-
 
         /// <summary>
         /// insert <param name="name">the file/folder</param> for <param name="change"/> in changes
-        /// It should do nothing if <param name="name">the file/folder</param> exists in changes
+        /// It should do nothing if the file/folder exists in changes
         /// </summary>
-        public void InsertChange(string name, ChangeTypes change)
+        public void AddChange(string name, ChangeTypes change)
         {
             if (ChangeTypes.None == change)
             {
@@ -156,11 +118,8 @@ namespace CmisSync.Lib
 
             lock (changeLock)
             {
-                if (!changes.ContainsKey(name))
-                {
-                    changeList.Add(name);
-                    changes[name] = change;
-                }
+                Logger.Debug(change + ": " + name);
+                changeQueue.Enqueue(new Tuple<string, ChangeTypes>(name, change));
             }
         }
 
@@ -172,8 +131,15 @@ namespace CmisSync.Lib
         {
             lock (changeLock)
             {
-                changes.Clear();
-                changeList.Clear();
+                if (Logger.IsDebugEnabled)
+                {
+                    foreach (Tuple<string, ChangeTypes> change in changeQueue)
+                    {
+                        Logger.Debug("Removing -> " + change.Item2 + ": " + change.Item1);
+                    }
+
+                }
+                changeQueue.Clear();
             }
         }
 
@@ -206,46 +172,31 @@ namespace CmisSync.Lib
 
         private void OnCreated(object source, FileSystemEventArgs e)
         {
-            List<ChangeTypes> checks = new List<ChangeTypes>();
-            checks.Add(ChangeTypes.Deleted);
-            ChangeHandle(e.FullPath, ChangeTypes.Created, checks);
+            ChangeHandle(e.FullPath, ChangeTypes.Created);
             InvokeChangeEvent(e);
         }
 
         
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
-            List<ChangeTypes> checks = new List<ChangeTypes>();
-            checks.Add(ChangeTypes.Created);
-            checks.Add(ChangeTypes.Changed);
-            ChangeHandle(e.FullPath, ChangeTypes.Deleted, checks);
+            ChangeHandle(e.FullPath, ChangeTypes.Deleted);
             InvokeChangeEvent(e);
         }
 
         
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            List<ChangeTypes> checks = new List<ChangeTypes>();
-            checks.Add(ChangeTypes.Created);
-            checks.Add(ChangeTypes.Changed);
-            ChangeHandle(e.FullPath, ChangeTypes.Changed, checks);
+            ChangeHandle(e.FullPath, ChangeTypes.Changed);
             InvokeChangeEvent(e);
         }
 
         
-        private void ChangeHandle(string name, ChangeTypes type, List<ChangeTypes> checks)
+        private void ChangeHandle(string name, ChangeTypes type)
         {
             lock (changeLock)
             {
                 Debug.Assert(name.StartsWith(Path));
-                ChangeTypes oldType;
-                if (changes.TryGetValue(name, out oldType))
-                {
-                    Debug.Assert(checks.Contains(oldType));
-                    changeList.Remove(name);
-                }
-                changeList.Add(name);
-                changes[name] = type;
+                AddChange(name, type);
             }
         }
 
@@ -276,7 +227,7 @@ namespace CmisSync.Lib
         
         private void OnError(object source, ErrorEventArgs e)
         {
-            Logger.Warn("Error occurred for FileSystemWatcher");
+            Logger.Error("Error occurred for FileSystemWatcher");
             EnableRaisingEvents = false;
         }
 

@@ -24,7 +24,6 @@ using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Shell;
-using System.Globalization;
 
 namespace CmisSync {
 
@@ -69,7 +68,6 @@ namespace CmisSync {
         /// Background for the bar line of buttons.
         /// </summary>
         private Rectangle buttonsBackground;
-        
 
         /// <summary>
         /// Constructor.
@@ -77,19 +75,19 @@ namespace CmisSync {
         public SetupWindow ()
         {
             // Window properties.
-            Title      = CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture);
-            Width      = 640;
-            Height     = 440;
+            Title = CmisSync.Properties_Resources.Oris4Sync;
+            Width = 640;
+            Height = 440;
             ResizeMode = ResizeMode.NoResize;
             Background = new SolidColorBrush (Colors.WhiteSmoke);
-            Icon       = UIHelpers.GetImageSource("cmissync-app", "ico");
+            Icon = UIHelpers.GetImageSource("cmissync-app", "ico");
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Content    = ContentCanvas;
+            Content = ContentCanvas;
             Closing += Close;
 			
             // Taskbar
 			TaskbarItemInfo = new TaskbarItemInfo () {
-				Description = "CmisSync"
+				Description = "Oris4 Sync"
 			};
 
             // Separation and background for the line of buttons.

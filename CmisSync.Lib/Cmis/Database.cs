@@ -144,7 +144,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (Exception e)
                 {
-                    Logger.Error("Error creating database: " + Utils.ToLogString(e));
+                    Logger.Error("Error creating database: " + e.Message, e);
                     throw;
                 }
             }
@@ -175,7 +175,7 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         private string Checksum(string filePath)
         {
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var bs = new BufferedStream(fs))
             {
                 using (var sha1 = new SHA1Managed())
@@ -256,8 +256,7 @@ namespace CmisSync.Lib.Cmis
                 catch (IOException e)
                 {
                     Logger.Warn("IOException while calculating checksum of " + path
-                        + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. "
-                        + Utils.ToLogString(e));
+                        + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. ", e);
                 }
             }
 

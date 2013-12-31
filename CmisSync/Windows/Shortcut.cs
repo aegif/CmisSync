@@ -1,4 +1,4 @@
-﻿//   CmisSync, a collaboration and sharing tool.
+//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -33,12 +33,21 @@ namespace CmisSync {
         private IShellLink link;
         private string description;
 
+        /// <summary>
+        /// Description.
+        /// </summary>
         public string Description { get { return description; } set { description = value; } }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Shortcut()
         {
         }
 
+        /// <summary>
+        /// Create shortcut.
+        /// </summary>
         public void Create(string file_path, string target_path)
         {
             link = (IShellLink)new ShellLink();
@@ -52,6 +61,9 @@ namespace CmisSync {
             file.Save(target_path, false);
         }
 
+        /// <summary>
+        /// Create shortcut.
+        /// </summary>
         public void Create(string file_path, string target_path, string icofile, int icoidx)
         {
             link = (IShellLink)new ShellLink();
@@ -66,6 +78,9 @@ namespace CmisSync {
             file.Save(target_path, false);
         }
 
+        /// <summary>
+        /// Dispose object.
+        /// </summary>
         public void Dispose()
         {
             if (this.link == null)

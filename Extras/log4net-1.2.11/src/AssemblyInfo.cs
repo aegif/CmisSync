@@ -37,6 +37,12 @@ using System.Runtime.CompilerServices;
 // If log4net is strongly named it still allows partially trusted callers
 //
 [assembly: System.Security.AllowPartiallyTrustedCallers]
+
+//
+// Allows partial trust applications (e.g. ASP.NET shared hosting) on .NET 4.0 to work
+// given our implementation of ISerializable.
+//
+[assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
 #endif
 
 //

@@ -15,16 +15,11 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-using System;
-using System.IO;
-using System.Timers;
-
-using Threading = System.Threading;
-
 using CmisSync.Lib;
-using System.Globalization;
-
-using System.Diagnostics;
+using CmisSync.Lib.Cmis;
+using log4net;
+using System;
+using System.Timers;
 
 namespace CmisSync {
 
@@ -32,10 +27,17 @@ namespace CmisSync {
     /// State of the CmisSync status icon.
     /// </summary>
     public enum IconState {
+        /// <summary>
+        /// Sync is idle.
+        /// </summary>
         Idle,
-        SyncingUp,
-        SyncingDown,
+        /// <summary>
+        /// Sync is running.
+        /// </summary>
         Syncing,
+        /// <summary>
+        /// Sync is in error state.
+        /// </summary>
         Error
     }
 
@@ -45,18 +47,45 @@ namespace CmisSync {
     /// </summary>
     public class StatusIconController {
 
-        // Event handlers.
+        /// <summary>
+        /// Log.
+        /// </summary>
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StatusIconController));
 
+        /// <summary>
+        /// Update icon event.
+        /// </summary>
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
-        public delegate void UpdateIconEventHandler (int icon_frame);
+        /// <summary>
+        /// Update icon event.
+        /// </summary>
+        public delegate void UpdateIconEventHandler(int icon_frame);
 
+        /// <summary>
+        /// Update menu event.
+        /// </summary>
         public event UpdateMenuEventHandler UpdateMenuEvent = delegate { };
-        public delegate void UpdateMenuEventHandler (IconState state);
+        /// <summary>
+        /// Update menu event.
+        /// </summary>
+        public delegate void UpdateMenuEventHandler(IconState state);
 
+        /// <summary>
+        /// Update status event.
+        /// </summary>
         public event UpdateStatusItemEventHandler UpdateStatusItemEvent = delegate { };
-        public delegate void UpdateStatusItemEventHandler (string state_text);
+        /// <summary>
+        /// Update status event.
+        /// </summary>
+        public delegate void UpdateStatusItemEventHandler(string state_text);
 
+        /// <summary>
+        /// Update suspended sync folder event.
+        /// </summary>
         public event UpdateSuspendSyncFolderEventHandler UpdateSuspendSyncFolderEvent = delegate { };
+        /// <summary>
+        /// Update suspended sync folder event.
+        /// </summary>
         public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
 		
 
@@ -160,12 +189,13 @@ namespace CmisSync {
 
                     if (Program.Controller.Folders.Count == 0)
                         StateText = Properties_Resources.Welcome;
-                    else
-                        StateText = Properties_Resources.FilesUpToDate;
+                    // else
+                    //     StateText = Properties_Resources.FilesUpToDate; TODO message is misleading in the current state, see https://github.com/nicolas-raoul/CmisSync/issues/260
                 }
 
                 UpdateStatusItemEvent (StateText);
-                UpdateMenuEvent (CurrentState);
+                UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
+                UpdateMenuEvent(CurrentState);
             };
 
             // No more download/upload.
@@ -175,15 +205,15 @@ namespace CmisSync {
 
                     if (Program.Controller.Folders.Count == 0)
                         StateText = Properties_Resources.Welcome;
-                    else
-                        StateText = Properties_Resources.FilesUpToDate;
+                    // else
+                    //     StateText = Properties_Resources.FilesUpToDate; TODO message is misleading in the current state, see https://github.com/nicolas-raoul/CmisSync/issues/260
                 }
 
                 UpdateStatusItemEvent (StateText);
 
                 this.animation.Stop ();
 
-                UpdateIconEvent (0);
+                UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
                 UpdateMenuEvent (CurrentState);
             };
 
@@ -195,6 +225,38 @@ namespace CmisSync {
                 UpdateStatusItemEvent (StateText);
 
                 this.animation.Start ();
+            };
+
+
+            // Error.
+            Program.Controller.OnError += delegate (Tuple<string, Exception> error)
+            {
+                Logger.Error(String.Format("Error syncing '{0}': {1}", error.Item1, error.Item2.Message), error.Item2);
+
+                string message = String.Format(Properties_Resources.SyncError, error.Item1, error.Item2.Message);
+
+                CurrentState = IconState.Error;
+                StateText = message;
+
+                UpdateStatusItemEvent(StateText);
+
+                this.animation.Stop();
+
+                UpdateIconEvent(-1);
+                UpdateMenuEvent(CurrentState);
+                
+                if (error.Item2 is PermissionDeniedException)
+                {
+                    //Suspend sync...
+                    SuspendSyncClicked(error.Item1);
+                }
+
+                Program.Controller.ShowAlert(Properties_Resources.Error, message);
+            };
+
+            Program.Controller.OnErrorResolved += delegate
+            {
+                CurrentState = IconState.Idle;
             };
         }
 
@@ -216,13 +278,30 @@ namespace CmisSync {
             Program.Controller.OpenRemoteFolder(reponame);
         }
 
+        /// <summary>
+        /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
+        /// </summary>
+        public void SettingsClicked(string reponame)
+        {
+            CmisSync.Lib.Config.SyncConfig.Folder repository = ConfigManager.CurrentConfig.getFolder(reponame);
+            Program.UI.Setup.Controller.saved_repository = reponame;
+            if (repository != null)
+            {
+                Program.UI.Setup.Controller.saved_user = repository.UserName;
+                Program.UI.Setup.Controller.saved_remote_path = repository.RemotePath;
+                Program.UI.Setup.Controller.saved_address = repository.RemoteUrl;
+                Program.UI.Setup.Controller.saved_sync_interval = (int)repository.PollInterval;
+            }
+            Program.Controller.ShowSetupWindow(PageType.Settings);
+        }
+
 
         /// <summary>
         /// Open the remote folder addition wizard.
         /// </summary>
         public void AddRemoteFolderClicked ()
         {
-            Program.Controller.ShowSetupWindow (PageType.Add1);
+            Program.Controller.ShowSetupWindow(PageType.Add1);
         }
 
 
@@ -262,9 +341,30 @@ namespace CmisSync {
             UpdateSuspendSyncFolderEvent(reponame);
         }
 
+        /// <summary>
+        /// Remove folder from sync clicked.
+        /// </summary>
         public void RemoveFolderFromSyncClicked(string reponame)
         {
-            Program.Controller.RemoveRepositoryFromSync(reponame);
+            System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show(
+                Properties_Resources.RemoveFolderFromSyncConfirm, 
+                Properties_Resources.RemoveFolderFromSync,
+                System.Windows.Forms.MessageBoxButtons.YesNo,
+                System.Windows.Forms.MessageBoxIcon.Question);
+
+            // If the yes button was pressed ... 
+            if (result == System.Windows.Forms.DialogResult.Yes)
+            {
+                Program.Controller.RemoveRepositoryFromSync(reponame);
+            }
+        }
+
+        /// <summary>
+        /// Manual sync clicked.
+        /// </summary>
+        public void ManualSyncClicked(string reponame)
+        {
+            Program.Controller.ManualSync(reponame);
         }
 
 
@@ -276,7 +376,7 @@ namespace CmisSync {
             this.animation_frame_number = 0;
 
             this.animation = new Timer () {
-                Interval = 50
+                Interval = 200
             };
 
             this.animation.Elapsed += delegate {
