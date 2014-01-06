@@ -7,47 +7,65 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace CmisSync
 {
+    /// <summary>
+    /// Slider to tune the poll interval.
+    /// </summary>
     class PollIntervalSlider : Slider
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(PollIntervalSlider));
 
+
+        /// <summary>
+        /// Tooltip that shows poll interval  when mouse goes over the slider.
+        /// </summary>
         private ToolTip _autoToolTip;
 
+
+        /// <summary>
+        /// Poll interval shown/tuned by the slider.
+        /// </summary>
         public int PollInterval {
             get {
-                return (int)this.Value * (60 * 1000);
+                return (int)this.Value * 1000;
             }
             set {
-                this.Value = value / (60 * 1000);
+                this.Value = value / 1000;
             }
         }
 
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public PollIntervalSlider()
         {
             this.IsSnapToTickEnabled = true;
-            this.Minimum = 1;
-            this.Maximum = 1440;
+            this.Minimum = 5;
+            this.Maximum = 60 * 60 * 24;
             this.TickPlacement = TickPlacement.BottomRight;
             this.AutoToolTipPlacement = AutoToolTipPlacement.BottomRight;
 
-            // Manually add ticks to the slider.
+            // Add ticks to the slider.
             DoubleCollection tickMarks = new DoubleCollection();
-            tickMarks.Add(1);
-            tickMarks.Add(2);
-            tickMarks.Add(3);
-            tickMarks.Add(5);
-            tickMarks.Add(10);
-            tickMarks.Add(15);
-            tickMarks.Add(30);
+            tickMarks.Add(5); // 5 seconds
             tickMarks.Add(60);
-            tickMarks.Add(120);
-            tickMarks.Add(240);
-            tickMarks.Add(480);
-            tickMarks.Add(720);
-            tickMarks.Add(1440);
+            tickMarks.Add(60 * 2); // 2 minutes
+            tickMarks.Add(60 * 3);
+            tickMarks.Add(60 * 5);
+            tickMarks.Add(60 * 10);
+            tickMarks.Add(60 * 15);
+            tickMarks.Add(60 * 30);
+            tickMarks.Add(60 * 60);
+            tickMarks.Add(60 * 60 * 2); // 2 hours
+            tickMarks.Add(60 * 60 * 4);
+            tickMarks.Add(60 * 60 * 8);
+            tickMarks.Add(60 * 60 * 12);
+            tickMarks.Add(60 * 60 * 24);
             this.Ticks = tickMarks;
         }
 
@@ -59,38 +77,46 @@ namespace CmisSync
             this.FormatAutoToolTipContent();
         }
 
+
         protected override void OnThumbDragDelta(DragDeltaEventArgs e)
         {
             base.OnThumbDragDelta(e);
             this.FormatAutoToolTipContent();
         }
 
+
         public string FormattedMaximum()
         {
             return FormatToolTip((int)this.Maximum);
         }
+
 
         public string FormattedMinimum()
         {
             return FormatToolTip((int)this.Minimum);
         }
 
+
         private string FormatToolTip(int value)
         {
-            TimeSpan timeSpan = new TimeSpan(0, value, 0);
-            if (value <= 1)
+            TimeSpan timeSpan = new TimeSpan(0, 0, value);
+            if (value < 60)
             {
-                return timeSpan.ToString("%m") + " " + Properties_Resources.Minute;
-            }
-            else if (value < 60)
-            {
-                return timeSpan.ToString("%m") + " " + Properties_Resources.Minutes;
+                return timeSpan.ToString("%s") + " " + Properties_Resources.Seconds;
             }
             else if (value == 60)
             {
+                return timeSpan.ToString("%m") + " " + Properties_Resources.Minute;
+            }
+            else if (value < 60 * 60)
+            {
+                return timeSpan.ToString("%m") + " " + Properties_Resources.Minutes;
+            }
+            else if (value == 60 * 60)
+            {
                 return timeSpan.ToString("%h") + " " + Properties_Resources.Hour;
             }
-            else if (value > 60 && value < 1440)
+            else if (value < 60 * 60 * 24)
             {
                 return timeSpan.ToString("%h") + " " + Properties_Resources.Hours;
             }
@@ -100,10 +126,12 @@ namespace CmisSync
             }
         }
 
+
         private void FormatAutoToolTipContent()
         {
             this.AutoToolTip.Content = FormatToolTip((int)this.Value);
         }
+
 
         private ToolTip AutoToolTip
         {
@@ -117,6 +145,22 @@ namespace CmisSync
                 }
                 return _autoToolTip;
             }
+        }
+    }
+
+
+    public class LogScaleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double x = (int)value;
+            return Math.Log(x);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double x = (double)value;
+            return (int)Math.Exp(x);
         }
     }
 }

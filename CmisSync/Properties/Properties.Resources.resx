@@ -358,4 +358,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="Minute" xml:space="preserve">
     <value>minute</value>
   </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>seconds</value>
+  </data>
 </root>
