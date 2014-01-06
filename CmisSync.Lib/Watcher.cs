@@ -156,7 +156,7 @@ namespace CmisSync.Lib
 
             Path = System.IO.Path.GetFullPath(folder);
             IncludeSubdirectories = true;
-            Filter                = "*";
+            Filter = "*";
             InternalBufferSize = 4 * 1024 * 16;
 
             Error += new ErrorEventHandler(OnError);
@@ -176,21 +176,21 @@ namespace CmisSync.Lib
             InvokeChangeEvent(e);
         }
 
-        
+
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
             ChangeHandle(e.FullPath, ChangeTypes.Deleted);
             InvokeChangeEvent(e);
         }
 
-        
+
         private void OnChanged(object source, FileSystemEventArgs e)
         {
             ChangeHandle(e.FullPath, ChangeTypes.Changed);
             InvokeChangeEvent(e);
         }
 
-        
+
         private void ChangeHandle(string name, ChangeTypes type)
         {
             lock (changeLock)
@@ -200,7 +200,7 @@ namespace CmisSync.Lib
             }
         }
 
-        
+
         private void OnRenamed(object source, RenamedEventArgs e)
         {
             string oldname = e.OldFullPath;
@@ -224,14 +224,14 @@ namespace CmisSync.Lib
             InvokeChangeEvent(e);
         }
 
-        
+
         private void OnError(object source, ErrorEventArgs e)
         {
             Logger.Error("Error occurred for FileSystemWatcher");
             EnableRaisingEvents = false;
         }
 
-        
+
         /// <summary>
         /// Whether this object has been disposed or not.
         /// </summary>
