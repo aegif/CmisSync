@@ -196,15 +196,15 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// Check whether the file is worth syncing or not.
-        /// Files that are not worth syncing include blank, .
+        /// This optionally excludes blank files or files too large.
         /// </summary>
         private static bool IsFileWorthSyncing(string filepath, RepoInfo repoInfo)
         {
             if (File.Exists(filepath))
             {
-                bool allowBlankFiles = false; //TODO: add a preference repoInfo.allowBlankFiles
-                bool limitFilesize = true; //TODO: add preference for filesize limiting
-                long filesizeLimit = 256 * 1024 * 1024; //TODO: add a preference for filesize limit?
+                bool allowBlankFiles = true; //TODO: add a preference repoInfo.allowBlankFiles
+                bool limitFilesize = false; //TODO: add preference for filesize limiting
+                long filesizeLimit = 256 * 1024 * 1024; //TODO: add a preference for filesize limit
 
                 FileInfo fileInfo = new FileInfo(filepath);
 
