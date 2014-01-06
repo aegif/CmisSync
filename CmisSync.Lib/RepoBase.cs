@@ -159,7 +159,10 @@ namespace CmisSync.Lib
 
             this.activityListener = activityListener;
 
-            folderLock = new FolderLock(LocalPath);
+            // Folder lock.
+            // Disabled for now. Can be an interesting feature, but should be made opt-in, as
+            // most users would be surprised to see this file appear.
+            // folderLock = new FolderLock(LocalPath);
 
             Watcher = new Watcher(LocalPath);
             Watcher.EnableRaisingEvents = true;

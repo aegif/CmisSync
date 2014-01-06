@@ -5,7 +5,8 @@ using System.IO;
 namespace CmisSync.Lib
 {
     /// <summary>
-    /// Create a "lock" file in folder that will prevent folder from being moved/deleted/renamed.
+    /// Create a "lock" file in folder that will prevent the user from
+    /// moving/deleting/renaming the folder as long as CmisSync is running.
     /// </summary>
     public class FolderLock : IDisposable
     {
@@ -23,7 +24,7 @@ namespace CmisSync.Lib
         {
             try
             {
-                //Lock desktop.ini file....
+                // Create lock file.
                 Logger.Info("Creating folder lock file: " + folderPath);
                 lockFilePath = Path.Combine(folderPath, FILENAME);
                 if (!File.Exists(lockFilePath))
