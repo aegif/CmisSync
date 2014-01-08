@@ -667,7 +667,6 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
-
             /// <summary>
             /// Upload folder recursively.
             /// After execution, the hierarchy on server will be: .../remoteBaseFolder/localFolder/...
