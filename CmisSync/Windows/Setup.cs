@@ -29,6 +29,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shell;
 using WPF = System.Windows.Controls;
+using System.Windows.Data;
 
 namespace CmisSync
 {
@@ -1068,9 +1069,13 @@ namespace CmisSync
 
                                 PollIntervalSlider slider = new PollIntervalSlider()
                                 {
+                                    Name = "TheSlider",
                                     Width = 400,
-                                    PollInterval = Controller.saved_sync_interval,
+                                    PollInterval = Controller.saved_sync_interval
                                 };
+                                var sliderBinding = new Binding("TheSlider") { ElementName = "PollInterval" };
+                                sliderBinding.Converter = new LogScaleConverter();
+                                slider.SetBinding(Slider.ValueProperty, sliderBinding);
 
                                 TextBlock slider_min_label = new TextBlock()
                                 {
