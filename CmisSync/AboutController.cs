@@ -34,7 +34,7 @@ namespace CmisSync {
         public event Action ShowWindowEvent = delegate { };
 
         /// <summary>
-        /// HIde window event.
+        /// Hide window event.
         /// </summary>
         public event Action HideWindowEvent = delegate { };
 
