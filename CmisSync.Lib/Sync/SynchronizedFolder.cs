@@ -235,30 +235,22 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        //if (ChangeLogCapability) //ChangeLog not supported at this time...
-                        //{
-                        //    if (syncFull)
-                        //    {
-                        //        ChangeLogSync(remoteFolder);
-                        //    }
-                        //    else
-                        //    {
-                        //        ChangeLogSync(remoteFolder);
-                        //        WatcherSync(remoteFolderPath, localFolder);
-                        //    }
-                        //}
-                        //else
-                        //{
-                        // No ChangeLog capability, so we have to crawl remote and local folders.
-                        if (syncFull)
+                        if (ChangeLogCapability)
                         {
-                            CrawlSync(remoteFolder, localFolder);
+                            // ChangeLog sync...
+                            ChangeLogSync(remoteFolder);
+                            WatcherSync(remoteFolderPath, localFolder);
                         }
                         else
                         {
+                            // No ChangeLog capability, so we have to crawl remote and local folders.
                             WatcherSync(remoteFolderPath, localFolder);
+                        
+                            if (syncFull)
+                            {
+                                CrawlSync(remoteFolder, localFolder);
+                            }
                         }
-                        //}
                     }
                 }
             }
@@ -424,7 +416,7 @@ namespace CmisSync.Lib.Sync
             private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
             {
                 sleepWhileSuspended();
-                
+
                 IItemEnumerable<ICmisObject> children;
                 try
                 {
@@ -487,7 +479,7 @@ namespace CmisSync.Lib.Sync
             private bool DownloadFile(IDocument remoteDocument, string localFolder)
             {
                 sleepWhileSuspended();
-                
+
                 string fileName = remoteDocument.ContentStreamFileName;
                 Logger.Info("Downloading: " + fileName);
 
@@ -620,7 +612,7 @@ namespace CmisSync.Lib.Sync
             private bool UploadFile(string filePath, IFolder remoteFolder)
             {
                 sleepWhileSuspended();
-                
+
                 Logger.Info("Uploading: " + filePath);
 
                 try
@@ -667,7 +659,6 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
-
             /// <summary>
             /// Upload folder recursively.
             /// After execution, the hierarchy on server will be: .../remoteBaseFolder/localFolder/...
@@ -675,7 +666,7 @@ namespace CmisSync.Lib.Sync
             private void UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
             {
                 sleepWhileSuspended();
-                
+
                 IFolder folder;
                 try
                 {
@@ -885,6 +876,136 @@ namespace CmisSync.Lib.Sync
                 return metadata;
             }
 
+            /// <summary>
+            /// Rename a file remotely.
+            /// </summary>
+            private bool RenameFile(string directory, string newFilename, IDocument remoteFile)
+            {
+                sleepWhileSuspended();
+
+                string oldPathname = Path.Combine(directory, remoteFile.Name);
+                string newPathname = Path.Combine(directory, newFilename);
+                try
+                {
+
+                    Logger.InfoFormat("Renaming: {0} -> {1}", oldPathname, newPathname);
+
+                    IDictionary<string, object> properties = new Dictionary<string, object>();
+                    properties[PropertyIds.Name] = newFilename;
+
+                    IDocument updatedDocument = (IDocument)remoteFile.UpdateProperties(properties);
+
+                    // Update the path in the database...
+                    database.MoveFile(oldPathname, newPathname);
+
+                    // Update timestamp in database.
+                    database.SetFileServerSideModificationDate(newPathname, ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());
+
+                    Logger.InfoFormat("Renamed file: {0} -> {1}", oldPathname, newPathname);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    ProcessRecoverableException(String.Format("Could not rename file: {0} -> {1}", oldPathname, newPathname), e);
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Rename a folder remotely.
+            /// </summary>
+            private bool RenameFolder(string directory, string newFilename, IFolder remoteFolder)
+            {
+                sleepWhileSuspended();
+
+                string oldPathname = Path.Combine(directory, remoteFolder.Name);
+                string newPathname = Path.Combine(directory, newFilename);
+                try
+                {
+
+                    Logger.InfoFormat("Renaming: {0} -> {1}", oldPathname, newPathname);
+
+                    IDictionary<string, object> properties = new Dictionary<string, object>();
+                    properties[PropertyIds.Name] = newFilename;
+
+                    IFolder updatedFolder = (IFolder)remoteFolder.UpdateProperties(properties);
+
+                    // Update the path in the database...
+                    database.MoveFolder(oldPathname, newPathname);
+
+                    Logger.InfoFormat("Renamed folder: {0} -> {1}", oldPathname, newPathname);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    ProcessRecoverableException(String.Format("Could not rename folder: {0} -> {1}", oldPathname, newPathname), e);
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Move a file remotely.
+            /// </summary>
+            private bool MoveFile(string oldDirectory, string newDirectory, IFolder oldRemoteFolder, IFolder newRemoteFolder, IDocument remoteFile)
+            {
+                sleepWhileSuspended();
+
+                string oldPathname = Path.Combine(oldDirectory, remoteFile.Name);
+                string newPathname = Path.Combine(newDirectory, remoteFile.Name);
+                try
+                {
+
+                    Logger.InfoFormat("Moving: {0} -> {1}", oldPathname, newPathname);
+
+
+                    IDocument updatedDocument = (IDocument)remoteFile.Move(oldRemoteFolder, newRemoteFolder);
+
+                    // Update the path in the database...
+                    database.MoveFile(oldPathname, newPathname);
+
+                    // Update timestamp in database.
+                    database.SetFileServerSideModificationDate(newPathname, ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());
+
+                    Logger.InfoFormat("Moved file: {0} -> {1}", oldPathname, newPathname);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    ProcessRecoverableException(String.Format("Could not move file: {0} -> {1}", oldPathname, newPathname), e);
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Move a folder remotely.
+            /// </summary>
+            private bool MoveFolder(string oldDirectory, string newDirectory, IFolder oldRemoteFolder, IFolder newRemoteFolder, IFolder remoteFolder)
+            {
+                sleepWhileSuspended();
+
+                string oldPathname = Path.Combine(oldDirectory, remoteFolder.Name);
+                string newPathname = Path.Combine(newDirectory, remoteFolder.Name);
+                try
+                {
+
+                    Logger.InfoFormat("Moving: {0} -> {1}", oldPathname, newPathname);
+
+
+                    IFolder updatedFolder = (IFolder)remoteFolder.Move(oldRemoteFolder, newRemoteFolder);
+
+                    // Update the path in the database...
+                    database.MoveFolder(oldPathname, newPathname);
+
+                    Logger.InfoFormat("Moved folder: {0} -> {1}", oldPathname, newPathname);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    ProcessRecoverableException(String.Format("Could not move folder: {0} -> {1}", oldPathname, newPathname), e);
+                    return false;
+                }
+            }
+            
             /// <summary>
             /// Sleep while suspended.
             /// </summary>

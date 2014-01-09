@@ -351,8 +351,8 @@ namespace CmisSync.Lib
 
             if (Watcher.GetChangeCount() > 0)
             {
-                //Watcher was stopped (due to error) so empty queue and restart sync
-                Watcher.RemoveAll();
+                //Watcher was stopped (due to error) so clear and restart sync
+                Watcher.Clear();
             }
 
             Watcher.EnableRaisingEvents = true;
