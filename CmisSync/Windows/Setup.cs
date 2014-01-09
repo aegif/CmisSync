@@ -1071,11 +1071,14 @@ namespace CmisSync
                                 {
                                     Name = "TheSlider",
                                     Width = 400,
-                                    PollInterval = Controller.saved_sync_interval
+                                    PollInterval = (int)new LogScaleConverter().Convert(
+                                        Controller.saved_sync_interval, typeof(int), null, CultureInfo.CurrentCulture)
                                 };
-                                var sliderBinding = new Binding("TheSlider") { ElementName = "PollInterval" };
-                                sliderBinding.Converter = new LogScaleConverter();
-                                slider.SetBinding(Slider.ValueProperty, sliderBinding);
+                                
+                                // Not working yet, investigating at http://stackoverflow.com/questions/20946760/make-a-slider-use-an-existing-ivalueconverter
+                                var valueBinding = new Binding("PollInterval");
+                                valueBinding.Converter = new LogScaleConverter();
+                                slider.SetBinding(Slider.ValueProperty, valueBinding);
 
                                 TextBlock slider_min_label = new TextBlock()
                                 {
