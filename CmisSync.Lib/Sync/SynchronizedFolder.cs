@@ -235,30 +235,22 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        //if (ChangeLogCapability) //ChangeLog not supported at this time...
-                        //{
-                        //    if (syncFull)
-                        //    {
-                        //        ChangeLogSync(remoteFolder);
-                        //    }
-                        //    else
-                        //    {
-                        //        ChangeLogSync(remoteFolder);
-                        //        WatcherSync(remoteFolderPath, localFolder);
-                        //    }
-                        //}
-                        //else
-                        //{
-                        // No ChangeLog capability, so we have to crawl remote and local folders.
-                        if (syncFull)
+                        if (ChangeLogCapability)
                         {
-                            CrawlSync(remoteFolder, localFolder);
+                            // ChangeLog sync...
+                            ChangeLogSync(remoteFolder);
+                            WatcherSync(remoteFolderPath, localFolder);
                         }
                         else
                         {
+                            // No ChangeLog capability, so we have to crawl remote and local folders.
                             WatcherSync(remoteFolderPath, localFolder);
+                        
+                            if (syncFull)
+                            {
+                                CrawlSync(remoteFolder, localFolder);
+                            }
                         }
-                        //}
                     }
                 }
             }
