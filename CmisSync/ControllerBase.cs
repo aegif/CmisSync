@@ -48,7 +48,7 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Whether the reporsitories have finished loading.
+        /// Whether the repositories have finished loading.
         /// </summary>
         public bool RepositoriesLoaded { get; private set; }
 

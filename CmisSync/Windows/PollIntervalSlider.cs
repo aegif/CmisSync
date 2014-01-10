@@ -154,7 +154,7 @@ namespace CmisSync
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             double x = (int)value;
-            return Math.Log(x);
+            return (int)Math.Log(x);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -459,9 +459,9 @@ namespace CmisSync
 
 
             bool emptyAddress = string.IsNullOrEmpty(address);
-            bool rejexMatch = this.UrlRegex.IsMatch(address);
+            bool regexMatch = this.UrlRegex.IsMatch(address);
             // Check address validity.
-            if (!emptyAddress && rejexMatch)
+            if (!emptyAddress && regexMatch)
             {
                 try
                 {
@@ -470,18 +470,18 @@ namespace CmisSync
                 catch (Exception ex)
                 {
                     Logger.Debug("Error creating URI: " + ex.Message, ex);
-                    rejexMatch = false;
+                    regexMatch = false;
                 }
             }
             // Enable button to next step.
-            UpdateAddProjectButtonEvent(!emptyAddress && rejexMatch);
+            UpdateAddProjectButtonEvent(!emptyAddress && regexMatch);
 
             // Return validity error, or empty string if valid.
             if (emptyAddress)
             {
                 return "EmptyURLNotAllowed";
             }
-            if (!rejexMatch)
+            if (!regexMatch)
             {
                 return "InvalidURL";
             }
