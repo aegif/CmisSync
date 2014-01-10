@@ -208,7 +208,8 @@
     <value>チュートリアルをスキップ</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>このアドレスではCmisSyncがCMISサーバを見つけることができませんでした。アドレスが正しい場合、ブラウザで取得したXMLをCmisSyncフォーラムへ投稿してください。</value>
+    <value>このアドレスでは、有効なCMISサーバを見つけることができませんでした。アドレスをもう一度確認してください。
+アドレスが正しい場合、Webブラウザでアドレスを開き、得られたXMLの結果を cmissync@aegif.jp までお送りください。</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>スタートアップへCmisSyncを追加</value>
@@ -232,13 +233,13 @@
     <value>CmisSyncへようこそ！</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>次は何が起こるか？</value>
+    <value>次のアクション</value>
   </data>
   <data name="Where" xml:space="preserve">
     <value>サーバのURL</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>どのアドレスを指定するか</value>
+    <value>指定するアドレスについて</value>
   </data>
   <data name="Which" xml:space="preserve">
     <value>どのリモートフォルダを同期しますか？</value>
@@ -266,5 +267,11 @@
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>ローカルフォルダのオープン</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>CmisSync について</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>ログの表示</value>
   </data>
 </root>

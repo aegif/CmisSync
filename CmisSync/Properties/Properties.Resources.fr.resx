@@ -211,9 +211,7 @@ Veuillez vérifier votre nom d'utilisateur et votre mot de passe.</value>
     <value>Passer le tutoriel</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Désolé, CmisSync n'a pas trouvé de serveur CMIS à cette adresse.
-Vérifiez à nouveau l'adresse que vous avez saisie.
-Si vous êtes sûr(e) de l'adresse, ouvrez-la dans votre navigateur et ajoutez les données XML obtenues dans le forum de CmisSync.</value>
+    <value>Désolé, CmisSync ne peut pas trouver de serveur CMIS à cette adresse.  Vuillez vérifier à nouveau. Si vous êtes sûr de l'adresse, ouvrez-la dans un navigateur et envoyer le document XML obtenu à cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Ajouter CmisSync dans le menu démarrer</value>
@@ -271,5 +269,11 @@ Si vous êtes sûr(e) de l'adresse, ouvrez-la dans votre navigateur et ajoutez l
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>Ouvrir le dossier local</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>A Propos de CmisSync</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>Afficher le journal</value>
   </data>
 </root>

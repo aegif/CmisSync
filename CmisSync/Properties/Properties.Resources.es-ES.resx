@@ -208,7 +208,7 @@
     <value>Saltar el tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Lo sentimos, CmisSync no puedo encontrar un servidor CMIS en esta dirección. Por favor reviselo de nuevo. Si estás seguro acerca de la dirección, ábralo en un navegador y publique el XML resultante en el foro de CmisSync.</value>
+    <value>Lo siento, CmisSync no puede encontrar un servidor CMIS en esta dirección. Por favor comprueba nuevamente. Si estas seguro de la direccipón, abrela en un navegador y envia el XML resultante a cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Añadir CmisSync a la barra de inicio</value>
@@ -266,5 +266,11 @@
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>Abrir carpeta local</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Sobre CmisSync</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>Ver Log</value>
   </data>
 </root>

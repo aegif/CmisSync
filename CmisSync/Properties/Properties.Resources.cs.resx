@@ -208,7 +208,8 @@
     <value>Přeskočit kurz</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Je nám líto CmisSync nemůže najít CMIS server na této adrese. Zkontrolujte ji prosím znovu. Pokud jste si adresou jisti, otevřete ji v prohlížeči a publikujte výsledné XML na CmisSync fóru.</value>
+    <value>Omlouváme se, CmisSync na této adrese nenalezl CMIS server. Překontrolujte si zadanou adresu.
+Pokud jste si jistí adresou, otevřete tuto adresu v prohlížeči a odešlete výsledné XML na adresu cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Přidat CmisSync do položek po spuštění</value>
@@ -266,5 +267,11 @@
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>Otevřít místní složku</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>O CmisSyncu</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>Zobrazit log</value>
   </data>
 </root>

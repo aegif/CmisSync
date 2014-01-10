@@ -118,162 +118,161 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Додати</value>
+    <value>Dodaj</value>
   </data>
   <data name="AddARemoteFolder" xml:space="preserve">
-    <value>Додати віддалену папку...</value>
+    <value>Dodaj zdalny folder ...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Додавання синхронізуваної папки для CmisSync</value>
+    <value>Dodawaniesynchronizowanych folderów do CmisSync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
-    <value>Додавання папки</value>
+    <value>Dodawanie folderu</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Назад</value>
+    <value>Wstecz</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Скасувати</value>
+    <value>Anuluj</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync створює спеціальну папку на вашому комп'ютері, де синхронізуються документах.</value>
+    <value>CmisSync tworzy specjalny folder na komputerze, gdzie dokumenty są synchronizowane.</value>
   </data>
   <data name="Continue" xml:space="preserve">
-    <value>Продовжити</value>
+    <value>Kontunuuj</value>
   </data>
   <data name="Customize" xml:space="preserve">
-    <value>Змінити ім'я локальної папки</value>
+    <value>Dostosowanie nazwy folderu lokalnego</value>
   </data>
   <data name="DocumentsAre" xml:space="preserve">
-    <value>Документів автоматично оновлюються з урахуванням останніх змін від ваших колег і ваші зміни надсилаються на сервер автоматично також.</value>
+    <value>Dokumenty są automatycznie aktualizowane w celu uwzględnienia najnowszych zmian od swoich kolegów, i zmiany są wysyłane do serwera automatycznie.</value>
   </data>
   <data name="EmptyURLNotAllowed" xml:space="preserve">
-    <value>Порожня URL</value>
+    <value>Pusty adres URL</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Введіть ім'я для локальної папки, де синхронізуються документи</value>
+    <value>Wprowadź nazwę folderu lokalnego, gdzie dokumenty mają być synchronizowane</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Введіть веб-адресу, де можна побачити документи:</value>
+    <value>Wprowadź adres internetowy gdzie można zobaczyć dokumenty:</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Вихід</value>
+    <value>Wyjście</value>
   </data>
   <data name="FailedToSendSomeChanges" xml:space="preserve">
-    <value>Не вдалося надіслати деякі зміни</value>
+    <value>Nie udało się wysłać kilka zmian</value>
   </data>
   <data name="FilesUpToDate" xml:space="preserve">
-    <value>Файли для оновлення</value>
+    <value>Pliki zsynchronizowane</value>
   </data>
   <data name="Finish" xml:space="preserve">
-    <value>Закінчити</value>
+    <value>Ukończone</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Папка вже в кореневій папці CmisSync</value>
+    <value>Folder w folderze głównym CmisSync</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Допомога</value>
+    <value>Pomoc</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync дозволяє синхронізувати з будь-якого CMIS-сумісного сервера підприємства і використовувати ваші документи, навіть під час автономної роботи.  Це як Dropbox для управління корпоративним контентом!</value>
+    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+
+It is like Dropbox for Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>Неприпустиме ім'я папки. Спеціальні символи не дозволяються.</value>
+    <value>Nazwa folderu jest nieprawidłowa. Znaki specjalne nie są dozwolone.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
-    <value>Неприпустима URL-адреса</value>
+    <value>Nieprawidłowy adres URL</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
-    <value>Це може тривати короткий або тривалий час залежно від розміру папки.</value>
+    <value>Może to potrwać dłuższa chwilę w zależności od rozmiaru folderu.</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
-    <value>Відкрити синхронізовану папку</value>
+    <value>Otwieranie folderu synchronizowanego</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Пароль</value>
+    <value>Hasło</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>CMIS сервер знайдено, але немає дозволу. Будь ласка, перевірте ім'я користувача та пароль.</value>
+    <value>Serwer CMIS odmawia dostępu . Sprawdź nazwę użytkownika i hasło.</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>Ваші документи наразі синхронізується</value>
+    <value>Dokumenty są teraz synchronizowane</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
-    <value>Отримання змін...</value>
+    <value>Odbieranie zmian...</value>
   </data>
   <data name="SendingChanges" xml:space="preserve">
-    <value>Надсилання змін...</value>
+    <value>Wysyłanie zmian...</value>
   </data>
   <data name="SkipTutorial" xml:space="preserve">
-    <value>Пропустити підручник</value>
+    <value>Pomiń samouczek</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
-Please check again.
-If you are sure about the address, open it in a browser and send
-the resulting XML to cmissync@aegif.jp</value>
+    <value>Niestety, CmisSync nie można znaleźć serwera CMIS pod tym adresem. Sprawdź jeszcze raz. Jeśli jesteś pewny adresu, otwórz go w przeglądarce i wyślij wynikowy XML na adres e-mail : cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Додати CmisSync до автозапуску</value>
+    <value>Dodaj CmisSync do autostartu</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>Значок стану, щоб допомогти</value>
+    <value>Ikona stanu jest tutaj, aby pomóc</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>Значок стану CmisSync показує прогрес синхронізації і забезпечує легкий доступ до ваших папок.</value>
+    <value>Ikona CmisSync pokazuje stan i postęp synchronizacji oraz zapewnia łatwy dostęp do folderów.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
-    <value>Синхронізація</value>
+    <value>Synchronizacja</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
-    <value>Триває синхронізація змін...</value>
+    <value>Synchronizowanie zmian...</value>
   </data>
   <data name="User" xml:space="preserve">
-    <value>Користувач</value>
+    <value>Użytkownik</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Ласкаво просимо до CmisSync!</value>
+    <value>Witamy w CmisSync!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>Що відбувається далі?</value>
+    <value>Co się dzieje dalej?</value>
   </data>
   <data name="Where" xml:space="preserve">
-    <value>Де знаходиться сервер організації?</value>
+    <value>Gdzie jest serwer w firmie?</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>Де знайти цю адресу</value>
+    <value>Gdzie można znaleźć ten adres</value>
   </data>
   <data name="Which" xml:space="preserve">
-    <value>Яку віддалену папку ви хочете синхронізувати?</value>
+    <value>Które zdalne foldery chcesz synchronizować?</value>
   </data>
   <data name="YouCan" xml:space="preserve">
-    <value>Ви можете легко додати нові папки CMIS в будь-який час.</value>
+    <value>Możesz łatwo dodać nowy folder CMIS w dowolnym momencie.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Їх можна знайти в папці CmisSync.</value>
+    <value>Można je znaleźć w folderze CmisSync.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Змінити локальний шлях до цього репозиторію:</value>
+    <value>Zmiana ścieżki lokalnej dla tego repozytorium:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Локальна папка з таким ім'ям вже існує, будь ласка, виберіть інше ім'я.</value>
+    <value>Lokalny folder o tej samej nazwie już istnieje, proszę użyć innej nazwy.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
-    <value>Зупинити синхронізацію</value>
+    <value>Wstrzymaj synchronizacje</value>
   </data>
   <data name="ResumeSync" xml:space="preserve">
-    <value>Відновити синхронізацію</value>
+    <value>Wznów synchronizacje</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
-    <value>Огляд віддаленої папки</value>
+    <value>Przeglądanie folderu zdalnego</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
-    <value>Відкрити локальну папку</value>
+    <value>Otwórz folder lokalny</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>About CmisSync</value>
+    <value>O CmisSync</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
-    <value>View Log</value>
+    <value>Pokaż dziennik</value>
   </data>
 </root>

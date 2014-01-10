@@ -210,7 +210,10 @@ Het is zoals Dropbox voor Enterprise Content Management!</value>
     <value>Introductie overslaan</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Het spijt ons, CmisSync kan geen CMIS server vinden op dit adres. Gelieve de gegevens te controleren. Indien u zeker bent dat het adres correct is, open het in een browser en plaats de resulterende XML code op het CmisSync forum.</value>
+    <value>Sorry, CmisSync can not find a CMIS server at this address.
+Please check again.
+If you are sure about the address, open it in a browser and send
+the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>CmisSync toevoegen aan opstartitems</value>
@@ -268,5 +271,11 @@ Het is zoals Dropbox voor Enterprise Content Management!</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>Lokale map openen</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>About CmisSync</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>View Log</value>
   </data>
 </root>
