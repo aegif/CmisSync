@@ -267,6 +267,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.cs.resx" />
+    <EmbeddedResource Include="Properties.Resources.nl.resx" />
+    <EmbeddedResource Include="Properties.Resources.pl.resx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />

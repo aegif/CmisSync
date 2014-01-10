@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" >
 
-  <Product Name="CmisSync" Id="C7E5E77C-EC7B-4CF2-8B25-A8A69A8E2A55" UpgradeCode="00CAC8B4-6592-4038-807D-846959F4BD69"
+  <Product Name="CmisSync" Id="10e53371-9e88-4fdb-a7d4-c49378209e17" UpgradeCode="00CAC8B4-6592-4038-807D-846959F4BD69"
     Language="1033" Codepage="1252" Version="$(var.BuildVersion)" Manufacturer="Aegif">
 
     <Package Id="*" Keywords="Installer" Description="CmisSync Setup" Manufacturer="CmisSync"
@@ -19,10 +19,13 @@
         <Directory Id="INSTALLDIR" Name="CmisSync">
           <Directory Id="DIR_x86" Name="x86"/>
           <Directory Id="DIR_x64" Name="x64"/>
+          <Directory Id="localeDirectoryCS" Name="cs"/>
           <Directory Id="localeDirectoryDE" Name="de"/>
           <Directory Id="localeDirectoryES" Name="es-ES"/>
           <Directory Id="localeDirectoryFR" Name="fr"/>
           <Directory Id="localeDirectoryJA" Name="ja"/>
+          <Directory Id="localeDirectoryNL" Name="nl"/>
+          <Directory Id="localeDirectoryPL" Name="pl"/>
           <Directory Id="localeDirectoryUK" Name="uk"/>
           <!--<Directory Id="localeDirectoryTLH" Name="tlh-KX"/>-->
           <Directory Id="PLUGINS_DIR" Name="plugins"/>
@@ -70,6 +73,13 @@
       </Component>
     </DirectoryRef>
 
+    <DirectoryRef Id="localeDirectoryCS">
+      <Component Id="localeComponentCS" Guid="a4547d4f-3fa5-48e6-bdf2-5f947e6ee3ac">
+        <CreateFolder />
+        <File Id="localeFileCS" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\cs\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
+      </Component>
+    </DirectoryRef>
+
     <DirectoryRef Id="localeDirectoryDE">
       <Component Id="localeComponentDE" Guid="FC474E35-94BC-4B57-9541-03551DF14642">
         <CreateFolder />
@@ -90,10 +100,25 @@
         <File Id="localeFileFR" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\fr\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
+
     <DirectoryRef Id="localeDirectoryJA">
       <Component Id="localeComponentJA" Guid="953D63DF-E558-4D50-9F73-7DD51E64D8DA">
         <CreateFolder />
         <File Id="localeFileJA" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\ja\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="localeDirectoryNL">
+      <Component Id="localeComponentNL" Guid="f322bf3e-4daa-4301-adfd-32745cfb2a23">
+        <CreateFolder />
+        <File Id="localeFileNL" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\nl\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="localeDirectoryPL">
+      <Component Id="localeComponentPL" Guid="10e53371-9e88-4fdb-a7d4-c49378209e17">
+        <CreateFolder />
+        <File Id="localeFilePL" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\pl\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
 
@@ -160,10 +185,13 @@
       <ComponentRef Id="DesktopShortcut" />
       <ComponentRef Id="CmisSyncAppData" />
       <ComponentRef Id="StartupMenuItem" />
+      <ComponentRef Id="localeComponentCS" />
       <ComponentRef Id="localeComponentDE" />
       <ComponentRef Id="localeComponentES" />
       <ComponentRef Id="localeComponentFR" />
       <ComponentRef Id="localeComponentJA" />
+      <ComponentRef Id="localeComponentNL" />
+      <ComponentRef Id="localeComponentPL" />
       <ComponentRef Id="localeComponentUK" />
       <!--<ComponentGroupRef Id="pluginsComponentGroup" />-->
     </Feature>
