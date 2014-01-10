@@ -333,6 +333,45 @@ namespace CmisSync.Lib.Cmis
             ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
         }
 
+        /// <summary>
+        /// Move a file.
+        /// </summary>
+        public void MoveFile(string oldPath, string newPath)
+        {
+            oldPath = Normalize(oldPath);
+            newPath = Normalize(newPath);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("oldPath", oldPath);
+            parameters.Add("newPath", newPath);
+            ExecuteSQLAction("UPDATE files SET path=@newPath WHERE path=@oldPath", parameters);
+        }
+
+
+        /// <summary>
+        /// Move a folder.
+        /// </summary>
+        public void MoveFolder(string oldPath, string newPath)
+        {
+            oldPath = Normalize(oldPath);
+            newPath = Normalize(newPath);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("oldPath", oldPath);
+            parameters.Add("oldPathLike", oldPath + "/%");
+            parameters.Add("substringIndex", oldPath.Length + 1);
+            parameters.Add("newPath", newPath);
+            
+            // Update folder itself
+            ExecuteSQLAction("UPDATE folders SET path=@newPath WHERE path=@oldPath", parameters);
+
+            // UPdate all folders under this folder
+            ExecuteSQLAction("UPDATE folders SET path=@newPath||SUBSTR(path, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
+
+            // Update all files under this folder
+            ExecuteSQLAction("UPDATE files SET path=@newPath||SUBSTR(path, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
+        }
+
 
         /// <summary>
         /// Get the time at which the file was last modified.
@@ -512,7 +551,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Error(e.Message);
+                    Logger.Error(String.Format("Could not execute SQL: {0}; {1}", text, JsonConvert.SerializeObject(parameters)), e);
                     throw;
                 }
             }
@@ -535,7 +574,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Error(e.Message);
+                    Logger.Error(String.Format("Could not execute SQL: {0}; {1}", text, JsonConvert.SerializeObject(parameters)), e);
                     throw;
                 }
             }
