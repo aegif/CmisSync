@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" >
 
-  <Product Name="CmisSync" Id="10e53371-9e88-4fdb-a7d4-c49378209e17" UpgradeCode="00CAC8B4-6592-4038-807D-846959F4BD69"
+  <Product Name="CmisSync" Id="08B73992-D400-4D9E-9BE5-4486CA0E09BA" UpgradeCode="00CAC8B4-6592-4038-807D-846959F4BD69"
     Language="1033" Codepage="1252" Version="$(var.BuildVersion)" Manufacturer="Aegif">
 
-    <Package Id="*" Keywords="Installer" Description="CmisSync Setup" Manufacturer="CmisSync"
+    <Package Id="*" Keywords="Installer" Description="CmisSync Setup" Manufacturer="Aegif"
       InstallerVersion="100" Languages="1033" Compressed="yes" SummaryCodepage="1252" InstallScope="perMachine" />
 
     <PropertyRef Id="NETFRAMEWORK40CLIENT" />
@@ -74,7 +74,7 @@
     </DirectoryRef>
 
     <DirectoryRef Id="localeDirectoryCS">
-      <Component Id="localeComponentCS" Guid="a4547d4f-3fa5-48e6-bdf2-5f947e6ee3ac">
+      <Component Id="localeComponentCS" Guid="C84BF5D4-4B4E-4FC4-9116-4BD0878EBDD4">
         <CreateFolder />
         <File Id="localeFileCS" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\cs\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
@@ -109,14 +109,14 @@
     </DirectoryRef>
 
     <DirectoryRef Id="localeDirectoryNL">
-      <Component Id="localeComponentNL" Guid="f322bf3e-4daa-4301-adfd-32745cfb2a23">
+      <Component Id="localeComponentNL" Guid="F726E946-E3CD-4806-9883-F06650B4AEBD">
         <CreateFolder />
         <File Id="localeFileNL" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\nl\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
     </DirectoryRef>
 
     <DirectoryRef Id="localeDirectoryPL">
-      <Component Id="localeComponentPL" Guid="10e53371-9e88-4fdb-a7d4-c49378209e17">
+      <Component Id="localeComponentPL" Guid="9290EFD5-B859-452A-9304-B18279152F45">
         <CreateFolder />
         <File Id="localeFilePL" Name="CmisSync.resources.dll" Source="$(var.CmisSync.TargetDir)\pl\CmisSync.resources.dll" KeyPath="yes" DiskId="1" />
       </Component>
