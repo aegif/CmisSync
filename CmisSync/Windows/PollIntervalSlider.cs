@@ -9,6 +9,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Data;
 using System.Globalization;
+using System.ComponentModel;
 
 namespace CmisSync
 {
@@ -45,14 +46,14 @@ namespace CmisSync
         public PollIntervalSlider()
         {
             this.IsSnapToTickEnabled = true;
-            this.Minimum = 5;
-            this.Maximum = 60 * 60 * 24;
+            this.Minimum = (int)new LogScaleConverter().Convert(5, typeof(int), null, CultureInfo.CurrentCulture);
+            this.Maximum = (int)new LogScaleConverter().Convert(60 * 60 * 24, typeof(int), null, CultureInfo.CurrentCulture);
             this.TickPlacement = TickPlacement.BottomRight;
             this.AutoToolTipPlacement = AutoToolTipPlacement.BottomRight;
 
             // Add ticks to the slider.
             DoubleCollection tickMarks = new DoubleCollection();
-            tickMarks.Add(5); // 5 seconds
+            /*tickMarks.Add(5); // 5 seconds
             tickMarks.Add(60);
             tickMarks.Add(60 * 2); // 2 minutes
             tickMarks.Add(60 * 3);
@@ -65,7 +66,12 @@ namespace CmisSync
             tickMarks.Add(60 * 60 * 4);
             tickMarks.Add(60 * 60 * 8);
             tickMarks.Add(60 * 60 * 12);
-            tickMarks.Add(60 * 60 * 24);
+            tickMarks.Add(60 * 60 * 24);*/
+
+            tickMarks.Add((int)new LogScaleConverter().Convert(5, typeof(int), null, CultureInfo.CurrentCulture)); // 5 seconds
+            tickMarks.Add((int)new LogScaleConverter().Convert(60, typeof(int), null, CultureInfo.CurrentCulture));
+            tickMarks.Add((int)new LogScaleConverter().Convert(60*60, typeof(int), null, CultureInfo.CurrentCulture));
+            tickMarks.Add((int)new LogScaleConverter().Convert(60 * 60 * 24, typeof(int), null, CultureInfo.CurrentCulture));
             this.Ticks = tickMarks;
         }
 
@@ -151,16 +157,59 @@ namespace CmisSync
 
     public class LogScaleConverter : IValueConverter
     {
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(LogScaleConverter));
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            double x = (int)value;
-            return (int)Math.Log(x);
+            Logger.Debug("Convert " + value + " type:" + value.GetType());
+            double x;
+            if (value.GetType().Equals(typeof(System.Double)))
+            {
+                Double d = (Double)value;
+                x = Double.Parse(d.ToString());
+            }
+            else
+            {
+                int intvalue = (int)value;
+                x = (double)intvalue;
+            }
+            double log = Math.Log(x);
+            return (int)log;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             double x = (double)value;
             return (int)Math.Exp(x);
+        }
+    }
+
+    public class SliderViewModel : INotifyPropertyChanged
+    {
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(SliderViewModel));
+
+        private double _sliderValue;
+
+        public SliderViewModel(int initialPollInterval)
+        {
+            _sliderValue = (double)initialPollInterval;
+        }
+
+        public double SliderValue
+        {
+            get {
+                return _sliderValue;
+            }
+            set {
+                _sliderValue = (int)new LogScaleConverter().Convert(value, typeof(int), null, CultureInfo.CurrentCulture);
+                /*NotifyOfPropertyChanged("SliderValue");*/
+            }
+        }
+        
+        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+        {
+            add { Logger.Debug("PropertyChanged add"); }
+            remove { Logger.Debug("PropertyChanged remove"); }
         }
     }
 }

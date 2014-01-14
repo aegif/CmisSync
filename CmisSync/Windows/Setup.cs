@@ -996,7 +996,7 @@ namespace CmisSync
                             }
                         #endregion
 
-                        // Settings Dialog...
+                        // Settings dialog.
                         #region Page Settings
                         case PageType.Settings:
                             {
@@ -1070,13 +1070,18 @@ namespace CmisSync
                                 PollIntervalSlider slider = new PollIntervalSlider()
                                 {
                                     Name = "TheSlider",
-                                    Width = 400,
+                                    Width = 400/*,
                                     PollInterval = (int)new LogScaleConverter().Convert(
-                                        Controller.saved_sync_interval, typeof(int), null, CultureInfo.CurrentCulture)
+                                        Controller.saved_sync_interval, typeof(int), null, CultureInfo.CurrentCulture)*/
                                 };
-                                
-                                // Not working yet, investigating at http://stackoverflow.com/questions/20946760/make-a-slider-use-an-existing-ivalueconverter
-                                var valueBinding = new Binding("PollInterval");
+
+                                var sliderViewModel = new SliderViewModel(Controller.saved_sync_interval);
+                                slider.DataContext = sliderViewModel;
+                                //var logScaleConverter = new LogScaleConverter();
+                                //You can either put this in a binding or if you hard code the value then just do this
+                                //slider.Value = logScaleConverter.Convert(10); //This is where you pass your linear like 1,2,10,1000 for instance. You probably want to use this method on how you set the Value property of the slider. Use the logScaleConverter.Convert(10); for example.
+
+                                var valueBinding = new Binding("SliderValue"); //If you are doing MVVM Pattern, then this is the property that you bound it to. Say public double SliderValue { get; set; }
                                 valueBinding.Converter = new LogScaleConverter();
                                 slider.SetBinding(Slider.ValueProperty, valueBinding);
 
