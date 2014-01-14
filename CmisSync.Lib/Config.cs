@@ -33,8 +33,9 @@ namespace CmisSync.Lib
         /// <summary>
         /// Default poll interval.
         /// It is used for any newly created synchronized folder.
+        /// In milliseconds.
         /// </summary>
-        public static readonly int DEFAULT_POLL_INTERVAL = 1 * 60 * 1000; //1 minute
+        public static readonly int DEFAULT_POLL_INTERVAL = 5 * 1000; // 5 seconds.
 
 
         /// <summary>
