@@ -237,9 +237,11 @@ namespace CmisSync.Lib.Sync
                                         DownloadFile(remoteDocument, localFolder);
                                         repo.OnConflictResolved();
 
+                                        string message = "Someone modified a file at the same time as you: " + filePath
+                                            + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.";
+                                        Logger.Info(message);
                                         // TODO move to OS-dependant layer
-                                        //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                        //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
+                                        //System.Windows.Forms.MessageBox.Show(message);
                                         // TODO show CMIS property lastModifiedBy
                                     }
                                     else
@@ -248,7 +250,6 @@ namespace CmisSync.Lib.Sync
                                         DownloadFile(remoteDocument, localFolder);
                                     }
                                 }
-
                             }
                         }
                         else
