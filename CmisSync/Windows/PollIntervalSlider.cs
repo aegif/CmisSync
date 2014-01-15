@@ -32,10 +32,10 @@ namespace CmisSync
         /// </summary>
         public int PollInterval {
             get {
-                return (int)this.Value * 1000;
+                return 1000 * LogScaleConverter.ConvertBack((int)Value);
             }
             set {
-                this.Value = value / 1000;
+                this.Value = LogScaleConverter.Convert(value);
             }
         }
 
@@ -46,35 +46,27 @@ namespace CmisSync
         public PollIntervalSlider()
         {
             this.IsSnapToTickEnabled = true;
-            this.Minimum = (int)new LogScaleConverter().Convert(5, typeof(int), null, CultureInfo.CurrentCulture);
-            this.Maximum = (int)new LogScaleConverter().Convert(60 * 60 * 24, typeof(int), null, CultureInfo.CurrentCulture);
+            this.Minimum = LogScaleConverter.Convert(1000 * 5);
+            this.Maximum = LogScaleConverter.Convert(1000 * 60 * 60 * 24);
             this.TickPlacement = TickPlacement.BottomRight;
             this.AutoToolTipPlacement = AutoToolTipPlacement.BottomRight;
 
             // Add ticks to the slider.
             DoubleCollection tickMarks = new DoubleCollection();
-            /*tickMarks.Add(5); // 5 seconds
-            tickMarks.Add(60);
-            tickMarks.Add(60 * 2); // 2 minutes
-            tickMarks.Add(60 * 3);
-            tickMarks.Add(60 * 5);
-            tickMarks.Add(60 * 10);
-            tickMarks.Add(60 * 15);
-            tickMarks.Add(60 * 30);
-            tickMarks.Add(60 * 60);
-            tickMarks.Add(60 * 60 * 2); // 2 hours
-            tickMarks.Add(60 * 60 * 4);
-            tickMarks.Add(60 * 60 * 8);
-            tickMarks.Add(60 * 60 * 12);
-            tickMarks.Add(60 * 60 * 24);*/
-
-            tickMarks.Add((int)new LogScaleConverter().Convert(5, typeof(int), null, CultureInfo.CurrentCulture)); // 5 seconds
-            tickMarks.Add((int)new LogScaleConverter().Convert(60, typeof(int), null, CultureInfo.CurrentCulture));
-            tickMarks.Add((int)new LogScaleConverter().Convert(60*60, typeof(int), null, CultureInfo.CurrentCulture));
-            tickMarks.Add((int)new LogScaleConverter().Convert(60 * 60 * 24, typeof(int), null, CultureInfo.CurrentCulture));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 5)); // 5 seconds.
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 15));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 30));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60 * 3)); // 3 minutes.
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60 * 10));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60 * 30));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60 * 60));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60 * 60 * 3)); // 3 hours.
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60 * 60 * 8));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60 * 60 * 12));
+            tickMarks.Add(LogScaleConverter.Convert(1000 * 60 * 60 * 24));
             this.Ticks = tickMarks;
         }
-
 
 
         protected override void OnThumbDragStarted(DragStartedEventArgs e)
@@ -105,30 +97,31 @@ namespace CmisSync
 
         private string FormatToolTip(int value)
         {
+            value = LogScaleConverter.ConvertBack(value);
             TimeSpan timeSpan = new TimeSpan(0, 0, value);
             if (value < 60)
             {
-                return timeSpan.ToString("%s") + " " + Properties_Resources.Seconds;
+                return timeSpan.ToString("%s") + " " + Properties_Resources.Seconds + " " + value;
             }
             else if (value == 60)
             {
-                return timeSpan.ToString("%m") + " " + Properties_Resources.Minute;
+                return timeSpan.ToString("%m") + " " + Properties_Resources.Minute + " " + value;
             }
             else if (value < 60 * 60)
             {
-                return timeSpan.ToString("%m") + " " + Properties_Resources.Minutes;
+                return timeSpan.ToString("%m") + " " + Properties_Resources.Minutes + " " + value;
             }
             else if (value == 60 * 60)
             {
-                return timeSpan.ToString("%h") + " " + Properties_Resources.Hour;
+                return timeSpan.ToString("%h") + " " + Properties_Resources.Hour + " " + value;
             }
             else if (value < 60 * 60 * 24)
             {
-                return timeSpan.ToString("%h") + " " + Properties_Resources.Hours;
+                return timeSpan.ToString("%h") + " " + Properties_Resources.Hours + " " + value;
             }
             else
             {
-                return timeSpan.ToString("%d") + " " + Properties_Resources.Day;
+                return timeSpan.ToString("%d") + " " + Properties_Resources.Day + " " + value;
             }
         }
 
@@ -155,61 +148,51 @@ namespace CmisSync
     }
 
 
-    public class LogScaleConverter : IValueConverter
+    public class LogScaleConverter
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(LogScaleConverter));
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+
+        public static int Convert(int value)
         {
-            Logger.Debug("Convert " + value + " type:" + value.GetType());
-            double x;
-            if (value.GetType().Equals(typeof(System.Double)))
+            return (int)Math.Log((double)value);
+        }
+
+
+        public static int ConvertBack(int value)
+        {
+            Logger.Debug("ConvertBack " + value + " type:" + value.GetType());
+            value = (int)Math.Exp((double)value) / 1000;
+            // Because of int rounding, approximation errors appear at exp/log conversion.
+            // This fixes the error for our known initial values.
+            switch (value)
             {
-                Double d = (Double)value;
-                x = Double.Parse(d.ToString());
+                case 2:
+                    return 5;
+                case 8:
+                    return 15;
+                case 22:
+                    return 30;
+                case 59:
+                    return 60;
+                case 162:
+                    return 60 * 3;
+                case 442:
+                    return 60 * 10;
+                case 1202:
+                    return 60 * 30;
+                case 3269:
+                    return 60 * 60;
+                case 8886:
+                    return 60 * 60 * 3;
+                case 24154:
+                    return 60 * 60 * 8;
+                case 65659:
+                    return 60 * 60 * 24;
+                default:
+                    Logger.Error("Should not happen");
+                    return 5;
             }
-            else
-            {
-                int intvalue = (int)value;
-                x = (double)intvalue;
-            }
-            double log = Math.Log(x);
-            return (int)log;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            double x = (double)value;
-            return (int)Math.Exp(x);
-        }
-    }
-
-    public class SliderViewModel : INotifyPropertyChanged
-    {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof(SliderViewModel));
-
-        private double _sliderValue;
-
-        public SliderViewModel(int initialPollInterval)
-        {
-            _sliderValue = (double)initialPollInterval;
-        }
-
-        public double SliderValue
-        {
-            get {
-                return _sliderValue;
-            }
-            set {
-                _sliderValue = (int)new LogScaleConverter().Convert(value, typeof(int), null, CultureInfo.CurrentCulture);
-                /*NotifyOfPropertyChanged("SliderValue");*/
-            }
-        }
-        
-        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
-        {
-            add { Logger.Debug("PropertyChanged add"); }
-            remove { Logger.Debug("PropertyChanged remove"); }
         }
     }
 }
