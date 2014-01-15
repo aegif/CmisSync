@@ -131,6 +131,10 @@ namespace CmisSync.Lib.Sync
                     case ChangeType.Security:
                         // TODO
                         break;
+
+                    default:
+                        Logger.Warn("Not applied because change not implemented:" + change.ChangeType);
+                        break;
                 }
             }
         }

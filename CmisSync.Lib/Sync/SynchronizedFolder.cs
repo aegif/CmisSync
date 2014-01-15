@@ -235,14 +235,15 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        if (ChangeLogCapability)
-                        {
-                            // ChangeLog sync...
-                            ChangeLogSync(remoteFolder);
-                            WatcherSync(remoteFolderPath, localFolder);
-                        }
-                        else
-                        {
+                    // ChangeLog is not ready yet.
+                    //    if (ChangeLogCapability)
+                    //    {
+                    //        // ChangeLog sync...
+                    //        ChangeLogSync(remoteFolder);
+                    //        WatcherSync(remoteFolderPath, localFolder);
+                    //    }
+                    //    else
+                    //    {
                             // No ChangeLog capability, so we have to crawl remote and local folders.
                             WatcherSync(remoteFolderPath, localFolder);
                         
@@ -250,7 +251,7 @@ namespace CmisSync.Lib.Sync
                             {
                                 CrawlSync(remoteFolder, localFolder);
                             }
-                        }
+                     //   }
                     }
                 }
             }
