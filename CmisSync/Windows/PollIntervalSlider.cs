@@ -101,27 +101,27 @@ namespace CmisSync
             TimeSpan timeSpan = new TimeSpan(0, 0, value);
             if (value < 60)
             {
-                return timeSpan.ToString("%s") + " " + Properties_Resources.Seconds + " " + value;
+                return timeSpan.ToString("%s") + " " + Properties_Resources.Seconds;
             }
             else if (value == 60)
             {
-                return timeSpan.ToString("%m") + " " + Properties_Resources.Minute + " " + value;
+                return timeSpan.ToString("%m") + " " + Properties_Resources.Minute;
             }
             else if (value < 60 * 60)
             {
-                return timeSpan.ToString("%m") + " " + Properties_Resources.Minutes + " " + value;
+                return timeSpan.ToString("%m") + " " + Properties_Resources.Minutes;
             }
             else if (value == 60 * 60)
             {
-                return timeSpan.ToString("%h") + " " + Properties_Resources.Hour + " " + value;
+                return timeSpan.ToString("%h") + " " + Properties_Resources.Hour;
             }
             else if (value < 60 * 60 * 24)
             {
-                return timeSpan.ToString("%h") + " " + Properties_Resources.Hours + " " + value;
+                return timeSpan.ToString("%h") + " " + Properties_Resources.Hours;
             }
             else
             {
-                return timeSpan.ToString("%d") + " " + Properties_Resources.Day + " " + value;
+                return timeSpan.ToString("%d") + " " + Properties_Resources.Day;
             }
         }
 
