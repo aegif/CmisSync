@@ -313,98 +313,101 @@ namespace CmisSync.Lib.Sync
             private void ProcessRecoverableException(string logMessage, Exception exception)
             {
                 bool recoverable;
-                //Exceptions: http://docs.oasis-open.org/cmis/CMIS/v1.0/cs01/cmis-spec-v1.0.html#_Toc243905433
+                // Exceptions: http://docs.oasis-open.org/cmis/CMIS/v1.0/cs01/cmis-spec-v1.0.html#_Toc243905433
                 if (exception is CmisInvalidArgumentException)
                 {
-                    //One or more of the input parameters to the service method is missing or invalid (any method)
+                    // One or more of the input parameters to the service method is missing or invalid (any method)
                     recoverable = true;
                 }
                 else if (exception is CmisObjectNotFoundException)
                 {
-                    //The service call has specified an object that does not exist in the Repository (any method)
+                    // The service call has specified an object that does not exist in the Repository (any method)
                     recoverable = true;
                 }
                 else if (exception is CmisNotSupportedException)
                 {
-                    //The service method invoked requires an optional capability not supported by the repository (any method)
+                    // The service method invoked requires an optional capability not supported by the repository (any method)
                     recoverable = false;
                 }
                 else if (exception is CmisPermissionDeniedException)
                 {
-                    //The caller of the service method does not have sufficient permissions to perform the operation (any method)
+                    // The caller of the service method does not have sufficient permissions to perform the operation (any method)
                     recoverable = false;
                 }
                 else if (exception is CmisRuntimeException)
                 {
-                    //Any other cause not expressible by another CMIS exception (any method)
+                    // Any other cause not expressible by another CMIS exception (any method)
                     recoverable = false;
                 }
                 else if (exception is CmisConstraintException)
                 {
-                    //The operation violates a Repository- or Object-level constraint defined in the CMIS domain model (write methods)
+                    // The operation violates a Repository- or Object-level constraint defined in the CMIS domain model (write methods)
                     recoverable = true;
                 }
                 else if (exception is CmisContentAlreadyExistsException)
                 {
-                    //The operation attempts to set the content stream for a Document that already has a content stream without explicitly specifying the �overwriteFlag� parameter (setContentStream method)
+                    // The operation attempts to set the content stream for a Document that already has a content stream without explicitly specifying the �overwriteFlag� parameter (setContentStream method)
                     recoverable = true;
                 }
                 else if (exception is CmisFilterNotValidException)
                 {
-                    //The property filter or rendition filter input to the operation is not valid (read methods)
+                    // The property filter or rendition filter input to the operation is not valid (read methods)
                     recoverable = true;
                 }
                 else if (exception is CmisNameConstraintViolationException)
                 {
-                    //The repository is not able to store the object that the user is creating/updating due to a name constraint violation (write methods)
+                    // The repository is not able to store the object that the user is creating/updating due to a name constraint violation (write methods)
                     recoverable = true;
                 }
                 else if (exception is CmisStorageException)
                 {
-                    //The repository is not able to store the object that the user is creating/updating due to an internal storage problem (write methods)
+                    // The repository is not able to store the object that the user is creating/updating due to an internal storage problem (write methods)
                     recoverable = true;
                 }
                 else if (exception is CmisStreamNotSupportedException)
                 {
-                    //The operation is attempting to get or set a contentStream for a Document whose Object-type specifies that a content stream is not allowed for Document�s of that type (write methods)
+                    // The operation is attempting to get or set a contentStream for a Document whose Object-type specifies that a content stream is not allowed for Document�s of that type (write methods)
                     recoverable = true;
                 }
                 else if (exception is CmisUpdateConflictException)
                 {
-                    //The operation is attempting to update an object that is no longer current (as determined by the repository) (write methods)
+                    // The operation is attempting to update an object that is no longer current (as determined by the repository) (write methods)
                     recoverable = true;
                 }
                 else if (exception is CmisVersioningException)
                 {
-                    //The operation is attempting to perform an action on a non-current version of a Document that cannot be performed on a non-current version.
+                    // The operation is attempting to perform an action on a non-current version of a Document that cannot be performed on a non-current version.
                     recoverable = true;
                 }
                 else if (exception is CmisConnectionException)
                 {
-                    //Client unable to connect to server
+                    // Client unable to connect to server
                     recoverable = false;
                 }
                 else if (exception is IOException)
                 {
-                    //IO Exception
+                    // IO Exception
                     recoverable = true;
                 }
                 else if (exception is UnauthorizedAccessException)
                 {
-                    //Unable to access file/directory
+                    // Unable to access file/directory
+                    recoverable = true;
+                }
+                else if (exception is ArgumentException)
+                {
+                    // File contains characters not valid for .NET, for instance carriage return.
                     recoverable = true;
                 }
                 else
                 {
-                    //All other errors...
+                    // All other errors...
                     recoverable = false;
                 }
 
-                if (recoverable)
-                {
-                    Logger.Error(logMessage, exception);
-                }
-                else
+                Logger.Error(logMessage, exception);
+
+                if ( ! recoverable)
                 {
                     throw exception;
                 }
