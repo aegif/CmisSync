@@ -22,7 +22,6 @@ Requires: mono-data-sqlite
 
 %description
 DataSpace Sync allows you to keep in sync with your CMIS repository.
-It is like Dropbox for Enterprise Content Management!
 
 More information is available at http://graudata.com/ .
 
