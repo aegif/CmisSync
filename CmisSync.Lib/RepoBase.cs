@@ -54,6 +54,18 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Whether this folder's synchronization is running right now.
+        /// </summary>
+        public abstract bool isSyncing();
+
+
+        /// <summary>
+        /// Whether this folder's synchronization is suspended right now.
+        /// </summary>
+        public abstract bool isSuspended();
+
+
+        /// <summary>
         /// Path of the local synchronized folder.
         /// </summary>
         public readonly string LocalPath;

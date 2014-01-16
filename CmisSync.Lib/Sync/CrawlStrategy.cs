@@ -58,7 +58,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlSync(IFolder remoteFolder, string localFolder)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 // Lists of files/folders, to delete those that have been removed on the server.
                 IList remoteFiles = new ArrayList();
@@ -91,7 +91,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
                 
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
@@ -121,7 +121,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlRemoteFolder(IFolder remoteSubFolder, string localFolder, IList remoteFolders)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 try
                 {
@@ -185,7 +185,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlRemoteDocument(IDocument remoteDocument, string localFolder, IList remoteFiles)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 try
                 {
@@ -283,7 +283,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
                 
                 string[] files;
                 try
@@ -307,7 +307,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlLocalFile(string filePath, IFolder remoteFolder, IList remoteFiles)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 try
                 {
@@ -390,7 +390,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 string[] folders;
                 try
@@ -414,7 +414,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void CrawlLocalFolder(string localSubFolder, IFolder remoteFolder, IList remoteFolders)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
                 try
                 {
                     string folderName = Path.GetFileName(localSubFolder);

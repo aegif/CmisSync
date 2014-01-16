@@ -20,7 +20,7 @@ namespace CmisSync.Lib.Sync
         {
             private void WatcherSync(string remoteFolder, string localFolder)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 Queue<FileSystemEventArgs> changeQueue = repo.Watcher.GetChangeQueue();
                 repo.Watcher.Clear();
@@ -90,7 +90,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void WatchSyncMove(string remoteFolder, string localFolder, string oldPathname, string newPathname)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 string oldDirectory = Path.GetDirectoryName(oldPathname);
                 string oldFilename = Path.GetFileName(oldPathname);
@@ -205,7 +205,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void WatchSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 string filename = Path.GetFileName(pathname);
                 if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), filename, repoinfo))
@@ -290,7 +290,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void WatchSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 string filename = Path.GetFileName(pathname);
                 if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), filename, repoinfo))

@@ -62,6 +62,24 @@ namespace CmisSync.Lib.Sync
 
 
         /// <summary>
+        /// Whether this folder's synchronization is running right now.
+        /// </summary>
+        public override bool isSyncing()
+        {
+            return this.synchronizedFolder.isSyncing();
+        }
+
+
+        /// <summary>
+        /// Whether this folder's synchronization is suspended right now.
+        /// </summary>
+        public override bool isSuspended()
+        {
+            return this.synchronizedFolder.isSuspended();
+        }
+
+
+        /// <summary>
         /// Synchronize.
         /// The synchronization is performed in the background, so that the UI stays usable.
         /// </summary>
@@ -108,7 +126,7 @@ namespace CmisSync.Lib.Sync
         {
             get
             {
-                return 1234567; // TODO
+                return 1234567; // TODO do we really need this size feature?
             }
         }
     }
