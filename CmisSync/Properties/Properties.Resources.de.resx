@@ -175,7 +175,7 @@
     <value>Hilfe</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>Mit DataSpace Sync können Sie mit jedem CMIS-konformen Server ihre Daten synchron halten, und Ihre Dokumente auch im Offlinemodus verwenden. Funktioniert wie Dropbox für Enterprise Content Management!</value>
+    <value>Mit DataSpace Sync können Sie mit jedem CMIS-konformen Server ihre Daten synchron halten, und Ihre Dokumente auch im Offlinemodus verwenden.</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
     <value>Der Ordnername ist ungültig. Sonderzeichen sind nicht erlaubt.</value>

@@ -1,6 +1,6 @@
 ## DataSpace Sync
 
-[DataSpace Sync](http://graudata.com) allows you to keep in sync with your DataSpace (CMIS) repository. It is like Dropbox for Enterprise Content Management!
+[DataSpace Sync](http://graudata.com) allows you to keep in sync with your DataSpace (CMIS) repository.
 See: http://graudata.com
 
 ### License

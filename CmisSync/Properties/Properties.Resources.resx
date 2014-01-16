@@ -175,9 +175,7 @@
     <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>DataSpace Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
-
-It is like Dropbox for Enterprise Content Management!</value>
+    <value>DataSpace Sync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
     <value>The folder name {0} is invalid. Special characters are not allowed.</value>
