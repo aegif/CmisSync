@@ -35,9 +35,9 @@
         <Directory Id="CmisSyncProgramsFolder" Name="CmisSync"/>
       </Directory>
       <Directory Id="DesktopFolder"/>
-      <Directory Id="AppDataFolder">
+      <!--<Directory Id="AppDataFolder">
         <Directory Id="CmisSyncAppDataFolder" Name="cmissync"/>
-      </Directory>
+      </Directory>-->
       <Directory Id="StartupFolder"/>
     </Directory>
 
@@ -160,13 +160,13 @@
       </Component>
     </DirectoryRef>
 
-    <DirectoryRef Id="CmisSyncAppDataFolder">
+<!--    <DirectoryRef Id="CmisSyncAppDataFolder">
       <Component Id="CmisSyncAppData" DiskId="1" Guid="C75496CB-DF13-42C7-8520-DB4574411B14">
         <RemoveFile Id="CleanDataDirectory" Name="*" On="both"/>
         <RemoveFolder Id="RemoveDataDirectory" On="both"/>
         <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="CmisSyncAppData" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
-    </DirectoryRef>
+    </DirectoryRef> -->
 
     <DirectoryRef Id="StartupFolder">
       <Component Id="StartupMenuItem" Guid="46C6E4A6-74C4-4D1B-AD7E-38F2F92144F6">
@@ -183,7 +183,6 @@
       <ComponentRef Id="COMP_x64" />
       <ComponentRef Id="StartMenuShortcut" />
       <ComponentRef Id="DesktopShortcut" />
-      <ComponentRef Id="CmisSyncAppData" />
       <ComponentRef Id="StartupMenuItem" />
       <ComponentRef Id="localeComponentCS" />
       <ComponentRef Id="localeComponentDE" />
