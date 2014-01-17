@@ -765,7 +765,6 @@ namespace CmisSync.Lib.Sync
                         ContentStream remoteStream = new ContentStream();
                         remoteStream.FileName = remoteFile.ContentStreamFileName;
                         remoteStream.Length = localfile.Length;
-                        remoteStream.MimeType = MimeType.GetMIMEType(Path.GetFileName(filePath));
                         remoteStream.Stream = localfile;
                         remoteStream.Stream.Flush();
                         Logger.Debug("before SetContentStream");
