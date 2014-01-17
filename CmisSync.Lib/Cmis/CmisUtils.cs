@@ -346,6 +346,7 @@ namespace CmisSync.Lib.Cmis
                         string escapedPathWithinSite = HttpUtility.UrlEncode(pathWithinSite);
                         string reescapedPathWithinSite = HttpUtility.UrlEncode(escapedPathWithinSite);
                         string sharePath = reescapedPathWithinSite.Replace("%252f", "%2F");
+                        sharePath = sharePath.Replace("%2b", "%20");
                         return root + "share/page/site/" + siteName + "/documentlibrary#filter=path|" + sharePath;
                     }
                     else
