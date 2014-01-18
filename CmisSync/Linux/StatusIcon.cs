@@ -301,14 +301,16 @@ namespace CmisSync {
                     (String.Format(CmisSync.Properties_Resources.RemoveSyncTitle), null, Gtk.DialogFlags.DestroyWithParent))
                 {
                     dialog.Modal = true;
-                    dialog.AddButton ("No, please continue synchronizing", ResponseType.No);
-                    dialog.AddButton ("Yes, stop synchronizing permanently", ResponseType.Yes);
-                    dialog.Response += delegate (object obj, ResponseArgs args){
-                        if(args.ResponseId == ResponseType.Yes)
-                            Controller.RemoveFolderFromSyncClicked(reponame);
-                    };
-                    dialog.Run();
-                    dialog.Destroy();
+                    using (var noButton = dialog.AddButton ("No, please continue synchronizing", ResponseType.No))
+                    using (var yesButton = dialog.AddButton ("Yes, stop synchronizing permanently", ResponseType.Yes))
+                    {
+                        dialog.Response += delegate (object obj, ResponseArgs args){
+                            if(args.ResponseId == ResponseType.Yes)
+                                Controller.RemoveFolderFromSyncClicked(reponame);
+                        };
+                        dialog.Run();
+                        dialog.Destroy();
+                    }
                 }
             };
         }
@@ -343,7 +345,7 @@ namespace CmisSync {
 
 
     public class CmisSyncMenuItem : ImageMenuItem {
-		public string RepoName {get;set;}
+        public string RepoName {get;set;}
         public CmisSyncMenuItem (string text) : base (text)
         {
             SetProperty ("always-show-image", new GLib.Value (true));
