@@ -24,6 +24,31 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Component which will receive notifications intended for the end-user.
+        /// A GUI program might raise a pop-up, a CLI program might print a line.
+        /// </summary>
+        private static UserNotificationListener UserNotificationListener;
+
+
+        /// <summary>
+        /// Register the component which will receive notifications intended for the end-user.
+        /// </summary>
+        public static void SetUserNotificationListener(UserNotificationListener listener)
+        {
+            UserNotificationListener = listener;
+        }
+
+
+        /// <summary>
+        /// Send a message to the end user.
+        /// </summary>
+        public static void NotifyUser(string message)
+        {
+            UserNotificationListener.NotifyUser(message);
+        }
+
+
+        /// <summary>
         /// Check whether the current user has write permission to the specified path.
         /// </summary>
         /// <param name="path"></param>

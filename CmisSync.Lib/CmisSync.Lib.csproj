@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UserNotificationListener.cs" />
     <Compile Include="Cmis\BaseException.cs" />
     <Compile Include="Cmis\Database.cs" />
     <Compile Include="FolderLock.cs" />
