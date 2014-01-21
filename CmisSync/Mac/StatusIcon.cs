@@ -25,6 +25,7 @@ using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
 using CmisSync.Lib;
+using CmisSync.Lib.Events;
 
 namespace CmisSync {
 
@@ -51,6 +52,9 @@ namespace CmisSync {
         private NSImage cmissync_image;
         private NSImage pause_image;
         private NSImage resume_image;
+        private NSImage download_image;
+        private NSImage upload_image;
+        private NSImage update_image;
 
         private Dictionary<String, NSMenuItem> FolderItems;
 
@@ -76,7 +80,7 @@ namespace CmisSync {
             Controller.UpdateIconEvent += delegate (int icon_frame) {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    BeginInvokeOnMainThread (delegate {
                         if (icon_frame > -1) {
                             this.status_item.Image               = this.animation_frames [icon_frame];
                             this.status_item.Image.Size          = new SizeF (16, 16);
@@ -116,6 +120,27 @@ namespace CmisSync {
                         NSMenuItem PauseItem;
                         if(FolderItems.TryGetValue(reponame,out PauseItem)){
                             setSyncItemState(PauseItem, getSyncStatus(reponame));
+                        }
+                    });
+                }
+            };
+
+            // TODO Need to implement this method like the COCOA way to do it
+            Controller.UpdateTransmissionMenuEvent += delegate
+            {
+                using (var a = new NSAutoreleasePool()) {
+                    InvokeOnMainThread(delegate {
+                        List<FileTransmissionEvent> transmissions =    Program.Controller.ActiveTransmissions();
+                        NSMenu transmissionmenu = new NSMenu();
+                        foreach(FileTransmissionEvent transmission in transmissions) {
+                            NSMenuItem transmissionItem = new TransmissionMenuItem(transmission);
+                            transmissionmenu.AddItem(transmissionItem);
+                        }
+                        if(transmissions.Count > 0) {
+                            state_item.Submenu = transmissionmenu;
+                            state_item.Enabled = true;
+                        }else{
+                            state_item.Enabled = false;
                         }
                     });
                 }
@@ -284,6 +309,7 @@ namespace CmisSync {
             {
                 NSAlert alert = NSAlert.WithMessage(Properties_Resources.RemoveSyncQuestion,"No, please continue syncing","Yes, stop syncing",null,"");
                 alert.Icon = this.caution_image;
+                alert.Window.OrderFrontRegardless();
                 int i = alert.RunModal();
                 if(i == 0)
                     Controller.RemoveFolderFromSyncClicked(name);
@@ -346,4 +372,31 @@ namespace CmisSync {
             });
         }
     }
+
+    //TODO This isn't working well, please create a native COCOA like solution 
+    public class TransmissionMenuItem : NSMenuItem {
+        public TransmissionMenuItem(FileTransmissionEvent transmission) {
+
+            Title = System.IO.Path.GetFileName(transmission.Path);
+
+            Activated += delegate {
+                NSWorkspace.SharedWorkspace.OpenFile (System.IO.Directory.GetParent(transmission.Path).FullName);
+            };
+
+            transmission.TransmissionStatus += delegate (object sender, TransmissionProgressEventArgs e){
+                double? percent = e.Percent;
+                long? bitsPerSecond = e.BitsPerSecond;
+                if( percent != null && bitsPerSecond != null ) {
+                    BeginInvokeOnMainThread(delegate {
+                        Title = String.Format("{0} ({1:###.#}% {2})",
+                            System.IO.Path.GetFileName(transmission.Path),
+                            Math.Round((double)percent,1),
+                            CmisSync.Lib.Utils.FormatBandwidth((long)bitsPerSecond));
+                    });
+                }
+            };
+        }
+    }
+
+
 }

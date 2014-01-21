@@ -58,7 +58,9 @@ namespace CmisSync {
 
         public event UpdateSuspendSyncFolderEventHandler UpdateSuspendSyncFolderEvent = delegate { };
         public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
-		
+
+        public event UpdateTransmissionMenuEventHandler UpdateTransmissionMenuEvent = delegate { };
+        public delegate void UpdateTransmissionMenuEventHandler();
 
         /// <summary>
         /// Current state of the CmisSync tray icon.
@@ -185,6 +187,10 @@ namespace CmisSync {
 
                 UpdateIconEvent (0);
 //                UpdateMenuEvent (CurrentState);
+            };
+
+            Program.Controller.OnTransmissionListChanged += delegate {
+                UpdateTransmissionMenuEvent();
             };
 
             // Syncing.

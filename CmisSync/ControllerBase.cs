@@ -22,11 +22,16 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
 using CmisSync.Lib.Events;
+
+#if __COCOA__
+using Edit = CmisSync.EditWizardController;
+#endif
 
 namespace CmisSync
 {
@@ -92,6 +97,7 @@ namespace CmisSync
 
         public event Action FolderListChanged = delegate { };
 
+        public event Action OnTransmissionListChanged = delegate { };
 
         public event Action OnIdle = delegate { };
         public event Action OnSyncing = delegate { };
@@ -168,6 +174,9 @@ namespace CmisSync
         private IActivityListener activityListenerAggregator;
 
 
+        private ActiveActivitiesManager activitiesManager;
+
+
         /// <summary>
         /// Component to create new CmisSync synchronized folders.
         /// </summary>
@@ -193,6 +202,14 @@ namespace CmisSync
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
             FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
+            activitiesManager = new ActiveActivitiesManager();
+            this.activitiesManager.ActiveTransmissions.CollectionChanged += delegate(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+                OnTransmissionListChanged();
+            };
+        }
+
+        public List<FileTransmissionEvent> ActiveTransmissions() {
+            return this.activitiesManager.ActiveTransmissions.ToList<FileTransmissionEvent>();
         }
 
 
@@ -266,6 +283,11 @@ namespace CmisSync
                 UpdateState();
             };
 
+            repo.EventManager.AddEventHandler(
+                new GenericSyncEventHandler<FileTransmissionEvent>( 50, delegate(ISyncEvent e){
+                this.activitiesManager.AddTransmission(e as FileTransmissionEvent);
+                return false;
+            }));
             this.repositories.Add(repo);
             repo.Initialize();
         }
@@ -280,7 +302,7 @@ namespace CmisSync
                     Edit edit = null;
                     if (edits.TryGetValue(reponame, out edit))
                     {
-                        edit.Close();
+                        edit.Controller.CloseWindow();
                     }
                     RemoveRepository(f);
                     ConfigManager.CurrentConfig.Folder.Remove(f);
@@ -581,11 +603,11 @@ namespace CmisSync
 
                 FolderFetched(this.fetcher.RemoteUrl.ToString());
 
-                // Initialize in the UI.
-                AddRepository(repoInfo);
-
                 this.fetcher.Dispose();
                 this.fetcher = null;
+
+                // Initialize in the UI.
+                AddRepository(repoInfo);
             }
 
             // Update UI.
@@ -616,11 +638,8 @@ namespace CmisSync
             {
                 lock (this.repo_lock)
                 {
-                    foreach (Edit editView in this.edits.Values)
-                        if (editView.IsVisible)
-                            return true;
+                    return (this.edits.Count > 0);
                 }
-                return false;
             }
             private set { }
         }
