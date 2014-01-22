@@ -28,23 +28,9 @@ using Mono.Unix;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Credentials;
+using CmisSync.CmisTree;
 
 namespace CmisSync {
-
-    /**
-     * Stores the metadata of an item in the folder selection dialog.
-     */
-    public class SelectionTreeItem
-    {
-        public bool childrenLoaded = false;
-        public string repository; // Only necessary for repository root nodes.
-        public string fullPath;
-        public SelectionTreeItem(string repository, string fullPath)
-        {
-            this.repository = repository;
-            this.fullPath = fullPath;
-        }
-    }
 
     public class Setup : SetupWindow {
 
@@ -181,9 +167,8 @@ namespace CmisSync {
 
             // Password
             Entry password_entry = new Entry () {
-                Text = Controller.PreviousPath,
-                     Visibility = false,
-                     ActivatesDefault = true
+                Visibility = false,
+                ActivatesDefault = true
             };
 
             Controller.ChangeAddressFieldEvent += delegate (string text,
@@ -261,7 +246,7 @@ namespace CmisSync {
 
             // Continue button
             Button continue_button = new Button (continueText) {
-                Sensitive = false
+                Sensitive = String.IsNullOrEmpty( Controller.CheckAddPage (address_entry.Text))
             };
 
             continue_button.Clicked += delegate {
@@ -347,11 +332,49 @@ namespace CmisSync {
             AddButton (cancel_button);
             AddButton (continue_button);
 
-            address_entry.GrabFocus();
+            Controller.CheckAddPage (address_entry.Text);
+            address_entry.GrabFocus ();
         }
 
         private void ShowAdd2Page()
         {
+            CmisTreeStore cmisStore = new CmisTreeStore ();
+            Gtk.TreeView treeView = new Gtk.TreeView (cmisStore.CmisStore);
+
+            bool firstRepo = true;
+            List<RootFolder> repositories = new List<RootFolder>();
+            Dictionary<string,AsyncNodeLoader> loader = new Dictionary<string, AsyncNodeLoader> ();
+            foreach (KeyValuePair<String, String> repository in Controller.repositories)
+            {
+                RootFolder root = new RootFolder () {
+                    Name = repository.Value,
+                    Id = repository.Key,
+                    Address = Controller.saved_address.ToString()
+                };
+                if (firstRepo)
+                {
+                    root.Selected = true;
+                    firstRepo = false;
+                }
+                else
+                {
+                    root.Selected = false;
+                }
+                repositories.Add (root);
+                CmisRepoCredentials cred = new CmisRepoCredentials () {
+                    UserName = Controller.saved_user,
+                    Password = Controller.saved_password,
+                    Address = Controller.saved_address,
+                    RepoId = repository.Key
+                };
+                AsyncNodeLoader asyncLoader = new AsyncNodeLoader (root, cred, PredefinedNodeLoader.LoadSubFolderDelegate, PredefinedNodeLoader.CheckSubFolderDelegate);
+                asyncLoader.UpdateNodeEvent += delegate {
+                    cmisStore.UpdateCmisTree(root);
+                };
+                cmisStore.UpdateCmisTree (root);
+                asyncLoader.Load (root);
+                loader.Add (root.Id, asyncLoader);
+            }
 
             Header = CmisSync.Properties_Resources.Which;
 
@@ -359,94 +382,114 @@ namespace CmisSync {
 
             Button cancel_button = new Button (cancelText);
             cancel_button.Clicked += delegate {
+                foreach (AsyncNodeLoader task in loader.Values)
+                    task.Cancel();
                 Controller.PageCancelled ();
             };
 
             Button continue_button = new Button (continueText)
             {
-                Sensitive = false
+                Sensitive = (repositories.Count > 0)
             };
+
             continue_button.Clicked += delegate {
-                Controller.Add2PageCompleted(
-                        Controller.saved_repository, "/", new string[]{}, new string[] {});
+                RootFolder root = repositories.Find (x => (x.Selected != false));
+                if (root != null)
+                {
+                    foreach (AsyncNodeLoader task in loader.Values)
+                        task.Cancel();
+                    Controller.saved_repository = root.Id;
+                    List<string> ignored = NodeModelUtils.GetIgnoredFolder(root);
+                    List<string> selected = NodeModelUtils.GetSelectedFolder(root);
+                    Controller.Add2PageCompleted (root.Id, root.Path, ignored.ToArray(), selected.ToArray());
+                }
             };
 
             Button back_button = new Button (backText)
             {
                 Sensitive = true
             };
+
             back_button.Clicked += delegate {
+                foreach (AsyncNodeLoader task in loader.Values)
+                    task.Cancel();
                 Controller.BackToPage1();
             };
 
-            TreeStore repoStore = new Gtk.TreeStore(typeof (string), typeof (SelectionTreeItem));
-            TreeIter iter;
-            foreach (KeyValuePair<String, String> repository in Controller.repositories)
-            {
-                iter = repoStore.AppendNode();
-                repoStore.SetValues(iter, repository.Value , new SelectionTreeItem(repository.Key, "/"));
-            }
-            Gtk.TreeView treeView = new Gtk.TreeView(repoStore);
+            Gtk.TreeIter iter;
             treeView.HeadersVisible = false;
             treeView.Selection.Mode = SelectionMode.Single;
-            treeView.AppendColumn("Name", new CellRendererText(), "text", 0);
-            treeView.CursorChanged += delegate(object o, EventArgs args) {
-                TreeSelection selection = (o as TreeView).Selection;
-                TreeModel model;
-                if (selection.GetSelected(out model, out iter)) {
-                    SelectionTreeItem sti = model.GetValue(iter, 1) as SelectionTreeItem;
 
-                    // Identify the selected remote path.
-                    Controller.saved_remote_path = sti.fullPath;
-
-                    // Identify the selected repository.
-                    TreeIter cnode = iter;
-                    TreeIter pnode = iter;
-                    while (model.IterParent(out pnode, cnode)) {
-                        cnode = pnode;
-                    }
-                    Controller.saved_repository = (model.GetValue(cnode, 1) as SelectionTreeItem).repository;
-
-                    // Load sub-folders if it has not been done already.
-                    // We use each item's Tag to store metadata: whether this item's subfolders have been loaded or not.
-                    if (sti.childrenLoaded == false)
-                    {
-                        this.GdkWindow.Cursor = wait_cursor;
-
-                        // Get list of subfolders asynchronously
-                        GetSubfoldersDelegate dlgt = new GetSubfoldersDelegate(CmisUtils.GetSubfolders);
-                        IAsyncResult ar = dlgt.BeginInvoke(Controller.saved_repository,
-                                Controller.saved_remote_path, Controller.saved_address.ToString(),
-                                Controller.saved_user, Controller.saved_password, null, null);
-                        while (!ar.AsyncWaitHandle.WaitOne(100)) {
-                            while (Application.EventsPending()) {
-                                Application.RunIteration();
-                            }
-                        }
-                        string[] subfolders = dlgt.EndInvoke(ar);
-
-                        TreePath tp = null;
-                        // Create a sub-item for each subfolder
-                        foreach (string subfolder in subfolders) {
-                            TreeIter newchild = repoStore.AppendNode(iter);
-                            repoStore.SetValues(newchild, System.IO.Path.GetFileName(subfolder),
-                                    new SelectionTreeItem(null, subfolder));
-                            if (null == tp) {
-                                tp = repoStore.GetPath(newchild);
-                            }
-                        }
-                        sti.childrenLoaded = true;
-                        if (null != tp) {
-                            treeView.ExpandToPath(tp);
-                        }
-                        this.GdkWindow.Cursor = default_cursor;
-                    }
-                    continue_button.Sensitive = true;
-                    continue_button.SetFlag(Gtk.WidgetFlags.CanFocus);
-                    continue_button.SetFlag(Gtk.WidgetFlags.CanDefault);
-                    continue_button.GrabDefault();
-
+            TreeViewColumn column = new TreeViewColumn ();
+            column.Title = "Name";
+            CellRendererToggle renderToggle = new CellRendererToggle ();
+            column.PackStart (renderToggle, false);
+            renderToggle.Activatable = true;
+            column.AddAttribute (renderToggle, "active", (int)CmisTreeStore.Column.ColumnSelected);
+            column.AddAttribute (renderToggle, "inconsistent", (int)CmisTreeStore.Column.ColumnSelectedThreeState);
+            column.AddAttribute (renderToggle, "radio", (int)CmisTreeStore.Column.ColumnRoot);
+            renderToggle.Toggled += delegate (object render, ToggledArgs args) {
+                TreeIter iterToggled;
+                if (! cmisStore.CmisStore.GetIterFromString (out iterToggled, args.Path))
+                {
+                    Console.WriteLine("Toggled GetIter Error " + args.Path);
+                    return;
                 }
+
+                Node node = cmisStore.CmisStore.GetValue(iterToggled,(int)CmisTreeStore.Column.ColumnNode) as Node;
+                if (node == null)
+                {
+                    Console.WriteLine("Toggled GetValue Error " + args.Path);
+                    return;
+                }
+
+                RootFolder selectedRoot = repositories.Find (x => (x.Selected != false));
+                Node parent = node;
+                while (parent.Parent != null)
+                {
+                    parent = parent.Parent;
+                }
+                RootFolder root = parent as RootFolder;
+                if (root != selectedRoot)
+                {
+                    selectedRoot.Selected = false;
+                    cmisStore.UpdateCmisTree(selectedRoot);
+                }
+
+                if (node.Parent == null)
+                {
+                    node.Selected = true;
+                }
+                else
+                {
+                    if (node.Selected == false)
+                    {
+                        node.Selected = true;
+                    }
+                    else
+                    {
+                        node.Selected = false;
+                    }
+                }
+                cmisStore.UpdateCmisTree(root);
+            };
+            CellRendererText renderText = new CellRendererText ();
+            column.PackStart (renderText, false);
+            column.SetAttributes (renderText, "text", (int)CmisTreeStore.Column.ColumnName);
+            column.Expand = true;
+            treeView.AppendColumn (column);
+
+            treeView.AppendColumn ("Status", new StatusCellRenderer (), "text", (int)CmisTreeStore.Column.ColumnStatus);
+
+            treeView.RowExpanded += delegate (object o, RowExpandedArgs args) {
+                Node node = cmisStore.CmisStore.GetValue(args.Iter, (int)CmisTreeStore.Column.ColumnNode) as Node;
+                Node parent = node;
+                while (parent.Parent != null)
+                {
+                    parent = parent.Parent;
+                }
+                RootFolder root = parent as RootFolder;
+                loader[root.Id].Load(node);
             };
 
             ScrolledWindow sw = new ScrolledWindow() {
@@ -460,6 +503,17 @@ namespace CmisSync {
             AddButton(back_button);
             AddButton(cancel_button);
             AddButton(continue_button);
+
+            if (repositories.Count > 0)
+            {
+                continue_button.GrabDefault ();
+                continue_button.GrabFocus ();
+            }
+            else
+            {
+                back_button.GrabDefault ();
+                back_button.GrabFocus ();
+            }
         }
 
         private void ShowCustomizePage()

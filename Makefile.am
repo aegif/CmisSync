@@ -34,8 +34,8 @@ debian-package:
 	make VERSION=`git describe --match linux* | cut -d - -f 2` -C debian build
 
 apple-package:
-	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Debug -t:Clean
-	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Debug
+	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Release -t:Clean
+	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Release
 	(cd build; ./dmg-creator.sh ../bin/DataSpace\ Sync.app/; cd ..)
 
 none:

@@ -185,6 +185,11 @@ namespace CmisSync {
                     };
                     browse_remotefolder_item.Activated += OpenRemoteFolderDelegate(folder_name);
 */
+
+                    ImageMenuItem edit_folder_item = new CmisSyncMenuItem (
+                        CmisSync.Properties_Resources.EditTitle);
+                    edit_folder_item.Activated += EditFolderDelegate(folder_name);
+
                     ImageMenuItem suspend_folder_item = new CmisSyncMenuItem(
                             CmisSync.Properties_Resources.PauseSync) {
                         RepoName = folder_name
@@ -208,6 +213,7 @@ namespace CmisSync {
                     submenu.Add(open_localfolder_item);
                     //submenu.Add(browse_remotefolder_item);
                     submenu.Add(suspend_folder_item);
+                    submenu.Add(edit_folder_item);
                     submenu.Add(new SeparatorMenuItem());
                     submenu.Add(remove_folder_from_sync_item);
 
@@ -269,6 +275,13 @@ namespace CmisSync {
         {
             return delegate {
                 Controller.LocalFolderClicked (name);
+            };
+        }
+
+        private EventHandler EditFolderDelegate (string name)
+        {
+            return delegate {
+                Controller.EditFolderClicked (name);
             };
         }
 

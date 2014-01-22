@@ -7,7 +7,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.graudata.dataspacesync</string>
 	<key>CFBundleName</key>
-	<string>CmisSync</string>
+	<string>DataSpace Sync</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>

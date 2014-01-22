@@ -21,6 +21,7 @@ SOURCES =  \
 	ConfigMigration.cs \
 	Credentials.cs \
 	Defines.cs \
+	Events/ActiveActivitiesManager.cs \
 	Events/ConfigChangedEvent.cs \
 	Events/DebugLoggingHandler.cs \
 	Events/FileConflictEvent.cs \

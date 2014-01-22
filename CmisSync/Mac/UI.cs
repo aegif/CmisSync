@@ -14,6 +14,7 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#define ODS_NEW_GUI
     
 using System;
 using System.Drawing;
@@ -23,12 +24,17 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
+
 namespace CmisSync {
 
     public class UI : AppDelegate {
 
         public StatusIcon StatusIcon;
+        #if ODS_NEW_GUI
+        public SetupWizardController Setup;
+        #else
         public Setup Setup;
+        #endif
         public About About;
         
         public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
@@ -45,8 +51,12 @@ namespace CmisSync {
                 NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("cmissync-app.icns");
 
                 SetFolderIcon ();
-    
-                Setup      = new Setup ();
+
+                #if ODS_NEW_GUI    
+                Setup      = new SetupWizardController ();
+                #else
+                Setup      = new Setup();
+                #endif
                 About      = new About ();
                 StatusIcon = new StatusIcon ();
 
@@ -73,7 +83,11 @@ namespace CmisSync {
 
         public void UpdateDockIconVisibility ()
         {
+            #if ODS_NEW_GUI
+            if ((Setup.IsWindowLoaded && Setup.Window.IsVisible) || About.IsVisible || Program.Controller.IsEditWindowVisible)
+            #else
             if (Setup.IsVisible || About.IsVisible || Program.Controller.IsEditWindowVisible)
+            #endif
                 ShowDockIcon ();
             else
                 HideDockIcon ();

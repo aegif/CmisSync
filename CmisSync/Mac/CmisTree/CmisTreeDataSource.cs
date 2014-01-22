@@ -201,7 +201,17 @@ namespace CmisSync.CmisTree
                 return (NSString)cmis.Name;
             }
             if (tableColumn.Identifier == "Status") {
-                return (NSString)cmis.Status.ToString ();
+                switch (cmis.Status) {
+                case LoadingStatus.START:
+                    return (NSString)Properties_Resources.LoadingStatusSTART;
+                case LoadingStatus.LOADING:
+                    return (NSString)Properties_Resources.LoadingStatusLOADING;
+                case LoadingStatus.ABORTED:
+                    return (NSString)Properties_Resources.LoadingStatusABORTED;
+                default:
+                    return (NSString)"";
+                }
+                return (NSString)"";
             }
             Console.WriteLine ("GetObjectValue Error");
             return (NSString)"";

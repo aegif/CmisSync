@@ -29,6 +29,9 @@ namespace CmisSync.Lib
     /// </summary>
     public class Config
     {
+        private const long DefaultChunkSize = 1024 * 1024;
+        private const int DefaultPollInterval = 5000;
+
         /// <summary>
         /// data structure storing the configuration.
         /// </summary>
@@ -341,15 +344,15 @@ namespace CmisSync.Lib
                 [XmlElement("password")]
                 public string ObfuscatedPassword { get; set; }
 
-                private double pollInterval = 5000;
-                [XmlElement("pollinterval"), System.ComponentModel.DefaultValue(5000)]
+                private double pollInterval = DefaultPollInterval;
+                [XmlElement("pollinterval"), System.ComponentModel.DefaultValue(DefaultPollInterval)]
                 public double PollInterval
                 {
                     get { return pollInterval; }
                     set {
                         if( value <= 0 )
                         {
-                            pollInterval = 5000;
+                            pollInterval = DefaultPollInterval;
                         }
                         else
                         {
@@ -402,8 +405,8 @@ namespace CmisSync.Lib
                 [XmlElement("ignoreFolder", IsNullable=true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
-                private long chunkSize = 1024 * 1024;
-                [XmlElement("chunkSize"), System.ComponentModel.DefaultValue(1024 * 1024)]
+                private long chunkSize = DefaultChunkSize;
+                [XmlElement("chunkSize"), System.ComponentModel.DefaultValue(DefaultChunkSize)]
                 public long ChunkSize
                 {
                     get { return chunkSize; }
@@ -436,16 +439,24 @@ namespace CmisSync.Lib
                     repoInfo.MaxUploadRetries = uploadRetries;
                     repoInfo.MaxDownloadRetries = downloadRetries;
                     repoInfo.MaxDeletionRetries = deletionRetries;
-                    if (PollInterval < 1) PollInterval = 5000;
+                    if (PollInterval < 1) PollInterval = DefaultPollInterval;
                         repoInfo.PollInterval = PollInterval;
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
                     {
                         repoInfo.addIgnorePath(ignoredFolder.Path);
                     }
                     if(SupportedFeatures != null && SupportedFeatures.ChunkedSupport != null && SupportedFeatures.ChunkedSupport == true)
+                    {
                         repoInfo.ChunkSize = ChunkSize;
+                        repoInfo.DownloadChunkSize = ChunkSize;
+                    }
                     else
+                    {
                         repoInfo.ChunkSize = 0;
+                        repoInfo.DownloadChunkSize = 0;
+                    }
+                    if(SupportedFeatures != null && SupportedFeatures.ChunkedDownloadSupport!=null && SupportedFeatures.ChunkedDownloadSupport == true)
+                        repoInfo.DownloadChunkSize = ChunkSize;
                     return repoInfo;
                 }
             }
@@ -477,6 +488,8 @@ namespace CmisSync.Lib
             public int? MaxNumberOfContentChanges {get; set;}
             [XmlElement("chunkedSupport", IsNullable=true)]
             public bool? ChunkedSupport {get;set;}
+            [XmlElement("chunkedDownloadSupport", IsNullable=true)]
+            public bool? ChunkedDownloadSupport {get;set;}
         }
 
         public class XmlUri : IXmlSerializable

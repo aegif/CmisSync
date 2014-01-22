@@ -29,11 +29,40 @@ SOURCES =  \
 	CmisTree/CmisOutlineController.cs \
 	CmisTree/CmisTreeDataSource.cs \
 	Controller.cs \
-	Edit.cs \
+	EditWizard.cs \
+	EditWizard.designer.cs \
+	EditWizardController.cs \
 	MacWatcher.cs \
 	OutlineViewDelegate.cs \
 	Setup.cs \
+	SetupSubCustomize.cs \
+	SetupSubCustomize.designer.cs \
+	SetupSubCustomizeController.cs \
+	SetupSubFinished.cs \
+	SetupSubFinished.designer.cs \
+	SetupSubFinishedController.cs \
+	SetupSubLogin.cs \
+	SetupSubLogin.designer.cs \
+	SetupSubLoginController.cs \
+	SetupSubRepoSelect.cs \
+	SetupSubRepoSelect.designer.cs \
+	SetupSubRepoSelectController.cs \
+	SetupSubTutorial.cs \
+	SetupSubTutorial.designer.cs \
+	SetupSubTutorialBegin.cs \
+	SetupSubTutorialBegin.designer.cs \
+	SetupSubTutorialBeginController.cs \
+	SetupSubTutorialController.cs \
+	SetupSubTutorialEnd.cs \
+	SetupSubTutorialEnd.designer.cs \
+	SetupSubTutorialEndController.cs \
+	SetupSubWelcome.cs \
+	SetupSubWelcome.designer.cs \
+	SetupSubWelcomeController.cs \
 	SetupWindow.cs \
+	SetupWizard.cs \
+	SetupWizard.designer.cs \
+	SetupWizardController.cs \
 	StatusIcon.cs \
 	TextFieldDelegate.cs \
 	UI.cs

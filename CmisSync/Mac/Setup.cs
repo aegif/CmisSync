@@ -60,6 +60,7 @@ namespace CmisSync {
         private CmisOutlineController OutlineController;
         private CmisTreeDataSource DataSource;
         private OutlineViewDelegate DataDelegate;
+        Dictionary<string,AsyncNodeLoader> Loader;
 
 
         public Setup () : base ()
@@ -86,6 +87,34 @@ namespace CmisSync {
                     });
                 }
             };
+
+            Controller.UpdateSetupContinueButtonEvent += delegate(bool button_enabled) {
+                InvokeOnMainThread(delegate {
+                    ContinueButton.Enabled = button_enabled;
+                });
+            };
+
+            Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled) {
+                InvokeOnMainThread(delegate {
+                    ContinueButton.Enabled = button_enabled;
+                });
+            };
+
+            Controller.ChangeAddressFieldEvent += delegate(string text, string example_text) {
+                InvokeOnMainThread(delegate {
+                    AddressTextField.StringValue = text;
+                    AddressTextField.Enabled = true;
+                    AddressHelpLabel.StringValue = example_text;
+                });
+            };
+
+            Controller.LocalPathExists += LocalPathExistsHandler;
+
+            Controller.UpdateProgressBarEvent += delegate(double percentage) {
+                InvokeOnMainThread(delegate {
+                    ProgressIndicator.DoubleValue = percentage;
+                });
+            };
         }
 
         private void ShowWelcomePage()
@@ -106,13 +135,6 @@ namespace CmisSync {
             CancelButton.Activated += delegate
             {
                 Controller.SetupPageCancelled();
-            };
-            Controller.UpdateSetupContinueButtonEvent += delegate(bool button_enabled)
-            {
-                InvokeOnMainThread(delegate
-                {
-                    ContinueButton.Enabled = button_enabled;
-                });
             };
             Buttons.Add(ContinueButton);
             Buttons.Add(CancelButton);
@@ -217,7 +239,6 @@ namespace CmisSync {
             {
                 Controller.CustomizePageCompleted(LocalFolderTextField.StringValue, LocalRepoPathTextField.StringValue);
             };
-            Controller.LocalPathExists += LocalPathExistsHandler;
             (LocalFolderTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate
             {
                 try
@@ -245,6 +266,18 @@ namespace CmisSync {
             Buttons.Add(ContinueButton);
             Buttons.Add(BackButton);
             Buttons.Add(CancelButton);
+        }
+
+        void CheckAddressTextField()
+        {
+            InvokeOnMainThread(delegate
+            {
+                string error = Controller.CheckAddPage(AddressTextField.StringValue);
+                if (String.IsNullOrEmpty(error))
+                    AddressHelpLabel.StringValue = "";
+                else
+                    AddressHelpLabel.StringValue = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
+            });
         }
 
         void ShowLoginPage()
@@ -319,35 +352,19 @@ namespace CmisSync {
             CancelButton = new NSButton() {
                 Title = Properties_Resources.Cancel
             };
-            Controller.ChangeAddressFieldEvent += delegate(string text, string example_text)
-            {
-                InvokeOnMainThread(delegate
-                {
-                    AddressTextField.StringValue = text;
-                    AddressTextField.Enabled = true;
-                    AddressHelpLabel.StringValue = example_text;
-                });
-            };
-            (AddressTextField.Delegate as TextFieldDelegate).StringValueChanged += delegate
-            {
-                InvokeOnMainThread(delegate
-                {
-                    string error = Controller.CheckAddPage(AddressTextField.StringValue);
-                    if (String.IsNullOrEmpty(error))
-                        AddressHelpLabel.StringValue = "";
-                    else
-                        AddressHelpLabel.StringValue = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentCulture);
-                });
-            };
+            (AddressTextField.Delegate as TextFieldDelegate).StringValueChanged += CheckAddressTextField;
             ContinueButton.Activated += delegate
             {
-                ServerCredentials credentials = new ServerCredentials() {
-                    UserName = UserTextField.StringValue,
-                    Password = PasswordTextField.StringValue,
-                    Address = new Uri(AddressTextField.StringValue)
-                };
-                ContinueButton.Enabled = false;
-                CancelButton.Enabled = false;
+                ServerCredentials credentials = null;
+                InvokeOnMainThread(delegate {
+                    credentials = new ServerCredentials() {
+                        UserName = UserTextField.StringValue,
+                        Password = PasswordTextField.StringValue,
+                        Address = new Uri(AddressTextField.StringValue)
+                    };
+                    ContinueButton.Enabled = false;
+                    CancelButton.Enabled = false;
+                });
                 Thread check = new Thread(() => {
                     Tuple<CmisServer, Exception> fuzzyResult = CmisUtils.GetRepositoriesFuzzy(credentials);
                     CmisServer cmisServer = fuzzyResult.Item1;
@@ -378,13 +395,6 @@ namespace CmisSync {
             {
                 Controller.PageCancelled();
             };
-            Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
-            {
-                InvokeOnMainThread(delegate
-                {
-                    ContinueButton.Enabled = button_enabled;
-                });
-            };
             ContentView.AddSubview(AddressLabel);
             ContentView.AddSubview(AddressTextField);
             ContentView.AddSubview(AddressHelpLabel);
@@ -404,7 +414,7 @@ namespace CmisSync {
             Description = "";
             bool firstRepo = true;
             Repositories = new List<RootFolder>();
-            Dictionary<string,AsyncNodeLoader> loader = new Dictionary<string,AsyncNodeLoader> ();
+            Loader = new Dictionary<string,AsyncNodeLoader> ();
             foreach (KeyValuePair<String, String> repository in Controller.repositories)
             {
                 RootFolder repo = new RootFolder() {
@@ -440,7 +450,7 @@ namespace CmisSync {
                     });
                 };
                 asyncLoader.Load(repo);
-                loader.Add(repo.Id, asyncLoader);
+                Loader.Add(repo.Id, asyncLoader);
             }
             DataSource = new CmisTree.CmisTreeDataSource(Repositories);
             DataSource.SelectedEvent += delegate (NSCmisTree cmis, int selected) {
@@ -520,7 +530,7 @@ namespace CmisSync {
                         Console.WriteLine("ItemExpanded find node Error");
                         return;
                     }
-                    loader[root.Id].Load(node);
+                    Loader[root.Id].Load(node);
                 });
             };
             ContinueButton.Activated += delegate
@@ -534,7 +544,7 @@ namespace CmisSync {
                     RootFolder root = Repositories.Find(x=>(x.Selected != false));
                     if (root != null)
                     {
-                        foreach (AsyncNodeLoader task in loader.Values)
+                        foreach (AsyncNodeLoader task in Loader.Values)
                             task.Cancel();
                         Controller.saved_repository = root.Id;
                         List<string> ignored = NodeModelUtils.GetIgnoredFolder(root);
@@ -547,7 +557,7 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate
                 {
-                    foreach (AsyncNodeLoader task in loader.Values)
+                    foreach (AsyncNodeLoader task in Loader.Values)
                         task.Cancel();
                     Controller.PageCancelled();
                 });
@@ -556,18 +566,12 @@ namespace CmisSync {
             {
                 InvokeOnMainThread(delegate
                 {
-                    foreach (AsyncNodeLoader task in loader.Values)
+                    foreach (AsyncNodeLoader task in Loader.Values)
                         task.Cancel();
                     Controller.BackToPage1();
                 });
             };
-            Controller.UpdateAddProjectButtonEvent += delegate(bool button_enabled)
-            {
-                InvokeOnMainThread(delegate
-                {
-                    ContinueButton.Enabled = button_enabled;
-                });
-            };
+
             OutlineController.View.Frame = new RectangleF (190, 60, 400, 240);
             ContentView.AddSubview(OutlineController.View);
             Buttons.Add(ContinueButton);
@@ -588,13 +592,6 @@ namespace CmisSync {
                 DoubleValue = Controller.ProgressBarPercentage
             };
             ProgressIndicator.StartAnimation(this);
-            Controller.UpdateProgressBarEvent += delegate(double percentage)
-            {
-                InvokeOnMainThread(delegate 
-                {
-                    ProgressIndicator.DoubleValue = percentage;
-                });
-            };
             ContentView.AddSubview(ProgressIndicator);
         }
 

@@ -349,12 +349,49 @@ namespace CmisSync.Lib
         }
 
         /// <summary>
+        /// Formats the bandwidth in typical 10 based calculation
+        /// </summary>
+        /// <returns>
+        /// The bandwidth.
+        /// </returns>
+        /// <param name='bitsPerSecond'>
+        /// Bits per second.
+        /// </param>
+        public static string FormatBandwidth(double bitsPerSecond)
+        {
+            if (bitsPerSecond >= (1000d*1000d*1000d*1000d))
+                return String.Format("{0:##.##} TBit/s", Math.Round(bitsPerSecond / (1000d*1000d*1000d*1000d), 1));
+            else if (bitsPerSecond >= (1000d*1000d*1000d))
+                return String.Format("{0:##.##} GBit/s", Math.Round(bitsPerSecond / (1000d*1000d*1000d), 1));
+            else if (bitsPerSecond >= (1000d*1000d))
+                return String.Format("{0:##.##} MBit/s", Math.Round(bitsPerSecond / (1000d*1000d), 1));
+            else if (bitsPerSecond >= 1000d)
+                return String.Format("{0:##.##} KBit/s", Math.Round(bitsPerSecond / 1000d, 1));
+            else
+                return bitsPerSecond.ToString() + " Bit/s";
+        }
+
+        /// <summary>
         /// Format a file size nicely.
         /// Example: 1048576 becomes "1 MB"
         /// </summary>
         public static string FormatSize(long byteCount)
         {
             return FormatSize((double) byteCount);
+        }
+
+        /// <summary>
+        /// Formats the bandwidth in typical 10 based calculation
+        /// </summary>
+        /// <returns>
+        /// The bandwidth.
+        /// </returns>
+        /// <param name='bitsPerSecond'>
+        /// Bits per second.
+        /// </param>
+        public static string FormatBandwidth(long bitsPerSecond)
+        {
+            return FormatBandwidth((double) bitsPerSecond);
         }
 
         
