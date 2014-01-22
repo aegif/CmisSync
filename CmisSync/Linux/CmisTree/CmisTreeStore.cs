@@ -86,12 +86,27 @@ namespace CmisSync.CmisTree
 //                CmisStore.SetValue (iter, (int)Column.ColumnSelectedThreeState, newSelectedThreeState);
 //            }
 //            string oldStatus = CmisStore.GetValue (iter, (int)Column.ColumnStatus) as string;
-//            string newStatus = node.Status.ToString ();
+            string newStatus = "";
+            switch (node.Status) {
+            case LoadingStatus.START:
+                newStatus = Properties_Resources.LoadingStatusSTART;
+                break;
+            case LoadingStatus.LOADING:
+                newStatus = Properties_Resources.LoadingStatusLOADING;
+                break;
+            case LoadingStatus.ABORTED:
+                newStatus = Properties_Resources.LoadingStatusABORTED;
+                break;
+            default:
+                newStatus = "";
+                break;
+            }
 //            if (oldStatus != newStatus)
 //            {
 //                CmisStore.SetValue (iter, (int)Column.ColumnStatus, newStatus);
 //            }
-            CmisStore.SetValues (iter, node, node.Name, node.Parent == null, node.Selected != false, node.Selected == null, node.Status.ToString ());
+
+            CmisStore.SetValues (iter, node, node.Name, node.Parent == null, node.Selected != false, node.Selected == null, newStatus);
             foreach (Node child in node.Children)
             {
                 TreeIter iterChild;
