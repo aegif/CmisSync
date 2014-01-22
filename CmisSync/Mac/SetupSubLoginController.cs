@@ -90,7 +90,7 @@ namespace CmisSync
             InvokeOnMainThread (delegate
             {
                 ContinueButton.Enabled = enabled;
-                ContinueButton.KeyEquivalent = "\r";
+//                ContinueButton.KeyEquivalent = "\r";
             });
         }
 

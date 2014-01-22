@@ -91,7 +91,7 @@ namespace CmisSync
             Outline.Delegate = DataDelegate;
 
             ContinueButton.Enabled = (Repositories.Count > 0);
-            ContinueButton.KeyEquivalent = "\r";
+//            ContinueButton.KeyEquivalent = "\r";
 
             this.BackButton.Title = Properties_Resources.Back;
             this.CancelButton.Title = Properties_Resources.Cancel;

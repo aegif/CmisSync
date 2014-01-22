@@ -45,7 +45,7 @@ namespace CmisSync
 
             this.CancelButton.Title = Properties_Resources.Cancel;
             this.ContinueButton.Title = Properties_Resources.Continue;
-            this.ContinueButton.KeyEquivalent = "\r";
+//            this.ContinueButton.KeyEquivalent = "\r";
         }
 
         partial void OnCancel (MonoMac.Foundation.NSObject sender)

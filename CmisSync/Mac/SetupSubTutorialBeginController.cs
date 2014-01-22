@@ -45,7 +45,7 @@ namespace CmisSync
 
             this.SkipButton.Title = Properties_Resources.SkipTutorial;
             this.ContinueButton.Title = Properties_Resources.Continue;
-            this.ContinueButton.KeyEquivalent = "\r";
+//            this.ContinueButton.KeyEquivalent = "\r";
 
             NSImage image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "tutorial-slide-" + Controller.TutorialCurrentPage + ".png")) {
                 Size = new SizeF (350, 200)
