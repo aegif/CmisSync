@@ -109,6 +109,7 @@ namespace CmisSync
             InvokeOnMainThread (delegate
             {
                 AddButton.Enabled = enabled;
+                AddButton.KeyEquivalent = "\r";
             });
         }
 

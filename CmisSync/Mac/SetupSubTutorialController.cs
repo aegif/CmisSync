@@ -44,6 +44,7 @@ namespace CmisSync
             base.AwakeFromNib ();
 
             this.ContinueButton.Title = Properties_Resources.Continue;
+            this.ContinueButton.KeyEquivalent = "\r";
 
             NSImage image = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "tutorial-slide-" + Controller.TutorialCurrentPage + ".png")) {
                 Size = new SizeF (350, 200)

@@ -90,6 +90,7 @@ namespace CmisSync
             InvokeOnMainThread (delegate
             {
                 ContinueButton.Enabled = enabled;
+                ContinueButton.KeyEquivalent = "\r";
             });
         }
 
@@ -121,6 +122,9 @@ namespace CmisSync
                 Password = PasswordText.StringValue,
                 Address = new Uri(AddressText.StringValue)
             };
+            AddressText.Enabled = false;
+            UserText.Enabled = false;
+            PasswordText.Enabled = false;
             ContinueButton.Enabled = false;
             CancelButton.Enabled = false;
 
@@ -139,6 +143,9 @@ namespace CmisSync
                     if (Controller.repositories == null)
                     {
                         WarnText.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
+                        AddressText.Enabled = true;
+                        UserText.Enabled = true;
+                        PasswordText.Enabled = true;
                         ContinueButton.Enabled = true;
                         CancelButton.Enabled = true;
                     }

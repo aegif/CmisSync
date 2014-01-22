@@ -50,6 +50,7 @@ namespace CmisSync
             this.OpenButton.Title = Properties_Resources.OpenFolder;
             this.OpenButton.SizeToFit ();
             this.FinishButton.Title = Properties_Resources.Finish;
+            this.FinishButton.KeyEquivalent = "\r";
 
             //  TODO: comment the blow line, since it may cause crash?
 //            NSApplication.SharedApplication.RequestUserAttention(NSRequestUserAttentionType.CriticalRequest);
