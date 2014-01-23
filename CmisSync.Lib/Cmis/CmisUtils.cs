@@ -84,7 +84,7 @@ namespace CmisSync.Lib.Cmis
             // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
             // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
             string[] suffixes = {
-                "/cmis/atom",
+                "/cmis/atom11",
                 "/alfresco/cmisatom",
                 "/alfresco/service/cmis",
                 "/cmis/resources/",
@@ -94,7 +94,8 @@ namespace CmisSync.Lib.Cmis
                 "/p8cmis/resources/Service",
                 "/_vti_bin/cmis/rest?getRepositories",
                 "/Nemaki/atom/bedroom",
-                "/nuxeo/atom/cmis"
+                "/nuxeo/atom/cmis",
+                "/cmis/atom"
             };
             string bestUrl = null;
             // Try all suffixes
