@@ -16,7 +16,7 @@
 
 
 using System;
-using System.Runtime.InteropServices;
+
 using Gtk;
 using CmisSync.Lib;
 
@@ -24,19 +24,16 @@ namespace CmisSync {
 
     public class UI {
 
-        [DllImport("X11")]
-        extern public static int XInitThreads();
-
         public StatusIcon StatusIcon;
         public Setup Setup;
         public About About;
+
         public static string AssetsPath =
             (null != Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR"))
             ? Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR") : Defines.ASSETS_DIR;
 
         public UI ()
         {
-            XInitThreads();
             Application.Init();
 
             Setup      = new Setup ();
