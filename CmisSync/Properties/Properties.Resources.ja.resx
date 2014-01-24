@@ -208,16 +208,13 @@
     <value>チュートリアルをスキップ</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
-Please ask your server administrator for the CMIS endpoint URL.
-If you are sure about the address, open it in a browser and send
-the resulting XML to cmissync@aegif.jp</value>
+    <value>申し訳ありませんが、CmisSync はこのアドレスで CMIS サーバーを見つけることができませんでした。CMIS エンドポイントの URL については、サーバーの管理者にお問い合わせください。なお、アドレスが正しいにもかかわらずエラーになる場合、その URL をWebブラウザで開き、表示される XML を cmissync@aegif.jp までお送りください。</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>スタートアップへCmisSyncを追加</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>ステータスアイコンはここで役立ちます。</value>
+    <value>ステータスアイコン</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
     <value>CmisSyncステータスアイコンは同期の進行状態を示します。また、これを利用するとフォルダへ簡単にアクセスできます。</value>
@@ -277,86 +274,83 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>ログの表示</value>
   </data>
   <data name="ConnectFailure" xml:space="preserve">
-    <value>Failed to connect to server!
-Please check the given URL for misspelled host name.
-If the URL is correct, please contact your server administrator!</value>
+    <value>サーバーへの接続に失敗しました。 URL のホスト名が正しく入力されているか確認してください。URL が正しい場合、サーバー管理者にお問い合わせください。</value>
   </data>
   <data name="LoginFailedForbidden" xml:space="preserve">
-    <value>Login failed!
-Please check your user credentials and potentially the server URL.</value>
+    <value>ログインに失敗しました!
+あなたの資格情報とサーバのURLが正しいか確認してください。</value>
   </data>
   <data name="SendFailureHttps" xml:space="preserve">
-    <value>Failed to communicate with the given server!
-Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https</value>
+    <value>サーバーとの通信に失敗しました。指定された URL のプロトコルの部分を確認してください。サーバーが https による通信に対応していない可能性があります。</value>
   </data>
   <data name="DoNotIgnoreFolder" xml:space="preserve">
-    <value>Enable folder for synchronization</value>
+    <value>フォルダ同期を有効にします。</value>
   </data>
   <data name="IgnoreFolder" xml:space="preserve">
-    <value>Ignore folder on synchronization</value>
+    <value>同期中のフォルダを無視する</value>
   </data>
   <data name="LoadingStatusLOADING" xml:space="preserve">
-    <value>loading ...</value>
+    <value>読み込んでいます...</value>
   </data>
   <data name="LoadingStatusSTART" xml:space="preserve">
     <value>pending ...</value>
   </data>
   <data name="RemoveFolderFromSync" xml:space="preserve">
-    <value>Remove the folder from synchronization</value>
+    <value>フォルダを同期対象から外す</value>
   </data>
   <data name="DoYouTrustTheCertificate" xml:space="preserve">
-    <value>Do you trust this certificate?
-(Yes == Always, Cancel = Just Now)</value>
+    <value>証明書を信頼しますか？
+（はい=常に信頼、キャンセル = 今回だけ信頼）</value>
   </data>
   <data name="TrustFailure" xml:space="preserve">
-    <value>Failed to establish a trusted Connection. Please inform your server administrator.</value>
+    <value>信頼された接続を確立できませんでした。サーバ管理者までお問い合わせください。</value>
   </data>
   <data name="UntrustedCertificate" xml:space="preserve">
-    <value>Untrusted Certificate</value>
+    <value>信頼されていない証明書</value>
   </data>
   <data name="ManualSync" xml:space="preserve">
-    <value>Run sync now</value>
+    <value>同期を今すぐ実行</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings...</value>
+    <value>設定...</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>保存</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
     <value>CmisSync</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
-    <value>Sync Interval</value>
+    <value>同期の間隔</value>
   </data>
   <data name="Hours" xml:space="preserve">
-    <value>hours</value>
+    <value>時間</value>
   </data>
   <data name="Minutes" xml:space="preserve">
-    <value>minutes</value>
+    <value>分</value>
   </data>
   <data name="Day" xml:space="preserve">
-    <value>day</value>
+    <value>日</value>
   </data>
   <data name="Hour" xml:space="preserve">
-    <value>hour</value>
+    <value>時間</value>
   </data>
   <data name="WebAddress" xml:space="preserve">
-    <value>Repository URL</value>
+    <value>リポジトリURL</value>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>Error</value>
+    <value>エラー</value>
   </data>
   <data name="SyncError" xml:space="preserve">
-    <value>Could not sync "{0}": {1}</value>
+    <value>同期できませんでした "{0}": {1}</value>
   </data>
   <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
-    <value>Are you sure you want to disconnect this repository?  No files will be deleted from your system but they will no longer be synchronized.</value>
+    <value>このリポジトリを切断してもよろしいですか？システムからファイルは削除されませんが、今後同期されなくなります。</value>
   </data>
   <data name="Minute" xml:space="preserve">
-    <value>minute</value>
+    <value>分</value>
   </data>
   <data name="Seconds" xml:space="preserve">
-    <value>seconds</value>
+    <value>秒</value>
   </data>
 </root>

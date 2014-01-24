@@ -2,6 +2,8 @@
 # Script to download translations from Crowdin
 # Author: Nicolas Raoul
 # Ideally, execute before each alpha/beta release.
+#
+# First go to https://crowdin.net/project/cmissync/settings and press "Build Fresh Package".
 
 
 mkdir crowdin
