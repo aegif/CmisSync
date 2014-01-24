@@ -308,7 +308,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   </data>
   <data name="DoYouTrustTheCertificate" xml:space="preserve">
     <value>Do you trust this certificate?
-(Yes == Always, Cancel = Just Now)</value>
+(Yes = Always, Cancel = Just Now)</value>
   </data>
   <data name="TrustFailure" xml:space="preserve">
     <value>Failed to establish a trusted Connection. Please inform your server administrator.</value>
