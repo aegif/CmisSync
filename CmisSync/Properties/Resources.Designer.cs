@@ -217,7 +217,7 @@ namespace CmisSync {
         
         /// <summary>
         ///   Looks up a localized string similar to Do you trust this certificate?
-        ///(Yes == Always, Cancel = Just Now).
+        ///(Yes = Always, Cancel = Just Now).
         /// </summary>
         internal static string DoYouTrustTheCertificate {
             get {
