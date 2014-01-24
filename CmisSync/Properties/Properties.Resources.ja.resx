@@ -293,7 +293,7 @@
     <value>読み込んでいます...</value>
   </data>
   <data name="LoadingStatusSTART" xml:space="preserve">
-    <value>pending ...</value>
+    <value>処理中…</value>
   </data>
   <data name="RemoveFolderFromSync" xml:space="preserve">
     <value>フォルダを同期対象から外す</value>
