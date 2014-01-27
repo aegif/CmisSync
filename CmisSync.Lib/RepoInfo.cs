@@ -177,6 +177,9 @@ namespace CmisSync.Lib
                 return true;
             return !String.IsNullOrEmpty(ignoredPaths.Find(delegate(string ignore)
             {
+                if (String.IsNullOrEmpty(ignore)) {
+                    return false;
+                }
                 return path.StartsWith(ignore);
             }));
         }

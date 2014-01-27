@@ -351,7 +351,9 @@ namespace CmisSync
                 List<string> oldIgnores = new List<string>();
                 foreach (Config.IgnoredFolder ignore in folder.IgnoredFolders)
                 {
-                    oldIgnores.Add(ignore.Path);
+                    if (!String.IsNullOrEmpty (ignore.Path)) {
+                        oldIgnores.Add(ignore.Path);
+                    }
                 }
                 edit = new Edit(credentials, folder.DisplayName, folder.RemotePath, oldIgnores, folder.LocalPath);
                 edits.Add(reponame, edit);
