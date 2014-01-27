@@ -24,6 +24,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xaml;
+using System.Globalization;
 
 namespace CmisSync {
 
@@ -48,7 +49,7 @@ namespace CmisSync {
         /// </summary>
         public About ()
         {
-            Title      = "About CmisSync";
+            Title      = Properties_Resources.ResourceManager.GetString("About", CultureInfo.CurrentCulture);
             ResizeMode = ResizeMode.NoResize;
             Height     = 288;
             Width      = 640;
@@ -109,13 +110,14 @@ namespace CmisSync {
 
 
             Label version = new Label () {
-                Content    = "Version " + Controller.RunningVersion,
+                Content    = Properties_Resources.ResourceManager.GetString("Version", CultureInfo.CurrentCulture) + " " + Controller.RunningVersion,
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
 
             this.updates = new Label () {
-                Content    = "Please check for updates at CmisSync.com", //"Checking for updates...",
+                Content    = Properties_Resources.ResourceManager.GetString(
+                    "PleaseCheckForUpdates", CultureInfo.CurrentCulture), // Previously: "Checking for updates...",
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
@@ -125,15 +127,17 @@ namespace CmisSync {
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227)),
                 Text         = "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
                     "\n" +
-                    "CmisSync is Open Source software. You are free to use, modify, " +
-                    "and redistribute it under the GNU General Public License version 3 or later.",
+                    Properties_Resources.ResourceManager.GetString("OpenSource", CultureInfo.CurrentCulture),
                 TextWrapping = TextWrapping.Wrap,
                 Width        = 318
             };
 
-			Link website_link = new Link ("Website", Controller.WebsiteLinkAddress);
-			Link credits_link = new Link ("Credits", Controller.CreditsLinkAddress);
-			Link report_problem_link = new Link ("Report a problem", Controller.ReportProblemLinkAddress);
+            Link website_link = new Link(Properties_Resources.ResourceManager.GetString(
+                "Website", CultureInfo.CurrentCulture), Controller.WebsiteLinkAddress);
+            Link credits_link = new Link(Properties_Resources.ResourceManager.GetString(
+                "Credits", CultureInfo.CurrentCulture), Controller.CreditsLinkAddress);
+            Link report_problem_link = new Link(Properties_Resources.ResourceManager.GetString(
+                "ReportProblem", CultureInfo.CurrentCulture), Controller.ReportProblemLinkAddress);
 
             Canvas canvas = new Canvas ();
 

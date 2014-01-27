@@ -180,6 +180,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Credits.
+        /// </summary>
+        internal static string Credits {
+            get {
+                return ResourceManager.GetString("Credits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Customize the local folder name.
         /// </summary>
         internal static string Customize {
@@ -463,6 +472,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CmisSync is Open Source software. You are free to use, modify, and redistribute it under the GNU General Public License version 3 or later..
+        /// </summary>
+        internal static string OpenSource {
+            get {
+                return ResourceManager.GetString("OpenSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password.
         /// </summary>
         internal static string Password {
@@ -486,6 +504,15 @@ namespace CmisSync {
         internal static string PermissionDenied {
             get {
                 return ResourceManager.GetString("PermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please check for updates at CmisSync.com.
+        /// </summary>
+        internal static string PleaseCheckForUpdates {
+            get {
+                return ResourceManager.GetString("PleaseCheckForUpdates", resourceCulture);
             }
         }
         
@@ -522,6 +549,15 @@ namespace CmisSync {
         internal static string RemoveFolderFromSyncConfirm {
             get {
                 return ResourceManager.GetString("RemoveFolderFromSyncConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report a problem.
+        /// </summary>
+        internal static string ReportProblem {
+            get {
+                return ResourceManager.GetString("ReportProblem", resourceCulture);
             }
         }
         
@@ -692,6 +728,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        internal static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View Log.
         /// </summary>
         internal static string ViewLog {
@@ -706,6 +751,15 @@ namespace CmisSync {
         internal static string WebAddress {
             get {
                 return ResourceManager.GetString("WebAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Website.
+        /// </summary>
+        internal static string Website {
+            get {
+                return ResourceManager.GetString("Website", resourceCulture);
             }
         }
         

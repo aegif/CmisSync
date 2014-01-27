@@ -361,4 +361,22 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="Seconds" xml:space="preserve">
     <value>seconds</value>
   </data>
+  <data name="Credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="OpenSource" xml:space="preserve">
+    <value>CmisSync is Open Source software. You are free to use, modify, and redistribute it under the GNU General Public License version 3 or later.</value>
+  </data>
+  <data name="PleaseCheckForUpdates" xml:space="preserve">
+    <value>Please check for updates at CmisSync.com</value>
+  </data>
+  <data name="ReportProblem" xml:space="preserve">
+    <value>Report a problem</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Website</value>
+  </data>
 </root>
