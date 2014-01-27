@@ -151,7 +151,7 @@ namespace CmisSync.Lib
         /// <param name="path"></param>
         public void addIgnorePath(string path)
         {
-            if(!this.ignoredPaths.Contains(path))
+            if(!this.ignoredPaths.Contains(path) && !String.IsNullOrEmpty(path))
                 this.ignoredPaths.Add(path);
         }
 
@@ -177,6 +177,9 @@ namespace CmisSync.Lib
                 return true;
             return !String.IsNullOrEmpty(ignoredPaths.Find(delegate(string ignore)
             {
+                if (String.IsNullOrEmpty(ignore)) {
+                    return false;
+                }
                 return path.StartsWith(ignore);
             }));
         }

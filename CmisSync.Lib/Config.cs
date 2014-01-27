@@ -402,7 +402,7 @@ namespace CmisSync.Lib
                 [XmlElement("features", IsNullable=true)]
                 public Feature SupportedFeatures { get; set;}
 
-                [XmlElement("ignoreFolder", IsNullable=true)]
+                [XmlElement("ignoreFolder")]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
                 private long chunkSize = DefaultChunkSize;
