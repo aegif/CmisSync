@@ -3,6 +3,8 @@ using DotCMIS.Exceptions;
 using System;
 using System.Collections;
 using System.IO;
+using System.Collections.Generic;
+using System.Globalization;
 
 
 namespace CmisSync.Lib.Sync
@@ -237,11 +239,26 @@ namespace CmisSync.Lib.Sync
                                         DownloadFile(remoteDocument, localFolder);
                                         repo.OnConflictResolved();
 
-                                        string message = "Someone modified a file at the same time as you: " + filePath
-                                            + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.";
+                                        // Get LastModifiedBy.
+                                        IEnumerator<IProperty> e = remoteDocument.Properties.GetEnumerator();
+                                        string lastModifiedBy = null;
+                                        while (e.MoveNext())
+	                                    {
+	                                        IProperty property = e.Current;
+	                                        if(property.Id.Equals("LastModifiedBy"))
+                                            {
+                                                lastModifiedBy = (string)property.Value;
+                                                break;
+                                            }
+	                                    }
+
+                                        /*string message = String.Format(
+                                            Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
+                                            lastModifiedBy, filePath)
+                                            + "\n\n"
+                                            + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
                                         Logger.Info(message);
-                                        Utils.NotifyUser(message);
-                                        // TODO show CMIS property lastModifiedBy
+                                        Utils.NotifyUser(message);*/
                                     }
                                     else
                                     {

@@ -454,6 +454,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User %1 modified the file %2 at the same time as you..
+        /// </summary>
+        internal static string ModifiedSame {
+            get {
+                return ResourceManager.GetString("ModifiedSame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the synchronized folder.
         /// </summary>
         internal static string OpenFolder {
@@ -823,6 +832,15 @@ namespace CmisSync {
         internal static string YouCanFind {
             get {
                 return ResourceManager.GetString("YouCanFind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your version has been saved with a &apos;_your-version&apos; suffix, please merge your important changes from it and then delete it..
+        /// </summary>
+        internal static string YourVersion {
+            get {
+                return ResourceManager.GetString("YourVersion", resourceCulture);
             }
         }
     }
