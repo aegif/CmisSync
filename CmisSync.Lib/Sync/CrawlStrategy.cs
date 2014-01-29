@@ -252,13 +252,15 @@ namespace CmisSync.Lib.Sync
                                             }
 	                                    }
 
-                                        /*string message = String.Format(
-                                            Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
+                                        string message = String.Format(
+                                            // Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
+                                            "User {0} modified the file {1} at the same time as you.",
                                             lastModifiedBy, filePath)
                                             + "\n\n"
-                                            + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
+                                            // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
+                                            + "Your version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.";
                                         Logger.Info(message);
-                                        Utils.NotifyUser(message);*/
+                                        Utils.NotifyUser(message);
                                     }
                                     else
                                     {
