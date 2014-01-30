@@ -836,7 +836,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your version has been saved with a &apos;_your-version&apos; suffix, please merge your important changes from it and then delete it..
+        ///   Looks up a localized string similar to Your version has been saved with a &apos;Conflict Copy&apos; suffix, please merge your important changes from it and then delete it..
         /// </summary>
         internal static string YourVersion {
             get {
