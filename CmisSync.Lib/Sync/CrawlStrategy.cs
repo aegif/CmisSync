@@ -245,7 +245,7 @@ namespace CmisSync.Lib.Sync
                                         while (e.MoveNext())
 	                                    {
 	                                        IProperty property = e.Current;
-	                                        if(property.Id.Equals("LastModifiedBy"))
+	                                        if(property.Id.Equals("cmis:lastModifiedBy"))
                                             {
                                                 lastModifiedBy = (string)property.Value;
                                                 break;
@@ -258,7 +258,7 @@ namespace CmisSync.Lib.Sync
                                             lastModifiedBy, filePath)
                                             + "\n\n"
                                             // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
-                                            + "Your version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.";
+                                            + "Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.";
                                         Logger.Info(message);
                                         Utils.NotifyUser(message);
                                     }
