@@ -2,7 +2,7 @@
 Type=Application
 Name=DataSpace Sync
 Exec=dataspacesync start
-Icon=folder-cmissync
+Icon=app-cmissync
 Terminal=false
 X-GNOME-Autostart-enabled=true
 Categories=Network;
