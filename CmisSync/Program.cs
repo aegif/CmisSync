@@ -60,6 +60,7 @@ namespace CmisSync
         {
 #if __MonoCS__
             Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
+            Environment.SetEnvironmentVariable("MONO_XMLSERIALIZER_THS", "no");
 #endif
 
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
