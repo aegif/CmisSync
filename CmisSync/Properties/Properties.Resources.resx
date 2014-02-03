@@ -383,6 +383,6 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Website</value>
   </data>
   <data name="YourVersion" xml:space="preserve">
-    <value>Your version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.</value>
+    <value>Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.</value>
   </data>
 </root>
