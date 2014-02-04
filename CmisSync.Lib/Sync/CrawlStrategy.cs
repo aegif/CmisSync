@@ -1,18 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using DotCMIS.Client;
-using DotCMIS;
-using DotCMIS.Client.Impl;
 using DotCMIS.Exceptions;
-using DotCMIS.Enums;
-using System.ComponentModel;
+using System;
 using System.Collections;
-using DotCMIS.Data.Impl;
+using System.IO;
+using System.Collections.Generic;
+using System.Globalization;
 
-using System.Net;
 
 namespace CmisSync.Lib.Sync
 {
@@ -65,27 +58,32 @@ namespace CmisSync.Lib.Sync
             ///     else:
             ///       upload recursively               // if BIDIRECTIONAL
             /// </summary>
-            private bool CrawlSync(IFolder remoteFolder, string localFolder)
+            private void CrawlSync(IFolder remoteFolder, string localFolder)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
 
                 // Lists of files/folders, to delete those that have been removed on the server.
                 IList remoteFiles = new ArrayList();
                 IList remoteSubfolders = new ArrayList();
 
-                // Crawl remote children.
-                // Logger.LogInfo("Sync", String.Format("Crawl remote folder {0}", this.remoteFolderPath));
-                bool success = CrawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
-                sleepWhileSuspended();
-                // Crawl local files.
-                // Logger.LogInfo("Sync", String.Format("Crawl local files in the local folder {0}", localFolder));
-                success = success && CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
-                sleepWhileSuspended();
-                // Crawl local folders.
-                // Logger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
-                success = success && CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
+                try
+                {
+                    // Crawl remote children.
+                    // Logger.LogInfo("Sync", String.Format("Crawl remote folder {0}", this.remoteFolderPath));
+                    CrawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
 
-                return success;
+                    // Crawl local files.
+                    // Logger.LogInfo("Sync", String.Format("Crawl local files in the local folder {0}", localFolder));
+                    CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
+
+                    // Crawl local folders.
+                    // Logger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
+                    CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
+                }
+                catch (CmisBaseException e)
+                {
+                    ProcessRecoverableException("Could not crawl folder: " + remoteFolder.Path, e);
+                }
             }
 
 
@@ -93,187 +91,218 @@ namespace CmisSync.Lib.Sync
             /// Crawl remote content, syncing down if needed.
             /// Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
             /// </summary>
-            private bool CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
+            private void CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
             {
-                bool success = true;
-
+                SleepWhileSuspended();
+                
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
-                    sleepWhileSuspended();
-
-                    #region Cmis Folder
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        if (Utils.WorthSyncing(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
-                        {
-                            //Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
-                            remoteFolders.Add(remoteSubFolder.Name);
-                            string localSubFolder = localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name;
-
-                            // Check whether local folder exists.
-                            if (Directory.Exists(localSubFolder))
-                            {
-                                // Recurse into folder.
-                                success = success && CrawlSync(remoteSubFolder, localSubFolder);
-                            }
-                            else
-                            {
-                                // If there was previously a file with this name, delete it.
-                                // TODO warn if local changes in the file.
-                                if (File.Exists(localSubFolder))
-                                {
-                                    File.Delete(localSubFolder);
-                                }
-
-                                if (database.ContainsFolder(localSubFolder))
-                                {
-                                    // If there was previously a folder with this name, it means that
-                                    // the user has deleted it voluntarily, so delete it from server too.
-
-                                    // Delete the folder from the remote server.
-                                    remoteSubFolder.DeleteTree(true, null, true);
-
-                                    // Delete the folder from database.
-                                    database.RemoveFolder(localSubFolder);
-                                }
-                                else
-                                {
-                                    // The folder has been recently created on server, so download it.
-
-                                    // Skip if invalid folder name. See https://github.com/nicolas-raoul/CmisSync/issues/196
-                                    if (Utils.IsInvalidFileName(remoteSubFolder.Name))
-                                    {
-                                        Logger.Info("Skipping download of folder with illegal name: " + remoteSubFolder.Name);
-                                    }
-                                    else if (repoinfo.isPathIgnored(remoteSubFolder.Path))
-                                    {
-                                        Logger.Info("Skipping dowload of ignored folder: " + remoteSubFolder.Name);
-                                    }
-                                    else
-                                    {
-                                        // Create local folder.remoteDocument.Name
-                                        Directory.CreateDirectory(localSubFolder);
-
-                                        // Create database entry for this folder.
-                                        // TODO - Yannick - Add metadata
-                                        database.AddFolder(localSubFolder, remoteFolder.LastModificationDate);
-
-                                        // Recursive copy of the whole folder.
-                                        success = success && RecursiveFolderCopy(remoteSubFolder, localSubFolder);
-                                    }
-                                }
-                            }
-                        }
+                        CrawlRemoteFolder(remoteSubFolder, localFolder, remoteFolders);
                     }
-                    #endregion
-
-                    #region Cmis Document
-                    else
+                    else if (cmisObject is DotCMIS.Client.Impl.Document)
                     {
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)cmisObject;
+                        CrawlRemoteDocument(remoteDocument, localFolder, remoteFiles);
+                    }
+                    else
+                    {
+                        Logger.Warn("Unknown object type: " + cmisObject.ObjectType.DisplayName);
+                    }
+                }
+            }
 
-                        if (Utils.WorthSyncing(remoteDocument.Name))
+
+            /// <summary>
+            /// Crawl remote subfolder, syncing down if needed.
+            /// Meanwhile, cache and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
+            /// </summary>
+            private void CrawlRemoteFolder(IFolder remoteSubFolder, string localFolder, IList remoteFolders)
+            {
+                SleepWhileSuspended();
+
+                try
+                {
+                    if (Utils.WorthSyncing(localFolder, remoteSubFolder.Name, repoinfo))
+                    {
+                        //Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
+                        remoteFolders.Add(remoteSubFolder.Name);
+                        string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
+
+                        // Check whether local folder exists.
+                        if (Directory.Exists(localSubFolder))
                         {
-                            // We use the filename of the document's content stream.
-                            // This can be different from the name of the document.
-                            // For instance in FileNet it is not usual to have a document where
-                            // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
-                            string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
-                            //Logger.Debug("CrawlRemote doc: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName);
-
-                            // Check if file extension is allowed
-
-                            remoteFiles.Add(remoteDocumentFileName);
-                            // If this file does not have a filename, ignore it.
-                            // It sometimes happen on IBM P8 CMIS server, not sure why.
-                            if (remoteDocumentFileName == null)
+                            // Recurse into folder.
+                            CrawlSync(remoteSubFolder, localSubFolder);
+                        }
+                        else
+                        {
+                            // If there was previously a file with this name, delete it.
+                            // TODO warn if local changes in the file.
+                            if (File.Exists(localSubFolder))
                             {
-                                Logger.Warn("Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
-                                continue;
+                                File.Delete(localSubFolder);
                             }
 
-                            string filePath = localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName;
-
-                            if (File.Exists(filePath))
+                            if (database.ContainsFolder(localSubFolder))
                             {
-                                // Check modification date stored in database and download if remote modification date if different.
-                                DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
-                                DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
+                                // If there was previously a folder with this name, it means that
+                                // the user has deleted it voluntarily, so delete it from server too.
 
-                                if (lastDatabaseUpdate == null)
-                                {
-                                    Logger.Info("Downloading file absent from database: " + filePath);
-                                    success = success && DownloadFile(remoteDocument, localFolder);
-                                }
-                                else
-                                {
-                                    // If the file has been modified since last time we downloaded it, then download again.
-                                    if (serverSideModificationDate > lastDatabaseUpdate)
-                                    {
-                                        if (database.LocalFileHasChanged(filePath))
-                                        {
-                                            Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
-                                            // Rename locally modified file.
-                                            String ext = Path.GetExtension(filePath);
-                                            String filename = Path.GetFileNameWithoutExtension(filePath);
-                                            String path = Path.GetDirectoryName(filePath);
+                                // Delete the folder from the remote server.
+                                remoteSubFolder.DeleteTree(true, null, true);
 
-                                            String NewFileName = Utils.SuffixIfExists(filename + "_" + repoinfo.User + "-version");
-                                            String newFilePath = Path.Combine(path, NewFileName);
-                                            File.Move(filePath, newFilePath);
-
-                                            // Download server version
-                                            success = success && DownloadFile(remoteDocument, localFolder);
-                                            repo.OnConflictResolved();
-
-                                            // TODO move to OS-dependant layer
-                                            //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-                                            //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
-                                            // TODO show CMIS property lastModifiedBy
-                                        }
-                                        else
-                                        {
-                                            Logger.Info("Downloading modified file: " + remoteDocumentFileName);
-                                            success = success && DownloadFile(remoteDocument, localFolder);
-                                        }
-                                    }
-
-                                }
+                                // Delete the folder from database.
+                                database.RemoveFolder(localSubFolder);
                             }
                             else
                             {
-                                if (database.ContainsFile(filePath))
-                                {
-                                    // File has been recently removed locally, so remove it from server too.
-                                    Logger.Info("Removing locally deleted file on server: " + filePath);
-                                    remoteDocument.DeleteAllVersions();
-                                    // Remove it from database.
-                                    database.RemoveFile(filePath);
-                                }
-                                else
-                                {
-                                    // New remote file, download it.
-                                    Logger.Info("New remote file: " + filePath);
-                                    success = success && DownloadFile(remoteDocument, localFolder);
-                                }
+                                // The folder has been recently created on server, so download it.
+                                Directory.CreateDirectory(localSubFolder);
+
+                                // Create database entry for this folder.
+                                // TODO - Yannick - Add metadata
+                                database.AddFolder(localSubFolder, remoteSubFolder.LastModificationDate);
+                                Logger.Info("Added folder to database: " + localSubFolder);
+
+                                // Recursive copy of the whole folder.
+                                RecursiveFolderCopy(remoteSubFolder, localSubFolder);
                             }
                         }
                     }
-                    #endregion
                 }
+                catch (Exception e)
+                {
+                    ProcessRecoverableException("Could not crawl sync remote folder: " + remoteSubFolder.Path, e);
+                }
+            }
 
-                return success;
+            /// <summary>
+            /// Crawl remote document, syncing down if needed.
+            /// Meanwhile, cache remoteFiles, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
+            /// </summary>
+            private void CrawlRemoteDocument(IDocument remoteDocument, string localFolder, IList remoteFiles)
+            {
+                SleepWhileSuspended();
+
+                try
+                {
+                    if (Utils.WorthSyncing(localFolder, remoteDocument.Name, repoinfo))
+                    {
+                        // We use the filename of the document's content stream.
+                        // This can be different from the name of the document.
+                        // For instance in FileNet it is not usual to have a document where
+                        // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
+                        string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
+                        //Logger.Debug("CrawlRemote doc: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName);
+
+                        // If this file does not have a filename, ignore it.
+                        // It sometimes happen on IBM P8 CMIS server, not sure why.
+                        if (remoteDocumentFileName == null)
+                        {
+                            Logger.Warn("Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
+                            return;
+                        }
+
+                        remoteFiles.Add(remoteDocumentFileName);
+
+                        string filePath = Path.Combine(localFolder, remoteDocumentFileName);
+
+                        if (File.Exists(filePath))
+                        {
+                            // Check modification date stored in database and download if remote modification date if different.
+                            DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
+                            DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
+
+                            if (lastDatabaseUpdate == null)
+                            {
+                                Logger.Info("Downloading file absent from database: " + filePath);
+                                DownloadFile(remoteDocument, localFolder);
+                            }
+                            else
+                            {
+                                // If the file has been modified since last time we downloaded it, then download again.
+                                if (serverSideModificationDate > lastDatabaseUpdate)
+                                {
+                                    if (database.LocalFileHasChanged(filePath))
+                                    {
+                                        Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
+                                        // Rename locally modified file.
+                                        String newFilePath = Utils.ConflictPath(filePath);
+                                        File.Move(filePath, newFilePath);
+
+                                        // Download server version
+                                        DownloadFile(remoteDocument, localFolder);
+                                        repo.OnConflictResolved();
+
+                                        // Get LastModifiedBy.
+                                        IEnumerator<IProperty> e = remoteDocument.Properties.GetEnumerator();
+                                        string lastModifiedBy = null;
+                                        while (e.MoveNext())
+	                                    {
+	                                        IProperty property = e.Current;
+	                                        if(property.Id.Equals("cmis:lastModifiedBy"))
+                                            {
+                                                lastModifiedBy = (string)property.Value;
+                                                break;
+                                            }
+	                                    }
+
+                                        string message = String.Format(
+                                            // Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
+                                            "User {0} modified the file {1} at the same time as you.",
+                                            lastModifiedBy, filePath)
+                                            + "\n\n"
+                                            // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
+                                            + "Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.";
+                                        Logger.Info(message);
+                                        Utils.NotifyUser(message);
+                                    }
+                                    else
+                                    {
+                                        Logger.Info("Downloading modified file: " + remoteDocumentFileName);
+                                        DownloadFile(remoteDocument, localFolder);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (database.ContainsFile(filePath))
+                            {
+                                // File has been recently removed locally, so remove it from server too.
+                                Logger.Info("Removing locally deleted file on server: " + filePath);
+                                remoteDocument.DeleteAllVersions();
+                                // Remove it from database.
+                                database.RemoveFile(filePath);
+                            }
+                            else
+                            {
+                                // New remote file, download it.
+                                Logger.Info("New remote file: " + filePath);
+                                DownloadFile(remoteDocument, localFolder);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    ProcessRecoverableException("Could not crawl sync remote document: " + remoteDocument.Name, e);
+                }
             }
 
 
             /// <summary>
             /// Crawl local files in a given directory (not recursive).
             /// </summary>
-            private bool CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
+            private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
             {
+                SleepWhileSuspended();
+                
                 string[] files;
                 try
                 {
@@ -281,18 +310,28 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while get the file list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
-                    return false;
+                    Logger.Warn("Could not get the file list from folder: " + localFolder, e);
+                    return;
                 }
 
-                bool success = true;
                 foreach (string filePath in files)
                 {
-                    sleepWhileSuspended();
+                    CrawlLocalFile(filePath, remoteFolder, remoteFiles);
+                }
+            }
 
+            /// <summary>
+            /// Crawl local file in a given directory (not recursive).
+            /// </summary>
+            private void CrawlLocalFile(string filePath, IFolder remoteFolder, IList remoteFiles)
+            {
+                SleepWhileSuspended();
+
+                try
+                {
                     string fileName = Path.GetFileName(filePath);
 
-                    if (Utils.WorthSyncing(fileName))
+                    if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoinfo))
                     {
                         if (!remoteFiles.Contains(fileName))
                         {
@@ -300,15 +339,37 @@ namespace CmisSync.Lib.Sync
                             // check whether it used invalidFolderNameRegex to exist on server or not.
                             if (database.ContainsFile(filePath))
                             {
-                                // If file has changed locally, move to 'your_version' and warn about conflict
-                                // TODO
+                                if (database.LocalFileHasChanged(filePath))
+                                {
+                                    // If file has changed locally, move to 'your_version' and warn about conflict
+                                    if (BIDIRECTIONAL)
+                                    {
+                                        // Local file was updated, sync up.
+                                        Logger.Info("Uploading locally edited remotely removed file from the repository: " + filePath);
+                                        UploadFile(filePath, remoteFolder);
+                                    }
+                                    else
+                                    {
+                                        Logger.Info("Conflict with file: " + filePath + ", backing up locally modified version.");
+                                        // Rename locally modified file.
+                                        String newFilePath = Utils.ConflictPath(filePath);
+                                        File.Move(filePath, newFilePath);
 
-                                // File has been deleted on server, so delete it locally.
-                                Logger.Info("Removing remotely deleted file: " + filePath);
-                                File.Delete(filePath);
+                                        // Delete file from database.
+                                        database.RemoveFile(filePath);
 
-                                // Delete file from database.
-                                database.RemoveFile(filePath);
+                                        repo.OnConflictResolved();
+                                    }
+                                }
+                                else
+                                {
+                                    // File has been deleted on server, so delete it locally.
+                                    Logger.Info("Removing remotely deleted file: " + filePath);
+                                    File.Delete(filePath);
+
+                                    // Delete file from database.
+                                    database.RemoveFile(filePath);
+                                }
                             }
                             else
                             {
@@ -316,41 +377,28 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // New file, sync up.
                                     Logger.Info("Uploading file absent on repository: " + filePath);
-                                    if (Utils.WorthSyncing(filePath))
-                                    {
-                                        success = success && UploadFile(filePath, remoteFolder);
-                                    }
+                                    UploadFile(filePath, remoteFolder);
                                 }
                             }
                         }
                         else
                         {
                             // The file exists both on server and locally.
-                            if (!syncFull)
+                            if (database.LocalFileHasChanged(filePath))
                             {
-                                if (database.LocalFileHasChanged(filePath))
+                                if (BIDIRECTIONAL)
                                 {
-                                    if (BIDIRECTIONAL)
-                                    {
-                                        // Upload new version of file content.
-                                        Logger.Info("Uploading file update on repository: " + filePath);
-                                        success = success && UpdateFile(filePath, remoteFolder);
-                                    }
+                                    // Upload new version of file content.
+                                    Logger.Info("Uploading file update on repository: " + filePath);
+                                    UpdateFile(filePath, remoteFolder);
                                 }
                             }
                         }
                     }
                 }
-
-                return success;
-            }
-
-            private void sleepWhileSuspended()
-            {
-                while (repo.Status == SyncStatus.Suspend)
+                catch (Exception e)
                 {
-                    Logger.Info(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, repoinfo.PollInterval));
-                    System.Threading.Thread.Sleep((int)repoinfo.PollInterval);
+                    ProcessRecoverableException("Could not crawl sync local file: " + filePath, e);
                 }
             }
 
@@ -358,8 +406,10 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Crawl local folders in a given directory (not recursive).
             /// </summary>
-            private bool CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
+            private void CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
             {
+                SleepWhileSuspended();
+
                 string[] folders;
                 try
                 {
@@ -367,17 +417,26 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while get the folder list from folder {0}: {1}", localFolder, Utils.ToLogString(e)));
-                    return false;
+                    Logger.Warn(String.Format("Exception while get the folder list from folder {0}", localFolder), e);
+                    return;
                 }
 
-                bool success = true;
                 foreach (string localSubFolder in folders)
                 {
-                    sleepWhileSuspended();
-                    string path = localSubFolder.Substring(repoinfo.TargetDirectory.Length).Replace("\\", "/");
+                    CrawlLocalFolder(localSubFolder, remoteFolder, remoteFolders);
+                }
+            }
+
+            /// <summary>
+            /// Crawl local folder in a given directory (not recursive).
+            /// </summary>
+            private void CrawlLocalFolder(string localSubFolder, IFolder remoteFolder, IList remoteFolders)
+            {
+                SleepWhileSuspended();
+                try
+                {
                     string folderName = Path.GetFileName(localSubFolder);
-                    if (Utils.WorthSyncing(folderName) && !repoinfo.isPathIgnored(path))
+                    if (Utils.WorthSyncing(Path.GetDirectoryName(localSubFolder), folderName, repoinfo))
                     {
                         if (!remoteFolders.Contains(folderName))
                         {
@@ -385,20 +444,24 @@ namespace CmisSync.Lib.Sync
                             // check whether it used to exist on server or not.
                             if (database.ContainsFolder(localSubFolder))
                             {
-                                success = success && RemoveFolderLocally(localSubFolder);
+                                RemoveFolderLocally(localSubFolder);
                             }
                             else
                             {
                                 if (BIDIRECTIONAL)
                                 {
                                     // New local folder, upload recursively.
-                                    success = success && UploadFolderRecursively(remoteFolder, localSubFolder);
+                                    UploadFolderRecursively(remoteFolder, localSubFolder);
                                 }
                             }
                         }
                     }
+
                 }
-                return success;
+                catch (Exception e)
+                {
+                    ProcessRecoverableException("Could not crawl sync local folder: " + localSubFolder, e);
+                }
             }
         }
     }

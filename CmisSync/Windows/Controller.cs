@@ -29,7 +29,7 @@ namespace CmisSync
     /// <summary>
     /// Windows-specific part of the main CmisSync controller.
     /// </summary>
-    public class Controller : ControllerBase
+    public class Controller : ControllerBase, UserNotificationListener
     {
         /// <summary>
         /// Constructor.
@@ -37,6 +37,7 @@ namespace CmisSync
         public Controller()
             : base()
         {
+            CmisSync.Lib.Utils.SetUserNotificationListener(this);
         }
 
 
@@ -179,6 +180,15 @@ namespace CmisSync
 
 
         /// <summary>
+        /// Send a message to the end user.
+        /// </summary>
+        public void NotifyUser(string message)
+        {
+            System.Windows.Forms.MessageBox.Show(message);
+        }
+
+
+        /// <summary>
         /// Quit CmisSync.
         /// </summary>
         public override void Quit()
@@ -194,6 +204,5 @@ namespace CmisSync
         {
             Process.Start("notepad.exe", path);
         }
-
     }
 }

@@ -37,9 +37,9 @@ namespace CmisSync.Lib.Sync
         /// Constructor.
         /// </summary>
         public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
-            : base(repoInfo)
+            : base(repoInfo, activityListener)
         {
-            this.synchronizedFolder = new SynchronizedFolder(repoInfo, activityListener, this);
+            this.synchronizedFolder = new SynchronizedFolder(repoInfo, this);
             Logger.Info(synchronizedFolder);
         }
 
@@ -62,17 +62,42 @@ namespace CmisSync.Lib.Sync
 
 
         /// <summary>
-        /// Sync for the first time.
-        /// This will create a database and download all files.
+        /// Whether this folder's synchronization is running right now.
         /// </summary>
-        public void DoFirstSync()
+        public override bool isSyncing()
         {
-            Logger.Info("First sync of " + this.Name);
-            if (this.synchronizedFolder != null)
+            return this.synchronizedFolder.isSyncing();
+        }
+
+
+        /// <summary>
+        /// Whether this folder's synchronization is suspended right now.
+        /// </summary>
+        public override bool isSuspended()
+        {
+            return this.synchronizedFolder.isSuspended();
+        }
+
+
+        /// <summary>
+        /// Synchronize.
+        /// The synchronization is performed in the background, so that the UI stays usable.
+        /// </summary>
+        public override void SyncInBackground(bool syncFull)
+        {
+            if (this.synchronizedFolder != null)// Because it is sometimes called before the object's constructor has completed.
             {
-                this.synchronizedFolder.Sync();
+                if (this.Status == SyncStatus.Idle)
+                {
+                    this.synchronizedFolder.SyncInBackground(syncFull);
+                }
+                else
+                {
+                    Logger.Info("Sync skipped. Status=" + this.Status);
+                }
             }
         }
+
 
         /// <summary>
         /// Synchronize.
@@ -80,8 +105,17 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public override void SyncInBackground()
         {
-            if (this.synchronizedFolder != null) // Because it is sometimes called before the object's constructor has completed.
-                this.synchronizedFolder.SyncInBackground();
+            SyncInBackground(true);
+        }
+
+        /// <summary>
+        /// Update repository settings.
+        /// </summary>
+        public override void UpdateSettings(string password, int pollInterval)
+        {
+            base.UpdateSettings(password, pollInterval);
+            this.synchronizedFolder = new SynchronizedFolder(RepoInfo, this);
+            Logger.Info(synchronizedFolder);
         }
 
         /// <summary>
@@ -92,7 +126,7 @@ namespace CmisSync.Lib.Sync
         {
             get
             {
-                return 1234567; // TODO
+                return 1234567; // TODO do we really need this size feature?
             }
         }
     }

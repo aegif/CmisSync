@@ -208,13 +208,13 @@
     <value>チュートリアルをスキップ</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>このアドレスではCmisSyncがCMISサーバを見つけることができませんでした。アドレスが正しい場合、ブラウザで取得したXMLをCmisSyncフォーラムへ投稿してください。</value>
+    <value>申し訳ありませんが、CmisSync はこのアドレスで CMIS サーバーを見つけることができませんでした。CMIS エンドポイントの URL については、サーバーの管理者にお問い合わせください。なお、アドレスが正しいにもかかわらずエラーになる場合、その URL をWebブラウザで開き、表示される XML を cmissync@aegif.jp までお送りください。</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>スタートアップへCmisSyncを追加</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>ステータスアイコンはここで役立ちます。</value>
+    <value>ステータスアイコン</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
     <value>CmisSyncステータスアイコンは同期の進行状態を示します。また、これを利用するとフォルダへ簡単にアクセスできます。</value>
@@ -232,13 +232,13 @@
     <value>CmisSyncへようこそ！</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>次は何が起こるか？</value>
+    <value>次のアクション</value>
   </data>
   <data name="Where" xml:space="preserve">
     <value>サーバのURL</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>どのアドレスを指定するか</value>
+    <value>指定するアドレスについて</value>
   </data>
   <data name="Which" xml:space="preserve">
     <value>どのリモートフォルダを同期しますか？</value>
@@ -266,5 +266,91 @@
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>ローカルフォルダのオープン</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>CmisSync について</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>ログの表示</value>
+  </data>
+  <data name="ConnectFailure" xml:space="preserve">
+    <value>サーバーへの接続に失敗しました。 URL のホスト名が正しく入力されているか確認してください。URL が正しい場合、サーバー管理者にお問い合わせください。</value>
+  </data>
+  <data name="LoginFailedForbidden" xml:space="preserve">
+    <value>ログインに失敗しました!
+あなたの資格情報とサーバのURLが正しいか確認してください。</value>
+  </data>
+  <data name="SendFailureHttps" xml:space="preserve">
+    <value>サーバーとの通信に失敗しました。指定された URL のプロトコルの部分を確認してください。サーバーが https による通信に対応していない可能性があります。</value>
+  </data>
+  <data name="DoNotIgnoreFolder" xml:space="preserve">
+    <value>フォルダ同期を有効にします。</value>
+  </data>
+  <data name="IgnoreFolder" xml:space="preserve">
+    <value>同期中のフォルダを無視する</value>
+  </data>
+  <data name="LoadingStatusLOADING" xml:space="preserve">
+    <value>読み込んでいます...</value>
+  </data>
+  <data name="LoadingStatusSTART" xml:space="preserve">
+    <value>処理中…</value>
+  </data>
+  <data name="RemoveFolderFromSync" xml:space="preserve">
+    <value>フォルダを同期対象から外す</value>
+  </data>
+  <data name="DoYouTrustTheCertificate" xml:space="preserve">
+    <value>証明書を信頼しますか？
+（はい=常に信頼、キャンセル = 今回だけ信頼）</value>
+  </data>
+  <data name="TrustFailure" xml:space="preserve">
+    <value>信頼された接続を確立できませんでした。サーバ管理者までお問い合わせください。</value>
+  </data>
+  <data name="UntrustedCertificate" xml:space="preserve">
+    <value>信頼されていない証明書</value>
+  </data>
+  <data name="ManualSync" xml:space="preserve">
+    <value>同期を今すぐ実行</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>設定...</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="CmisSync" xml:space="preserve">
+    <value>CmisSync</value>
+  </data>
+  <data name="SyncInterval" xml:space="preserve">
+    <value>同期の間隔</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>分</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>日</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="WebAddress" xml:space="preserve">
+    <value>リポジトリURL</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="SyncError" xml:space="preserve">
+    <value>同期できませんでした "{0}": {1}</value>
+  </data>
+  <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
+    <value>このリポジトリを切断してもよろしいですか？システムからファイルは削除されませんが、今後同期されなくなります。</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>分</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>秒</value>
   </data>
 </root>

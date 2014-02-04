@@ -44,6 +44,7 @@ namespace CmisSync {
         /// <summary>
         /// Get the image frame associated with given identifier and file type.
         /// </summary>
+        /// <param name="name">File name.</param>
         /// <param name="type">Filename extension, for instance "png" or "ico".</param>
         public static BitmapFrame GetImageSource(string name, string type)
         {

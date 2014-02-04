@@ -37,6 +37,7 @@ Code:
 	Vincent Untz <vuntz@gnome.org>
 	Will Thompson <will@willthompson.co.uk>
 	Yannick Molinet <yannick.molinet@dixinfor.com>
+	Keith Harrison <keithharrison@oris4.com>
 
 
 Artwork:
@@ -45,6 +46,7 @@ Artwork:
 	Jakub Steiner <jimmac@redhat.com>
 	Hylke Bons <hylkebons@gmail.com>
 	Lapo Calamandrei <calamandrei@gmail.com>
+	Mark James http://www.famfamfam.com/lab/icons/silk/
 
 
 Thanks very much!

@@ -144,7 +144,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (Exception e)
                 {
-                    Logger.Error("Error creating database: " + Utils.ToLogString(e));
+                    Logger.Error("Error creating database: " + e.Message, e);
                     throw;
                 }
             }
@@ -175,7 +175,7 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         private string Checksum(string filePath)
         {
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var bs = new BufferedStream(fs))
             {
                 using (var sha1 = new SHA1Managed())
@@ -256,8 +256,7 @@ namespace CmisSync.Lib.Cmis
                 catch (IOException e)
                 {
                     Logger.Warn("IOException while calculating checksum of " + path
-                        + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. "
-                        + Utils.ToLogString(e));
+                        + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. ", e);
                 }
             }
 
@@ -332,6 +331,45 @@ namespace CmisSync.Lib.Cmis
 
             // Remove all files under this folder
             ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
+        }
+
+        /// <summary>
+        /// Move a file.
+        /// </summary>
+        public void MoveFile(string oldPath, string newPath)
+        {
+            oldPath = Normalize(oldPath);
+            newPath = Normalize(newPath);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("oldPath", oldPath);
+            parameters.Add("newPath", newPath);
+            ExecuteSQLAction("UPDATE files SET path=@newPath WHERE path=@oldPath", parameters);
+        }
+
+
+        /// <summary>
+        /// Move a folder.
+        /// </summary>
+        public void MoveFolder(string oldPath, string newPath)
+        {
+            oldPath = Normalize(oldPath);
+            newPath = Normalize(newPath);
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("oldPath", oldPath);
+            parameters.Add("oldPathLike", oldPath + "/%");
+            parameters.Add("substringIndex", oldPath.Length + 1);
+            parameters.Add("newPath", newPath);
+            
+            // Update folder itself
+            ExecuteSQLAction("UPDATE folders SET path=@newPath WHERE path=@oldPath", parameters);
+
+            // UPdate all folders under this folder
+            ExecuteSQLAction("UPDATE folders SET path=@newPath||SUBSTR(path, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
+
+            // Update all files under this folder
+            ExecuteSQLAction("UPDATE files SET path=@newPath||SUBSTR(path, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
         }
 
 
@@ -513,7 +551,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Error(e.Message);
+                    Logger.Error(String.Format("Could not execute SQL: {0}; {1}", text, JsonConvert.SerializeObject(parameters)), e);
                     throw;
                 }
             }
@@ -536,7 +574,7 @@ namespace CmisSync.Lib.Cmis
                 }
                 catch (SQLiteException e)
                 {
-                    Logger.Error(e.Message);
+                    Logger.Error(String.Format("Could not execute SQL: {0}; {1}", text, JsonConvert.SerializeObject(parameters)), e);
                     throw;
                 }
             }

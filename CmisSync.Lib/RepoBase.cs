@@ -15,14 +15,9 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using log4net;
-
+using System;
+using System.IO;
 using Timers = System.Timers;
 
 namespace CmisSync.Lib
@@ -47,21 +42,27 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Perform a synchronization if one is not running already.
+        /// </summary>
+        public abstract void SyncInBackground(bool syncFull);
+
+
+        /// <summary>
         /// Local disk size taken by the repository.
         /// </summary>
         public abstract double Size { get; }
 
 
         /// <summary>
-        /// Affect a new <c>SyncStatus</c> value.
+        /// Whether this folder's synchronization is running right now.
         /// </summary>
-        public Action<SyncStatus> SyncStatusChanged { get; set; }
+        public abstract bool isSyncing();
 
 
         /// <summary>
-        /// Local changes have been detected.
+        /// Whether this folder's synchronization is suspended right now.
         /// </summary>
-        public Action ChangesDetected { get; set; }
+        public abstract bool isSuspended();
 
 
         /// <summary>
@@ -112,38 +113,45 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Listener we inform about activity (used by spinner).
+        /// </summary>
+        private IActivityListener activityListener;
+
+
+        /// <summary>
         /// Watches the local filesystem for changes.
         /// </summary>
         public Watcher Watcher { get; private set; }
-
-
-        /// <summary>
-        /// Interval at which the local and remote filesystems should be polled.
-        /// </summary>
-        private TimeSpan poll_interval = PollInterval.Short;
-
-
-        /// <summary>
-        /// When the local and remote filesystems were last checked for modifications.
-        /// </summary>
-        private DateTime last_poll = DateTime.Now;
-
 
         /// <summary>
         /// Timer for watching the local and remote filesystems.
         /// </summary>
         private Timers.Timer remote_timer = new Timers.Timer();
 
+        /// <summary>
+        /// Timer to delay syncing after local change is made.
+        /// </summary>
+        private Timers.Timer local_timer = new Timers.Timer();
 
         /// <summary>
-        /// Intervals for local and remote filesystems polling.
-        /// Currently the polling interval is fixed.
+        /// Timer for syncing after local change is made.
         /// </summary>
-        private static class PollInterval
-        {
-            public static readonly TimeSpan Short = new TimeSpan(0, 0, 5, 0);
-        }
+        private readonly double delay_interval = 15 * 1000; //15 seconds.
 
+        /// <summary>
+        /// When the last full sync completed.
+        /// </summary>
+        private DateTime last_sync;
+
+        /// <summary>
+        /// When the last partial sync completed.
+        /// </summary>
+        private DateTime last_partial_sync;
+
+        /// <summary>
+        /// Folder lock.
+        /// </summary>
+        private FolderLock folderLock;
 
         /// <summary>
         /// Track whether <c>Dispose</c> has been called.
@@ -154,31 +162,42 @@ namespace CmisSync.Lib
         /// <summary>
         /// Constructor.
         /// </summary>
-        public RepoBase(RepoInfo repoInfo)
+        public RepoBase(RepoInfo repoInfo, IActivityListener activityListener)
         {
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = repoInfo.Name;
             RemoteUrl = repoInfo.Address;
 
-            Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
-            this.remote_timer.Interval = repoInfo.PollInterval;
+            this.activityListener = activityListener;
 
-            SyncStatusChanged += delegate(SyncStatus status)
-            {
-                Status = status;
-            };
+            // Folder lock.
+            // Disabled for now. Can be an interesting feature, but should be made opt-in, as
+            // most users would be surprised to see this file appear.
+            // folderLock = new FolderLock(LocalPath);
 
-            this.Watcher = new Watcher(LocalPath);
+            Watcher = new Watcher(LocalPath);
+            Watcher.EnableRaisingEvents = true;
+
 
             // Main loop syncing every X seconds.
-            this.remote_timer.Elapsed += delegate
+            remote_timer.Elapsed += delegate
             {
                 // Synchronize.
                 SyncInBackground();
             };
-            
-            ChangesDetected += delegate { };
+            remote_timer.AutoReset = true;
+            Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
+            remote_timer.Interval = repoInfo.PollInterval;
+
+            //Partial sync interval..
+            local_timer.Elapsed += delegate
+            {
+                // Run partial sync.
+                SyncInBackground(false);
+            };
+            local_timer.AutoReset = false;
+            local_timer.Interval = delay_interval;
         }
 
 
@@ -212,7 +231,10 @@ namespace CmisSync.Lib
                 {
                     this.remote_timer.Stop();
                     this.remote_timer.Dispose();
+                    this.local_timer.Stop();
+                    this.local_timer.Dispose();
                     this.Watcher.Dispose();
+                    // this.folderLock.Dispose(); Folder lock disabled.
                 }
                 this.disposed = true;
             }
@@ -229,8 +251,49 @@ namespace CmisSync.Lib
             // Sync up everything that changed
             // since we've been offline
             SyncInBackground();
+        }
 
+        /// <summary>
+        /// Update repository settings.
+        /// </summary>
+        public virtual void UpdateSettings(string password, int pollInterval)
+        {
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+
+            //Pause sync
+            this.remote_timer.Stop();
+            if (Status == SyncStatus.Idle) Suspend();
+
+            //Update password...
+            if (!String.IsNullOrEmpty(password))
+            {
+                this.RepoInfo.Password = new CmisSync.Auth.CmisPassword(password.TrimEnd());
+                syncConfig.ObfuscatedPassword = RepoInfo.Password.ObfuscatedPassword;
+                Logger.Debug("Updated \"" + this.Name + "\" password");
+            }
+
+            //Update poll interval
+            this.RepoInfo.PollInterval = pollInterval;
+            this.remote_timer.Interval = pollInterval;
+            syncConfig.PollInterval = pollInterval;
+            Logger.Debug("Updated \"" + this.Name + "\" poll interval: " + pollInterval);
+
+            //Save configuration
+            config.Save();
+
+            //Always resume sync...
+            Resume();
             this.remote_timer.Start();
+        }
+
+        /// <summary>
+        /// Manual sync.
+        /// </summary>
+        public void ManualSync()
+        {
+            SyncInBackground();
         }
 
 
@@ -239,11 +302,8 @@ namespace CmisSync.Lib
         /// </summary>
         public void OnFileActivity(object sender, FileSystemEventArgs args)
         {
-            ChangesDetected();
-
-            this.Watcher.EnableEvent = false;
-            // TODO
-            this.Watcher.EnableEvent = true;
+            local_timer.Stop();
+            local_timer.Start(); //Restart the local timer...
         }
 
 
@@ -255,6 +315,75 @@ namespace CmisSync.Lib
             // ConflictResolved(); TODO
         }
 
+        /// <summary>
+        /// Called when sync starts.
+        /// </summary>
+        public void OnSyncStart(bool syncFull)
+        {
+            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Started: " + LocalPath);
+            activityListener.ActivityStarted();
+            if (syncFull)
+            {
+                remote_timer.Stop();
+                local_timer.Stop();
+            }
+            Watcher.EnableRaisingEvents = false; //Disable events while syncing...
+            Watcher.EnableEvent = false;
+        }
+
+        /// <summary>
+        /// Called when sync is suspended.
+        /// </summary>
+        public void OnSyncSuspend()
+        {
+            Logger.Info("Sync Suspended: " + LocalPath);
+            activityListener.ActivityStopped();
+        }
+
+        /// <summary>
+        /// Called when sync is resumed.
+        /// </summary>
+        public void OnSyncResume()
+        {
+            activityListener.ActivityStarted();
+            Logger.Info("Sync Resumed: " + LocalPath);
+        }
+
+        /// <summary>
+        /// Called when sync completes.
+        /// </summary>
+        public void OnSyncComplete(bool syncFull)
+        {
+            if (syncFull)
+            {
+                remote_timer.Start();
+                last_sync = DateTime.Now;
+            }
+            else
+            {
+                last_partial_sync = DateTime.Now;
+            }
+
+            if (Watcher.GetChangeCount() > 0)
+            {
+                //Watcher was stopped (due to error) so clear and restart sync
+                Watcher.Clear();
+            }
+
+            Watcher.EnableRaisingEvents = true;
+            Watcher.EnableEvent = true;
+            activityListener.ActivityStopped();
+            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+        }
+
+        /// <summary>
+        /// Called when sync encounters an error.
+        /// </summary>
+        public void OnSyncError(Exception exception)
+        {
+            Logger.Info("Sync Error: " + exception.Message);
+            activityListener.ActivityError(new Tuple<string, Exception>(Name, exception));
+        }
 
         /// <summary>
         /// Recursively gets a folder's size in bytes.
@@ -294,7 +423,6 @@ namespace CmisSync.Lib
 
     /// <summary>
     /// Current status of the synchronization.
-    /// TODO: It was used in SparkleShare for up/down/error but is not useful anymore, should be removed.
     /// </summary>
     public enum SyncStatus
     {
@@ -305,7 +433,6 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// Synchronization is suspended.
-        /// TODO this should be written in XML configuration instead.
         /// </summary>
         Suspend
     }

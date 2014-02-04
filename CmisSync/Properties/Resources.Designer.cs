@@ -142,6 +142,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CmisSync.
+        /// </summary>
+        internal static string CmisSync {
+            get {
+                return ResourceManager.GetString("CmisSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CmisSync creates a special folder on your computer where the documents are synchronized..
         /// </summary>
         internal static string CmisSyncCreates {
@@ -171,11 +180,29 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Credits.
+        /// </summary>
+        internal static string Credits {
+            get {
+                return ResourceManager.GetString("Credits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Customize the local folder name.
         /// </summary>
         internal static string Customize {
             get {
                 return ResourceManager.GetString("Customize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to day.
+        /// </summary>
+        internal static string Day {
+            get {
+                return ResourceManager.GetString("Day", resourceCulture);
             }
         }
         
@@ -199,7 +226,7 @@ namespace CmisSync {
         
         /// <summary>
         ///   Looks up a localized string similar to Do you trust this certificate?
-        ///(Yes == Always, Cancel = Just Now).
+        ///(Yes = Always, Cancel = Just Now).
         /// </summary>
         internal static string DoYouTrustTheCertificate {
             get {
@@ -231,6 +258,15 @@ namespace CmisSync {
         internal static string EnterWebAddress {
             get {
                 return ResourceManager.GetString("EnterWebAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        internal static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
             }
         }
         
@@ -289,6 +325,24 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to hour.
+        /// </summary>
+        internal static string Hour {
+            get {
+                return ResourceManager.GetString("Hour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to hours.
+        /// </summary>
+        internal static string Hours {
+            get {
+                return ResourceManager.GetString("Hours", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ignore folder on synchronization.
         /// </summary>
         internal static string IgnoreFolder {
@@ -299,6 +353,7 @@ namespace CmisSync {
         
         /// <summary>
         ///   Looks up a localized string similar to CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+        ///
         ///It is like Dropbox for Enterprise Content Management!.
         /// </summary>
         internal static string Intro {
@@ -363,11 +418,47 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Run sync now.
+        /// </summary>
+        internal static string ManualSync {
+            get {
+                return ResourceManager.GetString("ManualSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This may either take a short or a long time depending on the folder&apos;s size..
         /// </summary>
         internal static string MayTakeTime {
             get {
                 return ResourceManager.GetString("MayTakeTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minute.
+        /// </summary>
+        internal static string Minute {
+            get {
+                return ResourceManager.GetString("Minute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minutes.
+        /// </summary>
+        internal static string Minutes {
+            get {
+                return ResourceManager.GetString("Minutes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User %1 modified the file %2 at the same time as you..
+        /// </summary>
+        internal static string ModifiedSame {
+            get {
+                return ResourceManager.GetString("ModifiedSame", resourceCulture);
             }
         }
         
@@ -386,6 +477,15 @@ namespace CmisSync {
         internal static string OpenLocalFolder {
             get {
                 return ResourceManager.GetString("OpenLocalFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CmisSync is Open Source software. You are free to use, modify, and redistribute it under the GNU General Public License version 3 or later..
+        /// </summary>
+        internal static string OpenSource {
+            get {
+                return ResourceManager.GetString("OpenSource", resourceCulture);
             }
         }
         
@@ -417,6 +517,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please check for updates at CmisSync.com.
+        /// </summary>
+        internal static string PleaseCheckForUpdates {
+            get {
+                return ResourceManager.GetString("PleaseCheckForUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your documents are now being synchronized.
         /// </summary>
         internal static string Ready {
@@ -444,11 +553,47 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to disconnect this repository?  No files will be deleted from your system but they will no longer be synchronized..
+        /// </summary>
+        internal static string RemoveFolderFromSyncConfirm {
+            get {
+                return ResourceManager.GetString("RemoveFolderFromSyncConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report a problem.
+        /// </summary>
+        internal static string ReportProblem {
+            get {
+                return ResourceManager.GetString("ReportProblem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Resume sync.
         /// </summary>
         internal static string ResumeSync {
             get {
                 return ResourceManager.GetString("ResumeSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seconds.
+        /// </summary>
+        internal static string Seconds {
+            get {
+                return ResourceManager.GetString("Seconds", resourceCulture);
             }
         }
         
@@ -468,6 +613,15 @@ namespace CmisSync {
         internal static string SendingChanges {
             get {
                 return ResourceManager.GetString("SendingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings....
+        /// </summary>
+        internal static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
             }
         }
         
@@ -520,6 +674,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not sync &quot;{0}&quot;: {1}.
+        /// </summary>
+        internal static string SyncError {
+            get {
+                return ResourceManager.GetString("SyncError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Synchronization.
         /// </summary>
         internal static string Synchronization {
@@ -534,6 +697,15 @@ namespace CmisSync {
         internal static string SyncingChanges {
             get {
                 return ResourceManager.GetString("SyncingChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync Interval.
+        /// </summary>
+        internal static string SyncInterval {
+            get {
+                return ResourceManager.GetString("SyncInterval", resourceCulture);
             }
         }
         
@@ -565,11 +737,38 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        internal static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View Log.
         /// </summary>
         internal static string ViewLog {
             get {
                 return ResourceManager.GetString("ViewLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Repository URL.
+        /// </summary>
+        internal static string WebAddress {
+            get {
+                return ResourceManager.GetString("WebAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Website.
+        /// </summary>
+        internal static string Website {
+            get {
+                return ResourceManager.GetString("Website", resourceCulture);
             }
         }
         
@@ -633,6 +832,15 @@ namespace CmisSync {
         internal static string YouCanFind {
             get {
                 return ResourceManager.GetString("YouCanFind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your version has been saved with a &apos;Conflict Copy&apos; suffix, please merge your important changes from it and then delete it..
+        /// </summary>
+        internal static string YourVersion {
+            get {
+                return ResourceManager.GetString("YourVersion", resourceCulture);
             }
         }
     }

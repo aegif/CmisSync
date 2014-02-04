@@ -24,7 +24,6 @@ using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Shell;
-using System.Globalization;
 
 namespace CmisSync {
 
@@ -34,7 +33,7 @@ namespace CmisSync {
     /// - wizard to add a new remote folder.
     /// </summary>
     public class SetupWindow : Window {
-        
+
         /// <summary>
         /// Canvas that contains everything.
         /// </summary>
@@ -69,7 +68,6 @@ namespace CmisSync {
         /// Background for the bar line of buttons.
         /// </summary>
         private Rectangle buttonsBackground;
-        
 
         /// <summary>
         /// Constructor.
@@ -77,16 +75,16 @@ namespace CmisSync {
         public SetupWindow ()
         {
             // Window properties.
-            Title      = CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture);
-            Width      = 640;
-            Height     = 440;
+            Title = CmisSync.Properties_Resources.CmisSync;
+            Width = 640;
+            Height = 440;
             ResizeMode = ResizeMode.NoResize;
             Background = new SolidColorBrush (Colors.WhiteSmoke);
-            Icon       = UIHelpers.GetImageSource("cmissync-app", "ico");
+            Icon = UIHelpers.GetImageSource("cmissync-app", "ico");
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Content    = ContentCanvas;
+            Content = ContentCanvas;
             Closing += Close;
-			
+
             // Taskbar
 			TaskbarItemInfo = new TaskbarItemInfo () {
 				Description = "CmisSync"
@@ -103,32 +101,32 @@ namespace CmisSync {
             {
                 Width  = Width,
                 Height = 40,
-                Fill   = new SolidColorBrush (Color.FromRgb (240, 240, 240))    
+                Fill   = new SolidColorBrush (Color.FromRgb (240, 240, 240))
             };
-            
+
             // Splash image.
             this.side_splash = new Image () {
                 Width  = 150,
                 Height = 482
             };
             this.side_splash.Source = UIHelpers.GetImageSource ("side-splash");
-            
+
             // Components position.
 
             ContentCanvas.Children.Add (this.buttonsBackground);
             Canvas.SetRight (buttonsBackground, 0);
             Canvas.SetBottom (buttonsBackground, 0);
-            
+
             ContentCanvas.Children.Add (this.buttonsLine);
             Canvas.SetRight (this.buttonsLine, 0);
             Canvas.SetBottom (this.buttonsLine, 40);
-            
+
             ContentCanvas.Children.Add (this.side_splash);
             Canvas.SetLeft (this.side_splash, 0);
             Canvas.SetBottom (this.side_splash, 0);
         }
-        
-        
+
+
         /// <summary>
         /// Reset the window for use in another step/wizard.
         /// </summary>
@@ -151,8 +149,8 @@ namespace CmisSync {
             Header        = "";
             Description   = "";
         }
-        
-        
+
+
         /// <summary>
         /// Show the window's components.
         /// </summary>
@@ -163,59 +161,59 @@ namespace CmisSync {
                 Content    = Header,
                 Foreground = new SolidColorBrush (Color.FromRgb (0, 51, 153)),
                 FontSize   = 16
-            };          
+            };
             TextBlock description_label = new TextBlock () {
-                Text         = Description, 
+                Text         = Description,
                 TextWrapping = TextWrapping.Wrap,
                 Width        = 375
             };
 
             // Labels position.
-            
+
             ContentCanvas.Children.Add (header_label);
             Canvas.SetLeft (header_label, 180);
-            Canvas.SetTop (header_label, 18);    
-            
+            Canvas.SetTop (header_label, 18);
+
             ContentCanvas.Children.Add (description_label);
             Canvas.SetLeft (description_label, 185);
             Canvas.SetTop (description_label, 60);
-            
-        
+
+
             // If there are buttons, position them.
             if (Buttons.Count > 0) {
                 Buttons [0].IsDefault = true;
 				Buttons.Reverse ();
-                
+
                 int right = 9;
-                
+
                 foreach (Button button in Buttons) {
                     button.Measure (new Size (Double.PositiveInfinity, Double.PositiveInfinity));
                     Rect rect = new Rect (button.DesiredSize);
-            
+
                     button.Width = rect.Width + 26;
-                    
+
                     if (button.Width < 75)
                         button.Width = 75;
-                    
+
                     ContentCanvas.Children.Add (button);
                     Canvas.SetRight (button, right);
                     Canvas.SetBottom (button, 9);
-                    
+
                     right += (int) button.Width + 9;
                 }
             }
-            
+
             // Enables the window to receive keyboard messages when it is opened modelessly from Windows Forms.
             ElementHost.EnableModelessKeyboardInterop (this);
         }
-    
-        
+
+
         /// <summary>
         /// Close the window.
         /// </summary>
         private void Close (object sender, CancelEventArgs args)
         {
-            args.Cancel = true;    
+            args.Cancel = true;
         }
     }
 }

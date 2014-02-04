@@ -208,7 +208,7 @@
     <value>Пропустити підручник</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>На жаль, CmisSync не може знайти сервер CMIS за цією адресою. Будь ласка, перевірте ще раз. Якщо ви впевнені щодо адреси, то відкрийте її в браузері і напишіть отримане XML на форумі CmisSync.</value>
+    <value>На жаль, CmisSync не може знайти сервер CMIS за цією адресою. Будь ласка, попросіть адміністратора сервера URL-адресу кінцевої точки CMIS. Якщо ви впевнені у цій адресі, відкрийте її в браузері і відправте отриманий текст XML на cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Додати CmisSync до автозапуску</value>
@@ -266,5 +266,89 @@
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>Відкрити локальну папку</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Про CmisSync</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>Переглянути журнал</value>
+  </data>
+  <data name="ConnectFailure" xml:space="preserve">
+    <value>Не вдалося підключитися до сервера! Будь ласка, перевірте дану URL на вірність імені хосту. Якщо URL-адреса - вірна, то, будь ласка, зверніться до адміністратора сервера!</value>
+  </data>
+  <data name="LoginFailedForbidden" xml:space="preserve">
+    <value>Увійти не вдалося! Будь ласка, перевірте облікові дані користувача і потенційну URL-адресу сервера.</value>
+  </data>
+  <data name="SendFailureHttps" xml:space="preserve">
+    <value>Не вдалося зв'язатися із заданим сервером! Будь ласка, перевірте частину протоколу даного URL. Можливо, ваш сервер не здатний взаємодіяти через https</value>
+  </data>
+  <data name="DoNotIgnoreFolder" xml:space="preserve">
+    <value>Увімкнути папку для синхронізації</value>
+  </data>
+  <data name="IgnoreFolder" xml:space="preserve">
+    <value>Ігнорувати папку при синхронізації</value>
+  </data>
+  <data name="LoadingStatusLOADING" xml:space="preserve">
+    <value>завантаження...</value>
+  </data>
+  <data name="LoadingStatusSTART" xml:space="preserve">
+    <value>очікування…</value>
+  </data>
+  <data name="RemoveFolderFromSync" xml:space="preserve">
+    <value>Видалити папку із синхронізації</value>
+  </data>
+  <data name="DoYouTrustTheCertificate" xml:space="preserve">
+    <value>Ви довіряєте цьому сертифікату? (Так == завжди, Скасувати = лише зараз)</value>
+  </data>
+  <data name="TrustFailure" xml:space="preserve">
+    <value>Не вдалося встановити надійне з'єднання. Будь ласка, повідомте адміністратора сервера.</value>
+  </data>
+  <data name="UntrustedCertificate" xml:space="preserve">
+    <value>Ненадійний сертифікат</value>
+  </data>
+  <data name="ManualSync" xml:space="preserve">
+    <value>Тепер запустіть синхронізацію</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Параметри…</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="CmisSync" xml:space="preserve">
+    <value>CmisSync</value>
+  </data>
+  <data name="SyncInterval" xml:space="preserve">
+    <value>Інтервал синхронізації</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>години</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>хвилини</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>день</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>година</value>
+  </data>
+  <data name="WebAddress" xml:space="preserve">
+    <value>URL-адреса сховища</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Помилка</value>
+  </data>
+  <data name="SyncError" xml:space="preserve">
+    <value>Не вдалося синхронізувати "{0}": {1}</value>
+  </data>
+  <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
+    <value>Ви дійсно бажаєте відключити це сховище?  Файли не видаляються з вашої системи, але вони більше не синхронізуються.</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>хвилина</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>секунди</value>
   </data>
 </root>

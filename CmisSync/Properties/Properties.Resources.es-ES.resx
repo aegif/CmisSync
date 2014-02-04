@@ -208,7 +208,7 @@
     <value>Saltar el tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Lo sentimos, CmisSync no puedo encontrar un servidor CMIS en esta dirección. Por favor reviselo de nuevo. Si estás seguro acerca de la dirección, ábralo en un navegador y publique el XML resultante en el foro de CmisSync.</value>
+    <value>Lo sentimos, CmisSync no puede encontrar un servidor CMIS en esta dirección. Por favor pida la URL CMIS al administrador del servidor. Si usted está seguro de la dirección, ábralo en un navegador y enviar el XML resultante a cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Añadir CmisSync a la barra de inicio</value>
@@ -266,5 +266,89 @@
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
     <value>Abrir carpeta local</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Sobre CmisSync</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>Ver Log</value>
+  </data>
+  <data name="ConnectFailure" xml:space="preserve">
+    <value>Error al conectar al servidor. Por favor comprueba la URL introducida así como errores en el nombre de host. Si la URL es correcta, por favor póngase en contacto con el administrador del servidor.</value>
+  </data>
+  <data name="LoginFailedForbidden" xml:space="preserve">
+    <value>No se pudo iniciar sesión! Por favor compruebe sus credenciales de usuario y potencialmente la URL del servidor.</value>
+  </data>
+  <data name="SendFailureHttps" xml:space="preserve">
+    <value>Error al comunicarse con el servidor introducido. Por favor revise la parte de protocolo de la URL. Tal vez su servidor no es capaz de comunicarse a través de https</value>
+  </data>
+  <data name="DoNotIgnoreFolder" xml:space="preserve">
+    <value>Habilitar la carpeta para la sincronización</value>
+  </data>
+  <data name="IgnoreFolder" xml:space="preserve">
+    <value>Ignorar la carpeta de la sincronización</value>
+  </data>
+  <data name="LoadingStatusLOADING" xml:space="preserve">
+    <value>cargando...</value>
+  </data>
+  <data name="LoadingStatusSTART" xml:space="preserve">
+    <value>pendiente...</value>
+  </data>
+  <data name="RemoveFolderFromSync" xml:space="preserve">
+    <value>Eliminar la carpeta de la sincronización</value>
+  </data>
+  <data name="DoYouTrustTheCertificate" xml:space="preserve">
+    <value>¿Confías en este certificado? (Sí == siempre, Cancel = ahora)</value>
+  </data>
+  <data name="TrustFailure" xml:space="preserve">
+    <value>No se pudo establecer una conexión de confianza. Deberá informar al administrador del servidor.</value>
+  </data>
+  <data name="UntrustedCertificate" xml:space="preserve">
+    <value>Certificado de confianza</value>
+  </data>
+  <data name="ManualSync" xml:space="preserve">
+    <value>Ejecute la sincronización ahora</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Configuración...</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="CmisSync" xml:space="preserve">
+    <value>CmisSync</value>
+  </data>
+  <data name="SyncInterval" xml:space="preserve">
+    <value>Intervalo de sincronización</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>horas</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>minutos</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>día</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>hora</value>
+  </data>
+  <data name="WebAddress" xml:space="preserve">
+    <value>URL del repositorio</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="SyncError" xml:space="preserve">
+    <value>No puede sincronizar "{0}": {1}</value>
+  </data>
+  <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
+    <value>¿Está seguro de que desea desconectar este repositorio?  Los archivos archivos no serán eliminados de su sistema, pero ya no se sincronizarán.</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>minuto</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>segundos</value>
   </data>
 </root>

@@ -34,19 +34,21 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\bin</OutputPath>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>x86</PlatformTarget>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
+    <DocumentationFile>bin\$(Configuration)\CmisSync.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>CmisSync.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -56,8 +58,34 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\Debug\CmisSync.XML</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\CmisSync.XML</DocumentationFile>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>bin\Release\CmisSync.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DocumentationFile>bin\Debug\CmisSync.XML</DocumentationFile>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -95,7 +123,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PollIntervalSlider.cs" />
     <Compile Include="FolderTreeView.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
       <SubType>Form</SubType>
@@ -130,7 +160,7 @@
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
@@ -237,6 +267,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.cs.resx" />
+    <EmbeddedResource Include="Properties.Resources.nl.resx" />
+    <EmbeddedResource Include="Properties.Resources.pl.resx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />
@@ -255,6 +288,10 @@
     <EmbeddedResource Include="Pixmaps\tutorial-slide-3.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">
+      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
+      <Name>CmisSync.Auth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>CmisSync.Lib</Name>
@@ -266,8 +303,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\media_playback_pause.png" />
+    <EmbeddedResource Include="Pixmaps\media_playback_refresh.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
+    <EmbeddedResource Include="Pixmaps\connect.png" />
+    <EmbeddedResource Include="Pixmaps\disconnect.png" />
     <Content Include="Pixmaps\cmissync-folder.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -1,4 +1,4 @@
-﻿using CmisSync.Lib;
+using CmisSync.Lib;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

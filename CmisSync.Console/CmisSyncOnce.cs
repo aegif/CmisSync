@@ -59,10 +59,10 @@ namespace CmisSync.Console
                 return;
             }
 			RepoInfo repoInfo = folder.GetRepoInfo();
-			
+
 			ConsoleController controller = new ConsoleController ();
 			cmisRepo = new CmisRepo (repoInfo, controller);
-			
+
 			cmisRepo.Initialize ();
 		}
 

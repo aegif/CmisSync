@@ -29,7 +29,9 @@ using System.Net;
 
 namespace CmisSync
 {
-    // The CmisSync main class.
+    /// <summary>
+    /// The CmisSync main class.
+    /// </summary>
     public class Program
     {
         /// <summary>
@@ -52,9 +54,9 @@ namespace CmisSync
         /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
-        //
-        // Main method for CmisSync.
-        //
+        /// <summary>
+        /// Main method for CmisSync.
+        /// </summary>
         [STAThread]
         public static void Main(string[] args)
         {
@@ -65,9 +67,6 @@ namespace CmisSync
             // Migrate config.xml from past versions, if necessary.
             if ( ! firstRun )
                 ConfigMigration.Migrate();
-
-            // Clear log file.
-            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
 
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             Logger.Info("Starting.");
