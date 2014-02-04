@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
 
 namespace CmisSync.Lib.Sync
 {
@@ -33,7 +34,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Interval for which sync will wait while paused before retrying sync.
             /// </summary>
-            private static readonly int SYNC_SUSPEND_SLEEP_INTERVAL = 5 * 1000; //five seconds
+            private static readonly int SYNC_SUSPEND_SLEEP_INTERVAL = 1 * 1000; //five seconds
 
             /// <summary>
             /// An object for locking the sync method (one thread at a time can run sync).
@@ -67,15 +68,6 @@ namespace CmisSync.Lib.Sync
             /// Example: "/User Homes/nicolas.raoul/demos"
             /// </summary>
             private string remoteFolderPath;
-
-
-            /// <summary>
-            /// Syncing lock.
-            /// true if syncing is being performed right now.
-            /// TODO use is_syncing variable in parent
-            /// </summary>
-            private bool syncing;
-
 
             /// <summary>
             /// Parameters to use for all CMIS requests.
@@ -111,7 +103,15 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool firstSync = false;
 
+            /// <summary>
+            /// Background worker for sync.
+            /// </summary>
+            private BackgroundWorker syncWorker;
 
+            /// <summary>
+            /// Event to notify that the sync has completed.
+            /// </summary>
+            private AutoResetEvent autoResetEvent = new AutoResetEvent(true);
 
 
             /// <summary>
@@ -145,6 +145,35 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
                 }
+
+                syncWorker = new BackgroundWorker();
+                syncWorker.WorkerSupportsCancellation = true;
+                syncWorker.DoWork += new DoWorkEventHandler(
+                    delegate(Object o, DoWorkEventArgs args)
+                    {
+                        bool syncFull = (bool)args.Argument;
+                        try
+                        {
+                            Sync(syncFull);
+                        }
+                        catch (OperationCanceledException e)
+                        {
+                            Logger.Info(e.Message);
+                        }
+                        catch (CmisPermissionDeniedException e)
+                        {
+                            repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
+                        }
+                        catch (Exception e)
+                        {
+                            repo.OnSyncError(new BaseException(e));
+                        }
+                        finally
+                        {
+                            SyncComplete(syncFull);
+                        }
+                    }
+                );
             }
 
 
@@ -198,7 +227,13 @@ namespace CmisSync.Lib.Sync
                 Logger.Info("Created CMIS session: " + session.ToString());
             }
 
-
+            /// <summary>
+            /// Synchronize between CMIS folder and local folder.
+            /// </summary>
+            public bool IsSyncing()
+            {
+                return syncWorker.IsBusy;
+            }
 
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
@@ -215,7 +250,7 @@ namespace CmisSync.Lib.Sync
             {
                 lock (syncLock)
                 {
-                    this.syncing = true;
+                    autoResetEvent.Reset();
                     repo.OnSyncStart(syncFull);
 
                     // If not connected, connect.
@@ -245,7 +280,7 @@ namespace CmisSync.Lib.Sync
                         {
                             // No ChangeLog capability, so we have to crawl remote and local folders.
                             WatcherSync(remoteFolderPath, localFolder);
-                        
+
                             if (syncFull)
                             {
                                 CrawlSync(remoteFolder, localFolder);
@@ -262,8 +297,14 @@ namespace CmisSync.Lib.Sync
             {
                 lock (syncLock)
                 {
-                    repo.OnSyncComplete(syncFull);
-                    this.syncing = false;
+                    try
+                    {
+                        repo.OnSyncComplete(syncFull);
+                    }
+                    finally
+                    {
+                        autoResetEvent.Set();
+                    }
                 }
             }
 
@@ -272,38 +313,27 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             public void SyncInBackground(bool syncFull)
             {
-                if (this.syncing)
+                if (IsSyncing())
                 {
                     Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
                     return;
                 }
 
-                using (BackgroundWorker bw = new BackgroundWorker())
+                syncWorker.RunWorkerAsync(syncFull);
+            }
+
+            /// <summary>
+            /// Cancel a running sync (does nothing if sync thread is stopped).
+            /// </summary>
+            public void CancelSync()
+            {
+                if (IsSyncing())
                 {
-                    bw.DoWork += new DoWorkEventHandler(
-                        delegate(Object o, DoWorkEventArgs args)
-                        {
-                            try
-                            {
-                                Sync(syncFull);
-                            }
-                            catch (CmisPermissionDeniedException e)
-                            {
-                                repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
-                            }
-                            catch (Exception e)
-                            {
-                                repo.OnSyncError(new BaseException(e));
-                            }
-                        }
-                    );
-                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                        delegate(object o, RunWorkerCompletedEventArgs args)
-                        {
-                            SyncComplete(syncFull);
-                        }
-                    );
-                    bw.RunWorkerAsync();
+                    Logger.Info("Cancel Sync Requested...");
+                    syncWorker.CancelAsync();
+                    Logger.Debug("Wait for thread to complete...");
+                    autoResetEvent.WaitOne();
+                    Logger.Debug("...cancel completed.");
                 }
             }
 
@@ -1005,19 +1035,33 @@ namespace CmisSync.Lib.Sync
                     return false;
                 }
             }
-            
+
             /// <summary>
             /// Sleep while suspended.
             /// </summary>
             private void sleepWhileSuspended()
             {
+                if (syncWorker.CancellationPending)
+                {
+                    //Sync was cancelled...
+                    throw new OperationCanceledException("Sync was cancelled by user.");
+                }
+
                 if (repo.Status == SyncStatus.Suspend)
                 {
                     repo.OnSyncSuspend();
                     while (repo.Status == SyncStatus.Suspend)
                     {
-                        Logger.Debug(String.Format("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, SYNC_SUSPEND_SLEEP_INTERVAL));
+                        Logger.DebugFormat("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, SYNC_SUSPEND_SLEEP_INTERVAL);
                         System.Threading.Thread.Sleep(SYNC_SUSPEND_SLEEP_INTERVAL);
+
+                        if (syncWorker.CancellationPending)
+                        {
+                            //Sync was cancelled...
+                            repo.Resume();
+                            repo.OnSyncResume();
+                            throw new OperationCanceledException("Suspended sync was cancelled by user.");
+                        }
                     }
                     repo.OnSyncResume();
                 }

@@ -24,6 +24,7 @@ using System.Threading;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
+using System.ComponentModel;
 
 namespace CmisSync
 {
@@ -649,7 +650,15 @@ namespace CmisSync
         /// </summary>
         public void SettingsPageCompleted(string password, int pollInterval)
         {
-            Program.Controller.UpdateRepositorySettings(saved_repository, password, pollInterval);
+            //Run this in background so as not to free the UI...
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
+                {
+                    Program.Controller.UpdateRepositorySettings(saved_repository, password, pollInterval);
+                }
+            );
+            worker.RunWorkerAsync();
 
             FinishPageCompleted();
         }

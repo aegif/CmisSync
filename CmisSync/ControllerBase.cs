@@ -325,6 +325,7 @@ namespace CmisSync
 
                     if (repo.LocalPath.Equals(folder.LocalPath))
                     {
+                        repo.CancelSync();
                         repo.Dispose();
                         this.repositories.Remove(repo);
                         Logger.Info("Removed Repository: " + repo.Name);
