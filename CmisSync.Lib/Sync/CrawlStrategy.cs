@@ -94,7 +94,7 @@ namespace CmisSync.Lib.Sync
             private void CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
             {
                 SleepWhileSuspended();
-                
+
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
@@ -243,14 +243,14 @@ namespace CmisSync.Lib.Sync
                                         IEnumerator<IProperty> e = remoteDocument.Properties.GetEnumerator();
                                         string lastModifiedBy = null;
                                         while (e.MoveNext())
-	                                    {
-	                                        IProperty property = e.Current;
-	                                        if(property.Id.Equals("cmis:lastModifiedBy"))
+                                        {
+                                            IProperty property = e.Current;
+                                            if (property.Id.Equals("cmis:lastModifiedBy"))
                                             {
                                                 lastModifiedBy = (string)property.Value;
                                                 break;
                                             }
-	                                    }
+                                        }
 
                                         string message = String.Format(
                                             // Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
@@ -274,11 +274,16 @@ namespace CmisSync.Lib.Sync
                         {
                             if (database.ContainsFile(filePath))
                             {
-                                // File has been recently removed locally, so remove it from server too.
-                                Logger.Info("Removing locally deleted file on server: " + filePath);
-                                remoteDocument.DeleteAllVersions();
-                                // Remove it from database.
-                                database.RemoveFile(filePath);
+                                if (!(bool)remoteDocument.IsVersionSeriesCheckedOut)
+                                {
+                                    // File has been recently removed locally, so remove it from server too.
+                                    Logger.Info("Removing locally deleted file on server: " + filePath);
+                                    remoteDocument.DeleteAllVersions();
+                                    // Remove it from database.
+                                    database.RemoveFile(filePath);
+                                }
+                                else
+                                    throw new IOException("File is Check Out on the server");
                             }
                             else
                             {
@@ -302,7 +307,7 @@ namespace CmisSync.Lib.Sync
             private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
             {
                 SleepWhileSuspended();
-                
+
                 string[] files;
                 try
                 {

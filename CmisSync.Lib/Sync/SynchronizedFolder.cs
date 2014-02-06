@@ -761,33 +761,41 @@ namespace CmisSync.Lib.Sync
                             return true;
                         }
 
-                        // Prepare content stream
-                        ContentStream remoteStream = new ContentStream();
-                        remoteStream.FileName = remoteFile.ContentStreamFileName;
-                        remoteStream.Length = localfile.Length;
-                        remoteStream.MimeType = remoteFile.GetContentStream().MimeType;
-                        remoteStream.Stream = localfile;
-                        remoteStream.Stream.Flush();
-                        Logger.Debug("before SetContentStream");
+                        // Check if the file is Check out or not
+                        if (!(bool)remoteFile.IsVersionSeriesCheckedOut)
+                        {
 
-                        // CMIS do not have a Method to upload block by block. So upload file must be full.
-                        // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
-                        // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
-                        // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
-                        remoteFile.SetContentStream(remoteStream, true, true);
+                            // Prepare content stream
+                            ContentStream remoteStream = new ContentStream();
+                            remoteStream.FileName = remoteFile.ContentStreamFileName;
+                            remoteStream.Length = localfile.Length;
+                            remoteStream.MimeType = remoteFile.GetContentStream().MimeType;
+                            remoteStream.Stream = localfile;
+                            remoteStream.Stream.Flush();
+                            Logger.Debug("before SetContentStream");
 
-                        Logger.Debug("after SetContentStream");
+                            // CMIS do not have a Method to upload block by block. So upload file must be full.
+                            // We must waiting for support of CMIS 1.1 https://issues.apache.org/jira/browse/CMIS-628
+                            // http://docs.oasis-open.org/cmis/CMIS/v1.1/cs01/CMIS-v1.1-cs01.html#x1-29700019
+                            // DotCMIS.Client.IObjectId objID = remoteFile.SetContentStream(remoteStream, true, true);
+                            remoteFile.SetContentStream(remoteStream, true, true);
 
-                        // Update timestamp in database.
-                        database.SetFileServerSideModificationDate(filePath, ((DateTime)remoteFile.LastModificationDate).ToUniversalTime());
+                            Logger.Debug("after SetContentStream");
 
-                        // Update checksum
-                        database.RecalculateChecksum(filePath);
+                            // Update timestamp in database.
+                            database.SetFileServerSideModificationDate(filePath, ((DateTime)remoteFile.LastModificationDate).ToUniversalTime());
 
-                        // TODO Update metadata?
+                            // Update checksum
+                            database.RecalculateChecksum(filePath);
 
-                        Logger.Info("Updated: " + filePath);
-                        return true;
+                            // TODO Update metadata?
+                            Logger.Info("Updated: " + filePath);
+                            return true;
+                        }
+                        else
+                        {
+                            throw new IOException("File is Check Out on the server");
+                        }
                     }
                 }
                 catch (Exception e)
