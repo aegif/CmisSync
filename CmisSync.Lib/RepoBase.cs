@@ -95,6 +95,13 @@ namespace CmisSync.Lib
         public void Suspend()
         {
             Status = SyncStatus.Suspend;
+            RepoInfo.IsSuspended = true;
+            
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.IsSuspended = true;
+            config.Save();
         }
 
         /// <summary>
@@ -103,6 +110,13 @@ namespace CmisSync.Lib
         public void Resume()
         {
             Status = SyncStatus.Idle;
+            RepoInfo.IsSuspended = false;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.IsSuspended = false;
+            config.Save();
         }
 
 
@@ -170,6 +184,8 @@ namespace CmisSync.Lib
             RemoteUrl = repoInfo.Address;
 
             this.activityListener = activityListener;
+
+            if (repoInfo.IsSuspended) Status = SyncStatus.Suspend;
 
             // Folder lock.
             // Disabled for now. Can be an interesting feature, but should be made opt-in, as
@@ -374,6 +390,9 @@ namespace CmisSync.Lib
             Watcher.EnableEvent = true;
             activityListener.ActivityStopped();
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+
+            RepoInfo.LastSuccessedSync = DateTime.Now;
+
         }
 
         /// <summary>

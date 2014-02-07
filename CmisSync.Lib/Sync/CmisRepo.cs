@@ -93,7 +93,7 @@ namespace CmisSync.Lib.Sync
                 }
                 else
                 {
-                    Logger.Info("Sync skipped. Status=" + this.Status);
+                    Logger.Info(String.Format("Repo {0} - Sync skipped. Status={1}", this.Name, this.Status));
                 }
             }
         }

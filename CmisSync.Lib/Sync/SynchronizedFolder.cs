@@ -134,6 +134,8 @@ namespace CmisSync.Lib.Sync
                 this.repo = repoCmis;
                 this.repoinfo = repoInfo;
 
+                suspended = this.repoinfo.IsSuspended;
+
                 // Database is the user's AppData/Roaming
                 database = new Database(repoinfo.CmisDatabase);
 
@@ -807,6 +809,7 @@ namespace CmisSync.Lib.Sync
                             // throw new IOException("File is Check Out on the server");
                             Logger.Info(message);
                             Utils.NotifyUser(message);
+                            return false;
                         }
                     }
                 }
