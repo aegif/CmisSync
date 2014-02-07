@@ -250,7 +250,13 @@ namespace CmisSync.Lib.Sync
                         firstSync = true;
                     }
 
+                    // Add ACL in the context, or ACL is null
+                    // OperationContext context = new OperationContext();
+                    // context.IncludeAcls = true;
+
+                    // IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, context);
                     IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+
                     string localFolder = repoinfo.TargetDirectory;
 
                     if (firstSync)
@@ -260,23 +266,23 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                    // ChangeLog is not ready yet.
-                    //    if (ChangeLogCapability)
-                    //    {
-                    //        // ChangeLog sync...
-                    //        ChangeLogSync(remoteFolder);
-                    //        WatcherSync(remoteFolderPath, localFolder);
-                    //    }
-                    //    else
-                    //    {
-                            // No ChangeLog capability, so we have to crawl remote and local folders.
-                            WatcherSync(remoteFolderPath, localFolder);
-                        
-                            if (syncFull)
-                            {
-                                CrawlSync(remoteFolder, localFolder);
-                            }
-                     //   }
+                        // ChangeLog is not ready yet.
+                        //    if (ChangeLogCapability)
+                        //    {
+                        //        // ChangeLog sync...
+                        //        ChangeLogSync(remoteFolder);
+                        //        WatcherSync(remoteFolderPath, localFolder);
+                        //    }
+                        //    else
+                        //    {
+                        // No ChangeLog capability, so we have to crawl remote and local folders.
+                        WatcherSync(remoteFolderPath, localFolder);
+
+                        if (syncFull)
+                        {
+                            CrawlSync(remoteFolder, localFolder);
+                        }
+                        //   }
                     }
                 }
             }
@@ -433,7 +439,7 @@ namespace CmisSync.Lib.Sync
 
                 Logger.Error(logMessage, exception);
 
-                if ( ! recoverable)
+                if (!recoverable)
                 {
                     throw exception;
                 }
@@ -761,6 +767,8 @@ namespace CmisSync.Lib.Sync
                             return true;
                         }
 
+                        // Check is write permission is allow
+
                         // Check if the file is Check out or not
                         if (!(bool)remoteFile.IsVersionSeriesCheckedOut)
                         {
@@ -1042,7 +1050,7 @@ namespace CmisSync.Lib.Sync
                     return false;
                 }
             }
-            
+
             /// <summary>
             /// Sleep while suspended.
             /// </summary>
