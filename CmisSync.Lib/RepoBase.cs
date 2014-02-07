@@ -96,7 +96,7 @@ namespace CmisSync.Lib
         {
             Status = SyncStatus.Suspend;
             RepoInfo.IsSuspended = true;
-            
+
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
             CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
@@ -266,13 +266,33 @@ namespace CmisSync.Lib
 
             // Sync up everything that changed
             // since we've been offline
-            SyncInBackground();
+            if (RepoInfo.SyncAtStartup)
+            {
+                SyncInBackground();
+                Logger.Info(String.Format("Repo {0} - sync launch at startup", RepoInfo.Name));
+            }
+            else
+            {
+                Logger.Info(String.Format("Repo {0} - sync not launch at startup", RepoInfo.Name));
+                // if LastSuccessSync + pollInterval >= DateTime.Now => Sync
+                DateTime tm = RepoInfo.LastSuccessedSync.AddMilliseconds(RepoInfo.PollInterval);
+                // http://msdn.microsoft.com/fr-fr/library/system.datetime.compare(v=vs.110).aspx
+                if (DateTime.Compare(DateTime.Now, tm) >= 0)
+                {
+                    SyncInBackground();
+                    Logger.Info(String.Format("Repo {0} - sync launch based on last success time sync + poll interval", RepoInfo.Name));
+                }
+                else
+                {
+                    Logger.Info(String.Format("Repo {0} - sync not launch based on last success time sync + poll interval - Next sync at {1}", RepoInfo.Name, tm));
+                }
+            }
         }
 
         /// <summary>
         /// Update repository settings.
         /// </summary>
-        public virtual void UpdateSettings(string password, int pollInterval)
+        public virtual void UpdateSettings(string password, int pollInterval, bool syncAtStartup)
         {
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
@@ -289,6 +309,9 @@ namespace CmisSync.Lib
                 syncConfig.ObfuscatedPassword = RepoInfo.Password.ObfuscatedPassword;
                 Logger.Debug("Updated \"" + this.Name + "\" password");
             }
+
+            // Sync at startup
+            syncConfig.SyncAtStartup = syncAtStartup;
 
             //Update poll interval
             this.RepoInfo.PollInterval = pollInterval;
@@ -391,8 +414,14 @@ namespace CmisSync.Lib
             activityListener.ActivityStopped();
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
 
+            // Save last sync
             RepoInfo.LastSuccessedSync = DateTime.Now;
 
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.LastSuccessedSync = RepoInfo.LastSuccessedSync;
+            config.Save();
         }
 
         /// <summary>

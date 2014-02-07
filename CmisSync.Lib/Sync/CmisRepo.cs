@@ -111,9 +111,9 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Update repository settings.
         /// </summary>
-        public override void UpdateSettings(string password, int pollInterval)
+        public override void UpdateSettings(string password, int pollInterval, bool syncAtStartup)
         {
-            base.UpdateSettings(password, pollInterval);
+            base.UpdateSettings(password, pollInterval, syncAtStartup);
             this.synchronizedFolder = new SynchronizedFolder(RepoInfo, this);
             Logger.Info(synchronizedFolder);
         }

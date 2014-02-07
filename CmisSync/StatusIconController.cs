@@ -291,6 +291,7 @@ namespace CmisSync {
                 Program.UI.Setup.Controller.saved_remote_path = repository.RemotePath;
                 Program.UI.Setup.Controller.saved_address = repository.RemoteUrl;
                 Program.UI.Setup.Controller.saved_sync_interval = (int)repository.PollInterval;
+                Program.UI.Setup.Controller.saved_syncatstartup = repository.SyncAtStartup;
             }
             Program.Controller.ShowSetupWindow(PageType.Settings);
         }

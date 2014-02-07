@@ -275,7 +275,8 @@ namespace CmisSync.Lib
                 ObfuscatedPassword = repoInfo.Password.ObfuscatedPassword,
                 PollInterval = repoInfo.PollInterval,
                 LastSuccessedSync = repoInfo.LastSuccessedSync,
-                IsSuspended = repoInfo.IsSuspended
+                IsSuspended = repoInfo.IsSuspended,
+                SyncAtStartup = repoInfo.SyncAtStartup
             };
             foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
             {
@@ -445,12 +446,20 @@ namespace CmisSync.Lib
                 [XmlElement("password")]
                 public string ObfuscatedPassword { get; set; }
 
-
+                /// <summary>
+                /// IsSuspended
+                /// </summary>
                 [XmlElement("issuspended")]
                 public bool IsSuspended { get; set; }
 
+                /// <summary>
+                /// Last Success Time Sync
+                /// </summary>
                 [XmlElement("lastsuccessedsync")]
                 public DateTime LastSuccessedSync { get; set; }
+
+                [XmlElement("syncatstartup")]
+                public bool SyncAtStartup { get; set; }
 
                 private double pollInterval = DEFAULT_POLL_INTERVAL;
 
@@ -497,6 +506,7 @@ namespace CmisSync.Lib
                     repoInfo.PollInterval = PollInterval;
                     repoInfo.LastSuccessedSync = LastSuccessedSync;
                     repoInfo.IsSuspended = IsSuspended;
+                    repoInfo.SyncAtStartup = SyncAtStartup;
 
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
                     {

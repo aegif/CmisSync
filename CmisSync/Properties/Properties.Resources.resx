@@ -385,4 +385,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="YourVersion" xml:space="preserve">
     <value>Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.</value>
   </data>
+  <data name="SyncAtStartup" xml:space="preserve">
+    <value>Launch sync at CmisSync startup</value>
+  </data>
 </root>

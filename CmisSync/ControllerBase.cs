@@ -263,13 +263,13 @@ namespace CmisSync
         /// <summary>
         /// Update settings for repository.
         /// </summary>
-        public void UpdateRepositorySettings(string repoName, string password, int pollInterval)
+        public void UpdateRepositorySettings(string repoName, string password, int pollInterval, bool syncAtStartup)
         {
             foreach (RepoBase repoBase in this.repositories)
             {
                 if (repoBase.Name == repoName)
                 {
-                    repoBase.UpdateSettings(password, pollInterval);
+                    repoBase.UpdateSettings(password, pollInterval, syncAtStartup);
                     OnErrorResolved();
                     FolderListChanged();
                 }
@@ -326,10 +326,10 @@ namespace CmisSync
                     if (repo.LocalPath.Equals(folder.LocalPath))
                     {
                         repo.Suspend();
-                        while (repo.isSyncing() && ! repo.isSuspended())
+                        while (repo.isSyncing() && !repo.isSuspended())
                         {
                             Logger.Debug(String.Format("Waiting 5 more seconds for repo {0} to reach suspended state...", repo.Name));
-                            System.Threading.Thread.Sleep(5*1000);
+                            System.Threading.Thread.Sleep(5 * 1000);
                         }
                         repo.Dispose();
                         this.repositories.Remove(repo);
@@ -375,7 +375,7 @@ namespace CmisSync
                     if (aRepo.Status != SyncStatus.Suspend)
                     {
                         aRepo.Suspend();
-                        Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
+                        Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                     }
                     else
                     {
@@ -418,10 +418,11 @@ namespace CmisSync
                     }
                 }
 
-                foreach(Config.SyncConfig.Folder f in toBeDeleted){
+                foreach (Config.SyncConfig.Folder f in toBeDeleted)
+                {
                     ConfigManager.CurrentConfig.Folder.Remove(f);
                 }
-                if(toBeDeleted.Count>0)
+                if (toBeDeleted.Count > 0)
                     ConfigManager.CurrentConfig.Save();
                 // Update UI.
                 FolderListChanged();
@@ -464,7 +465,7 @@ namespace CmisSync
         /// Create a new CmisSync synchronized folder.
         /// </summary>
         public void CreateRepository(string name, Uri address, string user, string password, string repository, string remote_path, string local_path,
-            List<string> ignoredPaths)
+            List<string> ignoredPaths, bool syncAtStartup)
         {
             repoInfo = new RepoInfo(name, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = address;
@@ -476,6 +477,7 @@ namespace CmisSync
             repoInfo.PollInterval = Config.DEFAULT_POLL_INTERVAL;
             repoInfo.IsSuspended = false;
             repoInfo.LastSuccessedSync = new DateTime(1900, 01, 01);
+            repoInfo.SyncAtStartup = syncAtStartup;
 
             foreach (string ignore in ignoredPaths)
                 repoInfo.addIgnorePath(ignore);
