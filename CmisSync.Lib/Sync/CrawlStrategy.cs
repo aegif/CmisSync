@@ -283,7 +283,12 @@ namespace CmisSync.Lib.Sync
                                     database.RemoveFile(filePath);
                                 }
                                 else
-                                    throw new IOException("File is Check Out on the server");
+                                {
+                                    string message = String.Format("File {0} is CheckOut on the server by another user: {1}", filePath, remoteDocument.CheckinComment);
+                                    // throw new IOException("File is Check Out on the server");
+                                    Logger.Info(message);
+                                    Utils.NotifyUser(message);
+                                }
                             }
                             else
                             {
