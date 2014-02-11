@@ -176,6 +176,20 @@ namespace CmisSync.Lib.Sync
                 );
             }
 
+            /// <summary>
+            ///  Update Settings.
+            /// </summary>
+            public void UpdateSettings(RepoInfo repoInfo)
+            {
+                //Cancel sync before settings update.
+                CancelSync();
+
+                //Set the cmis session to null
+                session = null;
+
+                this.repoinfo = repoInfo;
+                cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
+            }
 
             /// <summary>
             /// Destructor.

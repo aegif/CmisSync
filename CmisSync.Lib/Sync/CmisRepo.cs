@@ -96,10 +96,8 @@ namespace CmisSync.Lib.Sync
         public override void UpdateSettings(string password, int pollInterval)
         {
             base.UpdateSettings(password, pollInterval);
-            synchronizedFolder.CancelSync();
-            synchronizedFolder.Dispose();
-            synchronizedFolder = new SynchronizedFolder(RepoInfo, this);
-            Logger.Info("Updating sync settings. Restarting sync.");
+            synchronizedFolder.UpdateSettings(RepoInfo);
+            Logger.Info("Updated sync settings. Restarting sync.");
             SyncInBackground();
         }
 
