@@ -497,7 +497,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool DownloadDirectory(IFolder remoteFolder, string localFolder)
             {
-                sleepWhileSuspended();
+                SleepWhileSuspended();
                 try
                 {
                     // Create local folder.
