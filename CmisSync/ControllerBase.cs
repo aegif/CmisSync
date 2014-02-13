@@ -325,12 +325,7 @@ namespace CmisSync
 
                     if (repo.LocalPath.Equals(folder.LocalPath))
                     {
-                        repo.Suspend();
-                        while (repo.isSyncing() && !repo.isSuspended())
-                        {
-                            Logger.Debug(String.Format("Waiting 5 more seconds for repo {0} to reach suspended state...", repo.Name));
-                            System.Threading.Thread.Sleep(5 * 1000);
-                        }
+                        repo.CancelSync();
                         repo.Dispose();
                         this.repositories.Remove(repo);
                         Logger.Info("Removed Repository: " + repo.Name);

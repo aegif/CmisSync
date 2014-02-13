@@ -328,6 +328,12 @@ namespace CmisSync.Lib
         }
 
         /// <summary>
+        /// Will send message the currently running sync thread (if one exists) to stop syncing as soon as the next
+        /// blockign operation completes.
+        /// </summary>
+        public abstract void CancelSync();
+
+        /// <summary>
         /// Manual sync.
         /// </summary>
         public void ManualSync()
