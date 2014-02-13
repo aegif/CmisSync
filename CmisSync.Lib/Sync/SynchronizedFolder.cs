@@ -259,7 +259,6 @@ namespace CmisSync.Lib.Sync
                 Logger.Info("Created CMIS session: " + session.ToString());
             }
 
-<<<<<<< HEAD
 
             /// <summary>
             /// Whether this folder's synchronization is running right now.
@@ -271,6 +270,15 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
+            /// Synchronize between CMIS folder and local folder.
+            /// </summary>
+            public bool IsSyncing()
+            {
+                return syncWorker.IsBusy;
+            }
+
+
+            /// <summary>
             /// Whether this folder's synchronization is suspended right now.
             /// </summary>
             public bool isSuspended()
@@ -278,15 +286,6 @@ namespace CmisSync.Lib.Sync
                 return this.suspended;
             }
 
-=======
-            /// <summary>
-            /// Synchronize between CMIS folder and local folder.
-            /// </summary>
-            public bool IsSyncing()
-            {
-                return syncWorker.IsBusy;
-            }
->>>>>>> 06f1267f5def6e12dba101ba93985161205994e4
 
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
@@ -344,23 +343,7 @@ namespace CmisSync.Lib.Sync
 
                         if (syncFull)
                         {
-<<<<<<< HEAD
                             CrawlSync(remoteFolder, localFolder);
-=======
-                            // ChangeLog sync...
-                            ChangeLogSync(remoteFolder);
-                            WatcherSync(remoteFolderPath, localFolder);
-                        }
-                        else
-                        {
-                            // No ChangeLog capability, so we have to crawl remote and local folders.
-                            WatcherSync(remoteFolderPath, localFolder);
-
-                            if (syncFull)
-                            {
-                                CrawlSync(remoteFolder, localFolder);
-                            }
->>>>>>> 06f1267f5def6e12dba101ba93985161205994e4
                         }
                         //   }
                     }
@@ -1178,12 +1161,8 @@ namespace CmisSync.Lib.Sync
                     repo.OnSyncSuspend();
                     while (repo.Status == SyncStatus.Suspend)
                     {
-<<<<<<< HEAD
                         suspended = true;
-                        Logger.Debug(String.Format("Sync of {0} is suspended, next retry in {1}ms", repoinfo.Name, SYNC_SUSPEND_SLEEP_INTERVAL));
-=======
                         Logger.DebugFormat("Sync of {0} is suspend, next retry in {1}ms", repoinfo.Name, SYNC_SUSPEND_SLEEP_INTERVAL);
->>>>>>> 06f1267f5def6e12dba101ba93985161205994e4
                         System.Threading.Thread.Sleep(SYNC_SUSPEND_SLEEP_INTERVAL);
 
                         if (syncWorker.CancellationPending)
