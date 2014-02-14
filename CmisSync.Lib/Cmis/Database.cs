@@ -327,7 +327,7 @@ namespace CmisSync.Lib.Cmis
             // Remove folder itself
             // ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
             parameters.Add("path", path);
-            ExecuteSQLAction("DELETE FROM folder WHERE path=@path", parameters);
+            ExecuteSQLAction("DELETE FROM folders WHERE path=@path", parameters);
 
             // Remove all folders under this folder
             // ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
