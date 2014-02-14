@@ -361,4 +361,31 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="Seconds" xml:space="preserve">
     <value>seconds</value>
   </data>
+  <data name="Credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="ModifiedSame" xml:space="preserve">
+    <value>User %1 modified the file %2 at the same time as you.</value>
+  </data>
+  <data name="OpenSource" xml:space="preserve">
+    <value>CmisSync is Open Source software. You are free to use, modify, and redistribute it under the GNU General Public License version 3 or later.</value>
+  </data>
+  <data name="PleaseCheckForUpdates" xml:space="preserve">
+    <value>Please check for updates at CmisSync.com</value>
+  </data>
+  <data name="ReportProblem" xml:space="preserve">
+    <value>Report a problem</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Website</value>
+  </data>
+  <data name="YourVersion" xml:space="preserve">
+    <value>Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.</value>
+  </data>
+  <data name="SyncAtStartup" xml:space="preserve">
+    <value>Launch sync at CmisSync startup</value>
+  </data>
 </root>

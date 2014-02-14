@@ -32,7 +32,8 @@
           DisplayInternalUI="no"
           Visible="no"
           Vital="yes"
-          Permanent="no">
+          Permanent="no"
+          Cache="no">
         <MsiProperty Name="INSTALLDIR" Value="[InstallFolder]" />
       </MsiPackage>
     </Chain>

@@ -3,6 +3,8 @@ using DotCMIS.Exceptions;
 using System;
 using System.Collections;
 using System.IO;
+using System.Collections.Generic;
+using System.Globalization;
 
 
 namespace CmisSync.Lib.Sync
@@ -92,7 +94,7 @@ namespace CmisSync.Lib.Sync
             private void CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
             {
                 SleepWhileSuspended();
-                
+
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
                 {
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
@@ -237,11 +239,28 @@ namespace CmisSync.Lib.Sync
                                         DownloadFile(remoteDocument, localFolder);
                                         repo.OnConflictResolved();
 
-                                        string message = "Someone modified a file at the same time as you: " + filePath
-                                            + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.";
+                                        // Get LastModifiedBy.
+                                        IEnumerator<IProperty> e = remoteDocument.Properties.GetEnumerator();
+                                        string lastModifiedBy = null;
+                                        while (e.MoveNext())
+                                        {
+                                            IProperty property = e.Current;
+                                            if (property.Id.Equals("cmis:lastModifiedBy"))
+                                            {
+                                                lastModifiedBy = (string)property.Value;
+                                                break;
+                                            }
+                                        }
+
+                                        string message = String.Format(
+                                            // Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
+                                            "User {0} modified the file {1} at the same time as you.",
+                                            lastModifiedBy, filePath)
+                                            + "\n\n"
+                                            // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
+                                            + "Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.";
                                         Logger.Info(message);
                                         Utils.NotifyUser(message);
-                                        // TODO show CMIS property lastModifiedBy
                                     }
                                     else
                                     {
@@ -255,11 +274,21 @@ namespace CmisSync.Lib.Sync
                         {
                             if (database.ContainsFile(filePath))
                             {
-                                // File has been recently removed locally, so remove it from server too.
-                                Logger.Info("Removing locally deleted file on server: " + filePath);
-                                remoteDocument.DeleteAllVersions();
-                                // Remove it from database.
-                                database.RemoveFile(filePath);
+                                if (!(bool)remoteDocument.IsVersionSeriesCheckedOut)
+                                {
+                                    // File has been recently removed locally, so remove it from server too.
+                                    Logger.Info("Removing locally deleted file on server: " + filePath);
+                                    remoteDocument.DeleteAllVersions();
+                                    // Remove it from database.
+                                    database.RemoveFile(filePath);
+                                }
+                                else
+                                {
+                                    string message = String.Format("File {0} is CheckOut on the server by another user: {1}", filePath, remoteDocument.CheckinComment);
+                                    // throw new IOException("File is Check Out on the server");
+                                    Logger.Info(message);
+                                    Utils.NotifyUser(message);
+                                }
                             }
                             else
                             {
@@ -283,7 +312,7 @@ namespace CmisSync.Lib.Sync
             private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
             {
                 SleepWhileSuspended();
-                
+
                 string[] files;
                 try
                 {

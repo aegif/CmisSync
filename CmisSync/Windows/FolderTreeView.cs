@@ -643,7 +643,7 @@ namespace CmisSync
             /// <summary>
             /// Message.
             /// </summary>
-            public string Message { get { return CmisSync.Properties_Resources.ResourceManager.GetString("LoadingStatus." + status.ToString(), CultureInfo.CurrentCulture); ; } }
+            public string Message { get { return CmisSync.Properties_Resources.ResourceManager.GetString("LoadingStatus." + status.ToString(), CultureInfo.CurrentCulture); } }
 
 
             /// <summary>

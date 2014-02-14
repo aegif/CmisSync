@@ -93,7 +93,7 @@ namespace CmisSync.Lib.Sync
                 }
                 else
                 {
-                    Logger.Info("Sync skipped. Status=" + this.Status);
+                    Logger.Info(String.Format("Repo {0} - Sync skipped. Status={1}", this.Name, this.Status));
                 }
             }
         }
@@ -111,11 +111,20 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Update repository settings.
         /// </summary>
-        public override void UpdateSettings(string password, int pollInterval)
+        public override void UpdateSettings(string password, int pollInterval, bool syncAtStartup)
         {
-            base.UpdateSettings(password, pollInterval);
-            this.synchronizedFolder = new SynchronizedFolder(RepoInfo, this);
-            Logger.Info(synchronizedFolder);
+            base.UpdateSettings(password, pollInterval, syncAtStartup);
+            synchronizedFolder.UpdateSettings(RepoInfo);
+            Logger.Info("Updated sync settings. Restarting sync.");
+            SyncInBackground();
+        }
+
+        /// <summary>
+        /// Cancel the currently running sync.  Returns once the current blocking operation completes.
+        /// </summary>
+        public override void CancelSync()
+        {
+            synchronizedFolder.CancelSync();
         }
 
         /// <summary>

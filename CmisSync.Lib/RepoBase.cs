@@ -95,6 +95,13 @@ namespace CmisSync.Lib
         public void Suspend()
         {
             Status = SyncStatus.Suspend;
+            RepoInfo.IsSuspended = true;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.IsSuspended = true;
+            config.Save();
         }
 
         /// <summary>
@@ -103,6 +110,13 @@ namespace CmisSync.Lib
         public void Resume()
         {
             Status = SyncStatus.Idle;
+            RepoInfo.IsSuspended = false;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.IsSuspended = false;
+            config.Save();
         }
 
 
@@ -170,6 +184,8 @@ namespace CmisSync.Lib
             RemoteUrl = repoInfo.Address;
 
             this.activityListener = activityListener;
+
+            if (repoInfo.IsSuspended) Status = SyncStatus.Suspend;
 
             // Folder lock.
             // Disabled for now. Can be an interesting feature, but should be made opt-in, as
@@ -250,13 +266,33 @@ namespace CmisSync.Lib
 
             // Sync up everything that changed
             // since we've been offline
-            SyncInBackground();
+            if (RepoInfo.SyncAtStartup)
+            {
+                SyncInBackground();
+                Logger.Info(String.Format("Repo {0} - sync launch at startup", RepoInfo.Name));
+            }
+            else
+            {
+                Logger.Info(String.Format("Repo {0} - sync not launch at startup", RepoInfo.Name));
+                // if LastSuccessSync + pollInterval >= DateTime.Now => Sync
+                DateTime tm = RepoInfo.LastSuccessedSync.AddMilliseconds(RepoInfo.PollInterval);
+                // http://msdn.microsoft.com/fr-fr/library/system.datetime.compare(v=vs.110).aspx
+                if (DateTime.Compare(DateTime.Now, tm) >= 0)
+                {
+                    SyncInBackground();
+                    Logger.Info(String.Format("Repo {0} - sync launch based on last success time sync + poll interval", RepoInfo.Name));
+                }
+                else
+                {
+                    Logger.Info(String.Format("Repo {0} - sync not launch based on last success time sync + poll interval - Next sync at {1}", RepoInfo.Name, tm));
+                }
+            }
         }
 
         /// <summary>
         /// Update repository settings.
         /// </summary>
-        public virtual void UpdateSettings(string password, int pollInterval)
+        public virtual void UpdateSettings(string password, int pollInterval, bool syncAtStartup)
         {
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
@@ -274,6 +310,9 @@ namespace CmisSync.Lib
                 Logger.Debug("Updated \"" + this.Name + "\" password");
             }
 
+            // Sync at startup
+            syncConfig.SyncAtStartup = syncAtStartup;
+
             //Update poll interval
             this.RepoInfo.PollInterval = pollInterval;
             this.remote_timer.Interval = pollInterval;
@@ -287,6 +326,12 @@ namespace CmisSync.Lib
             Resume();
             this.remote_timer.Start();
         }
+
+        /// <summary>
+        /// Will send message the currently running sync thread (if one exists) to stop syncing as soon as the next
+        /// blockign operation completes.
+        /// </summary>
+        public abstract void CancelSync();
 
         /// <summary>
         /// Manual sync.
@@ -374,6 +419,15 @@ namespace CmisSync.Lib
             Watcher.EnableEvent = true;
             activityListener.ActivityStopped();
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+
+            // Save last sync
+            RepoInfo.LastSuccessedSync = DateTime.Now;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.LastSuccessedSync = RepoInfo.LastSuccessedSync;
+            config.Save();
         }
 
         /// <summary>

@@ -75,6 +75,21 @@ namespace CmisSync.Lib
         public double PollInterval { get; set; }
 
         /// <summary>
+        /// Define if this repo is suspended or not ?
+        /// </summary>
+        public bool IsSuspended { get; set; }
+
+        /// <summary>
+        /// Define the last successed sync time
+        /// </summary>
+        public DateTime LastSuccessedSync { get; set; }
+
+        /// <summary>
+        /// Define if, at cmissync startup, first sync is base on last success time or on startup
+        /// </summary>
+        public bool SyncAtStartup { get; set; }
+
+        /// <summary>
         /// All folders, which should be ignored on synchronization.
         /// </summary>
         private List<string> ignoredPaths = new List<string>();
@@ -94,7 +109,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Full constructor.
         /// </summary>
-        public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval)
+        public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval, Boolean isSuspended, DateTime lastSuccessedSync, bool syncAtStartup)
         {
             Name = name;
             name = name.Replace("\\", "_");
@@ -107,6 +122,9 @@ namespace CmisSync.Lib
             RepoID = repoID;
             TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
             PollInterval = pollInterval;
+            IsSuspended = isSuspended;
+            LastSuccessedSync = lastSuccessedSync;
+            SyncAtStartup = syncAtStartup;
         }
 
         /// <summary>

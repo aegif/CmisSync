@@ -914,7 +914,7 @@ namespace CmisSync
                                     checkRepoPathAndNameDelegate();
                                 };
 
-                                windowActivatedEventHandler = new EventHandler( delegate(object sender, EventArgs e)
+                                windowActivatedEventHandler = new EventHandler(delegate(object sender, EventArgs e)
                                 {
                                     checkRepoPathAndNameDelegate();
                                 });
@@ -1059,6 +1059,15 @@ namespace CmisSync
                                     MaxWidth = 420
                                 };
 
+                                // Sync at startup ?
+                                CheckBox startup_checkbox = new CheckBox()
+                                {
+                                    Content = Properties_Resources.SyncAtStartup,
+                                    IsChecked = Controller.saved_syncatstartup,
+                                    FontWeight = FontWeights.Bold,
+                                    Width = 400,
+                                };
+
                                 // Sync duration input UI.
                                 TextBlock slider_label = new TextBlock()
                                 {
@@ -1131,6 +1140,11 @@ namespace CmisSync
                                 ContentCanvas.Children.Add(authentication_error_label);
                                 Canvas.SetTop(authentication_error_label, 215);
                                 Canvas.SetLeft(authentication_error_label, 185);
+
+                                // Sync at startup
+                                ContentCanvas.Children.Add(startup_checkbox);
+                                Canvas.SetTop(startup_checkbox, 220);
+                                Canvas.SetLeft(startup_checkbox, 185);
 
                                 // Sync Interval
                                 ContentCanvas.Children.Add(slider_label);
@@ -1225,13 +1239,13 @@ namespace CmisSync
                                         else
                                         {
                                             // Continue to next step, which is choosing a particular folder.
-                                            Controller.SettingsPageCompleted(password_box.Password, slider.PollInterval);
+                                            Controller.SettingsPageCompleted(password_box.Password, slider.PollInterval, (bool)startup_checkbox.IsChecked);
                                         }
 
                                     }
                                     else
                                     {
-                                        Controller.SettingsPageCompleted(null, slider.PollInterval);
+                                        Controller.SettingsPageCompleted(null, slider.PollInterval, (bool)startup_checkbox.IsChecked);
                                     }
 
                                 };

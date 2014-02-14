@@ -24,6 +24,7 @@ using System.Threading;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
+using System.ComponentModel;
 
 namespace CmisSync
 {
@@ -231,6 +232,10 @@ namespace CmisSync
         /// </summary>
         public int saved_sync_interval = 15;
         /// <summary>
+        /// Saved sync at startup
+        /// </summary>
+        public bool saved_syncatstartup = true;
+        /// <summary>
         /// Ignored paths.
         /// </summary>
         public List<string> ignoredPaths = new List<string>();
@@ -303,7 +308,7 @@ namespace CmisSync
         /// </summary>
         public SetupController()
         {
-            Logger.Debug("Entering constructor.");
+            Logger.Debug("SetupController - Entering constructor.");
 
             TutorialCurrentPage = 0;
             PreviousAddress = null;
@@ -353,7 +358,7 @@ namespace CmisSync
                 ChangePageEvent(page);
                 ShowWindowEvent();
             };
-            Logger.Debug("Exiting constructor.");
+            Logger.Debug("SetupController - Exiting constructor.");
         }
 
 
@@ -534,8 +539,8 @@ namespace CmisSync
             saved_user = user;
             saved_password = password;
 
-			ChangePageEvent(PageType.Add2);
-		}
+            ChangePageEvent(PageType.Add2);
+        }
 
 
         /// <summary>
@@ -599,7 +604,8 @@ namespace CmisSync
                     PreviousRepository,
                     PreviousPath,
                     localrepopath,
-                    ignoredPaths);
+                    ignoredPaths,
+                    saved_syncatstartup);
             }
             catch (Exception e)
             {
@@ -647,9 +653,17 @@ namespace CmisSync
         /// <summary>
         /// Repository settings page.
         /// </summary>
-        public void SettingsPageCompleted(string password, int pollInterval)
+        public void SettingsPageCompleted(string password, int pollInterval, bool syncAtStartup)
         {
-            Program.Controller.UpdateRepositorySettings(saved_repository, password, pollInterval);
+            //Run this in background so as not to free the UI...
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
+                {
+                    Program.Controller.UpdateRepositorySettings(saved_repository, password, pollInterval, syncAtStartup);
+                }
+            );
+            worker.RunWorkerAsync();
 
             FinishPageCompleted();
         }

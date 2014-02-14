@@ -21,7 +21,7 @@ using NUnit.Framework;
  * Put it in TestLibrary/test-servers.json and use this format:
 [
     [
-		"unittest1",
+        "unittest1",
         "/mylocalpath",
         "/myremotepath",
         "http://example.com/p8cmis/resources/Service",
@@ -30,7 +30,7 @@ using NUnit.Framework;
         "repository987080"
     ],
     [
-		"unittest2",
+        "unittest2",
         "/mylocalpath",
         "/myremotepath",
         "http://example.org:8080/Nemaki/cmis",
@@ -55,14 +55,14 @@ namespace TestLibrary
 
         private readonly string CMISSYNCDIR = ConfigManager.CurrentConfig.FoldersPath;
 
-        
+
         public CmisSyncTests()
         {
         }
 
         class TrustAlways : ICertificatePolicy
         {
-            public bool CheckValidationResult (ServicePoint sp, X509Certificate certificate, WebRequest request, int error)
+            public bool CheckValidationResult(ServicePoint sp, X509Certificate certificate, WebRequest request, int error)
             {
                 // For testing, always accept any certificate
                 return true;
@@ -90,8 +90,9 @@ namespace TestLibrary
                 string path = "../../test-servers.json";
                 bool exists = File.Exists(path);
 
-                if (!exists) {
-                    path= "../CmisSync/TestLibrary/test-servers.json";
+                if (!exists)
+                {
+                    path = "../CmisSync/TestLibrary/test-servers.json";
                 }
 
                 return JsonConvert.DeserializeObject<List<object[]>>(
@@ -107,8 +108,9 @@ namespace TestLibrary
                 string path = "../../test-servers-fuzzy.json";
                 bool exists = File.Exists(path);
 
-                if (!exists) {
-                    path= "../CmisSync/TestLibrary/test-servers-fuzzy.json";
+                if (!exists)
+                {
+                    path = "../CmisSync/TestLibrary/test-servers-fuzzy.json";
                 }
 
                 return JsonConvert.DeserializeObject<List<object[]>>(
@@ -221,7 +223,8 @@ namespace TestLibrary
         public void TestCrypto()
         {
             String[] test_pws = { "", "test", "Whatever", "Something to try" };
-            foreach (String pass in test_pws) {
+            foreach (String pass in test_pws)
+            {
                 String crypted = CmisSync.Auth.Crypto.Obfuscate(pass);
                 Assert.AreEqual(CmisSync.Auth.Crypto.Deobfuscate(crypted), pass);
             }
@@ -233,7 +236,7 @@ namespace TestLibrary
             string url, string user, string password, string repositoryId)
         {
             Dictionary<string, string> repos = CmisUtils.GetRepositories(new Uri(url), user, password);
-            foreach (KeyValuePair<string,string> pair in repos)
+            foreach (KeyValuePair<string, string> pair in repos)
             {
                 Console.WriteLine(pair.Key + " : " + pair.Value);
             }
@@ -259,7 +262,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    new DateTime(1900, 01, 01),
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
@@ -296,7 +302,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    new DateTime(1900, 01, 01),
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
@@ -343,7 +352,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    new DateTime(1900, 01, 01),
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
@@ -390,7 +402,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    new DateTime(01, 01, 1900),
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
@@ -435,7 +450,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    new DateTime(1900, 01, 01),
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
@@ -471,7 +489,7 @@ namespace TestLibrary
                     int count = 10000;
                     while (syncing)
                     {
-                        count --;
+                        count--;
                         if (count <= 0)
                         {
                             System.Threading.Thread.Sleep(1000);
@@ -619,7 +637,7 @@ namespace TestLibrary
             Assert.True(found);
 
             // Clean.
-            IDocument doc = (IDocument)session.GetObjectByPath((remoteFolderPath + "/" + fileName).Replace("//","/"));
+            IDocument doc = (IDocument)session.GetObjectByPath((remoteFolderPath + "/" + fileName).Replace("//", "/"));
             doc.DeleteAllVersions();
         }
 

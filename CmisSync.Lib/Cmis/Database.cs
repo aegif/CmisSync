@@ -323,14 +323,23 @@ namespace CmisSync.Lib.Cmis
         {
             path = Normalize(path);
 
+            Dictionary<string, object> parameters = new Dictionary<string,object>();
             // Remove folder itself
-            ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
+            // ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
+            parameters.Add("path", path);
+            ExecuteSQLAction("DELETE FROM folder WHERE path=@path", parameters);
 
             // Remove all folders under this folder
-            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
+            // ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
+            parameters.Clear();
+            parameters.Add("path", path + "/%");
+            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE @path", parameters);
 
             // Remove all files under this folder
-            ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
+            // ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
+            parameters.Clear();
+            parameters.Add("path", path + "/%");
+            ExecuteSQLAction("DELETE FROM files WHERE path LIKE @path", parameters);
         }
 
         /// <summary>
