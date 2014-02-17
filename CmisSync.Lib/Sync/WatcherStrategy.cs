@@ -37,6 +37,8 @@ namespace CmisSync.Lib.Sync
 
                 while (changeQueue.Count > 0)
                 {
+                    activityListener.ActivityStarted();
+
                     FileSystemEventArgs earliestChange = changeQueue.Dequeue();
                     string pathname = earliestChange.FullPath;
 
@@ -82,6 +84,8 @@ namespace CmisSync.Lib.Sync
                                 break;
                         }
                     }
+
+                    activityListener.ActivityStopped();
                 }
             }
 

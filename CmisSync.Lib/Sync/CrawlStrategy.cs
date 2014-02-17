@@ -145,7 +145,9 @@ namespace CmisSync.Lib.Sync
                             // TODO warn if local changes in the file.
                             if (File.Exists(localSubFolder))
                             {
+                                activityListener.ActivityStarted();
                                 File.Delete(localSubFolder);
+                                activityListener.ActivityStopped();
                             }
 
                             if (database.ContainsFolder(localSubFolder))
@@ -153,15 +155,20 @@ namespace CmisSync.Lib.Sync
                                 // If there was previously a folder with this name, it means that
                                 // the user has deleted it voluntarily, so delete it from server too.
 
+                                activityListener.ActivityStarted();
+
                                 // Delete the folder from the remote server.
                                 remoteSubFolder.DeleteTree(true, null, true);
 
                                 // Delete the folder from database.
                                 database.RemoveFolder(localSubFolder);
+
+                                activityListener.ActivityStopped();
                             }
                             else
                             {
                                 // The folder has been recently created on server, so download it.
+                                activityListener.ActivityStarted();
                                 Directory.CreateDirectory(localSubFolder);
 
                                 // Create database entry for this folder.
@@ -171,12 +178,15 @@ namespace CmisSync.Lib.Sync
 
                                 // Recursive copy of the whole folder.
                                 RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+
+                                activityListener.ActivityStopped();
                             }
                         }
                     }
                 }
                 catch (Exception e)
                 {
+                    activityListener.ActivityStopped();
                     ProcessRecoverableException("Could not crawl sync remote folder: " + remoteSubFolder.Path, e);
                 }
             }
@@ -221,13 +231,17 @@ namespace CmisSync.Lib.Sync
                             if (lastDatabaseUpdate == null)
                             {
                                 Logger.Info("Downloading file absent from database: " + filePath);
+                                activityListener.ActivityStarted();
                                 DownloadFile(remoteDocument, localFolder);
+                                activityListener.ActivityStopped();
                             }
                             else
                             {
                                 // If the file has been modified since last time we downloaded it, then download again.
                                 if (serverSideModificationDate > lastDatabaseUpdate)
                                 {
+                                    activityListener.ActivityStarted();
+
                                     if (database.LocalFileHasChanged(filePath))
                                     {
                                         Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
@@ -267,6 +281,8 @@ namespace CmisSync.Lib.Sync
                                         Logger.Info("Downloading modified file: " + remoteDocumentFileName);
                                         DownloadFile(remoteDocument, localFolder);
                                     }
+
+                                    activityListener.ActivityStopped();
                                 }
                             }
                         }
@@ -277,15 +293,17 @@ namespace CmisSync.Lib.Sync
                                 if (!(bool)remoteDocument.IsVersionSeriesCheckedOut)
                                 {
                                     // File has been recently removed locally, so remove it from server too.
+                                    activityListener.ActivityStarted();
                                     Logger.Info("Removing locally deleted file on server: " + filePath);
                                     remoteDocument.DeleteAllVersions();
                                     // Remove it from database.
                                     database.RemoveFile(filePath);
+                                    activityListener.ActivityStopped();
                                 }
                                 else
                                 {
-                                    string message = String.Format("File {0} is CheckOut on the server by another user: {1}", filePath, remoteDocument.CheckinComment);
-                                    // throw new IOException("File is Check Out on the server");
+                                    string message = String.Format("File {0} is checked out on the server by another user: {1}", filePath, remoteDocument.CheckinComment);
+                                    // throw new IOException("File is checked out on the server");
                                     Logger.Info(message);
                                     Utils.NotifyUser(message);
                                 }
@@ -294,7 +312,9 @@ namespace CmisSync.Lib.Sync
                             {
                                 // New remote file, download it.
                                 Logger.Info("New remote file: " + filePath);
+                                activityListener.ActivityStarted();
                                 DownloadFile(remoteDocument, localFolder);
+                                activityListener.ActivityStopped();
                             }
                         }
                     }
@@ -356,11 +376,14 @@ namespace CmisSync.Lib.Sync
                                     {
                                         // Local file was updated, sync up.
                                         Logger.Info("Uploading locally edited remotely removed file from the repository: " + filePath);
+                                        activityListener.ActivityStarted();
                                         UploadFile(filePath, remoteFolder);
+                                        activityListener.ActivityStopped();
                                     }
                                     else
                                     {
                                         Logger.Info("Conflict with file: " + filePath + ", backing up locally modified version.");
+                                        activityListener.ActivityStarted();
                                         // Rename locally modified file.
                                         String newFilePath = Utils.ConflictPath(filePath);
                                         File.Move(filePath, newFilePath);
@@ -369,16 +392,20 @@ namespace CmisSync.Lib.Sync
                                         database.RemoveFile(filePath);
 
                                         repo.OnConflictResolved();
+                                        activityListener.ActivityStopped();
                                     }
                                 }
                                 else
                                 {
                                     // File has been deleted on server, so delete it locally.
                                     Logger.Info("Removing remotely deleted file: " + filePath);
+                                    activityListener.ActivityStarted();
                                     File.Delete(filePath);
 
                                     // Delete file from database.
                                     database.RemoveFile(filePath);
+
+                                    activityListener.ActivityStopped();
                                 }
                             }
                             else
@@ -387,7 +414,9 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // New file, sync up.
                                     Logger.Info("Uploading file absent on repository: " + filePath);
+                                    activityListener.ActivityStarted();
                                     UploadFile(filePath, remoteFolder);
+                                    activityListener.ActivityStopped();
                                 }
                             }
                         }
@@ -400,7 +429,9 @@ namespace CmisSync.Lib.Sync
                                 {
                                     // Upload new version of file content.
                                     Logger.Info("Uploading file update on repository: " + filePath);
+                                    activityListener.ActivityStarted();
                                     UpdateFile(filePath, remoteFolder);
+                                    activityListener.ActivityStopped();
                                 }
                             }
                         }
@@ -454,14 +485,18 @@ namespace CmisSync.Lib.Sync
                             // check whether it used to exist on server or not.
                             if (database.ContainsFolder(localSubFolder))
                             {
+                                activityListener.ActivityStarted();
                                 RemoveFolderLocally(localSubFolder);
+                                activityListener.ActivityStopped();
                             }
                             else
                             {
                                 if (BIDIRECTIONAL)
                                 {
                                     // New local folder, upload recursively.
+                                    activityListener.ActivityStarted();
                                     UploadFolderRecursively(remoteFolder, localSubFolder);
+                                    activityListener.ActivityStopped();
                                 }
                             }
                         }

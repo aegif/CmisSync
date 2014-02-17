@@ -28,18 +28,23 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder : IDisposable
         {
-            // Log
+            /// <summary>
+            /// Log.
+            /// </summary>
             private static readonly ILog Logger = LogManager.GetLogger(typeof(SynchronizedFolder));
+
 
             /// <summary>
             /// Interval for which sync will wait while paused before retrying sync.
             /// </summary>
             private static readonly int SYNC_SUSPEND_SLEEP_INTERVAL = 1 * 1000; //five seconds
 
+
             /// <summary>
             /// An object for locking the sync method (one thread at a time can run sync).
             /// </summary>
             private Object syncLock = new Object();
+
 
             /// <summary>
             /// Whether sync is bidirectional or only from server to client.
@@ -86,6 +91,12 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
+            /// Listener we inform about activity (used by spinner).
+            /// </summary>
+            private IActivityListener activityListener;
+
+
+            /// <summary>
             /// Parameters to use for all CMIS requests.
             /// </summary>
             private Dictionary<string, string> cmisParameters;
@@ -114,15 +125,18 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private RepoBase repo;
 
+
             /// <summary>
             /// Set for first sync.
             /// </summary>
             private bool firstSync = false;
 
+
             /// <summary>
             /// Background worker for sync.
             /// </summary>
             private BackgroundWorker syncWorker;
+
 
             /// <summary>
             /// Event to notify that the sync has completed.
@@ -133,8 +147,10 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
             /// </summary>
-            public SynchronizedFolder(RepoInfo repoInfo, RepoBase repoCmis)
+            public SynchronizedFolder(RepoInfo repoInfo, RepoBase repoCmis, IActivityListener activityListener)
             {
+                this.activityListener = activityListener;
+
                 if (null == repoInfo || null == repoCmis)
                 {
                     throw new ArgumentNullException("repoInfo");
@@ -1158,7 +1174,6 @@ namespace CmisSync.Lib.Sync
 
                 if (repo.Status == SyncStatus.Suspend)
                 {
-                    repo.OnSyncSuspend();
                     while (repo.Status == SyncStatus.Suspend)
                     {
                         suspended = true;
@@ -1169,12 +1184,10 @@ namespace CmisSync.Lib.Sync
                         {
                             //Sync was cancelled...
                             repo.Resume();
-                            repo.OnSyncResume();
                             throw new OperationCanceledException("Suspended sync was cancelled by user.");
                         }
                     }
                     suspended = false;
-                    repo.OnSyncResume();
                 }
             }
         }

@@ -271,7 +271,7 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    cmis))
+                    cmis, activityListener))
                 {
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
@@ -311,7 +311,7 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    cmis))
+                    cmis, activityListener))
                 {
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
@@ -361,7 +361,7 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    cmis))
+                    cmis, activityListener))
                 {
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
@@ -411,7 +411,7 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    cmis))
+                    cmis, activityListener))
                 {
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");
@@ -459,7 +459,7 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    cmis))
+                    cmis, activityListener))
                 {
                     synchronizedFolder.Sync();
                     Console.WriteLine("Synced to clean state.");

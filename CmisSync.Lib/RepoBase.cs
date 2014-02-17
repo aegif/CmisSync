@@ -289,6 +289,7 @@ namespace CmisSync.Lib
             }
         }
 
+
         /// <summary>
         /// Update repository settings.
         /// </summary>
@@ -327,11 +328,13 @@ namespace CmisSync.Lib
             this.remote_timer.Start();
         }
 
+
         /// <summary>
         /// Will send message the currently running sync thread (if one exists) to stop syncing as soon as the next
         /// blockign operation completes.
         /// </summary>
         public abstract void CancelSync();
+
 
         /// <summary>
         /// Manual sync.
@@ -360,13 +363,13 @@ namespace CmisSync.Lib
             // ConflictResolved(); TODO
         }
 
+
         /// <summary>
         /// Called when sync starts.
         /// </summary>
         public void OnSyncStart(bool syncFull)
         {
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Started: " + LocalPath);
-            activityListener.ActivityStarted();
             if (syncFull)
             {
                 remote_timer.Stop();
@@ -376,23 +379,6 @@ namespace CmisSync.Lib
             Watcher.EnableEvent = false;
         }
 
-        /// <summary>
-        /// Called when sync is suspended.
-        /// </summary>
-        public void OnSyncSuspend()
-        {
-            Logger.Info("Sync Suspended: " + LocalPath);
-            activityListener.ActivityStopped();
-        }
-
-        /// <summary>
-        /// Called when sync is resumed.
-        /// </summary>
-        public void OnSyncResume()
-        {
-            activityListener.ActivityStarted();
-            Logger.Info("Sync Resumed: " + LocalPath);
-        }
 
         /// <summary>
         /// Called when sync completes.
@@ -417,7 +403,6 @@ namespace CmisSync.Lib
 
             Watcher.EnableRaisingEvents = true;
             Watcher.EnableEvent = true;
-            activityListener.ActivityStopped();
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
 
             // Save last sync
@@ -430,6 +415,7 @@ namespace CmisSync.Lib
             config.Save();
         }
 
+
         /// <summary>
         /// Called when sync encounters an error.
         /// </summary>
@@ -438,6 +424,7 @@ namespace CmisSync.Lib
             Logger.Info("Sync Error: " + exception.Message);
             activityListener.ActivityError(new Tuple<string, Exception>(Name, exception));
         }
+
 
         /// <summary>
         /// Recursively gets a folder's size in bytes.
