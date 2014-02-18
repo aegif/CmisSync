@@ -5,6 +5,7 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
+using DotCMIS.Client.Impl;
 
 
 namespace CmisSync.Lib.Sync
@@ -95,7 +96,11 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
 
-                foreach (ICmisObject cmisObject in remoteFolder.GetChildren())
+                // Get all remote children.
+                // TODO: use paging
+                IOperationContext operationContext = session.CreateOperationContext();
+                operationContext.MaxItemsPerPage = Int32.MaxValue;
+                foreach (ICmisObject cmisObject in remoteFolder.GetChildren(operationContext))
                 {
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
