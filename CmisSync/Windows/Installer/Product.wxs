@@ -207,6 +207,18 @@
     <Icon Id="icon.ico" SourceFile="$(var.CmisSync.ProjectDir)\Pixmaps\cmissync-app.ico"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />
 
+    <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+    <Upgrade Id="4C725498-9D2D-43BF-8966-FEEACE102830">
+      <UpgradeVersion
+         Minimum="1.0.0.0" Maximum="99.0.0.0"
+         Property="PREVIOUSVERSIONSINSTALLED"
+         IncludeMinimum="yes" IncludeMaximum="no" />
+    </Upgrade>
+    
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize"></RemoveExistingProducts>
+    </InstallExecuteSequence>
+    
     <MajorUpgrade
       Schedule="afterInstallInitialize"
       DowngradeErrorMessage="A later version of CmisSync is already installed. Setup will now exit." />
