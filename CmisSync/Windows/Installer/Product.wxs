@@ -215,9 +215,10 @@
          IncludeMinimum="yes" IncludeMaximum="no" />
     </Upgrade>
     
+    <!-- Incompatible with block "Upgrade" above it seems
     <InstallExecuteSequence>
       <RemoveExistingProducts After="InstallInitialize"></RemoveExistingProducts>
-    </InstallExecuteSequence>
+    </InstallExecuteSequence>-->
     
     <MajorUpgrade
       Schedule="afterInstallInitialize"
