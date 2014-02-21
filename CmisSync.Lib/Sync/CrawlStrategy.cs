@@ -134,7 +134,7 @@ namespace CmisSync.Lib.Sync
                 {
                     if (Utils.WorthSyncing(localFolder, remoteSubFolder.Name, repoinfo))
                     {
-                        //Logger.Debug("CrawlRemote dir: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteSubFolder.Name);
+                        // Logger.Debug("CrawlRemote localFolder:\"" + localFolder + "\" remoteSubFolder.Path:\"" + remoteSubFolder.Path + "\" remoteSubFolder.Name:\"" + remoteSubFolder.Name + "\"");
                         remoteFolders.Add(remoteSubFolder.Name);
                         string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
 
@@ -172,19 +172,26 @@ namespace CmisSync.Lib.Sync
                             }
                             else
                             {
-                                // The folder has been recently created on server, so download it.
-                                activityListener.ActivityStarted();
-                                Directory.CreateDirectory(localSubFolder);
+                                if (Utils.IsInvalidFileName(remoteSubFolder.Name))
+                                {
+                                    Logger.Warn("Skipping remote folder with name invalid on local filesystem: " + remoteSubFolder.Name);
+                                }
+                                else
+                                {
+                                    // The folder has been recently created on server, so download it.
+                                    activityListener.ActivityStarted();
+                                    Directory.CreateDirectory(localSubFolder);
 
-                                // Create database entry for this folder.
-                                // TODO - Yannick - Add metadata
-                                database.AddFolder(localSubFolder, remoteSubFolder.LastModificationDate);
-                                Logger.Info("Added folder to database: " + localSubFolder);
+                                    // Create database entry for this folder.
+                                    // TODO - Yannick - Add metadata
+                                    database.AddFolder(localSubFolder, remoteSubFolder.LastModificationDate);
+                                    Logger.Info("Added folder to database: " + localSubFolder);
 
-                                // Recursive copy of the whole folder.
-                                RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                    // Recursive copy of the whole folder.
+                                    RecursiveFolderCopy(remoteSubFolder, localSubFolder);
 
-                                activityListener.ActivityStopped();
+                                    activityListener.ActivityStopped();
+                                }
                             }
                         }
                     }
