@@ -249,6 +249,7 @@ namespace CmisSync
 
                 string message = String.Format(Properties_Resources.SyncError, error.Item1, error.Item2.Message);
 
+                IconState PreviousState = CurrentState;
                 CurrentState = IconState.Error;
                 StateText = message;
 
@@ -265,7 +266,10 @@ namespace CmisSync
                     SuspendSyncClicked(error.Item1);
                 }
 
-                Program.Controller.ShowAlert(Properties_Resources.Error, message);
+                if (PreviousState != IconState.Error)
+                {
+                    Program.Controller.ShowAlert(Properties_Resources.Error, message);
+                }
             };
 
             Program.Controller.OnErrorResolved += delegate
