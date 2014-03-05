@@ -90,6 +90,9 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)SQLite.Interop.dll"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
