@@ -404,7 +404,7 @@ namespace TestLibrary
                     repositoryId,
                     5000,
                     false,
-                    new DateTime(01, 01, 1900),
+                    new DateTime(1900, 01, 01),
                     true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
