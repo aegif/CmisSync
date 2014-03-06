@@ -616,10 +616,11 @@ namespace TestLibrary
 
             // Create file.
             DotCMIS.Enums.VersioningState? state = null;
-            if (true != session.RepositoryInfo.Capabilities.IsAllVersionsSearchableSupported)
+            // In Alfresco, this statement causes a "Conflict" response.
+            /* if (true != session.RepositoryInfo.Capabilities.IsAllVersionsSearchableSupported)
             {
                 state = DotCMIS.Enums.VersioningState.None;
-            }
+            } */
             session.CreateDocument(properties, root, contentStream, state);
 
             // Check whether file is present.
