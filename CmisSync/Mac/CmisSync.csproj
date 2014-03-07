@@ -6,16 +6,16 @@
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}</ProjectGuid>
-    <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <RootNamespace>CmisSync</RootNamespace>
     <AssemblyName>DataSpace Sync</AssemblyName>
     <ReleaseVersion>
     </ReleaseVersion>
+    <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>..\..\bin</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -31,7 +31,7 @@
     <DefineConstants>__COCOA__</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>..\..\bin</OutputPath>
     <WarningLevel>4</WarningLevel>
     <EnableCodeSigning>false</EnableCodeSigning>
@@ -40,8 +40,9 @@
     <UseSGen>false</UseSGen>
     <EnablePackageSigning>false</EnablePackageSigning>
     <DefineConstants>DEBUG,__COCOA__</DefineConstants>
-    <DebugSymbols>true</DebugSymbols>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <DebugSymbols>True</DebugSymbols>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DebugType>full</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -50,10 +51,11 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="Mono.Posix" />
-    <Reference Include="XamMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065">
-      <Private>False</Private>
-    </Reference>
+    <Reference Include="XamMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
+      <Package>monodevelop-core-mac-addins</Package>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.cs">

@@ -14,11 +14,11 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
+    <ConsolePause>False</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <OutputPath>bin\Debug\</OutputPath>
@@ -28,11 +28,11 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>full</DebugType>
     <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DocumentationFile>bin\Debug\CmisSync.Lib.XML</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -61,7 +61,6 @@
     <Compile Include="LoggingStream.cs" />
     <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />
-    <Compile Include="Defines.cs" />
     <Compile Include="Sync\SynchronizedFolder.cs" />
     <Compile Include="Sync\CrawlStrategy.cs" />
     <Compile Include="Cmis\CmisPermissionDeniedException.cs" />

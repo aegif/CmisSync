@@ -189,7 +189,7 @@ namespace CmisSync.CmisTree
                 Console.WriteLine ("GetObjectValue Error");
                 return (NSString)"";
             }
-            if (tableColumn.Identifier == "Name") {
+            if (tableColumn.Identifier.Equals("Name")) {
                 switch (cmis.Selected) {
                 case true:
                     return new NSNumber (1);
@@ -200,7 +200,7 @@ namespace CmisSync.CmisTree
                 }
                 return (NSString)cmis.Name;
             }
-            if (tableColumn.Identifier == "Status") {
+            if (tableColumn.Identifier.Equals ("Status")) {
                 return (NSString)cmis.Status.ToString ();
             }
             Console.WriteLine ("GetObjectValue Error");
@@ -220,7 +220,7 @@ namespace CmisSync.CmisTree
                 Console.WriteLine ("SetObjectValue Error");
                 return;
             }
-            if (tableColumn.Identifier == "Name") {
+            if (tableColumn.Identifier.Equals ("Name")) {
                 NSNumber number = (NSNumber)theObject;
                 if (number == null) {
                     Console.WriteLine ("SetObjectValue number Error");

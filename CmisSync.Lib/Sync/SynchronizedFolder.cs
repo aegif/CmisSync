@@ -1053,7 +1053,7 @@ namespace CmisSync.Lib.Sync
                             }
                             try
                             {
-                                remoteDocument.AppendContentStream(contentStream, isLastTrunk);
+                                // FIXME remoteDocument.AppendContentStream(contentStream, isLastTrunk);
                                 Logger.Debug("Response of the server: " + offset.ToString());
                                 database.SetFileServerSideModificationDate(filePath, remoteDocument.LastModificationDate);
                             }
@@ -1374,7 +1374,7 @@ namespace CmisSync.Lib.Sync
                                     }
                                     else
                                     {
-                                        remoteFile.AppendContentStream(contentStream, isLastChunk);
+                                        // FIXME remoteFile.AppendContentStream(contentStream, isLastChunk);
                                     }
                                 }
                             }
