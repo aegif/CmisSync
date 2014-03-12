@@ -39,10 +39,10 @@ Start the first part of the build:
 
 ```bash
 $ make -f Makefile.am
-$ ./configure --with-dotcmis=Extras/DotCMIS.dll ¥
- --with-newtonsoft-json=Extras/Newtonsoft.Json.dll ¥
- --with-nunit=Extras/nunit.framework.dll ¥
- --with-log4net=Extras/log4net-1.2.11/build/bin/net/2.0/debug/log4net.dll ¥
+$ ./configure --with-dotcmis=Extras/DotCMIS.dll \
+ --with-newtonsoft-json=Extras/Newtonsoft.Json.dll \
+ --with-nunit=Extras/nunit.framework.dll \
+ --with-log4net=Extras/log4net-1.2.11/build/bin/net/2.0/debug/log4net.dll \
  --with-monomac=Extras/MonoMac.dll
 $ make
 ```
