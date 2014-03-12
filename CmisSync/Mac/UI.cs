@@ -50,9 +50,9 @@ namespace CmisSync {
             {
 				var currentDirectory = Directory.GetCurrentDirectory();
 				var image = NSImage.ImageNamed ("cmissync-app.icns");
-				// FIXME NSApplication.SharedApplication.ApplicationIconImage = image;
+				NSApplication.SharedApplication.ApplicationIconImage = image;
 
-                // FIXME SetFolderIcon ();
+                SetFolderIcon ();
 
                 #if ODS_NEW_GUI    
                 Setup      = new SetupWizardController ();

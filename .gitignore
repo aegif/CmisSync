@@ -46,3 +46,4 @@ cmissync-*.tar*
 build/cmissync.spec
 DataSpaceSync.Console/dsscli
 TestResult.xml
+Extras/MonoMac.dll
