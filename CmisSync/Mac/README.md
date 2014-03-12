@@ -1,6 +1,6 @@
 ## Building on Mac
 
-You can choose to build SparkleShare from source or to download the SparkleShare bundle.
+You can choose to build CmisSync from source or to download the CmisSync bundle.
 
 
 ### Installing build requirements
