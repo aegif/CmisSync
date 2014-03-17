@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Data.Common;
 
 using DotCMIS;
 using DotCMIS.Client;
@@ -28,6 +29,7 @@ namespace CmisSync.Lib.Sync
                 if (Logger.IsDebugEnabled)
                 {
                     foreach (FileSystemEventArgs change in changeQueue)
+
                     {
                         if (change is MovedEventArgs) Logger.DebugFormat("Moved: {0} -> {1}", ((MovedEventArgs)change).OldFullPath, change.FullPath);
                         else if (change is RenamedEventArgs) Logger.DebugFormat("Renamed: {0} -> {1}", ((RenamedEventArgs)change).OldFullPath, change.FullPath);
@@ -50,10 +52,13 @@ namespace CmisSync.Lib.Sync
 
                     if (pathname == localFolder)
                     {
+
                         continue;
                     }
 
                     if (earliestChange is MovedEventArgs)
+
+
                     {
                         //Move
                         MovedEventArgs change = (MovedEventArgs)earliestChange;
@@ -77,7 +82,7 @@ namespace CmisSync.Lib.Sync
                                 WatchSyncUpdate(remoteFolder, localFolder, pathname);
                                 break;
                             case WatcherChangeTypes.Deleted:
-                                WatchSyncDelete(remoteFolder, localFolder, pathname);
+                                WatcherSyncDelete(remoteFolder, localFolder, pathname);
                                 break;
                             default:
                                 Logger.ErrorFormat("Invalid change -> '{0}': {1}.", earliestChange.ChangeType, pathname);
@@ -226,7 +231,9 @@ namespace CmisSync.Lib.Sync
                     if (File.Exists(pathname) || Directory.Exists(pathname))
                     {
                         string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/');
+
                         remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
+
 
                         if (null == remoteBase)
                         {
@@ -240,9 +247,11 @@ namespace CmisSync.Lib.Sync
                         return;
                     }
 
+
                     if (File.Exists(pathname))
                     {
                         bool success = false;
+
                         if (database.ContainsFile(pathname))
                         {
                             if (database.LocalFileHasChanged(pathname))
@@ -268,8 +277,13 @@ namespace CmisSync.Lib.Sync
                         return;
                     }
 
+
+
                     if (Directory.Exists(pathname))
                     {
+
+
+
                         if (database.ContainsFolder(pathname))
                         {
                             Logger.InfoFormat("Folder exists in Database {0}, ignore for the update action", pathname);
@@ -278,8 +292,13 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.InfoFormat("Create locally created folder on server: {0}", pathname);
                             UploadFolderRecursively(remoteBase, pathname);
+
+
+
+
                         }
                         return;
+
                     }
                     Logger.InfoFormat("The file/folder {0} is deleted, ignore for the update action", pathname);
                 }
@@ -287,6 +306,7 @@ namespace CmisSync.Lib.Sync
                 {
                     ProcessRecoverableException("Could process watcher sync update: " + pathname, e);
                 }
+
             }
 
             /// <summary>
@@ -298,15 +318,19 @@ namespace CmisSync.Lib.Sync
 
                 string filename = Path.GetFileName(pathname);
                 if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), filename, repoinfo))
+
+
                 {
+
                     return;
                 }
 
-                try
-                {
                     string name = pathname.Substring(localFolder.Length + 1);
                     string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
-
+                DbTransaction transaction = null; 
+                try
+                {
+                    transaction = database.BeginTransaction();
                     if (database.ContainsFile(pathname))
                     {
                         Logger.InfoFormat("Removing locally deleted file on server: {0}", pathname);
@@ -345,11 +369,23 @@ namespace CmisSync.Lib.Sync
                     {
                         Logger.InfoFormat("Ignore the delete action for the local created and deleted file/folder: {0}", pathname);
                     }
+                    transaction.Commit();
                 }
                 catch (Exception e)
                 {
-                    ProcessRecoverableException("Could process watcher sync update: " + pathname, e);
+                    if(transaction != null){
+                        transaction.Rollback();
+                    }
+                    Logger.Warn(String.Format("Exception while sync to delete file/folder {0}: {1}", pathname, Utils.ToLogString(e)));
+                    return;
                 }
+                finally
+                {
+                    if(transaction != null){
+                        transaction.Dispose();
+                    }
+                }
+
             }
         }
     }

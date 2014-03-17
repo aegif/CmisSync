@@ -15,6 +15,9 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.IO;
+
+using CmisSync.Lib.Events;
 
 namespace CmisSync.Lib.Sync
 {
@@ -40,7 +43,29 @@ namespace CmisSync.Lib.Sync
             : base(repoInfo, activityListener)
         {
             this.synchronizedFolder = new SynchronizedFolder(repoInfo, this, activityListener);
+            this.Watcher.ChangeEvent += OnFileActivity;
+            this.Watcher.EnableEvent = true;
             Logger.Info(synchronizedFolder);
+        }
+
+
+        public override void Resume()
+        {
+            if(this.synchronizedFolder != null)
+            {
+                Logger.Debug("Reset all failed upload counter");
+                this.synchronizedFolder.resetFailedOperationsCounter();
+                this.synchronizedFolder.ForceFullSyncAtNextSync();
+            }
+            base.Resume();
+        }
+
+        /// <summary>
+        /// Some file activity has been detected, add to queue
+        /// </summary>
+        public void OnFileActivity(object sender, FileSystemEventArgs args)
+        {
+            synchronizedFolder.Queue.AddEvent(new FSEvent(args.ChangeType, args.FullPath));
         }
 
 

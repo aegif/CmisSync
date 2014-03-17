@@ -52,21 +52,21 @@ namespace CmisSync {
 
                 Delegate    = new AboutDelegate ();
                 StyleMask   = (NSWindowStyle.Closable | NSWindowStyle.Titled);
-                Title       = "About CmisSync";
+                Title       = Properties_Resources.About;
                 MaxSize     = new SizeF (640, 281);
                 MinSize     = new SizeF (640, 281);
                 HasShadow   = true;
                 BackingType = NSBackingStore.Buffered;
 
-                this.website_link       = new CmisSyncLink ("Website", Controller.WebsiteLinkAddress);
+				this.website_link       = new CmisSyncLink (Properties_Resources.Website, Controller.WebsiteLinkAddress);
                 this.website_link.Frame = new RectangleF (new PointF (295, 25), this.website_link.Frame.Size);
 
-                this.credits_link = new CmisSyncLink ("Credits", Controller.CreditsLinkAddress);
+				this.credits_link = new CmisSyncLink (Properties_Resources.Credits, Controller.CreditsLinkAddress);
                 this.credits_link.Frame = new RectangleF (
                     new PointF (this.website_link.Frame.X + this.website_link.Frame.Width + 10, 25),
                     this.credits_link.Frame.Size);
 
-                this.report_problem_link = new CmisSyncLink ("Report a problem", Controller.ReportProblemLinkAddress);
+				this.report_problem_link = new CmisSyncLink (Properties_Resources.ReportProblem, Controller.ReportProblemLinkAddress);
                 this.report_problem_link.Frame = new RectangleF (
                     new PointF (this.credits_link.Frame.X + this.credits_link.Frame.Width + 10, 25),
                     this.report_problem_link.Frame.Size);
@@ -165,7 +165,7 @@ namespace CmisSync {
                     Bordered        = false,
                     Editable        = false,
                     DrawsBackground = false,
-                    TextColor       = NSColor.White,
+					TextColor       = NSColor.FromCalibratedRgba (0.45f, 0.62f, 0.81f, 1.0f),
                     Font            = NSFontManager.SharedFontManager.FontWithFamily
                         ("Lucida Grande", NSFontTraitMask.Unbold, 0, 11)
                 };
@@ -182,13 +182,13 @@ namespace CmisSync {
                 };
 
                 this.credits_text_field = new NSTextField () {
-                    StringValue     = @"Copyright © 2010–" + DateTime.Now.Year + " Hylke Bons and others." +
+					StringValue     = @"Copyright © 2013-" + DateTime.Now.Year + " GRAU DATA AG, Hylke Bons and others." +
                                        "\n" +
                                        "\n" +
-                                       "CmisSync is Open Source software. You are free to use, modify, and redistribute it " +
+					                  "DataSpace Sync is Open Source software. You are free to use, modify, and redistribute it " +
                                        "under the GNU General Public License version 3 or later.",
                     Frame           = new RectangleF (295, Frame.Height - 260, 318, 98),
-                    TextColor       = NSColor.White,
+					TextColor       = NSColor.FromCalibratedRgba (0.45f, 0.62f, 0.81f, 1.0f),
                     DrawsBackground = false,
                     Bordered        = false,
                     Editable        = false,
@@ -198,7 +198,7 @@ namespace CmisSync {
 
                 ContentView.AddSubview (this.about_image_view);
                 ContentView.AddSubview (this.version_text_field);
-                ContentView.AddSubview (this.updates_text_field);
+				//ContentView.AddSubview (this.updates_text_field);
                 ContentView.AddSubview (this.credits_text_field);
             }
         }

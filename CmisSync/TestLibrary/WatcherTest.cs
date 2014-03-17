@@ -1,4 +1,4 @@
-using System;
+﻿﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
@@ -24,23 +24,32 @@ namespace TestLibrary
         [TestFixtureSetUp]
         public void ClassInit()
         {
-            Directory.CreateDirectory(TestFolder);
-        }
-
-        [TestFixtureTearDown]
-        public void ClassCleanup()
-        {
-            if (Directory.Exists(TestFolder))
-            {
-                Directory.Delete(TestFolder, true);
-            }
+#if __MonoCS__
+            Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
+#endif
+            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
         [SetUp]
         public void TestInit()
         {
+            Directory.CreateDirectory(TestFolder);
+            WaitWatcher();
         }
-/*
+
+        [TearDown]
+        public void TestCleanup()
+        {
+            if (Directory.Exists(TestFolder))
+            {
+                Directory.Delete(TestFolder, true);
+                Console.WriteLine("Deleted TestFolder");
+            }
+            File.Delete(oldnameOut);
+            File.Delete(newnameOut);
+        }
+
+
         [Test, Category("Fast")]
         public void TestEnableRaisingEvents()
         {
@@ -80,7 +89,7 @@ namespace TestLibrary
             }
         }
 
-        class FileSystemEventCount
+        public class FileSystemEventCount
         {
             public int Count { get; private set; }
 
@@ -131,9 +140,9 @@ namespace TestLibrary
                     return c.Count >= number + 1;
                 });
                 Assert.LessOrEqual(number + 1, count.Count);
+                watcher.EnableEvent = false;
                 number = count.Count;
 
-                watcher.EnableEvent = false;
 
                 CreateTestFile(6);
                 Assert.AreEqual(number, count.Count);
@@ -255,19 +264,21 @@ namespace TestLibrary
                     CreateTestFile();
                     names.Add(GetPathname());
                 }
-                WaitWatcher(40000,watcher,NormalNumber);
-                Assert.AreEqual(NormalNumber, watcher.GetChangeList().Count);
+                WaitWatcher(40000, watcher, (w) =>
+                {
+                    return watcher.GetChangeType(names[NormalNumber -1]) == Watcher.ChangeTypes.Created;
+                });
                 for (int i = 0; i < NormalNumber; ++i)
                 {
-                    Assert.AreEqual(names[i], watcher.GetChangeList()[i]);
                     Assert.AreEqual(
                         Watcher.ChangeTypes.Created,
-                        watcher.GetChangeType((string)watcher.GetChangeList()[i]));
+                        watcher.GetChangeType(names[i]));
                 }
             }
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeCreatedHeavy()
         {
             using (Watcher watcher = new Watcher(TestFolder))
@@ -361,6 +372,7 @@ namespace TestLibrary
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeChangedHeavy()
         {
             //Assert.Fail("TODO");
@@ -402,6 +414,7 @@ namespace TestLibrary
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeDeleteHeavy()
         {
             //Assert.Fail("TODO");
@@ -417,17 +430,17 @@ namespace TestLibrary
             }
         }
 
-        [Test, Category("Fast")]
-        public void TestChangeTypeForMove()
-        {
-            string oldnameOut = Path.Combine(TestFolderParent, "test.old");
-            string newnameOut = Path.Combine(TestFolderParent, "test.new");
-            string oldname = Path.Combine(TestFolder, "test.old");
-            string newname = Path.Combine(TestFolder, "test.new");
+        //Filenames for move tests
+        private static readonly string oldnameOut = Path.Combine(TestFolderParent, "test.old");
+        private static readonly string newnameOut = Path.Combine(TestFolderParent, "test.new");
+        private static readonly string oldname = Path.Combine(TestFolder, "test.old");
+        private static readonly string newname = Path.Combine(TestFolder, "test.new");
 
+        [Test, Category("Fast")]
+        public void TestChangeTypeForMoveInsideSyncedFolder()
+        {
             using (Watcher watcher = new Watcher(TestFolder))
             {
-                File.Delete(newname);
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldname, 1);
                 WaitWatcher(40000,watcher,1);
@@ -443,12 +456,14 @@ namespace TestLibrary
                 Assert.Contains(newname, changeList);
                 Assert.AreEqual(Watcher.ChangeTypes.Deleted, watcher.GetChangeType(oldname));
                 Assert.AreEqual(Watcher.ChangeTypes.Created, watcher.GetChangeType(newname));
-                File.Delete(newname);
             }
+        }
 
+        [Test, Category("Fast")]
+        public void TestChangeTypeForMoveIntoSyncedFolder()
+        {
             using (Watcher watcher = new Watcher(TestFolder))
             {
-                File.Delete(newname);
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldnameOut, 1);
                 WaitWatcher();
@@ -457,16 +472,30 @@ namespace TestLibrary
                 Assert.AreEqual(1, watcher.GetChangeList().Count);
                 Assert.AreEqual(newname, watcher.GetChangeList()[0]);
                 Assert.AreEqual(Watcher.ChangeTypes.Created, watcher.GetChangeType(newname));
-                File.Delete(newname);
             }
+        }
+
+        [Test, Category("Fast")]
+        public void TestChangeTypeForMoveOutOfSyncedFolder()
+        {
 
             using (Watcher watcher = new Watcher(TestFolder))
             {
-                File.Delete(newnameOut);
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldname, 1);
-                WaitWatcher(40000,watcher,1);
+                WaitWatcher(40000,watcher,(w) => 
+                {
+#if __MonoCS__
+                    List<Watcher.ChangeTypes> types = new List<Watcher.ChangeTypes>();
+                    types.Add(Watcher.ChangeTypes.Created);
+                    types.Add(Watcher.ChangeTypes.Changed);
+                    return types.Contains(w.GetChangeType(oldname));
+#else
+                    return w.GetChangeType(oldname) == Watcher.ChangeTypes.Changed;
+#endif
+                });
                 File.Move(oldname, newnameOut);
+                Console.WriteLine("moved:"+oldname);
                 WaitWatcher(40000,watcher,(w) => 
                 {
                     return w.GetChangeType(oldname) == Watcher.ChangeTypes.Deleted;
@@ -474,35 +503,40 @@ namespace TestLibrary
                 Assert.AreEqual(1, watcher.GetChangeList().Count);
                 Assert.AreEqual(oldname, watcher.GetChangeList()[0]);
                 Assert.AreEqual(Watcher.ChangeTypes.Deleted, watcher.GetChangeType(oldname));
-                File.Delete(newnameOut);
             }
+        }
+
+        [Test, Category("Fast")]
+        public void TestChangeTypeForMoveInNotSyncedFolder()
+        {
 
             using (Watcher watcher = new Watcher(TestFolder))
             {
-                File.Delete(newnameOut);
                 watcher.EnableRaisingEvents = true;
                 CreateTestFile(oldnameOut, 1);
                 WaitWatcher();
                 File.Move(oldnameOut, newnameOut);
                 WaitWatcher();
                 Assert.AreEqual(0, watcher.GetChangeList().Count);
-                File.Delete(newnameOut);
             }
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeForMoveHeavy()
         {
             //Assert.Fail("TODO");
         }
 
         [Test, Category("Fast")]
+        [Ignore]
         public void TestChangeTypeMix()
         {
             //Assert.Fail("TODO");
         }
 
         [Test, Category("Slow")]
+        [Ignore]
         public void TestChangeTypeMixHeavy()
         {
             //Assert.Fail("TODO");
@@ -564,7 +598,7 @@ namespace TestLibrary
             }
         }
 
-        private void WaitWatcher(int milliseconds = 10)
+        public static void WaitWatcher(int milliseconds = 10)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -572,7 +606,7 @@ namespace TestLibrary
             Thread.Sleep(milliseconds);
         }
 
-        private void WaitWatcher(int milliseconds,Watcher watcher,int expect)
+        public static void WaitWatcher(int milliseconds, Watcher watcher, int expect)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -589,7 +623,7 @@ namespace TestLibrary
             Console.WriteLine("Timeout");
         }
 
-        private void WaitWatcher(int milliseconds,Watcher watcher,Func<Watcher,bool> checkStop)
+        public static void WaitWatcher(int milliseconds, Watcher watcher, Func<Watcher,bool> checkStop)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -606,7 +640,7 @@ namespace TestLibrary
             Console.WriteLine("Timeout");
         }
 
-        private void WaitWatcher(int milliseconds,FileSystemEventCount count,Func<FileSystemEventCount,bool> checkStop)
+        public static void WaitWatcher(int milliseconds, FileSystemEventCount count, Func<FileSystemEventCount,bool> checkStop)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -622,7 +656,5 @@ namespace TestLibrary
             }
             Console.WriteLine("Timeout");
         }
-
-*/
     }
 }

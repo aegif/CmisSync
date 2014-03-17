@@ -6,7 +6,7 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <ProjectGuid>{728483AA-E34B-4441-BF2C-C8BC2901E4E0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>CmisSync</AssemblyName>
+    <AssemblyName>DataSpaceSync</AssemblyName>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace>CmisSync</RootNamespace>
     <FileUpgradeFlags>
@@ -15,7 +15,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <ApplicationIcon>Pixmaps\cmissync-app.ico</ApplicationIcon>
+    <ApplicationIcon>Pixmaps\app.ico</ApplicationIcon>
     <ReleaseVersion />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -34,21 +34,19 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>x86</PlatformTarget>
-    <DefineConstants>
-    </DefineConstants>
-    <DocumentationFile>bin\$(Configuration)\CmisSync.XML</DocumentationFile>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>CmisSync.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -58,34 +56,8 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\$(Configuration)\CmisSync.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\DataSpaceSync.xml</DocumentationFile>
     <UseVSHostingProcess>true</UseVSHostingProcess>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetZone>LocalIntranet</TargetZone>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DocumentationFile>bin\Release\CmisSync.XML</DocumentationFile>
-    <Optimize>true</Optimize>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>bin\Debug\CmisSync.XML</DocumentationFile>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -112,6 +84,9 @@
     <Compile Include="..\ControllerBase.cs">
       <Link>ControllerBase.cs</Link>
     </Compile>
+    <Compile Include="..\EditController.cs">
+      <Link>EditController.cs</Link>
+    </Compile>
     <Compile Include="..\SetupController.cs">
       <Link>SetupController.cs</Link>
     </Compile>
@@ -123,9 +98,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="PollIntervalSlider.cs" />
-    <Compile Include="FolderTreeView.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CertPolicyWindow.cs" />
+    <Compile Include="Edit.cs" />
+    <Compile Include="FolderTreeMVC\InvalidPatternConverter.cs" />
+    <Compile Include="FolderTreeMVC\NodeLoader.cs" />
+    <Compile Include="FolderTreeMVC\IgnoredFolderLoader.cs" />
+    <Compile Include="FolderTreeMVC\LocalFolderLoader.cs" />
+    <Compile Include="FolderTreeMVC\NodeModel.cs" />
+    <Compile Include="FolderTreeMVC\NodeModelUtils.cs" />
+    <Compile Include="FolderTreeMVC\FolderTypeConverter.cs" />
+    <Compile Include="FolderTreeMVC\IgnoreStatusConverter.cs" />
+    <Compile Include="FolderTreeMVC\LoadingStatusModel.cs" />
+    <Compile Include="FolderTreeMVC\LoadingStatusConverter.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
       <SubType>Form</SubType>
@@ -246,9 +230,7 @@
     <EmbeddedResource Include="..\Linux\Pixmaps\icons\process-working-22.png">
       <Link>Pixmaps\process-working-22.png</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Properties\Properties.Resources.de.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <EmbeddedResource Include="..\Properties\Properties.Resources.de.resx" />
     <EmbeddedResource Include="..\Properties\Properties.Resources.es-ES.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -267,9 +249,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties.Resources.cs.resx" />
-    <EmbeddedResource Include="Properties.Resources.nl.resx" />
-    <EmbeddedResource Include="Properties.Resources.pl.resx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />
@@ -279,7 +258,7 @@
     <EmbeddedResource Include="Pixmaps\process-syncing-iii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiiii.png" />
-    <EmbeddedResource Include="Pixmaps\cmissync-app.ico" />
+    <EmbeddedResource Include="Pixmaps\app.ico" />
     <EmbeddedResource Include="Pixmaps\cmissync-folder.png" />
   </ItemGroup>
   <ItemGroup>
@@ -288,10 +267,6 @@
     <EmbeddedResource Include="Pixmaps\tutorial-slide-3.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">
-      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
-      <Name>CmisSync.Auth</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>CmisSync.Lib</Name>
@@ -303,11 +278,8 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\media_playback_pause.png" />
-    <EmbeddedResource Include="Pixmaps\media_playback_refresh.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
-    <EmbeddedResource Include="Pixmaps\connect.png" />
-    <EmbeddedResource Include="Pixmaps\disconnect.png" />
     <Content Include="Pixmaps\cmissync-folder.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -316,7 +288,7 @@
     <Folder Include="Plugins\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="TreeView.xaml">
+    <Resource Include="FolderTreeMVC\TreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Resource>

@@ -92,6 +92,8 @@ namespace CmisSync
         /// </summary>
         public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
 
+        public event UpdateTransmissionMenuEventHandler UpdateTransmissionMenuEvent = delegate { };
+        public delegate void UpdateTransmissionMenuEventHandler();
 
         /// <summary>
         /// Current state of the CmisSync tray icon.
@@ -226,6 +228,7 @@ namespace CmisSync
 
                 this.animation.Stop();
 
+//NOTGDS2: begin
                 UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
                 UpdateMenuEvent(CurrentState);
             };
@@ -275,6 +278,28 @@ namespace CmisSync
             Program.Controller.OnErrorResolved += delegate
             {
                 CurrentState = IconState.Idle;
+//NOTGDS2: end
+// GDS2:
+/*
+                UpdateIconEvent (0);
+//                UpdateMenuEvent (CurrentState);
+            };
+
+            Program.Controller.OnTransmissionListChanged += delegate {
+                UpdateTransmissionMenuEvent();
+            };
+
+            // Syncing.
+            Program.Controller.OnSyncing += delegate {
+                if (CurrentState != IconState.Syncing)
+                {
+                    CurrentState = IconState.Syncing;
+                    StateText = Properties_Resources.SyncingChanges;
+                    UpdateStatusItemEvent(StateText);
+
+                    this.animation.Start();
+                }
+*/
             };
         }
 
@@ -287,14 +312,14 @@ namespace CmisSync
             Program.Controller.OpenCmisSyncFolder(reponame);
         }
 
-
+        /*
         /// <summary>
         /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
         /// </summary>
         public void RemoteFolderClicked(string reponame)
         {
             Program.Controller.OpenRemoteFolder(reponame);
-        }
+        }*/
 
         /// <summary>
         /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
@@ -360,8 +385,9 @@ namespace CmisSync
             UpdateSuspendSyncFolderEvent(reponame);
         }
 
+
         /// <summary>
-        /// Remove folder from sync clicked.
+        /// Tries to remove a given repo from sync
         /// </summary>
         public void RemoveFolderFromSyncClicked(string reponame)
         {
@@ -394,6 +420,13 @@ namespace CmisSync
             Program.Controller.ManualSync(reponame);
         }
 
+        /// <summary>
+        /// Edit a particular folder.
+        /// </summary>
+        public void EditFolderClicked(string reponame)
+        {
+            Program.Controller.EditRepositoryFolder(reponame);
+        }
 
         /// <summary>
         /// Start the tray icon animation.

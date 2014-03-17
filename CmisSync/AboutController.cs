@@ -28,30 +28,39 @@ namespace CmisSync {
     /// </summary>
     public class AboutController {
 
+        //===== Actions =====
         /// <summary>
-        /// Show window event.
+        /// Show About Windows Action
         /// </summary>
         public event Action ShowWindowEvent = delegate { };
 
         /// <summary>
-        /// Hide window event.
+        /// Hide About Windows Action
         /// </summary>
         public event Action HideWindowEvent = delegate { };
 
         /// <summary>
-        /// Version up to date.
+        /// Version UpToDate Action
         /// </summary>
         public event Action VersionUpToDateEvent = delegate { };
 
         /// <summary>
-        /// Checking for new version.
+        /// Check for new Versions Action
         /// </summary>
         public event Action CheckingForNewVersionEvent = delegate { };
 
+        //===== Events =====
+
         /// <summary>
-        /// New version.
+        /// A new version is available event
         /// </summary>
         public event NewVersionEventDelegate NewVersionEvent = delegate { };
+
+        /// <summary>
+        /// Delegate for NewVersionEvent
+        /// </summary>
+        /// <param name="new_version_string"></param>
+        public delegate void NewVersionEventDelegate (string new_version_string);
 
         /// <summary>
         /// New Version delegate.
@@ -70,6 +79,16 @@ namespace CmisSync {
 
         /// <summary>
         /// Report problem URL.
+        /// </summary>
+        public readonly string WebsiteLinkAddress       = "https://github.com/OpenDataSpace/CmisSync";
+
+        /// <summary>
+        /// URL to the AUTHORS file
+        /// </summary>
+        public readonly string CreditsLinkAddress       = "https://raw.github.com/OpenDataSpace/CmisSync/master/legal/AUTHORS.txt";
+
+        /// <summary>
+        /// URL for Issue reports
         /// </summary>
         public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
 

@@ -63,9 +63,26 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
 
+                if (IsGetDescendantsSupported)
+                {
+                    IList<ITree<IFileableCmisObject>> desc;
+                    try{
+                        desc = remoteFolder.GetDescendants(-1);
+                    }catch (DotCMIS.Exceptions.CmisConnectionException ex) {
+                        if(ex.InnerException is System.Xml.XmlException)
+                        {
+                            Logger.Warn(String.Format("CMIS::getDescendants() response could not be parsed: {0}", ex.InnerException.Message ));
+                            return false;
+                        }
+                        throw;
+                    }
+                    return CrawlDescendants(remoteFolder, desc, localFolder);
+                }
+
                 // Lists of files/folders, to delete those that have been removed on the server.
-                IList remoteFiles = new ArrayList();
-                IList remoteSubfolders = new ArrayList();
+                IList<string> remoteFiles = new List<string>();
+                IList<string> remoteSubfolders = new List<string>();
+
 
                 try
                 {
@@ -85,6 +102,65 @@ namespace CmisSync.Lib.Sync
                 {
                     ProcessRecoverableException("Could not crawl folder: " + remoteFolder.Path, e);
                 }
+            }
+
+
+            /// <summary>
+            /// Takes the loaded and given descendants as children of the given remoteFolder and checks agains the localFolder
+            /// </summary>
+            /// <param name="remoteFolder">Folder which contains to given children</param>
+            /// <param name="children">All children of the given remote folder</param>
+            /// <param name="localFolder">The local folder, with which the remoteFolder should be synchronized</param>
+            /// <returns></returns>
+            private bool CrawlDescendants(IFolder remoteFolder, IList<ITree<IFileableCmisObject>> children, string localFolder)
+            {
+                bool success = true;
+
+                // Lists of files/folders, to delete those that have been removed on the server.
+                IList<string> remoteFiles = new List<string>();
+                IList<string> remoteSubfolders = new List<string>();
+                if (children != null)
+                foreach (ITree<IFileableCmisObject> node in children)
+                {
+                    #region Cmis Folder
+                    if (node.Item is Folder)
+                    {
+                        // It is a CMIS folder.
+                        IFolder remoteSubFolder = (IFolder)node.Item;
+                        remoteSubfolders.Add(remoteSubFolder.Name);
+                        if (!Utils.IsInvalidFolderName(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                        {
+                            string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
+
+                            //Check whether local folder exists.
+                            if (Directory.Exists(localSubFolder))
+                            {
+                                success = CrawlDescendants(remoteSubFolder, node.Children, localSubFolder) && success;
+                            }
+                            else
+                            {
+                                success = SyncDownloadFolder(remoteSubFolder, localFolder) && success;
+                                if (Directory.Exists(localSubFolder))
+                                {
+                                    success = RecursiveFolderCopy(remoteSubFolder, localSubFolder) && success;
+                                }
+                            }
+                        }
+                    }
+                    #endregion
+
+                    #region Cmis Document
+                    else if (node.Item is Document)
+                    {
+                        // It is a CMIS document.
+                        IDocument remoteDocument = (IDocument)node.Item;
+                        success = SyncDownloadFile(remoteDocument, localFolder, remoteFiles) && success;
+                    }
+                    #endregion
+                }
+                success = CrawlLocalFiles(localFolder, remoteFolder, remoteFiles) && success;
+                success = CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders) && success;
+                return success;
             }
 
 
@@ -371,6 +447,12 @@ namespace CmisSync.Lib.Sync
 
                 try
                 {
+                    if(Utils.IsSymlink(new FileInfo(filePath)))
+                    {
+                        Logger.Info("Skipping symbolic linked file: "+ filePath);
+                        continue;
+                    }
+
                     string fileName = Path.GetFileName(filePath);
 
                     if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoinfo))
@@ -488,6 +570,12 @@ namespace CmisSync.Lib.Sync
                 SleepWhileSuspended();
                 try
                 {
+                    if(Utils.IsSymlink(new DirectoryInfo(localSubFolder)))
+                    {
+                        Logger.Info("Skipping symbolic link folder: "+ localSubFolder);
+                        continue;
+                    }
+
                     string folderName = Path.GetFileName(localSubFolder);
                     if (Utils.WorthSyncing(Path.GetDirectoryName(localSubFolder), folderName, repoinfo))
                     {

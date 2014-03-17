@@ -71,8 +71,15 @@ namespace TestLibraryRunner
                 }
             }
 
-            File.Delete(ConfigManager.CurrentConfig.GetLogFilePath());
-            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));
+            if(alternativeLog4NetConfigFile.Exists)
+            {
+                log4net.Config.XmlConfigurator.ConfigureAndWatch(alternativeLog4NetConfigFile);
+            }
+            else
+            {
+                log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            }
 
             //new CmisSyncTests().TestCrypto();
             test(path == null ? "../../../TestLibrary/test-servers.json" : path);

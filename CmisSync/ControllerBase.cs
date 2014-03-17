@@ -1,4 +1,4 @@
-//   CmisSync, a collaboration and sharing tool.
+﻿//   CmisSync, a collaboration and sharing tool.
 //   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
 //
 //   This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Collections.ObjectModel;
+
+using CmisSync.Lib;
+using CmisSync.Lib.Cmis;
+using log4net;
+using CmisSync.Lib.Events;
+
+#if __COCOA__
+using Edit = CmisSync.EditWizardController;
+#endif
 
 namespace CmisSync
 {
@@ -60,6 +70,14 @@ namespace CmisSync
 
 
         /// <summary>
+        /// Dictionary of the edit folder diaglogs
+        /// Key: synchronized folder name
+        /// Value: <c>Edit</c>
+        /// </summary>
+        private Dictionary<string, Edit> edits = new Dictionary<string, Edit>();
+
+
+        /// <summary>
         /// Path where the CmisSync synchronized folders are by default.
         /// </summary>
         public string FoldersPath { get; private set; }
@@ -83,6 +101,8 @@ namespace CmisSync
         /// Folder list changed.
         /// </summary>
         public event Action FolderListChanged = delegate { };
+
+        public event Action OnTransmissionListChanged = delegate { };
 
         /// <summary>
         /// Called with status changes to idle.
@@ -177,6 +197,9 @@ namespace CmisSync
         private IActivityListener activityListenerAggregator;
 
 
+        private ActiveActivitiesManager activitiesManager;
+
+
         /// <summary>
         /// A folder lock for the base directory.
         /// </summary>
@@ -186,7 +209,6 @@ namespace CmisSync
         /// Concurrency locks.
         /// </summary>
         private Object repo_lock = new Object();
-        private Object check_repos_lock = new Object();
 
 
         /// <summary>
@@ -196,6 +218,14 @@ namespace CmisSync
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
             FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
+            activitiesManager = new ActiveActivitiesManager();
+            this.activitiesManager.ActiveTransmissions.CollectionChanged += delegate(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+                OnTransmissionListChanged();
+            };
+        }
+
+        public List<FileTransmissionEvent> ActiveTransmissions() {
+            return this.activitiesManager.ActiveTransmissions.ToList<FileTransmissionEvent>();
         }
 
 
@@ -240,8 +270,8 @@ namespace CmisSync
                 {
                     CheckRepositories();
                     RepositoriesLoaded = true;
+                    // Update UI.
                     FolderListChanged();
-
                 }).Start();
             }
         }
@@ -256,6 +286,16 @@ namespace CmisSync
             RepoBase repo = null;
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
 
+            repo.SyncStatusChanged += delegate(SyncStatus status)
+            {
+                UpdateState();
+            };
+
+            repo.EventManager.AddEventHandler(
+                new GenericSyncEventHandler<FileTransmissionEvent>( 50, delegate(ISyncEvent e){
+                this.activitiesManager.AddTransmission(e as FileTransmissionEvent);
+                return false;
+            }));
             this.repositories.Add(repo);
             repo.Initialize();
         }
@@ -317,9 +357,9 @@ namespace CmisSync
         /// <param name="folder">The synchronized folder to remove</param>
         private void RemoveRepository(Config.SyncConfig.Folder folder)
         {
-            if (this.repositories.Count > 0)
+            foreach (RepoBase repo in this.repositories)
             {
-                for (int i = 0; i < this.repositories.Count; i++)
+                if (repo.LocalPath.Equals(folder.LocalPath))
                 {
                     RepoBase repo = this.repositories[i];
 
@@ -334,6 +374,7 @@ namespace CmisSync
                     }
                 }
             }
+
             // Remove Cmis Database File
             string dbfilename = folder.DisplayName;
             dbfilename = dbfilename.Replace("\\", "_");
@@ -363,9 +404,9 @@ namespace CmisSync
         /// <param name="repoName">the folder to pause/unpause</param>
         public void StartOrSuspendRepository(string repoName)
         {
-            foreach (RepoBase aRepo in this.repositories)
+            lock (this.repo_lock)
             {
-                if (aRepo.Name == repoName)
+                foreach (RepoBase aRepo in this.repositories)
                 {
                     if (aRepo.Status != SyncStatus.Suspend)
                     {
@@ -374,8 +415,16 @@ namespace CmisSync
                     }
                     else
                     {
-                        aRepo.Resume();
-                        Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        if (aRepo.Status != SyncStatus.Suspend)
+                        {
+                            aRepo.Suspend();
+                            Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
+                        }
+                        else
+                        {
+                            aRepo.Resume();
+                            Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        }
                     }
                 }
             }
@@ -388,10 +437,8 @@ namespace CmisSync
         /// </summary>
         private void CheckRepositories()
         {
-            lock (this.check_repos_lock)
+            lock (this.repo_lock)
             {
-                string path = ConfigManager.CurrentConfig.FoldersPath;
-
                 List<Config.SyncConfig.Folder> toBeDeleted = new List<Config.SyncConfig.Folder>();
                 // If folder has been deleted, remove it from configuration too.
                 foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
@@ -419,9 +466,10 @@ namespace CmisSync
                 }
                 if (toBeDeleted.Count > 0)
                     ConfigManager.CurrentConfig.Save();
-                // Update UI.
-                FolderListChanged();
             }
+
+            // Update UI.
+            FolderListChanged();
         }
 
         /// <summary>
@@ -441,20 +489,9 @@ namespace CmisSync
             string[] files = Directory.GetFiles(path);
 
             foreach (string file in files)
-                if (!IsSymlink(file))
+                if (!CmisSync.Lib.Utils.IsSymlink(file))
                     File.SetAttributes(file, FileAttributes.Normal);
         }
-
-
-        /// <summary>
-        /// Whether a file is a symbolic link.
-        /// </summary>
-        private bool IsSymlink(string file)
-        {
-            FileAttributes attributes = File.GetAttributes(file);
-            return ((attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
-        }
-
 
         /// <summary>
         /// Create a new CmisSync synchronized folder.
@@ -473,6 +510,7 @@ namespace CmisSync
             repoInfo.IsSuspended = false;
             repoInfo.LastSuccessedSync = new DateTime(1900, 01, 01);
             repoInfo.SyncAtStartup = syncAtStartup;
+            repoInfo.MaxUploadRetries = 2;
 
             foreach (string ignore in ignoredPaths)
                 repoInfo.addIgnorePath(ignore);
@@ -519,12 +557,13 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Show info about CmisSync
+        /// Show info about DataSpace Sync
         /// </summary>
         public void ShowAboutWindow()
         {
             ShowAboutWindowEvent();
         }
+
 
         /// <summary>
         /// Show an alert to the user.

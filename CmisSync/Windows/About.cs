@@ -76,14 +76,14 @@ namespace CmisSync {
 
             Controller.NewVersionEvent += delegate (string new_version) {
                 Dispatcher.BeginInvoke((Action)delegate {
-                    this.updates.Content = "A newer version (" + new_version + ") is available!";
+                    this.updates.Content = String.Format(Properties_Resources.NewVersionAvailable, new_version);
                     this.updates.UpdateLayout ();
                 });
             };
 
             Controller.VersionUpToDateEvent += delegate {
                 Dispatcher.BeginInvoke ((Action) delegate {
-                    this.updates.Content = "You are running the latest version.";
+                    this.updates.Content = Properties_Resources.RunningLatestVersion;
                     this.updates.UpdateLayout ();
                 });
             };
@@ -110,7 +110,11 @@ namespace CmisSync {
 
 
             Label version = new Label () {
+<<<<<<< HEAD
                 Content    = Properties_Resources.ResourceManager.GetString("Version", CultureInfo.CurrentCulture) + " " + Controller.RunningVersion,
+=======
+                Content    = String.Format(Properties_Resources.Version, Controller.RunningVersion),
+>>>>>>> gds2-master
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
@@ -131,6 +135,7 @@ namespace CmisSync {
                 TextWrapping = TextWrapping.Wrap,
                 Width        = 318
             };
+<<<<<<< HEAD
 
             Link website_link = new Link(Properties_Resources.ResourceManager.GetString(
                 "Website", CultureInfo.CurrentCulture), Controller.WebsiteLinkAddress);
@@ -138,6 +143,12 @@ namespace CmisSync {
                 "Credits", CultureInfo.CurrentCulture), Controller.CreditsLinkAddress);
             Link report_problem_link = new Link(Properties_Resources.ResourceManager.GetString(
                 "ReportProblem", CultureInfo.CurrentCulture), Controller.ReportProblemLinkAddress);
+=======
+            
+            Link website_link = new Link (Properties_Resources.Website, Controller.WebsiteLinkAddress);
+            Link credits_link = new Link (Properties_Resources.Credits, Controller.CreditsLinkAddress);
+            Link report_problem_link = new Link (Properties_Resources.ReportProblem, Controller.ReportProblemLinkAddress);
+>>>>>>> gds2-master
 
             Canvas canvas = new Canvas ();
 
@@ -157,18 +168,22 @@ namespace CmisSync {
             Canvas.SetLeft (credits, 294);
             Canvas.SetTop (credits, 142);
 
-			canvas.Children.Add (website_link);
+            canvas.Children.Add (website_link);
             Canvas.SetLeft (website_link, 289);
             Canvas.SetTop (website_link, 222);
 
-			canvas.Children.Add (credits_link);
+            canvas.Children.Add (credits_link);
             Canvas.SetLeft (credits_link, 289 + website_link.ActualWidth + 60);
             Canvas.SetTop (credits_link, 222);
 
-			canvas.Children.Add (report_problem_link);
+            canvas.Children.Add (report_problem_link);
             Canvas.SetLeft (report_problem_link, 289 + website_link.ActualWidth + credits_link.ActualWidth + 115);
             Canvas.SetTop (report_problem_link, 222);
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> gds2-master
             Content = canvas;
         }
 
@@ -186,6 +201,7 @@ namespace CmisSync {
     /// <summary>
     /// Hyperlink label that opens an URL in the default browser.
     /// </summary>
+<<<<<<< HEAD
 	public class Link : Label {
 
         /// <summary>
@@ -217,4 +233,34 @@ namespace CmisSync {
 			};
 		}
 	}
+=======
+    public class Link : Label {
+
+        public Link (string title, string address)
+        {
+            FontSize   = 11;
+            Cursor     = Cursors.Hand;
+            Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227));
+
+            TextDecoration underline = new TextDecoration () {
+                Pen              = new Pen (new SolidColorBrush (Color.FromRgb (135, 178, 227)), 1),
+                PenThicknessUnit = TextDecorationUnit.FontRecommended
+            };
+
+            TextDecorationCollection collection = new TextDecorationCollection ();
+            collection.Add (underline);
+
+            TextBlock text_block = new TextBlock () {
+                Text            = title,
+                TextDecorations = collection
+            };
+
+            Content = text_block;
+
+            MouseUp += delegate {
+                Process.Start (new ProcessStartInfo (address));
+            };
+        }
+    }
+>>>>>>> gds2-master
 }

@@ -19,8 +19,5 @@ namespace CmisSync
             process.StartInfo.Arguments = "\"" + path + "\"";
             process.Start ();
         }
-
-
-
     }
 }

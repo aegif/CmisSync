@@ -141,8 +141,10 @@ namespace CmisSync
                     BeginInvoke((Action)delegate
                     {
                         ToolStripMenuItem repoitem = (ToolStripMenuItem)this.traymenu.Items["tsmi" + reponame];
-                        ToolStripMenuItem pauseitem = (ToolStripMenuItem)repoitem.DropDownItems.Find("pause", false)[0];
-                        ToolStripMenuItem syncitem = (ToolStripMenuItem)repoitem.DropDownItems.Find("sync", false)[0];
+// NOTGDS2                        ToolStripMenuItem pauseitem = (ToolStripMenuItem)repoitem.DropDownItems.Find("pause", false)[0];
+// NOTGDS2                        ToolStripMenuItem syncitem = (ToolStripMenuItem)repoitem.DropDownItems.Find("sync", false)[0];
+                        ToolStripMenuItem syncitem = (ToolStripMenuItem)repoitem.DropDownItems[2]; // GDS2
+
                         foreach (RepoBase aRepo in Program.Controller.Repositories)
                         {
                             if (aRepo.Name == reponame)
@@ -251,13 +253,22 @@ namespace CmisSync
                     openLocalFolderItem.Click += OpenLocalFolderDelegate(folderName);
 
                     // Sub-item: open remotely.
-                    ToolStripMenuItem openRemoteFolderItem = new ToolStripMenuItem()
+                    /*ToolStripMenuItem openRemoteFolderItem = new ToolStripMenuItem()
                     {
                         Text = CmisSync.Properties_Resources.BrowseRemoteFolder,
                         Name = "openRemote",
                         Image = UIHelpers.GetBitmap("classic_folder_web"),
                     };
                     openRemoteFolderItem.Click += OpenRemoteFolderDelegate(folderName);
+                    */
+
+                    // Sub-item: edit ignore folder.
+                    ToolStripMenuItem editFolderItem = new ToolStripMenuItem()
+                    {
+                        Text = CmisSync.Properties_Resources.EditTitle
+                    };
+                    editFolderItem.Click += EditFolderDelegate(folderName);
+
 
                     // Sub-item: suspend sync.
                     ToolStripMenuItem suspendFolderItem = new ToolStripMenuItem()
@@ -272,6 +283,7 @@ namespace CmisSync
                         Text = Properties_Resources.RemoveFolderFromSync,
                         Name = "remove",
                         Image = UIHelpers.GetBitmap("disconnect"),
+                        Tag = "remove",
                     };
                     removeFolderFromSyncItem.Click += RemoveFolderFromSyncDelegate(folderName);
 
@@ -305,10 +317,12 @@ namespace CmisSync
 
                     // Add the sub-items.
                     subfolderItem.DropDownItems.Add(openLocalFolderItem);
-                    subfolderItem.DropDownItems.Add(openRemoteFolderItem);
+                    //subfolderItem.DropDownItems.Add(openRemoteFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
                     subfolderItem.DropDownItems.Add(manualSyncItem);
+                    subfolderItem.DropDownItems.Add(new ToolStripSeparator());
+                    subfolderItem.DropDownItems.Add(editFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
@@ -325,7 +339,7 @@ namespace CmisSync
             {
                 Text = CmisSync.Properties_Resources.AddARemoteFolder,
                 Name = "add",
-                Image = UIHelpers.GetBitmap("connect"),
+                Image = UIHelpers.GetBitmap("connect")
             };
 
             if (ConfigManager.CurrentConfig.SingleRepository && ConfigManager.CurrentConfig.Folder.Count > 0)
@@ -345,7 +359,7 @@ namespace CmisSync
             ToolStripMenuItem log_item = new ToolStripMenuItem()
             {
                 Text = CmisSync.Properties_Resources.ViewLog,
-                Name = "log",
+                Name = "log"
             };
             log_item.Click += delegate
             {
@@ -357,7 +371,7 @@ namespace CmisSync
             ToolStripMenuItem about_item = new ToolStripMenuItem()
             {
                 Text = CmisSync.Properties_Resources.About,
-                Name = "about",
+                Name = "about"
             };
             about_item.Click += delegate
             {
@@ -369,7 +383,7 @@ namespace CmisSync
             this.exitItem = new ToolStripMenuItem()
             {
                 Text = CmisSync.Properties_Resources.Exit,
-                Name = "exit",
+                Name = "exit"
             };
             this.exitItem.Click += delegate
             {
@@ -392,7 +406,7 @@ namespace CmisSync
 	            UIHelpers.GetIcon ("process-syncing-iiii"),
 	            UIHelpers.GetIcon ("process-syncing-iiiii")
 			};
-            this.errorIcon = UIHelpers.GetIcon("process-syncing-error");
+            this.errorIcon = UIHelpers.GetIcon("process-syncing-error"); // NOTGDS2
         }
 
 
@@ -419,24 +433,13 @@ namespace CmisSync
         /// <summary>
         /// MouseEventListener function for popping up context menu.
         /// </summary>
-        private void TrayIcon_MouseClick(Object sender, MouseEventArgs e)
+        private void TrayIcon_MouseClick(Object sender, MouseEventArgs e) // NOTGDS2
         {
             if (e.Button == MouseButtons.Left)
             {
                 MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
                 mi.Invoke(trayicon, null);
             }
-        }
-
-        /// <summary>
-        /// Delegate for opening the remote folder.
-        /// </summary>
-        private EventHandler OpenRemoteFolderDelegate(string reponame)
-        {
-            return delegate
-            {
-                Controller.RemoteFolderClicked(reponame);
-            };
         }
 
 
@@ -455,7 +458,24 @@ namespace CmisSync
         {
             return delegate
             {
-                Controller.RemoveFolderFromSyncClicked(reponame);
+                if (System.Windows.MessageBox.Show(
+                    CmisSync.Properties_Resources.RemoveSyncQuestion,
+                    CmisSync.Properties_Resources.RemoveSyncTitle,
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question,
+                    MessageBoxResult.No
+                    ) == MessageBoxResult.Yes)
+                {
+                    Controller.RemoveFolderFromSyncClicked(reponame);
+                }
+            };
+        }
+
+        private EventHandler EditFolderDelegate(string reponame)
+        {
+            return delegate
+            {
+                Controller.EditFolderClicked(reponame);
             };
         }
 

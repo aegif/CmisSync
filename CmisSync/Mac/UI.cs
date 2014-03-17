@@ -14,6 +14,7 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#define ODS_NEW_GUI
     
 using System;
 using System.Drawing;
@@ -22,38 +23,43 @@ using System.IO;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
-using MonoMac.Growl;
+
 
 namespace CmisSync {
 
     public class UI : AppDelegate {
 
         public StatusIcon StatusIcon;
+        #if ODS_NEW_GUI
+        public SetupWizardController Setup;
+        #else
         public Setup Setup;
-        public Bubbles Bubbles;
+        #endif
         public About About;
-		
-		public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
-			"Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
-		
+        
+        public static NSFont Font = NSFontManager.SharedFontManager.FontWithFamily (
+            "Lucida Grande", NSFontTraitMask.Condensed, 0, 13);
+        
         public static NSFont BoldFont = NSFontManager.SharedFontManager.FontWithFamily (
-			"Lucida Grande", NSFontTraitMask.Bold, 0, 13);
-		
+            "Lucida Grande", NSFontTraitMask.Bold, 0, 13);
+        
 
         public UI ()
         {
             using (var a = new NSAutoreleasePool ())
             {
-                GrowlApplicationBridge.WeakDelegate = this;
-                GrowlApplicationBridge.Delegate     = new CmisSyncGrowlDelegate ();
-
-                NSApplication.SharedApplication.ApplicationIconImage = NSImage.ImageNamed ("cmissync-app.icns");
+				var currentDirectory = Directory.GetCurrentDirectory();
+				var image = NSImage.ImageNamed ("cmissync-app.icns");
+				NSApplication.SharedApplication.ApplicationIconImage = image;
 
                 SetFolderIcon ();
-    
-                Setup      = new Setup ();
+
+                #if ODS_NEW_GUI    
+                Setup      = new SetupWizardController ();
+                #else
+                Setup      = new Setup();
+                #endif
                 About      = new About ();
-                Bubbles    = new Bubbles ();
                 StatusIcon = new StatusIcon ();
 
                 Program.Controller.UIHasLoaded ();
@@ -79,7 +85,11 @@ namespace CmisSync {
 
         public void UpdateDockIconVisibility ()
         {
-            if (Setup.IsVisible || About.IsVisible)
+            #if ODS_NEW_GUI
+            if ((Setup.IsWindowLoaded && Setup.Window.IsVisible) || About.IsVisible || Program.Controller.IsEditWindowVisible)
+            #else
+            if (Setup.IsVisible || About.IsVisible || Program.Controller.IsEditWindowVisible)
+            #endif
                 ShowDockIcon ();
             else
                 HideDockIcon ();
@@ -88,8 +98,7 @@ namespace CmisSync {
 
         private void HideDockIcon ()
         {
-            // Currently not supported, here for completeness sake (see Apple's docs)
-            // NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.None;
+            NSApplication.SharedApplication.ActivationPolicy = NSApplicationActivationPolicy.Prohibited;
         }
 
 
@@ -105,7 +114,7 @@ namespace CmisSync {
         public override void WillBecomeActive (NSNotification notification)
         {
             if (NSApplication.SharedApplication.DockTile.BadgeLabel != null) {
-                Program.Controller.ShowEventLogWindow ();
+                //Program.Controller.ShowEventLogWindow ();
                 NSApplication.SharedApplication.DockTile.BadgeLabel = null;
             }
         }

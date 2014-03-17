@@ -20,7 +20,6 @@ using System.IO;
 
 using MonoMac.AppKit;
 using MonoMac.Foundation;
-using MonoMac.Growl;
 
 namespace CmisSync {
     

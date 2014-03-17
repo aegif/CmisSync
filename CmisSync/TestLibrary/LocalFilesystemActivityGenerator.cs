@@ -49,10 +49,16 @@ namespace TestLibrary
             CreateFile(path, sizeInKb);
         }
 
+        public static string GetNextFileName()
+        {
+            string filename = "file_" + id.ToString() + ".bin";
+            return filename;
+        }
+
         public static void CreateFile(string path, int sizeInKb)
         {
             Random rng = new Random();
-            string filename = "file_" + id.ToString() + ".bin";
+            string filename = GetNextFileName();
             ++ id;
             byte[] data = new byte[1024];
 
