@@ -51,6 +51,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\ActiveActivitiesManager.cs" />
+    <Compile Include="Events\ConfigChangedEvent.cs" />
+    <Compile Include="Events\DebugLoggingHandler.cs" />
+    <Compile Include="Events\FileConflictEvent.cs" />
+    <Compile Include="Events\FileTransmissionEvent.cs" />
+    <Compile Include="Events\FSDeletionHandler.cs" />
+    <Compile Include="Events\FSEvent.cs" />
+    <Compile Include="Events\GenericSyncEventHandler.cs" />
+    <Compile Include="Events\ISyncEvent.cs" />
+    <Compile Include="Events\SyncEventHandler.cs" />
+    <Compile Include="Events\SyncEventManager.cs" />
+    <Compile Include="Events\SyncEventQueue.cs" />
     <Compile Include="UserNotificationListener.cs" />
     <Compile Include="Cmis\BaseException.cs" />
     <Compile Include="Cmis\Database.cs" />

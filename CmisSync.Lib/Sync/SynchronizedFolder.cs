@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
+using CmisSync.Lib.Events;
 
 namespace CmisSync.Lib.Sync
 {
