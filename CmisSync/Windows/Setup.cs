@@ -588,21 +588,10 @@ namespace CmisSync
                                     // Try to find the CMIS server (asynchronously)
                                     GetRepositoriesFuzzyDelegate dlgt =
                                         new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
-<<<<<<< HEAD
                                     IAsyncResult ar = dlgt.BeginInvoke(new Uri(address_box.Text), user_box.Text,
                                         password_box.Password, null, null);
                                     while (!ar.AsyncWaitHandle.WaitOne(100))
                                     {
-=======
-                                    ServerCredentials credentials = new ServerCredentials()
-                                    {
-                                        UserName = user_box.Text,
-                                        Password = password_box.Password,
-                                        Address = new Uri(address_box.Text)
-                                    };
-                                    IAsyncResult ar = dlgt.BeginInvoke(credentials, null, null);
-                                    while (!ar.AsyncWaitHandle.WaitOne(100)) {
->>>>>>> gds2-master
                                         System.Windows.Forms.Application.DoEvents();
                                     }
                                     Tuple<CmisServer, Exception> result = dlgt.EndInvoke(ar);
@@ -664,7 +653,6 @@ namespace CmisSync
                                 Header = Properties_Resources.Which;
 
                                 // A tree allowing the user to browse CMIS repositories/folders.
-<<<<<<< HEAD
                                 /*if(TODO check if OpenDataSpace, and further separate code below)
                                 {
                                     System.Uri resourceLocater = new System.Uri("/CmisSync;component/TreeView.xaml", System.UriKind.Relative);
@@ -675,75 +663,15 @@ namespace CmisSync
                                 treeView.Width = 410;
                                 treeView.Height = 267;
 
-=======
-                                System.Uri resourceLocater = new System.Uri("/DataSpaceSync;component/FolderTreeMVC/TreeView.xaml", System.UriKind.Relative);
-                                System.Windows.Controls.TreeView treeView = System.Windows.Application.LoadComponent(resourceLocater) as TreeView;
-
-                                ObservableCollection<RootFolder> repos = new ObservableCollection<RootFolder>();
-                                Dictionary<string, AsyncNodeLoader> loader = new Dictionary<string, AsyncNodeLoader>();
->>>>>>> gds2-master
                                 // Some CMIS servers hold several repositories (ex:Nuxeo). Show one root per repository.
                                 foreach (KeyValuePair<String, String> repository in Controller.repositories)
                                 {
-<<<<<<< HEAD
                                     System.Windows.Controls.TreeViewItem item = new System.Windows.Controls.TreeViewItem();
                                     item.Tag = new SelectionTreeItem(repository.Key, "/");
                                     item.Header = repository.Value;
                                     treeView.Items.Add(item);
                                 }
 
-=======
-                                    RootFolder repo = new RootFolder()
-                                    {
-                                        Name = repository.Value,
-                                        Id = repository.Key,
-                                        Address = Controller.saved_address.ToString()
-                                    };
-                                    repos.Add(repo);
-                                    if (firstRepo)
-                                    {
-                                        repo.Selected = true;
-                                        firstRepo = false;
-                                    }
-                                    else
-                                    {
-                                        repo.Selected = false;
-                                    }
-                                    CmisRepoCredentials cred = new CmisRepoCredentials()
-                                    {
-                                        UserName = Controller.saved_user,
-                                        Password = Controller.saved_password,
-                                        Address = Controller.saved_address,
-                                        RepoId = repository.Key
-                                    };
-                                    AsyncNodeLoader asyncLoader = new AsyncNodeLoader(repo, cred, PredefinedNodeLoader.LoadSubFolderDelegate, PredefinedNodeLoader.CheckSubFolderDelegate);
-                                    asyncLoader.Load(repo);
-                                    loader.Add(repo.Id, asyncLoader);
-                                }
-                                treeView.DataContext = repos;
-                                treeView.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(delegate(object sender, RoutedEventArgs e)
-                                {
-                                    TreeViewItem expandedItem = e.OriginalSource as TreeViewItem;
-                                    Node expandedNode = expandedItem.Header as Folder;
-                                    if (expandedNode != null)
-                                    {
-                                        Node parent = expandedNode.Parent;
-                                        while (parent is Folder)
-                                        {
-                                            parent = parent.Parent;
-                                        }
-                                        if (parent is RootFolder)
-                                        {
-                                            AsyncNodeLoader l;
-                                            RootFolder r = parent as RootFolder;
-                                            if (loader.TryGetValue(r.Id, out l))
-                                            {
-                                                l.Load(expandedNode);
-                                            }
-                                        }
-                                    }
-                                }));
->>>>>>> gds2-master
                                 ContentCanvas.Children.Add(treeView);
                                 Canvas.SetTop(treeView, 70);
                                 Canvas.SetLeft(treeView, 185);
@@ -804,14 +732,11 @@ namespace CmisSync
                                     Content = Properties_Resources.Cancel
                                 };
 
-<<<<<<< HEAD
                                 Button continue_button = new Button()
                                 {
                                     Content = CmisSync.Properties_Resources.ResourceManager.GetString("Continue", CultureInfo.CurrentCulture)
                                 };
 
-=======
->>>>>>> gds2-master
                                 Button back_button = new Button()
                                 {
                                     Content = Properties_Resources.Back,
@@ -831,47 +756,13 @@ namespace CmisSync
 
                                 continue_button.Click += delegate
                                 {
-<<<<<<< HEAD
                                     Controller.Add2PageCompleted(
                                         Controller.saved_repository, Controller.saved_remote_path);
-=======
-                                    List<string> ignored = new List<string>();
-                                    List<string> selectedFolder = new List<string>();
-                                    ItemCollection items = treeView.Items;
-                                    RootFolder selectedRepo = null;
-                                    foreach (var item in items)
-                                    {
-                                        RootFolder repo = item as RootFolder;
-                                        if (repo != null)
-                                            if (repo.Selected != false)
-                                            {
-                                                selectedRepo = repo;
-                                                break;
-                                            }
-                                    }
-                                    if (selectedRepo != null)
-                                    {
-                                        ignored.AddRange(NodeModelUtils.GetIgnoredFolder(selectedRepo));
-                                        selectedFolder.AddRange(NodeModelUtils.GetSelectedFolder(selectedRepo));
-                                        Controller.saved_repository = selectedRepo.Id;
-                                        Controller.saved_remote_path = selectedRepo.Path;
-                                        Controller.Add2PageCompleted(
-                                            Controller.saved_repository, Controller.saved_remote_path, ignored.ToArray(), selectedFolder.ToArray());
-                                        foreach (AsyncNodeLoader task in loader.Values)
-                                            task.Cancel();
-                                    }
-                                    else
-                                    {
-                                        return;
-                                    }
->>>>>>> gds2-master
                                 };
 
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
-<<<<<<< HEAD
-=======
                                     foreach (AsyncNodeLoader task in loader.Values)
                                         task.Cancel();
                                 };
@@ -880,7 +771,6 @@ namespace CmisSync
                                 {
                                     foreach (AsyncNodeLoader task in loader.Values)
                                         task.Cancel();
->>>>>>> gds2-master
                                 };
                                 break;
                             }
@@ -931,19 +821,6 @@ namespace CmisSync
                                     Text = Path.Combine(parentFolder, localfolder_box.Text)
                                 };
 
-<<<<<<< HEAD
-=======
-                                localfolder_box.TextChanged += delegate
-                                {
-                                    try
-                                    {
-                                        localrepopath_box.Text = Path.Combine(parentFolder, localfolder_box.Text);
-                                    }
-                                    catch (Exception)
-                                    {}
-                                };
-
->>>>>>> gds2-master
                                 Button choose_folder_button = new Button()
                                 {
                                     Width = 40,
@@ -1032,7 +909,6 @@ namespace CmisSync
                                     });
                                 };
 
-<<<<<<< HEAD
                                 CheckRepoPathAndNameDelegate checkRepoPathAndNameDelegate = delegate()
                                 {
                                     string error = Controller.CheckRepoPathAndName(localrepopath_box.Text, localfolder_box.Text);
@@ -1059,16 +935,6 @@ namespace CmisSync
                                 localrepopath_box.TextChanged += delegate
                                 {
                                     checkRepoPathAndNameDelegate();
-=======
-                                localfolder_box.TextChanged += delegate
-                                {
-                                    CheckCustomizeInput(localfolder_box, localrepopath_box, localfolder_error_label);
-                                };
-
-                                localrepopath_box.TextChanged += delegate
-                                {
-                                    CheckCustomizeInput(localfolder_box, localrepopath_box, localfolder_error_label);
->>>>>>> gds2-master
                                 };
 
                                 windowActivatedEventHandler = new EventHandler(delegate(object sender, EventArgs e)
