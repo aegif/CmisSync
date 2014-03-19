@@ -20,6 +20,7 @@ using System;
 using System.IO;
 using Timers = System.Timers;
 using CmisSync.Lib.Events;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync.Lib
 {
@@ -114,7 +115,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Restart syncing.
         /// </summary>
-        public void Resume()
+        public virtual void Resume()
         {
             Status = SyncStatus.Idle;
             RepoInfo.IsSuspended = false;
@@ -344,7 +345,7 @@ namespace CmisSync.Lib
             //Update password...
             if (!String.IsNullOrEmpty(password))
             {
-                this.RepoInfo.Password = new CmisSync.Auth.CmisPassword(password.TrimEnd());
+                this.RepoInfo.Password = new Password(password.TrimEnd());
                 syncConfig.ObfuscatedPassword = RepoInfo.Password.ObfuscatedPassword;
                 Logger.Debug("Updated \"" + this.Name + "\" password");
             }
@@ -436,7 +437,7 @@ namespace CmisSync.Lib
             if (Watcher.GetChangeCount() > 0)
             {
                 //Watcher was stopped (due to error) so clear and restart sync
-                Watcher.Clear();
+                Watcher.RemoveAll();
             }
 
             Watcher.EnableRaisingEvents = true;

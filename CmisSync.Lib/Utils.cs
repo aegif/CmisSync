@@ -206,7 +206,7 @@ namespace CmisSync.Lib
         /// Check whether the directory is worth syncing or not.
         /// Directories that are not worth syncing include ignored, system, and hidden folders.
         /// </summary>
-        private static bool IsDirectoryWorthSyncing(string localDirectory, RepoInfo repoInfo)
+        public static bool IsDirectoryWorthSyncing(string localDirectory, RepoInfo repoInfo)
         {
             if (!localDirectory.StartsWith(repoInfo.TargetDirectory))
             {
@@ -247,7 +247,7 @@ namespace CmisSync.Lib
         /// This optionally excludes blank files or files too large.
 
         /// </summary>
-        private static bool IsFileWorthSyncing(string filepath, RepoInfo repoInfo)
+        public static bool IsFileWorthSyncing(string filepath, RepoInfo repoInfo)
         {
             if (File.Exists(filepath))
             {
@@ -273,19 +273,13 @@ namespace CmisSync.Lib
 
                 //Check filesize
                 if (!allowBlankFiles && fileInfo.Length <= 0)
-
-
-
-
-<Merge Conflict>
-
                 {
                     Logger.DebugFormat("Skipping {0}: blank file", filepath);
                     return false;
                 }
                 if (limitFilesize && fileInfo.Length > filesizeLimit)
                 {
-                    Logger.DebugFormat("Skipping {0}: file too large {1}mb", filepath, fileInfo.Length / (1024f * 1024f));
+                    Logger.DebugFormat("Skipping {0}: file too large {1}MB", filepath, fileInfo.Length / (1024f * 1024f));
                     return false;
                 }
 
@@ -321,6 +315,39 @@ namespace CmisSync.Lib
             byte[] bytes = Encoding.GetEncoding(28591).GetBytes(input);
             String result = Encoding.GetEncoding(28591).GetString(bytes);
             return String.Equals(input, result);
+        }
+
+
+        /// <summary>
+        /// Check whether the file is worth syncing or not.
+        /// Files that are not worth syncing include temp files, locks, etc.
+        /// </summary>
+        public static Boolean WorthSyncing(string filename)
+        {
+            if (null == filename)
+            {
+                return false;
+            }
+
+            // TODO: Consider these ones as well:
+            // "*~", // gedit and emacs
+            // ".~lock.*", // LibreOffice
+            // ".*.sw[a-z]", // vi(m)
+            // "*(Autosaved).graffle", // Omnigraffle
+
+            filename = filename.ToLower();
+
+            if (ignoredFilenames.Contains(filename)
+                || ignoredExtensions.Contains(Path.GetExtension(filename))
+                || filename[0] == '~' // Microsoft Office temporary files start with ~
+                || filename[0] == '.' && filename[1] == '_') // Mac OS X files starting with ._
+            {
+                Logger.Debug("Unworth syncing: " + filename);
+                return false;
+            }
+
+            //Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
+            return true;
         }
 
 
@@ -423,6 +450,45 @@ namespace CmisSync.Lib
             }
         }
 
+
+        /// <summary>
+        /// Find an available conflict free filename for this file.
+        /// For instance:
+        /// - if /dir/file does not exist, return the same path
+        /// - if /dir/file exists, return /dir/file (1)
+        /// - if /dir/file (1) also exists, return /dir/file (2)
+        /// - etc
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string FindNextConflictFreeFilename(String path, String user)
+        {
+            if (!File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                string extension = Path.GetExtension(path);
+                string filepath = path.Substring(0, path.Length - extension.Length);
+                string ret = String.Format("{0}_{1}-version{2}", filepath, user, extension);
+                if (!File.Exists(ret))
+                    return ret;
+                int index = 1;
+                do
+                {
+                    ret = String.Format("{0}_{1}-version ({2}){3}", filepath, user, index.ToString(), extension);
+                    if (!File.Exists(ret))
+                    {
+                        return ret;
+                    }
+                    index++;
+                }
+                while (true);
+            }
+        }
+        
+        
         /// <summary>
         /// Format a file size nicely.
         /// Example: 1048576 becomes "1 MB"

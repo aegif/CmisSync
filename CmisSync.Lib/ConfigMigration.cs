@@ -24,7 +24,7 @@ namespace CmisSync.Lib.Sync
             ReplaceCaseSensitiveNotification();
             // Replace XML root element from <sparkleshare> to <CmisSync>
             ReplaceXMLRootElement();
-            CheckForDoublicatedLog4NetElement();
+            CheckForDuplicatedLog4NetElement();
             ReplaceTrunkByChunk();
         }
 

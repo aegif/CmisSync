@@ -1,18 +1,18 @@
-﻿//   CmisSync, a collaboration and sharing tool.
-//   Copyright (C) 2010  Hylke Bons <hylkebons@gmail.com>
+﻿// CmisSync, a collaboration and sharing tool.
+// Copyright (C) 2010 Hylke Bons <hylkebons@gmail.com>
 //
-//   This program is free software: you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation, either version 3 of the License, or
-//   (at your option) any later version.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//   GNU General Public License for more details.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
 //
-//   You should have received a copy of the GNU General Public License
-//   along with this program. If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 using System;
@@ -179,18 +179,30 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Get the number of elements in the change queue.
+        /// </summary>
+        public int GetChangeCount()
+        {
+            lock (changeLock)
+            {
+                return changeList.Count;
+            }
+        }
+
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         public Watcher(string folder)
         {
 #if __MonoCS__
-            //  http://stackoverflow.com/questions/16859372/why-doesnt-the-servicestack-razor-filesystemwatcher-work-on-mono-mac-os-x
+            // http://stackoverflow.com/questions/16859372/why-doesnt-the-servicestack-razor-filesystemwatcher-work-on-mono-mac-os-x
             Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
 #endif
 
             Path = System.IO.Path.GetFullPath(folder);
             IncludeSubdirectories = true;
-            Filter                = "*";
+            Filter = "*";
             InternalBufferSize = 4 * 1024 * 16;
             NotifyFilter = NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 
@@ -214,7 +226,7 @@ namespace CmisSync.Lib
             InvokeChangeEvent(e);
         }
 
-        
+
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
             Logger.Debug("FS Object deletion detected: " + e.FullPath);
@@ -225,7 +237,7 @@ namespace CmisSync.Lib
             InvokeChangeEvent(e);
         }
 
-        
+
         private void OnChanged(object source, FileSystemEventArgs e)
         {
             Logger.Debug("FS Object change detected: " + e.FullPath);
@@ -236,7 +248,7 @@ namespace CmisSync.Lib
             InvokeChangeEvent(e);
         }
 
-        
+
         private void ChangeHandle(string name, ChangeTypes type, List<ChangeTypes> checks)
         {
             lock (changeLock)
@@ -253,7 +265,7 @@ namespace CmisSync.Lib
             }
         }
 
-        
+
         private void OnRenamed(object source, RenamedEventArgs e)
         {
             Logger.Debug("FS Object renaming detected: " + e.OldFullPath + " to " + e.FullPath);
@@ -278,14 +290,14 @@ namespace CmisSync.Lib
             InvokeChangeEvent(e);
         }
 
-        
+
         private void OnError(object source, ErrorEventArgs e)
         {
             Logger.Warn("Error occurred for FileSystemWatcher");
             EnableRaisingEvents = false;
         }
 
-        
+
         /// <summary>
         /// Whether this object has been disposed or not.
         /// </summary>

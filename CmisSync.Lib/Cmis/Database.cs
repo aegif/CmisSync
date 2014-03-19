@@ -386,21 +386,6 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
-        /// move a file from the database.
-        /// </summary>
-        public void MoveFile(string oldPath, string newPath)
-        {
-            oldPath = Normalize(oldPath);
-            newPath = Normalize(newPath);
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("oldpath", oldPath);
-            parameters.Add("newpath", newPath);
-            ExecuteSQLAction("UPDATE files SET path=@newpath WHERE path=@oldpath", parameters);
-        }
-
-
-        /// <summary>
         /// Remove a folder from the database.
         /// </summary>
         public void RemoveFolder(string path)
@@ -427,6 +412,7 @@ namespace CmisSync.Lib.Cmis
 
             //ExecuteSQLAction("DELETE FROM downloads WHERE path LIKE \"" + path + "/%\"", null);
         }
+
 
         /// <summary>
         /// Move a file.

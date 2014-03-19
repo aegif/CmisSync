@@ -49,16 +49,10 @@ namespace CmisSync.Lib.Sync
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just sync everything from remote.
-                    if (CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null))
-                    {
-                        Logger.Info("Success to sync from remote, update ChangeLog token: " + lastTokenOnServer);
-                        database.SetChangeLogToken(lastTokenOnServer);
-                    }
-                    else
-                    {
-                        Logger.Warn("Failure to sync from remote, wait for the next time.");
-                    }
-                    return;
+                    CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null);
+                    
+                    Logger.Info("Succeeded to sync from remote, update ChangeLog token: " + lastTokenOnServer);
+                    database.SetChangeLogToken(lastTokenOnServer);
                 }
 
                 do
@@ -93,9 +87,9 @@ namespace CmisSync.Lib.Sync
                                     break;
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception e)
                         {
-                            Logger.Warn("Exception when apply the change: " + Utils.ToLogString(ex));
+                            Logger.Warn("Exception when apply the change: ", e);
                             success = false;
                         }
                     }
@@ -119,15 +113,9 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         Logger.Warn("Failure to sync the changes on server, force crawl sync from remote");
-                        if (CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null))
-                        {
-                            Logger.Info("Success to sync from remote, update ChangeLog token: " + lastTokenOnServer);
-                            database.SetChangeLogToken(lastTokenOnServer);
-                        }
-                        else
-                        {
-                            Logger.Warn("Failure to sync from remote, wait for the next time.");
-                        }
+                        CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null);
+                        Logger.Info("Succeeded to sync from remote, update ChangeLog token: " + lastTokenOnServer);
+                        database.SetChangeLogToken(lastTokenOnServer);
                         return;
                     }
                 }
@@ -156,9 +144,9 @@ namespace CmisSync.Lib.Sync
                     Logger.Info("Ignore the missed object for " + change.ObjectId);
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " : " + Utils.ToLogString(ex));
+                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " :", e);
                     return false;
                 }
 
@@ -171,7 +159,7 @@ namespace CmisSync.Lib.Sync
                 }
                 if (remoteDocument != null)
                 {
-                    if (!Utils.WorthSyncing(remoteDocument.Name))
+                    if (!Utils.IsFileWorthSyncing(remoteDocument.Name, repoinfo))
                     {
                         Logger.Info("Change in remote unworth syncing file: " + remoteDocument.Paths);
                         return true;
@@ -231,9 +219,9 @@ namespace CmisSync.Lib.Sync
                     Logger.Info(String.Format("Ignore remote path {0} deleted from id {1}", remotePath, cmisObject.Id));
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Logger.Warn("Exception when GetObject for " + remotePath + " : " + Utils.ToLogString(ex));
+                    Logger.Warn("Exception when GetObject for " + remotePath + " : ", e);
                     return false;
                 }
 
@@ -287,19 +275,13 @@ namespace CmisSync.Lib.Sync
                     string savedFolderPath = database.GetFolderPath(change.ObjectId);
                     if ((null != savedFolderPath) && (savedFolderPath != localPath))
                     {
-                        MoveFolderLocally(savedFolderPath, localPath);
-                        return CrawlSync(remoteFolder, localPath);
+// TODO                        MoveFolderLocally(savedFolderPath, localPath);
+                        CrawlSync(remoteFolder, localPath);
                     }
                     else
                     {
-                        if(SyncDownloadFolder(remoteFolder, Path.GetDirectoryName(localPath)))
-                        {
-                            return CrawlSync(remoteFolder,localPath);
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        SyncDownloadFolder(remoteFolder, Path.GetDirectoryName(localPath));
+                        CrawlSync(remoteFolder,localPath);
                     }
                 }
 
@@ -325,9 +307,9 @@ namespace CmisSync.Lib.Sync
                 catch (CmisObjectNotFoundException)
                 {
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " : " + Utils.ToLogString(ex));
+                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " : ", e);
                 }
 
                 string savedDocumentPath = database.GetFilePath(change.ObjectId);

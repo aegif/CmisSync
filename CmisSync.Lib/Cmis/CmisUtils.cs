@@ -62,7 +62,7 @@ namespace CmisSync.Lib.Cmis
             catch (CmisRuntimeException e)
             {
                 if (e.Message == "ConnectFailure")
-                    return new Tuple<CmisServer, Exception>(new CmisServer(credentials.Address, null), new CmisServerNotFoundException(e.Message, e));
+                    return new Tuple<CmisServer, Exception>(new CmisServer(credentials.Address, null), new ServerNotFoundException(e.Message, e));
                 firstException = e;
             }
             catch (Exception e)
@@ -155,7 +155,7 @@ namespace CmisSync.Lib.Cmis
             IList<IRepository> repositories;
             try
             {
-                repositories = Auth.Auth.GetCmisRepositories(url, user, password);
+                repositories = Auth.Auth.GetCmisRepositories(credentials.Address, credentials.UserName, credentials.Password.ToString());
             }
             catch (CmisPermissionDeniedException e)
             {
@@ -241,11 +241,11 @@ namespace CmisSync.Lib.Cmis
             /// <summary>
             /// Children.
             /// </summary>
-            public List<FolderTree> children = new List<FolderTree>();
+            public List<FolderTree> Children = new List<FolderTree>();
             /// <summary>
             /// Folder path.
             /// </summary>
-            public string path;
+            public string Path;
             /// <summary>
             /// Folder name.
             /// </summary>
@@ -255,7 +255,7 @@ namespace CmisSync.Lib.Cmis
             /// <summary>
             /// Constructor.
             /// </summary>
-            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder)
+            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder, int depth)
             {
                 this.Path = folder.Path;
                 this.Name = folder.Name;
@@ -268,13 +268,15 @@ namespace CmisSync.Lib.Cmis
                     this.Finished = true;
                 }
 
-                if(trees != null)
+                if (trees != null)
+                {
                     foreach (ITree<IFileableCmisObject> tree in trees)
                     {
                         Folder f = tree.Item as Folder;
                         if (f != null)
-                            this.Children.Add(new NodeTree(tree.Children, f, depth - 1));
+                            this.Children.Add(new FolderTree(tree.Children, f, depth - 1));
                     }
+                }
             }
         }
 
@@ -285,7 +287,7 @@ namespace CmisSync.Lib.Cmis
         static public FolderTree GetSubfolderTree(Credentials.CmisRepoCredentials credentials, string path, int depth)
         {
             // Connect to the CMIS repository.
-            ISession session = Auth.Auth.GetCmisSession(url, user, password, repositoryId);
+            ISession session = Auth.Auth.GetCmisSession(credentials.Address.ToString(), credentials.UserName, credentials.Password.ToString(), credentials.RepoId);
 
             // Get the folder.
             IFolder folder;
@@ -305,7 +307,7 @@ namespace CmisSync.Lib.Cmis
             try
             {
                 IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
-                return new NodeTree(trees, folder, depth);
+                return new FolderTree(trees, folder, depth);
             }
             catch (Exception e)
             {

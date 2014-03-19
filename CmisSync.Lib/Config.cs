@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Xml;
 using log4net;
+using CmisSync.Lib.Credentials;
 
 namespace CmisSync.Lib
 {
@@ -30,6 +31,11 @@ namespace CmisSync.Lib
     /// </summary>
     public class Config
     {
+        /// <summary>
+        /// Chunk size for chunked transfers (not implemented yet)
+        /// </summary>
+        private const long DefaultChunkSize = 1024 * 1024;
+
         /// <summary>
         /// Default poll interval.
         /// It is used for any newly created synchronized folder.
@@ -526,14 +532,10 @@ namespace CmisSync.Lib
                 [XmlElement("features", IsNullable=true)]
                 public Feature SupportedFeatures { get; set;}
 
-                [XmlElement("ignoreFolder")]
-
                 /// <summary>
-                /// Ingored folders.
+                /// Ignored folders.
                 /// </summary>
                 [XmlElement("ignoreFolder", IsNullable = true)]
-                public List<IgnoredFolder> IgnoredFolders { get; set; }
-
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
                 private long chunkSize = DefaultChunkSize;
@@ -562,7 +564,7 @@ namespace CmisSync.Lib
                 {
                     RepoInfo repoInfo = new RepoInfo(DisplayName, ConfigManager.CurrentConfig.ConfigPath);
                     repoInfo.User = UserName;
-                    repoInfo.Password = new CmisSync.Auth.CmisPassword();
+                    repoInfo.Password = new Password();
                     repoInfo.Password.ObfuscatedPassword = ObfuscatedPassword;
                     repoInfo.Address = RemoteUrl;
                     repoInfo.RepoID = RepositoryId;

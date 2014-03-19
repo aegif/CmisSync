@@ -1,13 +1,13 @@
-﻿using CmisSync.Lib.Cmis;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CmisSync.Auth;
 
 namespace CmisSync.Lib.Credentials
 {
     /// <summary>
-    /// Typical user credantials used for generic logins
+    /// Typical user credentials used for generic logins
     /// </summary>
     [Serializable]
     public class UserCredentials

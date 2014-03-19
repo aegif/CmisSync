@@ -72,11 +72,10 @@ namespace CmisSync.Lib.Sync
                         if(ex.InnerException is System.Xml.XmlException)
                         {
                             Logger.Warn(String.Format("CMIS::getDescendants() response could not be parsed: {0}", ex.InnerException.Message ));
-                            return false;
                         }
                         throw;
                     }
-                    return CrawlDescendants(remoteFolder, desc, localFolder);
+                    CrawlDescendants(remoteFolder, desc, localFolder);
                 }
 
                 // Lists of files/folders, to delete those that have been removed on the server.
@@ -112,10 +111,8 @@ namespace CmisSync.Lib.Sync
             /// <param name="children">All children of the given remote folder</param>
             /// <param name="localFolder">The local folder, with which the remoteFolder should be synchronized</param>
             /// <returns></returns>
-            private bool CrawlDescendants(IFolder remoteFolder, IList<ITree<IFileableCmisObject>> children, string localFolder)
+            private void CrawlDescendants(IFolder remoteFolder, IList<ITree<IFileableCmisObject>> children, string localFolder)
             {
-                bool success = true;
-
                 // Lists of files/folders, to delete those that have been removed on the server.
                 IList<string> remoteFiles = new List<string>();
                 IList<string> remoteSubfolders = new List<string>();
@@ -135,14 +132,14 @@ namespace CmisSync.Lib.Sync
                             //Check whether local folder exists.
                             if (Directory.Exists(localSubFolder))
                             {
-                                success = CrawlDescendants(remoteSubFolder, node.Children, localSubFolder) && success;
+                                CrawlDescendants(remoteSubFolder, node.Children, localSubFolder);
                             }
                             else
                             {
-                                success = SyncDownloadFolder(remoteSubFolder, localFolder) && success;
+                                DownloadFolder(remoteSubFolder, localFolder);
                                 if (Directory.Exists(localSubFolder))
                                 {
-                                    success = RecursiveFolderCopy(remoteSubFolder, localSubFolder) && success;
+                                    RecursiveFolderCopy(remoteSubFolder, localSubFolder);
                                 }
                             }
                         }
@@ -154,13 +151,12 @@ namespace CmisSync.Lib.Sync
                     {
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)node.Item;
-                        success = SyncDownloadFile(remoteDocument, localFolder, remoteFiles) && success;
+                        SyncDownloadFile(remoteDocument, localFolder, remoteFiles);
                     }
                     #endregion
                 }
-                success = CrawlLocalFiles(localFolder, remoteFolder, remoteFiles) && success;
-                success = CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders) && success;
-                return success;
+                CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
+                CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
             }
 
 
@@ -168,7 +164,7 @@ namespace CmisSync.Lib.Sync
             /// Crawl remote content, syncing down if needed.
             /// Meanwhile, cache remoteFiles and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
             /// </summary>
-            private void CrawlRemote(IFolder remoteFolder, string localFolder, IList remoteFiles, IList remoteFolders)
+            private void CrawlRemote(IFolder remoteFolder, string localFolder, IList<string> remoteFiles, IList<string> remoteFolders)
             {
                 SleepWhileSuspended();
 
@@ -202,7 +198,7 @@ namespace CmisSync.Lib.Sync
             /// Crawl remote subfolder, syncing down if needed.
             /// Meanwhile, cache and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
             /// </summary>
-            private void CrawlRemoteFolder(IFolder remoteSubFolder, string localFolder, IList remoteFolders)
+            private void CrawlRemoteFolder(IFolder remoteSubFolder, string localFolder, IList<string> remoteFolders)
             {
                 SleepWhileSuspended();
 
@@ -260,7 +256,7 @@ namespace CmisSync.Lib.Sync
 
                                     // Create database entry for this folder.
                                     // TODO - Yannick - Add metadata
-                                    database.AddFolder(localSubFolder, remoteSubFolder.LastModificationDate);
+                                    database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
                                     Logger.Info("Added folder to database: " + localSubFolder);
 
                                     // Recursive copy of the whole folder.
@@ -283,7 +279,7 @@ namespace CmisSync.Lib.Sync
             /// Crawl remote document, syncing down if needed.
             /// Meanwhile, cache remoteFiles, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
             /// </summary>
-            private void CrawlRemoteDocument(IDocument remoteDocument, string localFolder, IList remoteFiles)
+            private void CrawlRemoteDocument(IDocument remoteDocument, string localFolder, IList<string> remoteFiles)
             {
                 SleepWhileSuspended();
 
@@ -417,7 +413,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Crawl local files in a given directory (not recursive).
             /// </summary>
-            private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList remoteFiles)
+            private void CrawlLocalFiles(string localFolder, IFolder remoteFolder, IList<string> remoteFiles)
             {
                 SleepWhileSuspended();
 
@@ -441,7 +437,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Crawl local file in a given directory (not recursive).
             /// </summary>
-            private void CrawlLocalFile(string filePath, IFolder remoteFolder, IList remoteFiles)
+            private void CrawlLocalFile(string filePath, IFolder remoteFolder, IList<string> remoteFiles)
             {
                 SleepWhileSuspended();
 
@@ -450,7 +446,7 @@ namespace CmisSync.Lib.Sync
                     if(Utils.IsSymlink(new FileInfo(filePath)))
                     {
                         Logger.Info("Skipping symbolic linked file: "+ filePath);
-                        continue;
+                        return;
                     }
 
                     string fileName = Path.GetFileName(filePath);
@@ -541,7 +537,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Crawl local folders in a given directory (not recursive).
             /// </summary>
-            private void CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList remoteFolders)
+            private void CrawlLocalFolders(string localFolder, IFolder remoteFolder, IList<string> remoteFolders)
             {
                 SleepWhileSuspended();
 
@@ -565,7 +561,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Crawl local folder in a given directory (not recursive).
             /// </summary>
-            private void CrawlLocalFolder(string localSubFolder, IFolder remoteFolder, IList remoteFolders)
+            private void CrawlLocalFolder(string localSubFolder, IFolder remoteFolder, IList<string> remoteFolders)
             {
                 SleepWhileSuspended();
                 try
@@ -573,7 +569,7 @@ namespace CmisSync.Lib.Sync
                     if(Utils.IsSymlink(new DirectoryInfo(localSubFolder)))
                     {
                         Logger.Info("Skipping symbolic link folder: "+ localSubFolder);
-                        continue;
+                        return;
                     }
 
                     string folderName = Path.GetFileName(localSubFolder);

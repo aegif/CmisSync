@@ -140,7 +140,7 @@ namespace CmisSync.Lib
         /// Full constructor.
         /// </summary>
         [Obsolete("Use other contructor outside of testings")]
-        public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval)
+        public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval, Boolean isSuspended, DateTime lastSuccessedSync, bool syncAtStartup)
         {
             Name = name;
             name = name.Replace("\\", "_");
