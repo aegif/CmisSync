@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChunkedStream.cs" />
     <Compile Include="Cmis\IDatabase.cs" />
     <Compile Include="Events\ActiveActivitiesManager.cs" />
     <Compile Include="Events\ConfigChangedEvent.cs" />
