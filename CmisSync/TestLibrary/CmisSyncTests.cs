@@ -1998,7 +1998,7 @@ namespace TestLibrary
                     Clean(localDirectory, synchronizedFolder);
                 }
             }
-        }*/
+        }
 
 
         // Write a file and immediately check whether it has been created.

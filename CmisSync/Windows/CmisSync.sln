@@ -12,9 +12,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.vs2010", "..\..\Ext
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Console", "..\..\CmisSync.Console\CmisSync.Console.csproj", "{A37D5F2B-AD95-44A6-9301-7532359D1A6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotCMIS", "..\..\Extras\chemistry-dotcmis-svn1550373-src-patched-for-cmis1.1-ws\DotCMIS.csproj", "{529EF90F-A34C-4426-A4F9-65113AC23841}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Auth", "..\..\CmisSync.Auth\CmisSync.Auth.csproj", "{FDB085EB-D424-434D-9C55-D31A8994F7B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotCMIS", "..\..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj", "{529EF90F-A34C-4426-A4F9-65113AC23841}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,16 +82,6 @@ Global
 		{A37D5F2B-AD95-44A6-9301-7532359D1A6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A37D5F2B-AD95-44A6-9301-7532359D1A6F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{A37D5F2B-AD95-44A6-9301-7532359D1A6F}.Release|x86.ActiveCfg = Release|x86
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|Any CPU.Build.0 = Release|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|x86.ActiveCfg = Release|Any CPU
 		{FDB085EB-D424-434D-9C55-D31A8994F7B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FDB085EB-D424-434D-9C55-D31A8994F7B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDB085EB-D424-434D-9C55-D31A8994F7B4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -102,6 +92,16 @@ Global
 		{FDB085EB-D424-434D-9C55-D31A8994F7B4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{FDB085EB-D424-434D-9C55-D31A8994F7B4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FDB085EB-D424-434D-9C55-D31A8994F7B4}.Release|x86.ActiveCfg = Release|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|Any CPU.Build.0 = Release|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{529EF90F-A34C-4426-A4F9-65113AC23841}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

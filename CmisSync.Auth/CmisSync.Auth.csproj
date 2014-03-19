@@ -51,8 +51,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Extras\chemistry-dotcmis-svn1550373-src-patched-for-cmis1.1-ws\DotCMIS.csproj">
-      <Project>{529ef90f-a34c-4426-a4f9-65113ac23841}</Project>
+    <ProjectReference Include="..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
+      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
       <Name>DotCMIS</Name>
     </ProjectReference>
   </ItemGroup>
