@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CmisSync.Auth;
 
-namespace CmisSync.Lib.Credentials
+namespace CmisSync.Auth
 {
     /// <summary>
     /// Typical user credentials used for generic logins
@@ -32,6 +31,13 @@ namespace CmisSync.Lib.Credentials
         /// Server Address and Path
         /// </summary>
         public Uri Address { get; set; }
+
+        /*public ServerCredentials(Uri Address, string UserName, Password Password)
+        {
+            this.Address = Address;
+            this.UserName = UserName;
+            this.Password = Password;
+        }*/
     }
 
     /// <summary>

@@ -57,12 +57,6 @@ namespace CmisSync {
         public event NewVersionEventDelegate NewVersionEvent = delegate { };
 
         /// <summary>
-        /// Delegate for NewVersionEvent
-        /// </summary>
-        /// <param name="new_version_string"></param>
-        public delegate void NewVersionEventDelegate (string new_version_string);
-
-        /// <summary>
         /// New Version delegate.
         /// </summary>
         public delegate void NewVersionEventDelegate(string new_version_string);
@@ -76,16 +70,6 @@ namespace CmisSync {
         /// Credits link URL.
         /// </summary>
         public readonly string CreditsLinkAddress       = "https://raw.github.com/nicolas-raoul/CmisSync/master/legal/AUTHORS.txt";
-
-        /// <summary>
-        /// Report problem URL.
-        /// </summary>
-        public readonly string WebsiteLinkAddress       = "https://github.com/OpenDataSpace/CmisSync";
-
-        /// <summary>
-        /// URL to the AUTHORS file
-        /// </summary>
-        public readonly string CreditsLinkAddress       = "https://raw.github.com/OpenDataSpace/CmisSync/master/legal/AUTHORS.txt";
 
         /// <summary>
         /// URL for Issue reports

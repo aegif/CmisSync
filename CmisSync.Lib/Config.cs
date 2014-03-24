@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Xml;
 using log4net;
-using CmisSync.Lib.Credentials;
+using CmisSync.Auth;
 
 namespace CmisSync.Lib
 {

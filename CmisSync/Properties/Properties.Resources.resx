@@ -377,7 +377,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Report a problem</value>
   </data>
   <data name="Version" xml:space="preserve">
-    <value>Version</value>
+    <value>Version {0}</value>
   </data>
   <data name="Website" xml:space="preserve">
     <value>Website</value>
@@ -394,23 +394,11 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
   <data name="RemoveSyncTitle" xml:space="preserve">
     <value>Remove folder from sync</value>
   </data>
-  <data name="Credits" xml:space="preserve">
-    <value>Credits</value>
-  </data>
   <data name="NewVersionAvailable" xml:space="preserve">
     <value>A newer version ({0}) is available!</value>
   </data>
-  <data name="ReportProblem" xml:space="preserve">
-    <value>Report a problem</value>
-  </data>
   <data name="RunningLatestVersion" xml:space="preserve">
     <value>You are running the latest version.</value>
-  </data>
-  <data name="Version" xml:space="preserve">
-    <value>Version {0}</value>
-  </data>
-  <data name="Website" xml:space="preserve">
-    <value>Website</value>
   </data>
   <data name="FolderAlreadyInUse" xml:space="preserve">
     <value>The directory {0} is already in use by {1}</value>

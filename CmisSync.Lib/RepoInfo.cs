@@ -35,7 +35,7 @@ namespace CmisSync.Lib
         public string RemotePath { get; set; }
 
 
-        private Credentials.CmisRepoCredentials credentials = new Credentials.CmisRepoCredentials();
+        private CmisRepoCredentials credentials = new CmisRepoCredentials();
         /// <summary>
         /// Address of the server's CMIS endpoint.
         /// For instance: http://192.168.0.1:8080/alfresco/cmisatom
@@ -53,7 +53,7 @@ namespace CmisSync.Lib
         /// CMIS password, hashed.
         /// For instance: AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAtiSvUCYn...
         /// </summary>
-        public Credentials.Password Password { get { return credentials.Password; } set { credentials.Password = value; } }
+        public Password Password { get { return credentials.Password; } set { credentials.Password = value; } }
 
 
         /// <summary>

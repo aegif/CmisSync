@@ -15,7 +15,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <ApplicationIcon>Pixmaps\app.ico</ApplicationIcon>
+    <ApplicationIcon>Pixmaps\cmissync-app.ico</ApplicationIcon>
     <ReleaseVersion />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -84,9 +84,6 @@
     <Compile Include="..\ControllerBase.cs">
       <Link>ControllerBase.cs</Link>
     </Compile>
-    <Compile Include="..\EditController.cs">
-      <Link>EditController.cs</Link>
-    </Compile>
     <Compile Include="..\SetupController.cs">
       <Link>SetupController.cs</Link>
     </Compile>
@@ -99,17 +96,7 @@
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="CertPolicyWindow.cs" />
-    <Compile Include="Edit.cs" />
-    <Compile Include="FolderTreeMVC\InvalidPatternConverter.cs" />
-    <Compile Include="FolderTreeMVC\NodeLoader.cs" />
-    <Compile Include="FolderTreeMVC\IgnoredFolderLoader.cs" />
-    <Compile Include="FolderTreeMVC\LocalFolderLoader.cs" />
-    <Compile Include="FolderTreeMVC\NodeModel.cs" />
-    <Compile Include="FolderTreeMVC\NodeModelUtils.cs" />
-    <Compile Include="FolderTreeMVC\FolderTypeConverter.cs" />
-    <Compile Include="FolderTreeMVC\IgnoreStatusConverter.cs" />
-    <Compile Include="FolderTreeMVC\LoadingStatusModel.cs" />
-    <Compile Include="FolderTreeMVC\LoadingStatusConverter.cs" />
+    <Compile Include="PollIntervalSlider.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
       <SubType>Form</SubType>
@@ -258,7 +245,6 @@
     <EmbeddedResource Include="Pixmaps\process-syncing-iii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiiii.png" />
-    <EmbeddedResource Include="Pixmaps\app.ico" />
     <EmbeddedResource Include="Pixmaps\cmissync-folder.png" />
   </ItemGroup>
   <ItemGroup>
@@ -267,6 +253,10 @@
     <EmbeddedResource Include="Pixmaps\tutorial-slide-3.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">
+      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
+      <Name>CmisSync.Auth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>CmisSync.Lib</Name>
@@ -277,21 +267,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Pixmaps\media_playback_refresh.png" />
+    <EmbeddedResource Include="Pixmaps\connect.png" />
+    <EmbeddedResource Include="Pixmaps\disconnect.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_pause.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
     <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
+    <EmbeddedResource Include="Pixmaps\cmissync-app.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="Pixmaps\cmissync-folder.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Plugins\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="FolderTreeMVC\TreeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Resource>
   </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent>Mkdir "$(ProjectDir)$(OutDir)x86"

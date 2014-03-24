@@ -20,7 +20,7 @@ using System;
 using System.IO;
 using Timers = System.Timers;
 using CmisSync.Lib.Events;
-using CmisSync.Lib.Credentials;
+using CmisSync.Auth;
 
 namespace CmisSync.Lib
 {

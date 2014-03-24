@@ -15,7 +15,6 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-using CmisSync.CmisTree;
 using CmisSync.Lib.Cmis;
 using log4net;
 using System;
@@ -29,16 +28,12 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shell;
 using WPF = System.Windows.Controls;
-//NOTGDS2 using System.Windows.Data;
+using System.Windows.Data;
 
-using CmisSync.Lib.Cmis;
 using CmisSync.Lib;
-using System.Globalization;
-using log4net;
 using System.Collections.ObjectModel;
-using CmisSync.CmisTree;
 using System.Windows.Input;
-using CmisSync.Lib.Credentials;
+using CmisSync.Auth;
 
 namespace CmisSync
 {
@@ -588,8 +583,13 @@ namespace CmisSync
                                     // Try to find the CMIS server (asynchronously)
                                     GetRepositoriesFuzzyDelegate dlgt =
                                         new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
-                                    IAsyncResult ar = dlgt.BeginInvoke(new Uri(address_box.Text), user_box.Text,
-                                        password_box.Password, null, null);
+                                    ServerCredentials credentials = new ServerCredentials()
+                                    {
+                                        UserName = user_box.Text,
+                                        Password = password_box.Password,
+                                        Address = new Uri(address_box.Text)
+                                    };
+                                    IAsyncResult ar = dlgt.BeginInvoke(credentials, null, null);
                                     while (!ar.AsyncWaitHandle.WaitOne(100))
                                     {
                                         System.Windows.Forms.Application.DoEvents();
@@ -763,14 +763,6 @@ namespace CmisSync
                                 back_button.Click += delegate
                                 {
                                     Controller.BackToPage1();
-                                    foreach (AsyncNodeLoader task in loader.Values)
-                                        task.Cancel();
-                                };
-
-                                Controller.HideWindowEvent += delegate
-                                {
-                                    foreach (AsyncNodeLoader task in loader.Values)
-                                        task.Cancel();
                                 };
                                 break;
                             }
@@ -1218,8 +1210,14 @@ namespace CmisSync
                                         // Try to find the CMIS server (asynchronously)
                                         GetRepositoriesFuzzyDelegate dlgt =
                                             new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
-                                        IAsyncResult ar = dlgt.BeginInvoke(Controller.saved_address, Controller.saved_user,
-                                            password_box.Password, null, null);
+                                        IAsyncResult ar = dlgt.BeginInvoke(
+                                            new ServerCredentials()
+                                                {
+                                                    UserName = Controller.saved_user,
+                                                    Password = password_box.Password,
+                                                    Address = Controller.saved_address
+                                                },
+                                            null, null);
                                         while (!ar.AsyncWaitHandle.WaitOne(100))
                                         {
                                             System.Windows.Forms.Application.DoEvents();

@@ -420,13 +420,6 @@ namespace CmisSync
             Program.Controller.ManualSync(reponame);
         }
 
-        /// <summary>
-        /// Edit a particular folder.
-        /// </summary>
-        public void EditFolderClicked(string reponame)
-        {
-            Program.Controller.EditRepositoryFolder(reponame);
-        }
 
         /// <summary>
         /// Start the tray icon animation.

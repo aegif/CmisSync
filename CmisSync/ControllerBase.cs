@@ -27,6 +27,7 @@ using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
 using CmisSync.Lib.Events;
+using CmisSync.Auth;
 
 #if __COCOA__
 using Edit = CmisSync.EditWizardController;
@@ -67,14 +68,6 @@ namespace CmisSync
         /// List of the CmisSync synchronized folders.
         /// </summary>
         private List<RepoBase> repositories = new List<RepoBase>();
-
-
-        /// <summary>
-        /// Dictionary of the edit folder diaglogs
-        /// Key: synchronized folder name
-        /// Value: <c>Edit</c>
-        /// </summary>
-        private Dictionary<string, Edit> edits = new Dictionary<string, Edit>();
 
 
         /// <summary>
@@ -224,10 +217,6 @@ namespace CmisSync
             };
         }
 
-        public List<FileTransmissionEvent> ActiveTransmissions() {
-            return this.activitiesManager.ActiveTransmissions.ToList<FileTransmissionEvent>();
-        }
-
 
         /// <summary>
         /// Initialize the controller.
@@ -285,11 +274,6 @@ namespace CmisSync
         {
             RepoBase repo = null;
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
-
-            repo.SyncStatusChanged += delegate(SyncStatus status)
-            {
-                UpdateState();
-            };
 
             repo.EventManager.AddEventHandler(
                 new GenericSyncEventHandler<FileTransmissionEvent>( 50, delegate(ISyncEvent e){
@@ -361,17 +345,11 @@ namespace CmisSync
             {
                 if (repo.LocalPath.Equals(folder.LocalPath))
                 {
-                    RepoBase repo = this.repositories[i];
-
-                    if (repo.LocalPath.Equals(folder.LocalPath))
-                    {
-                        repo.CancelSync();
-                        repo.Dispose();
-                        this.repositories.Remove(repo);
-                        Logger.Info("Removed Repository: " + repo.Name);
-                        repo = null;
-                        break;
-                    }
+                    repo.CancelSync();
+                    repo.Dispose();
+                    this.repositories.Remove(repo);
+                    Logger.Info("Removed Repository: " + repo.Name);
+                    break;
                 }
             }
 
@@ -502,7 +480,7 @@ namespace CmisSync
             repoInfo = new RepoInfo(name, ConfigManager.CurrentConfig.ConfigPath);
             repoInfo.Address = address;
             repoInfo.User = user;
-            repoInfo.Password = new CmisSync.Auth.CmisPassword(password);
+            repoInfo.Password = new Password(password);
             repoInfo.RepoID = repository;
             repoInfo.RemotePath = remote_path;
             repoInfo.TargetDirectory = local_path;

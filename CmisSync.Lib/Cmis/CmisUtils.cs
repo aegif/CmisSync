@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using CmisSync.Auth;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -49,7 +50,7 @@ namespace CmisSync.Lib.Cmis
         /// Users can provide the URL of the web interface, and we have to return the CMIS URL
         /// Returns the list of repositories as well.
         /// </summary>
-        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(Credentials.ServerCredentials credentials)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(ServerCredentials credentials)
         {
             Dictionary<string, string> repositories = null;
             Exception firstException = null;
@@ -107,7 +108,7 @@ namespace CmisSync.Lib.Cmis
                 Logger.Info("Sync | Trying with " + fuzzyUrl);
                 try
                 {
-                    Credentials.ServerCredentials cred = new Credentials.ServerCredentials()
+                    ServerCredentials cred = new ServerCredentials()
                     {
                         UserName = credentials.UserName,
                         Password = credentials.Password.ToString(),
@@ -142,7 +143,7 @@ namespace CmisSync.Lib.Cmis
         /// Each item contains id +
         /// </summary>
         /// <returns>The list of repositories. Each item contains the identifier and the human-readable name of the repository.</returns>
-        static public Dictionary<string,string> GetRepositories(Credentials.ServerCredentials credentials)
+        static public Dictionary<string,string> GetRepositories(ServerCredentials credentials)
         {
             Dictionary<string,string> result = new Dictionary<string,string>();
 
@@ -284,7 +285,7 @@ namespace CmisSync.Lib.Cmis
         /// Get the sub-folders of a particular CMIS folder.
         /// </summary>
         /// <returns>Full path of each sub-folder, including leading slash.</returns>
-        static public FolderTree GetSubfolderTree(Credentials.CmisRepoCredentials credentials, string path, int depth)
+        static public FolderTree GetSubfolderTree(CmisRepoCredentials credentials, string path, int depth)
         {
             // Connect to the CMIS repository.
             ISession session = Auth.Auth.GetCmisSession(credentials.Address.ToString(), credentials.UserName, credentials.Password.ToString(), credentials.RepoId);
