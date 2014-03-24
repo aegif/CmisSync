@@ -385,6 +385,36 @@ namespace CmisSync.Lib.Sync
             }
 
             /// <summary>
+            /// Sync on the current thread.
+            /// </summary>
+            /// <param name="syncFull"></param>
+            public void SyncInNotBackground(bool syncFull)
+            {
+                if (IsSyncing())
+                {
+                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
+                    return;
+                }
+
+                try
+                {
+                    Sync(syncFull);
+                }
+                catch (CmisPermissionDeniedException e)
+                {
+                    repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
+                }
+                catch (Exception e)
+                {
+                    repo.OnSyncError(new BaseException(e));
+                }
+                finally
+                {
+                    SyncComplete(syncFull);
+                }
+            }
+
+            /// <summary>
             /// Sync in the background.
             /// </summary>
             public void SyncInBackground(bool syncFull)

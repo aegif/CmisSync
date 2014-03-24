@@ -108,6 +108,36 @@ namespace CmisSync.Lib.Sync
             SyncInBackground(true);
         }
 
+
+        /// <summary>
+        /// Synchonize.
+        /// The synchronization is performed in synchronous.
+        /// </summary>
+        /// <param name="syncFull"></param>
+        public void SyncInNotBackground(bool syncFull)
+        {
+            if (this.synchronizedFolder != null)
+            {
+                if (this.Status == SyncStatus.Idle)
+                {
+                    this.synchronizedFolder.SyncInNotBackground(syncFull);
+                }
+                else
+                {
+                    Logger.Info(String.Format("Repo {0} - Sync skipped.Status={1}", this.Name, this.Status));
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// The synchronization is performed in synchronous.
+        /// </summary>
+        public void SyncInNotBackground()
+        {
+            SyncInNotBackground(true);
+        }
+
         /// <summary>
         /// Update repository settings.
         /// </summary>
