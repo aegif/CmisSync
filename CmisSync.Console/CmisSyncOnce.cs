@@ -68,8 +68,6 @@ namespace CmisSync.Console
 
 			ConsoleController controller = new ConsoleController ();
 			cmisRepo = new CmisRepo (repoInfo, controller);
-
-			cmisRepo.Initialize ();
 		}
 
         /// <summary>
@@ -77,7 +75,7 @@ namespace CmisSync.Console
         /// </summary>
 		private void Sync ()
 		{
-            cmisRepo.SyncInBackground(); // TODO should not be put in background.
+            cmisRepo.SyncInNotBackground();
 		}
 	}
 }
