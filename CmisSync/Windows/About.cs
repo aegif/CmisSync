@@ -110,7 +110,7 @@ namespace CmisSync {
 
 
             Label version = new Label () {
-                Content    = Properties_Resources.ResourceManager.GetString("Version", CultureInfo.CurrentCulture) + " " + Controller.RunningVersion,
+                Content = String.Format(Properties_Resources.Version, Controller.RunningVersion),
                 FontSize   = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
