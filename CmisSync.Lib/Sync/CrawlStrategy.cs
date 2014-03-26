@@ -196,7 +196,7 @@ namespace CmisSync.Lib.Sync
 
             /// <summary>
             /// Crawl remote subfolder, syncing down if needed.
-            /// Meanwhile, cache and remoteFolders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
+            /// Meanwhile, cache all contained remote folders, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
             /// </summary>
             private void CrawlRemoteFolder(IFolder remoteSubFolder, string localFolder, IList<string> remoteFolders)
             {

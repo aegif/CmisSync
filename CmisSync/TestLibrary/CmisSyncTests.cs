@@ -48,6 +48,7 @@ namespace TestLibrary
     using CmisSync.Lib.Sync;
     using log4net.Appender;
     using NUnit.Framework;
+    using CmisSync.Auth;
 
     [TestFixture]
     public class CmisSyncTests
@@ -398,7 +399,7 @@ namespace TestLibrary
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            CmisSync.Lib.Credentials.ServerCredentials credentials = new CmisSync.Lib.Credentials.ServerCredentials() // GDS2
+            ServerCredentials credentials = new ServerCredentials()
             {
                 Address = new Uri(url),
                 UserName = user,
@@ -480,9 +481,8 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-// NOTGDS2                    cmis, activityListener))
-                    activityListener,
-                    cmis))
+                    cmis,
+                    activityListener))
                 using (Watcher watcher = new Watcher(localDirectory))
                 {
                     synchronizedFolder.resetFailedOperationsCounter();
@@ -546,11 +546,8 @@ namespace TestLibrary
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                    repoInfo,
-//NOTGDS2                    cmis, activityListener))
-                    activityListener,
-                    cmis))
+                using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
                 using (Watcher watcher = new Watcher(localDirectory))
                 {
                     synchronizedFolder.resetFailedOperationsCounter();
@@ -617,7 +614,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             repoInfo.ChunkSize = 1024 * 1024;
             RepoInfo repoInfo2 = new RepoInfo(
                     canonical_name2,
@@ -627,14 +627,15 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             repoInfo2.ChunkSize = 1024 * 1024;
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
             {
                 synchronizedFolder.resetFailedOperationsCounter();
                 synchronizedFolder.Sync();
@@ -660,10 +661,8 @@ namespace TestLibrary
             for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 100; ++retry)
             {
                 using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                    repoInfo,
-                    activityListener,
-                    cmis))
+                using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
                 {
                     //  disable the chunk upload
                     //synchronizedFolder.SyncInBackground();
@@ -688,12 +687,10 @@ namespace TestLibrary
             for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 100; ++retry)
             {
                 using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
-                using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
-                    repoInfo2,
-                    activityListener,
-                    cmis2))
+                using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
+                    new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
                 {
-                    synchronizedFolder2.SyncInBackground();
+                    synchronizedFolder2.SyncInBackground(true);
                     System.Threading.Thread.Sleep(1000);
                 }
 
@@ -716,10 +713,8 @@ namespace TestLibrary
             Assert.IsTrue(checksum1 == checksum2);
 
             using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
-                repoInfo2,
-                activityListener,
-                cmis2))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
+                    new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
             {
                 // Clean.
                 Console.WriteLine("Clean all.");
@@ -749,14 +744,15 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                    repoInfo,
-                    activityListener,
-                    cmis))
+                using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
                 using (Watcher watcher = new Watcher(localDirectory))
                 {
                     // Clear local and remote folder
@@ -845,14 +841,15 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                    repoInfo,
-                    activityListener,
-                    cmis))
+                using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
                 using (Watcher watcher = new Watcher(localDirectory))
                 {
                     synchronizedFolder.Sync();
@@ -1017,14 +1014,15 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                    repoInfo,
-                    activityListener,
-                    cmis))
+                using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
                 using (Watcher watcher = new Watcher(localDirectory))
                 {
                     synchronizedFolder.Sync();
@@ -1117,7 +1115,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             RepoInfo repoInfo2 = new RepoInfo(
                     canonical_name2,
                     CMISSYNCDIR,
@@ -1126,17 +1127,16 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
             using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
-                repoInfo2,
-                activityListener,
-                cmis2))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
+                    new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
             using (Watcher watcher = new Watcher(localDirectory))
             using (Watcher watcher2 = new Watcher(localDirectory2))
             {
@@ -1236,7 +1236,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             RepoInfo repoInfo2 = new RepoInfo(
                     canonical_name2,
                     CMISSYNCDIR,
@@ -1245,17 +1248,16 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
             using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
-                repoInfo2,
-                activityListener,
-                cmis2))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
+                    new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
             using (Watcher watcher = new Watcher(localDirectory))
             using (Watcher watcher2 = new Watcher(localDirectory2))
             {
@@ -1512,7 +1514,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             RepoInfo repoInfo2 = new RepoInfo(
                     canonical_name2,
                     CMISSYNCDIR,
@@ -1521,17 +1526,16 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
             using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
-                repoInfo2,
-                activityListener,
-                cmis2))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
+                    new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
             using (Watcher watcher = new Watcher(localDirectory))
             using (Watcher watcher2 = new Watcher(localDirectory2))
             {
@@ -1592,7 +1596,10 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             RepoInfo repoInfo2 = new RepoInfo(
                     canonical_name2,
                     CMISSYNCDIR,
@@ -1601,17 +1608,16 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
             using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder2 = new CmisRepo.SynchronizedFolder(
-                repoInfo2,
-                activityListener,
-                cmis2))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
+                    new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
             using (Watcher watcher = new Watcher(localDirectory))
             using (Watcher watcher2 = new Watcher(localDirectory2))
             {
@@ -1710,13 +1716,14 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    100);
+                    100,
+                    false,
+                    DateTime.MinValue,
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                repoInfo,
-                activityListener,
-                cmis))
+            using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
             {
                 synchronizedFolder.resetFailedOperationsCounter();
                 synchronizedFolder.Sync();
@@ -1946,13 +1953,17 @@ namespace TestLibrary
                     user,
                     password,
                     repositoryId,
-                    5000);
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
 
             using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    cmis))
+                    cmis,
+                    new Mock<IActivityListener>().Object))
                 {
                     synchronizedFolder.resetFailedOperationsCounter();
                     synchronizedFolder.Sync();
@@ -2103,7 +2114,7 @@ namespace TestLibrary
         [Test, TestCaseSource("TestServersFuzzy"), Category("Slow")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
         {
-            CmisSync.Lib.Credentials.ServerCredentials credentials = new CmisSync.Lib.Credentials.ServerCredentials()
+            ServerCredentials credentials = new ServerCredentials()
             {
                 Address = new Uri(url),
                 UserName = user,

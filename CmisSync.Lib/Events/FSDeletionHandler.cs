@@ -18,13 +18,29 @@ namespace CmisSync.Lib.Events
 
         private static readonly int FSDELETIONPRIORITY = 100;
 
+        public FSDeletionHandler(IDatabase database, ISession session)
+        {
+            if (database == null)
+            {
+                throw new ArgumentNullException("Argument null in FSDeletionHandler Constructor", "database");
+            }
+            if (session == null)
+            {
+                throw new ArgumentNullException("Argument null in FSDeletionHandler Constructor", "session");
+            }
+            this.database = database;
+            this.session = session;
+        }
+
         public override bool Handle(ISyncEvent e)
         {
-            if(!(e is FSEvent)){
+            if(!(e is FSEvent))
+            {
                 return false;
             }
             FSEvent fsEvent = e as FSEvent;
-            if (fsEvent.Type != WatcherChangeTypes.Deleted){
+            if (fsEvent.Type != WatcherChangeTypes.Deleted)
+            {
                 return false;
             }
             return true;
@@ -33,18 +49,6 @@ namespace CmisSync.Lib.Events
         public override int Priority
         {
             get {return FSDELETIONPRIORITY;}
-        }
-
-        public FSDeletionHandler (IDatabase database, ISession session){
-
-            if(database == null) {
-                throw new ArgumentNullException("Argument null in FSDeletionHandler Constructor","database");
-            }
-            if(session == null) {
-                throw new ArgumentNullException("Argument null in FSDeletionHandler Constructor","session");
-            }
-            this.database = database;
-            this.session = session;
         }
     }
 }

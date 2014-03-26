@@ -16,12 +16,28 @@ namespace CmisSync.Lib.Events
         private Task consumer;
 
         private bool alreadyDisposed = false;
-        
-        private static void Listen(BlockingCollection<ISyncEvent> queue, SyncEventManager manager){
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public SyncEventQueue(SyncEventManager manager)
+        {
+            if (manager == null)
+            {
+                throw new ArgumentException("manager may not be null");
+            }
+            this.manager = manager;
+
+            // Start to listen in a separate thread.
+            this.consumer = new Task(() => Listen(this.queue, this.manager));
+            this.consumer.Start();
+        }
+
+        private static void Listen(BlockingCollection<ISyncEvent> queue, SyncEventManager manager)
+        {
             Logger.Debug("Starting to listen on SyncEventQueue");
             while (!queue.IsCompleted)
             {
-
                 ISyncEvent syncEvent = null;
                 // Blocks if number.Count == 0 
                 // IOE means that Take() was called on a completed collection. 
@@ -55,15 +71,6 @@ namespace CmisSync.Lib.Events
             }
             this.queue.Add(newEvent);
         } 
-
-        public SyncEventQueue(SyncEventManager manager) {
-            if(manager == null) {
-                throw new ArgumentException("manager may not be null");
-            }
-            this.manager = manager;
-            this.consumer = new Task(() => Listen(this.queue, this.manager));
-            this.consumer.Start();
-        }
 
         public void StopListener() {
             if(alreadyDisposed) {

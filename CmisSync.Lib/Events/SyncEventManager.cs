@@ -8,7 +8,9 @@ namespace CmisSync.Lib.Events
     public class SyncEventManager
     {
         private static readonly ILog logger = LogManager.GetLogger(typeof(SyncEventManager));
+
         private List<SyncEventHandler> handler = new List<SyncEventHandler>();
+        
         public SyncEventManager()
         {
         }
