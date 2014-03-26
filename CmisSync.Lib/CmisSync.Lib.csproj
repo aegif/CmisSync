@@ -36,6 +36,16 @@
     <DocumentationFile>bin\$(Configuration)\CmisSync.Lib.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Mac Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DocumentationFile>bin\Debug\CmisSync.Lib.XML</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Extras\Newtonsoft.Json.dll</HintPath>
@@ -49,6 +59,7 @@
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
+    <Reference Include="Mono.Data.SQLite" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChunkedStream.cs" />
