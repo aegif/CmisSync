@@ -928,6 +928,9 @@ namespace CmisSync.Lib.Sync
             }
             
             
+            /// <summary>
+            /// Set the last modification date of a local file to whatever a remote document's last modfication date is.
+            /// </summary>
             private void SetLastModifiedDate(IDocument remoteDocument, string filepath, Dictionary<string, string[]> metadata)
             {
                 try
@@ -1095,12 +1098,10 @@ namespace CmisSync.Lib.Sync
 		                {
 		                    if (database.LocalFileHasChanged(filepath))
 		                    {
-		                        Logger.Info("Conflict with file: " + fileName + ", backing up locally modified version and downloading server version");
-		                        // Rename locally modified file.
-		                        //String ext = Path.GetExtension(filePath);
-		                        //String filename = Path.GetFileNameWithoutExtension(filePath);
-		                        String dir = Path.GetDirectoryName(filepath);
+		                        Logger.Info("Conflict with file: " + fileName + ", backing up locally added version and downloading server version");
 
+		                        // Rename locally modified file.
+		                        String dir = Path.GetDirectoryName(filepath);
 		                        String newFileName = Utils.FindNextConflictFreeFilename(filepath, repoinfo.User);
 		                        String newFilePath = Path.Combine(dir, newFileName);
 		                        Logger.Debug(String.Format("Moving local file {0} file to new file {1}", filepath, newFilePath));
@@ -1109,10 +1110,29 @@ namespace CmisSync.Lib.Sync
 		                        File.Move(tmpfilepath, filepath);
 		                        SetLastModifiedDate(remoteDocument, filepath, metadata);
 		                        repo.OnConflictResolved();
-		                        // TODO move to OS-dependant layer
-		                        //System.Windows.Forms.MessageBox.Show("Someone modified a file at the same time as you: " + filePath
-		                        //    + "\n\nYour version has been saved with a '_your-version' suffix, please merge your important changes from it and then delete it.");
-		                        // TODO show CMIS property lastModifiedBy
+
+                                // Get LastModifiedBy.
+                                IEnumerator<IProperty> e = remoteDocument.Properties.GetEnumerator();
+                                string lastModifiedBy = null;
+                                while (e.MoveNext()) // TODO use TryGetValue
+                                {
+                                    IProperty property = e.Current;
+                                    if (property.Id.Equals("cmis:lastModifiedBy"))
+                                    {
+                                        lastModifiedBy = (string)property.Value;
+                                        break;
+                                    }
+                                }
+
+                                string message = String.Format(
+                                    // Properties_Resources.ResourceManager.GetString("AddedSame", CultureInfo.CurrentCulture),
+                                    "User {0} added a file named {1} at the same time as you.",
+                                    lastModifiedBy, filepath)
+                                    + "\n\n"
+                                    // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
+                                    + "Your version has been renamed '" + newFileName + "', please merge your important changes from it and then delete it.";
+                                Logger.Info(message);
+                                Utils.NotifyUser(message);
 		                    }
 		                    else
 		                    {
@@ -1121,7 +1141,6 @@ namespace CmisSync.Lib.Sync
 		                        Logger.Debug(String.Format("Moving temporary local download file {0} to target file {1}", tmpfilepath, filepath));
 		                        File.Move(tmpfilepath, filepath);
 		                        SetLastModifiedDate(remoteDocument, filepath, metadata);
-		                        
 		                    }
 		                }
 		                else
