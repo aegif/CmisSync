@@ -34,9 +34,15 @@ namespace CmisSync.Console
             // Check arguments.
             if (args.Length < 1)
             {
-                System.Console.WriteLine("Usage: CmisSyncOnce.exe mysyncedfolder");
-                System.Console.WriteLine("Example: CmisSyncOnce.exe \"192.168.0.22\\Main Repository\"");
-                System.Console.WriteLine("See your folders names in C:\\Users\\you\\AppData\\Roaming\\cmissync\\config.xml or similar");
+				#if __COCOA__
+				System.Console.WriteLine("Usage: cmissync_once mysyncedfolder");
+				System.Console.WriteLine("Example: cmissync_once \"192.168.0.22\\Main Repository\"");
+				System.Console.WriteLine("See your folders names in /Users/you/.config/cmissync/config.xml or similar");
+				#else
+				System.Console.WriteLine("Usage: CmisSyncOnce.exe mysyncedfolder");
+				System.Console.WriteLine("Example: CmisSyncOnce.exe \"192.168.0.22\\Main Repository\"");
+				System.Console.WriteLine("See your folders names in C:\\Users\\you\\AppData\\Roaming\\cmissync\\config.xml or similar");
+				#endif
                 return;
             }
 

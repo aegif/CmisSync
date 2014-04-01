@@ -180,10 +180,16 @@ namespace CmisSync.Lib
                 return false;
 
             }
-
+				
             //Check filename length
             String fullPath = Path.Combine(localDirectory, filename);
 
+			#if __COCOA__
+			// TODO Check filename length for OS X
+			// * Max "FileName" length: 255 charactors.
+			// * FileName encoding is UTF-16 (Modified NFD).
+
+			#else
             // reflection
             FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
                 BindingFlags.Static |
@@ -196,6 +202,7 @@ namespace CmisSync.Lib
                 return false;
 
             }
+			#endif
 
             return true;
 
