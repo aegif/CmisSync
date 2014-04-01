@@ -124,4 +124,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
+  <PropertyGroup>
+    <PostBuildEvent Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|AnyCPU'">$(SolutionDir)installer/createMacInstaller.sh 0.1</PostBuildEvent>
+  </PropertyGroup>
 </Project>
