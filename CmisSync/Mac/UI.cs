@@ -86,7 +86,7 @@ namespace CmisSync {
         public void UpdateDockIconVisibility ()
         {
             #if ODS_NEW_GUI
-            if ((Setup.IsWindowLoaded && Setup.Window.IsVisible) || About.IsVisible || Program.Controller.IsEditWindowVisible)
+			if ((Setup.IsWindowLoaded && Setup.Window.IsVisible) || About.IsVisible) // || Program.Controller.IsEditWindowVisible) // TODO fix
             #else
             if (Setup.IsVisible || About.IsVisible || Program.Controller.IsEditWindowVisible)
             #endif

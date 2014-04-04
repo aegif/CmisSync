@@ -6,7 +6,7 @@
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}</ProjectGuid>
-	<!--
+    <!--
 	For Xamarin.Mac Project:
 	<ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
 	-->
@@ -76,7 +76,6 @@
       <Link>Program.cs</Link>
     </Compile>
     <Compile Include="MacWatcher.cs" />
-    <Compile Include="Badger.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SetupWindow.cs" />
     <Compile Include="..\StatusIconController.cs">
@@ -91,29 +90,9 @@
     <Compile Include="..\CertPolicyHandler.cs" />
     <Compile Include="..\ControllerBase.cs" />
     <Compile Include="..\SetupController.cs" />
-    <Compile Include="..\Windows\FolderTreeMVC\IgnoredFolderLoader.cs">
-      <Link>CmisTree\IgnoredFolderLoader.cs</Link>
-    </Compile>
-    <Compile Include="..\Windows\FolderTreeMVC\LoadingStatusModel.cs">
-      <Link>CmisTree\LoadingStatusModel.cs</Link>
-    </Compile>
-    <Compile Include="..\Windows\FolderTreeMVC\LocalFolderLoader.cs">
-      <Link>CmisTree\LocalFolderLoader.cs</Link>
-    </Compile>
-    <Compile Include="..\Windows\FolderTreeMVC\NodeLoader.cs">
-      <Link>NodeLoader.cs</Link>
-    </Compile>
-    <Compile Include="..\Windows\FolderTreeMVC\NodeModel.cs">
-      <Link>NodeModel.cs</Link>
-    </Compile>
     <Compile Include="..\EditController.cs">
       <Link>EditController.cs</Link>
     </Compile>
-    <Compile Include="CmisTree\CmisTreeDataSource.cs" />
-    <Compile Include="..\Windows\FolderTreeMVC\NodeModelUtils.cs">
-      <Link>CmisTree\NodeModelUtils.cs</Link>
-    </Compile>
-    <Compile Include="OutlineViewDelegate.cs" />
     <Compile Include="TextFieldDelegate.cs" />
     <Compile Include="CertPolicyWindow.cs" />
     <Compile Include="CmisTree\CmisOutline.cs" />
@@ -132,7 +111,6 @@
       <DependentUpon>SetupSubLogin.cs</DependentUpon>
     </Compile>
     <Compile Include="SetupSubRepoSelect.cs" />
-    <Compile Include="SetupSubRepoSelectController.cs" />
     <Compile Include="SetupSubRepoSelect.designer.cs">
       <DependentUpon>SetupSubRepoSelect.cs</DependentUpon>
     </Compile>
@@ -165,11 +143,6 @@
     <Compile Include="SetupSubTutorialEndController.cs" />
     <Compile Include="SetupSubTutorialEnd.designer.cs">
       <DependentUpon>SetupSubTutorialEnd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EditWizard.cs" />
-    <Compile Include="EditWizardController.cs" />
-    <Compile Include="EditWizard.designer.cs">
-      <DependentUpon>EditWizard.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +246,7 @@
     <BundleResource Include="Pixmaps\tutorial-slide-4.png" />
     <BundleResource Include="Pixmaps\media_playback_pause.png" />
     <BundleResource Include="Pixmaps\media_playback_start.png" />
+    <BundleResource Include="Pixmaps\media_playback_refresh.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
@@ -286,6 +260,10 @@
     <ProjectReference Include="..\..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
       <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
       <Name>DotCMIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">
+      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
+      <Name>CmisSync.Auth</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
