@@ -91,28 +91,10 @@
     <Compile Include="..\CertPolicyHandler.cs" />
     <Compile Include="..\ControllerBase.cs" />
     <Compile Include="..\SetupController.cs" />
-    <Compile Include="..\Windows\FolderTreeMVC\IgnoredFolderLoader.cs">
-      <Link>CmisTree\IgnoredFolderLoader.cs</Link>
-    </Compile>
-    <Compile Include="..\Windows\FolderTreeMVC\LoadingStatusModel.cs">
-      <Link>CmisTree\LoadingStatusModel.cs</Link>
-    </Compile>
-    <Compile Include="..\Windows\FolderTreeMVC\LocalFolderLoader.cs">
-      <Link>CmisTree\LocalFolderLoader.cs</Link>
-    </Compile>
-    <Compile Include="..\Windows\FolderTreeMVC\NodeLoader.cs">
-      <Link>NodeLoader.cs</Link>
-    </Compile>
-    <Compile Include="..\Windows\FolderTreeMVC\NodeModel.cs">
-      <Link>NodeModel.cs</Link>
-    </Compile>
     <Compile Include="..\EditController.cs">
       <Link>EditController.cs</Link>
     </Compile>
     <Compile Include="CmisTree\CmisTreeDataSource.cs" />
-    <Compile Include="..\Windows\FolderTreeMVC\NodeModelUtils.cs">
-      <Link>CmisTree\NodeModelUtils.cs</Link>
-    </Compile>
     <Compile Include="OutlineViewDelegate.cs" />
     <Compile Include="TextFieldDelegate.cs" />
     <Compile Include="CertPolicyWindow.cs" />
