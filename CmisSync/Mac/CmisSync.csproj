@@ -6,7 +6,7 @@
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CF5BC8DB-A633-4FCC-8A3E-E3AC9B59FABC}</ProjectGuid>
-	<!--
+    <!--
 	For Xamarin.Mac Project:
 	<ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
 	-->
@@ -268,6 +268,10 @@
     <ProjectReference Include="..\..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
       <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
       <Name>DotCMIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">
+      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
+      <Name>CmisSync.Auth</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
