@@ -182,10 +182,10 @@ namespace CmisSync {
                 };
 
                 this.credits_text_field = new NSTextField () {
-					StringValue     = @"Copyright © 2013-" + DateTime.Now.Year + " GRAU DATA AG, Hylke Bons and others." +
+					StringValue     = @"Copyright © 2013-" + DateTime.Now.Year + " Aegif Corporation, Nicolas Raoul and others." +
                                        "\n" +
                                        "\n" +
-					                  "DataSpace Sync is Open Source software. You are free to use, modify, and redistribute it " +
+									   "CmisSync is Open Source software. You are free to use, modify, and redistribute it " +
                                        "under the GNU General Public License version 3 or later.",
                     Frame           = new RectangleF (295, Frame.Height - 260, 318, 98),
 					TextColor       = NSColor.FromCalibratedRgba (0.45f, 0.62f, 0.81f, 1.0f),

@@ -29,6 +29,7 @@ using Mono.Unix.Native;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Events;
+using CmisSync.Lib.Cmis;
 
 using log4net;
 
@@ -338,6 +339,24 @@ namespace CmisSync {
 					LocalFolderClicked(repo.LocalPath);
 					break;
 				}
+			}
+		}
+
+		/// <summary>
+		/// With the default web browser, open the remote folder of a CmisSync synchronized folder.
+		/// </summary>
+		/// <param name="name">Name of the synchronized folder</param>
+		public void OpenRemoteFolder(string name)
+		{
+			Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+			if (folder != null)
+			{
+				RepoInfo repo = folder.GetRepoInfo();
+				Process.Start(CmisUtils.GetBrowsableURL(repo));
+			}
+			else
+			{
+				Logger.Warn("Could not find requested config for \"" + name + "\"");
 			}
 		}
 

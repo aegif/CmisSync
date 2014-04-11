@@ -6,7 +6,7 @@ using System.Threading;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 
-using CmisSync.Lib.Credentials;
+using CmisSync.Auth;
 using CmisSync.Lib.Cmis;
 
 namespace CmisSync
@@ -142,12 +142,16 @@ namespace CmisSync
                 InvokeOnMainThread(delegate {
                     if (Controller.repositories == null)
                     {
-                        WarnText.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
-                        AddressText.Enabled = true;
+						// TODO fix
+						// WarnText.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
+						WarnText.StringValue = "Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2)";
+						AddressText.Enabled = true;
                         UserText.Enabled = true;
                         PasswordText.Enabled = true;
                         ContinueButton.Enabled = true;
                         CancelButton.Enabled = true;
+						// TODO remove  this line for debug
+
                     }
                     else
                     {

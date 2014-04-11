@@ -5,8 +5,8 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 
 using CmisSync.Lib.Cmis;
-using CmisSync.Lib.Credentials;
-using CmisSync.CmisTree;
+using CmisSync.Auth;
+// using CmisSync.CmisTree;
 
 namespace CmisSync
 {

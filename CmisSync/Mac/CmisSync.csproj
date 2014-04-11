@@ -76,7 +76,6 @@
       <Link>Program.cs</Link>
     </Compile>
     <Compile Include="MacWatcher.cs" />
-    <Compile Include="Badger.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SetupWindow.cs" />
     <Compile Include="..\StatusIconController.cs">
@@ -94,8 +93,6 @@
     <Compile Include="..\EditController.cs">
       <Link>EditController.cs</Link>
     </Compile>
-    <Compile Include="CmisTree\CmisTreeDataSource.cs" />
-    <Compile Include="OutlineViewDelegate.cs" />
     <Compile Include="TextFieldDelegate.cs" />
     <Compile Include="CertPolicyWindow.cs" />
     <Compile Include="CmisTree\CmisOutline.cs" />
@@ -114,7 +111,6 @@
       <DependentUpon>SetupSubLogin.cs</DependentUpon>
     </Compile>
     <Compile Include="SetupSubRepoSelect.cs" />
-    <Compile Include="SetupSubRepoSelectController.cs" />
     <Compile Include="SetupSubRepoSelect.designer.cs">
       <DependentUpon>SetupSubRepoSelect.cs</DependentUpon>
     </Compile>
@@ -147,11 +143,6 @@
     <Compile Include="SetupSubTutorialEndController.cs" />
     <Compile Include="SetupSubTutorialEnd.designer.cs">
       <DependentUpon>SetupSubTutorialEnd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EditWizard.cs" />
-    <Compile Include="EditWizardController.cs" />
-    <Compile Include="EditWizard.designer.cs">
-      <DependentUpon>EditWizard.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -255,6 +246,7 @@
     <BundleResource Include="Pixmaps\tutorial-slide-4.png" />
     <BundleResource Include="Pixmaps\media_playback_pause.png" />
     <BundleResource Include="Pixmaps\media_playback_start.png" />
+    <BundleResource Include="Pixmaps\media_playback_refresh.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">

@@ -16,18 +16,12 @@ SOURCES =  \
 	../StatusIconController.cs \
 	About.cs \
 	AppDelegate.cs \
-	Badger.cs \
 	CertPolicyWindow.cs \
 	CmisTree/CmisOutline.cs \
 	CmisTree/CmisOutline.designer.cs \
 	CmisTree/CmisOutlineController.cs \
-	CmisTree/CmisTreeDataSource.cs \
 	Controller.cs \
-	EditWizard.cs \
-	EditWizard.designer.cs \
-	EditWizardController.cs \
 	MacWatcher.cs \
-	OutlineViewDelegate.cs \
 	Setup.cs \
 	SetupSubCustomize.cs \
 	SetupSubCustomize.designer.cs \
@@ -40,7 +34,6 @@ SOURCES =  \
 	SetupSubLoginController.cs \
 	SetupSubRepoSelect.cs \
 	SetupSubRepoSelect.designer.cs \
-	SetupSubRepoSelectController.cs \
 	SetupSubTutorial.cs \
 	SetupSubTutorial.designer.cs \
 	SetupSubTutorialBegin.cs \
