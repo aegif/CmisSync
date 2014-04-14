@@ -408,5 +408,26 @@ namespace CmisSync.Lib.Cmis
                 }
             }
         }
+
+
+        /// <summary>
+        /// Get the value of a property of a CMIS document.
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="id">Name of the property, for instance cmis:lastModifiedBy</param>
+        /// <returns>property, or null if no such property</returns>
+        public static string GetProperty(IDocument document, string id)
+        {
+            IEnumerator<IProperty> e = document.Properties.GetEnumerator();
+            while (e.MoveNext())
+            {
+                IProperty property = e.Current;
+                if (property.Id.Equals(id))
+                {
+                    return (string)property.Value;
+                }
+            }
+            return null;
+        }
     }
 }

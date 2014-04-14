@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
 using DotCMIS.Client.Impl;
+using CmisSync.Lib.Cmis;
 
 
 namespace CmisSync.Lib.Sync
@@ -337,19 +338,8 @@ namespace CmisSync.Lib.Sync
                                         DownloadFile(remoteDocument, localFolder);
                                         repo.OnConflictResolved();
 
-                                        // Get LastModifiedBy.
-                                        IEnumerator<IProperty> e = remoteDocument.Properties.GetEnumerator();
-                                        string lastModifiedBy = null;
-                                        while (e.MoveNext())
-                                        {
-                                            IProperty property = e.Current;
-                                            if (property.Id.Equals("cmis:lastModifiedBy"))
-                                            {
-                                                lastModifiedBy = (string)property.Value;
-                                                break;
-                                            }
-                                        }
-
+                                        // Notify the user.
+                                        string lastModifiedBy = CmisUtils.GetProperty(remoteDocument, "cmis:lastModifiedBy");
                                         string message = String.Format(
                                             // Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
                                             "User {0} modified the file {1} at the same time as you.",
