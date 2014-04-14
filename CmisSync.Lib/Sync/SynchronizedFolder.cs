@@ -379,6 +379,7 @@ namespace CmisSync.Lib.Sync
                     filters.Add("cmis:contentStreamFileName");
                     filters.Add("cmis:contentStreamLength");
                     filters.Add("cmis:lastModificationDate");
+                    filters.Add("cmis:lastModifiedBy");
                     filters.Add("cmis:path");
                     session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
             }
@@ -942,7 +943,7 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         string[] cmisModDate;
-                        if (metadata.TryGetValue("cmis:lastModificationDate", out cmisModDate) && cmisModDate.Length == 3)
+                        if (metadata.TryGetValue("cmis:lastModificationDate", out cmisModDate) && cmisModDate.Length == 3) // TODO explain 3 and 2 in following line
                         {
                             DateTime modDate = DateTime.Parse(cmisModDate[2]);
                             File.SetLastWriteTimeUtc(filepath, modDate);
@@ -1111,19 +1112,8 @@ namespace CmisSync.Lib.Sync
 		                        SetLastModifiedDate(remoteDocument, filepath, metadata);
 		                        repo.OnConflictResolved();
 
-                                // Get LastModifiedBy.
-                                IEnumerator<IProperty> e = remoteDocument.Properties.GetEnumerator();
-                                string lastModifiedBy = null;
-                                while (e.MoveNext()) // TODO use TryGetValue
-                                {
-                                    IProperty property = e.Current;
-                                    if (property.Id.Equals("cmis:lastModifiedBy"))
-                                    {
-                                        lastModifiedBy = (string)property.Value;
-                                        break;
-                                    }
-                                }
-
+                                // Warn user about conflict.
+                                string lastModifiedBy = CmisUtils.GetProperty(remoteDocument, "cmis:lastModifiedBy");
                                 string message = String.Format(
                                     // Properties_Resources.ResourceManager.GetString("AddedSame", CultureInfo.CurrentCulture),
                                     "User {0} added a file named {1} at the same time as you.",
