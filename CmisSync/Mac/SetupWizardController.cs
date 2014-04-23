@@ -126,8 +126,7 @@ namespace CmisSync
         {
             Header.StringValue = Properties_Resources.Which;
             Description.StringValue = "";
-			// TODO fix
-			// SubController = new SetupSubRepoSelectController (Controller);
+			SubController = new SetupSubRepoSelectController (Controller);
             Content.ContentView = SubController.View;
         }
 

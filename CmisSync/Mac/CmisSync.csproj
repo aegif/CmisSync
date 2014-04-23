@@ -13,7 +13,7 @@
     <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <RootNamespace>CmisSync</RootNamespace>
-    <AssemblyName>DataSpace Sync</AssemblyName>
+    <AssemblyName>CmisSync</AssemblyName>
     <ReleaseVersion>
     </ReleaseVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
@@ -144,6 +144,18 @@
     <Compile Include="SetupSubTutorialEnd.designer.cs">
       <DependentUpon>SetupSubTutorialEnd.cs</DependentUpon>
     </Compile>
+    <Compile Include="SetupSubRepoSelectController.cs" />
+    <Compile Include="FolderTreeMVC\NodeModel.cs">
+      <Link>NodeModel.cs</Link>
+    </Compile>
+    <Compile Include="FolderTreeMVC\NodeLoader.cs">
+      <Link>NodeLoader.cs</Link>
+    </Compile>
+    <Compile Include="FolderTreeMVC\LoadingStatusModel.cs">
+      <Link>CmisTree\LoadingStatusModel.cs</Link>
+    </Compile>
+    <Compile Include="CmisTree\CmisTreeDataSource.cs" />
+    <Compile Include="OutlineViewDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

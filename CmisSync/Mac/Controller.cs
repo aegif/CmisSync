@@ -35,7 +35,7 @@ using log4net;
 
 namespace CmisSync {
 
-	public class Controller : ControllerBase {
+	public class Controller : ControllerBase, UserNotificationListener {
 
         private NSUserNotificationCenter notificationCenter;
         private Dictionary<string,DateTime> transmissionFiles = new Dictionary<string, DateTime> ();
@@ -125,6 +125,19 @@ namespace CmisSync {
                     });
                 }
             };
+
+			AlertNotificationRaised += delegate(string title, string message) {
+				var alert = new NSAlert {
+					MessageText = message,
+					AlertStyle = NSAlertStyle.Informational
+				};
+
+				alert.AddButton ("OK");
+
+				alert.RunModal();
+			};
+
+			Utils.SetUserNotificationListener (this);
 		}
 
         private void UpdateFileStatus(FileTransmissionEvent transmission, TransmissionProgressEventArgs e)
@@ -382,5 +395,10 @@ namespace CmisSync {
                 NSWorkspace.SharedWorkspace.OpenFile (path);
             });
         }
+			
+		public void NotifyUser (string message)
+		{
+			Console.WriteLine ("UserNotifier: " + message);
+		}
 	}
 }

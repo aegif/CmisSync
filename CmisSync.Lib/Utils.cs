@@ -93,6 +93,10 @@ namespace CmisSync.Lib
 //#if __MonoCS__
 //                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
 //#endif
+				#if __COCOA__
+				// TODO check directory permissions
+				writeAllow = true;
+				#endif
             }
             catch(System.UnauthorizedAccessException) {
                 var permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
@@ -369,11 +373,7 @@ namespace CmisSync.Lib
                 Logger.Debug(String.Format("The given file name {0} contains invalid patterns", name));
                 return ret;
             }
-            ret = !IsValidISO88591(name);
-            if (ret)
-            {
-                Logger.Debug(String.Format("The given file name {0} contains invalid characters", name));
-            }
+
             return ret;
         }
 
@@ -396,11 +396,7 @@ namespace CmisSync.Lib
                 Logger.Debug(String.Format("The given directory name {0} contains invalid patterns", name));
                 return ret;
             }
-            ret = !IsValidISO88591(name);
-            if (ret)
-            {
-                Logger.Debug(String.Format("The given directory name {0} contains invalid characters", name));
-            }
+
             return ret;
         }
 
