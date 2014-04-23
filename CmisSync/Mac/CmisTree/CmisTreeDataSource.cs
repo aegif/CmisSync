@@ -16,6 +16,8 @@ namespace CmisSync.CmisTree
         public bool? Selected = true;
         public NSCmisTree Parent = null;
         public IList<NSCmisTree> Children = new List<NSCmisTree> ();
+		public string FullPath = string.Empty;
+
         public override string ToString()
         {
             string path = Name;
@@ -29,9 +31,10 @@ namespace CmisSync.CmisTree
         public NSCmisTree(Node root)
         {
             Name = root.Name;
+			FullPath = root.Path;
             Status = root.Status;
             Selected = root.Selected;
-            Parent = null;
+			Parent = null;
             foreach (Node node in root.Children) {
                 NSCmisTree child = new NSCmisTree (node);
                 child.Parent = this;
@@ -190,7 +193,10 @@ namespace CmisSync.CmisTree
                 return (NSString)"";
             }
             if (tableColumn.Identifier.Equals("Name")) {
-                switch (cmis.Selected) {
+				// Console.WriteLine ("GetObjectValue " + item);
+				return (NSString)cmis.Name;
+				/*
+				switch (cmis.Selected) {
                 case true:
                     return new NSNumber (1);
                 case false:
@@ -199,6 +205,7 @@ namespace CmisSync.CmisTree
                     return new NSNumber (-1);
                 }
                 return (NSString)cmis.Name;
+                */
             }
             if (tableColumn.Identifier.Equals ("Status")) {
                 switch (cmis.Status) {
