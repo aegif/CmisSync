@@ -6,7 +6,7 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <ProjectGuid>{728483AA-E34B-4441-BF2C-C8BC2901E4E0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>CmisSync</AssemblyName>
+    <AssemblyName>DataSpaceSync</AssemblyName>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace>CmisSync</RootNamespace>
     <FileUpgradeFlags>
@@ -34,21 +34,19 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>x86</PlatformTarget>
-    <DefineConstants>
-    </DefineConstants>
-    <DocumentationFile>bin\$(Configuration)\CmisSync.XML</DocumentationFile>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>CmisSync.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -58,34 +56,8 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\$(Configuration)\CmisSync.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\DataSpaceSync.xml</DocumentationFile>
     <UseVSHostingProcess>true</UseVSHostingProcess>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetZone>LocalIntranet</TargetZone>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DocumentationFile>bin\Release\CmisSync.XML</DocumentationFile>
-    <Optimize>true</Optimize>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>bin\Debug\CmisSync.XML</DocumentationFile>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -123,9 +95,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="CertPolicyWindow.cs" />
     <Compile Include="PollIntervalSlider.cs" />
-    <Compile Include="FolderTreeView.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
       <SubType>Form</SubType>
@@ -246,9 +217,7 @@
     <EmbeddedResource Include="..\Linux\Pixmaps\icons\process-working-22.png">
       <Link>Pixmaps\process-working-22.png</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Properties\Properties.Resources.de.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <EmbeddedResource Include="..\Properties\Properties.Resources.de.resx" />
     <EmbeddedResource Include="..\Properties\Properties.Resources.es-ES.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -267,9 +236,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties.Resources.cs.resx" />
-    <EmbeddedResource Include="Properties.Resources.nl.resx" />
-    <EmbeddedResource Include="Properties.Resources.pl.resx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />
@@ -279,7 +245,6 @@
     <EmbeddedResource Include="Pixmaps\process-syncing-iii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiii.png" />
     <EmbeddedResource Include="Pixmaps\process-syncing-iiiii.png" />
-    <EmbeddedResource Include="Pixmaps\cmissync-app.ico" />
     <EmbeddedResource Include="Pixmaps\cmissync-folder.png" />
   </ItemGroup>
   <ItemGroup>
@@ -302,24 +267,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Pixmaps\media_playback_pause.png" />
     <EmbeddedResource Include="Pixmaps\media_playback_refresh.png" />
-    <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
-    <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
     <EmbeddedResource Include="Pixmaps\connect.png" />
     <EmbeddedResource Include="Pixmaps\disconnect.png" />
+    <EmbeddedResource Include="Pixmaps\media_playback_pause.png" />
+    <EmbeddedResource Include="Pixmaps\media_playback_start.png" />
+    <EmbeddedResource Include="Pixmaps\classic_folder_web.png" />
+    <EmbeddedResource Include="Pixmaps\cmissync-app.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="Pixmaps\cmissync-folder.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Plugins\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="TreeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Resource>
   </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent>Mkdir "$(ProjectDir)$(OutDir)x86"

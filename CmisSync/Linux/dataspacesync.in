@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+if [[ $UID -eq 0 ]]; then
+  echo "DataSpace Sync can't be run as root. Things would go utterly wrong."
+  exit 1
+fi
+
+if [ "$XDG_RUNTIME_DIR" ]; then
+  pidfile=${XDG_RUNTIME_DIR}/cmissync.pid
+else
+  pidfile=/tmp/cmissync-${USER}.pid
+fi
+
+start() {
+  if [ -e "${pidfile}" ]; then
+    cmissyncpid=`cat ${pidfile}`
+    if [ -n "`ps -p ${cmissyncpid} | grep ${cmissyncpid}`" ]; then
+      echo "DataSpace Sync is already running."
+      exit 0
+    else
+      echo "Stale DataSpace Sync PID file found, starting a new instance..."
+      rm -f $pidfile
+    fi
+  fi
+
+  echo -n "Starting DataSpace Sync... "
+  if [ -n "${SSH_AGENT_PID}" -o -n "${SSH_AUTH_SOCK}" ] ; then
+    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync@MONOEXE@ $2 &
+  else
+    ssh-agent @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync@MONOEXE@ $2 &
+  fi
+  ( umask 066; echo $! > ${pidfile} )
+  echo "Done."
+}
+
+stop() {
+  if [ -e "${pidfile}" ]; then
+    cmissyncpid=`cat ${pidfile}`
+    if [ -n "`ps -p ${cmissyncpid} | grep ${cmissyncpid}`" ]; then
+      echo -n "Stopping DataSpace Sync... "
+      kill ${cmissyncpid}
+      rm -f ${pidfile}
+      echo "Done."
+    else
+      echo "DataSpace Sync is not running, removing stale PID file..."
+      rm -f ${pidfile}
+    fi
+  else
+    echo "DataSpace Sync is not running."
+  fi
+}
+
+case $1 in
+  start|--start)
+    start
+    ;;
+  stop|--stop)
+    stop
+    ;;
+  restart|--restart)
+    stop
+    start
+    ;;
+  open|--open)
+    invite=`date -u +%N`
+    open=`echo $2 | sed s/cmissync:/https:/`
+    open=`echo $open | sed s/cmissync-unsafe:/http:/`
+    curl --insecure --output ~/DataSpace Sync/$invite.xml $open
+    ;;
+  *)
+    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync@MONOEXE@ --help
+    ;;
+esac

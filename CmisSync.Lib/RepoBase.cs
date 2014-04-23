@@ -19,6 +19,8 @@ using log4net;
 using System;
 using System.IO;
 using Timers = System.Timers;
+using CmisSync.Lib.Events;
+using CmisSync.Auth;
 
 namespace CmisSync.Lib
 {
@@ -51,6 +53,12 @@ namespace CmisSync.Lib
         /// Local disk size taken by the repository.
         /// </summary>
         public abstract double Size { get; }
+
+
+        /// <summary>
+        /// Affect a new <c>SyncStatus</c> value.
+        /// </summary>
+        public Action<SyncStatus> SyncStatusChanged { get; set; }
 
 
         /// <summary>
@@ -107,7 +115,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Restart syncing.
         /// </summary>
-        public void Resume()
+        public virtual void Resume()
         {
             Status = SyncStatus.Idle;
             RepoInfo.IsSuspended = false;
@@ -119,6 +127,17 @@ namespace CmisSync.Lib
             config.Save();
         }
 
+        /// <summary>
+        /// Event Queue for this repository.
+        /// Use this to notifiy events for this repository.
+        /// </summary>
+        public SyncEventQueue Queue { get; private set; }
+
+        /// <summary>
+        /// Event Manager for this repository.
+        /// Use this for adding and removing SyncEventHandler for this repository.
+        /// </summary>
+        public SyncEventManager EventManager { get; private set; }
 
         /// <summary>
         /// Return the synchronized folder's information.
@@ -178,6 +197,10 @@ namespace CmisSync.Lib
         /// </summary>
         public RepoBase(RepoInfo repoInfo, IActivityListener activityListener)
         {
+            EventManager = new SyncEventManager();
+            EventManager.AddEventHandler(new DebugLoggingHandler());
+            EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(0, RepoInfoChanged));
+            Queue = new SyncEventQueue(EventManager);
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = repoInfo.Name;
@@ -217,6 +240,21 @@ namespace CmisSync.Lib
         }
 
 
+        private bool RepoInfoChanged(ISyncEvent e)
+        {
+            if (e is RepoConfigChangedEvent)
+            {
+                this.RepoInfo = (e as RepoConfigChangedEvent).RepoInfo;
+                return true;
+            }
+            else
+            {
+                // This should never ever happen!
+                return false;
+            }
+        }
+
+
         /// <summary>
         /// Destructor.
         /// </summary>
@@ -251,6 +289,7 @@ namespace CmisSync.Lib
                     this.local_timer.Dispose();
                     this.Watcher.Dispose();
                     // this.folderLock.Dispose(); Folder lock disabled.
+					this.Queue.Dispose();
                 }
                 this.disposed = true;
             }
@@ -306,7 +345,7 @@ namespace CmisSync.Lib
             //Update password...
             if (!String.IsNullOrEmpty(password))
             {
-                this.RepoInfo.Password = new CmisSync.Auth.CmisPassword(password.TrimEnd());
+                this.RepoInfo.Password = new Password(password.TrimEnd());
                 syncConfig.ObfuscatedPassword = RepoInfo.Password.ObfuscatedPassword;
                 Logger.Debug("Updated \"" + this.Name + "\" password");
             }
@@ -398,7 +437,7 @@ namespace CmisSync.Lib
             if (Watcher.GetChangeCount() > 0)
             {
                 //Watcher was stopped (due to error) so clear and restart sync
-                Watcher.Clear();
+                Watcher.RemoveAll();
             }
 
             Watcher.EnableRaisingEvents = true;

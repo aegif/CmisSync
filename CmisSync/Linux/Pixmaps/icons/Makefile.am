@@ -6,12 +6,12 @@ system_themedir = $(datadir)/icons/$(theme)
 app_themedir = $(pkgdatadir)/icons/$(theme)
 
 system_theme_icons = \
-	apps,folder-cmissync-16.png \
-	apps,folder-cmissync-22.png	\
-	apps,folder-cmissync-24.png \
-	apps,folder-cmissync-256.png \
-	apps,folder-cmissync-32.png \
-	apps,folder-cmissync-48.png
+	apps,app-cmissync-16.png \
+	apps,app-cmissync-22.png	\
+	apps,app-cmissync-24.png \
+	apps,app-cmissync-256.png \
+	apps,app-cmissync-32.png \
+	apps,app-cmissync-48.png
 
 app_theme_icons = \
 	animations,process-working-22.png \
@@ -31,7 +31,9 @@ app_theme_icons = \
 	status,document-edited-12.png \
 	status,document-deleted-12.png \
 	status,document-moved-12.png \
-	status,list-point-16.png
+	status,list-point-16.png \
+	status,media_playback_start-16.png \
+	status,media_playback_pause-16.png
 
 install_icon_exec = $(top_srcdir)/build/icon-theme-installer \
 	-t "$(theme)" \

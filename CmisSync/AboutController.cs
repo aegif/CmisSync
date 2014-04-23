@@ -28,28 +28,31 @@ namespace CmisSync {
     /// </summary>
     public class AboutController {
 
+        //===== Actions =====
         /// <summary>
-        /// Show window event.
+        /// Show About Windows Action
         /// </summary>
         public event Action ShowWindowEvent = delegate { };
 
         /// <summary>
-        /// Hide window event.
+        /// Hide About Windows Action
         /// </summary>
         public event Action HideWindowEvent = delegate { };
 
         /// <summary>
-        /// Version up to date.
+        /// Version UpToDate Action
         /// </summary>
         public event Action VersionUpToDateEvent = delegate { };
 
         /// <summary>
-        /// Checking for new version.
+        /// Check for new Versions Action
         /// </summary>
         public event Action CheckingForNewVersionEvent = delegate { };
 
+        //===== Events =====
+
         /// <summary>
-        /// New version.
+        /// A new version is available event
         /// </summary>
         public event NewVersionEventDelegate NewVersionEvent = delegate { };
 
@@ -69,7 +72,7 @@ namespace CmisSync {
         public readonly string CreditsLinkAddress       = "https://raw.github.com/nicolas-raoul/CmisSync/master/legal/AUTHORS.txt";
 
         /// <summary>
-        /// Report problem URL.
+        /// URL for Issue reports
         /// </summary>
         public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
 

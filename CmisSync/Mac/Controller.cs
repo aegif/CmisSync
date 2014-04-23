@@ -18,76 +18,233 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.Generic;
+using System.Text;
 
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
+using Mono.Unix.Native;
+
 using CmisSync.Lib;
+using CmisSync.Lib.Events;
+
+using log4net;
 
 namespace CmisSync {
 
 	public class Controller : ControllerBase {
 
-        public override string PluginsPath {
-            get {
-                return Path.Combine (NSBundle.MainBundle.ResourcePath, "Plugins");
+        private NSUserNotificationCenter notificationCenter;
+        private Dictionary<string,DateTime> transmissionFiles = new Dictionary<string, DateTime> ();
+        private Object transmissionLock = new object ();
+        private int notificationInterval = 5;
+        private int notificationKeep = 5;
+
+        private class ComparerNSUserNotification : IComparer<NSUserNotification>
+        {
+            public int Compare (NSUserNotification x, NSUserNotification y)
+            {
+                DateTime xDate = x.DeliveryDate;
+                DateTime yDate = y.DeliveryDate;
+                return xDate.CompareTo (yDate);
             }
         }
 
-        // We have to use our own custom made folder watcher, as
-        // System.IO.FileSystemWatcher fails watching subfolders on Mac
-        private MacWatcher watcher;
-
-        
-        public Controller () : base ()
+		public Controller () : base ()
         {
             using (var a = new NSAutoreleasePool ())
             {
-                string content_path = Directory.GetParent (System.AppDomain.CurrentDomain.BaseDirectory).ToString ();
-    
-                string app_path   = Directory.GetParent (content_path).ToString ();
-                string growl_path = Path.Combine (app_path, "Frameworks", "Growl.framework", "Growl");
-    
-                // Needed for Growl
-                Dlfcn.dlopen (growl_path, 0);
                 NSApplication.Init ();
             }
-		}
 
+            // We get the Default notification Center
+            notificationCenter = NSUserNotificationCenter.DefaultUserNotificationCenter;
 
-        public override void Initialize ()
-        {
-            base.Initialize ();
+            notificationCenter.DidDeliverNotification += (s, e) => 
+            {
+                Console.WriteLine("Notification Delivered");
+            };
 
-            this.watcher.Changed += delegate (string path) {
-                // Don't even bother with paths in .git/
-                if (path.Contains (".git"))
-                    return;
+            notificationCenter.DidActivateNotification += (s, e) => 
+            {
+                LocalFolderClicked (Path.GetDirectoryName (e.Notification.InformativeText));
+            };
 
-                string repo_name;
+            // If we return true here, Notification will show up even if your app is TopMost.
+            notificationCenter.ShouldPresentNotification = (c, n) => { return true; };
 
-                if (path.Contains ("/"))
-                    repo_name = path.Substring (0, path.IndexOf ("/"));
-                else
-                    repo_name = path;
+            OnTransmissionListChanged += delegate {
 
-                // Ignore changes in the root of each subfolder, these
-                // are already handled by the repository
-                if (Path.GetFileNameWithoutExtension (path).Equals (repo_name))
-                    return;
-
-                repo_name = repo_name.Trim ("/".ToCharArray ());
-                FileSystemEventArgs fse_args = new FileSystemEventArgs (WatcherChangeTypes.Changed,
-                    Path.Combine (SparkleConfig.DefaultConfig.FoldersPath, path), Path.GetFileName (path));
-
-                foreach (SparkleRepoBase repo in Repositories) {
-                    if (repo.Name.Equals (repo_name))
-                        repo.OnFileActivity (fse_args);
+                using (var a = new NSAutoreleasePool()) {
+                    notificationCenter.BeginInvokeOnMainThread(delegate {
+                        lock (transmissionLock) {
+                            List<FileTransmissionEvent> transmissions = ActiveTransmissions();
+                            NSUserNotification[] notifications = notificationCenter.DeliveredNotifications;
+                            List<NSUserNotification> finishedNotifications = new List<NSUserNotification> ();
+                            foreach (NSUserNotification notification in notifications) {
+                                FileTransmissionEvent transmission = transmissions.Find( (FileTransmissionEvent e)=>{return (e.Path == notification.InformativeText);});
+                                if (transmission == null) {
+                                    finishedNotifications.Add (notification);
+                                } else {
+                                    if (transmissionFiles.ContainsKey (transmission.Path)) {
+                                        transmissions.Remove(transmission);
+                                    } else {
+                                        notificationCenter.RemoveDeliveredNotification (notification);
+                                    }
+                                }
+                            }
+                            finishedNotifications.Sort (new ComparerNSUserNotification ());
+                            for (int i = 0; i<(notifications.Length - notificationKeep) && i<finishedNotifications.Count; ++i) {
+                                notificationCenter.RemoveDeliveredNotification (finishedNotifications[i]);
+                            }
+                            foreach (FileTransmissionEvent transmission in transmissions) {
+                                if (transmission.Status.Aborted == true) {
+                                    continue;
+                                }
+                                if (transmission.Status.Completed == true) {
+                                    continue;
+                                }
+                                if (transmission.Status.FailedException != null) {
+                                    continue;
+                                }
+                                NSUserNotification notification = new NSUserNotification();
+                                notification.Title = Path.GetFileName (transmission.Path);
+                                notification.Subtitle = TransmissionStatus(transmission);
+                                notification.InformativeText = transmission.Path;
+//                                notification.SoundName = NSUserNotification.NSUserNotificationDefaultSoundName;
+                                transmission.TransmissionStatus += TransmissionReport;
+                                notification.DeliveryDate = NSDate.Now;
+                                notificationCenter.DeliverNotification (notification);
+                                transmissionFiles.Add (transmission.Path, notification.DeliveryDate);
+                                UpdateFileStatus (transmission, null);
+                            }
+                        }
+                    });
                 }
             };
+		}
+
+        private void UpdateFileStatus(FileTransmissionEvent transmission, TransmissionProgressEventArgs e)
+        {
+            if (e == null) {
+                e = transmission.Status;
+            }
+
+            string filePath = transmission.CachePath;
+            if (filePath == null || !File.Exists (filePath)) {
+                filePath = transmission.Path;
+            }
+            if (!File.Exists (filePath)) {
+                Logger.Error (String.Format ("None exist {0} for file status update", filePath));
+                return;
+            }
+
+            string extendAttrKey = "com.apple.progress.fractionCompleted";
+
+            if ((e.Aborted == true || e.Completed == true || e.FailedException != null)) {
+                Syscall.removexattr (filePath, extendAttrKey);
+                try {
+                    NSFileAttributes attr = NSFileManager.DefaultManager.GetAttributes (filePath);
+                    attr.CreationDate = (new FileInfo(filePath)).CreationTime;
+                    NSFileManager.DefaultManager.SetAttributes (attr, filePath);
+                } catch (Exception ex) {
+                    Logger.Error (String.Format ("Exception to set {0} creation time for file status update: {1}", filePath, ex));
+                }
+            } else {
+                double percent = transmission.Status.Percent.GetValueOrDefault() / 100;
+                if (percent < 1) {
+                    Syscall.setxattr (filePath, extendAttrKey, Encoding.ASCII.GetBytes (percent.ToString ()));
+                    try {
+                        NSFileAttributes attr = NSFileManager.DefaultManager.GetAttributes (filePath);
+                        attr.CreationDate = new DateTime (1984, 1, 24, 8, 0, 0, DateTimeKind.Utc);
+                        NSFileManager.DefaultManager.SetAttributes (attr, filePath);
+                    } catch (Exception ex) {
+                        Logger.Error (String.Format ("Exception to set {0} creation time for file status update: {1}", filePath, ex));
+                    }
+                } else {
+                    Syscall.removexattr (filePath, extendAttrKey);
+                    try {
+                        NSFileAttributes attr = NSFileManager.DefaultManager.GetAttributes (filePath);
+                        attr.CreationDate = (new FileInfo(filePath)).CreationTime;
+                        NSFileManager.DefaultManager.SetAttributes (attr, filePath);
+                    } catch (Exception ex) {
+                        Logger.Error (String.Format ("Exception to set {0} creation time for file status update: {1}", filePath, ex));
+                    }
+                }
+            }
+
         }
 
+        private string TransmissionStatus(FileTransmissionEvent transmission)
+        {
+            string type = "Unknown";
+            switch (transmission.Type) {
+            case FileTransmissionType.UPLOAD_NEW_FILE:
+                type = "Upload new file";
+                break;
+            case FileTransmissionType.UPLOAD_MODIFIED_FILE:
+                type = "Update remote file";
+                break;
+            case FileTransmissionType.DOWNLOAD_NEW_FILE:
+                type = "Download new file";
+                break;
+            case FileTransmissionType.DOWNLOAD_MODIFIED_FILE:
+                type = "Update local file";
+                break;
+            }
+            if (transmission.Status.Aborted == true) {
+                type += " aborted";
+            } else if (transmission.Status.Completed == true) {
+                type += " completed";
+            } else if (transmission.Status.FailedException != null) {
+                type += " failed";
+            }
+
+            return String.Format("{0} ({1:###.#}% {2})",
+                type,
+                Math.Round (transmission.Status.Percent.GetValueOrDefault(), 1),
+                CmisSync.Lib.Utils.FormatBandwidth ((long)transmission.Status.BitsPerSecond.GetValueOrDefault()));
+        }
+
+        private void TransmissionReport(object sender, TransmissionProgressEventArgs e)
+        {
+            using (var a = new NSAutoreleasePool()) {
+                FileTransmissionEvent transmission = sender as FileTransmissionEvent;
+                if (transmission == null) {
+                    return;
+                }
+                lock (transmissionLock) {
+                    if ((e.Aborted == true || e.Completed == true || e.FailedException != null)) {
+                        transmission.TransmissionStatus -= TransmissionReport;
+                        transmissionFiles.Remove (transmission.Path);
+                    } else {
+                        TimeSpan diff = NSDate.Now - transmissionFiles [transmission.Path];
+                        if (diff.Seconds < notificationInterval) {
+                            return;
+                        }
+                        transmissionFiles [transmission.Path] = NSDate.Now;
+                    }
+                    UpdateFileStatus (transmission, e);
+                }
+                notificationCenter.BeginInvokeOnMainThread (delegate
+                {
+                    lock (transmissionLock) {
+                        NSUserNotification[] notifications = notificationCenter.DeliveredNotifications;
+                        foreach (NSUserNotification notification in notifications) {
+                            if (notification.InformativeText == transmission.Path) {
+                                notificationCenter.RemoveDeliveredNotification (notification);
+                                notification.DeliveryDate = NSDate.Now;
+                                notification.Subtitle = TransmissionStatus (transmission);
+                                notificationCenter.DeliverNotification (notification);
+                                return;
+                            }
+                        }
+                    }
+                });
+            }
+        }
 
 		public override void CreateStartupItem ()
 		{
@@ -103,21 +260,13 @@ namespace CmisSync {
 
             process.Start ();
             process.WaitForExit ();
-
-            SparkleLogger.LogInfo ("Controller", "Added " + NSBundle.MainBundle.BundlePath + " to login items");
 		}
-
-
-        public override void InstallProtocolHandler ()
-        {
-             // We ship CmisSyncInviteHandler.app in the bundle
-        }
-
 
 		// Adds the CmisSync folder to the user's
 		// list of bookmarked places
 		public override void AddToBookmarks ()
-        {/*
+        {
+			/*
             NSMutableDictionary sidebar_plist = NSMutableDictionary.FromDictionary (
                 NSUserDefaults.StandardUserDefaults.PersistentDomainForName ("com.apple.sidebarlists"));
 
@@ -144,11 +293,11 @@ namespace CmisSync {
                             properties.SetValueForKey (new NSString ("1935819892"), new NSString ("com.apple.LSSharedFileList.TemplateSystemSelector"));
 
                             NSMutableDictionary new_favorite = new NSMutableDictionary ();
-                            new_favorite.SetValueForKey (new NSString ("CmisSync"),  new NSString ("Name"));
+							new_favorite.SetValueForKey (new NSString ("DataSpace Sync"),  new NSString ("Name"));
 
                             new_favorite.SetValueForKey (NSData.FromString ("ImgR SYSL fldr"),  new NSString ("Icon"));
 
-                            new_favorite.SetValueForKey (NSData.FromString (SparkleConfig.DefaultConfig.FoldersPath),
+							new_favorite.SetValueForKey (NSData.FromString (ConfigManager.CurrentConfig.FoldersPath),
                                 new NSString ("Alias"));
 
                             new_favorite.SetValueForKey (properties, new NSString ("CustomItemProperties"));
@@ -163,13 +312,13 @@ namespace CmisSync {
                 }
             }
 
-            NSUserDefaults.StandardUserDefaults.SetPersistentDomain (sidebar_plist, "com.apple.sidebarlists");*/
+            NSUserDefaults.StandardUserDefaults.SetPersistentDomain (sidebar_plist, "com.apple.sidebarlists");
+            */
 		}
 
 
 		public override bool CreateCmisSyncFolder ()
 		{
-            this.watcher = new MacWatcher (Program.Controller.FoldersPath);
 
             if (!Directory.Exists (Program.Controller.FoldersPath)) {
                 Directory.CreateDirectory (Program.Controller.FoldersPath);
@@ -180,62 +329,39 @@ namespace CmisSync {
             }
 		}
 
-
-		public override void OpenFolder (string path)
+		public void OpenCmisSyncFolder (string reponame)
 		{
-			NSWorkspace.SharedWorkspace.OpenFile (path);
+			foreach(CmisSync.Lib.RepoBase repo in Program.Controller.Repositories)
+			{
+				if(repo.Name.Equals(reponame))
+				{
+					LocalFolderClicked(repo.LocalPath);
+					break;
+				}
+			}
+		}
+
+		public void ShowLog (string str)
+		{
+			System.Diagnostics.Process.Start("/usr/bin/open", "-a Console " + str);
+		}
+
+		public void LocalFolderClicked (string path)
+		{
+            notificationCenter.BeginInvokeOnMainThread (delegate
+            {
+                NSWorkspace.SharedWorkspace.OpenFile (path);
+            });
 		}
 		
 
-        public override void OpenFile (string path)
+        public void OpenFile (string path)
         {
             path = Uri.UnescapeDataString (path);
-            NSWorkspace.SharedWorkspace.OpenFile (path);
-        }
-
-
-        private string event_log_html;
-		public override string EventLogHTML
-		{
-			get {
-                if (string.IsNullOrEmpty (this.event_log_html)) {
-                    string html_file_path   = Path.Combine (NSBundle.MainBundle.ResourcePath, "HTML", "event-log.html");
-                    string jquery_file_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "HTML", "jquery.js");
-                    string html             = File.ReadAllText (html_file_path);
-                    string jquery           = File.ReadAllText (jquery_file_path);
-                    this.event_log_html     = html.Replace ("<!-- $jquery -->", jquery);
-                }
-
-                return this.event_log_html;
-			}
-		}
-
-
-        private string day_entry_html;
-		public override string DayEntryHTML
-		{
-			get {
-                if (string.IsNullOrEmpty (this.day_entry_html)) {
-                    string html_file_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "HTML", "day-entry.html");
-                    this.day_entry_html   = File.ReadAllText (html_file_path);
-                }
-
-                return this.day_entry_html;
-			}
-		}
-		
-
-        private string event_entry_html;
-        public override string EventEntryHTML
-        {
-            get {
-               if (string.IsNullOrEmpty (this.event_entry_html)) {
-                   string html_file_path = Path.Combine (NSBundle.MainBundle.ResourcePath, "HTML", "event-entry.html");
-                   this.event_entry_html = File.ReadAllText (html_file_path);
-               }
-
-               return this.event_entry_html;
-            }
+            notificationCenter.BeginInvokeOnMainThread (delegate
+            {
+                NSWorkspace.SharedWorkspace.OpenFile (path);
+            });
         }
 	}
 }

@@ -1,13 +1,14 @@
 ## Building on Mac
 
-You can choose to build SparkleShare from source or to download the SparkleShare bundle.
+You can choose to build CmisSync from source or to download the CmisSync bundle.
 
 
 ### Installing build requirements
 
-Install [Xcode](https://developer.apple.com/xcode/), the [Mono Framework](http://www.mono-project.com/) (both MRE and MDK) and [MonoDevelop](http://monodevelop.com/).
+Install [Xcode](https://developer.apple.com/xcode/), the [Mono Framework](http://www.mono-project.com/) (both MRE and MDK) and [MonoDevelop](http://monodevelop.com/) (which actually installs with the name "Xamarin Studio").
 
-Start MonoDevelop and install the MonoMac add-in (it's in the menus: <tt>MonoDevelop</tt> > <tt>Add-in Manager</tt>).
+Start MonoDevelop and install the MonoMac add-in (it's in the menus: <tt>MonoDevelop</tt> > <tt>Add-in Manager</tt>).  
+Latest MonoDevelop(Xamarin Studio 4.x.x) contains the MonoMac add-in.
 
 
 You may need to adjust some environment variables to let the build environment tools find mono:
@@ -24,13 +25,27 @@ Install <tt>automake</tt>, <tt>libtool</tt> and <tt>intltool</tt> using <tt>MacP
 $ sudo port install automake intltool libtool
 ```
 
+Build log4net:
+```bash
+$ <mdtool path>/mdtool build Extras/log4net-1.2.11/src/log4net.vs2010.csproj
+```
+
+Copy MonoMac.dll from MonoDevelop AddIns folder:
+```bash
+$ cp <your MonoDevelop AddIns folder>/MonoMac.dll Extras
+```
+
 Start the first part of the build:
 
 ```bash
 $ make -f Makefile.am
-$ ./configure --with-dotcmis=Extras/DotCMIS.dll
+$ ./configure --with-dotcmis=Extras/DotCMIS.dll \
+ --with-newtonsoft-json=Extras/Newtonsoft.Json.dll \
+ --with-nunit=Extras/nunit.framework.dll \
+ --with-log4net=Extras/log4net-1.2.11/build/bin/net/2.0/debug/log4net.dll \
+ --with-monomac=Extras/MonoMac.dll
 $ make
 ```
 
-Now that you have compiled the libraries, open `SparkleShare/Mac/CmisSync.sln` in
+Now that you have compiled the libraries, open `CmisSync/Mac/CmisSync.sln` in
 MonoDevelop and start the build (Build > Build All).
