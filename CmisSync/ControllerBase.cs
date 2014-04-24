@@ -535,7 +535,7 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Show info about DataSpace Sync
+        /// Show info about CmisSync
         /// </summary>
         public void ShowAboutWindow()
         {

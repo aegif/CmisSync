@@ -47,7 +47,7 @@ namespace CmisSync {
             string autostart_path = Path.Combine (
                 Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData), "autostart");
 
-            string desktopfile_path = Path.Combine (autostart_path, "dataspacesync.desktop");
+            string desktopfile_path = Path.Combine (autostart_path, "cmissync.desktop");
 
             if (!Directory.Exists (autostart_path))
                 Directory.CreateDirectory (autostart_path);
@@ -57,17 +57,17 @@ namespace CmisSync {
                     File.WriteAllText (desktopfile_path,
                         "[Desktop Entry]\n" +
                         "Type=Application\n" +
-                        "Name=DataSpace Sync\n" +
-                        "Exec=dataspacesync start\n" +
+                        "Name=CmisSync\n" +
+                        "Exec=cmissync start\n" +
                         "Icon=folder-cmissync\n" +
                         "Terminal=false\n" +
                         "X-GNOME-Autostart-enabled=true\n" +
                         "Categories=Network");
 
-                    Logger.Info ("Added DataSpace Sync to login items");
+                    Logger.Info ("Added CmisSync to login items");
 
                 } catch (Exception e) {
-                    Logger.Info ("Failed adding DataSpace Sync to login items: " + e.Message);
+                    Logger.Info ("Failed adding CmisSync to login items: " + e.Message);
                 }
             }
         }
@@ -193,7 +193,7 @@ namespace CmisSync {
         {
             Process process = new Process();
             process.StartInfo.FileName  = "xterm";
-            process.StartInfo.Arguments = "-title \"DataSpace Sync Log\" -e tail -f \"" + path + "\"";
+            process.StartInfo.Arguments = "-title \"CmisSync Log\" -e tail -f \"" + path + "\"";
             process.Start ();
         }
 

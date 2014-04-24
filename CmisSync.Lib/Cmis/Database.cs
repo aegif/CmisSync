@@ -805,7 +805,7 @@ namespace CmisSync.Lib.Cmis
             object result = ExecuteSQLFunction("SELECT value FROM general WHERE key=\"PathPrefix\"", null);
             // Migration of databases, which do not have any prefix safed
             if(result == null) {
-                string oldprefix = Path.Combine(ConfigManager.CurrentConfig.HomePath, "DataSpace Sync");
+                string oldprefix = Path.Combine(ConfigManager.CurrentConfig.HomePath, "CmisSync");
                 SetPathPrefix(oldprefix);
                 return oldprefix;
             }else {

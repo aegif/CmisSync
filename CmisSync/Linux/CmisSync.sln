@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync", "CmisSync.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Lib", "..\..\CmisSync.Lib\CmisSync.Lib.csproj", "{2C914413-B31C-4362-93C7-1AE34F09112A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataSpaceSync.Console", "..\..\DataSpaceSync.Console\DataSpaceSync.Console.csproj", "{F62D4C7B-3A91-41A6-A758-8CEB95DEB629}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Console", "..\..\CmisSync.Console\CmisSync.Console.csproj", "{F62D4C7B-3A91-41A6-A758-8CEB95DEB629}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotCMIS", "..\..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj", "{529EF90F-A34C-4426-A4F9-65113AC23841}"
 EndProject

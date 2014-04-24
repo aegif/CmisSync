@@ -6,7 +6,7 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <ProjectGuid>{728483AA-E34B-4441-BF2C-C8BC2901E4E0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>DataSpaceSync</AssemblyName>
+    <AssemblyName>CmisSync</AssemblyName>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace>CmisSync</RootNamespace>
     <FileUpgradeFlags>
@@ -56,7 +56,7 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>bin\Debug\DataSpaceSync.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\CmisSync.xml</DocumentationFile>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -236,6 +236,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.cs.resx" />
+    <EmbeddedResource Include="Properties.Resources.nl.resx" />
+    <EmbeddedResource Include="Properties.Resources.pl.resx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />

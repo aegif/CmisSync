@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=DataSpace Sync
-Exec=dataspacesync start
+Name=CmisSync
+Exec=cmissync start
 Icon=app-cmissync
 Terminal=false
 X-GNOME-Autostart-enabled=true

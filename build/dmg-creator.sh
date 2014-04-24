@@ -10,7 +10,7 @@ if [ $# -ne 1 ]; then
 fi
 
 source=$1
-applicationName="DataSpace Sync"
+applicationName="CmisSync"
 backgroundPictureName="dmgBackground.png"
 title=$applicationName
 finalDMGName=$applicationName".dmg"
@@ -29,7 +29,7 @@ echo Temporary DMG file size:"$size"0k
 rm -f pack.temp.dmg
 
 #Create a new temp dmg file
-hdiutil create -srcfolder "$source" -volname "DataSpace Sync" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW -size "$size"0k pack.temp.dmg
+hdiutil create -srcfolder "$source" -volname "CmisSync" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW -size "$size"0k pack.temp.dmg
 device=$(hdiutil attach -readwrite -noverify -noautoopen "pack.temp.dmg" | \
          egrep '^/dev/' | sed 1q | awk '{print $1}')
 # Wait for mount

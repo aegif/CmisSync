@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 m4_define([cmissync_version], [1.2.0])
 
 AC_PREREQ([2.54])
-AC_INIT([DataSpace Sync], cmissync_version)
+AC_INIT([CmisSync], cmissync_version)
 AC_CONFIG_SRCDIR([CmisSync/Program.cs])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([foreign dist-bzip2 dist-zip no-dist-gzip])
@@ -351,7 +351,7 @@ CmisSync/Mac/Pixmaps/Makefile
 CmisSync/TestLibrary/Makefile
 CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibraryRunner/Makefile
-CmisSync/Linux/dataspacesync
+CmisSync/Linux/cmissync
 DataSpaceSync.Console/Makefile
 DataSpaceSync.Console/dsscli
 CmisSync/Makefile
@@ -359,7 +359,7 @@ Makefile
 ])
 
 echo "
-DataSpace Sync ${VERSION}
+CmisSync ${VERSION}
 
 Configuration:
        Prefix              : ${prefix}
