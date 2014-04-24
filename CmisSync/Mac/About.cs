@@ -182,7 +182,7 @@ namespace CmisSync {
                 };
 
                 this.credits_text_field = new NSTextField () {
-					StringValue     = @"Copyright © 2013-" + DateTime.Now.Year + " Aegif Corporation, Nicolas Raoul and others." +
+					StringValue     = @"Copyright © 2013-" + DateTime.Now.Year + "  Aegif and others." +
                                        "\n" +
                                        "\n" +
 									   "CmisSync is Open Source software. You are free to use, modify, and redistribute it " +
