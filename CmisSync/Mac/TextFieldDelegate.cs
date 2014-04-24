@@ -24,7 +24,7 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
-using CmisSync.CmisTree;
+// using CmisSync.CmisTree;
 
 namespace CmisSync {
 

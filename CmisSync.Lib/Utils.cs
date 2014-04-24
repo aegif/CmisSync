@@ -93,6 +93,10 @@ namespace CmisSync.Lib
 //#if __MonoCS__
 //                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
 //#endif
+				#if __COCOA__
+				// TODO check directory permissions
+				writeAllow = true;
+				#endif
             }
             catch(System.UnauthorizedAccessException) {
                 var permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
@@ -180,10 +184,16 @@ namespace CmisSync.Lib
                 return false;
 
             }
-
+				
             //Check filename length
             String fullPath = Path.Combine(localDirectory, filename);
 
+			#if __COCOA__
+			// TODO Check filename length for OS X
+			// * Max "FileName" length: 255 charactors.
+			// * FileName encoding is UTF-16 (Modified NFD).
+
+			#else
             // reflection
             FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
                 BindingFlags.Static |
@@ -196,6 +206,7 @@ namespace CmisSync.Lib
                 return false;
 
             }
+			#endif
 
             return true;
 
@@ -362,11 +373,7 @@ namespace CmisSync.Lib
                 Logger.Debug(String.Format("The given file name {0} contains invalid patterns", name));
                 return ret;
             }
-            ret = !IsValidISO88591(name);
-            if (ret)
-            {
-                Logger.Debug(String.Format("The given file name {0} contains invalid characters", name));
-            }
+
             return ret;
         }
 
@@ -389,11 +396,7 @@ namespace CmisSync.Lib
                 Logger.Debug(String.Format("The given directory name {0} contains invalid patterns", name));
                 return ret;
             }
-            ret = !IsValidISO88591(name);
-            if (ret)
-            {
-                Logger.Debug(String.Format("The given directory name {0} contains invalid characters", name));
-            }
+
             return ret;
         }
 

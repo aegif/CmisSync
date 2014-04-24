@@ -52,19 +52,15 @@ namespace CmisSync {
                 Console.WriteLine ("GetCell Error");
                 return null;
             }
-            if (column == null) {
-                return null;
-            } else if (column.Identifier.Equals ("Name")) {
-//                Console.WriteLine ("GetCell " + cmis);
-                NSButtonCell cell = new NSButtonCell ();
-                if (cmis.Parent != null)
-                    cell.SetButtonType (NSButtonType.Switch);
-                else
-                    cell.SetButtonType (NSButtonType.Radio);
-                // FIXME cell.AllowsMixedState = true;
-                cell.Title = cmis.Name;
-                cell.Editable = true;
-                return cell;
+			if (column == null) {
+				return null;
+			} else if (column.Identifier.Equals ("Name")) {
+				NSTextFieldCell cell = new NSTextFieldCell ();
+				cell.Title = cmis.Name;
+				cell.RepresentedObject = cmis;
+
+				return cell;
+
             } else {
                 NSTextFieldCell cell = new NSTextFieldCell ();
                 return cell;

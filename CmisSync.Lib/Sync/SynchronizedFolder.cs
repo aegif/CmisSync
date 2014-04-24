@@ -527,6 +527,36 @@ namespace CmisSync.Lib.Sync
             }
 
             /// <summary>
+            /// Sync on the current thread.
+            /// </summary>
+            /// <param name="syncFull"></param>
+            public void SyncInNotBackground(bool syncFull)
+            {
+                if (IsSyncing())
+                {
+                    Logger.Debug("Sync already running in background: " + repoinfo.TargetDirectory);
+                    return;
+                }
+
+                try
+                {
+                    Sync(syncFull);
+                }
+                catch (CmisPermissionDeniedException e)
+                {
+                    repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
+                }
+                catch (Exception e)
+                {
+                    repo.OnSyncError(new BaseException(e));
+                }
+                finally
+                {
+                    SyncComplete(syncFull);
+                }
+            }
+
+            /// <summary>
             /// Sync in the background.
             /// </summary>
             public void SyncInBackground(bool syncFull)
@@ -920,7 +950,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while download file to {0}: {1}", filePath), e);
+                    Logger.Warn(String.Format("Exception while download file to {0}", filePath), e);
                     success = false;
                 }
 
@@ -1436,8 +1466,9 @@ namespace CmisSync.Lib.Sync
                         // Check is write permission is allow
 
                         // Check if the file is Check out or not
-                        if (!(bool)remoteFile.IsVersionSeriesCheckedOut)
-                        {
+						//if (!(bool)remoteFile.IsVersionSeriesCheckedOut)
+						if ((remoteFile.IsVersionSeriesCheckedOut == null) || !(bool)remoteFile.IsVersionSeriesCheckedOut)
+						{
 
                             // Prepare content stream
                             ContentStream remoteStream = new ContentStream();
