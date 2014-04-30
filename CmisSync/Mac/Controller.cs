@@ -307,7 +307,7 @@ namespace CmisSync {
                             properties.SetValueForKey (new NSString ("1935819892"), new NSString ("com.apple.LSSharedFileList.TemplateSystemSelector"));
 
                             NSMutableDictionary new_favorite = new NSMutableDictionary ();
-							new_favorite.SetValueForKey (new NSString ("DataSpace Sync"),  new NSString ("Name"));
+							new_favorite.SetValueForKey (new NSString ("CmisSync"),  new NSString ("Name"));
 
                             new_favorite.SetValueForKey (NSData.FromString ("ImgR SYSL fldr"),  new NSString ("Icon"));
 
