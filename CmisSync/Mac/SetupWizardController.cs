@@ -100,7 +100,7 @@ namespace CmisSync
             }
         }
 
-        private SetupController Controller;
+		public SetupController Controller;
 
         private NSViewController SubController_ = null;
         private NSViewController SubController {
