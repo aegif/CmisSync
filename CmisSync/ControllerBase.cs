@@ -538,11 +538,7 @@ namespace CmisSync
 
 
         /// <summary>
-<<<<<<< HEAD
         /// Show info about CmisSync
-=======
-		/// Show info about CmisSync
->>>>>>> 455b47592e4b8379c8e0a2518773f9947be0e569
         /// </summary>
         public void ShowAboutWindow()
         {
