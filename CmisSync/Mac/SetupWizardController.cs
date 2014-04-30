@@ -70,9 +70,9 @@ namespace CmisSync
                         case PageType.Customize:
                             ShowCustomizePage();
                             break;
-                        case PageType.Syncing:
-                            ShowSyncingPage();
-                            break;
+						// case PageType.Syncing:
+						//    ShowSyncingPage();
+						//    break;
                         case PageType.Finished:
                             ShowFinishedPage();
                             break;
@@ -100,7 +100,7 @@ namespace CmisSync
             }
         }
 
-        private SetupController Controller;
+		public SetupController Controller;
 
         private NSViewController SubController_ = null;
         private NSViewController SubController {
@@ -126,7 +126,7 @@ namespace CmisSync
         {
             Header.StringValue = Properties_Resources.Which;
             Description.StringValue = "";
-            SubController = new SetupSubRepoSelectController (Controller);
+			SubController = new SetupSubRepoSelectController (Controller);
             Content.ContentView = SubController.View;
         }
 

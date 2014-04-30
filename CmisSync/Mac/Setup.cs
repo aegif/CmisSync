@@ -30,8 +30,8 @@ using MonoMac.WebKit;
 using Mono.Unix;
 
 using CmisSync.Lib.Cmis;
-using CmisSync.Lib.Credentials;
-using CmisSync.CmisTree;
+using CmisSync.Auth;
+// using CmisSync.CmisTree;
 
 namespace CmisSync {
 
@@ -56,11 +56,11 @@ namespace CmisSync {
         private NSTextField WarningTextField;
         private NSImage WarningImage;
         private NSImageView WarningImageView;
-        private List<RootFolder> Repositories;
-        private CmisOutlineController OutlineController;
-        private CmisTreeDataSource DataSource;
-        private OutlineViewDelegate DataDelegate;
-        Dictionary<string,AsyncNodeLoader> Loader;
+		// private List<RootFolder> Repositories;
+		// private CmisOutlineController OutlineController;
+		// private CmisTreeDataSource DataSource;
+		// private OutlineViewDelegate DataDelegate;
+		// Dictionary<string,AsyncNodeLoader> Loader;
 
 
         public Setup () : base ()
@@ -379,8 +379,11 @@ namespace CmisSync {
                     InvokeOnMainThread(delegate {
                         if (Controller.repositories == null)
                         {
-                            WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
-                            ContinueButton.Enabled = true;
+							// TODO fix
+							// WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
+							WarningTextField.StringValue = "Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2)";
+
+							ContinueButton.Enabled = true;
                             CancelButton.Enabled = true;
                         }
                         else
@@ -408,6 +411,7 @@ namespace CmisSync {
             Controller.CheckAddPage(AddressTextField.StringValue);
         }
 
+		/*
         void ShowFolderSeletionPage()
         {
             Header = Properties_Resources.Which;
@@ -577,7 +581,7 @@ namespace CmisSync {
             Buttons.Add(ContinueButton);
             Buttons.Add(BackButton);
             Buttons.Add(CancelButton);
-        }
+        } */
 
         void ShowSyncingPage()
         {
@@ -730,14 +734,16 @@ namespace CmisSync {
                     ShowLoginPage();
                     break;
                 case PageType.Add2:
-                    ShowFolderSeletionPage();
+				// TODO fix 
+				    //ShowFolderSeletionPage();
+
                     break;
                 case PageType.Customize:
                     ShowCustomizePage();
                     break;
-                case PageType.Syncing:
-                    ShowSyncingPage();
-                    break;
+				// case PageType.Syncing:
+				//    ShowSyncingPage();
+				//    break;
                 case PageType.Finished:
                     ShowFinishedPage();
                     break;

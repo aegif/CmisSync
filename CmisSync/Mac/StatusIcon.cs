@@ -52,6 +52,7 @@ namespace CmisSync {
         private NSImage cmissync_image;
         private NSImage pause_image;
         private NSImage resume_image;
+		private NSImage sync_image;
         private NSImage download_image;
         private NSImage upload_image;
         private NSImage update_image;
@@ -154,21 +155,39 @@ namespace CmisSync {
             folderitem.Image.Size = new SizeF(16, 16);
             folderitem.Title = folder_name;
             NSMenu foldersubmenu = new NSMenu();
-            NSMenuItem openitem = new NSMenuItem();
+
+			NSMenuItem openitem = new NSMenuItem();
             openitem.Title = Properties_Resources.OpenLocalFolder;
             openitem.Activated += OpenFolderDelegate(folder_name);
+
+			NSMenuItem openremote = new NSMenuItem();
+			openremote.Title = Properties_Resources.BrowseRemoteFolder;
+			openremote.Activated += OpenRemoteFolderDelegate (folder_name);
+
             NSMenuItem pauseitem = new NSMenuItem();
             setSyncItemState(pauseitem, getSyncStatus(folder_name));
             FolderItems.Add(folder_name, pauseitem);
             pauseitem.Activated += PauseFolderDelegate(folder_name);
-            NSMenuItem removeitem = new NSMenuItem();
+            
+			NSMenuItem manualSyncItem = new NSMenuItem();
+			manualSyncItem.Title = Properties_Resources.ManualSync;
+			manualSyncItem.Image = this.sync_image;
+			manualSyncItem.Image.Size = new SizeF (16, 16);
+			manualSyncItem.Activated += ManualSyncDelegate(folder_name);
+
+			NSMenuItem removeitem = new NSMenuItem();
             removeitem.Title = Properties_Resources.RemoveFolderFromSync;
             removeitem.Activated += RemoveFolderDelegate(folder_name);
+
             NSMenuItem settingsitem = new NSMenuItem();
             settingsitem.Title = Properties_Resources.EditTitle;
             settingsitem.Activated += OpenSettingsDialogDelegate(folder_name);
+
             foldersubmenu.AddItem(openitem);
+			foldersubmenu.AddItem(openremote);
+			foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
             foldersubmenu.AddItem(pauseitem);
+			foldersubmenu.AddItem(manualSyncItem);
             foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
             foldersubmenu.AddItem(settingsitem);
             foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
@@ -295,6 +314,14 @@ namespace CmisSync {
             };
         }
 
+		private EventHandler OpenRemoteFolderDelegate(string name)
+		{
+			return delegate
+			{
+				Controller.RemoteFolderClicked (name);
+			};
+		}
+
         private EventHandler PauseFolderDelegate ( string name)
         {
             return delegate
@@ -302,6 +329,14 @@ namespace CmisSync {
                 Controller.SuspendSyncClicked(name);
             };
         }
+
+		private EventHandler ManualSyncDelegate(string reponame)
+		{
+			return delegate
+			{
+				Controller.ManualSyncClicked (reponame);
+			};
+		}
 
         private EventHandler RemoveFolderDelegate(string name)
         {
@@ -354,6 +389,7 @@ namespace CmisSync {
             this.cmissync_image     = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "cmissync-app.icns"));
             this.pause_image        = new NSImage(Path.Combine(NSBundle.MainBundle.ResourcePath, "Pixmaps", "media_playback_pause.png"));
             this.resume_image       = new NSImage(Path.Combine(NSBundle.MainBundle.ResourcePath, "Pixmaps", "media_playback_start.png"));
+			this.sync_image         = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "media_playback_refresh.png"));
         }
     }
     

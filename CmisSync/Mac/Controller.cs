@@ -29,12 +29,13 @@ using Mono.Unix.Native;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Events;
+using CmisSync.Lib.Cmis;
 
 using log4net;
 
 namespace CmisSync {
 
-	public class Controller : ControllerBase {
+	public class Controller : ControllerBase, UserNotificationListener {
 
         private NSUserNotificationCenter notificationCenter;
         private Dictionary<string,DateTime> transmissionFiles = new Dictionary<string, DateTime> ();
@@ -124,6 +125,19 @@ namespace CmisSync {
                     });
                 }
             };
+
+			AlertNotificationRaised += delegate(string title, string message) {
+				var alert = new NSAlert {
+					MessageText = message,
+					AlertStyle = NSAlertStyle.Informational
+				};
+
+				alert.AddButton ("OK");
+
+				alert.RunModal();
+			};
+
+			Utils.SetUserNotificationListener (this);
 		}
 
         private void UpdateFileStatus(FileTransmissionEvent transmission, TransmissionProgressEventArgs e)
@@ -293,7 +307,7 @@ namespace CmisSync {
                             properties.SetValueForKey (new NSString ("1935819892"), new NSString ("com.apple.LSSharedFileList.TemplateSystemSelector"));
 
                             NSMutableDictionary new_favorite = new NSMutableDictionary ();
-							new_favorite.SetValueForKey (new NSString ("DataSpace Sync"),  new NSString ("Name"));
+							new_favorite.SetValueForKey (new NSString ("CmisSync"),  new NSString ("Name"));
 
                             new_favorite.SetValueForKey (NSData.FromString ("ImgR SYSL fldr"),  new NSString ("Icon"));
 
@@ -341,6 +355,24 @@ namespace CmisSync {
 			}
 		}
 
+		/// <summary>
+		/// With the default web browser, open the remote folder of a CmisSync synchronized folder.
+		/// </summary>
+		/// <param name="name">Name of the synchronized folder</param>
+		public void OpenRemoteFolder(string name)
+		{
+			Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+			if (folder != null)
+			{
+				RepoInfo repo = folder.GetRepoInfo();
+				Process.Start(CmisUtils.GetBrowsableURL(repo));
+			}
+			else
+			{
+				Logger.Warn("Could not find requested config for \"" + name + "\"");
+			}
+		}
+
 		public void ShowLog (string str)
 		{
 			System.Diagnostics.Process.Start("/usr/bin/open", "-a Console " + str);
@@ -363,5 +395,10 @@ namespace CmisSync {
                 NSWorkspace.SharedWorkspace.OpenFile (path);
             });
         }
+			
+		public void NotifyUser (string message)
+		{
+			Console.WriteLine ("UserNotifier: " + message);
+		}
 	}
 }

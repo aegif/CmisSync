@@ -951,7 +951,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn(String.Format("Exception while download file to {0}: {1}", filePath), e);
+                    Logger.Warn(String.Format("Exception while download file to {0}", filePath), e);
                     success = false;
                 }
 
@@ -1456,8 +1456,9 @@ namespace CmisSync.Lib.Sync
                         // Check is write permission is allow
 
                         // Check if the file is Check out or not
-                        if (!(bool)remoteFile.IsVersionSeriesCheckedOut)
-                        {
+						//if (!(bool)remoteFile.IsVersionSeriesCheckedOut)
+						if ((remoteFile.IsVersionSeriesCheckedOut == null) || !(bool)remoteFile.IsVersionSeriesCheckedOut)
+						{
 
                             // Prepare content stream
                             ContentStream remoteStream = new ContentStream();

@@ -20,17 +20,16 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Collections.ObjectModel;
 
-using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
-using log4net;
 using CmisSync.Lib.Events;
 using CmisSync.Auth;
 
 #if __COCOA__
-using Edit = CmisSync.EditWizardController;
+// using Edit = CmisSync.EditWizardController;
 #endif
 
 namespace CmisSync
@@ -216,6 +215,10 @@ namespace CmisSync
                 OnTransmissionListChanged();
             };
         }
+
+		public List<FileTransmissionEvent> ActiveTransmissions() {
+			return this.activitiesManager.ActiveTransmissions.ToList<FileTransmissionEvent>();
+		}
 
 
         /// <summary>
@@ -535,7 +538,11 @@ namespace CmisSync
 
 
         /// <summary>
+<<<<<<< HEAD
         /// Show info about CmisSync
+=======
+		/// Show info about CmisSync
+>>>>>>> 455b47592e4b8379c8e0a2518773f9947be0e569
         /// </summary>
         public void ShowAboutWindow()
         {
