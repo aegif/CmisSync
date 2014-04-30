@@ -70,9 +70,9 @@ namespace CmisSync
                         case PageType.Customize:
                             ShowCustomizePage();
                             break;
-                        case PageType.Syncing:
-                            ShowSyncingPage();
-                            break;
+						// case PageType.Syncing:
+						//    ShowSyncingPage();
+						//    break;
                         case PageType.Finished:
                             ShowFinishedPage();
                             break;
