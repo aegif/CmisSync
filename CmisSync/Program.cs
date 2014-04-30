@@ -93,25 +93,24 @@ namespace CmisSync
                 string n = Environment.NewLine;
 
                 Console.WriteLine(n +
-                    "DataSpace Sync is a collaboration and sharing tool that is" + n +
-                    "designed to keep things simple and to stay out of your way." + n +
-                    n +
-                    "Version: " + CmisSync.Lib.Backend.Version + n +
-                    "Copyright (C) 2013 GRAU DATA AG" + n +
-                    "Copyright (C) 2010 Hylke Bons" + n +
-                    "This program comes with ABSOLUTELY NO WARRANTY." + n +
-                    n +
-                    "This is free software, and you are welcome to redistribute it" + n +
-                    "under certain conditions. Please read the GNU GPLv3 for details." + n +
-                    n +
-                    "Usage: DataSpaceSync [start|stop|restart]");
+					"CmisSync is a collaboration and sharing tool that is" + n +
+					"designed to keep things simple and to stay out of your way." + n +
+					n +
+					"Version: " + CmisSync.Lib.Backend.Version + n +
+					"Copyright (C) 2014 Aegif" + n +
+					"This program comes with ABSOLUTELY NO WARRANTY." + n +
+					n +
+					"This is free software, and you are welcome to redistribute it" + n +
+					"under certain conditions. Please read the GNU GPLv3 for details." + n +
+					n +
+					"Usage: CmisSync [start|stop|restart]");
                 Environment.Exit(-1);
             }
 
             // Only allow one instance of CmisSync (on Windows)
             if (!program_mutex.WaitOne(0, false))
             {
-                Logger.Error("DataSpace Sync is already running.");
+				Logger.Error("CmisSync is already running.");
                 Environment.Exit(-1);
             }
 

@@ -35,8 +35,6 @@ namespace CmisSync
     /// </summary>
     public enum PageType
     {
-		Syncing,
-
         /// <summary>
         /// No page.
         /// </summary>

@@ -326,8 +326,6 @@ namespace CmisSync
         /// </summary>
         public void SettingsClicked(string reponame)
         {
-			// TODO fix
-			/*
             CmisSync.Lib.Config.SyncConfig.Folder repository = ConfigManager.CurrentConfig.getFolder(reponame);
             Program.UI.Setup.Controller.saved_repository = reponame;
             if (repository != null)
@@ -339,7 +337,6 @@ namespace CmisSync
                 Program.UI.Setup.Controller.saved_syncatstartup = repository.SyncAtStartup;
             }
             Program.Controller.ShowSetupWindow(PageType.Settings);
-            */
         }
 
 
