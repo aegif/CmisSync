@@ -289,7 +289,7 @@ namespace CmisSync.Lib
                     this.local_timer.Dispose();
                     this.Watcher.Dispose();
                     // this.folderLock.Dispose(); Folder lock disabled.
-					this.Queue.Dispose();
+                    this.Queue.Dispose();
                 }
                 this.disposed = true;
             }

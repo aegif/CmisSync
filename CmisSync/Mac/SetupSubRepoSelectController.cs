@@ -152,20 +152,20 @@ namespace CmisSync
             });
         }
             
-		void OutlineSelectionChanged (NSNotification notification)
-		{
-			InvokeOnMainThread (delegate 
-				{
-					var view = (NSOutlineView) notification.Object;
-					var cell = (NSCell) view.GetCell(0, view.SelectedRow);
-					if (cell != null)
-					{
-						var cmis = (NSCmisTree) cell.RepresentedObject;
-						Controller.saved_remote_path = cmis.FullPath;
-						Console.WriteLine("SelectionChanged: " + Controller.saved_remote_path);
-					}
-				});
-		}
+        void OutlineSelectionChanged (NSNotification notification)
+        {
+            InvokeOnMainThread (delegate 
+                {
+                    var view = (NSOutlineView) notification.Object;
+                    var cell = (NSCell) view.GetCell(0, view.SelectedRow);
+                    if (cell != null)
+                    {
+                        var cmis = (NSCmisTree) cell.RepresentedObject;
+                        Controller.saved_remote_path = cmis.FullPath;
+                        Console.WriteLine("SelectionChanged: " + Controller.saved_remote_path);
+                    }
+                });
+        }
 
         void OutlineItemExpanded (NSNotification notification)
         {
@@ -199,7 +199,7 @@ namespace CmisSync
         void InsertEvent ()
         {
             DataSource.SelectedEvent += OutlineSelected;
-			DataDelegate.SelectionChanged += OutlineSelectionChanged;
+            DataDelegate.SelectionChanged += OutlineSelectionChanged;
             DataDelegate.ItemExpanded += OutlineItemExpanded;
             foreach (AsyncNodeLoader task in Loader.Values)
                 task.UpdateNodeEvent += OutlineUpdate;
@@ -208,7 +208,7 @@ namespace CmisSync
         void RemoveEvent ()
         {
             DataSource.SelectedEvent -= OutlineSelected;
-			DataDelegate.SelectionChanged -= OutlineSelectionChanged;
+            DataDelegate.SelectionChanged -= OutlineSelectionChanged;
             DataDelegate.ItemExpanded -= OutlineItemExpanded;
             foreach (AsyncNodeLoader task in Loader.Values)
                 task.UpdateNodeEvent -= OutlineUpdate;
@@ -239,7 +239,7 @@ namespace CmisSync
                 foreach (AsyncNodeLoader task in Loader.Values)
                     task.Cancel();
                 Controller.saved_repository = root.Id;
-				Controller.Add2PageCompleted(Controller.saved_repository, Controller.saved_remote_path);
+                Controller.Add2PageCompleted(Controller.saved_repository, Controller.saved_remote_path);
             }
         }
 

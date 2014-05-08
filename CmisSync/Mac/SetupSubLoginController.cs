@@ -142,15 +142,15 @@ namespace CmisSync
                 InvokeOnMainThread(delegate {
                     if (Controller.repositories == null)
                     {
-						// TODO fix
-						// WarnText.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
-						WarnText.StringValue = "Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2)";
-						AddressText.Enabled = true;
+                        // TODO fix
+                        // WarnText.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
+                        WarnText.StringValue = "Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2)";
+                        AddressText.Enabled = true;
                         UserText.Enabled = true;
                         PasswordText.Enabled = true;
                         ContinueButton.Enabled = true;
                         CancelButton.Enabled = true;
-						// TODO remove  this line for debug
+                        // TODO remove  this line for debug
 
                     }
                     else

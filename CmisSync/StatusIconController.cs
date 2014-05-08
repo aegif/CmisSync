@@ -391,9 +391,9 @@ namespace CmisSync
         /// </summary>
         public void RemoveFolderFromSyncClicked(string reponame)
         {
-			#if __COCOA__
-			Program.Controller.RemoveRepositoryFromSync(reponame);
-			#else
+            #if __COCOA__
+            Program.Controller.RemoveRepositoryFromSync(reponame);
+            #else
             System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show(
                 Properties_Resources.RemoveFolderFromSyncConfirm,
                 Properties_Resources.RemoveFolderFromSync,
@@ -413,7 +413,7 @@ namespace CmisSync
                 );
                 worker.RunWorkerAsync(reponame);
             }
-			#endif
+            #endif
         }
 
         /// <summary>
@@ -425,15 +425,15 @@ namespace CmisSync
         }
 
 
-		/// <summary>
-		/// Edit a particular folder.
-		/// </summary>
-		public void EditFolderClicked(string reponame)
-		{
-			// TODO fix EditRepositoryFolder
-			// Program.Controller.EditRepositoryFolder(reponame);
-			Logger.Error ("Call Program.Controller.EditRepositoryFolder(" + reponame + ")");
-		}
+        /// <summary>
+        /// Edit a particular folder.
+        /// </summary>
+        public void EditFolderClicked(string reponame)
+        {
+            // TODO fix EditRepositoryFolder
+            // Program.Controller.EditRepositoryFolder(reponame);
+            Logger.Error ("Call Program.Controller.EditRepositoryFolder(" + reponame + ")");
+        }
 
         /// <summary>
         /// Start the tray icon animation.

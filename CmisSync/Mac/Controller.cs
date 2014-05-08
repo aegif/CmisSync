@@ -35,7 +35,7 @@ using log4net;
 
 namespace CmisSync {
 
-	public class Controller : ControllerBase, UserNotificationListener {
+    public class Controller : ControllerBase, UserNotificationListener {
 
         private NSUserNotificationCenter notificationCenter;
         private Dictionary<string,DateTime> transmissionFiles = new Dictionary<string, DateTime> ();
@@ -53,7 +53,7 @@ namespace CmisSync {
             }
         }
 
-		public Controller () : base ()
+        public Controller () : base ()
         {
             using (var a = new NSAutoreleasePool ())
             {
@@ -126,19 +126,19 @@ namespace CmisSync {
                 }
             };
 
-			AlertNotificationRaised += delegate(string title, string message) {
-				var alert = new NSAlert {
-					MessageText = message,
-					AlertStyle = NSAlertStyle.Informational
-				};
+            AlertNotificationRaised += delegate(string title, string message) {
+                var alert = new NSAlert {
+                    MessageText = message,
+                    AlertStyle = NSAlertStyle.Informational
+                };
 
-				alert.AddButton ("OK");
+                alert.AddButton ("OK");
 
-				alert.RunModal();
-			};
+                alert.RunModal();
+            };
 
-			Utils.SetUserNotificationListener (this);
-		}
+            Utils.SetUserNotificationListener (this);
+        }
 
         private void UpdateFileStatus(FileTransmissionEvent transmission, TransmissionProgressEventArgs e)
         {
@@ -260,8 +260,8 @@ namespace CmisSync {
             }
         }
 
-		public override void CreateStartupItem ()
-		{
+        public override void CreateStartupItem ()
+        {
             // There aren't any bindings in MonoMac to support this yet, so
             // we call out to an applescript to do the job
             Process process = new Process ();
@@ -274,13 +274,13 @@ namespace CmisSync {
 
             process.Start ();
             process.WaitForExit ();
-		}
+        }
 
-		// Adds the CmisSync folder to the user's
-		// list of bookmarked places
-		public override void AddToBookmarks ()
+        // Adds the CmisSync folder to the user's
+        // list of bookmarked places
+        public override void AddToBookmarks ()
         {
-			/*
+            /*
             NSMutableDictionary sidebar_plist = NSMutableDictionary.FromDictionary (
                 NSUserDefaults.StandardUserDefaults.PersistentDomainForName ("com.apple.sidebarlists"));
 
@@ -307,11 +307,11 @@ namespace CmisSync {
                             properties.SetValueForKey (new NSString ("1935819892"), new NSString ("com.apple.LSSharedFileList.TemplateSystemSelector"));
 
                             NSMutableDictionary new_favorite = new NSMutableDictionary ();
-							new_favorite.SetValueForKey (new NSString ("CmisSync"),  new NSString ("Name"));
+                            new_favorite.SetValueForKey (new NSString ("CmisSync"),  new NSString ("Name"));
 
                             new_favorite.SetValueForKey (NSData.FromString ("ImgR SYSL fldr"),  new NSString ("Icon"));
 
-							new_favorite.SetValueForKey (NSData.FromString (ConfigManager.CurrentConfig.FoldersPath),
+                            new_favorite.SetValueForKey (NSData.FromString (ConfigManager.CurrentConfig.FoldersPath),
                                 new NSString ("Alias"));
 
                             new_favorite.SetValueForKey (properties, new NSString ("CustomItemProperties"));
@@ -328,11 +328,11 @@ namespace CmisSync {
 
             NSUserDefaults.StandardUserDefaults.SetPersistentDomain (sidebar_plist, "com.apple.sidebarlists");
             */
-		}
+        }
 
 
-		public override bool CreateCmisSyncFolder ()
-		{
+        public override bool CreateCmisSyncFolder ()
+        {
 
             if (!Directory.Exists (Program.Controller.FoldersPath)) {
                 Directory.CreateDirectory (Program.Controller.FoldersPath);
@@ -341,51 +341,51 @@ namespace CmisSync {
             } else {
                 return false;
             }
-		}
+        }
 
-		public void OpenCmisSyncFolder (string reponame)
-		{
-			foreach(CmisSync.Lib.RepoBase repo in Program.Controller.Repositories)
-			{
-				if(repo.Name.Equals(reponame))
-				{
-					LocalFolderClicked(repo.LocalPath);
-					break;
-				}
-			}
-		}
+        public void OpenCmisSyncFolder (string reponame)
+        {
+            foreach(CmisSync.Lib.RepoBase repo in Program.Controller.Repositories)
+            {
+                if(repo.Name.Equals(reponame))
+                {
+                    LocalFolderClicked(repo.LocalPath);
+                    break;
+                }
+            }
+        }
 
-		/// <summary>
-		/// With the default web browser, open the remote folder of a CmisSync synchronized folder.
-		/// </summary>
-		/// <param name="name">Name of the synchronized folder</param>
-		public void OpenRemoteFolder(string name)
-		{
-			Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
-			if (folder != null)
-			{
-				RepoInfo repo = folder.GetRepoInfo();
-				Process.Start(CmisUtils.GetBrowsableURL(repo));
-			}
-			else
-			{
-				Logger.Warn("Could not find requested config for \"" + name + "\"");
-			}
-		}
+        /// <summary>
+        /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
+        /// </summary>
+        /// <param name="name">Name of the synchronized folder</param>
+        public void OpenRemoteFolder(string name)
+        {
+            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+            if (folder != null)
+            {
+                RepoInfo repo = folder.GetRepoInfo();
+                Process.Start(CmisUtils.GetBrowsableURL(repo));
+            }
+            else
+            {
+                Logger.Warn("Could not find requested config for \"" + name + "\"");
+            }
+        }
 
-		public void ShowLog (string str)
-		{
-			System.Diagnostics.Process.Start("/usr/bin/open", "-a Console " + str);
-		}
+        public void ShowLog (string str)
+        {
+            System.Diagnostics.Process.Start("/usr/bin/open", "-a Console " + str);
+        }
 
-		public void LocalFolderClicked (string path)
-		{
+        public void LocalFolderClicked (string path)
+        {
             notificationCenter.BeginInvokeOnMainThread (delegate
             {
                 NSWorkspace.SharedWorkspace.OpenFile (path);
             });
-		}
-		
+        }
+
 
         public void OpenFile (string path)
         {
@@ -395,10 +395,10 @@ namespace CmisSync {
                 NSWorkspace.SharedWorkspace.OpenFile (path);
             });
         }
-			
-		public void NotifyUser (string message)
-		{
-			Console.WriteLine ("UserNotifier: " + message);
-		}
-	}
+
+        public void NotifyUser (string message)
+        {
+            Console.WriteLine ("UserNotifier: " + message);
+        }
+    }
 }

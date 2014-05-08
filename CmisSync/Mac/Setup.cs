@@ -56,11 +56,11 @@ namespace CmisSync {
         private NSTextField WarningTextField;
         private NSImage WarningImage;
         private NSImageView WarningImageView;
-		// private List<RootFolder> Repositories;
-		// private CmisOutlineController OutlineController;
-		// private CmisTreeDataSource DataSource;
-		// private OutlineViewDelegate DataDelegate;
-		// Dictionary<string,AsyncNodeLoader> Loader;
+        // private List<RootFolder> Repositories;
+        // private CmisOutlineController OutlineController;
+        // private CmisTreeDataSource DataSource;
+        // private OutlineViewDelegate DataDelegate;
+        // Dictionary<string,AsyncNodeLoader> Loader;
 
 
         public Setup () : base ()
@@ -379,11 +379,11 @@ namespace CmisSync {
                     InvokeOnMainThread(delegate {
                         if (Controller.repositories == null)
                         {
-							// TODO fix
-							// WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
-							WarningTextField.StringValue = "Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2)";
+                            // TODO fix
+                            // WarningTextField.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
+                            WarningTextField.StringValue = "Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2)";
 
-							ContinueButton.Enabled = true;
+                            ContinueButton.Enabled = true;
                             CancelButton.Enabled = true;
                         }
                         else
@@ -411,7 +411,7 @@ namespace CmisSync {
             Controller.CheckAddPage(AddressTextField.StringValue);
         }
 
-		/*
+        /*
         void ShowFolderSeletionPage()
         {
             Header = Properties_Resources.Which;
@@ -734,16 +734,16 @@ namespace CmisSync {
                     ShowLoginPage();
                     break;
                 case PageType.Add2:
-				// TODO fix 
-				    //ShowFolderSeletionPage();
+                    // TODO fix 
+                    //ShowFolderSeletionPage();
 
                     break;
                 case PageType.Customize:
                     ShowCustomizePage();
                     break;
-				// case PageType.Syncing:
-				//    ShowSyncingPage();
-				//    break;
+                // case PageType.Syncing:
+                //    ShowSyncingPage();   
+                //    break;
                 case PageType.Finished:
                     ShowFinishedPage();
                     break;

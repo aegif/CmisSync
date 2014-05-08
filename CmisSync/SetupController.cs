@@ -634,7 +634,7 @@ namespace CmisSync
                 Logger.Fatal("Could not create repository.", e);
                 Program.Controller.ShowAlert(Properties_Resources.Error, String.Format(Properties_Resources.SyncError, repoName, e.Message));
                 FinishPageCompleted();
-				return;
+                return;
             }
 
             ChangePageEvent(PageType.Finished);
