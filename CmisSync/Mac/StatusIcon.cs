@@ -355,7 +355,8 @@ namespace CmisSync {
         {
             return delegate
             {
-                Controller.EditFolderClicked(name);
+                // Controller.EditFolderClicked(name);
+                Controller.SettingsClicked(name);
             };
         }
 

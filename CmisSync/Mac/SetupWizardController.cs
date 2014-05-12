@@ -76,6 +76,9 @@ namespace CmisSync
                         case PageType.Finished:
                             ShowFinishedPage();
                             break;
+                        case PageType.Settings:
+                            ShowSettingsPage();
+                            break;
                         }
                     });
                 }
@@ -192,6 +195,14 @@ namespace CmisSync
                 break;
             }
             Description.StringValue = "";
+            Content.ContentView = SubController.View;
+        }
+
+        void ShowSettingsPage()
+        {
+            Header.StringValue = Properties_Resources.Settings;
+            Description.StringValue = "";
+            SubController = new SetupSubSettingController(Controller);
             Content.ContentView = SubController.View;
         }
 

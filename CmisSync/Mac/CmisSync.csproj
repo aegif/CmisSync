@@ -156,6 +156,11 @@
     </Compile>
     <Compile Include="CmisTree\CmisTreeDataSource.cs" />
     <Compile Include="OutlineViewDelegate.cs" />
+    <Compile Include="SetupSubSettingController.cs" />
+    <Compile Include="SetupSubSetting.cs" />
+    <Compile Include="SetupSubSetting.designer.cs">
+      <DependentUpon>SetupSubSetting.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -295,6 +300,7 @@
     <InterfaceDefinition Include="SetupSubTutorialBegin.xib" />
     <InterfaceDefinition Include="SetupSubTutorialEnd.xib" />
     <InterfaceDefinition Include="EditWizard.xib" />
+    <InterfaceDefinition Include="SetupSubSetting.xib" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Properties\Properties.Resources.cs.resx" />
@@ -307,5 +313,8 @@
     <EmbeddedResource Include="..\Properties\Properties.Resources.tlh-AA.resx" />
     <EmbeddedResource Include="..\Properties\Properties.Resources.tlh-KX.resx" />
     <EmbeddedResource Include="..\Properties\Properties.Resources.uk.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Pixmaps\process-syncing-error.icns" />
   </ItemGroup>
 </Project>
