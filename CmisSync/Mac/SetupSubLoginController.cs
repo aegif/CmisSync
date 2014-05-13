@@ -51,63 +51,108 @@ namespace CmisSync
             base.AwakeFromNib ();
 
             this.AddressLabel.StringValue = Properties_Resources.EnterWebAddress;
-            this.UserLabel.StringValue = Properties_Resources.User;
-            this.PasswordLabel.StringValue = Properties_Resources.Password;
+            this.UserLabel.StringValue = Properties_Resources.User + ": ";
+            this.PasswordLabel.StringValue = Properties_Resources.Password + ": ";
 
-            this.AddressDelegate = new TextFieldDelegate ();
+            this.AddressDelegate = new TextFieldDelegate();
             this.AddressText.Delegate = this.AddressDelegate;
+            this.UserDelegate = new TextFieldDelegate();
+            this.UserText.Delegate = this.UserDelegate;
+            this.PasswordDelegate = new TextFieldDelegate();
+            this.PasswordText.Delegate = this.PasswordDelegate;
 
             this.ContinueButton.Title = Properties_Resources.Continue;
             this.CancelButton.Title = Properties_Resources.Cancel;
 
             this.AddressText.StringValue = (Controller.PreviousAddress == null || String.IsNullOrEmpty (Controller.PreviousAddress.ToString ())) ? "https://" : Controller.PreviousAddress.ToString ();
             this.UserText.StringValue = String.IsNullOrEmpty (Controller.saved_user) ? Environment.UserName : Controller.saved_user;
-//            this.PasswordText.StringValue = String.IsNullOrEmpty (Controller.saved_password) ? "" : Controller.saved_password;
+            //            this.PasswordText.StringValue = String.IsNullOrEmpty (Controller.saved_password) ? "" : Controller.saved_password;
             this.PasswordText.StringValue = "";
+
+
+            // Cmis server address help link
+            string helpLabel = Properties_Resources.Help + ": ";
+            string helpLink = Properties_Resources.WhereToFind;
+            string addressUrl = @"https://github.com/nicolas-raoul/CmisSync/wiki/What-address";
+            this.AddressHelp.AllowsEditingTextAttributes = true;
+            this.AddressHelp.Selectable = true;           
+            var attrStr = new NSMutableAttributedString(helpLabel + helpLink);
+            var labelRange = new NSRange(0, helpLabel.Length);
+            var linkRange = new NSRange(helpLabel.Length, helpLink.Length);
+            var url = new NSUrl(addressUrl);
+            var font = this.AddressHelp.Font;
+            var paragraph = new NSMutableParagraphStyle()
+            {
+                LineBreakMode = this.AddressHelp.Cell.LineBreakMode,
+                Alignment = this.AddressHelp.Alignment
+            };
+            attrStr.BeginEditing();
+            attrStr.AddAttribute(NSAttributedString.LinkAttributeName, url, linkRange);
+            attrStr.AddAttribute(NSAttributedString.ForegroundColorAttributeName, NSColor.Blue, linkRange);
+            attrStr.AddAttribute(NSAttributedString.ForegroundColorAttributeName, NSColor.Gray, labelRange);
+            attrStr.AddAttribute(NSAttributedString.UnderlineStyleAttributeName, new NSNumber(1), linkRange);
+            attrStr.AddAttribute(NSAttributedString.FontAttributeName, font, new NSRange(0, attrStr.Length));
+            attrStr.AddAttribute(NSAttributedString.ParagraphStyleAttributeName, paragraph, new NSRange(0, attrStr.Length));
+            attrStr.EndEditing();
+            this.AddressHelp.AttributedStringValue = attrStr;
 
             InsertEvent ();
 
             //  Must be called after InsertEvent()
-            CheckAddressTextField ();
+            CheckTextFields ();
         }
 
         void InsertEvent()
         {
-            this.AddressDelegate.StringValueChanged += CheckAddressTextField;
+            this.AddressDelegate.StringValueChanged += CheckTextFields;
+            this.UserDelegate.StringValueChanged += CheckTextFields;
+            this.PasswordDelegate.StringValueChanged += CheckTextFields;
             Controller.UpdateSetupContinueButtonEvent += SetContinueButton;
             Controller.UpdateAddProjectButtonEvent += SetContinueButton;
         }
 
         void RemoveEvent()
         {
-            this.AddressDelegate.StringValueChanged -= CheckAddressTextField;
+            this.AddressDelegate.StringValueChanged -= CheckTextFields;
+            this.UserDelegate.StringValueChanged -= CheckTextFields;
+            this.PasswordDelegate.StringValueChanged -= CheckTextFields;
             Controller.UpdateSetupContinueButtonEvent -= SetContinueButton;
             Controller.UpdateAddProjectButtonEvent -= SetContinueButton;
         }
 
         void SetContinueButton(bool enabled)
         {
-            InvokeOnMainThread (delegate
+            InvokeOnMainThread(delegate
             {
-                ContinueButton.Enabled = enabled;
-//                ContinueButton.KeyEquivalent = "\r";
+                if (!enabled || string.IsNullOrEmpty(this.UserText.StringValue) || string.IsNullOrEmpty(this.PasswordText.StringValue))
+                {
+                    ContinueButton.Enabled = false;
+                }
+                else
+                {
+                    ContinueButton.Enabled = true;
+                    //                ContinueButton.KeyEquivalent = "\r";
+                }
             });
+
         }
 
-        void CheckAddressTextField()
+        void CheckTextFields()
         {
             InvokeOnMainThread (delegate
             {
                 string error = Controller.CheckAddPage (AddressText.StringValue);
                 if (String.IsNullOrEmpty (error))
-                    AddressHelp.StringValue = "";
+                    WarnText.StringValue = "";
                 else
-                    AddressHelp.StringValue = Properties_Resources.ResourceManager.GetString (error, CultureInfo.CurrentCulture);
+                    WarnText.StringValue = Properties_Resources.ResourceManager.GetString(error, CultureInfo.CurrentUICulture);
             });
         }
 
         SetupController Controller;
         TextFieldDelegate AddressDelegate;
+        TextFieldDelegate UserDelegate;
+        TextFieldDelegate PasswordDelegate;
 
         partial void OnCancel (MonoMac.Foundation.NSObject sender)
         {
@@ -138,13 +183,42 @@ namespace CmisSync
                 else
                 {
                     Controller.repositories = null;
+                    // Could not retrieve repositories list from server
+                    string warning = "";
                 }
                 InvokeOnMainThread(delegate {
                     if (Controller.repositories == null)
                     {
-                        // TODO fix
                         // WarnText.StringValue = Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2);
-                        WarnText.StringValue = "Controller.getConnectionsProblemWarning(fuzzyResult.Item1, fuzzyResult.Item2)";
+                        string message = fuzzyResult.Item2.Message;
+                        string warning = "";
+                        Exception e = fuzzyResult.Item2;
+                        if (e is PermissionDeniedException)
+                        {
+                            warning = Properties_Resources.LoginFailedForbidden;
+                        }
+                        else if (e is ServerNotFoundException)
+                        {
+                            warning = Properties_Resources.ConnectFailure;
+                        }
+                        else if (e.Message == "SendFailure" && cmisServer.Url.Scheme.StartsWith("https"))
+                        {
+                            warning = Properties_Resources.SendFailureHttps;
+                        }
+                        else if (e.Message == "TrustFailure")
+                        {
+                            warning = Properties_Resources.TrustFailure;
+                        }
+                        else if (e.Message == "Unauthorized")
+                        {
+                            warning = Properties_Resources.LoginFailedForbidden;
+                        }
+                        else
+                        {
+                            warning = message + Environment.NewLine + Properties_Resources.Sorry;
+                        }
+
+                        WarnText.StringValue = warning;
                         AddressText.Enabled = true;
                         UserText.Enabled = true;
                         PasswordText.Enabled = true;
