@@ -96,7 +96,7 @@ namespace CmisSync.Lib.Cmis
                 "/files/basic/cmis/my/servicedoc",
                 "/p8cmis/resources/Service",
                 "/_vti_bin/cmis/rest?getRepositories",
-                "/nemakiware/atom/bedroom",
+                "/nemakiware/atom/bedroom", // TODO: different port, typically 8080 for Web UI and 3000 for CMIS
                 "/nuxeo/atom/cmis",
                 "/cmis/atom"
             };
