@@ -286,11 +286,11 @@ namespace CmisSync
         #endregion
 
         //strongly typed view accessor
-        public new SetupSubSettings View
+        public new SetupSubSetting View
         {
             get
             {
-                return (SetupSubSettings)base.View;
+                return (SetupSubSetting)base.View;
             }
         }
     }
