@@ -6,18 +6,18 @@ using MonoMac.AppKit;
 
 namespace CmisSync
 {
-    public partial class SetupSubSettings : MonoMac.AppKit.NSView
+    public partial class SetupSubSetting : MonoMac.AppKit.NSView
     {
         #region Constructors
 
         // Called when created from unmanaged code
-        public SetupSubSettings(IntPtr handle) : base(handle)
+        public SetupSubSetting(IntPtr handle) : base(handle)
         {
             Initialize();
         }
         // Called when created directly from a XIB file
         [Export("initWithCoder:")]
-        public SetupSubSettings(NSCoder coder) : base(coder)
+        public SetupSubSetting(NSCoder coder) : base(coder)
         {
             Initialize();
         }
