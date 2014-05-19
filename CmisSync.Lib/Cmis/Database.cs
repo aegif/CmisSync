@@ -135,12 +135,14 @@ namespace CmisSync.Lib.Cmis
                     string command =
                         @"CREATE TABLE IF NOT EXISTS files (
                         path TEXT PRIMARY KEY,
+                        localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
                         id TEXT,
                         serverSideModificationDate DATE,
                         metadata TEXT,
                         checksum TEXT);   /* Checksum of both data and metadata */
                     CREATE TABLE IF NOT EXISTS folders (
                         path TEXT PRIMARY KEY,
+                        localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
                         id TEXT,
                         serverSideModificationDate DATE,
                         metadata TEXT,
