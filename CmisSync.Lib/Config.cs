@@ -283,7 +283,7 @@ namespace CmisSync.Lib
                 LastSuccessedSync = repoInfo.LastSuccessedSync,
                 IsSuspended = repoInfo.IsSuspended,
                 SyncAtStartup = repoInfo.SyncAtStartup,
-				SupportedFeatures = null
+                SupportedFeatures = null
             };
             foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
             {

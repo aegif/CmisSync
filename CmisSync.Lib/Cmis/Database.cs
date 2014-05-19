@@ -167,15 +167,15 @@ namespace CmisSync.Lib.Cmis
                     DROP TABLE IF EXISTS faileduploads; /* Drop old upload Counter Table*/";
 
                     ExecuteSQLAction(command, null);
-		            if (createDatabase)
-		            {
-		                command = "INSERT INTO general (key, value) VALUES (\"PathPrefix\", @prefix)";
-		                Dictionary<string, object> parameters = new Dictionary<string, object>();
-		                parameters.Add("prefix", ConfigManager.CurrentConfig.FoldersPath);
-		                ExecuteSQLAction(command, parameters);
-		                Logger.Info("Database created");
-		            }
-		            Logger.Debug("Database migration successful");
+                    if (createDatabase)
+                    {
+                        command = "INSERT INTO general (key, value) VALUES (\"PathPrefix\", @prefix)";
+                        Dictionary<string, object> parameters = new Dictionary<string, object>();
+                        parameters.Add("prefix", ConfigManager.CurrentConfig.FoldersPath);
+                        ExecuteSQLAction(command, parameters);
+                        Logger.Info("Database created");
+                    }
+                    Logger.Debug("Database migration successful");
                 }
                 catch (Exception e)
                 {

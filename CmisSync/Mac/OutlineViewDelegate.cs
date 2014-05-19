@@ -52,14 +52,14 @@ namespace CmisSync {
                 Console.WriteLine ("GetCell Error");
                 return null;
             }
-			if (column == null) {
-				return null;
-			} else if (column.Identifier.Equals ("Name")) {
-				NSTextFieldCell cell = new NSTextFieldCell ();
-				cell.Title = cmis.Name;
-				cell.RepresentedObject = cmis;
+            if (column == null) {
+                return null;
+            } else if (column.Identifier.Equals ("Name")) {
+                NSTextFieldCell cell = new NSTextFieldCell ();
+                cell.Title = cmis.Name;
+                cell.RepresentedObject = cmis;
 
-				return cell;
+                return cell;
 
             } else {
                 NSTextFieldCell cell = new NSTextFieldCell ();

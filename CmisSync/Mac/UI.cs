@@ -48,9 +48,9 @@ namespace CmisSync {
         {
             using (var a = new NSAutoreleasePool ())
             {
-				var currentDirectory = Directory.GetCurrentDirectory();
-				var image = NSImage.ImageNamed ("cmissync-app.icns");
-				NSApplication.SharedApplication.ApplicationIconImage = image;
+                var currentDirectory = Directory.GetCurrentDirectory();
+                var image = NSImage.ImageNamed ("cmissync-app.icns");
+                NSApplication.SharedApplication.ApplicationIconImage = image;
 
                 SetFolderIcon ();
 
@@ -86,7 +86,7 @@ namespace CmisSync {
         public void UpdateDockIconVisibility ()
         {
             #if ODS_NEW_GUI
-			if ((Setup.IsWindowLoaded && Setup.Window.IsVisible) || About.IsVisible) // || Program.Controller.IsEditWindowVisible) // TODO fix
+            if ((Setup.IsWindowLoaded && Setup.Window.IsVisible) || About.IsVisible) // || Program.Controller.IsEditWindowVisible) // TODO fix
             #else
             if (Setup.IsVisible || About.IsVisible || Program.Controller.IsEditWindowVisible)
             #endif

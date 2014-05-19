@@ -181,7 +181,7 @@ namespace CmisSync.CmisTree
         /// <returns></returns>
         public static List<Node> LoadSubFolderDelegate(CmisRepoCredentials credentials, Node root)
         {
-			CmisUtils.FolderTree tree = CmisUtils.GetSubfolderTree(credentials, root.Path, 2);
+            CmisUtils.FolderTree tree = CmisUtils.GetSubfolderTree(credentials, root.Path, 2);
             List<Node> children = CreateSubTrees(tree.Children, null);
             foreach (Node child in children)
                 child.Parent = root;
@@ -225,10 +225,10 @@ namespace CmisSync.CmisTree
             throw new NotImplementedException();
         }*/
 
-		private static List<Node> CreateSubTrees(List<CmisUtils.FolderTree> children, Node parent)
+        private static List<Node> CreateSubTrees(List<CmisUtils.FolderTree> children, Node parent)
         {
             List<Node> result = new List<Node>();
-			foreach (CmisUtils.FolderTree child in children)
+            foreach (CmisUtils.FolderTree child in children)
             {
                 Folder f = new Folder()
                 {
