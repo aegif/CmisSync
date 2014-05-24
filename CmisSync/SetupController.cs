@@ -24,6 +24,8 @@ using System.Threading;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
+using System.ComponentModel;
+using CmisSync.Auth;
 
 namespace CmisSync
 {
@@ -166,6 +168,9 @@ namespace CmisSync
         /// </summary>
         public delegate void ChangePasswordFieldEventHandler(string text, string example_text);
 
+        public event LocalPathExistsEventHandler LocalPathExists;
+        public delegate bool LocalPathExistsEventHandler(string path);
+
         /// <summary>
         /// Whether the window is currently open.
         /// </summary>
@@ -231,6 +236,10 @@ namespace CmisSync
         /// </summary>
         public int saved_sync_interval = 15;
         /// <summary>
+        /// Saved sync at startup
+        /// </summary>
+        public bool saved_syncatstartup = true;
+        /// <summary>
         /// Ignored paths.
         /// </summary>
         public List<string> ignoredPaths = new List<string>();
@@ -249,13 +258,11 @@ namespace CmisSync
         /// <summary>
         /// Load repositories information from a CMIS endpoint.
         /// </summary>
-        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(string url, string user, string password)
+        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(ServerCredentials credentials)
         {
-            Uri uri;
             try
             {
-                uri = new Uri(url);
-                return CmisUtils.GetRepositoriesFuzzy(uri, user, password);
+                return CmisUtils.GetRepositoriesFuzzy(credentials);
             }
             catch (Exception e)
             {
@@ -296,6 +303,7 @@ namespace CmisSync
         /// Basically, it should be a valid local filesystem folder name.
         /// </summary>
         Regex RepositoryRegex = new Regex(@"^([a-zA-Z0-9][^*/><?\|:]*)$");
+        Regex RepositoryRegexLinux = new Regex(@"^([a-zA-Z0-9][^*\\><?\|:]*)$");
 
 
         /// <summary>
@@ -303,7 +311,7 @@ namespace CmisSync
         /// </summary>
         public SetupController()
         {
-            Logger.Debug("Entering constructor.");
+            Logger.Debug("SetupController - Entering constructor.");
 
             TutorialCurrentPage = 0;
             PreviousAddress = null;
@@ -353,7 +361,7 @@ namespace CmisSync
                 ChangePageEvent(page);
                 ShowWindowEvent();
             };
-            Logger.Debug("Exiting constructor.");
+            Logger.Debug("SetupController - Exiting constructor.");
         }
 
 
@@ -496,34 +504,41 @@ namespace CmisSync
         /// <returns>validity error, or empty string if valid</returns>
         public string CheckRepoPathAndName(string localpath, string reponame)
         {
-            // Check whether foldername is already in use
-            bool folderAlreadyExists = (Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase)) != -1);
-
-            // Check whether folde rname contains invalid characters.
-            bool valid = (RepositoryRegex.IsMatch(reponame) && (!folderAlreadyExists));
-
-            if (!valid)
+            try
             {
-                // Disable button to next step.
-                UpdateAddProjectButtonEvent(false);
+                // Check whether foldername is already in use
+                int index = Program.Controller.Folders.FindIndex(x => x.Equals(reponame, StringComparison.OrdinalIgnoreCase));
+                if ( index != -1)
+                    throw new ArgumentException(String.Format(Properties_Resources.FolderAlreadyInUse, localpath, Program.Controller.Folders[index]));
+
+                // Check whether folder name contains invalid characters.
+                Regex regexRepoName = (Path.DirectorySeparatorChar.Equals('\\')) ? RepositoryRegex : RepositoryRegexLinux;
+                if (!regexRepoName.IsMatch(reponame)||CmisSync.Lib.Utils.IsInvalidFolderName(reponame.Replace(Path.DirectorySeparatorChar, ' ')))
+                    throw new ArgumentException(String.Format(Properties_Resources.InvalidRepoName, reponame));
+                // Validate localpath
+                if(localpath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    localpath = localpath.Substring(0,localpath.Length-1);
+                if (CmisSync.Lib.Utils.IsInvalidFolderName(Path.GetFileName(localpath)))
+                    throw new ArgumentException(String.Format(Properties_Resources.InvalidFolderName, Path.GetFileName(localpath)));
+                // If no warning handler is registered, handle warning as error
+                if (LocalPathExists == null)
+                    CheckRepoPathExists(localpath);
+                UpdateAddProjectButtonEvent(true);
+                return String.Empty;
             }
-            // Return validity error, or continue validating.
-            if (folderAlreadyExists) return "FolderAlreadyExist";
-            if (!RepositoryRegex.IsMatch(reponame)) return "InvalidFolderName";
-
-            // Validate localpath
-            folderAlreadyExists = Directory.Exists(localpath);
-
-            valid = !folderAlreadyExists;
-
-            // Enable button to next step.
-            UpdateAddProjectButtonEvent(valid);
-
-            // Return validity error, or empty string if valid.
-            if (folderAlreadyExists) return "LocalDirectoryExist";
-            return String.Empty;
+            catch (Exception e)
+            {
+                UpdateAddProjectButtonEvent(false);
+                return e.Message;
+            }
         }
 
+
+        public void CheckRepoPathExists(string localpath)
+        {
+            if (Directory.Exists(localpath))
+                throw new ArgumentException(String.Format(Properties_Resources.LocalDirectoryExist));
+        }
 
         /// <summary>
         /// First step of remote folder addition wizard is complete, switch to second step
@@ -534,8 +549,8 @@ namespace CmisSync
             saved_user = user;
             saved_password = password;
 
-			ChangePageEvent(PageType.Add2);
-		}
+            ChangePageEvent(PageType.Add2);
+        }
 
 
         /// <summary>
@@ -567,6 +582,7 @@ namespace CmisSync
             PreviousRepository = repository;
             PreviousPath = remote_path;
 
+            this.ignoredPaths.Clear();
             foreach (string ignore in ignoredPaths)
                 this.ignoredPaths.Add(ignore);
         }
@@ -585,6 +601,17 @@ namespace CmisSync
         /// </summary>
         public void CustomizePageCompleted(String repoName, String localrepopath)
         {
+            try
+            {
+                CheckRepoPathExists(localrepopath);
+            }
+            catch (ArgumentException)
+            {
+                if (LocalPathExists != null && ! LocalPathExists(localrepopath))
+                {
+                    return;
+                }
+            }
             SyncingReponame = repoName;
 
 
@@ -599,13 +626,15 @@ namespace CmisSync
                     PreviousRepository,
                     PreviousPath,
                     localrepopath,
-                    ignoredPaths);
+                    ignoredPaths,
+                    saved_syncatstartup);
             }
             catch (Exception e)
             {
                 Logger.Fatal("Could not create repository.", e);
                 Program.Controller.ShowAlert(Properties_Resources.Error, String.Format(Properties_Resources.SyncError, repoName, e.Message));
                 FinishPageCompleted();
+                return;
             }
 
             ChangePageEvent(PageType.Finished);
@@ -644,12 +673,21 @@ namespace CmisSync
             HideWindowEvent();
         }
 
+
         /// <summary>
         /// Repository settings page.
         /// </summary>
-        public void SettingsPageCompleted(string password, int pollInterval)
+        public void SettingsPageCompleted(string password, int pollInterval, bool syncAtStartup)
         {
-            Program.Controller.UpdateRepositorySettings(saved_repository, password, pollInterval);
+            //Run this in background so as not to free the UI...
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
+                {
+                    Program.Controller.UpdateRepositorySettings(saved_repository, password, pollInterval, syncAtStartup);
+                }
+            );
+            worker.RunWorkerAsync();
 
             FinishPageCompleted();
         }

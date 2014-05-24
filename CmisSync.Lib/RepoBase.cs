@@ -19,6 +19,8 @@ using log4net;
 using System;
 using System.IO;
 using Timers = System.Timers;
+using CmisSync.Lib.Events;
+using CmisSync.Auth;
 
 namespace CmisSync.Lib
 {
@@ -51,6 +53,12 @@ namespace CmisSync.Lib
         /// Local disk size taken by the repository.
         /// </summary>
         public abstract double Size { get; }
+
+
+        /// <summary>
+        /// Affect a new <c>SyncStatus</c> value.
+        /// </summary>
+        public Action<SyncStatus> SyncStatusChanged { get; set; }
 
 
         /// <summary>
@@ -95,16 +103,41 @@ namespace CmisSync.Lib
         public void Suspend()
         {
             Status = SyncStatus.Suspend;
+            RepoInfo.IsSuspended = true;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.IsSuspended = true;
+            config.Save();
         }
 
         /// <summary>
         /// Restart syncing.
         /// </summary>
-        public void Resume()
+        public virtual void Resume()
         {
             Status = SyncStatus.Idle;
+            RepoInfo.IsSuspended = false;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.IsSuspended = false;
+            config.Save();
         }
 
+        /// <summary>
+        /// Event Queue for this repository.
+        /// Use this to notifiy events for this repository.
+        /// </summary>
+        public SyncEventQueue Queue { get; private set; }
+
+        /// <summary>
+        /// Event Manager for this repository.
+        /// Use this for adding and removing SyncEventHandler for this repository.
+        /// </summary>
+        public SyncEventManager EventManager { get; private set; }
 
         /// <summary>
         /// Return the synchronized folder's information.
@@ -164,12 +197,18 @@ namespace CmisSync.Lib
         /// </summary>
         public RepoBase(RepoInfo repoInfo, IActivityListener activityListener)
         {
+            EventManager = new SyncEventManager();
+            EventManager.AddEventHandler(new DebugLoggingHandler());
+            EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(0, RepoInfoChanged));
+            Queue = new SyncEventQueue(EventManager);
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = repoInfo.Name;
             RemoteUrl = repoInfo.Address;
 
             this.activityListener = activityListener;
+
+            if (repoInfo.IsSuspended) Status = SyncStatus.Suspend;
 
             // Folder lock.
             // Disabled for now. Can be an interesting feature, but should be made opt-in, as
@@ -198,6 +237,21 @@ namespace CmisSync.Lib
             };
             local_timer.AutoReset = false;
             local_timer.Interval = delay_interval;
+        }
+
+
+        private bool RepoInfoChanged(ISyncEvent e)
+        {
+            if (e is RepoConfigChangedEvent)
+            {
+                this.RepoInfo = (e as RepoConfigChangedEvent).RepoInfo;
+                return true;
+            }
+            else
+            {
+                // This should never ever happen!
+                return false;
+            }
         }
 
 
@@ -235,6 +289,7 @@ namespace CmisSync.Lib
                     this.local_timer.Dispose();
                     this.Watcher.Dispose();
                     // this.folderLock.Dispose(); Folder lock disabled.
+                    this.Queue.Dispose();
                 }
                 this.disposed = true;
             }
@@ -250,13 +305,34 @@ namespace CmisSync.Lib
 
             // Sync up everything that changed
             // since we've been offline
-            SyncInBackground();
+            if (RepoInfo.SyncAtStartup)
+            {
+                SyncInBackground();
+                Logger.Info(String.Format("Repo {0} - sync launch at startup", RepoInfo.Name));
+            }
+            else
+            {
+                Logger.Info(String.Format("Repo {0} - sync not launch at startup", RepoInfo.Name));
+                // if LastSuccessSync + pollInterval >= DateTime.Now => Sync
+                DateTime tm = RepoInfo.LastSuccessedSync.AddMilliseconds(RepoInfo.PollInterval);
+                // http://msdn.microsoft.com/fr-fr/library/system.datetime.compare(v=vs.110).aspx
+                if (DateTime.Compare(DateTime.Now, tm) >= 0)
+                {
+                    SyncInBackground();
+                    Logger.Info(String.Format("Repo {0} - sync launch based on last success time sync + poll interval", RepoInfo.Name));
+                }
+                else
+                {
+                    Logger.Info(String.Format("Repo {0} - sync not launch based on last success time sync + poll interval - Next sync at {1}", RepoInfo.Name, tm));
+                }
+            }
         }
+
 
         /// <summary>
         /// Update repository settings.
         /// </summary>
-        public virtual void UpdateSettings(string password, int pollInterval)
+        public virtual void UpdateSettings(string password, int pollInterval, bool syncAtStartup)
         {
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
@@ -269,10 +345,13 @@ namespace CmisSync.Lib
             //Update password...
             if (!String.IsNullOrEmpty(password))
             {
-                this.RepoInfo.Password = new CmisSync.Auth.CmisPassword(password.TrimEnd());
+                this.RepoInfo.Password = new Password(password.TrimEnd());
                 syncConfig.ObfuscatedPassword = RepoInfo.Password.ObfuscatedPassword;
                 Logger.Debug("Updated \"" + this.Name + "\" password");
             }
+
+            // Sync at startup
+            syncConfig.SyncAtStartup = syncAtStartup;
 
             //Update poll interval
             this.RepoInfo.PollInterval = pollInterval;
@@ -287,6 +366,14 @@ namespace CmisSync.Lib
             Resume();
             this.remote_timer.Start();
         }
+
+
+        /// <summary>
+        /// Will send message the currently running sync thread (if one exists) to stop syncing as soon as the next
+        /// blockign operation completes.
+        /// </summary>
+        public abstract void CancelSync();
+
 
         /// <summary>
         /// Manual sync.
@@ -315,13 +402,13 @@ namespace CmisSync.Lib
             // ConflictResolved(); TODO
         }
 
+
         /// <summary>
         /// Called when sync starts.
         /// </summary>
         public void OnSyncStart(bool syncFull)
         {
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Started: " + LocalPath);
-            activityListener.ActivityStarted();
             if (syncFull)
             {
                 remote_timer.Stop();
@@ -331,23 +418,6 @@ namespace CmisSync.Lib
             Watcher.EnableEvent = false;
         }
 
-        /// <summary>
-        /// Called when sync is suspended.
-        /// </summary>
-        public void OnSyncSuspend()
-        {
-            Logger.Info("Sync Suspended: " + LocalPath);
-            activityListener.ActivityStopped();
-        }
-
-        /// <summary>
-        /// Called when sync is resumed.
-        /// </summary>
-        public void OnSyncResume()
-        {
-            activityListener.ActivityStarted();
-            Logger.Info("Sync Resumed: " + LocalPath);
-        }
 
         /// <summary>
         /// Called when sync completes.
@@ -367,14 +437,23 @@ namespace CmisSync.Lib
             if (Watcher.GetChangeCount() > 0)
             {
                 //Watcher was stopped (due to error) so clear and restart sync
-                Watcher.Clear();
+                Watcher.RemoveAll();
             }
 
             Watcher.EnableRaisingEvents = true;
             Watcher.EnableEvent = true;
-            activityListener.ActivityStopped();
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+
+            // Save last sync
+            RepoInfo.LastSuccessedSync = DateTime.Now;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            syncConfig.LastSuccessedSync = RepoInfo.LastSuccessedSync;
+            config.Save();
         }
+
 
         /// <summary>
         /// Called when sync encounters an error.
@@ -384,6 +463,7 @@ namespace CmisSync.Lib
             Logger.Info("Sync Error: " + exception.Message);
             activityListener.ActivityError(new Tuple<string, Exception>(Name, exception));
         }
+
 
         /// <summary>
         /// Recursively gets a folder's size in bytes.

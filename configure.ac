@@ -1,9 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
-m4_define([cmissync_version], [1.0.0])
+m4_define([cmissync_version], [1.2.0])
 
 AC_PREREQ([2.54])
 AC_INIT([CmisSync], cmissync_version)
 AC_CONFIG_SRCDIR([CmisSync/Program.cs])
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([foreign dist-bzip2 dist-zip no-dist-gzip])
 AM_MAINTAINER_MODE
 
@@ -36,15 +37,35 @@ SHAMROCK_CHECK_MONO_4_0_GAC_ASSEMBLIES([
 ])]
 )
 
-PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
-if test "x$have_nunit" = "xno" ; then
-    dnl On som distro's the package is named mono-nunit
-    PKG_CHECK_MODULES(NUNIT, mono-nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+AC_ARG_WITH([nunit],
+            AS_HELP_STRING([--with-nunit=PATH],[Specify path to nunit.framework.dll]),
+            [nunit_dll=${withval}],[nunit_dll=no])
+if test "x$nunit_dll" = "xno" ; then
+    PKG_CHECK_MODULES(NUNIT, nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
     if test "x$have_nunit" = "xno" ; then
-        AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+      dnl On som distro's the package is named mono-nunit
+      PKG_CHECK_MODULES(NUNIT, mono-nunit >= 2.6.0, have_nunit=yes, have_nunit=no)
+      if test "x$have_nunit" = "xno" ; then
+          AC_ERROR("nunit is a required dependency: you need to install the appropriate devel package before you can compile")
+      fi
+    fi
+    AC_SUBST(NUNIT_LIBS)
+else
+ if test -f ${nunit_dll} ; then
+        case ${nunit_dll} in
+            /*)
+            AC_SUBST(NUNIT_LIBS,[-r:${nunit_dll}])
+            AC_SUBST(NUNIT_PATH,[${nunit_dll}])
+            ;;
+            *)
+            AC_SUBST(NUNIT_LIBS,[[-r:\$\(top_srcdir\)/${nunit_dll}]])
+            AC_SUBST(NUNIT_PATH,[[\$\(top_srcdir\)/${nunit_dll}]])
+            ;;
+        esac
+    else
+        AC_ERROR([${nunit_dll} not found])
     fi
 fi
-AC_SUBST(NUNIT_LIBS)
 
 AC_ARG_WITH([newtonsoft-json],
             AS_HELP_STRING([--with-newtonsoft-json=PATH],[Specify path to NewtonSoft.Json.dll]),
@@ -70,10 +91,22 @@ else
         AC_ERROR([${newtonsoft_json_dll} not found])
     fi
 fi
-AC_SUBST(NUNIT_LIBS)
 
 CMISSYNC_CHECK_NOTIFY_SHARP
 CMISSYNC_CHECK_GTK_SHARP
+
+AC_ARG_ENABLE(fat-binary,
+  AS_HELP_STRING([--enable-fat-binary[=@<:@no/yes@:>@]],[Build fat binary after compilation]),
+  [enable_fat_binary=$enableval],
+  [enable_fat_binary="no"])
+
+if test "x$enable_fat_binary" = "xno" ; then
+    AC_SUBST(SLIMMONO, "mono")
+    AC_SUBST(MONOEXE, ".exe")
+  else
+    AC_SUBST(SLIMMONO, "")
+    AC_SUBST(MONOEXE, "")
+fi
 
 AC_ARG_ENABLE(appindicator,
 	AS_HELP_STRING([--enable-appindicator[=@<:@no/auto/yes@:>@]],[Build support for application indicators ]),
@@ -99,6 +132,22 @@ if test -f ${dotcmis_dll} ; then
     esac
 else
     AC_ERROR([${dotcmis_dll} not found])
+fi
+
+AC_ARG_WITH([log4net],
+            AS_HELP_STRING([--with-log4net=PATH],[Specify path to log4net.dll]),
+            [log4net_dll=${withval}],[log4net_dll=no])
+if test ${log4net_dll} != "no" ; then
+    case ${log4net_dll} in
+        /*)
+        AC_SUBST(LOG4NETLIBS,[-r:${log4net_dll}])
+        AC_SUBST(LOG4NETPATH,[${log4net_dll}])
+        ;;
+        *)
+        AC_SUBST(LOG4NETLIBS,[[-r:\$\(top_srcdir\)/${log4net_dll}]])
+        AC_SUBST(LOG4NETPATH,[[\$\(top_srcdir\)/${log4net_dll}]])
+        ;;
+    esac
 fi
 
 TEST_URL="https://devel.dataspace.cc/cmis/atom"
@@ -138,6 +187,10 @@ AC_ARG_WITH([test-repoid],
 AC_SUBST(TEST_REPOID)
 
 OSNAME=`uname -s`
+OSOK=no
+
+PACKAGE_TARGET=none
+
 if test "$OSNAME" = "Linux" ; then
 
 	dnl check for notify-sharp
@@ -150,7 +203,11 @@ if test "$OSNAME" = "Linux" ; then
     dnl check for log4net
 	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
 	if test "x$have_log4net" = "xno" ; then
-		AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        if test "$log4net_dll" != "no" ; then
+            LOG4NET_LIBS=['[$](LOG4NETLIBS)']
+        else
+		    AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        fi
 	fi
 	AC_SUBST(LOG4NET_LIBS)
 
@@ -176,9 +233,96 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
 
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
-	GUISUBDIRS=CmisSync
+    GUISUBDIRS=CmisSync
     enable_gtkui=yes
+	cocoa=false
+	macos=false
+    OSOK=yes
+    PACKAGE_TARGET=debian-package
+fi
+
+if test "$OSNAME" = "Darwin" ; then
+	AC_MSG_RESULT([Building on OSX])
+
+	AC_SUBST(NOTIFY_SHARP_LIBS)
+
+	dnl check for log4net
+        LOG4NET_LIBS=
+	PKG_CHECK_MODULES(LOG4NET, log4net, have_log4net=yes, have_log4net=no)
+	if test "x$have_log4net" = "xno" ; then
+        if test "x$log4net_dll" != "xno" ; then
+            LOG4NET_LIBS=$LOG4NETLIBS
+        else
+            AC_ERROR([log4net is a required dependency: you need to install the appropriate devel package before you can compile])
+        fi
+	fi
+	AC_SUBST(LOG4NET_LIBS)
+	
+
+    AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
+    AC_SUBST(WEBLIBS,[-r:System.Web.dll])
+    AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
+    AC_SUBST(DRAWING, [-r:System.Drawing.dll])
+
+    AC_ARG_WITH([monomac],
+        AS_HELP_STRING([--with-monomac=PATH],[Specify path to MonoMac.dll]),
+            [monomac_dll=${withval}],[monomac_dll=no])
+    if test "x$monomac_dll" = "xno" ; then
+        PKG_CHECK_MODULES(MONOMAC, xammac, have_xammac=yes, have_xammac=no)
+        if test "x$have_xammac" = "xno" ; then
+            AM_CONDITIONAL([HAVE_XAMMAC], false)
+            PKG_CHECK_MODULES(MONOMAC, monomac, have_monomac=yes, have_monomac=no)
+            if test "x$have_monomac" = "xno" ; then
+                AM_CONDITIONAL([HAVE_MONOMAC], false)
+                AC_ERROR([xammac or monomac are required dependency: you need to install the appropriate lib before you can compile])
+                else
+                AM_CONDITIONAL([HAVE_MONOMAC], true)
+		AC_MSG_RESULT([HAVE_MONOMAC=true])
+            fi
+        else
+        AM_CONDITIONAL([HAVE_XAMMAC], true)
+        AM_CONDITIONAL([HAVE_MONOMAC], false)
+	AC_MSG_RESULT([HAVE_MONOMAC=false])
+        fi
+    else
+        AM_CONDITIONAL([HAVE_XAMMAC], false)
+        AM_CONDITIONAL([HAVE_MONOMAC], true)
+        AC_MSG_RESULT([HAVE_MONOMAC=true])
+        if test -f ${monomac_dll} ; then
+            case ${monomac_dll} in
+                /*)
+                AC_SUBST(MONOMAC_LIBS,[-r:${monomac_dll}])
+                AC_SUBST(MONOMAC_PATH,[${monomac_dll}])
+                ;;
+                *)
+                AC_SUBST(MONOMAC_LIBS,[[-r:\$\(top_srcdir\)/${monomac_dll}]])
+                AC_SUBST(MONOMAC_PATH,[[\$\(top_srcdir\)/${monomac_dll}]])
+                ;;
+            esac
+        else
+            AC_ERROR([${monomac_dll} not found])
+        fi
+    fi
+    AC_SUBST(MONOMAC_LIBS)
+
+    AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES} -define:__COCOA__")
+    GUISUBDIRS=CmisSync
+    enable_gtkui=no
+	cocoa=true
+	macos=true
+    OSOK=yes
+    PACKAGE_TARGET=apple-package
 else
+    AM_CONDITIONAL([HAVE_XAMMAC], false)
+    AM_CONDITIONAL([HAVE_MONOMAC], false)
+fi
+
+AC_SUBST(PACKAGE_TARGET)
+
+AM_CONDITIONAL([HAVE_MAC_OS],[test x$macos = xtrue])
+AM_CONDITIONAL([__COCOA__], [test x$cocoa = xtrue])
+
+if test "$OSOK" = "no" ; then
 	GUISUBDIRS=
     enable_gtkui=no
 fi
@@ -201,10 +345,15 @@ CmisSync/Linux/Pixmaps/Makefile
 CmisSync/Linux/Pixmaps/icons/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-dark/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
+CmisSync/Mac/Makefile
+CmisSync/Mac/Info.plist
+CmisSync/Mac/Pixmaps/Makefile
 CmisSync/TestLibrary/Makefile
 CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibraryRunner/Makefile
 CmisSync/Linux/cmissync
+DataSpaceSync.Console/Makefile
+DataSpaceSync.Console/dsscli
 CmisSync/Makefile
 Makefile
 ])

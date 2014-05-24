@@ -10,9 +10,14 @@ T: CmisSync.Lib.Defines
 R: Gendarme.Rules.Correctness.DisposableFieldsShouldBeDisposedRule
 T: CmisSync.Lib.Sync.CmisRepo/SynchronizedFolder
 
+#  http://blogs.msdn.com/b/pfxteam/archive/2012/03/25/10287435.aspx
+R: Gendarme.Rules.Correctness.DisposableFieldsShouldBeDisposedRule
+T: CmisSync.Lib.Events.SyncEventQueue
+
 #Ignore dispose pattern for UI widget (Linux)
 R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
 M: System.Void CmisSync.CertPolicyHandler/<ShowCertDialog>c__AnonStorey0::<>m__7(System.Object,System.EventArgs)
+M: System.Void CmisSync.StatusIcon/<RemoveFolderFromSyncDelegate>c__AnonStorey17::<>m__73(System.Object,System.EventArgs)
 M: System.Void CmisSync.Setup::ShowSetupPage()
 M: System.Void CmisSync.Setup::ShowAdd2Page()
 M: System.Void CmisSync.Setup::ShowFinishedPage()
@@ -40,8 +45,7 @@ R: Gendarme.Rules.Design.TypesWithDisposableFieldsShouldBeDisposableRule
 T: CmisSync.ControllerBase
 T: CmisSync.StatusIconController
 T: CmisSync.UI
-T: CmisSync.CmisTree.Folder
-T: CmisSync.CmisTree.CmisRepo
+T: CmisSync.CmisTree.AsyncNodeLoader
 
 #Windows Gendarme bug? XmlNodeList is not an IDisposal object at all
 R: Gendarme.Rules.Correctness.EnsureLocalDisposalRule
@@ -50,4 +54,9 @@ M: System.Void CmisSync.Lib.Config::RemoveFolder(System.String)
 
 #Ignore DotCMIS based rule
 R: Gendarme.Rules.Design.Generic.DoNotExposeNestedGenericSignaturesRule
-M: System.Void CmisSync.Lib.Cmis.CmisUtils/FolderTree::.ctor(System.Collections.Generic.IList`1<DotCMIS.Client.ITree`1<DotCMIS.Client.IFileableCmisObject>>,DotCMIS.Client.IFolder)
+M: System.Void CmisSync.Lib.Cmis.CmisUtils/FolderTree::.ctor(System.Collections.Generic.IList`1<DotCMIS.Client.ITree`1<DotCMIS.Client.IFileableCmisObject>>,DotCMIS.Client.IFolder,System.Int32)
+
+#We want to sort only
+R: Gendarme.Rules.Design.ImplementIComparableCorrectlyRule
+T: CmisSync.Lib.Events.SyncEventHandler
+

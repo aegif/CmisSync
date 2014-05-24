@@ -26,6 +26,7 @@ libtool
 ltmain.sh
 missing
 CmisSync/Linux/cmissync
+CmisSync/Linux/dataspacesync
 CmisSync/Mac/git
 CmisSync.Lib/Defines.cs
 CmisSync/Linux/Defines.cs
@@ -43,4 +44,7 @@ Extras/log4net-1.2.11/src/log4net.xml
 cmissync-*.zip
 cmissync-*.tar*
 build/cmissync.spec
-/.project
+.project
+DataSpaceSync.Console/dsscli
+TestResult.xml
+Extras/MonoMac.dll

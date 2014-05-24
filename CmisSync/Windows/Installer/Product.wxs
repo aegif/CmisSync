@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" >
 
-  <Product Name="CmisSync" Id="08B73992-D400-4D9E-9BE5-4486CA0E09BA" UpgradeCode="4C725498-9D2D-43BF-8966-FEEACE102830"
+  <Product Name="CmisSync" Id="*" UpgradeCode="4C725498-9D2D-43BF-8966-FEEACE102830"
     Language="1033" Codepage="1252" Version="$(var.BuildVersion)" Manufacturer="Aegif">
 
     <Package Id="*" Keywords="Installer" Description="CmisSync Setup" Manufacturer="Aegif"
@@ -207,6 +207,19 @@
     <Icon Id="icon.ico" SourceFile="$(var.CmisSync.ProjectDir)\Pixmaps\cmissync-app.ico"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />
 
+    <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+    <Upgrade Id="4C725498-9D2D-43BF-8966-FEEACE102830">
+      <UpgradeVersion
+         Minimum="1.0.0.0" Maximum="99.0.0.0"
+         Property="PREVIOUSVERSIONSINSTALLED"
+         IncludeMinimum="yes" IncludeMaximum="no" />
+    </Upgrade>
+    
+    <!-- Incompatible with block "Upgrade" above it seems
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize"></RemoveExistingProducts>
+    </InstallExecuteSequence>-->
+    
     <MajorUpgrade
       Schedule="afterInstallInitialize"
       DowngradeErrorMessage="A later version of CmisSync is already installed. Setup will now exit." />

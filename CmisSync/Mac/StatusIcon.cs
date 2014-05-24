@@ -18,10 +18,14 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Collections.Generic;
 
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
+
+using CmisSync.Lib;
+using CmisSync.Lib.Events;
 
 namespace CmisSync {
 
@@ -30,21 +34,14 @@ namespace CmisSync {
         public StatusIconController Controller = new StatusIconController ();
 
         private NSMenu menu;
-        private NSMenu submenu;
 
         private NSStatusItem status_item;
         private NSMenuItem state_item;
-        private NSMenuItem folder_item;
 
-        private NSMenuItem [] folder_menu_items;
-        private NSMenuItem [] submenu_items;
-
-        private NSMenuItem more_item;
         private NSMenuItem add_item;
         private NSMenuItem about_item;
-        private NSMenuItem notify_item;
-        private NSMenuItem recent_events_item;
         private NSMenuItem quit_item;
+        private NSMenuItem log_item;
 
         private NSImage [] animation_frames;
         private NSImage [] animation_frames_active;
@@ -53,11 +50,15 @@ namespace CmisSync {
         private NSImage folder_image;
         private NSImage caution_image;
         private NSImage cmissync_image;
+        private NSImage pause_image;
+        private NSImage resume_image;
+        private NSImage sync_image;
+        private NSImage download_image;
+        private NSImage upload_image;
+        private NSImage update_image;
 
-        private EventHandler [] folder_tasks;
-        private EventHandler [] overflow_tasks;
+        private Dictionary<String, NSMenuItem> FolderItems;
 
-        
         public StatusIcon () : base ()
         {
             using (var a = new NSAutoreleasePool ())
@@ -73,18 +74,14 @@ namespace CmisSync {
                 this.status_item.AlternateImage      = this.animation_frames_active [0];
                 this.status_item.AlternateImage.Size = new SizeF (16, 16);
 
-                this.folder_image       = NSImage.ImageNamed ("NSFolder");
-                this.caution_image      = NSImage.ImageNamed ("NSCaution");
-                this.cmissync_image = NSImage.ImageNamed ("cmissync-folder");
-
                 CreateMenu ();
             }
-			
+            
 
             Controller.UpdateIconEvent += delegate (int icon_frame) {
                 using (var a = new NSAutoreleasePool ())
                 {
-                    InvokeOnMainThread (delegate {
+                    BeginInvokeOnMainThread (delegate {
                         if (icon_frame > -1) {
                             this.status_item.Image               = this.animation_frames [icon_frame];
                             this.status_item.Image.Size          = new SizeF (16, 16);
@@ -117,25 +114,112 @@ namespace CmisSync {
                 }
             };
 
-            Controller.UpdateQuitItemEvent += delegate (bool quit_item_enabled) {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        this.quit_item.Enabled = quit_item_enabled;
+            Controller.UpdateSuspendSyncFolderEvent += delegate(string reponame)
+            {
+                using (var a = new NSAutoreleasePool()){
+                    InvokeOnMainThread(delegate {
+                        NSMenuItem PauseItem;
+                        if(FolderItems.TryGetValue(reponame,out PauseItem)){
+                            setSyncItemState(PauseItem, getSyncStatus(reponame));
+                        }
                     });
                 }
             };
 
-            Controller.UpdateOpenRecentEventsItemEvent += delegate (bool events_item_enabled) {
-                using (var a = new NSAutoreleasePool ())
-                {
-                    InvokeOnMainThread (delegate {
-                        this.recent_events_item.Enabled = events_item_enabled;
+            // TODO Need to implement this method like the COCOA way to do it
+            Controller.UpdateTransmissionMenuEvent += delegate
+            {
+                using (var a = new NSAutoreleasePool()) {
+                    InvokeOnMainThread(delegate {
+                        List<FileTransmissionEvent> transmissions =    Program.Controller.ActiveTransmissions();
+                        NSMenu transmissionmenu = new NSMenu();
+                        foreach(FileTransmissionEvent transmission in transmissions) {
+                            NSMenuItem transmissionItem = new TransmissionMenuItem(transmission);
+                            transmissionmenu.AddItem(transmissionItem);
+                        }
+                        if(transmissions.Count > 0) {
+                            state_item.Submenu = transmissionmenu;
+                            state_item.Enabled = true;
+                        }else{
+                            state_item.Enabled = false;
+                        }
                     });
                 }
             };
         }
 
+        NSMenuItem CreateFolderMenuItem(string folder_name)
+        {
+            NSMenuItem folderitem = new NSMenuItem();
+            folderitem.Image = this.folder_image;
+            folderitem.Image.Size = new SizeF(16, 16);
+            folderitem.Title = folder_name;
+            NSMenu foldersubmenu = new NSMenu();
+
+            NSMenuItem openitem = new NSMenuItem();
+            openitem.Title = Properties_Resources.OpenLocalFolder;
+            openitem.Activated += OpenFolderDelegate(folder_name);
+
+            NSMenuItem openremote = new NSMenuItem();
+            openremote.Title = Properties_Resources.BrowseRemoteFolder;
+            openremote.Activated += OpenRemoteFolderDelegate (folder_name);
+
+            NSMenuItem pauseitem = new NSMenuItem();
+            setSyncItemState(pauseitem, getSyncStatus(folder_name));
+            FolderItems.Add(folder_name, pauseitem);
+            pauseitem.Activated += PauseFolderDelegate(folder_name);
+            
+            NSMenuItem manualSyncItem = new NSMenuItem();
+            manualSyncItem.Title = Properties_Resources.ManualSync;
+            manualSyncItem.Image = this.sync_image;
+            manualSyncItem.Image.Size = new SizeF (16, 16);
+            manualSyncItem.Activated += ManualSyncDelegate(folder_name);
+
+            NSMenuItem removeitem = new NSMenuItem();
+            removeitem.Title = Properties_Resources.RemoveFolderFromSync;
+            removeitem.Activated += RemoveFolderDelegate(folder_name);
+
+            NSMenuItem settingsitem = new NSMenuItem();
+            settingsitem.Title = Properties_Resources.EditTitle;
+            settingsitem.Activated += OpenSettingsDialogDelegate(folder_name);
+
+            foldersubmenu.AddItem(openitem);
+            foldersubmenu.AddItem(openremote);
+            foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
+            foldersubmenu.AddItem(pauseitem);
+            foldersubmenu.AddItem(manualSyncItem);
+            foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
+            foldersubmenu.AddItem(settingsitem);
+            foldersubmenu.AddItem(NSMenuItem.SeparatorItem);
+            foldersubmenu.AddItem(removeitem);
+            folderitem.Submenu = foldersubmenu;
+            return folderitem;
+        }
+
+        private SyncStatus getSyncStatus(string reponame) {
+            foreach (RepoBase repo in Program.Controller.Repositories)
+            {
+                if(repo.Name.Equals(reponame)){
+                    return repo.Status;
+                }
+            }
+            return SyncStatus.Idle;
+        }
+
+        private void setSyncItemState(NSMenuItem item, SyncStatus status) {
+            switch (status)
+            {
+                case SyncStatus.Idle:
+                    item.Title = Properties_Resources.PauseSync;
+                    item.Image = this.pause_image;
+                    break;
+                case SyncStatus.Suspend:
+                    item.Title = Properties_Resources.ResumeSync;
+                    item.Image = this.resume_image;
+                    break;
+            }
+            item.Image.Size = new SizeF(16, 16);
+        }
 
         public void CreateMenu ()
         {
@@ -144,65 +228,33 @@ namespace CmisSync {
                 this.menu                  = new NSMenu ();
                 this.menu.AutoEnablesItems = false;
 
+                this.FolderItems = new Dictionary<String, NSMenuItem>();
+
                 this.state_item = new NSMenuItem () {
                     Title   = Controller.StateText,
                     Enabled = false
                 };
 
-                this.folder_item = new NSMenuItem () {
-                    Title = "CmisSync"
+                this.log_item = new NSMenuItem () {
+                    Title = CmisSync.Properties_Resources.ViewLog
                 };
 
-                this.folder_item.Activated += delegate {
-                    Controller.CmisSyncClicked ();
+                this.log_item.Activated += delegate
+                {
+                    Controller.LogClicked();
                 };
-
-                this.folder_item.Image      = this.cmissync_image;
-                this.folder_item.Image.Size = new SizeF (16, 16);
-                this.folder_item.Enabled    = true;
 
                 this.add_item = new NSMenuItem () {
-                    Title   = "Add Hosted Project…",
+                    Title   = CmisSync.Properties_Resources.AddARemoteFolder,
                     Enabled = true
                 };
 
                 this.add_item.Activated += delegate {
-                    Controller.AddHostedProjectClicked ();
-                };
-
-                this.recent_events_item = new NSMenuItem () {
-                    Title   = "Recent Changes…",
-                    Enabled = Controller.OpenRecentEventsItemEnabled
-                };
-
-                if (Controller.Folders.Length > 0) {
-                    this.recent_events_item.Activated += delegate {
-                        Controller.OpenRecentEventsClicked ();
-                    };
-                }
-
-                this.notify_item = new NSMenuItem () {
-                    Enabled = (Controller.Folders.Length > 0)
-                };
-
-                if (Program.Controller.NotificationsEnabled)
-                    this.notify_item.Title = "Turn Notifications Off";
-                else
-                    this.notify_item.Title = "Turn Notifications On";
-
-                this.notify_item.Activated += delegate {
-                    Program.Controller.ToggleNotifications ();
-
-                    InvokeOnMainThread (delegate {
-                        if (Program.Controller.NotificationsEnabled)
-                            this.notify_item.Title = "Turn Notifications Off";
-                        else
-                            this.notify_item.Title = "Turn Notifications On";
-                    });
+                    Controller.AddRemoteFolderClicked ();
                 };
 
                 this.about_item = new NSMenuItem () {
-                    Title   = "About CmisSync",
+                    Title   = CmisSync.Properties_Resources.About,
                     Enabled = true
                 };
 
@@ -211,93 +263,40 @@ namespace CmisSync {
                 };
 
                 this.quit_item = new NSMenuItem () {
-                    Title   = "Quit",
-                    Enabled = Controller.QuitItemEnabled
+                    Title   = CmisSync.Properties_Resources.Exit,
+                    Enabled = true
                 };
 
                 this.quit_item.Activated += delegate {
                     Controller.QuitClicked ();
                 };
 
-
                 this.menu.AddItem (this.state_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.folder_item);
-
-                this.folder_menu_items = new NSMenuItem [Controller.Folders.Length];
-                this.submenu_items     = new NSMenuItem [Controller.OverflowFolders.Length];
 
                 if (Controller.Folders.Length > 0) {
-                    this.folder_tasks   = new EventHandler [Controller.Folders.Length];
-                    this.overflow_tasks = new EventHandler [Controller.OverflowFolders.Length];
-
-                    int i = 0;
                     foreach (string folder_name in Controller.Folders) {
-                        NSMenuItem item = new NSMenuItem ();
-                        item.Title      = folder_name;
-
-                        if (Program.Controller.UnsyncedFolders.Contains (folder_name))
-                            item.Image = this.caution_image;
-                        else
-                            item.Image = this.folder_image;
-
-                        item.Image.Size = new SizeF (16, 16);
-                        this.folder_tasks [i] = OpenFolderDelegate (folder_name);
-
-                        this.folder_menu_items [i] = item;
-                        this.folder_menu_items [i].Activated += this.folder_tasks [i];
-
-                        i++;
+                        this.menu.AddItem(CreateFolderMenuItem(folder_name));
                     };
-
-                    i = 0;
-                    foreach (string folder_name in Controller.OverflowFolders) {
-                        NSMenuItem item = new NSMenuItem ();
-                        item.Title      = folder_name;
-
-                        if (Program.Controller.UnsyncedFolders.Contains (folder_name))
-                            item.Image = this.caution_image;
-                        else
-                            item.Image = this.folder_image;
-
-                        item.Image.Size   = new SizeF (16, 16);
-                        this.overflow_tasks [i] = OpenFolderDelegate (folder_name);
-
-                        this.submenu_items [i] = item;
-                        this.submenu_items [i].Activated += this.overflow_tasks [i];
-
-                        i++;
-                    };
-
-                }
-
-
-                foreach (NSMenuItem item in this.folder_menu_items)
-                    this.menu.AddItem (item);
-
-                if (this.submenu_items.Length > 0) {
-                    this.submenu = new NSMenu ();
-
-                    foreach (NSMenuItem item in this.submenu_items)
-                        this.submenu.AddItem (item);
-
-                    this.more_item = new NSMenuItem () {
-                        Title = "More Projects",
-                        Submenu = this.submenu
-                    };
-
+                    if (Controller.OverflowFolders.Length > 0)
+                    {
+                        NSMenuItem moreitem = new NSMenuItem();
+                        moreitem.Title = "More Folder";
+                        NSMenu moreitemsmenu = new NSMenu();
+                        foreach (string folder_name in Controller.OverflowFolders) {
+                            moreitemsmenu.AddItem(CreateFolderMenuItem(folder_name));
+                        };
+                        moreitem.Submenu = moreitemsmenu;
+                        this.menu.AddItem(moreitem);
+                    }
                     this.menu.AddItem (NSMenuItem.SeparatorItem);
-                    this.menu.AddItem (this.more_item);
                 }
 
-                this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.add_item);
-                this.menu.AddItem (this.recent_events_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-                this.menu.AddItem (this.notify_item);
+                this.menu.AddItem (this.log_item);
+                this.menu.AddItem (this.about_item);
                 this.menu.AddItem (NSMenuItem.SeparatorItem);
-				this.menu.AddItem (this.about_item);
-			    this.menu.AddItem (NSMenuItem.SeparatorItem);
                 this.menu.AddItem (this.quit_item);
 
                 this.menu.Delegate    = new StatusIconMenuDelegate ();
@@ -311,7 +310,53 @@ namespace CmisSync {
         private EventHandler OpenFolderDelegate (string name)
         {
             return delegate {
-                Controller.SubfolderClicked (name);
+                Controller.LocalFolderClicked (name);
+            };
+        }
+
+        private EventHandler OpenRemoteFolderDelegate(string name)
+        {
+            return delegate
+            {
+                Controller.RemoteFolderClicked (name);
+            };
+        }
+
+        private EventHandler PauseFolderDelegate ( string name)
+        {
+            return delegate
+            {
+                Controller.SuspendSyncClicked(name);
+            };
+        }
+
+        private EventHandler ManualSyncDelegate(string reponame)
+        {
+            return delegate
+            {
+                Controller.ManualSyncClicked (reponame);
+            };
+        }
+
+        private EventHandler RemoveFolderDelegate(string name)
+        {
+            return delegate
+            {
+                NSAlert alert = NSAlert.WithMessage(Properties_Resources.RemoveSyncQuestion,"No, please continue syncing","Yes, stop syncing",null,"");
+                alert.Icon = this.caution_image;
+                alert.Window.OrderFrontRegardless();
+                int i = alert.RunModal();
+                if(i == 0)
+                    Controller.RemoveFolderFromSyncClicked(name);
+            };
+        }
+
+        private EventHandler OpenSettingsDialogDelegate(string name)
+        {
+            return delegate
+            {
+                // Controller.EditFolderClicked(name);
+                Controller.SettingsClicked(name);
             };
         }
 
@@ -333,12 +378,19 @@ namespace CmisSync {
                 new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iiii-active.png")),
                 new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iiiii-active.png"))
             };
-			
+            
             this.error_image = new NSImage (
                 Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
 
             this.error_image_active = new NSImage (
-                Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
+                Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error-active.png"));
+
+            this.folder_image       = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "cmissync-folder.icns"));
+            this.caution_image      = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.icns"));
+            this.cmissync_image     = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "cmissync-app.icns"));
+            this.pause_image        = new NSImage(Path.Combine(NSBundle.MainBundle.ResourcePath, "Pixmaps", "media_playback_pause.png"));
+            this.resume_image       = new NSImage(Path.Combine(NSBundle.MainBundle.ResourcePath, "Pixmaps", "media_playback_start.png"));
+            this.sync_image         = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "media_playback_refresh.png"));
         }
     }
     
@@ -357,4 +409,31 @@ namespace CmisSync {
             });
         }
     }
+
+    //TODO This isn't working well, please create a native COCOA like solution 
+    public class TransmissionMenuItem : NSMenuItem {
+        public TransmissionMenuItem(FileTransmissionEvent transmission) {
+
+            Title = System.IO.Path.GetFileName(transmission.Path);
+
+            Activated += delegate {
+                NSWorkspace.SharedWorkspace.OpenFile (System.IO.Directory.GetParent(transmission.Path).FullName);
+            };
+
+            transmission.TransmissionStatus += delegate (object sender, TransmissionProgressEventArgs e){
+                double? percent = e.Percent;
+                long? bitsPerSecond = e.BitsPerSecond;
+                if( percent != null && bitsPerSecond != null ) {
+                    BeginInvokeOnMainThread(delegate {
+                        Title = String.Format("{0} ({1:###.#}% {2})",
+                            System.IO.Path.GetFileName(transmission.Path),
+                            Math.Round((double)percent,1),
+                            CmisSync.Lib.Utils.FormatBandwidth((long)bitsPerSecond));
+                    });
+                }
+            };
+        }
+    }
+
+
 }

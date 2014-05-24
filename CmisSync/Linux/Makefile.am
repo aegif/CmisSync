@@ -11,12 +11,23 @@ SOURCES =  \
 	../AboutController.cs \
 	../CertPolicyHandler.cs \
 	../ControllerBase.cs \
+	../EditController.cs \
 	../Program.cs \
 	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
+	../Windows/FolderTreeMVC/IgnoredFolderLoader.cs \
+	../Windows/FolderTreeMVC/LoadingStatusModel.cs \
+	../Windows/FolderTreeMVC/LocalFolderLoader.cs \
+	../Windows/FolderTreeMVC/NodeLoader.cs \
+	../Windows/FolderTreeMVC/NodeModel.cs \
+	../Windows/FolderTreeMVC/NodeModelUtils.cs \
 	About.cs \
+	CertPolicyWindow.cs \
+	CmisTree/CmisTreeStore.cs \
+	CmisTree/StatusCellRenderer.cs \
 	Controller.cs \
+	Edit.cs \
 	Setup.cs \
 	SetupWindow.cs \
 	Spinner.cs \
@@ -33,11 +44,10 @@ RESOURCES_RESOURCES = $(addprefix CmisSync.,$(patsubst %.resx,%.resources,$(notd
 CmisSync.%.resources: $(srcdir)/../Properties/%.resx
 	resgen2 $< $@
 
-bin_SCRIPTS = cmissync
+bin_SCRIPTS = dataspacesync
 
 Applicationsdir = $(datadir)/applications
-dist_Applications_DATA = cmissync.desktop \
-	cmissync-invite-opener.desktop
+dist_Applications_DATA = dataspacesync.desktop 
 
 EXTRA_DIST = README.md
 

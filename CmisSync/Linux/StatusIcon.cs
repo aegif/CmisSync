@@ -24,6 +24,8 @@ using Gtk;
 using Mono.Unix;
 using System.Globalization;
 
+using CmisSync.Lib;
+
 namespace CmisSync {
 
     public class StatusIcon {
@@ -35,6 +37,7 @@ namespace CmisSync {
         private Menu menu;
         private MenuItem quit_item;
         private MenuItem state_item;
+        private bool IsHandleCreated = false;
 
 #if HAVE_APP_INDICATOR
         private ApplicationIndicator indicator;
@@ -95,6 +98,7 @@ namespace CmisSync {
             };
 
             Controller.UpdateStatusItemEvent += delegate (string state_text) {
+                if(!IsHandleCreated) return;
                 Application.Invoke (delegate {
                         (this.state_item.Child as Label).Text = state_text;
                         this.state_item.ShowAll ();
@@ -106,8 +110,46 @@ namespace CmisSync {
                         CreateMenu ();
                         });
             };
+
+            Controller.UpdateSuspendSyncFolderEvent += delegate (string reponame) {
+                if(!IsHandleCreated) return;
+                Application.Invoke(delegate
+                    {
+                        foreach (var menuItem in this.menu.Children) 
+                        {
+                            if(menuItem is CmisSyncMenuItem && reponame.Equals(((CmisSyncMenuItem)menuItem).RepoName))
+                            {
+                                foreach (RepoBase aRepo in Program.Controller.Repositories)
+                                {
+                                    if (aRepo.Name.Equals(reponame))
+                                    {
+                                        Menu submenu = (Menu)((CmisSyncMenuItem)menuItem).Submenu;
+                                        CmisSyncMenuItem pauseItem = (CmisSyncMenuItem)submenu.Children[1];
+                                        setSyncItemState(pauseItem, aRepo.Status);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    });
+            };
         }
 
+        private void setSyncItemState(ImageMenuItem syncitem, SyncStatus status)
+        {
+            switch (status)
+            {
+                case SyncStatus.Idle:
+                    (syncitem.Child as Label).Text = CmisSync.Properties_Resources.PauseSync;
+                    syncitem.Image = new Image (UIHelpers.GetIcon ("media_playback_pause", 12));
+                    break;
+                case SyncStatus.Suspend:
+                    (syncitem.Child as Label).Text = CmisSync.Properties_Resources.ResumeSync;
+                    syncitem.Image = new Image (UIHelpers.GetIcon ("media_playback_start", 12));
+                    break;
+            }
+        }
 
         public void CreateMenu ()
         {
@@ -127,30 +169,53 @@ namespace CmisSync {
                     Menu submenu = new Menu();
                     ImageMenuItem subfolder_item = new CmisSyncMenuItem (folder_name) {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16)),
-                        Submenu = submenu
+                        Submenu = submenu,
+                        RepoName = folder_name
                     };
 
                     ImageMenuItem open_localfolder_item = new CmisSyncMenuItem(
-                            CmisSync.Properties_Resources.ResourceManager.GetString("OpenLocalFolder", CultureInfo.CurrentCulture)) {
+                            CmisSync.Properties_Resources.OpenLocalFolder) {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
                     };
                     open_localfolder_item.Activated += OpenFolderDelegate(folder_name);
-
+/*
                     ImageMenuItem browse_remotefolder_item = new CmisSyncMenuItem(
-                            CmisSync.Properties_Resources.ResourceManager.GetString("BrowseRemoteFolder", CultureInfo.CurrentCulture)) {
+                            CmisSync.Properties_Resources.BrowseRemoteFolder) {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
                     };
                     browse_remotefolder_item.Activated += OpenRemoteFolderDelegate(folder_name);
+*/
+
+                    ImageMenuItem edit_folder_item = new CmisSyncMenuItem (
+                        CmisSync.Properties_Resources.EditTitle);
+                    edit_folder_item.Activated += EditFolderDelegate(folder_name);
 
                     ImageMenuItem suspend_folder_item = new CmisSyncMenuItem(
-                            CmisSync.Properties_Resources.ResourceManager.GetString("PauseSync", CultureInfo.CurrentCulture)) {
-                        Image = new Image (UIHelpers.GetIcon ("media_playback_pause", 16))
+                            CmisSync.Properties_Resources.PauseSync) {
+                        RepoName = folder_name
                     };
+                    foreach (RepoBase aRepo in Program.Controller.Repositories)
+                    {
+                        if (aRepo.Name.Equals(folder_name))
+                        {
+                            setSyncItemState(suspend_folder_item, aRepo.Status);
+                            break;
+                        }
+                    }
                     suspend_folder_item.Activated += SuspendSyncFolderDelegate(folder_name);
 
+                    ImageMenuItem remove_folder_from_sync_item = new CmisSyncMenuItem(
+                            CmisSync.Properties_Resources.RemoveFolderFromSync) {
+                        Image = new Image (UIHelpers.GetIcon ("document-deleted", 12))
+                    };
+                    remove_folder_from_sync_item.Activated += RemoveFolderFromSyncDelegate(folder_name);
+
                     submenu.Add(open_localfolder_item);
-                    submenu.Add(browse_remotefolder_item);
+                    //submenu.Add(browse_remotefolder_item);
                     submenu.Add(suspend_folder_item);
+                    submenu.Add(edit_folder_item);
+                    submenu.Add(new SeparatorMenuItem());
+                    submenu.Add(remove_folder_from_sync_item);
 
                     this.menu.Add (subfolder_item);
                 }
@@ -160,7 +225,7 @@ namespace CmisSync {
 
             // Add Menu
             MenuItem add_item = new MenuItem (
-                    CmisSync.Properties_Resources.ResourceManager.GetString("AddARemoteFolder", CultureInfo.CurrentCulture));
+                    CmisSync.Properties_Resources.AddARemoteFolder);
             add_item.Activated += delegate {
                 Controller.AddRemoteFolderClicked ();
             };
@@ -170,7 +235,7 @@ namespace CmisSync {
 
             // Log Menu
             MenuItem log_item = new MenuItem(
-                    CmisSync.Properties_Resources.ResourceManager.GetString("ViewLog", CultureInfo.CurrentCulture));
+                    CmisSync.Properties_Resources.ViewLog);
             log_item.Activated += delegate
             {
                 Controller.LogClicked();
@@ -179,14 +244,14 @@ namespace CmisSync {
 
             // About Menu
             MenuItem about_item = new MenuItem (
-                    CmisSync.Properties_Resources.ResourceManager.GetString("About", CultureInfo.CurrentCulture));
+                    CmisSync.Properties_Resources.About);
             about_item.Activated += delegate {
                 Controller.AboutClicked ();
             };
             this.menu.Add (about_item);
 
             this.quit_item = new MenuItem (
-                    CmisSync.Properties_Resources.ResourceManager.GetString("Exit", CultureInfo.CurrentCulture)) {
+                    CmisSync.Properties_Resources.Exit) {
                 Sensitive = true
             };
 
@@ -200,6 +265,7 @@ namespace CmisSync {
 #if HAVE_APP_INDICATOR
             this.indicator.Menu = this.menu;
 #endif
+            this.IsHandleCreated = true;
         }
 
 
@@ -212,11 +278,10 @@ namespace CmisSync {
             };
         }
 
-        private EventHandler OpenRemoteFolderDelegate(string reponame)
+        private EventHandler EditFolderDelegate (string name)
         {
-            return delegate
-            {
-                Controller.RemoteFolderClicked(reponame);
+            return delegate {
+                Controller.EditFolderClicked (name);
             };
         }
 
@@ -225,6 +290,28 @@ namespace CmisSync {
             return delegate
             {
                 Controller.SuspendSyncClicked(reponame);
+            };
+        }
+
+        private EventHandler RemoveFolderFromSyncDelegate(string reponame)
+        {
+            return delegate
+            {
+                using( Dialog dialog = new Dialog
+                    (String.Format(CmisSync.Properties_Resources.RemoveSyncTitle), null, Gtk.DialogFlags.DestroyWithParent))
+                {
+                    dialog.Modal = true;
+                    using (var noButton = dialog.AddButton ("No, please continue synchronizing", ResponseType.No))
+                    using (var yesButton = dialog.AddButton ("Yes, stop synchronizing permanently", ResponseType.Yes))
+                    {
+                        dialog.Response += delegate (object obj, ResponseArgs args){
+                            if(args.ResponseId == ResponseType.Yes)
+                                Controller.RemoveFolderFromSyncClicked(reponame);
+                        };
+                        dialog.Run();
+                        dialog.Destroy();
+                    }
+                }
             };
         }
 
@@ -258,10 +345,12 @@ namespace CmisSync {
 
 
     public class CmisSyncMenuItem : ImageMenuItem {
-
+        public string RepoName {get;set;}
         public CmisSyncMenuItem (string text) : base (text)
         {
             SetProperty ("always-show-image", new GLib.Value (true));
         }
     }
+
+
 }

@@ -2,7 +2,7 @@
 Type=Application
 Name=CmisSync
 Exec=cmissync start
-Icon=folder-cmissync
+Icon=app-cmissync
 Terminal=false
 X-GNOME-Autostart-enabled=true
 Categories=Network;

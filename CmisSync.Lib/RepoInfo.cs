@@ -35,24 +35,25 @@ namespace CmisSync.Lib
         public string RemotePath { get; set; }
 
 
+        private CmisRepoCredentials credentials = new CmisRepoCredentials();
         /// <summary>
         /// Address of the server's CMIS endpoint.
         /// For instance: http://192.168.0.1:8080/alfresco/cmisatom
         /// </summary>
-        public Uri Address { get; set; }
+        public Uri Address { get { return credentials.Address; } set { credentials.Address = value; } }
 
 
         /// <summary>
         /// CMIS user.
         /// </summary>
-        public string User { get; set; }
+        public string User { get { return credentials.UserName; } set { credentials.UserName = value; } }
 
 
         /// <summary>
         /// CMIS password, hashed.
         /// For instance: AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAtiSvUCYn...
         /// </summary>
-        public CmisPassword Password { get; set; }
+        public Password Password { get { return credentials.Password; } set { credentials.Password = value; } }
 
 
         /// <summary>
@@ -75,9 +76,53 @@ namespace CmisSync.Lib
         public double PollInterval { get; set; }
 
         /// <summary>
+        /// Define if this repo is suspended or not ?
+        /// </summary>
+        public bool IsSuspended { get; set; }
+
+        /// <summary>
+        /// Define the last successed sync time
+        /// </summary>
+        public DateTime LastSuccessedSync { get; set; }
+
+        /// <summary>
+        /// Define if, at cmissync startup, first sync is base on last success time or on startup
+        /// </summary>
+        public bool SyncAtStartup { get; set; }
+
+        /// <summary>
         /// All folders, which should be ignored on synchronization.
         /// </summary>
         private List<string> ignoredPaths = new List<string>();
+
+
+        /// <summary>
+        /// Chunk size
+        /// If none zero, CmisSync will divide the document by chunk size for download/upload.
+        /// </summary>
+        public long ChunkSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of download chunks
+        /// If size is set to none zero, a download will be chunked by the size.
+        /// </summary>
+        /// <value>
+        /// The size of the download chunk.
+        /// </value>
+        public long DownloadChunkSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the max upload retries.
+        /// </summary>
+        /// <value>
+        /// The max upload retries.
+        /// </value>
+        public long MaxUploadRetries { get; set; }
+
+        public long MaxDownloadRetries { get; set; }
+
+        public long MaxDeletionRetries { get; set; }
+
 
         /// <summary>
         /// Simple constructor.
@@ -94,7 +139,8 @@ namespace CmisSync.Lib
         /// <summary>
         /// Full constructor.
         /// </summary>
-        public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval)
+        [Obsolete("Use other contructor outside of testings")]
+        public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval, Boolean isSuspended, DateTime lastSuccessedSync, bool syncAtStartup)
         {
             Name = name;
             name = name.Replace("\\", "_");
@@ -107,6 +153,13 @@ namespace CmisSync.Lib
             RepoID = repoID;
             TargetDirectory = Path.Combine(ConfigManager.CurrentConfig.FoldersPath, name);
             PollInterval = pollInterval;
+            IsSuspended = isSuspended;
+            LastSuccessedSync = lastSuccessedSync;
+            SyncAtStartup = syncAtStartup;
+            ChunkSize = 0;
+            MaxUploadRetries = 2;
+            MaxDownloadRetries = 2;
+            MaxDeletionRetries = 2;
         }
 
         /// <summary>
@@ -117,7 +170,7 @@ namespace CmisSync.Lib
         /// <param name="path"></param>
         public void addIgnorePath(string path)
         {
-            if(!this.ignoredPaths.Contains(path))
+            if(!this.ignoredPaths.Contains(path) && !String.IsNullOrEmpty(path))
                 this.ignoredPaths.Add(path);
         }
 
@@ -139,7 +192,15 @@ namespace CmisSync.Lib
         /// <returns></returns>
         public bool isPathIgnored(string path)
         {
-            return ignoredPaths.Contains(path);
+            if(Utils.IsInvalidFolderName(path.Replace("/", "").Replace("\"","")))
+                return true;
+            return !String.IsNullOrEmpty(ignoredPaths.Find(delegate(string ignore)
+            {
+                if (String.IsNullOrEmpty(ignore)) {
+                    return false;
+                }
+                return path.StartsWith(ignore);
+            }));
         }
     }
 }

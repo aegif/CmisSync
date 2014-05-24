@@ -8,7 +8,7 @@ namespace CmisSync.Auth
     /// <summary>
     /// CmisPassword.
     /// </summary>
-    public class CmisPassword
+    /*public class CmisPassword
     {
         private string password = null;
 
@@ -48,5 +48,5 @@ namespace CmisSync.Auth
         /// Get/set obfuscated password.
         /// </summary>
         public string ObfuscatedPassword { get { return password; } set { password = value; } }
-    }
+    }*/
 }

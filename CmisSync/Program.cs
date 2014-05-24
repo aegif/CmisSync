@@ -60,6 +60,11 @@ namespace CmisSync
         [STAThread]
         public static void Main(string[] args)
         {
+#if __MonoCS__
+            Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
+            Environment.SetEnvironmentVariable("MONO_XMLSERIALIZER_THS", "no");
+#endif
+
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
             ServicePointManager.CertificatePolicy = new CertPolicyHandler();
@@ -68,8 +73,17 @@ namespace CmisSync
             if ( ! firstRun )
                 ConfigMigration.Migrate();
 
-            log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
-            Logger.Info("Starting.");
+            FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));
+            if(alternativeLog4NetConfigFile.Exists)
+            {
+                log4net.Config.XmlConfigurator.ConfigureAndWatch(alternativeLog4NetConfigFile);
+            }
+            else
+            {
+                log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            }
+
+            Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);
 
             if (args.Length != 0 && !args[0].Equals("start") &&
                 Backend.Platform != PlatformID.MacOSX &&
@@ -83,7 +97,7 @@ namespace CmisSync
                     "designed to keep things simple and to stay out of your way." + n +
                     n +
                     "Version: " + CmisSync.Lib.Backend.Version + n +
-                    "Copyright (C) 2010 Hylke Bons" + n +
+                    "Copyright (C) 2014 Aegif" + n +
                     "This program comes with ABSOLUTELY NO WARRANTY." + n +
                     n +
                     "This is free software, and you are welcome to redistribute it" + n +

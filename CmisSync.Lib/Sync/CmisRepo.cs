@@ -15,6 +15,9 @@
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.IO;
+
+using CmisSync.Lib.Events;
 
 namespace CmisSync.Lib.Sync
 {
@@ -39,8 +42,30 @@ namespace CmisSync.Lib.Sync
         public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
             : base(repoInfo, activityListener)
         {
-            this.synchronizedFolder = new SynchronizedFolder(repoInfo, this);
+            this.synchronizedFolder = new SynchronizedFolder(repoInfo, this, activityListener);
+            this.Watcher.ChangeEvent += OnFileActivity;
+            this.Watcher.EnableEvent = true;
             Logger.Info(synchronizedFolder);
+        }
+
+
+        public override void Resume()
+        {
+            if(this.synchronizedFolder != null)
+            {
+                Logger.Debug("Reset all failed upload counter");
+                this.synchronizedFolder.resetFailedOperationsCounter();
+                this.synchronizedFolder.ForceFullSyncAtNextSync();
+            }
+            base.Resume();
+        }
+
+        /// <summary>
+        /// Some file activity has been detected, add to queue
+        /// </summary>
+        public void OnFileActivity(object sender, FileSystemEventArgs args)
+        {
+            synchronizedFolder.Queue.AddEvent(new FSEvent(args.ChangeType, args.FullPath));
         }
 
 
@@ -93,7 +118,7 @@ namespace CmisSync.Lib.Sync
                 }
                 else
                 {
-                    Logger.Info("Sync skipped. Status=" + this.Status);
+                    Logger.Info(String.Format("Repo {0} - Sync skipped. Status={1}", this.Name, this.Status));
                 }
             }
         }
@@ -108,14 +133,53 @@ namespace CmisSync.Lib.Sync
             SyncInBackground(true);
         }
 
+
+        /// <summary>
+        /// Synchonize.
+        /// The synchronization is performed in synchronous.
+        /// </summary>
+        /// <param name="syncFull"></param>
+        public void SyncInNotBackground(bool syncFull)
+        {
+            if (this.synchronizedFolder != null)
+            {
+                if (this.Status == SyncStatus.Idle)
+                {
+                    this.synchronizedFolder.SyncInNotBackground(syncFull);
+                }
+                else
+                {
+                    Logger.Info(String.Format("Repo {0} - Sync skipped.Status={1}", this.Name, this.Status));
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// The synchronization is performed in synchronous.
+        /// </summary>
+        public void SyncInNotBackground()
+        {
+            SyncInNotBackground(true);
+        }
+
         /// <summary>
         /// Update repository settings.
         /// </summary>
-        public override void UpdateSettings(string password, int pollInterval)
+        public override void UpdateSettings(string password, int pollInterval, bool syncAtStartup)
         {
-            base.UpdateSettings(password, pollInterval);
-            this.synchronizedFolder = new SynchronizedFolder(RepoInfo, this);
-            Logger.Info(synchronizedFolder);
+            base.UpdateSettings(password, pollInterval, syncAtStartup);
+            synchronizedFolder.UpdateSettings(RepoInfo);
+            Logger.Info("Updated sync settings. Restarting sync.");
+            SyncInBackground();
+        }
+
+        /// <summary>
+        /// Cancel the currently running sync.  Returns once the current blocking operation completes.
+        /// </summary>
+        public override void CancelSync()
+        {
+            synchronizedFolder.CancelSync();
         }
 
         /// <summary>

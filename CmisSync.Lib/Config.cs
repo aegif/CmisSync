@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Xml;
 using log4net;
+using CmisSync.Auth;
 
 namespace CmisSync.Lib
 {
@@ -30,6 +31,11 @@ namespace CmisSync.Lib
     /// </summary>
     public class Config
     {
+        /// <summary>
+        /// Chunk size for chunked transfers (not implemented yet)
+        /// </summary>
+        private const long DefaultChunkSize = 1024 * 1024;
+
         /// <summary>
         /// Default poll interval.
         /// It is used for any newly created synchronized folder.
@@ -273,7 +279,11 @@ namespace CmisSync.Lib
                 RemotePath = repoInfo.RemotePath,
                 UserName = repoInfo.User,
                 ObfuscatedPassword = repoInfo.Password.ObfuscatedPassword,
-                PollInterval = repoInfo.PollInterval
+                PollInterval = repoInfo.PollInterval,
+                LastSuccessedSync = repoInfo.LastSuccessedSync,
+                IsSuspended = repoInfo.IsSuspended,
+                SyncAtStartup = repoInfo.SyncAtStartup,
+                SupportedFeatures = null
             };
             foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
             {
@@ -443,6 +453,21 @@ namespace CmisSync.Lib
                 [XmlElement("password")]
                 public string ObfuscatedPassword { get; set; }
 
+                /// <summary>
+                /// IsSuspended
+                /// </summary>
+                [XmlElement("issuspended")]
+                public bool IsSuspended { get; set; }
+
+                /// <summary>
+                /// Last Success Time Sync
+                /// </summary>
+                [XmlElement("lastsuccessedsync")]
+                public DateTime LastSuccessedSync { get; set; }
+
+                [XmlElement("syncatstartup")]
+                public bool SyncAtStartup { get; set; }
+
                 private double pollInterval = DEFAULT_POLL_INTERVAL;
 
                 /// <summary>
@@ -465,11 +490,72 @@ namespace CmisSync.Lib
                     }
                 }
 
+                private int uploadRetries = 2;
+                [XmlElement("maxUploadRetries", IsNullable=true)]
+                public int? UploadRetries
+                {
+                    get { return uploadRetries; }
+                    set {
+                        if( value==null || value < 0 )
+                            uploadRetries = 2;
+                        else
+                            uploadRetries = (int) value;
+                    }
+                }
+
+                private int downloadRetries = 2;
+                [XmlElement("maxDownloadRetries", IsNullable=true)]
+                public int? DownLoadRetries
+                {
+                    get { return downloadRetries; }
+                    set {
+                        if( value == null || value < 0 )
+                            downloadRetries = 2;
+                        else
+                            downloadRetries = (int) value;
+                    }
+                }
+
+                private int deletionRetries = 2;
+                [XmlElement("maxDeletionRetries", IsNullable=true)]
+                public int? DeletionRetries
+                {
+                    get { return deletionRetries; }
+                    set {
+                        if ( value == null || value < 0 )
+                            deletionRetries = 2;
+                        else
+                            deletionRetries = (int) value;
+                    }
+                }
+
+                [XmlElement("features", IsNullable=true)]
+                public Feature SupportedFeatures { get; set;}
+
                 /// <summary>
-                /// Ingored folders.
+                /// Ignored folders.
                 /// </summary>
                 [XmlElement("ignoreFolder", IsNullable = true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
+
+                private long chunkSize = DefaultChunkSize;
+                [XmlElement("chunkSize"), System.ComponentModel.DefaultValue(DefaultChunkSize)]
+                public long ChunkSize
+                {
+                    get { return chunkSize; }
+                    set
+                    {
+                        if (value < 0)
+                        {
+                            chunkSize = 0;
+                        }
+                        else
+                        {
+                            chunkSize = value;
+                        }
+                    }
+                }
+
 
                 /// <summary>
                 /// Get all the configured info about a synchronized folder.
@@ -478,19 +564,39 @@ namespace CmisSync.Lib
                 {
                     RepoInfo repoInfo = new RepoInfo(DisplayName, ConfigManager.CurrentConfig.ConfigPath);
                     repoInfo.User = UserName;
-                    repoInfo.Password = new CmisSync.Auth.CmisPassword();
+                    repoInfo.Password = new Password();
                     repoInfo.Password.ObfuscatedPassword = ObfuscatedPassword;
                     repoInfo.Address = RemoteUrl;
                     repoInfo.RepoID = RepositoryId;
                     repoInfo.RemotePath = RemotePath;
                     repoInfo.TargetDirectory = LocalPath;
+                    repoInfo.MaxUploadRetries = uploadRetries;
+                    repoInfo.MaxDownloadRetries = downloadRetries;
+                    repoInfo.MaxDeletionRetries = deletionRetries;
                     if (PollInterval < 1) PollInterval = Config.DEFAULT_POLL_INTERVAL;
                     repoInfo.PollInterval = PollInterval;
+                    repoInfo.LastSuccessedSync = LastSuccessedSync;
+                    repoInfo.IsSuspended = IsSuspended;
+                    repoInfo.SyncAtStartup = SyncAtStartup;
 
                     foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
                     {
                         repoInfo.addIgnorePath(ignoredFolder.Path);
                     }
+
+                    if(SupportedFeatures != null && SupportedFeatures.ChunkedSupport != null && SupportedFeatures.ChunkedSupport == true)
+                    {
+                        repoInfo.ChunkSize = ChunkSize;
+                        repoInfo.DownloadChunkSize = ChunkSize;
+                    }
+                    else
+                    {
+                        repoInfo.ChunkSize = 0;
+                        repoInfo.DownloadChunkSize = 0;
+                    }
+                    if(SupportedFeatures != null && SupportedFeatures.ChunkedDownloadSupport!=null && SupportedFeatures.ChunkedDownloadSupport == true)
+                        repoInfo.DownloadChunkSize = ChunkSize;
+
                     return repoInfo;
                 }
             }
@@ -524,6 +630,25 @@ namespace CmisSync.Lib
             [XmlElement("email")]
             public string EMail { get; set; }
         }
+
+
+        public class Feature {
+            [XmlElement("getFolderTree", IsNullable=true)]
+            public bool? GetFolderTreeSupport {get; set;}
+            [XmlElement("getDescendants", IsNullable=true)]
+            public bool? GetDescendantsSupport {get; set;}
+            [XmlElement("getContentChanges", IsNullable=true)]
+            public bool? GetContentChangesSupport {get; set;}
+            [XmlElement("fileSystemWatcher", IsNullable=true)]
+            public bool? FileSystemWatcherSupport {get; set;}
+            [XmlElement("maxContentChanges", IsNullable=true)]
+            public int? MaxNumberOfContentChanges {get; set;}
+            [XmlElement("chunkedSupport", IsNullable=true)]
+            public bool? ChunkedSupport {get;set;}
+            [XmlElement("chunkedDownloadSupport", IsNullable=true)]
+            public bool? ChunkedDownloadSupport {get;set;}
+        }
+
 
         /// <summary>
         /// XML URI.

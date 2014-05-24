@@ -25,6 +25,7 @@ namespace CmisSync.Lib.Sync
             // Replace XML root element from <sparkleshare> to <CmisSync>
             ReplaceXMLRootElement();
             CheckForDuplicatedLog4NetElement();
+            ReplaceTrunkByChunk();
         }
 
         private static void CheckForDuplicatedLog4NetElement()
@@ -34,6 +35,18 @@ namespace CmisSync.Lib.Sync
             {
                 ConfigManager.CurrentConfig.SetLog4NetConfig(log4net.ChildNodes.Item(0));
                 ConfigManager.CurrentConfig.Save();
+            }
+        }
+
+        private static void ReplaceTrunkByChunk()
+        {
+            var fileContents = System.IO.File.ReadAllText(ConfigManager.CurrentConfigFile);
+            if (fileContents.Contains("<trunkSize>") || fileContents.Contains("</trunkSize>") )
+            {
+                fileContents = fileContents.Replace("<trunkSize>", "<chunkSize>");
+                fileContents = fileContents.Replace("</trunkSize>", "</chunkSize>");
+                System.IO.File.WriteAllText(ConfigManager.CurrentConfigFile, fileContents);
+                System.Console.Out.WriteLine("Migrated old trunkSize to chunkSize");
             }
         }
 

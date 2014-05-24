@@ -19,14 +19,17 @@ using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using log4net;
 using System;
+using System.ComponentModel;
 using System.Timers;
 
-namespace CmisSync {
+namespace CmisSync
+{
 
     /// <summary>
     /// State of the CmisSync status icon.
     /// </summary>
-    public enum IconState {
+    public enum IconState
+    {
         /// <summary>
         /// Sync is idle.
         /// </summary>
@@ -45,7 +48,8 @@ namespace CmisSync {
     /// <summary>
     /// MVC controller for the CmisSync status icon.
     /// </summary>
-    public class StatusIconController {
+    public class StatusIconController
+    {
 
         /// <summary>
         /// Log.
@@ -88,6 +92,8 @@ namespace CmisSync {
         /// </summary>
         public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
 
+        public event UpdateTransmissionMenuEventHandler UpdateTransmissionMenuEvent = delegate { };
+        public delegate void UpdateTransmissionMenuEventHandler();
 
         /// <summary>
         /// Current state of the CmisSync tray icon.
@@ -104,7 +110,7 @@ namespace CmisSync {
         /// <summary>
         /// Maximum number of remote folders in the menu before the overflow menu appears.
         /// </summary>
-        public readonly int MenuOverflowThreshold   = 9;
+        public readonly int MenuOverflowThreshold = 9;
 
 
         /// <summary>
@@ -116,14 +122,16 @@ namespace CmisSync {
         /// <summary>
         /// The list of remote folders to show in the CmisSync tray menu.
         /// </summary>
-        public string [] Folders {
-            get {
+        public string[] Folders
+        {
+            get
+            {
                 int overflow_count = (Program.Controller.Folders.Count - MenuOverflowThreshold);
 
                 if (overflow_count >= MinSubmenuOverflowCount)
-                    return Program.Controller.Folders.GetRange (0, MenuOverflowThreshold).ToArray ();
+                    return Program.Controller.Folders.GetRange(0, MenuOverflowThreshold).ToArray();
                 else
-                    return Program.Controller.Folders.ToArray ();
+                    return Program.Controller.Folders.ToArray();
             }
         }
 
@@ -133,13 +141,14 @@ namespace CmisSync {
         /// </summary>
         public string[] OverflowFolders
         {
-            get {
+            get
+            {
                 int overflow_count = (Program.Controller.Folders.Count - MenuOverflowThreshold);
 
                 if (overflow_count >= MinSubmenuOverflowCount)
-                    return Program.Controller.Folders.GetRange (MenuOverflowThreshold, overflow_count).ToArray ();
+                    return Program.Controller.Folders.GetRange(MenuOverflowThreshold, overflow_count).ToArray();
                 else
-                    return new string [0];
+                    return new string[0];
             }
         }
 
@@ -147,8 +156,10 @@ namespace CmisSync {
         /// <summary>
         /// Total disk space taken by the sum of the remote folders.
         /// </summary>
-        public string FolderSize {
-            get {
+        public string FolderSize
+        {
+            get
+            {
                 double size = 0;
 
                 foreach (RepoBase repo in Program.Controller.Repositories)
@@ -178,13 +189,15 @@ namespace CmisSync {
         /// <summary>
         /// Constructor.
         /// </summary>
-        public StatusIconController ()
+        public StatusIconController()
         {
-            InitAnimation ();
+            InitAnimation();
 
             // A remote folder has been added.
-            Program.Controller.FolderListChanged += delegate {
-                if (CurrentState != IconState.Error) {
+            Program.Controller.FolderListChanged += delegate
+            {
+                if (CurrentState != IconState.Error)
+                {
                     CurrentState = IconState.Idle;
 
                     if (Program.Controller.Folders.Count == 0)
@@ -193,14 +206,16 @@ namespace CmisSync {
                         StateText = Properties_Resources.FilesUpToDate;
                 }
 
-                UpdateStatusItemEvent (StateText);
+                UpdateStatusItemEvent(StateText);
                 UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
                 UpdateMenuEvent(CurrentState);
             };
 
             // No more download/upload.
-            Program.Controller.OnIdle += delegate {
-                if (CurrentState != IconState.Error) {
+            Program.Controller.OnIdle += delegate
+            {
+                if (CurrentState != IconState.Error)
+                {
                     CurrentState = IconState.Idle;
 
                     if (Program.Controller.Folders.Count == 0)
@@ -209,32 +224,35 @@ namespace CmisSync {
                         StateText = Properties_Resources.FilesUpToDate;
                 }
 
-                UpdateStatusItemEvent (StateText);
+                UpdateStatusItemEvent(StateText);
 
-                this.animation.Stop ();
+                this.animation.Stop();
 
+//NOTGDS2: begin
                 UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
-                UpdateMenuEvent (CurrentState);
+                UpdateMenuEvent(CurrentState);
             };
 
             // Syncing.
-            Program.Controller.OnSyncing += delegate {
+            Program.Controller.OnSyncing += delegate
+            {
                 CurrentState = IconState.Syncing;
                 StateText = Properties_Resources.SyncingChanges;
 
-                UpdateStatusItemEvent (StateText);
+                UpdateStatusItemEvent(StateText);
 
-                this.animation.Start ();
+                this.animation.Start();
             };
 
 
             // Error.
-            Program.Controller.OnError += delegate (Tuple<string, Exception> error)
+            Program.Controller.OnError += delegate(Tuple<string, Exception> error)
             {
                 Logger.Error(String.Format("Error syncing '{0}': {1}", error.Item1, error.Item2.Message), error.Item2);
 
                 string message = String.Format(Properties_Resources.SyncError, error.Item1, error.Item2.Message);
 
+                IconState PreviousState = CurrentState;
                 CurrentState = IconState.Error;
                 StateText = message;
 
@@ -251,12 +269,37 @@ namespace CmisSync {
                     SuspendSyncClicked(error.Item1);
                 }
 
-                Program.Controller.ShowAlert(Properties_Resources.Error, message);
+                if (PreviousState != IconState.Error)
+                {
+                    Program.Controller.ShowAlert(Properties_Resources.Error, message);
+                }
             };
 
             Program.Controller.OnErrorResolved += delegate
             {
                 CurrentState = IconState.Idle;
+//NOTGDS2: end
+// GDS2:
+/*
+                UpdateIconEvent (0);
+//                UpdateMenuEvent (CurrentState);
+            };
+
+            Program.Controller.OnTransmissionListChanged += delegate {
+                UpdateTransmissionMenuEvent();
+            };
+
+            // Syncing.
+            Program.Controller.OnSyncing += delegate {
+                if (CurrentState != IconState.Syncing)
+                {
+                    CurrentState = IconState.Syncing;
+                    StateText = Properties_Resources.SyncingChanges;
+                    UpdateStatusItemEvent(StateText);
+
+                    this.animation.Start();
+                }
+*/
             };
         }
 
@@ -264,12 +307,12 @@ namespace CmisSync {
         /// <summary>
         /// With the local file explorer, open the folder where the local synchronized folders are.
         /// </summary>
-        public void LocalFolderClicked (string reponame)
+        public void LocalFolderClicked(string reponame)
         {
-            Program.Controller.OpenCmisSyncFolder (reponame);
+            Program.Controller.OpenCmisSyncFolder(reponame);
         }
 
-
+        
         /// <summary>
         /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
         /// </summary>
@@ -291,6 +334,7 @@ namespace CmisSync {
                 Program.UI.Setup.Controller.saved_remote_path = repository.RemotePath;
                 Program.UI.Setup.Controller.saved_address = repository.RemoteUrl;
                 Program.UI.Setup.Controller.saved_sync_interval = (int)repository.PollInterval;
+                Program.UI.Setup.Controller.saved_syncatstartup = repository.SyncAtStartup;
             }
             Program.Controller.ShowSetupWindow(PageType.Settings);
         }
@@ -299,7 +343,7 @@ namespace CmisSync {
         /// <summary>
         /// Open the remote folder addition wizard.
         /// </summary>
-        public void AddRemoteFolderClicked ()
+        public void AddRemoteFolderClicked()
         {
             Program.Controller.ShowSetupWindow(PageType.Add1);
         }
@@ -328,7 +372,7 @@ namespace CmisSync {
         /// </summary>
         public void QuitClicked()
         {
-                Program.Controller.Quit ();
+            Program.Controller.Quit();
         }
 
 
@@ -341,11 +385,15 @@ namespace CmisSync {
             UpdateSuspendSyncFolderEvent(reponame);
         }
 
+
         /// <summary>
-        /// Remove folder from sync clicked.
+        /// Tries to remove a given repo from sync
         /// </summary>
         public void RemoveFolderFromSyncClicked(string reponame)
         {
+            #if __COCOA__
+            Program.Controller.RemoveRepositoryFromSync(reponame);
+            #else
             System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show(
                 Properties_Resources.RemoveFolderFromSyncConfirm,
                 Properties_Resources.RemoveFolderFromSync,
@@ -355,8 +403,17 @@ namespace CmisSync {
             // If the yes button was pressed ...
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
-                Program.Controller.RemoveRepositoryFromSync(reponame);
+                //Run this in background so as not to free the UI...
+                BackgroundWorker worker = new BackgroundWorker();
+                worker.DoWork += new DoWorkEventHandler(
+                    delegate(Object o, DoWorkEventArgs args)
+                    {
+                        Program.Controller.RemoveRepositoryFromSync((string)args.Argument);
+                    }
+                );
+                worker.RunWorkerAsync(reponame);
             }
+            #endif
         }
 
         /// <summary>
@@ -369,23 +426,35 @@ namespace CmisSync {
 
 
         /// <summary>
+        /// Edit a particular folder.
+        /// </summary>
+        public void EditFolderClicked(string reponame)
+        {
+            // TODO fix EditRepositoryFolder
+            // Program.Controller.EditRepositoryFolder(reponame);
+            Logger.Error ("Call Program.Controller.EditRepositoryFolder(" + reponame + ")");
+        }
+
+        /// <summary>
         /// Start the tray icon animation.
         /// </summary>
-        private void InitAnimation ()
+        private void InitAnimation()
         {
             this.animation_frame_number = 0;
 
-            this.animation = new Timer () {
+            this.animation = new Timer()
+            {
                 Interval = 200
             };
 
-            this.animation.Elapsed += delegate {
+            this.animation.Elapsed += delegate
+            {
                 if (this.animation_frame_number < 4)
                     this.animation_frame_number++;
                 else
                     this.animation_frame_number = 0;
 
-                UpdateIconEvent (this.animation_frame_number);
+                UpdateIconEvent(this.animation_frame_number);
             };
         }
     }

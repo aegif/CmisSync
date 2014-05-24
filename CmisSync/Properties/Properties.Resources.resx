@@ -180,7 +180,7 @@
 It is like Dropbox for Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>The folder name is invalid. Special characters are not allowed.</value>
+    <value>The folder name {0} is invalid. Special characters are not allowed.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
     <value>Invalid URL</value>
@@ -212,8 +212,8 @@ It is like Dropbox for Enterprise Content Management!</value>
   <data name="Sorry" xml:space="preserve">
     <value>Sorry, CmisSync can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
-If you are sure about the address, open it in a browser and send
-the resulting XML to cmissync@aegif.jp</value>
+If you are sure about the address, open it in a browser and post
+the resulting XML on the cmissync forum.</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Add CmisSync to startup items</value>
@@ -258,7 +258,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Change the local path of this repository:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>A local folder with the same name already exist, please use a different name.</value>
+    <value>A local folder with the same name already exist, please use a different name to prevent sync conflicts.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
     <value>Pause sync</value>
@@ -377,12 +377,55 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Report a problem</value>
   </data>
   <data name="Version" xml:space="preserve">
-    <value>Version</value>
+    <value>Version {0}</value>
   </data>
   <data name="Website" xml:space="preserve">
     <value>Website</value>
   </data>
   <data name="YourVersion" xml:space="preserve">
     <value>Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.</value>
+  </data>
+  <data name="SyncAtStartup" xml:space="preserve">
+    <value>Launch sync at CmisSync startup</value>
+  </data>
+  <data name="RemoveSyncQuestion" xml:space="preserve">
+    <value>Do you really want to remove folder from synchronization?</value>
+  </data>
+  <data name="RemoveSyncTitle" xml:space="preserve">
+    <value>Remove folder from sync</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>A newer version ({0}) is available!</value>
+  </data>
+  <data name="RunningLatestVersion" xml:space="preserve">
+    <value>You are running the latest version.</value>
+  </data>
+  <data name="FolderAlreadyInUse" xml:space="preserve">
+    <value>The directory {0} is already in use by {1}</value>
+  </data>
+  <data name="InvalidRepoName" xml:space="preserve">
+    <value>The repository name {0} contains illegal characters</value>
+  </data>
+  <data name="NameResolutionFailure" xml:space="preserve">
+    <value>The given host name could not be found. Please check the host name and your internet connection.</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Discard changes</value>
+  </data>
+  <data name="EditTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="LoadingStatusABORTED" xml:space="preserve">
+    <value>loading aborted</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderText" xml:space="preserve">
+    <value>Do you really want to sync the existing local folder "{0}"?
+This could lead to a lot of conflict files!</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderTitle" xml:space="preserve">
+    <value>Selected folder "{0}" as sync target</value>
   </data>
 </root>

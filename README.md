@@ -10,4 +10,4 @@ CmisSync is Open Source software and licensed under the `GNU General Public Lice
 ### Development
 
 We are looking for volunteers!  
-See [how to get started developing CmisSync](https://github.com/nicolas-raoul/CmisSync/wiki/Getting-started-with-CmisSync-development)
+See [how to get started developing CmisSync](https://github.com/aegif/CmisSync/wiki/Getting-started-with-CmisSync-development)

@@ -16,6 +16,7 @@
 
 
 using System;
+using System.Reflection;
 using System.Diagnostics;
 using System.IO;
 
@@ -78,16 +79,22 @@ namespace CmisSync {
         {
             string bookmarks_file_path   = Path.Combine (
                     Environment.GetFolderPath (Environment.SpecialFolder.Personal), ".gtk-bookmarks");
-            string cmissync_bookmark = "file://" + FoldersPath + " CmisSync";
+            // newer nautilus version using a different path then older ones
+            string bookmarks_file_path_gtk3 = Path.Combine (
+                    Environment.GetFolderPath (Environment.SpecialFolder.Personal), ".config", "gtk-3.0" ,"bookmarks");
+            // if the new path is found, take the new one, otherwise the old one
+            if(File.Exists(bookmarks_file_path_gtk3))
+                bookmarks_file_path = bookmarks_file_path_gtk3;
+            string cmissync_bookmark = "file://" + FoldersPath.Replace(" ", "%20");
 
             if (File.Exists (bookmarks_file_path)) {
                 string bookmarks = File.ReadAllText (bookmarks_file_path);
 
                 if (!bookmarks.Contains (cmissync_bookmark))
-                    File.AppendAllText (bookmarks_file_path, "file://" + FoldersPath + " CmisSync");
+                    File.AppendAllText (bookmarks_file_path, cmissync_bookmark);
 
             } else {
-                File.WriteAllText (bookmarks_file_path, "file://" + FoldersPath + " CmisSync");
+                File.WriteAllText (bookmarks_file_path, cmissync_bookmark);
             }
         }
 
@@ -99,6 +106,13 @@ namespace CmisSync {
                 Directory.CreateDirectory (FoldersPath);
                 Logger.Info ("Created '" + FoldersPath + "'");
 
+                string iconName = "folder-cmissync.png";
+                string iconSrc = Path.Combine(Defines.ASSETS_DIR, "icons", "hicolor", "256x256", "places", iconName);
+                string iconDst = Path.Combine(FoldersPath,iconName);
+                if (File.Exists(iconSrc)) {
+                    File.Copy(iconSrc,iconDst);
+                }
+
                 string gvfs_command_path = Path.Combine (
                     Path.VolumeSeparatorChar.ToString (), "usr", "bin", "gvfs-set-attribute");
 
@@ -109,18 +123,36 @@ namespace CmisSync {
                     process.StartInfo.FileName        = "gvfs-set-attribute";
 
                     // Clear the custom (legacy) icon path
-                    process.StartInfo.Arguments = "-t unset " +
-                        FoldersPath + " metadata::custom-icon";
+                    process.StartInfo.Arguments = "-t unset \"" +
+                        FoldersPath.Replace(" ", "\\ ") + "\" metadata::custom-icon";
 
                     process.Start ();
                     process.WaitForExit ();
 
                     // Give the CmisSync folder an icon name, so that it scales
-                    process.StartInfo.Arguments = FoldersPath +
+                    process.StartInfo.Arguments = FoldersPath.Replace(" ", "\\ ") +
                         " metadata::custom-icon-name 'folder-cmissync'";
 
                     process.Start ();
                     process.WaitForExit ();
+
+                    if (File.Exists(iconDst)) {
+                        process.StartInfo.Arguments = FoldersPath.Replace(" ", "\\ ") +
+                            " metadata::custom-icon 'folder-cmissync.png'";
+                        process.Start ();
+                        process.WaitForExit ();
+                    }
+                }
+
+                string kde_directory_path = Path.Combine(FoldersPath, ".directory");
+                string kde_directory_content = "[Desktop Entry]\nIcon=folder-cmissync\n";
+                try
+                {
+                    File.WriteAllText(kde_directory_path, kde_directory_content);
+                }
+                catch (IOException e)
+                {
+                    Logger.Info("Config | Failed setting kde icon for '" + FoldersPath + "': " + e.Message);
                 }
 
                 return true;
