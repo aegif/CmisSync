@@ -396,9 +396,42 @@ namespace CmisSync {
             });
         }
 
+
+        static private NSString FullNotificationMessaageKey = (NSString)"FullNotificationMessage";
+
         public void NotifyUser (string message)
         {
             Console.WriteLine ("UserNotifier: " + message);
+
+            // Make a notification to the OS X Notification Center
+            var info = NSDictionary.FromObjectAndKey((NSString)message, FullNotificationMessaageKey);
+            var notification = new NSUserNotification();
+            notification.Title = "CmisSync";
+            notification.InformativeText = message;
+            notification.UserInfo = info;
+            notification.DeliveryDate = DateTime.Now;
+            notification.SoundName = NSUserNotification.NSUserNotificationDefaultSoundName;
+
+            var center = NSUserNotificationCenter.DefaultUserNotificationCenter;
+
+            center.DidDeliverNotification += (sender, e) => 
+            {
+                Console.WriteLine("Notification Deliverd");
+            };
+
+            // If the notification is clicked, displays the entire message.
+            center.DidActivateNotification += (object sender, UNCDidActivateNotificationEventArgs e) => 
+            {
+                string msg = (string)(NSString)e.Notification.UserInfo[FullNotificationMessaageKey];
+                NSAlert alert = NSAlert.WithMessage(e.Notification.Title, "OK", null, null, msg);
+                alert.Icon = new NSImage (System.IO.Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.icns"));
+                alert.Window.OrderFrontRegardless();
+                alert.RunModal();
+            };
+
+            center.ShouldPresentNotification = (c, n) => { return true; };
+
+            center.ScheduleNotification(notification);
         }
     }
 }
