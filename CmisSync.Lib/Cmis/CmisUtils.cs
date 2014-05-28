@@ -98,7 +98,9 @@ namespace CmisSync.Lib.Cmis
                 "/_vti_bin/cmis/rest?getRepositories",
                 "/nemakiware/atom/bedroom", // TODO: different port, typically 8080 for Web UI and 3000 for CMIS
                 "/nuxeo/atom/cmis",
-                "/cmis/atom"
+                "/cmis/atom",
+                "/docushare/ds_mobile_connector/atom",
+                "/documents/ds_mobile_connector/atom" // TODO: can be anything instead of "documents"
             };
             string bestUrl = null;
             // Try all suffixes
