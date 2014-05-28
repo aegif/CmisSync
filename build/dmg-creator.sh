@@ -51,14 +51,14 @@ echo '
            set current view of container window to icon view
            set toolbar visible of container window to false
            set statusbar visible of container window to false
-           set the bounds of container window to {400, 100, 885, 430}
+           set the bounds of container window to {400, 100, 950, 430}
            set theViewOptions to the icon view options of container window
            set arrangement of theViewOptions to not arranged
-           set icon size of theViewOptions to 72
+           set icon size of theViewOptions to 90
            set background picture of theViewOptions to file ".background:'${backgroundPictureName}'"
            make new alias file at container window to POSIX file "/Applications" with properties {name:"Applications"}
-           set position of item "'${applicationName}'" of container window to {150, 125}
-           set position of item "Applications" of container window to {325, 125}
+           set position of item "'${applicationName}'" of container window to {170, 170}
+           set position of item "Applications" of container window to {370, 170}
            close
            open
            update without registering applications
