@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ $UID -eq 0 ]]; then
-  echo "DataSpace Sync can't be run as root. Things would go utterly wrong."
+  echo "CmisSync can't be run as root. Things would go utterly wrong."
   exit 1
 fi
 
@@ -15,19 +15,19 @@ start() {
   if [ -e "${pidfile}" ]; then
     cmissyncpid=`cat ${pidfile}`
     if [ -n "`ps -p ${cmissyncpid} | grep ${cmissyncpid}`" ]; then
-      echo "DataSpace Sync is already running."
+      echo "CmisSync is already running."
       exit 0
     else
-      echo "Stale DataSpace Sync PID file found, starting a new instance..."
+      echo "Stale CmisSync PID file found, starting a new instance..."
       rm -f $pidfile
     fi
   fi
 
-  echo -n "Starting DataSpace Sync... "
+  echo -n "Starting CmisSync... "
   if [ -n "${SSH_AGENT_PID}" -o -n "${SSH_AUTH_SOCK}" ] ; then
-    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console@MONOEXE@ $2 &
+    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/CmisSync.Console@MONOEXE@ $2 &
   else
-    ssh-agent @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console@MONOEXE@ $2 &
+    ssh-agent @SLIMMONO@ @expanded_libdir@/@PACKAGE@/CmisSync.Console@MONOEXE@ $2 &
   fi
   ( umask 066; echo $! > ${pidfile} )
   echo "Done."
@@ -37,16 +37,16 @@ stop() {
   if [ -e "${pidfile}" ]; then
     cmissyncpid=`cat ${pidfile}`
     if [ -n "`ps -p ${cmissyncpid} | grep ${cmissyncpid}`" ]; then
-      echo -n "Stopping DataSpace Sync... "
+      echo -n "Stopping CmisSync... "
       kill ${cmissyncpid}
       rm -f ${pidfile}
       echo "Done."
     else
-      echo "DataSpace Sync is not running, removing stale PID file..."
+      echo "CmisSync is not running, removing stale PID file..."
       rm -f ${pidfile}
     fi
   else
-    echo "DataSpace Sync is not running."
+    echo "CmisSync is not running."
   fi
 }
 
@@ -62,6 +62,6 @@ case $1 in
     start
     ;;
   *)
-    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/DataSpaceSync.Console@MONOEXE@ --help
+    @SLIMMONO@ @expanded_libdir@/@PACKAGE@/CmisSync.Console@MONOEXE@ --help
     ;;
 esac
