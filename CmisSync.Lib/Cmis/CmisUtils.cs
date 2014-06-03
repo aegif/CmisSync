@@ -80,8 +80,8 @@ namespace CmisSync.Lib.Cmis
             // Extract protocol and server name or IP address
             string prefix = credentials.Address.GetLeftPart(UriPartial.Authority);
 
-            // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
-            // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
+            // See https://github.com/aegif/CmisSync/wiki/What-address for the list of ECM products prefixes
+            // Please send us requests to support more CMIS servers: https://github.com/aegif/CmisSync/issues
             string[] suffixes = {
                 "/cmis/atom11",
                 "/alfresco/cmisatom",

@@ -1,4 +1,4 @@
-![CmisSync logo](https://github.com/nicolas-raoul/CmisSync/raw/master/CmisSync/Windows/Installer/WixUIBanner.bmp)
+![CmisSync logo](https://github.com/aegif/CmisSync/raw/master/CmisSync/Windows/Installer/WixUIBanner.bmp)
 
 [CmisSync](http://CmisSync.com) allows you to keep in sync with your CMIS repository. It is like Dropbox for Enterprise Content Management!  
 See: http://CmisSync.com

@@ -73,7 +73,7 @@ namespace CmisSync
             // Cmis server address help link
             string helpLabel = Properties_Resources.Help + ": ";
             string helpLink = Properties_Resources.WhereToFind;
-            string addressUrl = @"https://github.com/nicolas-raoul/CmisSync/wiki/What-address";
+            string addressUrl = @"https://github.com/aegif/CmisSync/wiki/What-address";
             this.AddressHelp.AllowsEditingTextAttributes = true;
             this.AddressHelp.Selectable = true;           
             var attrStr = new NSMutableAttributedString(helpLabel + helpLink);

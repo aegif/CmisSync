@@ -825,7 +825,7 @@ namespace CmisSync.Lib.Sync
                         File.Move(localSubFolder, localSubFolder + ".conflict");
                     }
 
-                    // Skip if invalid folder name. See https://github.com/nicolas-raoul/CmisSync/issues/196
+                    // Skip if invalid folder name. See https://github.com/aegif/CmisSync/issues/196
                     if (Utils.IsInvalidFolderName(name))
                     {
                         Logger.Info("Skipping download of folder with illegal name: " + name);
@@ -1022,7 +1022,7 @@ namespace CmisSync.Lib.Sync
                 string fileName = remoteDocument.ContentStreamFileName;
                 Logger.Info("Downloading: " + fileName);
 
-                // Skip if invalid file name. See https://github.com/nicolas-raoul/CmisSync/issues/196
+                // Skip if invalid file name. See https://github.com/aegif/CmisSync/issues/196
                 if (Utils.IsInvalidFileName(fileName))
                 {
                     Logger.Info("Skipping download of file with illegal filename: " + fileName);

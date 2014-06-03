@@ -756,7 +756,7 @@ namespace CmisSync.Lib.Cmis
             catch (IOException)
             {
                 Logger.Warn("IOException while reading file checksum: " + path
-                    + " File is probably being edited right now, so skip it. See https://github.com/nicolas-raoul/CmisSync/issues/245");
+                    + " File is probably being edited right now, so skip it. See https://github.com/aegif/CmisSync/issues/245");
                 return false;
             }
 

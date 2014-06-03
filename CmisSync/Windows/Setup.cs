@@ -381,7 +381,7 @@ namespace CmisSync
                                 };
                                 Run run = new Run(Properties_Resources.WhereToFind);
                                 Hyperlink link = new Hyperlink(run);
-                                link.NavigateUri = new Uri("https://github.com/nicolas-raoul/CmisSync/wiki/What-address");
+                                link.NavigateUri = new Uri("https://github.com/aegif/CmisSync/wiki/What-address");
                                 address_help_label.Inlines.Add(link);
                                 link.RequestNavigate += (sender, e) =>
                                 {
