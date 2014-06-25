@@ -169,11 +169,40 @@ namespace CmisSync.Lib.Cmis
                     ExecuteSQLAction(command, null);
                     if (createDatabase)
                     {
-                        command = "INSERT INTO general (key, value) VALUES (\"PathPrefix\", @prefix)";
+                        Logger.Info("Database created");
+                    }
+
+                    bool oldVersion = false;
+                    var filesColumns = GetColumns("files");
+                    if (!filesColumns.Contains("localPath"))
+                    {
+                        oldVersion = true;
+                        ExecuteSQLAction("ALTER TABLE files ADD COLUMN localPath TEXT;", null);
+                    }
+                    if (!filesColumns.Contains("id"))
+                    {
+                        oldVersion = true;
+                        ExecuteSQLAction("ALTER TABLE files ADD COLUMN id TEXT;", null);
+                    }
+
+                    var foldersColumns = GetColumns("folders");
+                    if (!foldersColumns.Contains("localPath"))
+                    {
+                        oldVersion = true;
+                        ExecuteSQLAction("ALTER TABLE folders ADD COLUMN localPath TEXT;", null);
+                    }
+                    if (!foldersColumns.Contains("id"))
+                    {
+                        oldVersion = true;
+                        ExecuteSQLAction("ALTER TABLE folders ADD COLUMN id TEXT;", null);
+                    }
+
+                    if (createDatabase || oldVersion)
+                    {
+                        command = "INSERT OR IGNORE INTO general (key, value) VALUES (\"PathPrefix\", @prefix);";
                         Dictionary<string, object> parameters = new Dictionary<string, object>();
                         parameters.Add("prefix", ConfigManager.CurrentConfig.FoldersPath);
                         ExecuteSQLAction(command, parameters);
-                        Logger.Info("Database created");
                     }
                     Logger.Debug("Database migration successful");
                 }
@@ -915,6 +944,44 @@ namespace CmisSync.Lib.Cmis
                     return "delete";
                 default:
                     return "";
+            }
+        }
+
+        /// <summary>
+        /// Helper method to get columns
+        /// </summary>
+        /// <param name="table">table name</param>
+        /// <returns>array of column name</returns>
+        private string[] GetColumns(string table)
+        {
+            using (var command = new SQLiteCommand(GetSQLiteConnection()))
+            {
+                string sql = String.Format("PRAGMA table_info('{0}');", table);
+                command.CommandText = sql;
+
+                #if __MonoCS__
+                SqliteDataReader dataReader;
+                #else
+                SQLiteDataReader dataReader;
+                #endif
+
+                try
+                {
+                    dataReader = command.ExecuteReader();
+                }
+                catch (SQLiteException e)
+                {
+                    Logger.Error(String.Format("Could not execute SQL: {0};", sql), e);
+                    throw;
+                }
+
+                int nameOrdinal = dataReader.GetOrdinal("name");
+                var columnList = new List<string>();
+                while (dataReader.Read())
+                {
+                    columnList.Add((string)dataReader[nameOrdinal]);
+                }
+                return columnList.ToArray();
             }
         }
     }
