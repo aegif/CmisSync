@@ -65,7 +65,11 @@ namespace CmisSync.Lib.Cmis
                 {
                     MigrateToVersion1(filePath, connection);
                 }
-                    
+                else
+                {
+                    throw new NotSupportedException(String.Format("Unexpected database version: {0}.", dbVersion)); 
+                }
+
                 Logger.Debug("Database migration successful");
             }
             catch (Exception e)
