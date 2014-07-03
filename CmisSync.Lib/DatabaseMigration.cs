@@ -13,6 +13,9 @@ using System.Security.Cryptography;
 using Newtonsoft.Json;
 using log4net;
 
+using CmisSync.Auth;
+using DotCMIS.Client;
+
 namespace CmisSync.Lib.Cmis
 {
     #if __MonoCS__
@@ -261,6 +264,159 @@ namespace CmisSync.Lib.Cmis
             }
         }
 
+        /// <summary>
+        /// Fills the object identifier.
+        /// </summary>
+        /// <param name="dbFilePath">Db file path.</param>
+        /// <param name="folderName">Folder name.</param>
+        public static void FillObjectId(string dbFilePath, string folderName)
+        {
+            var configFolder = ConfigManager.CurrentConfig.getFolder(folderName);
+            var session = Auth.Auth.GetCmisSession(
+                              ((Uri)configFolder.RemoteUrl).ToString(),
+                              configFolder.UserName,
+                              Crypto.Deobfuscate(configFolder.ObfuscatedPassword),
+                              configFolder.RepositoryId);
+
+            var filters = new HashSet<string>();
+            filters.Add("cmis:objectId");
+            session.DefaultContext = session.CreateOperationContext(filters, false, true, false, DotCMIS.Enums.IncludeRelationshipsFlag.None, null, true, null, true, 100);
+            string remoteRootFolder = configFolder.RemotePath;
+            string localRootFolder = configFolder.LocalPath.Substring(ConfigManager.CurrentConfig.FoldersPath.Length + 1);
+
+            string newDbFile = dbFilePath + ".new";
+            if (File.Exists(newDbFile))
+            {
+                File.Delete(newDbFile);
+            }
+
+            try
+            {
+                File.Copy(dbFilePath, newDbFile);
+
+                ExecuteSQLAction(GetConnection(newDbFile), "DROP TABLE IF EXISTS files;", null);
+                ExecuteSQLAction(GetConnection(newDbFile),
+                    @"CREATE TABLE IF NOT EXISTS files (
+                        path TEXT PRIMARY KEY,
+                        localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
+                        id TEXT,
+                        serverSideModificationDate DATE,
+                        metadata TEXT,
+                        checksum TEXT);   /* Checksum of both data and metadata */", null);
+
+                using (var newConnection = GetConnection(newDbFile))
+                using (var command = new SQLiteCommand(GetConnection(dbFilePath)))
+                {
+                    string sql = "SELECT * FROM files;";
+                    command.CommandText = sql;
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            //int id = Convert.ToInt32(reader["id"]);
+                            string path = reader["path"].ToString();
+                            var modDate = (DateTime)reader["serverSideModificationDate"];
+                            string metadata = reader["metadata"].ToString();
+                            string checksum = reader["checksum"].ToString();
+
+                            string remotePath = remoteRootFolder + path.Substring(localRootFolder.Length);
+                            string id = null;
+                            try
+                            {
+                                id = session.GetObjectByPath(remotePath).Id;
+                            }
+                            catch (DotCMIS.Exceptions.CmisObjectNotFoundException e)
+                            {
+                                Logger.Info(String.Format("File Not Found: \"{0}\"", remotePath), e);
+                                id = null;
+                            }
+                            catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
+                            {
+                                Logger.Info(String.Format("PermissionDenied: \"{0}\"", remotePath), e); 
+                                id = null;
+                            }
+
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("@path", path);
+                            parameters.Add("@id", id);
+                            parameters.Add("@modDate", modDate);
+                            parameters.Add("@metadata", metadata);
+                            parameters.Add("@checksum", checksum);
+                            ExecuteSQLAction(newConnection, "INSERT INTO files (path,id,serverSideModificationDate,metadata,checksum) VALUES (@path, @id, @modDate, @metadata, @checksum);", parameters);
+
+                        }
+                    }
+                }
+
+                ExecuteSQLAction(GetConnection(newDbFile), "DROP TABLE IF EXISTS folder;", null);
+                ExecuteSQLAction(GetConnection(newDbFile),
+                    @"CREATE TABLE IF NOT EXISTS folders (
+                            path TEXT PRIMARY KEY,
+                            localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
+                            id TEXT,
+                            serverSideModificationDate DATE,
+                            metadata TEXT,
+                            checksum TEXT);   /* Checksum of metadata */", null);
+
+                using (var newConnection = GetConnection(newDbFile))
+                using (var command = new SQLiteCommand(GetConnection(dbFilePath)))
+                {
+                    string sql = "SELECT * FROM folders;";
+                    command.CommandText = sql;
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            //int id = Convert.ToInt32(reader["id"]);
+                            var path = reader["path"].ToString();
+                            var modDate = (DateTime)reader["serverSideModificationDate"];
+                            var metadata = reader["metadata"];
+                            var checksum = reader["checksum"];
+
+                            string remotePath = remoteRootFolder + path.Substring(localRootFolder.Length);
+                            string id = null;
+                            try
+                            {
+                                id = session.GetObjectByPath(remotePath).Id;
+                            }
+                            catch (DotCMIS.Exceptions.CmisObjectNotFoundException e)
+                            {
+                                Logger.Info(String.Format("File Not Found: \"{0}\"", remotePath), e);
+                                id = null;
+                            }
+                            catch (DotCMIS.Exceptions.CmisPermissionDeniedException e)
+                            {
+                                Logger.Info(String.Format("PermissionDenied: \"{0}\"", remotePath), e); 
+                                id = null;
+                            }
+
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("@path", path);
+                            parameters.Add("@id", id);
+                            parameters.Add("@modDate", modDate);
+                            parameters.Add("@metadata", metadata);
+                            parameters.Add("@checksum", checksum);
+                            ExecuteSQLAction(newConnection, "INSERT INTO folders (path,id,serverSideModificationDate,metadata,checksum) VALUES (@path, @id, @modDate, @metadata, @checksum);", parameters);
+
+                        }
+                    }
+                }
+
+                string oldDbFile = dbFilePath + ".old";
+                if (File.Exists(oldDbFile))
+                {
+                    File.Delete(oldDbFile);
+                }
+                File.Move(newDbFile, dbFilePath);
+            }
+            catch(Exception e)
+            {
+                Logger.Info("Failed to fills object id.", e);
+                throw;
+            }
+        }
     }
 }
 
