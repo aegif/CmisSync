@@ -45,7 +45,7 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         /// <param name="filePath">Database File path.</param>
         /// <param name="currentDatabaseVersion">Current database version.</param>
-        public static void Migrate(string filePath, int currentDatabaseVersion)
+        public static void Migrate(string filePath, int currentDbVersion)
         {
             try
             {
@@ -59,20 +59,23 @@ namespace CmisSync.Lib.Cmis
                 var connection = GetConnection(filePath);
                 int dbVersion = GetDatabaseVersion(connection);
 
-                if (dbVersion >= currentDatabaseVersion)
+                if (dbVersion >= currentDbVersion)
                 {
                     return;     // migration is not needed
                 }
 
-                if (dbVersion == 0 && currentDatabaseVersion == 1)
-                {
-                    MigrateToVersion1(filePath, connection);
-                }
-                else
-                {
-                    throw new NotSupportedException(String.Format("Unexpected database version: {0}.", dbVersion)); 
-                }
+                Logger.DebugFormat("Current Database Schema must be update from {0} to {0}", dbVersion, currentDbVersion);
 
+                switch (dbVersion)
+                {
+                    case 0:
+                        MigrateFromVersion0(filePath, connection, currentDbVersion);
+                        break;
+                    default:
+                        throw new NotSupportedException(String.Format("Unexpected database version: {0}.", dbVersion)); 
+                        break;
+                }
+                        
                 Logger.Debug("Database migration successful");
             }
             catch (Exception e)
@@ -82,10 +85,14 @@ namespace CmisSync.Lib.Cmis
             }
         }
 
-
-        private static void MigrateToVersion1(string filePath, SQLiteConnection connection)
+        /// <summary>
+        /// Migrates from Database version0.
+        /// </summary>
+        /// <param name="filePath">File path.</param>
+        /// <param name="connection">Connection.</param>
+        private static void MigrateFromVersion0(string filePath, SQLiteConnection connection, int currentVersion)
         {
-            var filesTableColumns = GetColumns(GetConnection(filePath, connection), "files");
+            var filesTableColumns = GetColumnNames(GetConnection(filePath, connection), "files");
             if (!filesTableColumns.Contains("localPath"))
             {
                 ExecuteSQLAction(GetConnection(filePath, connection), 
@@ -97,7 +104,7 @@ namespace CmisSync.Lib.Cmis
                     "ALTER TABLE files ADD COLUMN id TEXT;", null);
             }
 
-            var foldersTableColumns = GetColumns(connection, "files");
+            var foldersTableColumns = GetColumnNames(connection, "files");
             if (!foldersTableColumns.Contains("localPath"))
             {
                 ExecuteSQLAction(GetConnection(filePath, connection), 
@@ -113,6 +120,7 @@ namespace CmisSync.Lib.Cmis
             parameters.Add("prefix", ConfigManager.CurrentConfig.FoldersPath);
             ExecuteSQLAction(GetConnection(filePath, connection),
                 "INSERT OR IGNORE INTO general (key, value) VALUES (\"PathPrefix\", @prefix);", parameters);
+            SetDatabaseVersion(GetConnection(filePath, connection), currentVersion);
         }
 
 
@@ -154,22 +162,34 @@ namespace CmisSync.Lib.Cmis
         /// <param name="connection">Connection.</param>
         private static int GetDatabaseVersion(SQLiteConnection connection)
         {
-            string sql = "SELECT value FROM general WHERE key=\"DatabaseVersion\";";
-            object obj = ExecuteSQLFunction(connection, sql, null);
-            if (obj != null)
+            var objUserVersion = ExecuteSQLFunction(connection ,"PRAGMA user_version;", null);
+            if (objUserVersion != null)
             {
-                return int.Parse((string)obj);
+                return (int)objUserVersion;
             }
             return 0;
         }
 
         /// <summary>
-        /// Helper method to get columns
+        /// Sets the database version.
+        /// </summary>
+        /// <param name="connection">Connection.</param>
+        /// <param name="version">database version</param> 
+        private static void SetDatabaseVersion(SQLiteConnection connection, int version)
+        {
+            string command = "PRAGMA user_version=" + version.ToString();
+            ExecuteSQLAction(connection ,command, null);
+        }
+
+
+
+        /// <summary>
+        /// Helper method to get column Names
         /// </summary>
         /// <param name="connection">database connection</param>
         /// <param name="table">table name</param>
         /// <returns>array of column name</returns>
-        private static string[] GetColumns(SQLiteConnection connection, string table)
+        private static string[] GetColumnNames(SQLiteConnection connection, string table)
         {
             using (var command = new SQLiteCommand(connection))
             {

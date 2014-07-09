@@ -124,8 +124,8 @@ namespace CmisSync
             {
                 File.WriteAllText(ini_file_path, ini_file);
 
-                    File.SetAttributes(ini_file_path,
-                        File.GetAttributes(ini_file_path) | FileAttributes.Hidden | FileAttributes.System);
+                File.SetAttributes(ini_file_path,
+                    File.GetAttributes(ini_file_path) | FileAttributes.Hidden | FileAttributes.System);
 
             }
             catch (IOException e)
@@ -184,7 +184,7 @@ namespace CmisSync
         /// </summary>
         public void NotifyUser(string message)
         {
-            System.Windows.Forms.MessageBox.Show(message);
+            // System.Windows.Forms.MessageBox.Show(message);
         }
 
 
@@ -202,7 +202,7 @@ namespace CmisSync
         /// <param name="path">Path to the log file</param>
         public void ShowLog(string path)
         {
-            Process.Start("notepad.exe", path);
+            Process.Start(path);
         }
     }
 }

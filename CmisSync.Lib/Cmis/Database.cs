@@ -33,7 +33,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// The current database schema version.
         /// </summary>
-        public const int SchemaVersion = 1;
+        public const int SchemaVersion = 2;
 
         /// <summary>
         /// Log.
@@ -78,7 +78,7 @@ namespace CmisSync.Lib.Cmis
         {
             this.databaseFileName = dataPath;
             pathPrefix = GetPathPrefix();
-            pathPrefixSize = pathPrefix.Length+1;
+            pathPrefixSize = pathPrefix.Length + 1;
 
         }
 
@@ -134,7 +134,7 @@ namespace CmisSync.Lib.Cmis
                     Logger.Info(String.Format("Checking whether database {0} exists", databaseFileName));
                     bool createDatabase = !File.Exists(databaseFileName);
 
-                    sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL;");
+                    sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL");
                     sqliteConnection.Open();
 
                     string command =
@@ -248,7 +248,7 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         private static string ChecksumToString(byte[] hash)
         {
-            if(hash == null || hash.Length == 0) return String.Empty;
+            if (hash == null || hash.Length == 0) return String.Empty;
             StringBuilder formatted = new StringBuilder(2 * hash.Length);
             foreach (byte b in hash)
             {
@@ -279,7 +279,8 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Begins a Database transaction
         /// </summary>
-        public DbTransaction BeginTransaction() {
+        public DbTransaction BeginTransaction()
+        {
             return GetSQLiteConnection().BeginTransaction();
         }
 
@@ -311,9 +312,9 @@ namespace CmisSync.Lib.Cmis
                 serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
             }
 
-            if(String.IsNullOrEmpty(checksum))
+            if (String.IsNullOrEmpty(checksum))
             {
-            // Calculate file checksum.
+                // Calculate file checksum.
                 try
                 {
                     checksum = Checksum(path);
@@ -394,7 +395,7 @@ namespace CmisSync.Lib.Cmis
         {
             path = Normalize(path);
 
-            Dictionary<string, object> parameters = new Dictionary<string,object>();
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
             // Remove folder itself
             // ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
             parameters.Add("path", path);
@@ -444,7 +445,7 @@ namespace CmisSync.Lib.Cmis
             parameters.Add("oldPathLike", oldPath + "/%");
             parameters.Add("substringIndex", oldPath.Length + 1);
             parameters.Add("newPath", newPath);
-            
+
             // Update folder itself
             ExecuteSQLAction("UPDATE folders SET path=@newPath WHERE path=@oldPath", parameters);
 
@@ -565,7 +566,8 @@ namespace CmisSync.Lib.Cmis
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", Normalize(path));
             object result = null;
-            switch(type){
+            switch (type)
+            {
                 case OperationType.DOWNLOAD:
                     goto case OperationType.DELETE;
                 case OperationType.DELETE:
@@ -576,8 +578,8 @@ namespace CmisSync.Lib.Cmis
                     result = ExecuteSQLFunction(String.Format("SELECT {0}Counter FROM failedoperations WHERE path=@path AND lastLocalModificationDate=@date", operationTypeToString(type)), parameters);
                     break;
             }
-            if( result != null && !(result is DBNull))
-            { return (long) result; }
+            if (result != null && !(result is DBNull))
+            { return (long)result; }
             else
             { return 0; }
         }
@@ -594,7 +596,8 @@ namespace CmisSync.Lib.Cmis
         public void SetOperationRetryCounter(string path, long counter, OperationType type)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            switch(type){
+            switch (type)
+            {
                 case OperationType.DOWNLOAD:
                     goto case OperationType.DELETE;
                 case OperationType.DELETE:
@@ -605,12 +608,12 @@ namespace CmisSync.Lib.Cmis
                     break;
             }
             parameters.Add("path", Normalize(path));
-            parameters.Add("counter", (counter>=0) ? counter:0);
+            parameters.Add("counter", (counter >= 0) ? counter : 0);
             string uploadCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN uploadCounter ELSE '' END FROM failedoperations WHERE path=@path)";
             string downloadCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN downloadCounter ELSE '' END FROM failedoperations WHERE path=@path)";
             string changeCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN changeCounter ELSE '' END FROM failedoperations WHERE path=@path)";
             string deleteCounter = "(SELECT CASE WHEN lastLocalModificationDate=@date THEN deleteCounter ELSE '' END FROM failedoperations WHERE path=@path)";
-            switch(type)
+            switch (type)
             {
                 case OperationType.UPLOAD:
                     uploadCounter = "@counter";
@@ -633,7 +636,7 @@ namespace CmisSync.Lib.Cmis
                                 (SELECT CASE WHEN lastLocalModificationDate=@date THEN downloadMessage ELSE '' END FROM failedoperations WHERE path=@path),
                                 (SELECT CASE WHEN lastLocalModificationDate=@date THEN changeMessage ELSE '' END FROM failedoperations WHERE path=@path),
                                 (SELECT CASE WHEN lastLocalModificationDate=@date THEN deleteMessage ELSE '' END FROM failedoperations WHERE path=@path)
-                            )",uploadCounter,downloadCounter,changeCounter,deleteCounter);
+                            )", uploadCounter, downloadCounter, changeCounter, deleteCounter);
             ExecuteSQLAction(command, parameters);
         }
 
@@ -806,12 +809,15 @@ namespace CmisSync.Lib.Cmis
         {
             object result = ExecuteSQLFunction("SELECT value FROM general WHERE key=\"PathPrefix\"", null);
             // Migration of databases, which do not have any prefix safed
-            if(result == null) {
+            if (result == null)
+            {
                 string oldprefix = Path.Combine(ConfigManager.CurrentConfig.HomePath, "CmisSync");
                 SetPathPrefix(oldprefix);
                 return oldprefix;
-            }else {
-                return (string) result;
+            }
+            else
+            {
+                return (string)result;
             }
         }
 
@@ -836,7 +842,6 @@ namespace CmisSync.Lib.Cmis
         /// <param name="text">SQL query, optionnally with @something parameters.</param>
         /// <param name="parameters">Parameters to replace in the SQL query.</param>
         private void ExecuteSQLAction(string text, Dictionary<string, object> parameters)
-
         {
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
             {
@@ -877,7 +882,7 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        public enum OperationType 
+        public enum OperationType
         {
             UPLOAD, DOWNLOAD, CHANGE, DELETE
         }
@@ -904,7 +909,8 @@ namespace CmisSync.Lib.Cmis
 
         private string operationTypeToString(OperationType type)
         {
-            switch(type) {
+            switch (type)
+            {
                 case OperationType.UPLOAD:
                     return "upload";
                 case OperationType.CHANGE:

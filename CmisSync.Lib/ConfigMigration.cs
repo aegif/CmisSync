@@ -26,6 +26,11 @@ namespace CmisSync.Lib.Sync
             ReplaceXMLRootElement();
             CheckForDuplicatedLog4NetElement();
             ReplaceTrunkByChunk();
+            CheckForDatabaseSchema();
+        }
+
+        private static void CheckForDatabaseSchema()
+        {
         }
 
         private static void CheckForDuplicatedLog4NetElement()
