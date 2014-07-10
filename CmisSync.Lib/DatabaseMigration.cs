@@ -73,7 +73,6 @@ namespace CmisSync.Lib.Cmis
                         break;
                     default:
                         throw new NotSupportedException(String.Format("Unexpected database version: {0}.", dbVersion)); 
-                        break;
                 }
                         
                 Logger.Debug("Database migration successful");
@@ -90,30 +89,39 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         /// <param name="filePath">File path.</param>
         /// <param name="connection">Connection.</param>
+        /// <param name="currentVersion">Current database schema version.</param>
         private static void MigrateFromVersion0(string filePath, SQLiteConnection connection, int currentVersion)
         {
             var filesTableColumns = GetColumnNames(GetConnection(filePath, connection), "files");
             if (!filesTableColumns.Contains("localPath"))
             {
                 ExecuteSQLAction(GetConnection(filePath, connection), 
-                    "ALTER TABLE files ADD COLUMN localPath TEXT;", null);
+                    @"ALTER TABLE files ADD COLUMN localPath TEXT;
+                      CREATE INDEX IF NOT EXISTS files_localPath_index ON files (localPath);",
+                    null);
             }
             if (!filesTableColumns.Contains("id"))
             {
                 ExecuteSQLAction(GetConnection(filePath, connection), 
-                    "ALTER TABLE files ADD COLUMN id TEXT;", null);
+                    @"ALTER TABLE files ADD COLUMN id TEXT;
+                      CREATE INDEX IF NOT EXISTS files_id_index ON files (id);",
+                    null);
             }
 
-            var foldersTableColumns = GetColumnNames(connection, "files");
+            var foldersTableColumns = GetColumnNames(connection, "folders");
             if (!foldersTableColumns.Contains("localPath"))
             {
                 ExecuteSQLAction(GetConnection(filePath, connection), 
-                    "ALTER TABLE folders ADD COLUMN localPath TEXT;", null);
+                    @"ALTER TABLE folders ADD COLUMN localPath TEXT;
+                      CREATE INDEX IF NOT EXISTS folders_localPath_index ON folders (localPath);",
+                    null);
             }
             if (!foldersTableColumns.Contains("id"))
             {
                 ExecuteSQLAction(GetConnection(filePath, connection), 
-                    "ALTER TABLE folders ADD COLUMN id TEXT;", null);
+                    @"ALTER TABLE folders ADD COLUMN id TEXT;
+                      CREATE INDEX IF NOT EXISTS folders_id_index ON folders (in);",
+                    null);
             }
 
             var parameters = new Dictionary<string, object>();
@@ -165,7 +173,7 @@ namespace CmisSync.Lib.Cmis
             var objUserVersion = ExecuteSQLFunction(connection ,"PRAGMA user_version;", null);
             if (objUserVersion != null)
             {
-                return (int)objUserVersion;
+                return (int)(long)objUserVersion;
             }
             return 0;
         }
@@ -195,25 +203,26 @@ namespace CmisSync.Lib.Cmis
             {
                 string sql = String.Format("PRAGMA table_info('{0}');", table);
                 command.CommandText = sql;
-                SQLiteDataReader dataReader;
 
                 try
                 {
-                    dataReader = command.ExecuteReader();
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        int nameOrdinal = dataReader.GetOrdinal("name");
+                        var columnList = new List<string>();
+                        while (dataReader.Read())
+                        {
+                            columnList.Add((string)dataReader[nameOrdinal]);
+                        }
+
+                        return columnList.ToArray();
+                    }
                 }
-                catch (SQLiteException e)
+                catch(SQLiteException e)
                 {
                     Logger.Error(String.Format("Could not execute SQL: {0};", sql), e);
                     throw;
                 }
-
-                int nameOrdinal = dataReader.GetOrdinal("name");
-                var columnList = new List<string>();
-                while (dataReader.Read())
-                {
-                    columnList.Add((string)dataReader[nameOrdinal]);
-                }
-                return columnList.ToArray();
             }
         }
 
@@ -368,16 +377,19 @@ namespace CmisSync.Lib.Cmis
                         }
                     }
                 }
+                ExecuteSQLAction(GetConnection(newDbFile),
+                    @"CREATE INDEX IF NOT EXISTS files_localPath_index ON files (localPath);
+                      CREATE INDEX IF NOT EXISTS files_id_index ON files (id);", null);
 
-                ExecuteSQLAction(GetConnection(newDbFile), "DROP TABLE IF EXISTS folder;", null);
+                ExecuteSQLAction(GetConnection(newDbFile), "DROP TABLE IF EXISTS folders;", null);
                 ExecuteSQLAction(GetConnection(newDbFile),
                     @"CREATE TABLE IF NOT EXISTS folders (
-                            path TEXT PRIMARY KEY,
-                            localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
-                            id TEXT,
-                            serverSideModificationDate DATE,
-                            metadata TEXT,
-                            checksum TEXT);   /* Checksum of metadata */", null);
+                        path TEXT PRIMARY KEY,
+                        localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
+                        id TEXT,
+                        serverSideModificationDate DATE,
+                        metadata TEXT,
+                        checksum TEXT);   /* Checksum of metadata */", null);
 
                 using (var newConnection = GetConnection(newDbFile))
                 using (var command = new SQLiteCommand(GetConnection(dbFilePath)))
@@ -419,16 +431,19 @@ namespace CmisSync.Lib.Cmis
                             parameters.Add("@metadata", metadata);
                             parameters.Add("@checksum", checksum);
                             ExecuteSQLAction(newConnection, "INSERT INTO folders (path,id,serverSideModificationDate,metadata,checksum) VALUES (@path, @id, @modDate, @metadata, @checksum);", parameters);
-
                         }
                     }
                 }
+                ExecuteSQLAction(GetConnection(newDbFile),
+                    @"CREATE INDEX IF NOT EXISTS folders_localPath_index ON folders (localPath);
+                      CREATE INDEX IF NOT EXISTS folders_id_index ON folders (id);", null);
 
-                string oldDbFile = dbFilePath + ".old";
+                string oldDbFile = dbFilePath + "." + DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 if (File.Exists(oldDbFile))
                 {
                     File.Delete(oldDbFile);
                 }
+                File.Move(dbFilePath, oldDbFile);
                 File.Move(newDbFile, dbFilePath);
             }
             catch(Exception e)

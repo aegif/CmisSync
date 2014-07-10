@@ -138,13 +138,15 @@ namespace CmisSync.Lib.Cmis
                     sqliteConnection.Open();
 
                     string command =
-                        @"CREATE TABLE IF NOT EXISTS files (
+                   @"CREATE TABLE IF NOT EXISTS files (
                         path TEXT PRIMARY KEY,
                         localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
                         id TEXT,
                         serverSideModificationDate DATE,
                         metadata TEXT,
                         checksum TEXT);   /* Checksum of both data and metadata */
+                    CREATE INDEX IF NOT EXISTS files_localPath_index ON files (localPath);
+                    CREATE INDEX IF NOT EXISTS files_id_index ON files (id);
                     CREATE TABLE IF NOT EXISTS folders (
                         path TEXT PRIMARY KEY,
                         localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
@@ -152,6 +154,8 @@ namespace CmisSync.Lib.Cmis
                         serverSideModificationDate DATE,
                         metadata TEXT,
                         checksum TEXT);   /* Checksum of metadata */
+                    CREATE INDEX IF NOT EXISTS folders_localPath_index ON folders (localPath);
+                    CREATE INDEX IF NOT EXISTS folders_id_index ON folders (id);
                     CREATE TABLE IF NOT EXISTS general (
                         key TEXT PRIMARY KEY,
                         value TEXT);      /* Other data such as ChangeLog token */
