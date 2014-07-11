@@ -175,11 +175,16 @@ namespace CmisSync.Lib.Cmis
                         deleteMessage TEXT);     /* Failed Operations*/
                     DROP TABLE IF EXISTS faileduploads; /* Drop old upload Counter Table*/";
 
-                    ExecuteSQLAction(command, null);
                     if (createDatabase)
                     {
+                        ExecuteSQLAction(command, null);
                         Logger.Info("Database created");
                     }
+                    else
+                    {
+                        DatabaseMigration.Migrate(databaseFileName);
+                    }
+
                 }
                 catch (Exception e)
                 {

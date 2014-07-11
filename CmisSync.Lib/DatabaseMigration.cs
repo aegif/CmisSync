@@ -37,28 +37,14 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DatabaseMigration));
 
-
         /// <summary>
         /// Migrate all Database file in current configuration
         /// </summary>
-        public static void Migrate()
+        /// <param name="dbFile">Database file.</param>
+        public static void Migrate(string dbFile)
         {
-            foreach (var folder in ConfigManager.CurrentConfig.Folder)
-            {
-                Migrate(folder);
-            }
-
-            string dbfile = @"C:\Users\soma\AppData\Roaming\cmissync\avenue.aegif.jp_Main Repository.cmissync";
-            var tFolder = ConfigManager.CurrentConfig.Folder.Find(f => f.GetRepoInfo().CmisDatabase == dbfile);
-
-
-            foreach (var folder in ConfigManager.CurrentConfig.Folder)
-            {
-                Console.WriteLine(folder.DisplayName);
-                string dbFile = folder.GetRepoInfo().CmisDatabase;
-
-
-            }
+            var syncFolder = ConfigManager.CurrentConfig.Folder.Find((f) => f.GetRepoInfo().CmisDatabase == dbFile);
+            Migrate(syncFolder);
         }
 
 
@@ -174,7 +160,7 @@ namespace CmisSync.Lib.Cmis
             ExecuteSQLAction(connection,
                 "INSERT OR IGNORE INTO general (key, value) VALUES (\"PathPrefix\", @prefix);", parameters);
             SetDatabaseVersion(connection, currentVersion);
-            FillObjectId(syncFolder, connection);
+            // FillObjectId(syncFolder, connection);
         }
 
 
