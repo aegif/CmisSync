@@ -407,52 +407,6 @@ namespace CmisSync.Lib
         private static Regex invalidFolderNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?:/\\|<>*") + "]");
 
-        /// <summary>
-        /// Get the name of the conflicted file.
-        /// </summary>
-        public static string ConflictPath(String filePath)
-        {
-            String path = Path.GetDirectoryName(filePath);
-            String filename = Path.GetFileNameWithoutExtension(filePath) + " (Conflict Copy " + DateTime.Today.ToString("yyyy-MM-dd") + ")";
-            String ext = Path.GetExtension(filePath);
-            return SuffixIfExists(path, filename, ext);
-        }
-
-        /// <summary>
-        /// Find an available name (potentially suffixed) for this file.
-        /// For instance:
-        /// - if /dir/file does not exist, return the same path
-        /// - if /dir/file exists, return /dir/file (1)
-        /// - if /dir/file (1) also exists, return /dir/file (2)
-        /// - etc
-        /// </summary>
-        private static string SuffixIfExists(String path, String filename, String extension)
-
-
-        {
-            string fullPath = Path.Combine(path, filename + extension);
-
-            if (!File.Exists(fullPath))
-            {
-                return fullPath;
-            }
-            else
-            {
-
-                int index = 1;
-                do
-                {
-                    fullPath = Path.Combine(path, filename + " (" + index.ToString() + ")" + extension);
-                    if (!File.Exists(fullPath))
-                    {
-                        return fullPath;
-                    }
-                    index++;
-                }
-                while (true);
-            }
-        }
-
 
         /// <summary>
         /// Find an available conflict free filename for this file.
@@ -462,7 +416,8 @@ namespace CmisSync.Lib
         /// - if /dir/file (1) also exists, return /dir/file (2)
         /// - etc
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Path of the file in conflict</param>
+        /// <param name="user">Local user</param>
         /// <returns></returns>
         public static string FindNextConflictFreeFilename(String path, String user)
         {

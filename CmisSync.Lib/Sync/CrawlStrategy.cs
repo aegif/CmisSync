@@ -331,7 +331,7 @@ namespace CmisSync.Lib.Sync
                                     {
                                         Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
                                         // Rename locally modified file.
-                                        String newFilePath = Utils.ConflictPath(filePath);
+                                        String newFilePath = Utils.FindNextConflictFreeFilename(filePath, repoinfo.User);
                                         File.Move(filePath, newFilePath);
 
                                         // Download server version
@@ -465,7 +465,7 @@ namespace CmisSync.Lib.Sync
                                         Logger.Info("Conflict with file: " + filePath + ", backing up locally modified version.");
                                         activityListener.ActivityStarted();
                                         // Rename locally modified file.
-                                        String newFilePath = Utils.ConflictPath(filePath);
+                                        String newFilePath = Utils.FindNextConflictFreeFilename(filePath, repoinfo.User);
                                         File.Move(filePath, newFilePath);
 
                                         // Delete file from database.
