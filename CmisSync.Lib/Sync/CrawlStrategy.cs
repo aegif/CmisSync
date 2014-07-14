@@ -330,12 +330,18 @@ namespace CmisSync.Lib.Sync
                                     if (database.LocalFileHasChanged(filePath))
                                     {
                                         Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
+                                        Logger.Info("- serverSideModificationDate: " + serverSideModificationDate);
+                                        Logger.Info("- lastDatabaseUpdate: " + lastDatabaseUpdate);
+                                        Logger.Info("- Checksum in database: " + database.GetChecksum(filePath));
+                                        Logger.Info("- Checksum of local file: " + Database.Checksum(filePath));
+
                                         // Rename locally modified file.
                                         String newFilePath = Utils.FindNextConflictFreeFilename(filePath, repoinfo.User);
                                         File.Move(filePath, newFilePath);
 
                                         // Download server version
                                         DownloadFile(remoteDocument, localFolder);
+                                        Logger.Info("- Checksum of remote file: " + Database.Checksum(filePath));
                                         repo.OnConflictResolved();
 
                                         // Notify the user.

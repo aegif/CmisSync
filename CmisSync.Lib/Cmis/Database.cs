@@ -757,8 +757,6 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public bool LocalFileHasChanged(string path)
         {
-            string normalizedPath = Normalize(path);
-
             // Calculate current checksum.
             string currentChecksum = null;
             try
@@ -773,16 +771,27 @@ namespace CmisSync.Lib.Cmis
             }
 
             // Read previous checksum from database.
-            string previousChecksum = null;
-            string command = "SELECT checksum FROM files WHERE path=@path";
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", normalizedPath);
-            previousChecksum = (string)ExecuteSQLFunction(command, parameters);
+            string previousChecksum = GetChecksum(path);
 
             // Compare checksums.
             if (!currentChecksum.Equals(previousChecksum))
                 Logger.Info("Checksum of " + path + " has changed from " + previousChecksum + " to " + currentChecksum);
             return !currentChecksum.Equals(previousChecksum);
+        }
+
+
+        /// <summary>
+        /// Get checksum from database.
+        /// Public for debugging purposes only.
+        /// </summary>
+        /// <returns></returns>
+        public string GetChecksum(string path)
+        {
+            string normalizedPath = Normalize(path);
+            string command = "SELECT checksum FROM files WHERE path=@path";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", normalizedPath);
+            return (string)ExecuteSQLFunction(command, parameters);
         }
 
 
