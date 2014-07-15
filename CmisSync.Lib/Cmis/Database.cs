@@ -178,6 +178,7 @@ namespace CmisSync.Lib.Cmis
                         DROP TABLE IF EXISTS faileduploads; /* Drop old upload Counter Table*/";
 
                         ExecuteSQLAction(command, null);
+                        ExecuteSQLAction("PRAGMA user_version=" + SchemaVersion.ToString(), null);
                         Logger.Info("Database created");
                     }
                     else
