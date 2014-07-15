@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="IActivityListener.cs" />
     <Compile Include="ActivityListenerAggregator.cs" />
+    <Compile Include="SyncItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">

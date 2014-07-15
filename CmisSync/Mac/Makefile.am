@@ -26,6 +26,7 @@ SOURCES =  \
 	FolderTreeMVC/NodeLoader.cs \
 	FolderTreeMVC/NodeModel.cs \
 	MacWatcher.cs \
+	OSXPathRepresentationConverter.cs \
 	OutlineViewDelegate.cs \
 	Setup.cs \
 	SetupSubCustomize.cs \
