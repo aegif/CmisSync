@@ -137,47 +137,48 @@ namespace CmisSync.Lib.Cmis
                     sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL");
                     sqliteConnection.Open();
 
-                    string command =
-                   @"CREATE TABLE IF NOT EXISTS files (
-                        path TEXT PRIMARY KEY,
-                        localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
-                        id TEXT,
-                        serverSideModificationDate DATE,
-                        metadata TEXT,
-                        checksum TEXT);   /* Checksum of both data and metadata */
-                    CREATE INDEX IF NOT EXISTS files_localPath_index ON files (localPath);
-                    CREATE INDEX IF NOT EXISTS files_id_index ON files (id);
-                    CREATE TABLE IF NOT EXISTS folders (
-                        path TEXT PRIMARY KEY,
-                        localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
-                        id TEXT,
-                        serverSideModificationDate DATE,
-                        metadata TEXT,
-                        checksum TEXT);   /* Checksum of metadata */
-                    CREATE INDEX IF NOT EXISTS folders_localPath_index ON folders (localPath);
-                    CREATE INDEX IF NOT EXISTS folders_id_index ON folders (id);
-                    CREATE TABLE IF NOT EXISTS general (
-                        key TEXT PRIMARY KEY,
-                        value TEXT);      /* Other data such as ChangeLog token */
-                    CREATE TABLE IF NOT EXISTS downloads (
-                        PATH TEXT PRIMARY KEY,
-                        serverSideModificationDate DATE);     /* Download */
-                    CREATE TABLE IF NOT EXISTS failedoperations (
-                        path TEXT PRIMARY KEY,
-                        lastLocalModificationDate DATE,
-                        uploadCounter INTEGER,
-                        downloadCounter INTEGER,
-                        changeCounter INTEGER,
-                        deleteCounter INTEGER,
-                        uploadMessage TEXT,
-                        downloadMessage TEXT,
-                        changeMessage TEXT,
-                        deleteMessage TEXT);     /* Failed Operations*/
-                    DROP TABLE IF EXISTS faileduploads; /* Drop old upload Counter Table*/";
-
                     if (createDatabase)
                     {
+                        string command =
+                       @"CREATE TABLE IF NOT EXISTS files (
+                            path TEXT PRIMARY KEY,
+                            localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
+                            id TEXT,
+                            serverSideModificationDate DATE,
+                            metadata TEXT,
+                            checksum TEXT);   /* Checksum of both data and metadata */
+                        CREATE INDEX IF NOT EXISTS files_localPath_index ON files (localPath);
+                        CREATE INDEX IF NOT EXISTS files_id_index ON files (id);
+                        CREATE TABLE IF NOT EXISTS folders (
+                            path TEXT PRIMARY KEY,
+                            localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
+                            id TEXT,
+                            serverSideModificationDate DATE,
+                            metadata TEXT,
+                            checksum TEXT);   /* Checksum of metadata */
+                        CREATE INDEX IF NOT EXISTS folders_localPath_index ON folders (localPath);
+                        CREATE INDEX IF NOT EXISTS folders_id_index ON folders (id);
+                        CREATE TABLE IF NOT EXISTS general (
+                            key TEXT PRIMARY KEY,
+                            value TEXT);      /* Other data such as ChangeLog token */
+                        CREATE TABLE IF NOT EXISTS downloads (
+                            PATH TEXT PRIMARY KEY,
+                            serverSideModificationDate DATE);     /* Download */
+                        CREATE TABLE IF NOT EXISTS failedoperations (
+                            path TEXT PRIMARY KEY,
+                            lastLocalModificationDate DATE,
+                            uploadCounter INTEGER,
+                            downloadCounter INTEGER,
+                            changeCounter INTEGER,
+                            deleteCounter INTEGER,
+                            uploadMessage TEXT,
+                            downloadMessage TEXT,
+                            changeMessage TEXT,
+                            deleteMessage TEXT);     /* Failed Operations*/
+                        DROP TABLE IF EXISTS faileduploads; /* Drop old upload Counter Table*/";
+
                         ExecuteSQLAction(command, null);
+                        ExecuteSQLAction("PRAGMA user_version=" + SchemaVersion.ToString(), null);
                         Logger.Info("Database created");
                     }
                     else
@@ -757,8 +758,6 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public bool LocalFileHasChanged(string path)
         {
-            string normalizedPath = Normalize(path);
-
             // Calculate current checksum.
             string currentChecksum = null;
             try
@@ -773,15 +772,27 @@ namespace CmisSync.Lib.Cmis
             }
 
             // Read previous checksum from database.
-            string previousChecksum = null;
-            string command = "SELECT checksum FROM files WHERE path=@path";
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", normalizedPath);
-            previousChecksum = (string)ExecuteSQLFunction(command, parameters);
+            string previousChecksum = GetChecksum(path);
 
+            // Compare checksums.
             if (!currentChecksum.Equals(previousChecksum))
                 Logger.Info("Checksum of " + path + " has changed from " + previousChecksum + " to " + currentChecksum);
             return !currentChecksum.Equals(previousChecksum);
+        }
+
+
+        /// <summary>
+        /// Get checksum from database.
+        /// Public for debugging purposes only.
+        /// </summary>
+        /// <returns></returns>
+        public string GetChecksum(string path)
+        {
+            string normalizedPath = Normalize(path);
+            string command = "SELECT checksum FROM files WHERE path=@path";
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", normalizedPath);
+            return (string)ExecuteSQLFunction(command, parameters);
         }
 
 
