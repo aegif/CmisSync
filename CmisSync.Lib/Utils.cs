@@ -139,7 +139,7 @@ namespace CmisSync.Lib
             "|" + "^\\.~lock\\." +  // LibreOffice
             "|" + "^\\..*\\.sw[a-z]$" + // vi(m)
             "|" + "\\(autosaved\\).graffle$" + // Omnigraffle
-            "|" + "\\(conflict copy \\d\\d\\d\\d-\\d\\d-\\d\\d\\)" + //CmisSync conflict
+            "|" + "-conflict-version" + // CmisSync conflict
             ")"
         );
 
@@ -429,13 +429,13 @@ namespace CmisSync.Lib
             {
                 string extension = Path.GetExtension(path);
                 string filepath = path.Substring(0, path.Length - extension.Length);
-                string ret = String.Format("{0}_{1}-version{2}", filepath, user, extension);
+                string ret = String.Format("{0}_{1}-conflict-version{2}", filepath, user, extension);
                 if (!File.Exists(ret))
                     return ret;
                 int index = 1;
                 do
                 {
-                    ret = String.Format("{0}_{1}-version ({2}){3}", filepath, user, index.ToString(), extension);
+                    ret = String.Format("{0}_{1}-conflict-version ({2}){3}", filepath, user, index.ToString(), extension);
                     if (!File.Exists(ret))
                     {
                         return ret;
