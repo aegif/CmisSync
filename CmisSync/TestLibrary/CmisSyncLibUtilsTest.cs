@@ -34,12 +34,12 @@ namespace TestLibrary
             string user = "unittest";
             string path = Path.Combine(TestFolder, "testfile.txt");
             string originalParent = Directory.GetParent(path).FullName;
-            string conflictFilePath = Utils.FindNextConflictFreeFilename(path, user);
+            string conflictFilePath = Utils.CreateConflictFilename(path, user);
             Assert.AreEqual(path, conflictFilePath, "There is no testfile.txt but another conflict file is created");
             for (int i = 0; i < 10; i++)
             {
                 using (FileStream s = File.Create(conflictFilePath)){};
-                conflictFilePath = Utils.FindNextConflictFreeFilename(path, user);
+                conflictFilePath = Utils.CreateConflictFilename(path, user);
                 Assert.AreNotEqual(path, conflictFilePath, "The conflict file must differ from original file");
                 Assert.True(conflictFilePath.Contains(user), "The username should be added to the conflict file name");
                 Assert.True(conflictFilePath.EndsWith(Path.GetExtension(path)), "The file extension must be kept the same as in the original file");

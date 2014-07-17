@@ -821,8 +821,9 @@ namespace CmisSync.Lib.Sync
                     // TODO warn if local changes in the file.
                     if (File.Exists(localSubFolder))
                     {
-                        Logger.Warn("Local file \"" + localSubFolder + "\" has been renamed to \"" + localSubFolder + ".conflict\"");
-                        File.Move(localSubFolder, localSubFolder + ".conflict");
+                        string conflictFilename = Utils.CreateConflictFilename(localSubFolder, repoinfo.User);
+                        Logger.Warn("Local file \"" + localSubFolder + "\" has been renamed to \"" + conflictFilename + "\"");
+                        File.Move(localSubFolder, conflictFilename);
                     }
 
                     // Skip if invalid folder name. See https://github.com/aegif/CmisSync/issues/196
@@ -1125,9 +1126,11 @@ namespace CmisSync.Lib.Sync
                         }
 
                         // Remove the ".sync" suffix.
+                        
+                        // 
                         if (File.Exists(filepath))
                         {
-                            if (database.LocalFileHasChanged(filepath))
+                            /* we just check that file was not present locally, so no need to check for just-created file if (database.LocalFileHasChanged(filepath))
                             {
                                 Logger.Info("Conflict with file: " + fileName + ", backing up locally added version and downloading server version");
 
@@ -1155,13 +1158,14 @@ namespace CmisSync.Lib.Sync
                                 Utils.NotifyUser(message);
                             }
                             else
-                            {
-                                Logger.Debug("Removing local file: " + filepath);
-                                File.Delete(filepath);
+                            {*/
+                                //Logger.Debug("Removing local file: " + filepath);
+                                //File.Delete(filepath);
+                                File.Move(filepath, Utils.CreateConflictFilename(filepath, repoinfo.User));
                                 Logger.Debug(String.Format("Moving temporary local download file {0} to target file {1}", tmpfilepath, filepath));
                                 File.Move(tmpfilepath, filepath);
                                 SetLastModifiedDate(remoteDocument, filepath, metadata);
-                            }
+                            //}
                         }
                         else
                         {
