@@ -832,6 +832,8 @@ namespace CmisSync.Lib.Cmis
             if (result == null)
             {
                 string oldprefix = Path.Combine(ConfigManager.CurrentConfig.HomePath, "CmisSync");
+                // var syncFolder = ConfigManager.CurrentConfig.Folder.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
+                // string oldprefix = syncFolder.LocalPath;
                 SetPathPrefix(oldprefix);
                 return oldprefix;
             }
@@ -852,6 +854,54 @@ namespace CmisSync.Lib.Cmis
             string command = "INSERT OR REPLACE INTO general (key, value) VALUES (\"PathPrefix\", @prefix)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("prefix", pathprefix);
+            ExecuteSQLAction(command, parameters);
+        }
+
+
+        public bool ContainsFileId(string path)
+        {
+            path = Normalize(path);
+
+            var parameters = new Dictionary<string, object>();
+            parameters.Add("@path", path);
+            return null != ExecuteSQLFunction("SELECT id FROM files WHERE path = @path;", parameters);
+        }
+
+
+        public bool ContainsFolderId(string path)
+        {
+            path = Normalize(path);
+
+            var parameters = new Dictionary<string, object>();
+            parameters.Add("@path", path);
+            return null != ExecuteSQLFunction("SELECT id FROM folders WHERE path = @path;", parameters);
+        }
+
+        /// <summary>
+        /// Sets the file identifier.
+        /// </summary>
+        /// <param name="path">Path.</param>
+        /// <param name="id">Identifier.</param>
+        public void SetFileId(string path, string id)
+        {
+            string command = "UPDATE files SET id = @id WHERE path = @path;";
+            var parameters = new Dictionary<string, object>();
+            parameters.Add("@path", path);
+            parameters.Add("@id", id);
+            ExecuteSQLAction(command, parameters);
+        }
+
+        /// <summary>
+        /// Sets the folder identifier.
+        /// </summary>
+        /// <param name="path">Path.</param>
+        /// <param name="id">Identifier.</param>
+        public void SetFolderId(string path, string id)
+        {
+            string command = "UPDATE folders SET id = @id WHERE path = @path;";
+            var parameters = new Dictionary<string, object>();
+            parameters.Add("@path", path);
+            parameters.Add("@id", id);
             ExecuteSQLAction(command, parameters);
         }
 
