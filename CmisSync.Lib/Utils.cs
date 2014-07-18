@@ -419,7 +419,7 @@ namespace CmisSync.Lib
         /// <param name="path">Path of the file in conflict</param>
         /// <param name="user">Local user</param>
         /// <returns></returns>
-        public static string FindNextConflictFreeFilename(String path, String user)
+        public static string CreateConflictFilename(String path, String user)
         {
             if (!File.Exists(path))
             {
