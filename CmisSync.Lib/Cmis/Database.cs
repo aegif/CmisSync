@@ -857,21 +857,28 @@ namespace CmisSync.Lib.Cmis
             ExecuteSQLAction(command, parameters);
         }
 
-
+        /// <summary>
+        /// Checks whether the database contains a given files's id.
+        /// </summary>
+        /// <returns><c>true</c>, if file identifier was containsed, <c>false</c> otherwise.</returns>
+        /// <param name="path">Path.</param>
         public bool ContainsFileId(string path)
         {
             path = Normalize(path);
-
             var parameters = new Dictionary<string, object>();
             parameters.Add("@path", path);
-            return null != ExecuteSQLFunction("SELECT id FROM files WHERE path = @path;", parameters);
+            var value = ExecuteSQLFunction("SELECT id FROM files WHERE path = @path;", parameters);
+            return !(value is DBNull);
         }
 
-
+        /// <summary>
+        /// Checks whether the database contains a given folders's id.
+        /// </summary>
+        /// <returns><c>true</c>, if folder identifier was containsed, <c>false</c> otherwise.</returns>
+        /// <param name="path">Path.</param>
         public bool ContainsFolderId(string path)
         {
             path = Normalize(path);
-
             var parameters = new Dictionary<string, object>();
             parameters.Add("@path", path);
             return null != ExecuteSQLFunction("SELECT id FROM folders WHERE path = @path;", parameters);
@@ -884,6 +891,7 @@ namespace CmisSync.Lib.Cmis
         /// <param name="id">Identifier.</param>
         public void SetFileId(string path, string id)
         {
+            path = Normalize(path);
             string command = "UPDATE files SET id = @id WHERE path = @path;";
             var parameters = new Dictionary<string, object>();
             parameters.Add("@path", path);
@@ -898,6 +906,7 @@ namespace CmisSync.Lib.Cmis
         /// <param name="id">Identifier.</param>
         public void SetFolderId(string path, string id)
         {
+            path = Normalize(path);
             string command = "UPDATE folders SET id = @id WHERE path = @path;";
             var parameters = new Dictionary<string, object>();
             parameters.Add("@path", path);
