@@ -111,7 +111,7 @@ namespace CmisSync
                         #region Page Setup
                         case PageType.Setup:
                             {
-                                // UI elements.
+                                // GUI elements.
 
                                 Header = Properties_Resources.Welcome;
                                 Description = Properties_Resources.Intro;
@@ -170,7 +170,7 @@ namespace CmisSync
                                     // First page of the tutorial.
                                     case 1:
                                         {
-                                            // UI elements.
+                                            // GUI elements.
 
                                             Header = Properties_Resources.WhatsNext;
                                             Description = Properties_Resources.CmisSyncCreates;
@@ -219,7 +219,7 @@ namespace CmisSync
                                     // Second page of the tutorial.
                                     case 2:
                                         {
-                                            // UI elements.
+                                            // GUI elements.
 
                                             Header = Properties_Resources.Synchronization;
                                             Description = Properties_Resources.DocumentsAre;
@@ -258,7 +258,7 @@ namespace CmisSync
                                     // Third page of the tutorial.
                                     case 3:
                                         {
-                                            // UI elements.
+                                            // GUI elements.
 
                                             Header = Properties_Resources.StatusIcon;
                                             Description = Properties_Resources.StatusIconShows;
@@ -297,7 +297,7 @@ namespace CmisSync
                                     // Fourth page of the tutorial.
                                     case 4:
                                         {
-                                            // UI elements.
+                                            // GUI elements.
 
                                             Header = Properties_Resources.AddFolders;
                                             Description = Properties_Resources.YouCan;
@@ -356,11 +356,11 @@ namespace CmisSync
                         #region Page Add1
                         case PageType.Add1:
                             {
-                                // UI elements.
+                                // GUI elements.
 
                                 Header = Properties_Resources.Where;
 
-                                // Address input UI.
+                                // Address input GUI.
                                 TextBlock address_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.EnterWebAddress,
@@ -402,7 +402,7 @@ namespace CmisSync
                                 };
 
 
-                                // User input UI.
+                                // User input GUI.
                                 TextBlock user_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.User + ":",
@@ -430,7 +430,7 @@ namespace CmisSync
                                     Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128))
                                 };
 
-                                // Password input UI.
+                                // Password input GUI.
                                 TextBlock password_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.Password + ":",
@@ -648,7 +648,7 @@ namespace CmisSync
                         #region Page Add2
                         case PageType.Add2:
                             {
-                                // UI elements.
+                                // GUI elements.
 
                                 Header = Properties_Resources.Which;
 
@@ -774,7 +774,7 @@ namespace CmisSync
                             {
                                 string parentFolder = Controller.DefaultRepoPath;
 
-                                // UI elements.
+                                // GUI elements.
 
                                 Header = Properties_Resources.Customize;
 
@@ -973,7 +973,7 @@ namespace CmisSync
                         #region Page Finished
                         case PageType.Finished:
                             {
-                                // UI elements.
+                                // GUI elements.
 
                                 Header = Properties_Resources.Ready;
                                 Description = Properties_Resources.YouCanFind;
@@ -1017,11 +1017,11 @@ namespace CmisSync
                         #region Page Settings
                         case PageType.Settings:
                             {
-                                // UI elements.
+                                // GUI elements.
 
                                 Header = Properties_Resources.Settings;
 
-                                // Address input UI.
+                                // Address input GUI.
                                 TextBlock address_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.WebAddress,
@@ -1035,7 +1035,7 @@ namespace CmisSync
                                     IsEnabled = false,
                                 };
 
-                                // User input UI.
+                                // User input GUI.
                                 TextBlock user_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.User + ":",
@@ -1050,7 +1050,7 @@ namespace CmisSync
                                     IsEnabled = false,
                                 };
 
-                                // Password input UI.
+                                // Password input GUI.
                                 TextBlock password_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.Password + ":",
@@ -1085,7 +1085,7 @@ namespace CmisSync
                                     Width = 400,
                                 };
 
-                                // Sync duration input UI.
+                                // Sync duration input GUI.
                                 TextBlock slider_label = new TextBlock()
                                 {
                                     Text = Properties_Resources.SyncInterval + ":",

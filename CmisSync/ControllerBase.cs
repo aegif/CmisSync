@@ -247,7 +247,7 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Once the UI has loaded, show setup window if it is the first run, or check the repositories.
+        /// Once the GUI has loaded, show setup window if it is the first run, or check the repositories.
         /// </summary>
         public void UIHasLoaded()
         {
@@ -262,7 +262,7 @@ namespace CmisSync
                 {
                     CheckRepositories();
                     RepositoriesLoaded = true;
-                    // Update UI.
+                    // Update GUI.
                     FolderListChanged();
                 }).Start();
             }
@@ -270,7 +270,7 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Initialize (in the UI and syncing mechanism) an existing CmisSync synchronized folder.
+        /// Initialize (in the GUI and syncing mechanism) an existing CmisSync synchronized folder.
         /// </summary>
         /// <param name="repositoryInfo">Synchronized folder path</param>
         private void AddRepository(RepoInfo repositoryInfo)
@@ -449,7 +449,7 @@ namespace CmisSync
                     ConfigManager.CurrentConfig.Save();
             }
 
-            // Update UI.
+            // Update GUI.
             FolderListChanged();
         }
 
@@ -523,7 +523,7 @@ namespace CmisSync
             // Add folder to XML config file.
             ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
-            // Initialize in the UI.
+            // Initialize in the GUI.
             AddRepository(repoInfo);
             FolderListChanged();
         }

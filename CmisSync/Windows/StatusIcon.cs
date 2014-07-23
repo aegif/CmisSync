@@ -192,7 +192,7 @@ namespace CmisSync
         }
 
         /// <summary>
-        /// Dispose of the status icon UI elements.
+        /// Dispose of the status icon GUI elements.
         /// </summary>
         protected override void Dispose(bool isDisposing)
         {
@@ -207,7 +207,7 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Create the UI elements of the menu.
+        /// Create the GUI elements of the menu.
         /// </summary>
         private void CreateMenu()
         {
