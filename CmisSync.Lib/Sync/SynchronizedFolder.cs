@@ -266,7 +266,7 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.Password] = repoinfo.Password.ToString();
                 cmisParameters[SessionParameter.RepositoryId] = repoinfo.RepoID;
                 // Sets the Connect Timeout to infinite
-                cmisParameters[SessionParameter.ConnectTimeout] = "-1";
+                cmisParameters[SessionParameter.ConnectTimeout] = "60000"; // One minute
                 // Sets the Read Timeout to infinite
                 cmisParameters[SessionParameter.ReadTimeout] = "-1";
             }
