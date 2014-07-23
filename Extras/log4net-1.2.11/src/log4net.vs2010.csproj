@@ -56,7 +56,6 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <ReleaseVersion />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\build\bin\net\2.0\debug\</OutputPath>
@@ -102,6 +101,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -488,12 +489,6 @@
     <Compile Include="Layout\SimpleLayout.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Layout\XmlLayout.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Layout\XmlLayoutBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Layout\XmlLayoutSchemaLog4j.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -751,6 +746,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Util\WindowsSecurityContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Layout\XMLLayout.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Layout\XMLLayoutBase.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

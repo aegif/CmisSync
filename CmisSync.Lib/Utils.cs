@@ -11,7 +11,7 @@ using System.Security.Permissions;
 using System.Text.RegularExpressions;
 using System.Reflection;
 //#if __MonoCS__
-//using Mono.Unix.Native;
+using Mono.Unix.Native;
 //#endif
 
 
@@ -90,9 +90,10 @@ namespace CmisSync.Lib
             }
             catch (System.PlatformNotSupportedException)
             {
-//#if __MonoCS__
-//                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
-//#endif
+#if __MonoCS__
+                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
+				//writeAllow = true;
+#endif
                 #if __COCOA__
                 // TODO check directory permissions
                 writeAllow = true;
@@ -188,14 +189,15 @@ namespace CmisSync.Lib
             //Check filename length
             String fullPath = Path.Combine(localDirectory, filename);
 
-            #if __COCOA__
+            #if __COCOA__ || __MonoCS__
             // TODO Check filename length for OS X
             // * Max "FileName" length: 255 charactors.
             // * FileName encoding is UTF-16 (Modified NFD).
 
             #else
             // reflection
-            FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
+
+			FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
                 BindingFlags.Static |
                 BindingFlags.GetField |
                 BindingFlags.NonPublic);

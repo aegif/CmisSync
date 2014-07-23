@@ -67,6 +67,7 @@ namespace CmisSync
         /// Settings page.
         /// </summary>
         Settings,
+		Syncing
     }
 
     /// <summary>
