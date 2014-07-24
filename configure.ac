@@ -231,7 +231,6 @@ if test "$OSNAME" = "Linux" ; then
     AC_SUBST(DATALIBS,[-r:System.Data.dll,Mono.Data.Sqlite.dll])
     AC_SUBST(WEBLIBS,[-r:System.Web.dll])
     AC_SUBST(MONOPOSIX,[-r:Mono.Posix.dll])
-
     AC_SUBST(BUILD_DEFINES,"${BUILD_DEFINES}")
     GUISUBDIRS=CmisSync
     enable_gtkui=yes
@@ -333,6 +332,7 @@ AC_OUTPUT([
 build/cmissync.spec
 build/Makefile
 build/m4/Makefile
+CmisSync.Auth/Makefile
 CmisSync.Lib/Defines.cs
 CmisSync.Lib/Makefile
 CmisSync/Common/Makefile
@@ -347,13 +347,10 @@ CmisSync/Linux/Pixmaps/icons/ubuntu-mono-dark/Makefile
 CmisSync/Linux/Pixmaps/icons/ubuntu-mono-light/Makefile
 CmisSync/Mac/Makefile
 CmisSync/Mac/Info.plist
-CmisSync/Mac/Pixmaps/Makefile
 CmisSync/TestLibrary/Makefile
 CmisSync/TestLibrary/test-servers.json
 CmisSync/TestLibraryRunner/Makefile
 CmisSync/Linux/cmissync
-DataSpaceSync.Console/Makefile
-DataSpaceSync.Console/dsscli
 CmisSync/Makefile
 Makefile
 ])
