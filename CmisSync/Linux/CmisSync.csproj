@@ -67,7 +67,7 @@
     <Compile Include="SetupWindow.cs" />
     <Compile Include="Spinner.cs" />
     <Compile Include="StatusIcon.cs" />
-    <Compile Include="UI.cs" />
+    <Compile Include="GUI.cs" />
     <Compile Include="UIHelpers.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="..\AboutController.cs" />
