@@ -27,6 +27,6 @@ using System.Reflection;
 namespace CmisSync {
 
     public class Defines {
-        public const string ASSETS_DIR = "@expanded_datadir@/dataspace-sync";
+        public const string ASSETS_DIR = "@expanded_datadir@/cmissync";
     }
 }

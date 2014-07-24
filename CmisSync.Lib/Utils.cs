@@ -11,7 +11,7 @@ using System.Security.Permissions;
 using System.Text.RegularExpressions;
 using System.Reflection;
 //#if __MonoCS__
-//using Mono.Unix.Native;
+using Mono.Unix.Native;
 //#endif
 
 
@@ -90,9 +90,10 @@ namespace CmisSync.Lib
             }
             catch (System.PlatformNotSupportedException)
             {
-//#if __MonoCS__
-//                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
-//#endif
+#if __MonoCS__
+                writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
+				//writeAllow = true;
+#endif
                 #if __COCOA__
                 // TODO check directory permissions
                 writeAllow = true;
@@ -139,7 +140,7 @@ namespace CmisSync.Lib
             "|" + "^\\.~lock\\." +  // LibreOffice
             "|" + "^\\..*\\.sw[a-z]$" + // vi(m)
             "|" + "\\(autosaved\\).graffle$" + // Omnigraffle
-            "|" + "\\(conflict copy \\d\\d\\d\\d-\\d\\d-\\d\\d\\)" + //CmisSync conflict
+            "|" + "-conflict-version" + // CmisSync conflict
             ")"
         );
 
@@ -188,14 +189,15 @@ namespace CmisSync.Lib
             //Check filename length
             String fullPath = Path.Combine(localDirectory, filename);
 
-            #if __COCOA__
+            #if __COCOA__ || __MonoCS__
             // TODO Check filename length for OS X
             // * Max "FileName" length: 255 charactors.
             // * FileName encoding is UTF-16 (Modified NFD).
 
             #else
             // reflection
-            FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
+
+			FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
                 BindingFlags.Static |
                 BindingFlags.GetField |
                 BindingFlags.NonPublic);
@@ -419,7 +421,7 @@ namespace CmisSync.Lib
         /// <param name="path">Path of the file in conflict</param>
         /// <param name="user">Local user</param>
         /// <returns></returns>
-        public static string FindNextConflictFreeFilename(String path, String user)
+        public static string CreateConflictFilename(String path, String user)
         {
             if (!File.Exists(path))
             {
@@ -429,13 +431,13 @@ namespace CmisSync.Lib
             {
                 string extension = Path.GetExtension(path);
                 string filepath = path.Substring(0, path.Length - extension.Length);
-                string ret = String.Format("{0}_{1}-version{2}", filepath, user, extension);
+                string ret = String.Format("{0}_{1}-conflict-version{2}", filepath, user, extension);
                 if (!File.Exists(ret))
                     return ret;
                 int index = 1;
                 do
                 {
-                    ret = String.Format("{0}_{1}-version ({2}){3}", filepath, user, index.ToString(), extension);
+                    ret = String.Format("{0}_{1}-conflict-version ({2}){3}", filepath, user, index.ToString(), extension);
                     if (!File.Exists(ret))
                     {
                         return ret;

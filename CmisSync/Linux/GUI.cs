@@ -16,56 +16,38 @@
 
 
 using System;
-using System.Windows.Forms;
+
+using Gtk;
+using CmisSync.Lib;
 
 namespace CmisSync {
 
-    /// <summary>
-    /// User interface of CmisSync.
-    /// </summary>
-    public class UI {
+    public class GUI {
 
-        /// <summary>
-        /// Dialog shown at first run to explain how CmisSync works.
-        /// </summary>
-        public Setup Setup;
-
-
-        /// <summary>
-        /// CmisSync icon in the task bar.
-        /// It contains the main CmisSync menu.
-        /// </summary>
         public StatusIcon StatusIcon;
-
-
-        /// <summary>
-        /// Small dialog showing some information about CmisSync.
-        /// </summary>
+        public Setup Setup;
         public About About;
 
+        public static string AssetsPath =
+            (null != Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR"))
+            ? Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR") : Defines.ASSETS_DIR;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public UI ()
-        {   
-			// FIXME: The second time windows are shown, the windows
-			// don't have the smooth ease in animation, but appear abruptly.
-			// The ease out animation always seems to work
+        public GUI ()
+        {
+            Application.Init();
+
             Setup      = new Setup ();
             About      = new About ();
-            
+            StatusIcon = new StatusIcon ();
+
             Program.Controller.UIHasLoaded ();
         }
 
-        
-        /// <summary>
-        /// Run the CmisSync user interface.
-        /// </summary>
+
+        // Runs the application
         public void Run ()
         {
-            Application.Run (StatusIcon = new StatusIcon ());
-            StatusIcon.Dispose ();
+            Application.Run ();
         }
     }
 }
