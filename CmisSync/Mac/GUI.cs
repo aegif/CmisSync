@@ -27,7 +27,7 @@ using MonoMac.ObjCRuntime;
 
 namespace CmisSync {
 
-    public class UI : AppDelegate {
+    public class GUI : AppDelegate {
 
         public StatusIcon StatusIcon;
         #if ODS_NEW_GUI
@@ -44,7 +44,7 @@ namespace CmisSync {
             "Lucida Grande", NSFontTraitMask.Bold, 0, 13);
         
 
-        public UI ()
+        public GUI ()
         {
             using (var a = new NSAutoreleasePool ())
             {

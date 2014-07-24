@@ -48,7 +48,7 @@ If it says `Mono [...] version 2.x.y` the you must first install a newer version
 
 ### 3) Build
 
-Run the following commands:
+At the root of the CmisSync root folder, run the following commands:
 
 ```bash
 $ make -f Makefile.am

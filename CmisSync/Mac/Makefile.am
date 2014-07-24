@@ -25,6 +25,7 @@ SOURCES =  \
 	FolderTreeMVC/LoadingStatusModel.cs \
 	FolderTreeMVC/NodeLoader.cs \
 	FolderTreeMVC/NodeModel.cs \
+	GUI.cs \
 	MacWatcher.cs \
 	OutlineViewDelegate.cs \
 	Setup.cs \
@@ -60,8 +61,7 @@ SOURCES =  \
 	SetupWizard.designer.cs \
 	SetupWizardController.cs \
 	StatusIcon.cs \
-	TextFieldDelegate.cs \
-	UI.cs
+	TextFieldDelegate.cs
 
 RESOURCES = $(RESOURCES_RESOURCES)
 
