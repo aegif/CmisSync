@@ -71,7 +71,6 @@
       <DependentUpon>MainMenu.xib</DependentUpon>
     </Compile>
     <Compile Include="StatusIcon.cs" />
-    <Compile Include="UI.cs" />
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
@@ -161,6 +160,7 @@
     <Compile Include="SetupSubSetting.designer.cs">
       <DependentUpon>SetupSubSetting.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

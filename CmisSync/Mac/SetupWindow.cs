@@ -124,7 +124,7 @@ namespace CmisSync {
                         x += 15;
                     }
 
-                    button.Font = UI.Font;
+                    button.Font = GUI.Font;
                     ContentView.AddSubview (button);
                     i++;
                 }
