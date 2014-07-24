@@ -4,14 +4,15 @@ using CmisSync.Lib;
 namespace CmisSync.Console
 {
     // Console UI does not actually need a controller, so we use this empty controller instead.
-	public class ConsoleController : IActivityListener
+	public class ConsoleController : IActivityListener, UserNotificationListener
 	{
         /// <summary>
         /// Constructor
         /// </summary>
 		public ConsoleController ()
 		{
-            // Intentionally empty.
+            // 
+            CmisSync.Lib.Utils.SetUserNotificationListener(this);
 		}
 
         /// <summary>
@@ -36,6 +37,15 @@ namespace CmisSync.Console
         public void ActivityError(Tuple<string, Exception> error)
         {
             System.Console.WriteLine(String.Format("Could not sync '{0}': {1}", error.Item1, error.Item2.Message));
+        }
+
+
+        /// <summary>
+        /// Send a message to the end user.
+        /// </summary>
+        public void NotifyUser(string message)
+        {
+            System.Console.WriteLine(message);
         }
     }
 

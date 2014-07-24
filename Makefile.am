@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I build/m4/cmissync -I build/m4/shamrock
 
-basedirs = build CmisSync.Lib DataSpaceSync.Console
+basedirs = build CmisSync.Auth CmisSync.Lib 
 
 SUBDIRS = $(basedirs) $(GUISUBDIRS)
 DIST_SUBDIRS = $(basedirs) CmisSync
@@ -39,6 +39,7 @@ apple-package:
 	(cd build; ./dmg-creator.sh ../bin/DataSpace\ Sync.app/; cd ..)
 
 none:
-
+install-exec-hook:
+	cp $(DOTCMISPATH) $(libdir)/cmissync/
 dist-hook:
 	make $(PACKAGE_TARGET)

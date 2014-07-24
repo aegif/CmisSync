@@ -22,7 +22,7 @@ using CmisSync.Lib;
 
 namespace CmisSync {
 
-    public class UI {
+    public class GUI {
 
         public StatusIcon StatusIcon;
         public Setup Setup;
@@ -32,7 +32,7 @@ namespace CmisSync {
             (null != Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR"))
             ? Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR") : Defines.ASSETS_DIR;
 
-        public UI ()
+        public GUI ()
         {
             Application.Init();
 

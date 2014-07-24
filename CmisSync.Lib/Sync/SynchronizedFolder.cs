@@ -266,7 +266,7 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.Password] = repoinfo.Password.ToString();
                 cmisParameters[SessionParameter.RepositoryId] = repoinfo.RepoID;
                 // Sets the Connect Timeout to infinite
-                cmisParameters[SessionParameter.ConnectTimeout] = "-1";
+                cmisParameters[SessionParameter.ConnectTimeout] = "60000"; // One minute
                 // Sets the Read Timeout to infinite
                 cmisParameters[SessionParameter.ReadTimeout] = "-1";
             }
@@ -925,7 +925,8 @@ namespace CmisSync.Lib.Sync
                                 Logger.Info("Removing locally deleted file on server: " + filePath);
                                 try
                                 {
-                                    remoteDocument.DeleteAllVersions();
+									remoteDocument.Delete(false);
+									//remoteDocument.DeleteAllVersions();
                                     // Remove it from database.
                                     database.RemoveFile(filePath);
                                     database.SetOperationRetryCounter(filePath, 0, Database.OperationType.DELETE);
@@ -1203,7 +1204,7 @@ namespace CmisSync.Lib.Sync
             }
 
 
-            private bool UploadStreamInTrunk(string filePath, Stream fileStream, IDocument remoteDocument)
+            private bool UploadStreamInTrunk(string filePath, Stream fileStream, IDocument remoteDocument) // TODO Rename UploadStreamInChunk ?
             {
                 if (repoinfo.ChunkSize <= 0)
                 {

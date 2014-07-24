@@ -4,9 +4,9 @@ using System.ComponentModel;
 
 using Gtk;
 
-using CmisSync.Lib.Credentials;
+using CmisSync.Auth;
 using CmisSync.CmisTree;
-
+using DotCMIS.Exceptions;
 namespace CmisSync
 {
     /// <summary>
