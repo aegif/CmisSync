@@ -29,7 +29,7 @@ SOURCES =  \
 	SetupWindow.cs \
 	Spinner.cs \
 	StatusIcon.cs \
-	UI.cs \
+	GUI.cs \
 	UIHelpers.cs \
 	Utils.cs
 
