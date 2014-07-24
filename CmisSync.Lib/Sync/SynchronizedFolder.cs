@@ -1220,7 +1220,7 @@ namespace CmisSync.Lib.Sync
             }
 
 
-            private bool UploadStreamInTrunk(string filePath, Stream fileStream, IDocument remoteDocument)
+            private bool UploadStreamInTrunk(string filePath, Stream fileStream, IDocument remoteDocument) // TODO Rename UploadStreamInChunk ?
             {
                 if (repoinfo.ChunkSize <= 0)
                 {
