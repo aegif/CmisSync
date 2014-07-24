@@ -925,8 +925,7 @@ namespace CmisSync.Lib.Sync
                                 Logger.Info("Removing locally deleted file on server: " + filePath);
                                 try
                                 {
-									remoteDocument.Delete(false);
-									//remoteDocument.DeleteAllVersions();
+                                    remoteDocument.DeleteAllVersions();
                                     // Remove it from database.
                                     database.RemoveFile(filePath);
                                     database.SetOperationRetryCounter(filePath, 0, Database.OperationType.DELETE);
