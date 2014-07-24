@@ -1,12 +1,29 @@
 ﻿using System;
-
+using System.IO;
 
 
 namespace CmisSync.Lib
 {
     abstract public class SyncItem
     {
+        // local Repository root folder
+        protected string localRoot;
+
+        // remote Repository root folder
+        protected string remoteRoot;
+
+        // local relative path
+        protected string localPath;
+
+        // remote relative path
+        protected string remotePath;
+
+        // obsolete
         protected string path;
+
+        protected SyncItem()
+        {
+        }
 
         public SyncItem(string path)
         {
@@ -18,9 +35,59 @@ namespace CmisSync.Lib
             get;
         }
        
-        abstract public string Path
+        abstract public string RemotePath
         {
             get;
+        }
+
+        abstract public string LocalFileName
+        {
+            get;
+        }
+
+        abstract public string RemoteFileName
+        {
+            get;
+        }
+
+        virtual public bool ExistsLocal()
+        {
+            return File.Exists(LocalPath);
+        }
+    }
+
+
+    public static class SyncItemFactory
+    {
+
+        public static SyncItem CreateFromLocalPath(string path, RepoInfo repoInfo)
+        {
+            return new LocalPathSyncItem(path, repoInfo);
+        }
+
+        public static SyncItem CreateFromLocalPath(string folder, string fileName, RepoInfo repoInfo)
+        {
+            return new LocalPathSyncItem(Path.Combine(folder, fileName), repoInfo);
+        }
+
+        public static SyncItem CreateFromRemotePath(string path, RepoInfo repoInfo)
+        {
+            return new RemotePathSyncItem(path, repoInfo);
+        }
+            
+        public static SyncItem CreateFromRemotePath(string folder, string fileName, RepoInfo repoInfo)
+        {
+            return new RemotePathSyncItem(Path.Combine(folder, fileName), repoInfo);
+        }
+
+        public static SyncItem CreateFromLocalFolderAndRemoteName(string localFolder, string remoteFileName, RepoInfo repoInfo)
+        {
+            return new LocalPathSyncItem(localFolder, remoteFileName, repoInfo);
+        }
+
+        public static SyncItem CreateFromRemoteFolderAndLocalName(string remoteFolder, string LocalFileName, RepoInfo repoInfo)
+        {
+            return new RemotePathSyncItem(remoteFolder, LocalFileName, repoInfo);
         }
     }
 
@@ -30,66 +97,193 @@ namespace CmisSync.Lib
 
         public LocalPathSyncItem(string path) : base(path) {}
 
+        public LocalPathSyncItem(string localPath, RepoInfo repoInfo)
+        {
+            this.localRoot = repoInfo.TargetDirectory;
+            this.remoteRoot = repoInfo.RemotePath;
+
+            this.localPath = localPath;
+            if (localPath.StartsWith(this.localRoot))
+            {
+                this.localPath = localPath.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+            }
+            this.remotePath = PathRepresentationConverter.LocalToRemote(this.localPath);
+        }
+
+        public LocalPathSyncItem(string localFolder, string remoteRelativePath, RepoInfo repoInfo)
+        {
+            this.localRoot = repoInfo.TargetDirectory;
+            this.remoteRoot = repoInfo.RemotePath;
+
+            this.localPath = Path.Combine(localFolder, PathRepresentationConverter.RemoteToLocal(remoteRelativePath));
+            if (localPath.StartsWith(this.localRoot))
+            {
+                this.localPath = localPath.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+            }
+            string localRootRelative = localFolder;
+            if (localFolder.StartsWith(this.localRoot))
+            {
+                localRootRelative = localFolder.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+            }
+            this.remotePath = Path.Combine(PathRepresentationConverter.LocalToRemote(localRootRelative), remoteRelativePath);
+        }
+            
+
+        public string LocalRelativePath
+        {
+            get
+            {
+                return localPath;
+            }
+        }
+
+        public string RemoteRelativePath
+        {
+            get
+            {
+                return remotePath;
+            }
+        }
+
         public override string LocalPath
         {
             get
             {
-                return path;
+                return Path.Combine(this.localRoot, this.localPath);
             }
         }
 
-        public override string Path
+        public override string RemotePath
         {
             get
             {
-                return PathRepresentationConverter.LocalToUtf8(path);
+                return Path.Combine(this.remoteRoot, this.remotePath);
+            }
+        }
+
+        public override string LocalFileName
+        {
+            get
+            {
+                return Path.GetFileName(this.localPath);
+            }
+        }
+
+        public override string RemoteFileName
+        {
+            get
+            {
+                return Path.GetFileName(this.remotePath);
             }
         }
     }
 
 
-    public class Utf8PathSyncItem : SyncItem
+    public class RemotePathSyncItem : SyncItem
     {
-        public Utf8PathSyncItem(string path) : base(path) {}
+        public RemotePathSyncItem(string path) : base(path) {}
 
+        public RemotePathSyncItem(string remotePath, RepoInfo repoInfo)
+        {
+            this.localRoot = PathRepresentationConverter.RemoteToLocal(repoInfo.TargetDirectory);
+            this.remoteRoot = PathRepresentationConverter.LocalToRemote(repoInfo.RemotePath);
+
+            this.remotePath = remotePath;
+            if (remotePath.StartsWith(this.remoteRoot))
+            {
+                this.remotePath = remotePath.Substring(this.remoteRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+            }
+            this.localPath = PathRepresentationConverter.RemoteToLocal(this.remotePath);
+        }
+
+        public RemotePathSyncItem(string remoteFolder, string localRelativePath, RepoInfo repoInfo)
+        {
+            this.localRoot = repoInfo.TargetDirectory;
+            this.remoteRoot = repoInfo.RemotePath;
+
+            this.remotePath = Path.Combine(remoteFolder, PathRepresentationConverter.LocalToRemote(localRelativePath));
+            if (this.remotePath.StartsWith(this.remoteRoot))
+            {
+                this.remotePath = this.remotePath.Substring(this.localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+            }
+            string remoteRootRelative = remoteFolder;
+            if (remoteFolder.StartsWith(this.remoteRoot))
+            {
+                remoteRootRelative = remoteFolder.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+            }
+            this.localPath = Path.Combine(PathRepresentationConverter.RemoteToLocal(remoteRootRelative), localRelativePath);
+        }
+
+        public string LocalRelativePath
+        {
+            get
+            {
+                return localPath;
+            }
+        }
+
+        public string RemoteRelativePath
+        {
+            get
+            {
+                return remotePath;
+            }
+        }
+            
         public override string LocalPath
         {
             get
             {
-                return PathRepresentationConverter.Utf8ToLocal(path);
+                return Path.Combine(localRoot, localPath);
             }
         }
 
-        public override string Path
+        public override string RemotePath
         {
             get
             {
-                return path;
+                return Path.Combine(remoteRoot, remotePath);
+            }
+        }
+
+        public override string LocalFileName
+        {
+            get
+            {
+                return Path.GetFileName(localPath);
+            }
+        }
+
+        public override string RemoteFileName
+        {
+            get
+            {
+                return Path.GetFileName(remotePath);
             }
         }
     }
 
 
     /// <summary>
-    /// I path representation converter.
+    /// Path representation converter.
     /// </summary>
     public interface IPathRepresentationConverter
     {
-        string LocalToUtf8(string localPath);
+        string LocalToRemote(string localPath);
 
-        string Utf8ToLocal(string utf8Path);
+        string RemoteToLocal(string remotePath);
     }
 
 
     public class DefaultPathRepresentationConverter : IPathRepresentationConverter
     {
-        public string LocalToUtf8(string localPath)
+        public string LocalToRemote(string localPath)
         {
             return localPath;
         }
-        public string Utf8ToLocal(string utf8Path)
+        public string RemoteToLocal(string remotePath)
         {
-            return utf8Path;
+            return remotePath;
         }
     }
 
@@ -105,14 +299,14 @@ namespace CmisSync.Lib
             PathConverter = converter;
         }
 
-        static public string LocalToUtf8(string localPath)
+        static public string LocalToRemote(string localPath)
         {
-            return PathConverter.LocalToUtf8(localPath);
+            return PathConverter.LocalToRemote(localPath);
         }
 
-        static public string Utf8ToLocal(string utf8Path)
+        static public string RemoteToLocal(string remotePath)
         {
-            return PathConverter.Utf8ToLocal(utf8Path);
+            return PathConverter.RemoteToLocal(remotePath);
         }
     }
 }

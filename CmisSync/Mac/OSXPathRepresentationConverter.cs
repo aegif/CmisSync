@@ -8,7 +8,7 @@ namespace CmisSync
     public class OSXPathRepresentationConverter : IPathRepresentationConverter
     {
     
-        public string LocalToUtf8(string localPath)
+        public string LocalToRemote(string localPath)
         {
             if (string.IsNullOrEmpty(localPath))
             {
@@ -18,15 +18,15 @@ namespace CmisSync
             return localPath.Normalize(NormalizationForm.FormC);
         }
 
-        public string Utf8ToLocal(string utf8Path)
+        public string RemoteToLocal(string remotePath)
         {
-            if (String.IsNullOrEmpty(utf8Path))
+            if (String.IsNullOrEmpty(remotePath))
             {
-                return utf8Path;
+                return remotePath;
             }
 
-            var url = NSUrl.FromFilename(utf8Path);
-            if (utf8Path.StartsWith("/"))
+            var url = NSUrl.FromFilename(remotePath);
+            if (remotePath.StartsWith("/"))
             {
                 return url.Path;
             }
