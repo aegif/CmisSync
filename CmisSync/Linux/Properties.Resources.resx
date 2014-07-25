@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AddARemoteFolder" xml:space="preserve">
+    <value>Add a remote folder…</value>
+  </data>
+  <data name="AddFolders" xml:space="preserve">
+    <value>Adding synchronized folders to CmisSync</value>
+  </data>
+  <data name="AddingFolder" xml:space="preserve">
+    <value>Adding Folder</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CmisSyncCreates" xml:space="preserve">
+    <value>CmisSync creates a special folder on your computer where the documents are synchronized.</value>
+  </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="Customize" xml:space="preserve">
+    <value>Customize the local folder name</value>
+  </data>
+  <data name="DocumentsAre" xml:space="preserve">
+    <value>Documents are automatically updated to reflect the latest changes from your colleagues, and your changes are sent to the server automatically too.</value>
+  </data>
+  <data name="EmptyURLNotAllowed" xml:space="preserve">
+    <value>Empty URL</value>
+  </data>
+  <data name="EnterLocalFolderName" xml:space="preserve">
+    <value>Enter a name for the local folder where the documents are synchronized</value>
+  </data>
+  <data name="EnterWebAddress" xml:space="preserve">
+    <value>Enter a Web address where the documents can be seen:</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="FailedToSendSomeChanges" xml:space="preserve">
+    <value>Failed to send some changes</value>
+  </data>
+  <data name="FilesUpToDate" xml:space="preserve">
+    <value>Files up to date</value>
+  </data>
+  <data name="Finish" xml:space="preserve">
+    <value>Finish</value>
+  </data>
+  <data name="FolderAlreadyExist" xml:space="preserve">
+    <value>A folder already in the CmisSync root folder</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Intro" xml:space="preserve">
+    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+
+It is like Dropbox for Enterprise Content Management!</value>
+  </data>
+  <data name="InvalidFolderName" xml:space="preserve">
+    <value>The folder name {0} is invalid. Special characters are not allowed.</value>
+  </data>
+  <data name="InvalidURL" xml:space="preserve">
+    <value>Invalid URL</value>
+  </data>
+  <data name="MayTakeTime" xml:space="preserve">
+    <value>This may either take a short or a long time depending on the folder's size.</value>
+  </data>
+  <data name="OpenFolder" xml:space="preserve">
+    <value>Open the synchronized folder</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PermissionDenied" xml:space="preserve">
+    <value>CMIS server found, but permission denied. Please check username/password.</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Your documents are now being synchronized</value>
+  </data>
+  <data name="ReceivingChanges" xml:space="preserve">
+    <value>Receiving changes…</value>
+  </data>
+  <data name="SendingChanges" xml:space="preserve">
+    <value>Sending changes…</value>
+  </data>
+  <data name="SkipTutorial" xml:space="preserve">
+    <value>Skip Tutorial</value>
+  </data>
+  <data name="Sorry" xml:space="preserve">
+    <value>Sorry, CmisSync can not find a CMIS server at this address.
+Please ask your server administrator for the CMIS endpoint URL.
+If you are sure about the address, open it in a browser and post
+the resulting XML on the cmissync forum.</value>
+  </data>
+  <data name="Startup" xml:space="preserve">
+    <value>Add CmisSync to startup items</value>
+  </data>
+  <data name="StatusIcon" xml:space="preserve">
+    <value>The status icon is here to help</value>
+  </data>
+  <data name="StatusIconShows" xml:space="preserve">
+    <value>CmisSync's status icon shows the syncing progress, and provides easy access to your folders.</value>
+  </data>
+  <data name="Synchronization" xml:space="preserve">
+    <value>Synchronization</value>
+  </data>
+  <data name="SyncingChanges" xml:space="preserve">
+    <value>Syncing changes…</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Welcome to CmisSync!</value>
+  </data>
+  <data name="WhatsNext" xml:space="preserve">
+    <value>What's happening next?</value>
+  </data>
+  <data name="Where" xml:space="preserve">
+    <value>Where is your organization's server?</value>
+  </data>
+  <data name="WhereToFind" xml:space="preserve">
+    <value>Where to find this address</value>
+  </data>
+  <data name="Which" xml:space="preserve">
+    <value>Which remote folder do you want to sync?</value>
+  </data>
+  <data name="YouCan" xml:space="preserve">
+    <value>You can easily add a new CMIS folder at any time.</value>
+  </data>
+  <data name="YouCanFind" xml:space="preserve">
+    <value>You can find them in your CmisSync folder.</value>
+  </data>
+  <data name="ChangeRepoPath" xml:space="preserve">
+    <value>Change the local path of this repository:</value>
+  </data>
+  <data name="LocalDirectoryExist" xml:space="preserve">
+    <value>A local folder with the same name already exist, please use a different name to prevent sync conflicts.</value>
+  </data>
+  <data name="PauseSync" xml:space="preserve">
+    <value>Pause sync</value>
+  </data>
+  <data name="ResumeSync" xml:space="preserve">
+    <value>Resume sync</value>
+  </data>
+  <data name="BrowseRemoteFolder" xml:space="preserve">
+    <value>Browse remote folder</value>
+  </data>
+  <data name="OpenLocalFolder" xml:space="preserve">
+    <value>Open local folder</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>About CmisSync</value>
+  </data>
+  <data name="ViewLog" xml:space="preserve">
+    <value>View Log</value>
+  </data>
+  <data name="ConnectFailure" xml:space="preserve">
+    <value>Failed to connect to server!
+Please check the given URL for misspelled host name.
+If the URL is correct, please contact your server administrator!</value>
+  </data>
+  <data name="LoginFailedForbidden" xml:space="preserve">
+    <value>Login failed!
+Please check your user credentials and potentially the server URL.</value>
+  </data>
+  <data name="SendFailureHttps" xml:space="preserve">
+    <value>Failed to communicate with the given server!
+Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https</value>
+  </data>
+  <data name="DoNotIgnoreFolder" xml:space="preserve">
+    <value>Enable folder for synchronization</value>
+  </data>
+  <data name="IgnoreFolder" xml:space="preserve">
+    <value>Ignore folder on synchronization</value>
+  </data>
+  <data name="LoadingStatusLOADING" xml:space="preserve">
+    <value>loading ...</value>
+  </data>
+  <data name="LoadingStatusSTART" xml:space="preserve">
+    <value>pending ...</value>
+  </data>
+  <data name="RemoveFolderFromSync" xml:space="preserve">
+    <value>Remove the folder from synchronization</value>
+  </data>
+  <data name="DoYouTrustTheCertificate" xml:space="preserve">
+    <value>Do you trust this certificate?
+(Yes = Always, Cancel = Just Now)</value>
+  </data>
+  <data name="TrustFailure" xml:space="preserve">
+    <value>Failed to establish a trusted Connection. Please inform your server administrator.</value>
+  </data>
+  <data name="UntrustedCertificate" xml:space="preserve">
+    <value>Untrusted Certificate</value>
+  </data>
+  <data name="ManualSync" xml:space="preserve">
+    <value>Run sync now</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings...</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="CmisSync" xml:space="preserve">
+    <value>CmisSync</value>
+  </data>
+  <data name="SyncInterval" xml:space="preserve">
+    <value>Sync Interval</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>hours</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>minutes</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>day</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>hour</value>
+  </data>
+  <data name="WebAddress" xml:space="preserve">
+    <value>Repository URL</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="SyncError" xml:space="preserve">
+    <value>Could not sync "{0}": {1}</value>
+  </data>
+  <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
+    <value>Are you sure you want to disconnect this repository?  No files will be deleted from your system but they will no longer be synchronized.</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>minute</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>seconds</value>
+  </data>
+  <data name="Credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="ModifiedSame" xml:space="preserve">
+    <value>User %1 modified the file %2 at the same time as you.</value>
+  </data>
+  <data name="OpenSource" xml:space="preserve">
+    <value>CmisSync is Open Source software. You are free to use, modify, and redistribute it under the GNU General Public License version 3 or later.</value>
+  </data>
+  <data name="PleaseCheckForUpdates" xml:space="preserve">
+    <value>Please check for updates at CmisSync.com</value>
+  </data>
+  <data name="ReportProblem" xml:space="preserve">
+    <value>Report a problem</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Website</value>
+  </data>
+  <data name="YourVersion" xml:space="preserve">
+    <value>Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.</value>
+  </data>
+  <data name="SyncAtStartup" xml:space="preserve">
+    <value>Launch sync at CmisSync startup</value>
+  </data>
+  <data name="RemoveSyncQuestion" xml:space="preserve">
+    <value>Do you really want to remove folder from synchronization?</value>
+  </data>
+  <data name="RemoveSyncTitle" xml:space="preserve">
+    <value>Remove folder from sync</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>A newer version ({0}) is available!</value>
+  </data>
+  <data name="RunningLatestVersion" xml:space="preserve">
+    <value>You are running the latest version.</value>
+  </data>
+  <data name="FolderAlreadyInUse" xml:space="preserve">
+    <value>The directory {0} is already in use by {1}</value>
+  </data>
+  <data name="InvalidRepoName" xml:space="preserve">
+    <value>The repository name {0} contains illegal characters</value>
+  </data>
+  <data name="NameResolutionFailure" xml:space="preserve">
+    <value>The given host name could not be found. Please check the host name and your internet connection.</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Discard changes</value>
+  </data>
+  <data name="EditTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="LoadingStatusABORTED" xml:space="preserve">
+    <value>loading aborted</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderText" xml:space="preserve">
+    <value>Do you really want to sync the existing local folder "{0}"?
+This could lead to a lot of conflict files!</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderTitle" xml:space="preserve">
+    <value>Selected folder "{0}" as sync target</value>
+  </data>
+</root>
