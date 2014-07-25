@@ -10,9 +10,9 @@ using System.Security.Permissions;
 
 using System.Text.RegularExpressions;
 using System.Reflection;
-//#if __MonoCS__
+#if __MonoCS__
 using Mono.Unix.Native;
-//#endif
+#endif
 
 
 namespace CmisSync.Lib
