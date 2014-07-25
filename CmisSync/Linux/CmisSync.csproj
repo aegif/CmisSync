@@ -84,9 +84,9 @@
     <Compile Include="CmisTree\LoadingStatusModel.cs" />
     <Compile Include="CmisTree\NodeLoader.cs" />
     <Compile Include="CmisTree\NodeModel.cs" />
-    <Compile Include="Defines.cs" />
     <Compile Include="CmisTree\NodeModelUtils.cs" />
     <Compile Include="Resources.Designer.cs" />
+    <Compile Include="Defines.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
@@ -101,17 +101,11 @@
       <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
       <Name>CmisSync.Auth</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\chemistry-dotcmis\DotCMIS\DotCMIS.csproj">
-      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
-      <Name>DotCMIS</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CmisTree\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Properties\Properties.Resources.resources">
-      <Link>Properties.Resources.resources</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.resx" />
   </ItemGroup>
 </Project>
