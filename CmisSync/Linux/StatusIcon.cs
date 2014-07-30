@@ -25,22 +25,32 @@ using Mono.Unix;
 using System.Globalization;
 
 using CmisSync.Lib;
-
 namespace CmisSync {
 
     public class StatusIcon {
+		public void NotifyUser (string message)
+		{
+
+			not.Body=message;
+			not.Summary="CmisSync";
+
+			not.Show ();
+
+		}
 
         public StatusIconController Controller = new StatusIconController ();
 
         private Gdk.Pixbuf [] animation_frames;
 
+		private Notifications.Notification not = new Notifications.Notification ();
         private Menu menu;
         private MenuItem quit_item;
         private MenuItem state_item;
         private bool IsHandleCreated = false;
+#if HAVE_APP_INDICATOR		
+private ApplicationIndicator indicator;
 
-#if HAVE_APP_INDICATOR
-        private ApplicationIndicator indicator;
+		
 #else
         private Gtk.StatusIcon status_icon;
 #endif

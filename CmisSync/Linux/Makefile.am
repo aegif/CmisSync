@@ -29,6 +29,7 @@ SOURCES =  \
 	SetupWindow.cs \
 	Spinner.cs \
 	StatusIcon.cs \
+	UserNotificationListenerLinux.cs \
 	GUI.cs \
 	UIHelpers.cs \
 	Utils.cs

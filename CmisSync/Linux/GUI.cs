@@ -39,7 +39,7 @@ namespace CmisSync {
             Setup      = new Setup ();
             About      = new About ();
             StatusIcon = new StatusIcon ();
-
+			CmisSync.Lib.Utils.SetUserNotificationListener (new UserNotificationListenerLinux (StatusIcon));
             Program.Controller.UIHasLoaded ();
         }
 
