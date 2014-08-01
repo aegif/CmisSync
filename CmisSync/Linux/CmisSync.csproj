@@ -43,6 +43,13 @@
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="DotCMIS">
+      <HintPath>..\..\Extras\DotCMIS.dll</HintPath>
+    </Reference>
+    <Reference Include="appindicator-sharp, Version=0.2.0.0, Culture=neutral, PublicKeyToken=bcae265d1c7ab4c2">
+      <Private>False</Private>
+      <Package>appindicator-sharp-0.1</Package>
+    </Reference>
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
@@ -87,6 +94,7 @@
     <Compile Include="CmisTree\NodeModelUtils.cs" />
     <Compile Include="Resources.Designer.cs" />
     <Compile Include="Defines.cs" />
+    <Compile Include="UserNotificationListenerLinux.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
