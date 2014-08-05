@@ -43,6 +43,9 @@ namespace CmisSync {
         private int notificationInterval = 5;
         private int notificationKeep = 5;
 
+        private Dictionary<double, string> notificationMessages = new Dictionary<double, string>();
+
+
         private class ComparerNSUserNotification : IComparer<NSUserNotification>
         {
             public int Compare (NSUserNotification x, NSUserNotification y)
@@ -63,14 +66,36 @@ namespace CmisSync {
             // We get the Default notification Center
             notificationCenter = NSUserNotificationCenter.DefaultUserNotificationCenter;
 
+            // Clear old notifications
+            foreach (var n in notificationCenter.DeliveredNotifications)
+            {
+                notificationCenter.RemoveDeliveredNotification(n);
+            }
+
             notificationCenter.DidDeliverNotification += (s, e) => 
             {
                 Console.WriteLine("Notification Delivered");
             };
-
-            notificationCenter.DidActivateNotification += (s, e) => 
+                
+            // If the notification is clicked, displays the entire message.
+            notificationCenter.DidActivateNotification += (object sender, UNCDidActivateNotificationEventArgs e) => 
             {
-                LocalFolderClicked (Path.GetDirectoryName (e.Notification.InformativeText));
+                var notification = (UserNotification)e.Notification;
+
+                if (notification.Kind == UserNotification.NotificationKind.Normal)
+                {
+                    notificationCenter.RemoveDeliveredNotification(e.Notification);
+                    string msg = notificationMessages[notification.Id];
+                    NSAlert alert = NSAlert.WithMessage(notification.Title, "OK", null, null, msg);
+                    notificationMessages.Remove(notification.Id);
+                    alert.Icon = new NSImage (System.IO.Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.icns"));
+                    alert.Window.OrderFrontRegardless();
+                    alert.RunModal();
+                }
+                else
+                {
+                    LocalFolderClicked (Path.GetDirectoryName (e.Notification.InformativeText));
+                }
             };
 
             // If we return true here, Notification will show up even if your app is TopMost.
@@ -110,13 +135,15 @@ namespace CmisSync {
                                 if (transmission.Status.FailedException != null) {
                                     continue;
                                 }
-                                NSUserNotification notification = new NSUserNotification();
+                                var notification = new UserNotification(UserNotification.NotificationKind.Transmission); 
+                                // NSUserNotification notification = new NSUserNotification();
                                 notification.Title = Path.GetFileName (transmission.Path);
                                 notification.Subtitle = TransmissionStatus(transmission);
                                 notification.InformativeText = transmission.Path;
+                                notificationMessages.Add(notification.Id, transmission.Path);
 //                                notification.SoundName = NSUserNotification.NSUserNotificationDefaultSoundName;
                                 transmission.TransmissionStatus += TransmissionReport;
-                                notification.DeliveryDate = NSDate.Now;
+                                // notification.DeliveryDate = NSDate.Now;
                                 notificationCenter.DeliverNotification (notification);
                                 transmissionFiles.Add (transmission.Path, notification.DeliveryDate);
                                 UpdateFileStatus (transmission, null);
@@ -249,6 +276,7 @@ namespace CmisSync {
                         foreach (NSUserNotification notification in notifications) {
                             if (notification.InformativeText == transmission.Path) {
                                 notificationCenter.RemoveDeliveredNotification (notification);
+                                notificationMessages.Remove(new UserNotification(notification).Id);
                                 notification.DeliveryDate = NSDate.Now;
                                 notification.Subtitle = TransmissionStatus (transmission);
                                 notificationCenter.DeliverNotification (notification);
@@ -396,9 +424,120 @@ namespace CmisSync {
             });
         }
 
+
+
+        private class UserNotification
+        {
+            public static implicit operator UserNotification(NSUserNotification notification)
+            {
+                return new UserNotification(notification);
+            }
+
+            public static implicit operator NSUserNotification(UserNotification notification)
+            {
+                return notification.GetNSUserNotification();
+            }
+
+            static private NSString NotificationIDKey = (NSString)"ID";
+            static private NSString NotificationKindKey = (NSString)"Kind";
+
+            public enum NotificationKind
+            {
+                Normal,
+                Transmission,
+            }
+
+            private NotificationKind kind;
+            private double id;
+            private NSUserNotification nsNotification;
+
+            public NotificationKind Kind
+            {
+                get { return kind; }
+            }
+
+            public double Id
+            {
+                get { return id; }
+            }
+
+            public UserNotification(NotificationKind kind)
+            {
+                this.id = DateTime.Now.Ticks;
+                this.nsNotification = new NSUserNotification();
+                this.nsNotification.DeliveryDate = DateTime.Now;
+            }
+
+            public UserNotification(NSUserNotification notification)
+            {
+                this.nsNotification = notification;
+                this.id = ((NSNumber)notification.UserInfo[NotificationIDKey]).DoubleValue;
+                this.kind = (NotificationKind)((NSNumber)notification.UserInfo[NotificationKindKey]).IntValue;
+            }
+
+            public NSUserNotification GetNSUserNotification()
+            {
+                if (nsNotification.UserInfo != null)
+                {
+                    return nsNotification;
+                }
+
+                var info = new NSMutableDictionary();
+                info.Add(NotificationIDKey, (NSNumber)Id);
+                info.Add(NotificationKindKey, (NSNumber)(int)Kind);
+                nsNotification.UserInfo = info;
+
+                return nsNotification;
+            }
+
+            public string Title
+            {
+                set { this.nsNotification.Title = value; }
+                get { return this.nsNotification.Title; }
+            }
+
+            public string Subtitle
+            {
+                set { this.nsNotification.Subtitle = value; }
+                get { return this.nsNotification.Subtitle; }
+            }
+
+            public string InformativeText
+            {
+                set { this.nsNotification.InformativeText = value; }
+                get { return this.nsNotification.InformativeText; }
+            }
+
+            public string SoundName
+            {
+                set { this.nsNotification.SoundName = value; }
+                get { return this.nsNotification.SoundName; }
+            }
+
+            public NSDate DeliveryDate
+            {
+                get { return this.nsNotification.DeliveryDate; }
+            }
+
+        }
+
         public void NotifyUser (string message)
         {
             Console.WriteLine ("UserNotifier: " + message);
+
+            using (var a = new NSAutoreleasePool())
+            {
+                notificationCenter.BeginInvokeOnMainThread(delegate
+                {
+                    var notification = new UserNotification(UserNotification.NotificationKind.Normal);
+                    notification.Title = Properties_Resources.CmisSync;
+                    notification.InformativeText = message;
+                    notification.SoundName = NSUserNotification.NSUserNotificationDefaultSoundName;
+                    notificationMessages.Add(notification.Id, message);
+
+                    notificationCenter.ScheduleNotification(notification);
+                });
+            }
         }
     }
 }

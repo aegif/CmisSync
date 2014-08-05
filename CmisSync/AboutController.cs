@@ -69,12 +69,12 @@ namespace CmisSync {
         /// <summary>
         /// Credits link URL.
         /// </summary>
-        public readonly string CreditsLinkAddress       = "https://raw.github.com/nicolas-raoul/CmisSync/master/legal/AUTHORS.txt";
+        public readonly string CreditsLinkAddress       = "https://raw.github.com/aegif/CmisSync/master/legal/AUTHORS.txt";
 
         /// <summary>
         /// URL for Issue reports
         /// </summary>
-        public readonly string ReportProblemLinkAddress = "http://www.github.com/nicolas-raoul/CmisSync/issues";
+        public readonly string ReportProblemLinkAddress = "http://www.github.com/aegif/CmisSync/issues";
 
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace CmisSync {
 
         /// <summary>
         /// Check whether a new version of CmisSync is available.
-        ///  TODO https://github.com/nicolas-raoul/CmisSync/issues/148
+        ///  TODO https://github.com/aegif/CmisSync/issues/148
         /// </summary>
         private void CheckForNewVersion()
         {

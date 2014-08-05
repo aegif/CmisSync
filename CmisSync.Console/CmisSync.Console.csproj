@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -53,6 +53,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -60,6 +62,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -69,6 +72,8 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -78,11 +83,10 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotCMIS">
-      <HintPath>..\Extras\DotCMIS.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +103,10 @@
     <ProjectReference Include="..\Extras\log4net-1.2.11\src\log4net.vs2010.csproj">
       <Project>{181FE707-E161-4722-9F38-6AAAB6FAA106}</Project>
       <Name>log4net.vs2010</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
+      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+      <Name>DotCMIS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

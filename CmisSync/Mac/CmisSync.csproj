@@ -71,7 +71,6 @@
       <DependentUpon>MainMenu.xib</DependentUpon>
     </Compile>
     <Compile Include="StatusIcon.cs" />
-    <Compile Include="UI.cs" />
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
@@ -161,6 +160,7 @@
     <Compile Include="SetupSubSetting.designer.cs">
       <DependentUpon>SetupSubSetting.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -201,44 +201,8 @@
       <DeployService-Deploy>True</DeployService-Deploy>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </BundleResource>
-    <BundleResource Include="..\Common\Pixmaps\side-splash.png">
-      <Link>Pixmaps\side-splash.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-i-active.png">
-      <Link>Pixmaps\process-syncing-i-active.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-i.png">
-      <Link>Pixmaps\process-syncing-i.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-ii-active.png">
-      <Link>Pixmaps\process-syncing-ii-active.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-ii.png">
-      <Link>Pixmaps\process-syncing-ii.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-iii-active.png">
-      <Link>Pixmaps\process-syncing-iii-active.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-iii.png">
-      <Link>Pixmaps\process-syncing-iii.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-iiii-active.png">
-      <Link>Pixmaps\process-syncing-iiii-active.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-iiii.png">
-      <Link>Pixmaps\process-syncing-iiii.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-iiiii-active.png">
-      <Link>Pixmaps\process-syncing-iiiii-active.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-iiiii.png">
-      <Link>Pixmaps\process-syncing-iiiii.png</Link>
-    </BundleResource>
     <BundleResource Include="Pixmaps\process-syncing-error.png">
       <Link>Pixmaps\process-syncing-error.png</Link>
-    </BundleResource>
-    <BundleResource Include="Pixmaps\process-syncing-error-active.png">
-      <Link>Pixmaps\process-syncing-error-active.png</Link>
     </BundleResource>
     <BundleResource Include="..\Linux\Pixmaps\icons\document-added-12.png">
       <Link>Pixmaps\document-added-12.png</Link>
@@ -268,6 +232,15 @@
     <BundleResource Include="Pixmaps\media_playback_pause.png" />
     <BundleResource Include="Pixmaps\media_playback_start.png" />
     <BundleResource Include="Pixmaps\media_playback_refresh.png" />
+    <BundleResource Include="Pixmaps\process-syncing-i.pdf" />
+    <BundleResource Include="Pixmaps\process-syncing-ii.pdf" />
+    <BundleResource Include="Pixmaps\process-syncing-iii.pdf" />
+    <BundleResource Include="Pixmaps\process-syncing-iiii.pdf" />
+    <BundleResource Include="Pixmaps\process-syncing-iiiii.pdf" />
+    <BundleResource Include="Pixmaps\process-syncing-error%40x2.png" />
+    <BundleResource Include="..\Common\Pixmaps\side-splash.png">
+      <Link>Pixmaps\side-splash.png</Link>
+    </BundleResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">

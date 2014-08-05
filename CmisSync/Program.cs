@@ -37,7 +37,7 @@ namespace CmisSync
         /// <summary>
         /// User interface for CmisSync.
         /// </summary>
-        public static UI UI;
+        public static GUI UI;
 
         /// <summary>
         /// MVC controller.
@@ -116,7 +116,7 @@ namespace CmisSync
 
             // Increase the number of concurrent requests to each server,
             // as an unsatisfying workaround until this DotCMIS bug 632 is solved.
-            // See https://github.com/nicolas-raoul/CmisSync/issues/140
+            // See https://github.com/aegif/CmisSync/issues/140
             ServicePointManager.DefaultConnectionLimit = 1000;
 
             try
@@ -124,7 +124,7 @@ namespace CmisSync
                 Controller = new Controller();
                 Controller.Initialize(firstRun);
 
-                UI = new UI();
+                UI = new GUI();
                 UI.Run();
             }
             catch (Exception e)

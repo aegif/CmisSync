@@ -44,9 +44,7 @@ namespace CmisSync {
         private NSMenuItem log_item;
 
         private NSImage [] animation_frames;
-        private NSImage [] animation_frames_active;
         private NSImage error_image;
-        private NSImage error_image_active;
         private NSImage folder_image;
         private NSImage caution_image;
         private NSImage cmissync_image;
@@ -71,8 +69,6 @@ namespace CmisSync {
 
                 this.status_item.Image               = this.animation_frames [0];
                 this.status_item.Image.Size          = new SizeF (16, 16);
-                this.status_item.AlternateImage      = this.animation_frames_active [0];
-                this.status_item.AlternateImage.Size = new SizeF (16, 16);
 
                 CreateMenu ();
             }
@@ -85,14 +81,10 @@ namespace CmisSync {
                         if (icon_frame > -1) {
                             this.status_item.Image               = this.animation_frames [icon_frame];
                             this.status_item.Image.Size          = new SizeF (16, 16);
-                            this.status_item.AlternateImage      = this.animation_frames_active [icon_frame];
-                            this.status_item.AlternateImage.Size = new SizeF (16, 16);
 
                         } else {
                             this.status_item.Image               = this.error_image;
-                            this.status_item.AlternateImage      = this.error_image_active;
                             this.status_item.Image.Size          = new SizeF (16, 16);
-                            this.status_item.AlternateImage.Size = new SizeF (16, 16);
                         }
                     });
                 }
@@ -364,26 +356,20 @@ namespace CmisSync {
         private void CreateAnimationFrames ()
         {
             this.animation_frames = new NSImage [] {
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-i.png")),
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-ii.png")),
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iii.png")),
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iiii.png")),
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iiiii.png"))
+                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-i.pdf")),
+                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-ii.pdf")),
+                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iii.pdf")),
+                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iiii.pdf")),
+                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iiiii.pdf"))
             };
 
-            this.animation_frames_active = new NSImage [] {
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-i-active.png")),
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-ii-active.png")),
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iii-active.png")),
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iiii-active.png")),
-                new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-iiiii-active.png"))
-            };
-            
+            foreach (NSImage img in this.animation_frames)
+            {
+                img.Template = true;
+            }
+                
             this.error_image = new NSImage (
                 Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.png"));
-
-            this.error_image_active = new NSImage (
-                Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error-active.png"));
 
             this.folder_image       = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "cmissync-folder.icns"));
             this.caution_image      = new NSImage (Path.Combine (NSBundle.MainBundle.ResourcePath, "Pixmaps", "process-syncing-error.icns"));

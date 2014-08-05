@@ -97,7 +97,7 @@ namespace CmisSync {
         }
 
         /// <summary>
-        /// Create the UI.
+        /// Create the GUI.
         /// </summary>
         private void CreateAbout ()
         {

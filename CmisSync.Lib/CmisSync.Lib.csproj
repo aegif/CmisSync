@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="ChunkedStream.cs" />
     <Compile Include="Cmis\IDatabase.cs" />
+    <Compile Include="DatabaseMigration.cs" />
     <Compile Include="Events\ActiveActivitiesManager.cs" />
     <Compile Include="Events\ConfigChangedEvent.cs" />
     <Compile Include="Events\DebugLoggingHandler.cs" />

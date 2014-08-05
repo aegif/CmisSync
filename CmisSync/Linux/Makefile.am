@@ -5,7 +5,7 @@ TARGET = exe
 
 ASSEMBLY_INFO_SOURCE = Defines.cs
 
-LIBS = $(REF_CMISSYNC) $(LOG4NET_LIBS) $(NOTIFY_SHARP_LIBS)
+LIBS = $(REF_CMISSYNC) $(LOG4NET_LIBS) $(NOTIFY_SHARP_LIBS) $(LIB_CMISAUTH) $(DOTCMISLIBS)
 
 SOURCES =  \
 	../AboutController.cs \
@@ -13,26 +13,24 @@ SOURCES =  \
 	../ControllerBase.cs \
 	../EditController.cs \
 	../Program.cs \
-	../Properties/Resources.Designer.cs \
 	../SetupController.cs \
 	../StatusIconController.cs \
-	../Windows/FolderTreeMVC/IgnoredFolderLoader.cs \
-	../Windows/FolderTreeMVC/LoadingStatusModel.cs \
-	../Windows/FolderTreeMVC/LocalFolderLoader.cs \
-	../Windows/FolderTreeMVC/NodeLoader.cs \
-	../Windows/FolderTreeMVC/NodeModel.cs \
-	../Windows/FolderTreeMVC/NodeModelUtils.cs \
 	About.cs \
 	CertPolicyWindow.cs \
 	CmisTree/CmisTreeStore.cs \
+	CmisTree/LoadingStatusModel.cs \
+	CmisTree/NodeLoader.cs \
+	CmisTree/NodeModel.cs \
+	CmisTree/NodeModelUtils.cs \
 	CmisTree/StatusCellRenderer.cs \
 	Controller.cs \
-	Edit.cs \
+	Resources.Designer.cs \
 	Setup.cs \
 	SetupWindow.cs \
 	Spinner.cs \
 	StatusIcon.cs \
-	UI.cs \
+	UserNotificationListenerLinux.cs \
+	GUI.cs \
 	UIHelpers.cs \
 	Utils.cs
 
@@ -44,10 +42,10 @@ RESOURCES_RESOURCES = $(addprefix CmisSync.,$(patsubst %.resx,%.resources,$(notd
 CmisSync.%.resources: $(srcdir)/../Properties/%.resx
 	resgen2 $< $@
 
-bin_SCRIPTS = dataspacesync
+bin_SCRIPTS = cmissync
 
 Applicationsdir = $(datadir)/applications
-dist_Applications_DATA = dataspacesync.desktop 
+dist_Applications_DATA = cmissync.desktop 
 
 EXTRA_DIST = README.md
 

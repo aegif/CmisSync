@@ -101,7 +101,7 @@
     <Compile Include="StatusIcon.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI.cs" />
+    <Compile Include="GUI.cs" />
     <Compile Include="About.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Setup.cs" />

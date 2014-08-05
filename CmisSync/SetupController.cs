@@ -67,6 +67,7 @@ namespace CmisSync
         /// Settings page.
         /// </summary>
         Settings,
+		Syncing
     }
 
     /// <summary>
@@ -679,7 +680,7 @@ namespace CmisSync
         /// </summary>
         public void SettingsPageCompleted(string password, int pollInterval, bool syncAtStartup)
         {
-            //Run this in background so as not to free the UI...
+            //Run this in background so as not to free the GUI...
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += new DoWorkEventHandler(
                 delegate(Object o, DoWorkEventArgs args)

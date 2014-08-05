@@ -80,8 +80,8 @@ namespace CmisSync.Lib.Cmis
             // Extract protocol and server name or IP address
             string prefix = credentials.Address.GetLeftPart(UriPartial.Authority);
 
-            // See https://github.com/nicolas-raoul/CmisSync/wiki/What-address for the list of ECM products prefixes
-            // Please send us requests to support more CMIS servers: https://github.com/nicolas-raoul/CmisSync/issues
+            // See https://github.com/aegif/CmisSync/wiki/What-address for the list of ECM products prefixes
+            // Please send us requests to support more CMIS servers: https://github.com/aegif/CmisSync/issues
             string[] suffixes = {
                 "/cmis/atom11",
                 "/alfresco/cmisatom",
@@ -98,7 +98,9 @@ namespace CmisSync.Lib.Cmis
                 "/_vti_bin/cmis/rest?getRepositories",
                 "/nemakiware/atom/bedroom", // TODO: different port, typically 8080 for Web UI and 3000 for CMIS
                 "/nuxeo/atom/cmis",
-                "/cmis/atom"
+                "/cmis/atom",
+                "/docushare/ds_mobile_connector/atom",
+                "/documents/ds_mobile_connector/atom" // TODO: can be anything instead of "documents"
             };
             string bestUrl = null;
             // Try all suffixes

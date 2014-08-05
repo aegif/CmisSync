@@ -23,7 +23,7 @@ namespace CmisSync {
     /// <summary>
     /// User interface of CmisSync.
     /// </summary>
-    public class UI {
+    public class GUI {
 
         /// <summary>
         /// Dialog shown at first run to explain how CmisSync works.
@@ -47,7 +47,7 @@ namespace CmisSync {
         /// <summary>
         /// Constructor.
         /// </summary>
-        public UI ()
+        public GUI ()
         {   
 			// FIXME: The second time windows are shown, the windows
 			// don't have the smooth ease in animation, but appear abruptly.

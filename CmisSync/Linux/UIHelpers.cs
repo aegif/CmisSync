@@ -27,7 +27,7 @@ namespace CmisSync {
         public static Gdk.Pixbuf GetIcon (string name, int size)
         {
             IconTheme icon_theme = new IconTheme ();
-            icon_theme.AppendSearchPath (Path.Combine (UI.AssetsPath, "icons"));
+            icon_theme.AppendSearchPath (Path.Combine (GUI.AssetsPath, "icons"));
 
             try {
                 return icon_theme.LoadIcon (name, size, IconLookupFlags.GenericFallback);
@@ -45,7 +45,7 @@ namespace CmisSync {
 
         public static Image GetImage (string name)
         {
-            string image_path = Path.Combine (UI.AssetsPath, "pixmaps", name);
+            string image_path = Path.Combine (GUI.AssetsPath, "pixmaps", name);
             return new Image (image_path);
         }
 

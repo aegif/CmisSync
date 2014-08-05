@@ -27,9 +27,9 @@ using Mono.Unix;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
-using CmisSync.Lib.Credentials;
+using CmisSync.Auth;
 using CmisSync.CmisTree;
-
+using DotCMIS.Exceptions;
 namespace CmisSync {
 
     public class Setup : SetupWindow {
@@ -135,7 +135,7 @@ namespace CmisSync {
             address_help_urlbox.ButtonPressEvent += delegate(object o, ButtonPressEventArgs args) {
                 Process process = new Process();
                 process.StartInfo.FileName  = "xdg-open";
-                process.StartInfo.Arguments = "https://github.com/nicolas-raoul/CmisSync/wiki/What-address";
+                process.StartInfo.Arguments = "https://github.com/aegif/CmisSync/wiki/What-address";
                 process.Start ();
             };
             address_help_urlbox.EnterNotifyEvent += delegate(object o, EnterNotifyEventArgs args) {
@@ -291,10 +291,10 @@ namespace CmisSync {
                     {
                         warning = Properties_Resources.LoginFailedForbidden;
                     }
-                    else if (e is CmisServerNotFoundException)
-                    {
-                        warning = Properties_Resources.ConnectFailure;
-                    }
+//                    else if (e is CmisServerNotFoundException)
+//                    {
+//                        warning = Properties_Resources.ConnectFailure;
+//                    }
                     else if (e.Message == "SendFailure" && cmisServer.Url.Scheme.StartsWith("https"))
                     {
                         warning = Properties_Resources.SendFailureHttps;

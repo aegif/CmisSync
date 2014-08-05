@@ -330,23 +330,29 @@ namespace CmisSync.Lib.Sync
                                     if (database.LocalFileHasChanged(filePath))
                                     {
                                         Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
+                                        Logger.Info("- serverSideModificationDate: " + serverSideModificationDate);
+                                        Logger.Info("- lastDatabaseUpdate: " + lastDatabaseUpdate);
+                                        Logger.Info("- Checksum in database: " + database.GetChecksum(filePath));
+                                        Logger.Info("- Checksum of local file: " + Database.Checksum(filePath));
+
                                         // Rename locally modified file.
-                                        String newFilePath = Utils.ConflictPath(filePath);
+                                        String newFilePath = Utils.CreateConflictFilename(filePath, repoinfo.User);
                                         File.Move(filePath, newFilePath);
 
                                         // Download server version
                                         DownloadFile(remoteDocument, localFolder);
+                                        Logger.Info("- Checksum of remote file: " + Database.Checksum(filePath));
                                         repo.OnConflictResolved();
 
                                         // Notify the user.
                                         string lastModifiedBy = CmisUtils.GetProperty(remoteDocument, "cmis:lastModifiedBy");
                                         string message = String.Format(
                                             // Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
-                                            "User {0} modified the file {1} at the same time as you.",
+                                            "User {0} modified file \"{1}\" at the same time as you.",
                                             lastModifiedBy, filePath)
                                             + "\n\n"
                                             // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
-                                            + "Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.";
+                                            + "Your version has been saved as \"" + newFilePath + "\", please merge your important changes from it and then delete it.";
                                         Logger.Info(message);
                                         Utils.NotifyUser(message);
                                     }
@@ -465,7 +471,7 @@ namespace CmisSync.Lib.Sync
                                         Logger.Info("Conflict with file: " + filePath + ", backing up locally modified version.");
                                         activityListener.ActivityStarted();
                                         // Rename locally modified file.
-                                        String newFilePath = Utils.ConflictPath(filePath);
+                                        String newFilePath = Utils.CreateConflictFilename(filePath, repoinfo.User);
                                         File.Move(filePath, newFilePath);
 
                                         // Delete file from database.

@@ -3,24 +3,23 @@ TARGET = library
 
 ASSEMBLY_INFO_SOURCE = Defines.cs
 
-LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) $(WEBLIBS) $(MONOPOSIX)
+LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) $(WEBLIBS) $(MONOPOSIX) $(LIB_CMISAUTH)
 
 SOURCES =  \
 	ActivityListenerAggregator.cs \
 	Backend.cs \
 	ChunkedStream.cs \
-	Cmis/CmisPermissionDeniedException.cs \
-	Cmis/CmisServerNotFoundException.cs \
+	Cmis/BaseException.cs \
+	Cmis/PermissionDeniedException.cs \
 	Cmis/CmisUtils.cs \
-	Cmis/Crypto.cs \
-	Cmis/Database.cs \
 	Cmis/IDatabase.cs \
+	Cmis/Database.cs \
+	Cmis/ServerNotFoundException.cs \
 	Cmis/MimeType.cs \
 	Config.cs \
 	ConfigManager.cs \
 	ConfigMigration.cs \
-	Credentials.cs \
-	Defines.cs \
+	DatabaseMigration.cs \
 	Events/ActiveActivitiesManager.cs \
 	Events/ConfigChangedEvent.cs \
 	Events/DebugLoggingHandler.cs \
@@ -33,9 +32,9 @@ SOURCES =  \
 	Events/SyncEventHandler.cs \
 	Events/SyncEventManager.cs \
 	Events/SyncEventQueue.cs \
-	Fetcher.cs \
 	IActivityListener.cs \
-	LoggingStream.cs \
+	FolderLock.cs \
+  ##	Properties/AssemblyInfo.cs \
 	RepoBase.cs \
 	RepoInfo.cs \
 	Sync/ChangeLogStrategy.cs \
@@ -43,6 +42,7 @@ SOURCES =  \
 	Sync/CrawlStrategy.cs \
 	Sync/SynchronizedFolder.cs \
 	Sync/WatcherStrategy.cs \
+	UserNotificationListener.cs \
 	Utils.cs \
 	Watcher.cs
 
