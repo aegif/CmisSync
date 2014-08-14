@@ -51,6 +51,8 @@ If it says `Mono [...] version 2.x.y` the you must first install a newer version
 At the root of the CmisSync root folder, run the following commands:
 
 ```bash
+$ git submodule init
+$ git submodule update
 $ make -f Makefile.am
 $ ./configure --with-dotcmis=Extras/DotCMIS.dll
 $ make
