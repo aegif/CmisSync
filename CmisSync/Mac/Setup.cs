@@ -159,12 +159,12 @@ namespace CmisSync {
                 Bordered = false,
                 Editable = false,
                 Frame = new RectangleF(190, 320, 196 + 196 + 16, 17),
-                Font = UI.BoldFont,
+                Font = GUI.BoldFont,
                 StringValue = Properties_Resources.EnterLocalFolderName
             };
             NSTextField LocalFolderTextField = new NSTextField() {
                 Frame = new RectangleF(190, 290, 196 + 196 + 16, 22),
-                Font = UI.Font,
+                Font = GUI.Font,
                 Delegate = new TextFieldDelegate(),
                 StringValue = localfoldername
             };
@@ -174,12 +174,12 @@ namespace CmisSync {
                 Bordered = false,
                 Editable = false,
                 Frame = new RectangleF(190, 220, 196 + 196 + 16, 17),
-                Font = UI.BoldFont,
+                Font = GUI.BoldFont,
                 StringValue = Properties_Resources.ChangeRepoPath
             };
             NSTextField LocalRepoPathTextField = new NSTextField() {
                 Frame = new RectangleF(190, 190, 196 + 196 + 16 -60, 22),
-                Font = UI.Font,
+                Font = GUI.Font,
                 Delegate = new TextFieldDelegate(),
                 StringValue = Path.Combine(Controller.DefaultRepoPath, LocalFolderTextField.StringValue)
             };
@@ -291,11 +291,11 @@ namespace CmisSync {
                 Editable = false,
                 Frame = new RectangleF(190, 320, 196 + 196 + 16, 17),
                 StringValue = Properties_Resources.EnterWebAddress,
-                Font = UI.BoldFont
+                Font = GUI.BoldFont
             };
             AddressTextField = new NSTextField() {
                 Frame = new RectangleF(190, 290, 196 + 196 + 16, 22),
-                Font = UI.Font,
+                Font = GUI.Font,
                 Delegate = new TextFieldDelegate(),
                 StringValue = (Controller.PreviousAddress == null || String.IsNullOrEmpty(Controller.PreviousAddress.ToString())) ? "https://" : Controller.PreviousAddress.ToString()
             };
@@ -311,14 +311,14 @@ namespace CmisSync {
             NSTextField UserLabel = new NSTextField() {
                 Alignment = NSTextAlignment.Left,
                 BackgroundColor = NSColor.WindowBackground,
-                Font = UI.BoldFont,
+                Font = GUI.BoldFont,
                 Bordered = false,
                 Editable = false,
                 Frame = new RectangleF(190, 230, 196, 17),
                 StringValue = Properties_Resources.User
             };
             NSTextField UserTextField = new NSTextField() {
-                Font = UI.Font,
+                Font = GUI.Font,
                 StringValue = String.IsNullOrEmpty(Controller.saved_user) ? Environment.UserName : Controller.saved_user,
                 Frame = new RectangleF(190, 200, 196, 22)
             };
@@ -330,7 +330,7 @@ namespace CmisSync {
                 Editable = false,
                 Frame = new RectangleF(190 + 196 + 16, 230, 196, 17),
                 StringValue = Properties_Resources.Password,
-                Font = UI.BoldFont
+                Font = GUI.BoldFont
             };
             PasswordTextField = new NSSecureTextField() {
                 Frame = new RectangleF(190 + 196 + 16, 200, 196, 22),

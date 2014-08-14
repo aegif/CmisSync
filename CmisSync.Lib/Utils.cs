@@ -10,9 +10,9 @@ using System.Security.Permissions;
 
 using System.Text.RegularExpressions;
 using System.Reflection;
-//#if __MonoCS__
+#if __MonoCS__ && !__COCOA__
 using Mono.Unix.Native;
-//#endif
+#endif
 
 
 namespace CmisSync.Lib
@@ -90,7 +90,7 @@ namespace CmisSync.Lib
             }
             catch (System.PlatformNotSupportedException)
             {
-#if __MonoCS__
+#if __MonoCS__ && !__COCOA__
                 writeAllow = (0 == Syscall.access(path, AccessModes.W_OK));
 				//writeAllow = true;
 #endif

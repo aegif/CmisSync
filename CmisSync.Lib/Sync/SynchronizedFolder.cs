@@ -925,8 +925,7 @@ namespace CmisSync.Lib.Sync
                                 Logger.Info("Removing locally deleted file on server: " + filePath);
                                 try
                                 {
-									remoteDocument.Delete(false);
-									//remoteDocument.DeleteAllVersions();
+                                    remoteDocument.DeleteAllVersions();
                                     // Remove it from database.
                                     database.RemoveFile(filePath);
                                     database.SetOperationRetryCounter(filePath, 0, Database.OperationType.DELETE);
@@ -1126,25 +1125,44 @@ namespace CmisSync.Lib.Sync
                             return false;
                         }
 
-                        if (File.Exists(filepath)) // Conflict
+
+                        // Conflict handling
+                        if (File.Exists(filepath))
                         {
-                            // Rename local file with a conflict suffix.
-                            string conflictFilename = Utils.CreateConflictFilename(filepath, repoinfo.User);
-                            File.Move(filepath, conflictFilename);
+                            if (database.LocalFileHasChanged(filepath)) // Conflict. Server-side file and Local file both modified.
+                            {
+                                Logger.Info(String.Format("Conflict with file: {0}", fileName));
+                                // Rename local file with a conflict suffix.
+                                string conflictFilename = Utils.CreateConflictFilename(filepath, repoinfo.User);
+                                Logger.Debug(String.Format("Renaming conflicted local file {0} to {1}", filepath, conflictFilename));
+                                File.Move(filepath, conflictFilename);
 
-                            // Remove the ".sync" suffix.
-                            File.Move(tmpfilepath, filepath);
-                            SetLastModifiedDate(remoteDocument, filepath, metadata);
+                                Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpfilepath, filepath));
+                                // Remove the ".sync" suffix.
+                                // Remove the ".sync" suffix.
+                                File.Move(tmpfilepath, filepath);
+                                SetLastModifiedDate(remoteDocument, filepath, metadata);
 
-                            // Warn user about conflict.
-                            string lastModifiedBy = CmisUtils.GetProperty(remoteDocument, "cmis:lastModifiedBy");
-                            string message =
-                                String.Format("User {0} added a file named {1} at the same time as you.", lastModifiedBy, filepath)
-                                + "\n\n"
-                                + "Your version has been renamed '" + conflictFilename + "', please merge your important changes from it and then delete it.";
-                            Logger.Info(message);
-                            Utils.NotifyUser(message);
-                            
+                                // Warn user about conflict.
+                                string lastModifiedBy = CmisUtils.GetProperty(remoteDocument, "cmis:lastModifiedBy");
+                                string message =
+                                    String.Format("User {0} added a file named {1} at the same time as you.", lastModifiedBy, filepath)
+                                    + "\n\n"
+                                    + "Your version has been renamed '" + conflictFilename + "', please merge your important changes from it and then delete it.";
+                                Logger.Info(message);
+                                Utils.NotifyUser(message);
+                            }
+                            else // Server side file was modified, but local file was not modified.
+                            {
+                                Logger.Debug(String.Format("Deleteing old local file {0}", filepath));
+                                File.Delete(filepath);
+
+                                Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpfilepath, filepath));
+                                // Remove the ".sync" suffix.
+                                // Remove the ".sync" suffix.
+                                File.Move(tmpfilepath, filepath);
+                                SetLastModifiedDate(remoteDocument, filepath, metadata);
+                            }
                         }
                         else // No conflict
                         {

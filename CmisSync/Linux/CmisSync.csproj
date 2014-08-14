@@ -43,6 +43,13 @@
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="DotCMIS">
+      <HintPath>..\..\Extras\DotCMIS.dll</HintPath>
+    </Reference>
+    <Reference Include="appindicator-sharp, Version=0.2.0.0, Culture=neutral, PublicKeyToken=bcae265d1c7ab4c2">
+      <Private>False</Private>
+      <Package>appindicator-sharp-0.1</Package>
+    </Reference>
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
@@ -84,9 +91,10 @@
     <Compile Include="CmisTree\LoadingStatusModel.cs" />
     <Compile Include="CmisTree\NodeLoader.cs" />
     <Compile Include="CmisTree\NodeModel.cs" />
-    <Compile Include="Defines.cs" />
     <Compile Include="CmisTree\NodeModelUtils.cs" />
     <Compile Include="Resources.Designer.cs" />
+    <Compile Include="Defines.cs" />
+    <Compile Include="UserNotificationListenerLinux.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
@@ -101,17 +109,11 @@
       <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
       <Name>CmisSync.Auth</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\chemistry-dotcmis\DotCMIS\DotCMIS.csproj">
-      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
-      <Name>DotCMIS</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CmisTree\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Properties\Properties.Resources.resources">
-      <Link>Properties.Resources.resources</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.resx" />
   </ItemGroup>
 </Project>

@@ -27,6 +27,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\TestLibrary.XML</DocumentationFile>
@@ -40,12 +42,18 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq, Version=4.0.10827.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Extras\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Extras\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -54,20 +62,12 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="xunit.extensions">
-      <HintPath>lib\xunit.extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Moq">
-      <HintPath>lib\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\Extras\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit">
+    <Reference Include="xunit, Version=1.9.1.1600, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\xunit.dll</HintPath>
     </Reference>
-    <Reference Include="DotCMIS">
-      <HintPath>..\..\Extras\DotCMIS.dll</HintPath>
+    <Reference Include="xunit.extensions">
+      <HintPath>lib\xunit.extensions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +87,10 @@
     <Compile Include="FSDeletionHandlerTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">
+      <Project>{fdb085eb-d424-434d-9c55-d31a8994f7b4}</Project>
+      <Name>CmisSync.Auth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
       <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
       <Name>CmisSync.Lib</Name>
@@ -95,9 +99,9 @@
       <Project>{181FE707-E161-4722-9F38-6AAAB6FAA106}</Project>
       <Name>log4net.vs2010</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">
-      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
-      <Name>CmisSync.Auth</Name>
+    <ProjectReference Include="..\..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
+      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+      <Name>DotCMIS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
