@@ -229,7 +229,7 @@
     <value>ユーザ</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>CmisSyncへようこそ！</value>
+    <value>CmisSync へようこそ！</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>次のアクション</value>
@@ -287,7 +287,7 @@
     <value>フォルダ同期を有効にします。</value>
   </data>
   <data name="IgnoreFolder" xml:space="preserve">
-    <value>同期中のフォルダを無視する</value>
+    <value>フォルダ同期を無効にします。</value>
   </data>
   <data name="LoadingStatusLOADING" xml:space="preserve">
     <value>読み込んでいます...</value>
