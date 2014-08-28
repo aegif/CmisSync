@@ -371,7 +371,7 @@ namespace CmisSync.Lib.Cmis
         /// Add a file to the database.
         /// If checksum is not null, it will be used for the database entry
         /// </summary>
-        public void AddFile2(SyncItem item, string objectId, DateTime? serverSideModificationDate,
+        public void AddFile(SyncItem item, string objectId, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata, byte[] filehash)
         {
             Logger.Debug("Starting database file addition for file: " + item.LocalPath);
@@ -446,7 +446,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Add a folder to the database.
         /// </summary>
-        public void AddFolder2(SyncItem item, string objectId, DateTime? serverSideModificationDate)
+        public void AddFolder(SyncItem item, string objectId, DateTime? serverSideModificationDate)
         {
             // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // See http://www.sqlite.org/datatype3.html
@@ -486,7 +486,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Remove a file from the database.
         /// </summary>
-        public void RemoveFile2(SyncItem item)
+        public void RemoveFile(SyncItem item)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);
@@ -530,7 +530,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Remove a folder from the database.
         /// </summary>
-        public void RemoveFolder2(SyncItem item)
+        public void RemoveFolder(SyncItem item)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             // Remove folder itself
@@ -571,7 +571,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Move a file.
         /// </summary>
-        public void MoveFile2(SyncItem oldItem, SyncItem newItem)
+        public void MoveFile(SyncItem oldItem, SyncItem newItem)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("oldPath", oldItem.RemoteRelativePath);
@@ -609,7 +609,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Move a folder.
         /// </summary>
-        public void MoveFolder2(SyncItem oldItem, SyncItem newItem)
+        public void MoveFolder(SyncItem oldItem, SyncItem newItem)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("oldPath", oldItem.RemoteRelativePath);
@@ -655,7 +655,7 @@ namespace CmisSync.Lib.Cmis
         /// Get the time at which the file was last modified.
         /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
         /// </summary>
-        public DateTime? GetServerSideModificationDate2(SyncItem item)
+        public DateTime? GetServerSideModificationDate(SyncItem item)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);
@@ -705,7 +705,7 @@ namespace CmisSync.Lib.Cmis
         /// 
         /// TODO Combine this method and the next in a new method ModifyFile, and find out if GetServerSideModificationDate is really needed.
         /// </summary>
-        public void SetFileServerSideModificationDate2(SyncItem item, DateTime? serverSideModificationDate)
+        public void SetFileServerSideModificationDate(SyncItem item, DateTime? serverSideModificationDate)
         {
             // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones.
             // See http://www.sqlite.org/datatype3.html
@@ -751,7 +751,7 @@ namespace CmisSync.Lib.Cmis
         /// Get the date at which the file was last download.
         /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
         /// </summary>
-        public DateTime? GetDownloadServerSideModificationDate2(SyncItem item)
+        public DateTime? GetDownloadServerSideModificationDate(SyncItem item)
         {
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
@@ -796,7 +796,7 @@ namespace CmisSync.Lib.Cmis
         /// Set the last download date of a file.
         /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
         /// </summary>
-        public void SetDownloadServerSideModificationDate2(SyncItem item, DateTime? serverSideModificationDate)
+        public void SetDownloadServerSideModificationDate(SyncItem item, DateTime? serverSideModificationDate)
         {
             // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
             // See http://www.sqlite.org/datatype3.html
@@ -856,7 +856,7 @@ namespace CmisSync.Lib.Cmis
         /// <param name='path'>
         /// Path of the local file.
         /// </param>
-        public long GetOperationRetryCounter2(SyncItem item, OperationType type)
+        public long GetOperationRetryCounter(SyncItem item, OperationType type)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);
@@ -944,7 +944,7 @@ namespace CmisSync.Lib.Cmis
         /// <param name='counter'>
         /// Counter.
         /// </param>
-        public void SetOperationRetryCounter2(SyncItem item, long counter, OperationType type)
+        public void SetOperationRetryCounter(SyncItem item, long counter, OperationType type)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             switch (type)
@@ -1011,7 +1011,7 @@ namespace CmisSync.Lib.Cmis
         /// <param name='path'>
         /// Path of the local file.
         /// </param>
-        public void DeleteAllFailedOperations2(SyncItem item)
+        public void DeleteAllFailedOperations(SyncItem item)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);
@@ -1074,7 +1074,7 @@ namespace CmisSync.Lib.Cmis
         /// <summary>
         /// Checks whether the database contains a given file.
         /// </summary>
-        public bool ContainsFile2(SyncItem item)
+        public bool ContainsFile(SyncItem item)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);

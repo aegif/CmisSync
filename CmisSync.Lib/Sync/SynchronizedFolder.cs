@@ -863,10 +863,7 @@ namespace CmisSync.Lib.Sync
                 var syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.Name, repoinfo);
                 // var syncItem = SyncItemFactory.CreateFromRemotePath(localFolder, remoteDocument.Name);
                 string fileName = remoteDocument.Name;
-                // string fileName = syncItem.RemoteFileName;
                 string filePath = Path.Combine(localFolder, fileName);
-                // string remotePath = syncItem.RemotePath;
-                // string localPath = syncItem.LocalPath;
 
                 // If this file does not have a filename, ignore it.
                 // It sometimes happen on IBM P8 CMIS server, not sure why.
@@ -1185,7 +1182,7 @@ namespace CmisSync.Lib.Sync
 
                         // Create database entry for this file.
                         // *** Add File
-                        database.AddFile2(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                        database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                         // database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);     // database query
                         Logger.Info("Added file to database: " + filepath);     // local path
                     }
@@ -1350,7 +1347,7 @@ namespace CmisSync.Lib.Sync
                     // Create database entry for this file.
                     // *** Add File
                     // database.AddFile(syncItem.LocalPath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);     // database query
-                    database.AddFile2(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                    database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                     Logger.Info("Added file to database: " + syncItem.LocalPath);
                     return true;
                 }
