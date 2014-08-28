@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.vs2010", "..\..\Ext
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Auth", "..\..\CmisSync.Auth\CmisSync.Auth.csproj", "{FDB085EB-D424-434D-9C55-D31A8994F7B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotCMIS", "..\..\..\chemistry-dotcmis\DotCMIS\DotCMIS.csproj", "{529EF90F-A34C-4426-A4F9-65113AC23841}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotCMIS", "..\..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj", "{529EF90F-A34C-4426-A4F9-65113AC23841}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
