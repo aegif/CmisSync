@@ -195,7 +195,6 @@ namespace CmisSync.Lib.Sync
 
                 // Database is the user's AppData/Roaming
                 database = new Database(repoinfo.CmisDatabase);
-                var s = database.GetSyncItem("workspace://SpacesStore/b233d52b-8de7-4130-898d-4b230de8a28c");
                 // Get path on remote repository.
                 remoteFolderPath = repoInfo.RemotePath;
 
