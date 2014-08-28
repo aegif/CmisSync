@@ -1402,7 +1402,12 @@ namespace CmisSync.Lib.Cmis
             }
         }
 
-
+        /// <summary>
+        /// Executes the SQL and Return multiple results.
+        /// </summary>
+        /// <returns>results</returns>
+        /// <param name="text">SQL</param>
+        /// <param name="parameters">Parameters.</param>
         private Dictionary<string, object> ExecuteSQL(string text, Dictionary<string, object> parameters)
         {
             using (var command = new SQLiteCommand(GetSQLiteConnection()))
