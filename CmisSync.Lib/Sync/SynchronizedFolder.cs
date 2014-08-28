@@ -1152,7 +1152,7 @@ namespace CmisSync.Lib.Sync
                         {
                             if (database.LocalFileHasChanged(filepath)) // Conflict. Server-side file and Local file both modified.
                             {
-                                Logger.Info(String.Format("Conflict with file: {0}", fileName));
+                                Logger.Info(String.Format("Conflict with file: {0}", syncItem.RemoteFileName));
                                 // Rename local file with a conflict suffix.
                                 string conflictFilename = Utils.CreateConflictFilename(filepath, repoinfo.User);
                                 Logger.Debug(String.Format("Renaming conflicted local file {0} to {1}", filepath, conflictFilename));
