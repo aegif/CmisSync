@@ -1186,7 +1186,8 @@ namespace CmisSync.Lib.Sync
 
                         // Create database entry for this file.
                         // *** Add File
-                        database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);     // database query
+                        database.AddFile2(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
+                        // database.AddFile(filepath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);     // database query
                         Logger.Info("Added file to database: " + filepath);     // local path
                     }
                     return success;
@@ -1349,7 +1350,8 @@ namespace CmisSync.Lib.Sync
 
                     // Create database entry for this file.
                     // *** Add File
-                    database.AddFile(syncItem.LocalPath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);     // database query
+                    // database.AddFile(syncItem.LocalPath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);     // database query
+                    database.AddFile2(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                     Logger.Info("Added file to database: " + syncItem.LocalPath);
                     return true;
                 }
