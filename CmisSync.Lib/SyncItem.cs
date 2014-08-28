@@ -30,6 +30,16 @@ namespace CmisSync.Lib
             this.path = path;
         }
 
+        abstract public string LocalRelativePath
+        {
+            get;
+        }
+
+        abstract public string RemoteRelativePath
+        {
+            get;
+        }
+
         abstract public string LocalPath
         {
             get;
@@ -89,8 +99,13 @@ namespace CmisSync.Lib
         {
             return new RemotePathSyncItem(remoteFolder, LocalFileName, repoInfo);
         }
-    }
 
+        public static SyncItem CreateFromPaths(string localPathPrefix, string localPath, string remotePathPrefix, string remotePath)
+        {
+            return new LocalPathSyncItem(localPathPrefix, localPath, remotePathPrefix, remotePath);
+        }
+    }
+               
 
     public class LocalPathSyncItem : SyncItem
     {
@@ -127,9 +142,17 @@ namespace CmisSync.Lib
             }
             this.remotePath = Path.Combine(PathRepresentationConverter.LocalToRemote(localRootRelative), remoteRelativePath);
         }
+
+        public LocalPathSyncItem(string localPrefix, string localPath, string remotePrefix, string remotePath)
+        {
+            this.localRoot = localPrefix;
+            this.remoteRoot = remotePrefix;
+            this.localPath = localPath;
+            this.remotePath = remotePath;
+        }
             
 
-        public string LocalRelativePath
+        public override string LocalRelativePath
         {
             get
             {
@@ -137,7 +160,7 @@ namespace CmisSync.Lib
             }
         }
 
-        public string RemoteRelativePath
+        public override string RemoteRelativePath
         {
             get
             {
@@ -214,7 +237,7 @@ namespace CmisSync.Lib
             this.localPath = Path.Combine(PathRepresentationConverter.RemoteToLocal(remoteRootRelative), localRelativePath);
         }
 
-        public string LocalRelativePath
+        public override string LocalRelativePath
         {
             get
             {
@@ -222,7 +245,7 @@ namespace CmisSync.Lib
             }
         }
 
-        public string RemoteRelativePath
+        public override string RemoteRelativePath
         {
             get
             {

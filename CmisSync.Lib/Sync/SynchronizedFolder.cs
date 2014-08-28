@@ -195,7 +195,7 @@ namespace CmisSync.Lib.Sync
 
                 // Database is the user's AppData/Roaming
                 database = new Database(repoinfo.CmisDatabase);
-
+                var s = database.GetSyncItem("workspace://SpacesStore/b233d52b-8de7-4130-898d-4b230de8a28c");
                 // Get path on remote repository.
                 remoteFolderPath = repoInfo.RemotePath;
 
@@ -1038,25 +1038,26 @@ namespace CmisSync.Lib.Sync
                 SleepWhileSuspended();
 
                 // **** Get ContentStreamFileName
-                string fileName = remoteDocument.ContentStreamFileName;     // remote
-                Logger.Info("Downloading: " + fileName);
+                SyncItem syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.ContentStreamFileName, repoinfo);
+                // string fileName = remoteDocument.ContentStreamFileName;     // remote
+                Logger.Info("Downloading: " + syncItem.RemoteFileName);
 
                 // Skip if invalid file name. See https://github.com/aegif/CmisSync/issues/196
-                if (Utils.IsInvalidFileName(fileName))      // local
+                if (Utils.IsInvalidFileName(syncItem.LocalFileName))      // local
                 {
-                    Logger.Info("Skipping download of file with illegal filename: " + fileName);
+                    Logger.Info("Skipping download of file with illegal filename: " + syncItem.LocalFileName);
                     return true;
                 }
 
                 try
                 {
                     DotCMIS.Data.IContentStream contentStream = null;
-                    string filepath = Path.Combine(localFolder, fileName);
+                    string filepath = syncItem.LocalPath;
                     string tmpfilepath = filepath + ".sync";        // local path
                     // *** GetOperationRetryCounter
-                    if(database.GetOperationRetryCounter(filepath,Database.OperationType.DOWNLOAD) > repoinfo.MaxDownloadRetries)       // database query
+                    if(database.GetOperationRetryCounter(filepath, Database.OperationType.DOWNLOAD) > repoinfo.MaxDownloadRetries)       // database query
                     {
-                        Logger.Info(String.Format("Skipping download of file {0} because of too many failed ({1}) downloads",database.GetOperationRetryCounter(filepath,Database.OperationType.DOWNLOAD)));
+                        Logger.Info(String.Format("Skipping download of file {0} because of too many failed ({1}) downloads",database.GetOperationRetryCounter(filepath, Database.OperationType.DOWNLOAD)));
                         return true;
                     }
 
@@ -1098,13 +1099,13 @@ namespace CmisSync.Lib.Sync
                         // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
                         if (contentStream == null)
                         {
-                            Logger.Warn("Skipping download of file with null content stream: " + fileName);
+                            Logger.Warn("Skipping download of file with null content stream: " + syncItem.RemoteFileName);
                             return true;
                         }
                         // Skip downloading the content, just go on with an empty file
                         if (remoteDocument.ContentStreamLength == 0)
                         {
-                            Logger.Info("Skipping download of file with content length zero: " + fileName);
+                            Logger.Info("Skipping download of file with content length zero: " + syncItem.RemoteFileName);
                             using (FileStream s = File.Create(tmpfilepath))
                             {
                                 s.Close();
@@ -1119,7 +1120,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (CmisBaseException e)
                     {
-                        ProcessRecoverableException("Download failed: " + fileName, e);
+                        ProcessRecoverableException("Download failed: " + syncItem.RemoteFileName, e);
                         if (contentStream != null) contentStream.Stream.Close();
                         success = false;
                         File.Delete(tmpfilepath);
@@ -1127,7 +1128,7 @@ namespace CmisSync.Lib.Sync
 
                     if (success)
                     {
-                        Logger.Info(String.Format("Downloaded remote object({0}): {1}", remoteDocument.Id, fileName));
+                        Logger.Info(String.Format("Downloaded remote object({0}): {1}", remoteDocument.Id, syncItem.RemoteFileName));
 
                         // TODO Control file integrity by using hash compare?
 
@@ -1139,7 +1140,7 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (CmisBaseException e)
                         {
-                            ProcessRecoverableException("Could not fetch metadata: " + fileName, e);
+                            ProcessRecoverableException("Could not fetch metadata: " + syncItem.RemoteFileName, e);
                             // Remove temporary local document to avoid it being considered a new document.
                             File.Delete(tmpfilepath);
                             return false;
@@ -1192,7 +1193,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    ProcessRecoverableException("Could not download file: " + Path.Combine(localFolder, fileName), e);
+                    ProcessRecoverableException("Could not download file: " + syncItem.LocalPath, e);
                     return false;
                 }
             }
@@ -1309,7 +1310,8 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
 
-                Logger.Info("Uploading: " + filePath);      // local path
+                SyncItem syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                Logger.Info("Uploading: " + syncItem.LocalPath);
 
                 try
                 {
@@ -1317,21 +1319,21 @@ namespace CmisSync.Lib.Sync
                     byte[] filehash = { };
 
                     // Prepare properties
-                    string fileName = Path.GetFileName(filePath);       // 
+                    string remoteFileName = syncItem.RemoteFileName;
                     Dictionary<string, object> properties = new Dictionary<string, object>();
-                    properties.Add(PropertyIds.Name, fileName);
+                    properties.Add(PropertyIds.Name, remoteFileName);
                     properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
-                    properties.Add(PropertyIds.CreationDate, File.GetCreationTime(filePath));   // local path
-                    properties.Add(PropertyIds.LastModificationDate, File.GetLastWriteTime(filePath));      // local path
+                    properties.Add(PropertyIds.CreationDate, File.GetCreationTime(syncItem.LocalPath));
+                    properties.Add(PropertyIds.LastModificationDate, File.GetLastWriteTime(syncItem.LocalPath));
 
                     // Prepare content stream
-                    using (Stream file = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))      // 
+                    using (Stream file = File.Open(syncItem.LocalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))      // 
                     using (SHA1 hashAlg = new SHA1Managed())
                     using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))        // 
                     {
                         ContentStream contentStream = new ContentStream();
-                        contentStream.FileName = fileName;
-                        contentStream.MimeType = MimeType.GetMIMEType(fileName);        // local
+                        contentStream.FileName = remoteFileName;
+                        contentStream.MimeType = MimeType.GetMIMEType(remoteFileName);        // local
                         contentStream.Length = file.Length;
                         contentStream.Stream = hashstream;
 
@@ -1340,20 +1342,20 @@ namespace CmisSync.Lib.Sync
                     }
 
                     // Metadata.
-                    Logger.Info("Uploaded: " + filePath);
+                    Logger.Info("Uploaded: " + syncItem.LocalPath);
 
                     // Get metadata. Some metadata has probably been automatically added by the server.
                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
 
                     // Create database entry for this file.
                     // *** Add File
-                    database.AddFile(filePath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);     // database query
-                    Logger.Info("Added file to database: " + filePath);
+                    database.AddFile(syncItem.LocalPath, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);     // database query
+                    Logger.Info("Added file to database: " + syncItem.LocalPath);
                     return true;
                 }
                 catch (Exception e)
                 {
-                    ProcessRecoverableException("Could not upload file: " + filePath, e);
+                    ProcessRecoverableException("Could not upload file: " + syncItem.LocalPath, e);
                     return false;
                 }
             }
@@ -1450,7 +1452,8 @@ namespace CmisSync.Lib.Sync
                 SleepWhileSuspended();
                 try
                 {
-                    Logger.Info("Updating: " + filePath);
+                    SyncItem syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                    Logger.Info("Updating: " + syncItem.LocalPath);
                     using (Stream localfile = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         // Ignore files with null or empty content stream.
@@ -1491,15 +1494,15 @@ namespace CmisSync.Lib.Sync
 
                             // Update checksum
                             // *** RecalculateChecksum
-                            database.RecalculateChecksum(filePath);
+                            database.RecalculateChecksum(syncItem.LocalPath);
 
                             // TODO Update metadata?
-                            Logger.Info("Updated: " + filePath);
+                            Logger.Info("Updated: " + syncItem.LocalPath);
                             return true;
                         }
                         else
                         {
-                            string message = String.Format("File {0} is CheckOut on the server by another user: {1}", filePath, remoteFile.CheckinComment);
+                            string message = String.Format("File {0} is CheckOut on the server by another user: {1}", syncItem.LocalPath, remoteFile.CheckinComment);
 
                             // throw new IOException("File is Check Out on the server");
                             Logger.Info(message);
@@ -1524,7 +1527,8 @@ namespace CmisSync.Lib.Sync
                 try
                 {
                     // Find the document within the folder.
-                    string fileName = Path.GetFileName(filePath);
+                    SyncItem syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                    string fileName = syncItem.RemoteFileName;
                     IDocument document = null;
                     bool found = false;
                     foreach (ICmisObject obj in remoteFolder.GetChildren())
@@ -1542,12 +1546,12 @@ namespace CmisSync.Lib.Sync
                     // If not found, it means the document has been deleted.
                     if (!found)
                     {
-                        Logger.Info(filePath + " not found on server, must be uploaded instead of updated");
-                        return UploadFile(filePath, remoteFolder);
+                        Logger.Info(syncItem.LocalPath + " not found on server, must be uploaded instead of updated");
+                        return UploadFile(syncItem.LocalPath, remoteFolder);
                     }
 
                     // Update the document itself.
-                    return UpdateFile(filePath, document);
+                    return UpdateFile(syncItem.LocalPath, document);
                 }
                 catch (CmisBaseException e)
                 {
