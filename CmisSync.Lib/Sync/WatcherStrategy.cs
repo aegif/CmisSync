@@ -19,6 +19,11 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder
         {
+            /// <summary>
+            /// Watchers the sync.
+            /// </summary>
+            /// <param name="remoteFolder">Remote folder.</param>
+            /// <param name="localFolder">Local folder.</param>
             private void WatcherSync(string remoteFolder, string localFolder)
             {
                 Logger.Debug(remoteFolder + " : " + localFolder);
@@ -85,6 +90,12 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
+            /// <summary>
+            /// Watchers the sync update.
+            /// </summary>
+            /// <param name="remoteFolder">Remote folder.</param>
+            /// <param name="localFolder">Local folder.</param>
+            /// <param name="pathname">Pathname.</param>
             private void WatcherSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
                 string name = pathname.Substring(localFolder.Length + 1);
@@ -121,8 +132,10 @@ namespace CmisSync.Lib.Sync
                         bool success = false;
                         repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Created);
                         repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Changed);
+                        // *** ContainsFile
                         if (database.ContainsFile(pathname))
                         {
+                            // *** LocalFileHasChanged
                             if (database.LocalFileHasChanged(pathname))
                             {
                                 success = UpdateFile(pathname, remoteBase);
@@ -163,6 +176,7 @@ namespace CmisSync.Lib.Sync
                             return;
                         }
 
+                        // *** ContainsFolder
                         if (database.ContainsFolder(pathname))
                         {
                             Logger.Info(String.Format("Database exists for {0}, ignore for the update action", pathname));
@@ -186,6 +200,12 @@ namespace CmisSync.Lib.Sync
                 Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
             }
 
+            /// <summary>
+            /// Watchers the sync delete.
+            /// </summary>
+            /// <param name="remoteFolder">Remote folder.</param>
+            /// <param name="localFolder">Local folder.</param>
+            /// <param name="pathname">Pathname.</param>
             private void WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
                 string name = pathname.Substring(localFolder.Length + 1);
@@ -194,6 +214,7 @@ namespace CmisSync.Lib.Sync
                 try
                 {
                     transaction = database.BeginTransaction();
+                    // *** ContainsFiles
                     if (database.ContainsFile(pathname))
                     {
                         Logger.Info("Removing locally deleted file on server: " + pathname);
@@ -209,8 +230,10 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
+                        // *** Remove File
                         database.RemoveFile(pathname);
                     }
+                    // *** ContainsFolder
                     else if (database.ContainsFolder(pathname))
                     {
                         Logger.Info("Removing locally deleted folder on server: " + pathname);
@@ -226,6 +249,7 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
+                        // *** Remove File
                         database.RemoveFolder(pathname);
                     }
                     else

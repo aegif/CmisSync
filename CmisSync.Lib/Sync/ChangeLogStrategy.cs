@@ -52,6 +52,7 @@ namespace CmisSync.Lib.Sync
                     CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null);
                     
                     Logger.Info("Succeeded to sync from remote, update ChangeLog token: " + lastTokenOnServer);
+                    // *** SetChangeLogToken
                     database.SetChangeLogToken(lastTokenOnServer);
                 }
 
@@ -106,6 +107,7 @@ namespace CmisSync.Lib.Sync
                             lastTokenOnClient = lastTokenOnServer;
                         }
                         Logger.Info("Sync the changes on server, update ChangeLog token: " + lastTokenOnClient);
+                        // *** SetChangeLogToken
                         database.SetChangeLogToken(lastTokenOnClient);
                         session.Binding.GetRepositoryService().GetRepositoryInfos(null);    //  refresh
                         lastTokenOnServer = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
@@ -113,6 +115,7 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         Logger.Warn("Failure to sync the changes on server, force crawl sync from remote");
+                        // *** SetChangeLogToken
                         CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null);
                         Logger.Info("Succeeded to sync from remote, update ChangeLog token: " + lastTokenOnServer);
                         database.SetChangeLogToken(lastTokenOnServer);
@@ -242,12 +245,14 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info(String.Format("New remote file ({0}) found.", remotePath));
                     //  check moveObject
+                    // *** GetFilePath
                     string savedDocumentPath = database.GetFilePath(change.ObjectId);
                     if ((null != savedDocumentPath) && (savedDocumentPath != localPath))
                     {
                         if (File.Exists(localPath))
                         {
                             File.Delete(savedDocumentPath);
+                            // *** Remove File
                             database.RemoveFile(savedDocumentPath);
                         }
                         else
@@ -261,6 +266,7 @@ namespace CmisSync.Lib.Sync
                                 }
                                 File.Move(savedDocumentPath, localPath);
                             }
+                            // *** Move File
                             database.MoveFile(savedDocumentPath, localPath);
                         }
                     }
@@ -272,6 +278,7 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info(String.Format("New remote folder ({0}) found.", remotePath));
                     //  check moveObject
+                    // *** GetFolderPath
                     string savedFolderPath = database.GetFolderPath(change.ObjectId);
                     if ((null != savedFolderPath) && (savedFolderPath != localPath))
                     {
@@ -311,24 +318,27 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Warn("Exception when GetObject for " + change.ObjectId + " : ", e);
                 }
-
+                // *** GetFilePath
                 string savedDocumentPath = database.GetFilePath(change.ObjectId);
                 if (null != savedDocumentPath)
                 {
                     Logger.Info("Remove local document: " + savedDocumentPath);
                     if(File.Exists(savedDocumentPath))
                         File.Delete(savedDocumentPath);
+                    // *** Remove File
                     database.RemoveFile(savedDocumentPath);
                     Logger.Info("Removed local document: " + savedDocumentPath);
                     return true;
                 }
 
+                // *** GetFolderPath
                 string savedFolderPath = database.GetFolderPath(change.ObjectId);
                 if (null != savedFolderPath)
                 {
                     Logger.Info("Remove local folder: " + savedFolderPath);
                     if(Directory.Exists(savedFolderPath)) {
                         Directory.Delete(savedFolderPath, true);
+                        // *** Remove Folder
                         database.RemoveFolder(savedFolderPath);
                     }
                     Logger.Info("Removed local folder: " + savedFolderPath);
