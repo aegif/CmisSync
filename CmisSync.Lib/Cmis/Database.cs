@@ -696,8 +696,8 @@ namespace CmisSync.Lib.Cmis
             path = Normalize(path);
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", path);
-            object obj = ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE path=@path", parameters);
+			parameters.Add("localPath", path);
+			object obj = ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE localPath=@localPath", parameters);
             if (null != obj)
             {
 #if __MonoCS__
@@ -1271,9 +1271,9 @@ namespace CmisSync.Lib.Cmis
         public string GetChecksum(string path)
         {
             string normalizedPath = Normalize(path);
-            string command = "SELECT checksum FROM files WHERE path=@path";
+			string command = "SELECT checksum FROM files WHERE localPath=@localPath";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", normalizedPath);
+			parameters.Add("localPath", normalizedPath);
             return (string)ExecuteSQLFunction(command, parameters);
         }
 
