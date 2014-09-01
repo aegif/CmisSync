@@ -1311,7 +1311,7 @@ namespace CmisSync.Lib.Cmis
         private string GetPathPrefix()
         {
             object result = GetGeneralTableValue(PathPrefixKey);
-            // Migration of databases, which do not have any prefix safed
+            // Migration of databases, which do not have any prefix saved
             if (result == null)
             {
                 // string oldprefix = Path.Combine(ConfigManager.CurrentConfig.HomePath, "CmisSync");

@@ -360,14 +360,14 @@ namespace CmisSync.Lib.Cmis
                         while (reader.Read())
                         {
                             // Example: "old-db-1.0.13/テスト・テスト/テスト用ファイル.pptx"
-							string legacyPath = reader["path"].ToString();
+                            string legacyPath = reader["path"].ToString();
 
                             // Example: /Sites/cmissync/documentLibrary/tests/テスト・テスト/テスト用ファイル.pptx
                             string remotePath = remoteRootFolder + legacyPath.Substring(localRootFolder.Length);
 
                             // Example: テスト・テスト/テスト用ファイル.pptx
                             string localPath = legacyPath.Substring(localRootFolder.Length + 1);
-                            
+
                             string id = null;
                             try
                             {
@@ -419,6 +419,20 @@ namespace CmisSync.Lib.Cmis
                             parameters.Add("@path", legacyPath);
                             ExecuteSQLAction(connection, "UPDATE folders SET id = @id, localPath = @localPath WHERE path = @path;", parameters);
                         }
+                    }
+
+                    {
+                        // Replace repository path prefix.
+                        // Before: C:\Users\myuser\CmisSync
+                        // After:  C:\Users\myuser\CmisSync\myfolder
+
+                        // Read existing prefix.
+
+                        string newPrefix = syncFolder.LocalPath;
+
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("prefix", newPrefix);
+                        ExecuteSQLAction(connection, "INSERT OR REPLACE INTO general (key, value) VALUES (\"PathPrefix\", @prefix)", parameters);
                     }
                 }
             }
