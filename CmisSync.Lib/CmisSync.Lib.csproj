@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChunkedStream.cs" />
-    <Compile Include="Database\DatabaseMigration2.cs" />
+    <Compile Include="Database\DatabaseMigrationToVersion2.cs" />
     <Compile Include="Database\DatabaseMigrationBase.cs" />
     <Compile Include="Database\IDatabase.cs" />
     <Compile Include="Database\DatabaseMigration.cs" />
