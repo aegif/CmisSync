@@ -76,7 +76,7 @@ namespace CmisSync.Lib.Cmis
                         return;     // migration is not needed
                     }
 
-                    Logger.DebugFormat("Current Database Schema must be update from {0} to {0}", dbVersion, currentDbVersion);
+                    Logger.DebugFormat("Current Database Schema must be updated from {0} to {0}", dbVersion, currentDbVersion);
 
                     switch (dbVersion)
                     {
@@ -159,8 +159,11 @@ namespace CmisSync.Lib.Cmis
             parameters.Add("prefix", ConfigManager.CurrentConfig.FoldersPath);
             ExecuteSQLAction(connection,
                 "INSERT OR IGNORE INTO general (key, value) VALUES (\"PathPrefix\", @prefix);", parameters);
-            SetDatabaseVersion(connection, currentVersion);
-            // FillObjectId(syncFolder, connection);
+
+			FillObjectId(syncFolder, connection);
+
+			// If everything has succeded, upgrade database version number.
+			SetDatabaseVersion(connection, currentVersion);
         }
 
 
@@ -332,6 +335,9 @@ namespace CmisSync.Lib.Cmis
         /// <param name="folderName">Folder name.</param>
         public static void FillObjectId(Config.SyncConfig.Folder syncFolder, SQLiteConnection connection)
         {
+            // Tell the user to go online.
+            // TODO
+
             var session = Auth.Auth.GetCmisSession(
                               ((Uri)syncFolder.RemoteUrl).ToString(),
                               syncFolder.UserName,
@@ -340,7 +346,7 @@ namespace CmisSync.Lib.Cmis
 
             var filters = new HashSet<string>();
             filters.Add("cmis:objectId");
-            session.DefaultContext = session.CreateOperationContext(filters, false, true, false, DotCMIS.Enums.IncludeRelationshipsFlag.None, null, true, null, true, 100);
+            //session.DefaultContext = session.CreateOperationContext(filters, false, true, false, DotCMIS.Enums.IncludeRelationshipsFlag.None, null, true, null, true, 100);
             string remoteRootFolder = syncFolder.RemotePath;
             string localRootFolder = syncFolder.LocalPath.Substring(ConfigManager.CurrentConfig.FoldersPath.Length + 1);
 
@@ -353,7 +359,7 @@ namespace CmisSync.Lib.Cmis
                     {
                         while (reader.Read())
                         {
-                            string path = reader["path"].ToString();
+							string path = reader["path"].ToString(); // Example: "old-db-1.0.13/テスト・テスト/テスト用ファイル.pptx"
                             string remotePath = remoteRootFolder + path.Substring(localRootFolder.Length);
                             string id = null;
                             try
