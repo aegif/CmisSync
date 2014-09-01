@@ -5,6 +5,7 @@ using log4net;
 
 using CmisSync.Lib.Cmis;
 using DotCMIS.Client;
+using CmisSync.Lib.Database;
 
 namespace CmisSync.Lib.Events
 {

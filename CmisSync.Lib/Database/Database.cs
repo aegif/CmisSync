@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using log4net;
 
 
-namespace CmisSync.Lib.Cmis
+namespace CmisSync.Lib.Database
 {
 #if __MonoCS__
     // Mono's SQLite ADO implementation uses pure CamelCase (Sqlite vs. SQLite)

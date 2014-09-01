@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using Newtonsoft.Json;
 using log4net;
 
-namespace CmisSync.Lib.Cmis
+namespace CmisSync.Lib.Database
 {
 
     /// <summary>
