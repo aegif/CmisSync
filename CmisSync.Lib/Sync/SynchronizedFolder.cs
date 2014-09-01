@@ -15,6 +15,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using CmisSync.Lib.Events;
+using CmisSync.Lib.Database;
 
 namespace CmisSync.Lib.Sync
 {
@@ -135,7 +136,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Database to cache remote information from the CMIS server.
             /// </summary>
-            private Database database;
+            private Database.Database database;
 
 
             /// <summary>
@@ -194,7 +195,7 @@ namespace CmisSync.Lib.Sync
                 Queue = repoCmis.Queue;
 
                 // Database is the user's AppData/Roaming
-                database = new Database(repoinfo.CmisDatabase);
+                database = new Database.Database(repoinfo.CmisDatabase);
 
                 // Get path on remote repository.
                 remoteFolderPath = repoInfo.RemotePath;
@@ -930,7 +931,7 @@ namespace CmisSync.Lib.Sync
                         if (database.ContainsFile(syncItem.LocalPath))
                         {
                             // *** GetOperationRetryCounter
-                            long retries = database.GetOperationRetryCounter(syncItem.LocalPath, Database.OperationType.DELETE);
+                            long retries = database.GetOperationRetryCounter(syncItem.LocalPath, Database.Database.OperationType.DELETE);
                             if (retries <= repoinfo.MaxDeletionRetries)
                             {
                                 // File has been recently removed locally, so remove it from server too.
@@ -943,13 +944,13 @@ namespace CmisSync.Lib.Sync
                                     database.RemoveFile(syncItem.LocalPath);      // 
 
                                     // *** SetOperationRetryCounter
-                                    database.SetOperationRetryCounter(syncItem.LocalPath, 0, Database.OperationType.DELETE);
+                                    database.SetOperationRetryCounter(syncItem.LocalPath, 0, Database.Database.OperationType.DELETE);
                                 }
                                 catch (CmisBaseException ex)
                                 {
                                     Logger.Warn("Could not delete remote file: ", ex);
                                     // *** SetOperationRetryCounter
-                                    database.SetOperationRetryCounter(syncItem.LocalPath, retries + 1, Database.OperationType.DELETE);
+                                    database.SetOperationRetryCounter(syncItem.LocalPath, retries + 1, Database.Database.OperationType.DELETE);
                                     throw;
                                 }
                             }
@@ -1054,9 +1055,9 @@ namespace CmisSync.Lib.Sync
                     string filepath = syncItem.LocalPath;
                     string tmpfilepath = filepath + ".sync";        // local path
                     // *** GetOperationRetryCounter
-                    if(database.GetOperationRetryCounter(filepath, Database.OperationType.DOWNLOAD) > repoinfo.MaxDownloadRetries)       // database query
+                    if (database.GetOperationRetryCounter(filepath, Database.Database.OperationType.DOWNLOAD) > repoinfo.MaxDownloadRetries)       // database query
                     {
-                        Logger.Info(String.Format("Skipping download of file {0} because of too many failed ({1}) downloads",database.GetOperationRetryCounter(filepath, Database.OperationType.DOWNLOAD)));
+                        Logger.Info(String.Format("Skipping download of file {0} because of too many failed ({1}) downloads", database.GetOperationRetryCounter(filepath, Database.Database.OperationType.DOWNLOAD)));
                         return true;
                     }
 

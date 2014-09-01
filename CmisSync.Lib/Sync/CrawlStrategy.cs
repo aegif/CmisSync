@@ -349,7 +349,7 @@ namespace CmisSync.Lib.Sync
                                         Logger.Info("- serverSideModificationDate: " + serverSideModificationDate);
                                         Logger.Info("- lastDatabaseUpdate: " + lastDatabaseUpdate);
                                         Logger.Info("- Checksum in database: " + database.GetChecksum(filePath));
-                                        Logger.Info("- Checksum of local file: " + Database.Checksum(filePath));
+                                        Logger.Info("- Checksum of local file: " + Database.Database.Checksum(filePath));
 
                                         // Rename locally modified file.
                                         String newFilePath = Utils.CreateConflictFilename(filePath, repoinfo.User);
@@ -357,7 +357,7 @@ namespace CmisSync.Lib.Sync
 
                                         // Download server version
                                         DownloadFile(remoteDocument, localFolder);
-                                        Logger.Info("- Checksum of remote file: " + Database.Checksum(filePath));
+                                        Logger.Info("- Checksum of remote file: " + Database.Database.Checksum(filePath));
                                         repo.OnConflictResolved();
 
                                         // Notify the user.
