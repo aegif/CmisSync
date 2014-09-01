@@ -29,7 +29,9 @@ namespace CmisSync.Lib.Cmis
         /// Add a file to the database.
         /// If checksum is not null, it will be used for the database entry
         /// </summary>
-        void AddFile(string path, string objectId, DateTime? serverSideModificationDate,
+        // void AddFile(string path, string objectId, DateTime? serverSideModificationDate,
+        //     Dictionary<string, string[]> metadata, byte[] filehash);
+        void AddFile(SyncItem item, string objectId, DateTime? serverSideModificationDate,
             Dictionary<string, string[]> metadata, byte[] filehash);
 
         /// <summary>

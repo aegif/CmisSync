@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 using Newtonsoft.Json;
 using log4net;
 
+
 namespace CmisSync.Lib.Cmis
 {
 #if __MonoCS__
@@ -89,10 +90,9 @@ namespace CmisSync.Lib.Cmis
             this.databaseFileName = dataPath;
             pathPrefix = GetPathPrefix();
             pathPrefixSize = pathPrefix.Length + 1;
-            // remotePathPrefix = GetRemotePathPrefix();
-            // remotePathPrefixSize = remotePathPrefix.Length + 1;
+            remotePathPrefix = GetRemotePathPrefix();
+            remotePathPrefixSize = remotePathPrefix.Length + 1;
         }
-
 
         /// <summary>
         /// Finalizer.
@@ -246,6 +246,43 @@ namespace CmisSync.Lib.Cmis
             return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, path).Replace('/', Path.DirectorySeparatorChar);
         }
 
+        /// <summary>
+        /// Normalizes a remote path.
+        /// All remote paths in database must be normalized.
+        /// </summary>
+        /// <returns>normalized remote path.</returns>
+        /// <param name="path">remote path.</param>
+        private string NormalizeRemotePath(string path)
+        {
+            if (path.StartsWith(remotePathPrefix))
+            {
+                // Remove path prefix
+                path = path.Substring(remotePathPrefixSize, path.Length - remotePathPrefixSize);
+                // Normalize all slashes to forward slash
+                path = path.Replace('\\', '/');
+            }
+            return path;
+        }
+
+        /// <summary>
+        /// Denormalizes a remote path from the normalized one to a remote path.
+        /// </summary>
+        /// <returns>The remote path.</returns>
+        /// <param name="path">normalized remote path</param>
+        private string DenormalizeRemotePath(string path)
+        {
+            if (null == path)
+            {
+                return null;
+            }
+
+            if (Path.IsPathRooted(path))
+            {
+                return path;
+            }
+
+            return Path.Combine(remotePathPrefix, path);
+        }
 
         /// <summary>
         /// Calculate the SHA1 checksum of a file.
@@ -263,6 +300,26 @@ namespace CmisSync.Lib.Cmis
                 }
             }
         }
+
+        /// <summary>
+        /// Calculate the SHA1 checksum of a syncitem.
+        /// Code from http://stackoverflow.com/a/1993919/226958
+        /// </summary>
+        /// <param name="item">sync item</param>
+        public static string Checksum(SyncItem item)
+        {
+            using (var fs = new FileStream(item.LocalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var bs = new BufferedStream(fs))
+            {
+                using (var sha1 = new SHA1Managed())
+                {
+                    byte[] hash = sha1.ComputeHash(bs);
+                    return ChecksumToString(hash);
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// Transforms a given hash into a string
@@ -305,7 +362,7 @@ namespace CmisSync.Lib.Cmis
             return GetSQLiteConnection().BeginTransaction();
         }
 
-
+        /*
         /// <summary>
         /// Add a file to the database. And calculate the checksum of the file
         /// </summary>
@@ -315,6 +372,7 @@ namespace CmisSync.Lib.Cmis
         {
             AddFile(path, objectId, serverSideModificationDate, metadata, null);
         }
+
 
         /// <summary>
         /// Add a file to the database.
@@ -366,6 +424,7 @@ namespace CmisSync.Lib.Cmis
             ExecuteSQLAction(command, parameters);
             Logger.Debug("Completed database file addition for file: " + path);
         }
+        */
 
         /// <summary>
         /// Add a file to the database.
@@ -405,8 +464,8 @@ namespace CmisSync.Lib.Cmis
 
             // Insert into database.
             string command =
-                @"INSERT OR REPLACE INTO files (path, id, serverSideModificationDate, metadata, checksum)
-                    VALUES (@path, @id, @serverSideModificationDate, @metadata, @checksum)";
+                @"INSERT OR REPLACE INTO files (path, localPath, id, serverSideModificationDate, metadata, checksum)
+                    VALUES (@path, @localPath, @id, @serverSideModificationDate, @metadata, @checksum)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);
             parameters.Add("localPath", item.LocalRelativePath);
@@ -456,8 +515,8 @@ namespace CmisSync.Lib.Cmis
             }
 
             string command =
-                @"INSERT OR REPLACE INTO folders (path, id, serverSideModificationDate)
-                    VALUES (@path, @id, @serverSideModificationDate)";
+                @"INSERT OR REPLACE INTO folders (path, localPath, id, serverSideModificationDate)
+                    VALUES (@path, @localPath, @id, @serverSideModificationDate)";
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);
             parameters.Add("localPath", item.LocalRelativePath);
@@ -497,7 +556,7 @@ namespace CmisSync.Lib.Cmis
             ExecuteSQLAction("DELETE FROM downloads WHERE path=@path", parameters);
         }
 
-
+        /// *** Used for local util method.
         /// <summary>
         /// Remove a folder from the database.
         /// </summary>
@@ -1095,8 +1154,10 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
-        /// <returns>path field in files table for <paramref name="id"/></returns>
+        /// Gets the syncitem from id.
         /// </summary>
+        /// <returns>syncitem.</returns>
+        /// <param name="id">Identifier.</param>
         public SyncItem GetSyncItem(string id)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
@@ -1107,6 +1168,45 @@ namespace CmisSync.Lib.Cmis
             string localPath = (localPathObj is DBNull) ? remotePath : (string)localPathObj;
             return SyncItemFactory.CreateFromPaths(pathPrefix, localPath, remotePathPrefix, remotePath);
         }
+
+        /// <summary>
+        /// Gets the syncitem from local path.
+        /// </summary>
+        /// <returns>syncitem. If the item is not included in the database, return null.</returns>
+        /// <param name="localPath">Local path.</param>
+        public SyncItem GetSyncItemFromLocalPath(string localPath)
+        {
+            string normalizedLocalPath = Normalize(localPath);
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("localPath", normalizedLocalPath);
+            string path = (string)ExecuteSQLFunction("SELECT path FROM files WHERE localPath=@localPath", parameters);
+            if (string.IsNullOrEmpty(path))
+            {
+                return null;
+            }
+
+            return SyncItemFactory.CreateFromPaths(pathPrefix, normalizedLocalPath, remotePathPrefix, path);
+        }
+
+        /// <summary>
+        /// Gets the syncitem from remote path.
+        /// </summary>
+        /// <returns>syncitem. If the item is not included in the database, return null.</returns>
+        /// <param name="remotePath">Remote path.</param>
+        public SyncItem GetSyncItemFromRemotePath(string remotePath)
+        {
+            string normalizedRemotePath = remotePath; // TODO
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", normalizedRemotePath);
+            string localPath = (string)ExecuteSQLFunction("SELECT localPath FROM files WHERE path=@path", parameters);
+            if (string.IsNullOrEmpty(localPath))
+            {
+                return null;
+            }
+
+            return SyncItemFactory.CreateFromPaths(pathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
+        }
+
 
 
         /// <summary>
@@ -1210,14 +1310,13 @@ namespace CmisSync.Lib.Cmis
         /// </returns>
         private string GetPathPrefix()
         {
-            // object result = ExecuteSQLFunction("SELECT value FROM general WHERE key=\"PathPrefix\"", null);
             object result = GetGeneralTableValue(PathPrefixKey);
             // Migration of databases, which do not have any prefix safed
             if (result == null)
             {
-                string oldprefix = Path.Combine(ConfigManager.CurrentConfig.HomePath, "CmisSync");
-                // var syncFolder = ConfigManager.CurrentConfig.Folder.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
-                // string oldprefix = syncFolder.LocalPath;
+                // string oldprefix = Path.Combine(ConfigManager.CurrentConfig.HomePath, "CmisSync");
+                var syncFolder = ConfigManager.CurrentConfig.Folder.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
+                string oldprefix = syncFolder.LocalPath;
                 SetPathPrefix(oldprefix);
                 return oldprefix;
             }
@@ -1255,9 +1354,18 @@ namespace CmisSync.Lib.Cmis
         /// </returns>
         private string GetRemotePathPrefix()
         {
-            // object result = ExecuteSQLFunction("SELECT value FROM general WHERE key=\"RemotePathPrefix\"", null);
             object result = GetGeneralTableValue(RemotePathPrefixKey);
-            return (string)result;
+            if (result == null)
+            {
+                var syncFolder = ConfigManager.CurrentConfig.Folder.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
+                string oldprefix = syncFolder.RemotePath;
+                SetRemotePathPrefix(oldprefix);
+                return oldprefix;
+            }
+            else
+            {
+                return (string)result;
+            }
         }
 
         /// <summary>

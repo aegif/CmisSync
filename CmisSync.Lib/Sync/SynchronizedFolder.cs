@@ -717,6 +717,7 @@ namespace CmisSync.Lib.Sync
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
                         string localSubFolder = Path.Combine(localFolder, PathRepresentationConverter.RemoteToLocal(cmisObject.Name));
+                        SyncItem syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, cmisObject.Name, repoinfo);
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoinfo))
                         {
                             DownloadDirectory(remoteSubFolder, localSubFolder);
@@ -939,6 +940,7 @@ namespace CmisSync.Lib.Sync
                                     // Remove it from database.
                                     // *** Remove File
                                     database.RemoveFile(syncItem.LocalPath);      // 
+
                                     // *** SetOperationRetryCounter
                                     database.SetOperationRetryCounter(syncItem.LocalPath, 0, Database.OperationType.DELETE);
                                 }
