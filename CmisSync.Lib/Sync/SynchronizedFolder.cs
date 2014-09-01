@@ -268,7 +268,7 @@ namespace CmisSync.Lib.Sync
                 // Sets the Connect Timeout to infinite
                 cmisParameters[SessionParameter.ConnectTimeout] = "60000"; // One minute
                 // Sets the Read Timeout to infinite
-                cmisParameters[SessionParameter.ReadTimeout] = "60000"; // One minute
+                cmisParameters[SessionParameter.ReadTimeout] = "-1";
             }
 
 
@@ -1332,9 +1332,7 @@ namespace CmisSync.Lib.Sync
                         contentStream.Length = file.Length;
                         contentStream.Stream = hashstream;
 
-                        Logger.Debug("Upload Start: " + filePath + " as " + remoteFolder.Path + Path.PathSeparator.ToString() + fileName);
                         remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                        Logger.Debug("remoteFolder.CreateDocument finished.");
                         filehash = hashAlg.Hash;
                     }
 
