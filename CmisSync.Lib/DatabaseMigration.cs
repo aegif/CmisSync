@@ -335,8 +335,7 @@ namespace CmisSync.Lib.Cmis
         /// <param name="folderName">Folder name.</param>
         public static void FillObjectId(Config.SyncConfig.Folder syncFolder, SQLiteConnection connection)
         {
-            // Tell the user to go online.
-            // TODO
+            Utils.NotifyUser("CmisSync needs to upgrade its own local data. Please stay on the network for a few minutes.");
 
             var session = Auth.Auth.GetCmisSession(
                               ((Uri)syncFolder.RemoteUrl).ToString(),
@@ -354,13 +353,21 @@ namespace CmisSync.Lib.Cmis
             {
                 using (var command = new SQLiteCommand(connection))
                 {
+                    // Fill missing columns of all files.
                     command.CommandText = "SELECT path FROM files WHERE id IS NULL;";
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-							string path = reader["path"].ToString(); // Example: "old-db-1.0.13/テスト・テスト/テスト用ファイル.pptx"
-                            string remotePath = remoteRootFolder + path.Substring(localRootFolder.Length);
+                            // Example: "old-db-1.0.13/テスト・テスト/テスト用ファイル.pptx"
+							string legacyPath = reader["path"].ToString();
+
+                            // Example: /Sites/cmissync/documentLibrary/tests/テスト・テスト/テスト用ファイル.pptx
+                            string remotePath = remoteRootFolder + legacyPath.Substring(localRootFolder.Length);
+
+                            // Example: テスト・テスト/テスト用ファイル.pptx
+                            string localPath = legacyPath.Substring(localRootFolder.Length + 1);
+                            
                             string id = null;
                             try
                             {
@@ -376,19 +383,22 @@ namespace CmisSync.Lib.Cmis
                             }
 
                             var parameters = new Dictionary<string, object>();
-                            parameters.Add("@path", path);
                             parameters.Add("@id", id);
-                            ExecuteSQLAction(connection, "UPDATE files SET id = @id WHERE path = @path;", parameters);
+                            parameters.Add("@localPath", localPath);
+                            parameters.Add("@path", legacyPath);
+                            ExecuteSQLAction(connection, "UPDATE files SET id = @id, localPath = @localPath WHERE path = @path;", parameters);
                         }
                     }
 
+                    // Fill missing columns of all folders.
                     command.CommandText = "SELECT path FROM folders WHERE id IS NULL;";
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            string path = reader["path"].ToString();
-                            string remotePath = remoteRootFolder + path.Substring(localRootFolder.Length);
+                            string legacyPath = reader["path"].ToString();
+                            string remotePath = remoteRootFolder + legacyPath.Substring(localRootFolder.Length);
+                            string localPath = legacyPath.Substring(localRootFolder.Length + 1);
                             string id = null;
                             try
                             {
@@ -404,9 +414,10 @@ namespace CmisSync.Lib.Cmis
                             }
 
                             var parameters = new Dictionary<string, object>();
-                            parameters.Add("@path", path);
                             parameters.Add("@id", id);
-                            ExecuteSQLAction(connection, "UPDATE folders SET id = @id WHERE path = @path;", parameters);
+                            parameters.Add("@localPath", localPath);
+                            parameters.Add("@path", legacyPath);
+                            ExecuteSQLAction(connection, "UPDATE folders SET id = @id, localPath = @localPath WHERE path = @path;", parameters);
                         }
                     }
                 }
@@ -416,7 +427,8 @@ namespace CmisSync.Lib.Cmis
                 Logger.Info("Failed to fills object id.", e);
                 throw;
             }
+
+            Utils.NotifyUser("CmisSync has finished upgrading its own local data for this folder.");
         }
     }
 }
-
