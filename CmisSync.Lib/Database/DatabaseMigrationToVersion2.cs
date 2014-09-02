@@ -2,12 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if __MonoCS__
+using Mono.Data.Sqlite;
+#else
 using System.Data.SQLite;
+#endif
+
 using log4net;
 using CmisSync.Auth;
 
 namespace CmisSync.Lib.Database
 {
+    #if __MonoCS__
+    // Mono's SQLite ADO implementation uses pure CamelCase (Sqlite vs. SQLite)
+    // so we define some aliases here
+    using SQLiteConnection = SqliteConnection;
+    using SQLiteCommand = SqliteCommand;
+    using SQLiteException = SqliteException;
+    using SQLiteDataReader = SqliteDataReader;
+    #endif
+
     /// <summary>
     /// Migrate from database version 0 to version 2.
     /// </summary>
