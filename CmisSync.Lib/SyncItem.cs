@@ -18,16 +18,9 @@ namespace CmisSync.Lib
         // remote relative path
         protected string remotePath;
 
-        // obsolete
-        protected string path;
 
         protected SyncItem()
         {
-        }
-
-        public SyncItem(string path)
-        {
-            this.path = path;
         }
 
         abstract public string LocalRelativePath
@@ -109,9 +102,6 @@ namespace CmisSync.Lib
 
     public class LocalPathSyncItem : SyncItem
     {
-
-        public LocalPathSyncItem(string path) : base(path) {}
-
         public LocalPathSyncItem(string localPath, RepoInfo repoInfo)
         {
             this.localRoot = repoInfo.TargetDirectory;
@@ -204,8 +194,6 @@ namespace CmisSync.Lib
 
     public class RemotePathSyncItem : SyncItem
     {
-        public RemotePathSyncItem(string path) : base(path) {}
-
         public RemotePathSyncItem(string remotePath, RepoInfo repoInfo)
         {
             this.localRoot = PathRepresentationConverter.RemoteToLocal(repoInfo.TargetDirectory);
