@@ -312,15 +312,7 @@ namespace CmisSync.Lib.Sync
 
                         remoteFiles.Add(remoteDocumentFileName);
 
-
-
-                        // string filePath = Path.Combine(localFolder, remoteDocumentFileName);
                         string filePath = PathRepresentationConverter.RemoteToLocal(Path.Combine(localFolder, remoteDocumentFileName));
-                        if (!database.ContainsFileId(filePath))
-                        {
-                            database.SetFileId(filePath, remoteDocument.Id);
-                        }
-
 
                         if (File.Exists(filePath))
                         {

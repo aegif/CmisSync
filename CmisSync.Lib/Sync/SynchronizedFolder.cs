@@ -1652,7 +1652,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Rename a file remotely.
             /// </summary>
-            private bool RenameFile(string directory, string newFilename, IDocument remoteFile)
+/*            private bool RenameFile(string directory, string newFilename, IDocument remoteFile)
             {
                 SleepWhileSuspended();
 
@@ -1783,7 +1783,8 @@ namespace CmisSync.Lib.Sync
                     ProcessRecoverableException(String.Format("Could not move folder: {0} -> {1}", oldPathname, newPathname), e);
                     return false;
                 }
-            }
+            }*/
+
 
             /// <summary>
             /// Sleep while suspended.

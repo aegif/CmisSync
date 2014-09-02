@@ -220,7 +220,8 @@ namespace CmisSync.Lib.Database
             }
             catch (Exception e)
             {
-                Logger.Info("Failed to fills object id.", e);
+                Logger.Info("Failed to migrate \"" + syncFolder.RepositoryId + "\".", e);
+                Utils.NotifyUser("Failure while migrating folder \"" + syncFolder.RepositoryId + "\".");
                 throw;
             }
 
