@@ -45,6 +45,9 @@ namespace CmisSync.Lib.Cmis
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
 
+        public static string CMIS_FILE_SEPARATOR = "/";
+
+
         /// <summary>
         /// Try to find the CMIS server associated to any URL.
         /// Users can provide the URL of the web interface, and we have to return the CMIS URL
@@ -430,6 +433,22 @@ namespace CmisSync.Lib.Cmis
                 }
             }
             return null;
+        }
+
+
+        /// <summary>
+        /// Equivalent of .NET Path.Combine, but for CMIS paths.
+        /// CMIS paths always use forward slashes.
+        /// </summary>
+        public static string PathCombine(string path1, string path2)
+        {
+            if (String.IsNullOrEmpty(path1))
+                return path2;
+
+            if (String.IsNullOrEmpty(path2))
+                return path1;
+
+            return path1 + CMIS_FILE_SEPARATOR + path2;
         }
     }
 }

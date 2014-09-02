@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using CmisSync.Lib.Cmis;
 
 
 namespace CmisSync.Lib
@@ -130,7 +131,7 @@ namespace CmisSync.Lib
             {
                 localRootRelative = localFolder.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
             }
-            this.remotePath = Path.Combine(PathRepresentationConverter.LocalToRemote(localRootRelative), remoteRelativePath);
+            this.remotePath = CmisUtils.PathCombine(PathRepresentationConverter.LocalToRemote(localRootRelative), remoteRelativePath);
         }
 
         public LocalPathSyncItem(string localPrefix, string localPath, string remotePrefix, string remotePath)

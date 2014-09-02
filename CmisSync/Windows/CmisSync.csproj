@@ -113,6 +113,7 @@
       <Link>Program.cs</Link>
     </Compile>
     <Compile Include="Utils.cs" />
+    <Compile Include="WindowsPathRepresentationConverter.cs" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
