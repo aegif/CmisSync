@@ -38,6 +38,7 @@ namespace CmisSync
             : base()
         {
             CmisSync.Lib.Utils.SetUserNotificationListener(this);
+			PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
         }
 
 

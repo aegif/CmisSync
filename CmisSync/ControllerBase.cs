@@ -214,7 +214,6 @@ namespace CmisSync
             this.activitiesManager.ActiveTransmissions.CollectionChanged += delegate(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
                 OnTransmissionListChanged();
             };
-            PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
         }
 
         public List<FileTransmissionEvent> ActiveTransmissions() {
