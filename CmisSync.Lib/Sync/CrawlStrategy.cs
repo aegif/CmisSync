@@ -67,12 +67,15 @@ namespace CmisSync.Lib.Sync
                 if (IsGetDescendantsSupported)
                 {
                     IList<ITree<IFileableCmisObject>> desc;
-                    try{
+                    try
+                    {
                         desc = remoteFolder.GetDescendants(-1);
-                    }catch (DotCMIS.Exceptions.CmisConnectionException ex) {
-                        if(ex.InnerException is System.Xml.XmlException)
+                    }
+                    catch (DotCMIS.Exceptions.CmisConnectionException ex)
+                    {
+                        if (ex.InnerException is System.Xml.XmlException)
                         {
-                            Logger.Warn(String.Format("CMIS::getDescendants() response could not be parsed: {0}", ex.InnerException.Message ));
+                            Logger.Warn(String.Format("CMIS::getDescendants() response could not be parsed: {0}", ex.InnerException.Message));
                         }
                         throw;
                     }
@@ -118,47 +121,47 @@ namespace CmisSync.Lib.Sync
                 IList<string> remoteFiles = new List<string>();
                 IList<string> remoteSubfolders = new List<string>();
                 if (children != null)
-                foreach (ITree<IFileableCmisObject> node in children)
-                {
-                    #region Cmis Folder
-                    if (node.Item is Folder)
+                    foreach (ITree<IFileableCmisObject> node in children)
                     {
-                        // It is a CMIS folder.
-                        IFolder remoteSubFolder = (IFolder)node.Item;
-                        remoteSubfolders.Add(remoteSubFolder.Name);
-                        if (!Utils.IsInvalidFolderName(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                        #region Cmis Folder
+                        if (node.Item is Folder)
                         {
-                            // *** create localFolderName from localFolder and remoteFolderName
-                            string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
+                            // It is a CMIS folder.
+                            IFolder remoteSubFolder = (IFolder)node.Item;
+                            remoteSubfolders.Add(remoteSubFolder.Name);
+                            if (!Utils.IsInvalidFolderName(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
+                            {
+                                // *** create localFolderName from localFolder and remoteFolderName
+                                string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
 
-                            //Check whether local folder exists.
-                            if (Directory.Exists(localSubFolder))
-                            {
-                                CrawlDescendants(remoteSubFolder, node.Children, localSubFolder);
-                            }
-                            else
-                            {
-                                DownloadFolder(remoteSubFolder, localFolder);
+                                //Check whether local folder exists.
                                 if (Directory.Exists(localSubFolder))
                                 {
-                                    RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                    CrawlDescendants(remoteSubFolder, node.Children, localSubFolder);
+                                }
+                                else
+                                {
+                                    DownloadFolder(remoteSubFolder, localFolder);
+                                    if (Directory.Exists(localSubFolder))
+                                    {
+                                        RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                    }
                                 }
                             }
                         }
-                    }
-                    #endregion
+                        #endregion
 
-                    #region Cmis Document
-                    else if (node.Item is Document)
-                    {
-                        // It is a CMIS document.
-                        string remoteFolderPath = remoteFolder.Path;
-                        string remoteDocumentName = ((IDocument)node.Item).Name;
-                        IDocument remoteDocument = (IDocument)node.Item;
-                        SyncDownloadFile(remoteDocument, localFolder, remoteFiles);
+                        #region Cmis Document
+                        else if (node.Item is Document)
+                        {
+                            // It is a CMIS document.
+                            string remoteFolderPath = remoteFolder.Path;
+                            string remoteDocumentName = ((IDocument)node.Item).Name;
+                            IDocument remoteDocument = (IDocument)node.Item;
+                            SyncDownloadFile(remoteDocument, localFolder, remoteFiles);
+                        }
+                        #endregion
                     }
-                    #endregion
-                }
                 CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
                 CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
             }
@@ -219,7 +222,7 @@ namespace CmisSync.Lib.Sync
                         if (Directory.Exists(subFolderItem.LocalPath))   // local path
                         {
                             // Recurse into folder.
-                            CrawlSync(remoteSubFolder, subFolderItem.LocalPath);     
+                            CrawlSync(remoteSubFolder, subFolderItem.LocalPath);
                         }
                         else
                         {
@@ -245,7 +248,7 @@ namespace CmisSync.Lib.Sync
 
                                 // Delete the folder from database.
                                 // *** Remove File
-                                database.RemoveFolder(subFolderItem.LocalPath);      // database query
+                                database.RemoveFolder(subFolderItem);      // database query
 
                                 activityListener.ActivityStopped();
                             }
@@ -451,9 +454,9 @@ namespace CmisSync.Lib.Sync
 
                 try
                 {
-                    if(Utils.IsSymlink(new FileInfo(filePath)))
+                    if (Utils.IsSymlink(new FileInfo(filePath)))
                     {
-                        Logger.Info("Skipping symbolic linked file: "+ filePath);
+                        Logger.Info("Skipping symbolic linked file: " + filePath);
                         return;
                     }
 
@@ -577,9 +580,9 @@ namespace CmisSync.Lib.Sync
                 SleepWhileSuspended();
                 try
                 {
-                    if(Utils.IsSymlink(new DirectoryInfo(localSubFolder)))
+                    if (Utils.IsSymlink(new DirectoryInfo(localSubFolder)))
                     {
-                        Logger.Info("Skipping symbolic link folder: "+ localSubFolder);
+                        Logger.Info("Skipping symbolic link folder: " + localSubFolder);
                         return;
                     }
 
