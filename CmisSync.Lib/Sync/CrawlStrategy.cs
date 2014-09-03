@@ -132,19 +132,24 @@ namespace CmisSync.Lib.Sync
                             if (!Utils.IsInvalidFolderName(remoteSubFolder.Name) && !repoinfo.isPathIgnored(remoteSubFolder.Path))
                             {
                                 // *** create localFolderName from localFolder and remoteFolderName
-                                string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
+                                var syncItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+                                if (null == syncItem)
+                                {
+                                    syncItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoinfo);
+                                }
+                                // string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name); 
 
                                 //Check whether local folder exists.
-                                if (Directory.Exists(localSubFolder))
+                                if (Directory.Exists(syncItem.LocalPath))
                                 {
-                                    CrawlDescendants(remoteSubFolder, node.Children, localSubFolder);
+                                    CrawlDescendants(remoteSubFolder, node.Children, syncItem.LocalPath);
                                 }
                                 else
                                 {
                                     DownloadFolder(remoteSubFolder, localFolder);
-                                    if (Directory.Exists(localSubFolder))
+                                    if (Directory.Exists(syncItem.LocalPath))
                                     {
-                                        RecursiveFolderCopy(remoteSubFolder, localSubFolder);
+                                        RecursiveFolderCopy(remoteSubFolder, syncItem.LocalPath);
                                     }
                                 }
                             }
@@ -216,8 +221,10 @@ namespace CmisSync.Lib.Sync
                         // Logger.Debug("CrawlRemote localFolder:\"" + localFolder + "\" remoteSubFolder.Path:\"" + remoteSubFolder.Path + "\" remoteSubFolder.Name:\"" + remoteSubFolder.Name + "\"");
                         remoteFolders.Add(remoteSubFolder.Name);
                         var subFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
-                        // SyncItem subFolderItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteSubFolder.Name, repoinfo);
-                        string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
+                        if (null == subFolderItem)
+                        {
+                            subFolderItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoinfo);
+                        }
 
                         // Check whether local folder exists.
                         if (Directory.Exists(subFolderItem.LocalPath))   // local path
@@ -270,7 +277,7 @@ namespace CmisSync.Lib.Sync
                                     // *** Add Folder
                                     // database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);       // database query
                                     database.AddFolder(subFolderItem, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
-                                    Logger.Info("Added folder to database: " + localSubFolder);
+                                    Logger.Info("Added folder to database: " + subFolderItem.LocalPath);
 
                                     // Recursive copy of the whole folder.
                                     RecursiveFolderCopy(remoteSubFolder, subFolderItem.LocalPath);
@@ -472,7 +479,7 @@ namespace CmisSync.Lib.Sync
 
                     if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoinfo))
                     {
-                        if (!remoteFiles.Contains(fileName)) //TODO search remote file names by local file names. fileName must convert to remoteFileName by database.
+                        if (!remoteFiles.Contains(fileName))
                         {
                             // This local file is not on the CMIS server now, so
                             // check whether it used invalidFolderNameRegex to exist on server or not.
