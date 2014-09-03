@@ -1414,7 +1414,12 @@ namespace CmisSync.Lib.Sync
                 SleepWhileSuspended();
                 try
                 {
-                    SyncItem syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                    var syncItem = database.GetSyncItemFromLocalPath(filePath);
+                    if (null == syncItem)
+                    {
+                        syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                    }
+
                     Logger.Info("Updating: " + syncItem.LocalPath);
                     using (Stream localfile = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
