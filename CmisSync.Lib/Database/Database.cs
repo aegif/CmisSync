@@ -418,30 +418,6 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// Add a folder to the database.
         /// </summary>
-        public void AddFolder(string path, string objectId, DateTime? serverSideModificationDate)
-        {
-            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
-            // See http://www.sqlite.org/datatype3.html
-            if (null != serverSideModificationDate)
-            {
-                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
-            }
-            path = RemoveLocalPrefix(path);
-
-            string command =
-                @"INSERT OR REPLACE INTO folders (path, id, serverSideModificationDate)
-                    VALUES (@path, @id, @serverSideModificationDate)";
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", path);
-            parameters.Add("id", objectId);
-            parameters.Add("serverSideModificationDate", serverSideModificationDate);
-            ExecuteSQLAction(command, parameters);
-        }
-
-
-        /// <summary>
-        /// Add a folder to the database.
-        /// </summary>
         public void AddFolder(SyncItem item, string objectId, DateTime? serverSideModificationDate)
         {
             // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
@@ -491,35 +467,6 @@ namespace CmisSync.Lib.Database
             parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);
             ExecuteSQLAction("DELETE FROM downloads WHERE path=@path", parameters);
-        }
-
-        /// *** Used for local util method.
-        /// <summary>
-        /// Remove a folder from the database.
-        /// </summary>
-        public void RemoveFolder(string path)
-        {
-            path = RemoveLocalPrefix(path);
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            // Remove folder itself
-            // ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
-            parameters.Add("path", path);
-            ExecuteSQLAction("DELETE FROM folders WHERE path=@path", parameters);
-
-            // Remove all folders under this folder
-            // ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
-            parameters.Clear();
-            parameters.Add("path", path + "/%");
-            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE @path", parameters);
-
-            // Remove all files under this folder
-            // ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
-            parameters.Clear();
-            parameters.Add("path", path + "/%");
-            ExecuteSQLAction("DELETE FROM files WHERE path LIKE @path", parameters);
-
-            //ExecuteSQLAction("DELETE FROM downloads WHERE path LIKE \"" + path + "/%\"", null);
         }
 
 

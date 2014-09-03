@@ -768,7 +768,7 @@ namespace CmisSync.Lib.Sync
 
                 // Create database entry for this folder
                 // *** Add Folder
-                database.AddFolder(localFolder, remoteFolder.Id, remoteFolder.LastModificationDate);
+                database.AddFolder(SyncItemFactory.CreateFromLocalPath(localFolder, repoinfo), remoteFolder.Id, remoteFolder.LastModificationDate);
                 Logger.Info("Added folder to database: " + localFolder);
 
                 // Recurse into folder.
@@ -811,7 +811,7 @@ namespace CmisSync.Lib.Sync
                         remoteSubFolder.DeleteTree(true, null, true);
                         // Delete the folder from database.
                         // *** Remove File
-                        database.RemoveFolder(localSubFolder);
+                        database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(localSubFolder, repoinfo));
                     }
                     catch (Exception)
                     {
@@ -850,7 +850,7 @@ namespace CmisSync.Lib.Sync
                         // Create database entry for this folder.
                         // TODO - Yannick - Add metadata
                         // *** Add Folder
-                        database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
+                        database.AddFolder(SyncItemFactory.CreateFromLocalPath(localSubFolder, repoinfo), remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
                     }
                 }
 
@@ -1438,7 +1438,7 @@ namespace CmisSync.Lib.Sync
                     // Create database entry for this folder
                     // TODO Add metadata
                     // *** Add Folder
-                    database.AddFolder(localFolder, folder.Id, folder.LastModificationDate);
+                    database.AddFolder(SyncItemFactory.CreateFromLocalPath(localFolder, repoinfo), folder.Id, folder.LastModificationDate);
                     Logger.Info("Added folder to database: " + localFolder);
                 }
                 catch (CmisBaseException e)
@@ -1617,7 +1617,7 @@ namespace CmisSync.Lib.Sync
                 if (!Directory.Exists(folderPath))
                 {
                     // *** Remove File
-                    database.RemoveFolder(folderPath);
+                    database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(folderPath, repoinfo));
                 }
 
                 return true;

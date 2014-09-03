@@ -339,7 +339,7 @@ namespace CmisSync.Lib.Sync
                     if(Directory.Exists(savedFolderPath)) {
                         Directory.Delete(savedFolderPath, true);
                         // *** Remove Folder
-                        database.RemoveFolder(savedFolderPath);
+                        database.RemoveFolder(SyncItemFactory.CreateFromRemotePath(savedFolderPath, repoinfo));
                     }
                     Logger.Info("Removed local folder: " + savedFolderPath);
                     return true;

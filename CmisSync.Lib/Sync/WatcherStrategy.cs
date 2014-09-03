@@ -8,6 +8,7 @@ using System.Data.Common;
 
 using DotCMIS;
 using DotCMIS.Client;
+using CmisSync.Lib.Cmis;
 
 
 namespace CmisSync.Lib.Sync
@@ -99,7 +100,7 @@ namespace CmisSync.Lib.Sync
             private void WatcherSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
                 string name = pathname.Substring(localFolder.Length + 1);
-                string remotePathname = Path.Combine(remoteFolder, name).Replace('\\', '/');
+                string remotePathname = CmisUtils.PathCombine(remoteFolder, name);
 
                 IFolder remoteBase = null;
                 if (File.Exists(pathname) || Directory.Exists(pathname))
@@ -250,7 +251,7 @@ namespace CmisSync.Lib.Sync
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
                         // *** Remove File
-                        database.RemoveFolder(pathname);
+                        database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
                     else
                     {
