@@ -418,30 +418,6 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// Add a folder to the database.
         /// </summary>
-        public void AddFolder(string path, string objectId, DateTime? serverSideModificationDate)
-        {
-            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
-            // See http://www.sqlite.org/datatype3.html
-            if (null != serverSideModificationDate)
-            {
-                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime();
-            }
-            path = RemoveLocalPrefix(path);
-
-            string command =
-                @"INSERT OR REPLACE INTO folders (path, id, serverSideModificationDate)
-                    VALUES (@path, @id, @serverSideModificationDate)";
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", path);
-            parameters.Add("id", objectId);
-            parameters.Add("serverSideModificationDate", serverSideModificationDate);
-            ExecuteSQLAction(command, parameters);
-        }
-
-
-        /// <summary>
-        /// Add a folder to the database.
-        /// </summary>
         public void AddFolder(SyncItem item, string objectId, DateTime? serverSideModificationDate)
         {
             // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones

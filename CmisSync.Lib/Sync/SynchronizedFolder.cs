@@ -768,7 +768,7 @@ namespace CmisSync.Lib.Sync
 
                 // Create database entry for this folder
                 // *** Add Folder
-                database.AddFolder(localFolder, remoteFolder.Id, remoteFolder.LastModificationDate);
+                database.AddFolder(SyncItemFactory.CreateFromLocalPath(localFolder, repoinfo), remoteFolder.Id, remoteFolder.LastModificationDate);
                 Logger.Info("Added folder to database: " + localFolder);
 
                 // Recurse into folder.
@@ -850,7 +850,7 @@ namespace CmisSync.Lib.Sync
                         // Create database entry for this folder.
                         // TODO - Yannick - Add metadata
                         // *** Add Folder
-                        database.AddFolder(localSubFolder, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
+                        database.AddFolder(SyncItemFactory.CreateFromLocalPath(localSubFolder, repoinfo), remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
                     }
                 }
 
@@ -1429,7 +1429,7 @@ namespace CmisSync.Lib.Sync
                     // Create database entry for this folder
                     // TODO Add metadata
                     // *** Add Folder
-                    database.AddFolder(localFolder, folder.Id, folder.LastModificationDate);
+                    database.AddFolder(SyncItemFactory.CreateFromLocalPath(localFolder, repoinfo), folder.Id, folder.LastModificationDate);
                     Logger.Info("Added folder to database: " + localFolder);
                 }
                 catch (CmisBaseException e)

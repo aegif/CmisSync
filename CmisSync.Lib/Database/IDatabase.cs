@@ -37,7 +37,7 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// Add a folder to the database.
         /// </summary>
-        void AddFolder(string path, string objectId, DateTime? serverSideModificationDate);
+        void AddFolder(SyncItem item, string objectId, DateTime? serverSideModificationDate);
 
 
         /// <summary>
