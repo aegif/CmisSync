@@ -863,8 +863,13 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool SyncDownloadFile(IDocument remoteDocument, string localFolder, IList<string> remoteFiles = null)
             {
-                var syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.Name, repoinfo);
-                // var syncItem = SyncItemFactory.CreateFromRemotePath(localFolder, remoteDocument.Name);
+                string remotePath = remoteDocument.Paths[0];
+                var syncItem = database.GetSyncItemFromRemotePath(remotePath);
+                if (null == syncItem)
+                {
+                    syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.Name, repoinfo);
+                }
+                //var syncItem = SyncItemFactory.CreateFromRemotePath(localFolder, remoteDocument.Name);
                 string fileName = remoteDocument.Name;
                 string filePath = Path.Combine(localFolder, fileName);
 
@@ -1038,7 +1043,11 @@ namespace CmisSync.Lib.Sync
                 SleepWhileSuspended();
 
                 // **** Get ContentStreamFileName
-                SyncItem syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.ContentStreamFileName, repoinfo);
+                var syncItem = database.GetSyncItemFromRemotePath(remoteDocument.Paths[0]);
+                if (null == syncItem)
+                {
+                    syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.ContentStreamFileName, repoinfo);
+                }
                 // string fileName = remoteDocument.ContentStreamFileName;     // remote
                 Logger.Info("Downloading: " + syncItem.RemoteFileName);
 
@@ -1548,7 +1557,11 @@ namespace CmisSync.Lib.Sync
                 try
                 {
                     // Find the document within the folder.
-                    SyncItem syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                    var syncItem = database.GetSyncItemFromLocalPath(filePath);
+                    if (null == syncItem)
+                    {
+                        syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                    }
                     string fileName = syncItem.RemoteFileName;
                     IDocument document = null;
                     bool found = false;

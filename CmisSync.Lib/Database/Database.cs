@@ -252,14 +252,14 @@ namespace CmisSync.Lib.Database
         /// </summary>
         /// <returns>normalized remote path.</returns>
         /// <param name="path">remote path.</param>
-        private string NormalizeRemotePath(string path)
+        private string RemoveRemotePrefix(string path)
         {
             if (path.StartsWith(remotePathPrefix))
             {
                 // Remove path prefix
                 path = path.Substring(remotePathPrefixSize, path.Length - remotePathPrefixSize);
                 // RemoveLocalPrefix all slashes to forward slash
-                path = path.Replace('\\', '/');
+                // path = path.Replace('\\', '/');
             }
             return path;
         }
@@ -1101,6 +1101,7 @@ namespace CmisSync.Lib.Database
             return SyncItemFactory.CreateFromPaths(pathPrefix, localPath, remotePathPrefix, remotePath);
         }
 
+
         /// <summary>
         /// Gets the syncitem from local path.
         /// </summary>
@@ -1139,7 +1140,44 @@ namespace CmisSync.Lib.Database
             return SyncItemFactory.CreateFromPaths(pathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
         }
 
+        /// <summary>
+        /// Gets the syncitem from local path.
+        /// </summary>
+        /// <returns>syncitem. If the item is not included in the database, return null.</returns>
+        /// <param name="localPath">Local path.</param>
+        public SyncItem GetFolderSyncItemFromLocalPath(string localPath)
+        {
+            string normalizedLocalPath = RemoveLocalPrefix(localPath);
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("localPath", normalizedLocalPath);
+            string path = (string)ExecuteSQLFunction("SELECT path FROM folders WHERE localPath=@localPath", parameters);
+            if (string.IsNullOrEmpty(path))
+            {
+                return null;
+            }
 
+            return SyncItemFactory.CreateFromPaths(pathPrefix, normalizedLocalPath, remotePathPrefix, path);
+        }
+
+        /// <summary>
+        /// Gets the syncitem from remote path.
+        /// </summary>
+        /// <returns>syncitem. If the item is not included in the database, return null.</returns>
+        /// <param name="remotePath">Remote path.</param>
+        public SyncItem GetFolderSyncItemFromRemotePath(string remotePath)
+        {
+            string normalizedRemotePath = RemoveRemotePrefix(remotePath);
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", normalizedRemotePath);
+            string localPath = (string)ExecuteSQLFunction("SELECT localPath FROM folders WHERE path=@path", parameters);
+            if (string.IsNullOrEmpty(localPath))
+            {
+                return null;
+            }
+
+            return SyncItemFactory.CreateFromPaths(pathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
+        }
+            
 
         /// <summary>
         /// Checks whether the database contains a given folder.
