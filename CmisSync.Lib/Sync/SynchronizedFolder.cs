@@ -928,7 +928,7 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         // *** ContainsFile
-                        if (database.ContainsFile(syncItem.LocalPath))
+                        if (database.ContainsFile(syncItem))
                         {
                             // *** GetOperationRetryCounter
                             long retries = database.GetOperationRetryCounter(syncItem.LocalPath, Database.Database.OperationType.DELETE);

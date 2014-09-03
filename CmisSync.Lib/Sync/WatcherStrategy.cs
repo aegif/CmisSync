@@ -133,7 +133,7 @@ namespace CmisSync.Lib.Sync
                         repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Created);
                         repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Changed);
                         // *** ContainsFile
-                        if (database.ContainsFile(pathname))
+                        if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo)))
                         {
                             // *** LocalFileHasChanged
                             if (database.LocalFileHasChanged(pathname))
@@ -215,7 +215,7 @@ namespace CmisSync.Lib.Sync
                 {
                     transaction = database.BeginTransaction();
                     // *** ContainsFiles
-                    if (database.ContainsFile(pathname))
+                    if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo)))
                     {
                         Logger.Info("Removing locally deleted file on server: " + pathname);
                         try

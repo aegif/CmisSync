@@ -1057,19 +1057,6 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// Checks whether the database contains a given file.
         /// </summary>
-        public bool ContainsFile(string path)
-        {
-            string localPath = RemoveLocalPrefix(path);
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("localPath", localPath);
-            return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE localPath=@localPath", parameters);
-        }
-
-
-        /// <summary>
-        /// Checks whether the database contains a given file.
-        /// </summary>
         public bool ContainsFile(SyncItem item)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();

@@ -110,11 +110,6 @@ namespace CmisSync.Lib.Database
         void RecalculateChecksum(string path);
 
         /// <summary>
-        /// Checks whether the database contains a given file.
-        /// </summary>
-        bool ContainsFile(string path);
-
-        /// <summary>
         /// <returns>path field in files table for <paramref name="id"/></returns>
         /// </summary>
         string GetFilePath(string id);

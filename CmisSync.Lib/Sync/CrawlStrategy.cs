@@ -377,7 +377,7 @@ namespace CmisSync.Lib.Sync
                         else
                         {
                             // *** ContainsFile
-                            if (database.ContainsFile(filePath))
+                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo)))
                             {
                                 if (!(bool)remoteDocument.IsVersionSeriesCheckedOut)
                                 {
@@ -464,7 +464,7 @@ namespace CmisSync.Lib.Sync
                             // This local file is not on the CMIS server now, so
                             // check whether it used invalidFolderNameRegex to exist on server or not.
                             // *** ContainsFile
-                            if (database.ContainsFile(filePath))
+                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo)))
                             {
                                 if (database.LocalFileHasChanged(filePath))
                                 {
