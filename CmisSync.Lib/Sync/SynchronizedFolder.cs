@@ -811,7 +811,7 @@ namespace CmisSync.Lib.Sync
                         remoteSubFolder.DeleteTree(true, null, true);
                         // Delete the folder from database.
                         // *** Remove File
-                        database.RemoveFolder(localSubFolder);
+                        database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(localSubFolder, repoinfo));
                     }
                     catch (Exception)
                     {
@@ -1604,7 +1604,7 @@ namespace CmisSync.Lib.Sync
                 if (!Directory.Exists(folderPath))
                 {
                     // *** Remove File
-                    database.RemoveFolder(folderPath);
+                    database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(folderPath, repoinfo));
                 }
 
                 return true;

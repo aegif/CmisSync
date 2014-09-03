@@ -469,35 +469,6 @@ namespace CmisSync.Lib.Database
             ExecuteSQLAction("DELETE FROM downloads WHERE path=@path", parameters);
         }
 
-        /// *** Used for local util method.
-        /// <summary>
-        /// Remove a folder from the database.
-        /// </summary>
-        public void RemoveFolder(string path)
-        {
-            path = RemoveLocalPrefix(path);
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            // Remove folder itself
-            // ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
-            parameters.Add("path", path);
-            ExecuteSQLAction("DELETE FROM folders WHERE path=@path", parameters);
-
-            // Remove all folders under this folder
-            // ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
-            parameters.Clear();
-            parameters.Add("path", path + "/%");
-            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE @path", parameters);
-
-            // Remove all files under this folder
-            // ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
-            parameters.Clear();
-            parameters.Add("path", path + "/%");
-            ExecuteSQLAction("DELETE FROM files WHERE path LIKE @path", parameters);
-
-            //ExecuteSQLAction("DELETE FROM downloads WHERE path LIKE \"" + path + "/%\"", null);
-        }
-
 
         /// <summary>
         /// Remove a folder from the database.

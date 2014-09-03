@@ -251,7 +251,7 @@ namespace CmisSync.Lib.Sync
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
                         // *** Remove File
-                        database.RemoveFolder(pathname);
+                        database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
                     else
                     {

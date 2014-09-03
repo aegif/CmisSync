@@ -53,12 +53,6 @@ namespace CmisSync.Lib.Database
 
 
         /// <summary>
-        /// Remove a folder from the database.
-        /// </summary>
-        void RemoveFolder(string path);
-
-
-        /// <summary>
         /// move a folder from the database.
         /// </summary>
         void MoveFolder(string oldPath, string newPath);
