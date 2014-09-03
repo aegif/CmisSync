@@ -948,13 +948,13 @@ namespace CmisSync.Lib.Sync
                                     database.RemoveFile(syncItem);
 
                                     // *** SetOperationRetryCounter
-                                    database.SetOperationRetryCounter(syncItem.LocalPath, 0, Database.Database.OperationType.DELETE);
+                                    database.SetOperationRetryCounter(syncItem, 0, Database.Database.OperationType.DELETE);
                                 }
                                 catch (CmisBaseException ex)
                                 {
                                     Logger.Warn("Could not delete remote file: ", ex);
                                     // *** SetOperationRetryCounter
-                                    database.SetOperationRetryCounter(syncItem.LocalPath, retries + 1, Database.Database.OperationType.DELETE);
+                                    database.SetOperationRetryCounter(syncItem, retries + 1, Database.Database.OperationType.DELETE);
                                     throw;
                                 }
                             }
@@ -1087,7 +1087,7 @@ namespace CmisSync.Lib.Sync
                         {
                             remoteDate = ((DateTime)remoteDate).ToUniversalTime();
                             // *** GetDLSSModDate
-                            DateTime? serverDate = database.GetDownloadServerSideModificationDate(filepath);    // database query
+                            DateTime? serverDate = database.GetDownloadServerSideModificationDate(syncItem);    // database query
                             if (remoteDate != serverDate)
                             {
                                 File.Delete(tmpfilepath);
@@ -1237,73 +1237,6 @@ namespace CmisSync.Lib.Sync
 
                 // disable the chunk upload
                 return UpdateFile(filePath, remoteDocument);
-
-                //if (database.LocalFileHasChanged(filePath))
-                //{
-                // return UpdateFile(filePath, remoteDocument);
-                //}
-
-                //using (Stream file = File.OpenRead(filePath))
-                //{
-                // file.Position = (long)remoteDocument.ContentStreamLength;
-                // return UploadStreamInTrunk(filePath, file, remoteDocument);
-                //}
-
-                ////return false;
-            }
-
-
-            private bool UploadStreamInTrunk(string filePath, Stream fileStream, IDocument remoteDocument) // TODO Rename UploadStreamInChunk ?
-            {
-                if (repoinfo.ChunkSize <= 0)
-                {
-                    return false;
-                }
-
-                string fileName = remoteDocument.Name;
-                for (long offset = fileStream.Position; offset < fileStream.Length; offset += repoinfo.ChunkSize)
-                {
-                    bool isLastTrunk = false;
-                    if (offset + repoinfo.ChunkSize >= fileStream.Length)
-                    {
-                        isLastTrunk = true;
-                    }
-                    Logger.Debug(String.Format("Uploading next chunk (size={1}) of {0}: {2} of {3} finished({4}%)", fileName, repoinfo.ChunkSize, offset, fileStream.Length, 100 * offset / fileStream.Length));
-                    using (ChunkedStream chunkstream = new ChunkedStream(fileStream, repoinfo.ChunkSize))
-                    {
-                        chunkstream.ChunkPosition = offset;
-
-                        ContentStream contentStream = new ContentStream();
-                        contentStream.FileName = fileName;
-                        contentStream.MimeType = MimeType.GetMIMEType(fileName);
-                        contentStream.Length = repoinfo.ChunkSize;
-                        if (isLastTrunk)
-                        {
-                            contentStream.Length = fileStream.Length - offset;
-                        }
-                        contentStream.Stream = chunkstream;
-                        lock (disposeLock)
-                        {
-                            if (disposed)
-                            {
-                                throw new ObjectDisposedException("Uploading");
-                            }
-                            try
-                            {
-                                remoteDocument.AppendContentStream(contentStream, isLastTrunk);
-                                Logger.Debug("Response of the server: " + offset.ToString());
-                                // *** SetSSModDate
-                                database.SetFileServerSideModificationDate(filePath, remoteDocument.LastModificationDate);
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Fatal("Upload failed: " + ex);
-                                return false;
-                            }
-                        }
-                    }
-                }
-                return true;
             }
 
 
@@ -1519,11 +1452,11 @@ namespace CmisSync.Lib.Sync
 
                             // Update timestamp in database.
                             // *** SetSSModDate
-                            database.SetFileServerSideModificationDate(filePath, ((DateTime)remoteFile.LastModificationDate).ToUniversalTime());
+                            database.SetFileServerSideModificationDate(syncItem, ((DateTime)remoteFile.LastModificationDate).ToUniversalTime());
 
                             // Update checksum
                             // *** RecalculateChecksum
-                            database.RecalculateChecksum(syncItem.LocalPath);
+                            database.RecalculateChecksum(syncItem);
 
                             // TODO Update metadata?
                             Logger.Info("Updated: " + syncItem.LocalPath);

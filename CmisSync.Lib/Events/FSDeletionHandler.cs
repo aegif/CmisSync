@@ -11,7 +11,7 @@ namespace CmisSync.Lib.Events
 {
     public class FSDeletionHandler : SyncEventHandler
     {
-        private IDatabase database;
+        private Database.Database database;
 
         private ISession session;
 
@@ -19,7 +19,7 @@ namespace CmisSync.Lib.Events
 
         private static readonly int FSDELETIONPRIORITY = 100;
 
-        public FSDeletionHandler(IDatabase database, ISession session)
+        public FSDeletionHandler(Database.Database database, ISession session)
         {
             if (database == null)
             {
