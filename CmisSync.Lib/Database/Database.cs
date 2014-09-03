@@ -152,8 +152,8 @@ namespace CmisSync.Lib.Database
                     {
                         string command =
                        @"CREATE TABLE IF NOT EXISTS files (
-                            path TEXT PRIMARY KEY,
-                            localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
+                            path TEXT PRIMARY KEY, /* Remote path of the folder, on the CMIS server side */
+                            localPath TEXT, /* Local path, sometimes different due to local filesystem constraints */
                             id TEXT,
                             serverSideModificationDate DATE,
                             metadata TEXT,
@@ -161,8 +161,8 @@ namespace CmisSync.Lib.Database
                         CREATE INDEX IF NOT EXISTS files_localPath_index ON files (localPath);
                         CREATE INDEX IF NOT EXISTS files_id_index ON files (id);
                         CREATE TABLE IF NOT EXISTS folders (
-                            path TEXT PRIMARY KEY,
-                            localPath TEXT, /* Local path is sometimes different due to local filesystem constraints */
+                            path TEXT PRIMARY KEY, /* Remote path of the folder, on the CMIS server side */
+                            localPath TEXT, /* Local path, sometimes different due to local filesystem constraints */
                             id TEXT,
                             serverSideModificationDate DATE,
                             metadata TEXT,
