@@ -215,7 +215,8 @@ namespace CmisSync.Lib.Sync
                     {
                         // Logger.Debug("CrawlRemote localFolder:\"" + localFolder + "\" remoteSubFolder.Path:\"" + remoteSubFolder.Path + "\" remoteSubFolder.Name:\"" + remoteSubFolder.Name + "\"");
                         remoteFolders.Add(remoteSubFolder.Name);
-                        SyncItem subFolderItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteSubFolder.Name, repoinfo);
+                        var subFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+                        // SyncItem subFolderItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteSubFolder.Name, repoinfo);
                         string localSubFolder = Path.Combine(localFolder, remoteSubFolder.Name);
 
                         // Check whether local folder exists.
@@ -459,8 +460,15 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("Skipping symbolic linked file: " + filePath);
                         return;
                     }
+                        
+                    var item = database.GetSyncItemFromLocalPath(filePath);
+                    if (null == item)
+                    {
+                        item = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                    }
 
-                    string fileName = Path.GetFileName(filePath);
+                    // string fileName = Path.GetFileName(filePath);
+                    string fileName = item.RemoteFileName;
 
                     if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoinfo))
                     {
