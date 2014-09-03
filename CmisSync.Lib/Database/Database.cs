@@ -633,8 +633,8 @@ namespace CmisSync.Lib.Database
             path = RemoveLocalPrefix(path);
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-			parameters.Add("localPath", path);
-			object obj = ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE localPath=@localPath", parameters);
+            parameters.Add("localPath", path);
+            object obj = ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE localPath=@localPath", parameters);
             if (null != obj)
             {
 #if __MonoCS__
@@ -1055,13 +1055,21 @@ namespace CmisSync.Lib.Database
 
 
         /// <summary>
-        /// Checks whether the database contains a given file.
+        /// Checks whether the database contains a given item.
         /// </summary>
         public bool ContainsFile(SyncItem item)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", item.RemoteRelativePath);
-            return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE path=@path", parameters);
+            if (item is RemotePathSyncItem)
+            {
+                parameters.Add("path", item.RemoteRelativePath);
+                return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE path=@path", parameters);
+            }
+            else
+            {
+                parameters.Add("localPath", item.LocalRelativePath);
+                return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE localPath=@localPath", parameters);
+            }
         }
 
 
@@ -1144,6 +1152,26 @@ namespace CmisSync.Lib.Database
             parameters.Add("path", path);
             return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM folders WHERE path=@path", parameters);
         }
+
+        /// <summary>
+        /// Checks whether the database contains a given folder item.
+        /// </summary>
+        public bool ContainsFolder(SyncItem item)
+        {
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            if (item is RemotePathSyncItem)
+            {
+                parameters.Add("path", item.RemoteRelativePath);
+                return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM folders WHERE path=@path", parameters);
+            }
+            else
+            {
+                parameters.Add("localPath", item.LocalRelativePath);
+                return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM folders WHERE localPath=@localPath", parameters);
+            }
+        }
+
 
 
         /// <summary>
