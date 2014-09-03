@@ -324,7 +324,7 @@ namespace CmisSync.Lib.Sync
                             // Check modification date stored in database and download if remote modification date if different.
                             DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
                             // *** GetSSModDate
-                            DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(filePath);
+                            DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo));
 
                             if (lastDatabaseUpdate == null)
                             {
@@ -392,7 +392,7 @@ namespace CmisSync.Lib.Sync
                                     remoteDocument.DeleteAllVersions();
                                     // Remove it from database.
                                     // *** Remove File
-                                    database.RemoveFile(filePath);
+                                    database.RemoveFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo));
                                     activityListener.ActivityStopped();
                                 }
                                 else
@@ -492,7 +492,7 @@ namespace CmisSync.Lib.Sync
 
                                         // Delete file from database.
                                         // *** Remove File
-                                        database.RemoveFile(filePath);
+                                        database.RemoveFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo));
 
                                         repo.OnConflictResolved();
                                         activityListener.ActivityStopped();
@@ -507,7 +507,7 @@ namespace CmisSync.Lib.Sync
 
                                     // Delete file from database.
                                     // *** Remove File
-                                    database.RemoveFile(filePath);
+                                    database.RemoveFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo));
 
                                     activityListener.ActivityStopped();
                                 }

@@ -43,19 +43,19 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// Remove a file from the database.
         /// </summary>
-        void RemoveFile(string path);
+        void RemoveFile(SyncItem item);
 
 
         /// <summary>
         /// move a file from the database.
         /// </summary>
-        void MoveFile(string oldPath, string newPath);
+        void MoveFile(SyncItem oldItem, SyncItem newItem);
 
 
         /// <summary>
         /// move a folder from the database.
         /// </summary>
-        void MoveFolder(string oldPath, string newPath);
+        void MoveFolder(SyncItem oldItem, SyncItem newItem);
 
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// <returns>path field in files table for <paramref name="id"/></returns>
         /// </summary>
-        string GetFilePath(string id);
+        string GetRemoteFilePath(string id);
 
         /// <summary>
         /// Checks whether the database contains a given folder.

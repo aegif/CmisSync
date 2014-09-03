@@ -437,22 +437,6 @@ namespace CmisSync.Lib.Database
             parameters.Add("serverSideModificationDate", serverSideModificationDate);
             ExecuteSQLAction(command, parameters);
         }
-
-        /// <summary>
-        /// Remove a file from the database.
-        /// </summary>
-        public void RemoveFile(string path)
-        {
-            path = RemoveLocalPrefix(path);
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", path);
-            ExecuteSQLAction("DELETE FROM files WHERE path=@path", parameters);
-
-            parameters = new Dictionary<string, object>();
-            parameters.Add("path", path);
-            ExecuteSQLAction("DELETE FROM downloads WHERE path=@path", parameters);
-        }
             
 
         /// <summary>
@@ -477,37 +461,18 @@ namespace CmisSync.Lib.Database
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             // Remove folder itself
-            // ExecuteSQLAction("DELETE FROM folders WHERE path='" + path + "'", null);
             parameters.Add("path", item.RemoteRelativePath);
             ExecuteSQLAction("DELETE FROM folders WHERE path=@path", parameters);
 
             // Remove all folders under this folder
-            // ExecuteSQLAction("DELETE FROM folders WHERE path LIKE '" + path + "/%'", null);
             parameters.Clear();
             parameters.Add("path", item.RemoteRelativePath + "/%");
             ExecuteSQLAction("DELETE FROM folders WHERE path LIKE @path", parameters);
 
             // Remove all files under this folder
-            // ExecuteSQLAction("DELETE FROM files WHERE path LIKE '" + path + "/%'", null);
             parameters.Clear();
             parameters.Add("path", item.RemoteRelativePath + "/%");
             ExecuteSQLAction("DELETE FROM files WHERE path LIKE @path", parameters);
-
-            //ExecuteSQLAction("DELETE FROM downloads WHERE path LIKE \"" + path + "/%\"", null);
-        }
-
-        /// <summary>
-        /// Move a file.
-        /// </summary>
-        public void MoveFile(string oldPath, string newPath)
-        {
-            oldPath = RemoveLocalPrefix(oldPath);
-            newPath = RemoveLocalPrefix(newPath);
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("oldPath", oldPath);
-            parameters.Add("newPath", newPath);
-            ExecuteSQLAction("UPDATE files SET path=@newPath WHERE path=@oldPath", parameters);
         }
 
 
@@ -521,31 +486,6 @@ namespace CmisSync.Lib.Database
             parameters.Add("newPath", newItem.RemoteRelativePath);
             parameters.Add("newLocalPath", newItem.LocalRelativePath);
             ExecuteSQLAction("UPDATE files SET path=@newPath, localPath=@newLocalPath WHERE path=@oldPath", parameters);
-        }
-
-
-        /// <summary>
-        /// Move a folder.
-        /// </summary>
-        public void MoveFolder(string oldPath, string newPath)
-        {
-            oldPath = RemoveLocalPrefix(oldPath);
-            newPath = RemoveLocalPrefix(newPath);
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("oldPath", oldPath);
-            parameters.Add("oldPathLike", oldPath + "/%");
-            parameters.Add("substringIndex", oldPath.Length + 1);
-            parameters.Add("newPath", newPath);
-
-            // Update folder itself
-            ExecuteSQLAction("UPDATE folders SET path=@newPath WHERE path=@oldPath", parameters);
-
-            // UPdate all folders under this folder
-            ExecuteSQLAction("UPDATE folders SET path=@newPath||SUBSTR(path, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
-
-            // Update all files under this folder
-            ExecuteSQLAction("UPDATE files SET path=@newPath||SUBSTR(path, @substringIndex), localPath=@newPath||SUBSTR(localPath, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
         }
 
 
@@ -569,28 +509,6 @@ namespace CmisSync.Lib.Database
 
             // Update all files under this folder
             ExecuteSQLAction("UPDATE files SET path=@newPath||SUBSTR(path, @substringIndex), localPath=@newLocalPath||SUBSTR(localPath, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
-        }
-
-        /// <summary>
-        /// Get the time at which the file was last modified.
-        /// This is the time on the CMIS server side, in UTC. Client-side time does not matter.
-        /// </summary>
-        public DateTime? GetServerSideModificationDate(string path)
-        {
-            path = RemoveLocalPrefix(path);
-
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("localPath", path);
-            object obj = ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE localPath=@localPath", parameters);
-            if (null != obj)
-            {
-#if __MonoCS__
-                obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
-#else
-                obj = ((DateTime)obj).ToUniversalTime();
-#endif
-            }
-            return (DateTime?)obj;
         }
 
 
@@ -1024,7 +942,7 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// <returns>path field in files table for <paramref name="id"/></returns>
         /// </summary>
-        public string GetFilePath(string id)
+        public string GetRemoteFilePath(string id)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("id", id);

@@ -898,8 +898,7 @@ namespace CmisSync.Lib.Sync
                         // Check modification date stored in database and download if remote modification date if different.
                         DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
                         // *** GetSSModDate
-                        DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(syncItem.LocalPath);    // database query
-                        // DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(remotePath);
+                        DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(syncItem);    // database query
 
                         if (lastDatabaseUpdate == null)
                         {
@@ -941,7 +940,7 @@ namespace CmisSync.Lib.Sync
                                     remoteDocument.DeleteAllVersions();
                                     // Remove it from database.
                                     // *** Remove File
-                                    database.RemoveFile(syncItem.LocalPath);      // 
+                                    database.RemoveFile(syncItem);
 
                                     // *** SetOperationRetryCounter
                                     database.SetOperationRetryCounter(syncItem.LocalPath, 0, Database.Database.OperationType.DELETE);

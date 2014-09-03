@@ -216,7 +216,7 @@ namespace CmisSync.Lib.Sync
                 {
                     transaction = database.BeginTransaction();
                     // *** ContainsFiles
-                    if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo)))
+                    if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo))) // FIXME remote or local?
                     {
                         Logger.Info("Removing locally deleted file on server: " + pathname);
                         try
@@ -232,7 +232,7 @@ namespace CmisSync.Lib.Sync
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
                         // *** Remove File
-                        database.RemoveFile(pathname);
+                        database.RemoveFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
                     // *** ContainsFolder
                     else if (database.ContainsFolder(pathname))
