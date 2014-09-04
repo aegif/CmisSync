@@ -606,14 +606,20 @@ namespace CmisSync.Lib.Sync
                     }
 
                     string folderName = Path.GetFileName(localSubFolder);
+                    var syncFolderItem = database.GetFolderSyncItemFromLocalPath(localSubFolder);
+                    if (null == syncFolderItem)
+                    {
+                        syncFolderItem = SyncItemFactory.CreateFromLocalPath(localSubFolder, repoinfo);
+                    }
+
                     if (Utils.WorthSyncing(Path.GetDirectoryName(localSubFolder), folderName, repoinfo))
                     {
-                        if (!remoteFolders.Contains(folderName))
+                        if (!remoteFolders.Contains(syncFolderItem.RemoteFileName))
                         {
                             // This local folder is not on the CMIS server now, so
                             // check whether it used to exist on server or not.
                             // *** ContainsFolder
-                            if (database.ContainsFolder(localSubFolder))
+                            if (database.ContainsFolder(syncFolderItem))
                             {
                                 activityListener.ActivityStarted();
                                 RemoveFolderLocally(localSubFolder);

@@ -774,7 +774,12 @@ namespace CmisSync.Lib.Sync
 
                 // Create database entry for this folder
                 // *** Add Folder
-                database.AddFolder(SyncItemFactory.CreateFromLocalPath(localFolder, repoinfo), remoteFolder.Id, remoteFolder.LastModificationDate);
+                var syncFolderItem = database.GetFolderSyncItemFromRemotePath(remoteFolder.Path);
+                if (null == syncFolderItem)
+                {
+                    syncFolderItem = SyncItemFactory.CreateFromRemotePath(remoteFolder.Path, repoinfo);
+                }
+                database.AddFolder(syncFolderItem, remoteFolder.Id, remoteFolder.LastModificationDate);
                 Logger.Info("Added folder to database: " + localFolder);
 
                 // Recurse into folder.
@@ -789,9 +794,10 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool SyncDownloadFolder(IFolder remoteSubFolder, string localFolder)
             {
+                var syncItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                 string localName = PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name);
-                string remotePathname = remoteSubFolder.Path;
-                string localSubFolder = Path.Combine(localFolder, localName);
+                // string remotePathname = remoteSubFolder.Path;
+                // string localSubFolder = Path.Combine(localFolder, localName);
                 if (!Directory.Exists(localFolder))
                 {
                     // The target folder has been removed/renamed => relaunch sync
@@ -799,13 +805,13 @@ namespace CmisSync.Lib.Sync
                     return false;
                 }
 
-                if (Directory.Exists(localSubFolder))
+                if (Directory.Exists(syncItem.LocalPath))
                 {
                     return true;
                 }
 
                 // *** ContainsFolder
-                if (database.ContainsFolder(localSubFolder))
+                if (database.ContainsFolder(syncItem))
                 {
                     // If there was previously a folder with this name, it means that
                     // the user has deleted it voluntarily, so delete it from server too.
@@ -817,7 +823,7 @@ namespace CmisSync.Lib.Sync
                         remoteSubFolder.DeleteTree(true, null, true);
                         // Delete the folder from database.
                         // *** Remove File
-                        database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(localSubFolder, repoinfo));
+                        database.RemoveFolder(syncItem);
                     }
                     catch (Exception)
                     {
@@ -831,11 +837,11 @@ namespace CmisSync.Lib.Sync
 
                     // If there was previously a file with this name, delete it.
                     // TODO warn if local changes in the file.
-                    if (File.Exists(localSubFolder))
+                    if (File.Exists(syncItem.LocalPath))
                     {
-                        string conflictFilename = Utils.CreateConflictFilename(localSubFolder, repoinfo.User);
-                        Logger.Warn("Local file \"" + localSubFolder + "\" has been renamed to \"" + conflictFilename + "\"");
-                        File.Move(localSubFolder, conflictFilename);
+                        string conflictFilename = Utils.CreateConflictFilename(syncItem.LocalPath, repoinfo.User);
+                        Logger.Warn("Local file \"" + syncItem.LocalPath + "\" has been renamed to \"" + conflictFilename + "\"");
+                        File.Move(syncItem.LocalPath, conflictFilename);
                     }
 
                     // Skip if invalid folder name. See https://github.com/aegif/CmisSync/issues/196
@@ -843,20 +849,20 @@ namespace CmisSync.Lib.Sync
                     {
                         Logger.Info("Skipping download of folder with illegal name: " + localName);
                     }
-                    else if (repoinfo.isPathIgnored(remotePathname))
+                    else if (repoinfo.isPathIgnored(syncItem.RemotePath))
                     {
-                        Logger.Info("Skipping dowload of ignored folder: " + remotePathname);
+                        Logger.Info("Skipping dowload of ignored folder: " + syncItem.RemotePath);
                     }
                     else
                     {
                         // Create local folder.remoteDocument.Name
-                        Logger.Info("Creating local directory: " + localSubFolder);
-                        Directory.CreateDirectory(localSubFolder);
+                        Logger.Info("Creating local directory: " + syncItem.LocalPath);
+                        Directory.CreateDirectory(syncItem.LocalPath);
 
                         // Create database entry for this folder.
                         // TODO - Yannick - Add metadata
                         // *** Add Folder
-                        database.AddFolder(SyncItemFactory.CreateFromLocalPath(localSubFolder, repoinfo), remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
+                        database.AddFolder(syncItem, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
                     }
                 }
 
@@ -1339,30 +1345,35 @@ namespace CmisSync.Lib.Sync
                 IFolder folder = null;
                 try
                 {
+                    var syncItem = database.GetFolderSyncItemFromLocalPath(localFolder);
+                    if (null == syncItem)
+                    {
+                        syncItem = SyncItemFactory.CreateFromLocalPath(localFolder, repoinfo);
+                    }
                     // Create remote folder.
                     Dictionary<string, object> properties = new Dictionary<string, object>();
-                    properties.Add(PropertyIds.Name, Path.GetFileName(localFolder));
+                    properties.Add(PropertyIds.Name, syncItem.RemoteFileName);
                     properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
                     properties.Add(PropertyIds.CreationDate, Directory.GetCreationTime(localFolder));
                     properties.Add(PropertyIds.LastModificationDate, Directory.GetLastWriteTime(localFolder));
                     try
                     {
-                        Logger.Debug(String.Format("Creating remote folder {0} for local folder {1}", Path.GetFileName(localFolder), localFolder));
+                        Logger.Debug(String.Format("Creating remote folder {0} for local folder {1}", syncItem.RemoteFileName, localFolder));
                         folder = remoteBaseFolder.CreateFolder(properties);
-                        Logger.Debug(String.Format("Created remote folder {0}({1}) for local folder {2}", Path.GetFileName(localFolder), folder.Id ,localFolder));
+                        Logger.Debug(String.Format("Created remote folder {0}({1}) for local folder {2}", syncItem.RemoteFileName, folder.Id ,localFolder));
                     }
                     catch (CmisNameConstraintViolationException)
                     {
                         foreach (ICmisObject cmisObject in remoteBaseFolder.GetChildren())
                         {
-                            if (cmisObject.Name == Path.GetFileName(localFolder))
+                            if (cmisObject.Name == syncItem.RemoteFileName)
                             {
                                 folder = cmisObject as IFolder;
                             }
                         }
                         if (folder == null)
                         {
-                            Logger.Warn("Remote file conflict with local folder " + Path.GetFileName(localFolder));
+                            Logger.Warn("Remote file conflict with local folder " + syncItem.LocalFileName);
                             return;
                         }
                     }
@@ -1376,7 +1387,7 @@ namespace CmisSync.Lib.Sync
                     // Create database entry for this folder
                     // TODO Add metadata
                     // *** Add Folder
-                    database.AddFolder(SyncItemFactory.CreateFromLocalPath(localFolder, repoinfo), folder.Id, folder.LastModificationDate);
+                    database.AddFolder(syncItem, folder.Id, folder.LastModificationDate);
                     Logger.Info("Added folder to database: " + localFolder);
                 }
                 catch (CmisBaseException e)
@@ -1560,7 +1571,12 @@ namespace CmisSync.Lib.Sync
                 if (!Directory.Exists(folderPath))
                 {
                     // *** Remove File
-                    database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(folderPath, repoinfo));
+                    var syncFolderItem = database.GetFolderSyncItemFromLocalPath(folderPath);
+                    if (null == syncFolderItem)
+                    {
+                        syncFolderItem = SyncItemFactory.CreateFromLocalPath(folderPath, repoinfo);
+                    }
+                    database.RemoveFolder(syncFolderItem);
                 }
 
                 return true;
