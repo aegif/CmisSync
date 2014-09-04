@@ -325,18 +325,22 @@ namespace CmisSync.Lib.Sync
 
                         remoteFiles.Add(remoteDocumentFileName);
 
-                        string filePath = PathRepresentationConverter.RemoteToLocal(Path.Combine(localFolder, remoteDocumentFileName));
-
-                        if (File.Exists(filePath))
+                        var syncItem = database.GetSyncItemFromRemotePath(remoteDocument.Paths[0]);
+                        if (null == syncItem)
+                        {
+                            syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocumentFileName, repoinfo);
+                            // string filePath = PathRepresentationConverter.RemoteToLocal(Path.Combine(localFolder, remoteDocumentFileName));
+                        }
+                        if (syncItem.ExistsLocal())
                         {
                             // Check modification date stored in database and download if remote modification date if different.
                             DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
                             // *** GetSSModDate
-                            DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo));
+                            DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(syncItem);
 
                             if (lastDatabaseUpdate == null)
                             {
-                                Logger.Info("Downloading file absent from database: " + filePath);
+                                Logger.Info("Downloading file absent from database: " + syncItem.LocalPath);
                                 activityListener.ActivityStarted();
                                 DownloadFile(remoteDocument, localFolder);
                                 activityListener.ActivityStopped();
@@ -348,21 +352,21 @@ namespace CmisSync.Lib.Sync
                                 {
                                     activityListener.ActivityStarted();
 
-                                    if (database.LocalFileHasChanged(filePath))
+                                    if (database.LocalFileHasChanged(syncItem.LocalPath))
                                     {
                                         Logger.Info("Conflict with file: " + remoteDocumentFileName + ", backing up locally modified version and downloading server version");
                                         Logger.Info("- serverSideModificationDate: " + serverSideModificationDate);
                                         Logger.Info("- lastDatabaseUpdate: " + lastDatabaseUpdate);
-                                        Logger.Info("- Checksum in database: " + database.GetChecksum(filePath));
-                                        Logger.Info("- Checksum of local file: " + Database.Database.Checksum(filePath));
+                                        Logger.Info("- Checksum in database: " + database.GetChecksum(syncItem.LocalPath));
+                                        Logger.Info("- Checksum of local file: " + Database.Database.Checksum(syncItem.LocalPath));
 
                                         // Rename locally modified file.
-                                        String newFilePath = Utils.CreateConflictFilename(filePath, repoinfo.User);
-                                        File.Move(filePath, newFilePath);
+                                        String newFilePath = Utils.CreateConflictFilename(syncItem.LocalPath, repoinfo.User);
+                                        File.Move(syncItem.LocalPath, newFilePath);
 
                                         // Download server version
                                         DownloadFile(remoteDocument, localFolder);
-                                        Logger.Info("- Checksum of remote file: " + Database.Database.Checksum(filePath));
+                                        Logger.Info("- Checksum of remote file: " + Database.Database.Checksum(syncItem.LocalPath));
                                         repo.OnConflictResolved();
 
                                         // Notify the user.
@@ -370,7 +374,7 @@ namespace CmisSync.Lib.Sync
                                         string message = String.Format(
                                             // Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
                                             "User {0} modified file \"{1}\" at the same time as you.",
-                                            lastModifiedBy, filePath)
+                                            lastModifiedBy, syncItem.LocalPath)
                                             + "\n\n"
                                             // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
                                             + "Your version has been saved as \"" + newFilePath + "\", please merge your important changes from it and then delete it.";
@@ -390,22 +394,22 @@ namespace CmisSync.Lib.Sync
                         else
                         {
                             // *** ContainsFile
-                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo)))
+                            if (database.ContainsFile(syncItem))
                             {
                                 if (!(bool)remoteDocument.IsVersionSeriesCheckedOut)
                                 {
                                     // File has been recently removed locally, so remove it from server too.
                                     activityListener.ActivityStarted();
-                                    Logger.Info("Removing locally deleted file on server: " + filePath);
+                                    Logger.Info("Removing locally deleted file on server: " + syncItem.RemotePath);
                                     remoteDocument.DeleteAllVersions();
                                     // Remove it from database.
                                     // *** Remove File
-                                    database.RemoveFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo));
+                                    database.RemoveFile(syncItem);
                                     activityListener.ActivityStopped();
                                 }
                                 else
                                 {
-                                    string message = String.Format("File {0} is checked out on the server by another user: {1}", filePath, remoteDocument.CheckinComment);
+                                    string message = String.Format("File {0} is checked out on the server by another user: {1}", syncItem.LocalPath, remoteDocument.CheckinComment);
                                     // throw new IOException("File is checked out on the server");
                                     Logger.Info(message);
                                     Utils.NotifyUser(message);
@@ -414,7 +418,7 @@ namespace CmisSync.Lib.Sync
                             else
                             {
                                 // New remote file, download it.
-                                Logger.Info("New remote file: " + filePath);
+                                Logger.Info("New remote file: " + syncItem.RemotePath);
                                 activityListener.ActivityStarted();
                                 DownloadFile(remoteDocument, localFolder);
                                 activityListener.ActivityStopped();
