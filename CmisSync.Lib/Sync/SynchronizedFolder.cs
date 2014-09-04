@@ -1273,7 +1273,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Upload a single file to the CMIS server.
             /// </summary>
-            private bool UploadFile(string filePath, IFolder remoteFolder)
+            private bool UploadFile(string filePath, IFolder remoteFolder) // TODO make SyncItem
             {
                 SleepWhileSuspended();
 
