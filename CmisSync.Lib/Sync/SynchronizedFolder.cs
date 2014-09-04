@@ -718,11 +718,17 @@ namespace CmisSync.Lib.Sync
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
-                        string localSubFolder = Path.Combine(localFolder, PathRepresentationConverter.RemoteToLocal(cmisObject.Name));
-                        SyncItem syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, cmisObject.Name, repoinfo);
+                        // string localSubFolder = Path.Combine(localFolder, PathRepresentationConverter.RemoteToLocal(cmisObject.Name));
+
+                        var localSubFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+                        if (null == localSubFolderItem)
+                        {
+                            localSubFolderItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, cmisObject.Name, repoinfo);
+                        }
+
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoinfo))
                         {
-                            DownloadDirectory(remoteSubFolder, localSubFolder);
+                            DownloadDirectory(remoteSubFolder, localSubFolderItem.LocalPath);
                         }
                     }
                     else if (cmisObject is DotCMIS.Client.Impl.Document)
