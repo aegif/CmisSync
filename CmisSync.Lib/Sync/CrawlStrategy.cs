@@ -253,6 +253,7 @@ namespace CmisSync.Lib.Sync
 
                                 // Delete the folder from the remote server.
                                 remoteSubFolder.DeleteTree(true, null, true);
+                                Logger.Debug("Remove remote folder tree: " + remoteSubFolder.Path);
 
                                 // Delete the folder from database.
                                 // *** Remove File
@@ -328,7 +329,8 @@ namespace CmisSync.Lib.Sync
                         var syncItem = database.GetSyncItemFromRemotePath(remoteDocument.Paths[0]);
                         if (null == syncItem)
                         {
-                            syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocumentFileName, repoinfo);
+                            syncItem = SyncItemFactory.CreateFromRemotePath(remoteDocument.Paths[0], repoinfo);
+                            // syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocumentFileName, repoinfo);
                             // string filePath = PathRepresentationConverter.RemoteToLocal(Path.Combine(localFolder, remoteDocumentFileName));
                         }
                         if (syncItem.ExistsLocal())
@@ -511,7 +513,7 @@ namespace CmisSync.Lib.Sync
 
                                         // Delete file from database.
                                         // *** Remove File
-                                        database.RemoveFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo));
+                                        database.RemoveFile(item);
 
                                         repo.OnConflictResolved();
                                         activityListener.ActivityStopped();
@@ -526,7 +528,7 @@ namespace CmisSync.Lib.Sync
 
                                     // Delete file from database.
                                     // *** Remove File
-                                    database.RemoveFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo));
+                                    database.RemoveFile(item);
 
                                     activityListener.ActivityStopped();
                                 }

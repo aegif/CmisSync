@@ -723,7 +723,8 @@ namespace CmisSync.Lib.Sync
                         var localSubFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                         if (null == localSubFolderItem)
                         {
-                            localSubFolderItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, cmisObject.Name, repoinfo);
+                            localSubFolderItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoinfo);
+                            // localSubFolderItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, cmisObject.Name, repoinfo);
                         }
 
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoinfo))
@@ -879,7 +880,8 @@ namespace CmisSync.Lib.Sync
                 var syncItem = database.GetSyncItemFromRemotePath(remotePath);
                 if (null == syncItem)
                 {
-                    syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.Name, repoinfo);
+                    syncItem = SyncItemFactory.CreateFromRemotePath(remotePath, repoinfo);
+                    // syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.Name, repoinfo);
                 }
                 //var syncItem = SyncItemFactory.CreateFromRemotePath(localFolder, remoteDocument.Name);
                 string fileName = remoteDocument.Name;
@@ -1057,7 +1059,8 @@ namespace CmisSync.Lib.Sync
                 var syncItem = database.GetSyncItemFromRemotePath(remoteDocument.Paths[0]);
                 if (null == syncItem)
                 {
-                    syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.ContentStreamFileName, repoinfo);
+                    syncItem = SyncItemFactory.CreateFromRemotePath(remoteDocument.Paths[0], repoinfo);
+                    // syncItem = SyncItemFactory.CreateFromLocalFolderAndRemoteName(localFolder, remoteDocument.ContentStreamFileName, repoinfo);
                 }
                 // string fileName = remoteDocument.ContentStreamFileName;     // remote
                 Logger.Info("Downloading: " + syncItem.RemoteFileName);
@@ -1283,7 +1286,11 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
 
-                SyncItem syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                var syncItem = database.GetSyncItemFromLocalPath(filePath);
+                if (null == syncItem)
+                {
+                    syncItem = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                }
                 Logger.Info("Uploading: " + syncItem.LocalPath);
 
                 try
