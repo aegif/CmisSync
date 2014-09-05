@@ -307,7 +307,7 @@ namespace CmisSync.Lib.Sync
                         // For instance in FileNet it is not usual to have a document where
                         // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
                         string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
-                        //Logger.Debug("CrawlRemote doc: " + localFolder + Path.DirectorySeparatorChar.ToString() + remoteDocumentFileName);
+                        //Logger.Debug("CrawlRemote doc: " + localFolder + CmisUtils.CMIS_FILE_SEPARATOR + remoteDocumentFileName);
 
                         // If this file does not have a filename, ignore it.
                         // It sometimes happen on IBM P8 CMIS server, not sure why.
