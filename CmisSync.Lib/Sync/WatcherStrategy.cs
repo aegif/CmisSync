@@ -133,10 +133,9 @@ namespace CmisSync.Lib.Sync
                         bool success = false;
                         repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Created);
                         repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Changed);
-                        // *** ContainsFile
+
                         if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo)))
                         {
-                            // *** LocalFileHasChanged
                             if (database.LocalFileHasChanged(pathname))
                             {
                                 success = UpdateFile(pathname, remoteBase);
@@ -177,7 +176,6 @@ namespace CmisSync.Lib.Sync
                             return;
                         }
 
-                        // *** ContainsFolder
                         if (database.ContainsFolder(pathname))
                         {
                             Logger.Info(String.Format("Database exists for {0}, ignore for the update action", pathname));
@@ -215,7 +213,7 @@ namespace CmisSync.Lib.Sync
                 try
                 {
                     transaction = database.BeginTransaction();
-                    // *** ContainsFiles
+
                     if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo))) // FIXME remote or local?
                     {
                         Logger.Info("Removing locally deleted file on server: " + pathname);
@@ -231,10 +229,8 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
-                        // *** Remove File
                         database.RemoveFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
-                    // *** ContainsFolder
                     else if (database.ContainsFolder(pathname))
                     {
                         Logger.Info("Removing locally deleted folder on server: " + pathname);
@@ -250,7 +246,6 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
-                        // *** Remove File
                         database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
                     else
