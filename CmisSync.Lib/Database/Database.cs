@@ -909,11 +909,11 @@ namespace CmisSync.Lib.Database
         /// </summary>
         public bool ContainsFolder(string path)
         {
-            path = RemoveLocalPrefix(path);
+            string localPath = RemoveLocalPrefix(path);
 
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("path", path);
-            return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM folders WHERE path=@path", parameters);
+            parameters.Add("localPath", localPath);
+            return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM folders WHERE localPath=@localPath", parameters);
         }
 
         /// <summary>
