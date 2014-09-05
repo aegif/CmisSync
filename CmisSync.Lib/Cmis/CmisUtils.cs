@@ -45,7 +45,7 @@ namespace CmisSync.Lib.Cmis
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
 
-        public static string CMIS_FILE_SEPARATOR = "/";
+        public static char CMIS_FILE_SEPARATOR = '/';
 
 
         /// <summary>

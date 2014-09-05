@@ -129,7 +129,7 @@ namespace CmisSync.Lib
             string localRootRelative = localFolder;
             if (localFolder.StartsWith(this.localRoot))
             {
-                localRootRelative = localFolder.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+                localRootRelative = localFolder.Substring(localRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
             this.remotePath = CmisUtils.PathCombine(PathRepresentationConverter.LocalToRemote(localRootRelative), remoteRelativePath);
         }
@@ -203,7 +203,7 @@ namespace CmisSync.Lib
             this.remotePath = remotePath;
             if (remotePath.StartsWith(this.remoteRoot))
             {
-                this.remotePath = remotePath.Substring(this.remoteRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+                this.remotePath = remotePath.Substring(this.remoteRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
             this.localPath = PathRepresentationConverter.RemoteToLocal(this.remotePath);
         }
@@ -216,12 +216,12 @@ namespace CmisSync.Lib
             this.remotePath = Path.Combine(remoteFolder, PathRepresentationConverter.LocalToRemote(localRelativePath));
             if (this.remotePath.StartsWith(this.remoteRoot))
             {
-                this.remotePath = this.remotePath.Substring(this.localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+                this.remotePath = this.remotePath.Substring(this.localRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
             string remoteRootRelative = remoteFolder;
             if (remoteFolder.StartsWith(this.remoteRoot))
             {
-                remoteRootRelative = remoteFolder.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
+                remoteRootRelative = remoteFolder.Substring(localRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
             this.localPath = Path.Combine(PathRepresentationConverter.RemoteToLocal(remoteRootRelative), localRelativePath);
         }
