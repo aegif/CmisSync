@@ -136,7 +136,7 @@ namespace CmisSync.Lib.Database
                 using (var command = new SQLiteCommand(connection))
                 {
                     // Fill missing columns of all files.
-                    command.CommandText = "SELECT path FROM files WHERE id IS NULL;";
+                    command.CommandText = "SELECT path FROM files WHERE id IS NULL or localPath IS NULL;";
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -144,11 +144,14 @@ namespace CmisSync.Lib.Database
                             // Example: "old-db-1.0.13/テスト・テスト/テスト用ファイル.pptx"
                             string legacyPath = reader["path"].ToString();
 
+                            // Example:  テスト・テスト/テスト用ファイル.pptx
+                            string remoteRelativePath = legacyPath.Substring(localRootFolder.Length + 1);
+
                             // Example: /Sites/cmissync/documentLibrary/tests/テスト・テスト/テスト用ファイル.pptx
-                            string remotePath = remoteRootFolder + legacyPath.Substring(localRootFolder.Length);
+                            string remotePath = remoteRootFolder + "/" + remoteRelativePath;
 
                             // Example: テスト・テスト/テスト用ファイル.pptx
-                            string localPath = legacyPath.Substring(localRootFolder.Length + 1);
+                            string localPath = PathRepresentationConverter.RemoteToLocal(legacyPath.Substring(localRootFolder.Length + 1));
 
                             string id = null;
                             try
@@ -166,21 +169,23 @@ namespace CmisSync.Lib.Database
 
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("@id", id);
+                            parameters.Add("@remotePath", remoteRelativePath);
                             parameters.Add("@localPath", localPath);
                             parameters.Add("@path", legacyPath);
-                            ExecuteSQLAction(connection, "UPDATE files SET id = @id, localPath = @localPath WHERE path = @path;", parameters);
+                            ExecuteSQLAction(connection, "UPDATE files SET id = @id, path = @remotePath, localPath = @localPath WHERE path = @path;", parameters);
                         }
                     }
 
                     // Fill missing columns of all folders.
-                    command.CommandText = "SELECT path FROM folders WHERE id IS NULL;";
+                    command.CommandText = "SELECT path FROM folders WHERE id IS NULL or localPath IS NULL;";
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
                             string legacyPath = reader["path"].ToString();
-                            string remotePath = remoteRootFolder + legacyPath.Substring(localRootFolder.Length);
-                            string localPath = legacyPath.Substring(localRootFolder.Length + 1);
+                            string remoteRelativePath = legacyPath.Substring(localRootFolder.Length + 1);
+                            string remotePath = remoteRootFolder + "/" + remoteRelativePath;
+                            string localPath = PathRepresentationConverter.RemoteToLocal(legacyPath.Substring(localRootFolder.Length + 1));
                             string id = null;
                             try
                             {
@@ -197,9 +202,10 @@ namespace CmisSync.Lib.Database
 
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("@id", id);
+                            parameters.Add("@remotePath", remoteRelativePath);
                             parameters.Add("@localPath", localPath);
                             parameters.Add("@path", legacyPath);
-                            ExecuteSQLAction(connection, "UPDATE folders SET id = @id, localPath = @localPath WHERE path = @path;", parameters);
+                            ExecuteSQLAction(connection, "UPDATE folders SET id = @id, path = @remotePath, localPath = @localPath WHERE path = @path;", parameters);
                         }
                     }
 
