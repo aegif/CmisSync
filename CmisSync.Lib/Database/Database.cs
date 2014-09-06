@@ -34,7 +34,7 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// The current database schema version.
         /// </summary>
-        public const int SchemaVersion = 2;
+        public const int SchemaVersion = 3;
 
         /// <summary>
         /// Log.

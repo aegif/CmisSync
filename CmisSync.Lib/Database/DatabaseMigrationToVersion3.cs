@@ -23,17 +23,17 @@ namespace CmisSync.Lib.Database
     #endif
 
     /// <summary>
-    /// Migrate from database version 0 to version 2.
+    /// Migrate from database version 0,2 to version 3.
     /// </summary>
-    public class DatabaseMigrationToVersion2 : DatabaseMigrationBase
+    public class DatabaseMigrationToVersion3 : DatabaseMigrationBase
     {
         /// <summary>
         /// Log.
         /// </summary>
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(DatabaseMigrationToVersion2));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(DatabaseMigrationToVersion3));
 
         /// <summary>
-        /// Migrate from database version 0 to version 2.
+        /// Migrate from database version 0,2 to version 3.
         /// </summary>
         /// <param name="filePath">File path.</param>
         /// <param name="connection">Connection.</param>
