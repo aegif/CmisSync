@@ -165,6 +165,7 @@ namespace CmisSync {
             };
 
             Utils.SetUserNotificationListener (this);
+            PathRepresentationConverter.SetConverter(new OSXPathRepresentationConverter());
         }
 
         private void UpdateFileStatus(FileTransmissionEvent transmission, TransmissionProgressEventArgs e)

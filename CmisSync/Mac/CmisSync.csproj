@@ -161,6 +161,7 @@
       <DependentUpon>SetupSubSetting.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI.cs" />
+    <Compile Include="OSXPathRepresentationConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
