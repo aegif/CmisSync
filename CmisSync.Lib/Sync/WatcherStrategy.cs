@@ -8,6 +8,7 @@ using System.Data.Common;
 
 using DotCMIS;
 using DotCMIS.Client;
+using CmisSync.Lib.Cmis;
 
 
 namespace CmisSync.Lib.Sync
@@ -19,6 +20,11 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder
         {
+            /// <summary>
+            /// Watchers the sync.
+            /// </summary>
+            /// <param name="remoteFolder">Remote folder.</param>
+            /// <param name="localFolder">Local folder.</param>
             private void WatcherSync(string remoteFolder, string localFolder)
             {
                 Logger.Debug(remoteFolder + " : " + localFolder);
@@ -85,10 +91,16 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
+            /// <summary>
+            /// Watchers the sync update.
+            /// </summary>
+            /// <param name="remoteFolder">Remote folder.</param>
+            /// <param name="localFolder">Local folder.</param>
+            /// <param name="pathname">Pathname.</param>
             private void WatcherSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
                 string name = pathname.Substring(localFolder.Length + 1);
-                string remotePathname = Path.Combine(remoteFolder, name).Replace('\\', '/');
+                string remotePathname = CmisUtils.PathCombine(remoteFolder, name);
 
                 IFolder remoteBase = null;
                 if (File.Exists(pathname) || Directory.Exists(pathname))
@@ -121,7 +133,8 @@ namespace CmisSync.Lib.Sync
                         bool success = false;
                         repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Created);
                         repo.Watcher.RemoveChange(pathname, Watcher.ChangeTypes.Changed);
-                        if (database.ContainsFile(pathname))
+
+                        if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo)))
                         {
                             if (database.LocalFileHasChanged(pathname))
                             {
@@ -186,6 +199,12 @@ namespace CmisSync.Lib.Sync
                 Logger.Info(String.Format("The file/folder {0} is deleted, ignore for the update action", pathname));
             }
 
+            /// <summary>
+            /// Watchers the sync delete.
+            /// </summary>
+            /// <param name="remoteFolder">Remote folder.</param>
+            /// <param name="localFolder">Local folder.</param>
+            /// <param name="pathname">Pathname.</param>
             private void WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
                 string name = pathname.Substring(localFolder.Length + 1);
@@ -194,7 +213,8 @@ namespace CmisSync.Lib.Sync
                 try
                 {
                     transaction = database.BeginTransaction();
-                    if (database.ContainsFile(pathname))
+
+                    if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo))) // FIXME remote or local?
                     {
                         Logger.Info("Removing locally deleted file on server: " + pathname);
                         try
@@ -209,7 +229,7 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
-                        database.RemoveFile(pathname);
+                        database.RemoveFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
                     else if (database.ContainsFolder(pathname))
                     {
@@ -226,7 +246,7 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Warn(String.Format("Exception when operate remote {0}: ", remoteName), e);
                         }
-                        database.RemoveFolder(pathname);
+                        database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
                     else
                     {
