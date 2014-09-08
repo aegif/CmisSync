@@ -73,7 +73,10 @@ namespace CmisSync.Lib.Database
                     switch (dbVersion)
                     {
                         case 0:
-                            new DatabaseMigrationToVersion2().Migrate(syncFolder, connection, currentDbVersion);
+                            new DatabaseMigrationToVersion3().Migrate(syncFolder, connection, currentDbVersion);
+                            break;
+                        case 2: // Need to fill the localPath value.
+                            new DatabaseMigrationToVersion3().Migrate(syncFolder, connection, currentDbVersion);
                             break;
                         default:
                             throw new NotSupportedException(String.Format("Unexpected database version: {0}.", dbVersion));
