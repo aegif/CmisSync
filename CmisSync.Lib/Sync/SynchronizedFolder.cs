@@ -1287,9 +1287,9 @@ namespace CmisSync.Lib.Sync
                     properties.Add(PropertyIds.LastModificationDate, File.GetLastWriteTime(syncItem.LocalPath));
 
                     // Prepare content stream
-                    using (Stream file = File.Open(syncItem.LocalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))      // 
+                    using (Stream file = File.Open(syncItem.LocalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     using (SHA1 hashAlg = new SHA1Managed())
-                    using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))        // 
+                    using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Read))
                     {
                         ContentStream contentStream = new ContentStream();
                         contentStream.FileName = remoteFileName;
@@ -1297,7 +1297,7 @@ namespace CmisSync.Lib.Sync
                         contentStream.Length = file.Length;
                         contentStream.Stream = hashstream;
 
-                        Logger.Debug("Upload Start: " + filePath + " as " + remoteFolder.Path + Path.PathSeparator.ToString() + fileName);
+                        Logger.Debug("Upload Start: " + filePath + " as " + remoteFolder.Path + Path.PathSeparator.ToString() + remoteFileName);
                         remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                         Logger.Debug("remoteFolder.CreateDocument finished.");
                         filehash = hashAlg.Hash;
