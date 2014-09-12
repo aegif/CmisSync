@@ -12,7 +12,6 @@ SOURCES =  \
 	Cmis/BaseException.cs \
 	Cmis/PermissionDeniedException.cs \
 	Cmis/CmisUtils.cs \
-	Cmis/IDatabase.cs \
 	Cmis/Database.cs \
 	Cmis/ServerNotFoundException.cs \
 	Cmis/MimeType.cs \
