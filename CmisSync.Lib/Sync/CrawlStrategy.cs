@@ -249,8 +249,23 @@ namespace CmisSync.Lib.Sync
                                 activityListener.ActivityStarted();
 
                                 // Delete the folder from the remote server.
-                                remoteSubFolder.DeleteTree(true, null, true);
-                                Logger.Debug("Remove remote folder tree: " + remoteSubFolder.Path);
+                                try
+                                {
+                                    Logger.Debug("Removing remote folder tree: " + remoteSubFolder.Path);
+                                    IList<string> failedIDs = remoteSubFolder.DeleteTree(true, null, true);
+                                    if (failedIDs.Count != 0)
+                                    {
+                                        Logger.Error("Failed to completely delete remote folder " + remoteSubFolder.Path);
+                                        // TODO Should we retry? Maybe at least once, as a manual recursion instead of a DeleteTree.
+                                    }
+                                }
+                                catch (CmisPermissionDeniedException e)
+                                {
+                                    // We don't have the permission to delete this folder. Warn and recreate it.
+                                    Utils.NotifyUser("You don't have the necessary permissions to delete folder " + remoteSubFolder.Path
+                                        + "\nIf you feel you should be able to delete it, please contact your server administrator");
+                                    DownloadFolder(remoteSubFolder, localFolder);
+                                }
 
                                 // Delete the folder from database.
                                 database.RemoveFolder(subFolderItem);
