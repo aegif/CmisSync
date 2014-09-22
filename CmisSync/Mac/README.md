@@ -30,7 +30,7 @@ Build log4net (`<mdtool path>` is often `/Applications/MonoDevelop.app/Contents/
 $ <mdtool path>/mdtool build Extras/log4net-1.2.11/src/log4net.vs2010.csproj
 ```
 
-Copy MonoMac.dll from MonoDevelop AddIns folder:
+Copy MonoMac.dll from MonoDevelop AddIns folder (often `~/.config/MonoDevelop/addins/`):
 ```bash
 $ cp <your MonoDevelop AddIns folder>/MonoMac.dll Extras
 ```
