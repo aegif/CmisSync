@@ -25,7 +25,7 @@ Install <tt>automake</tt>, <tt>libtool</tt> and <tt>intltool</tt> using <tt>MacP
 $ sudo port install automake intltool libtool
 ```
 
-Build log4net:
+Build log4net (`<mdtool path>` is often `/Applications/MonoDevelop.app/Contents/MacOS/`):
 ```bash
 $ <mdtool path>/mdtool build Extras/log4net-1.2.11/src/log4net.vs2010.csproj
 ```
