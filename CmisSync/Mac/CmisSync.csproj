@@ -17,6 +17,7 @@
     <ReleaseVersion>
     </ReleaseVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
+    <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>

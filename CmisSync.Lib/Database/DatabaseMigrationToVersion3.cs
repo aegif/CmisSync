@@ -113,11 +113,12 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// Fill the data which is missing due to new columns in the database.
         /// </summary>
-        /// <param name="dbFilePath">Db file path.</param>
-        /// <param name="folderName">Folder name.</param>
         public static void FillMissingData(Config.SyncConfig.Folder syncFolder, SQLiteConnection connection)
         {
-            Utils.NotifyUser("CmisSync needs to upgrade its own local data for folder \"" + syncFolder.RepositoryId + "\". Please stay on the network for a few minutes.");
+            Utils.NotifyUser("CmisSync needs to upgrade its own local data for folder \"" + syncFolder.RepositoryId +
+                "\".\nPlease stay on the network during that time, sorry for the inconvenience." +
+                "\nIt can take up to HOURS if you have many files, thank you for your patience." +
+                "\nA notification will pop up when it is done.");
 
             var session = Auth.Auth.GetCmisSession(
                               ((Uri)syncFolder.RemoteUrl).ToString(),
@@ -127,7 +128,6 @@ namespace CmisSync.Lib.Database
 
             var filters = new HashSet<string>();
             filters.Add("cmis:objectId");
-            //session.DefaultContext = session.CreateOperationContext(filters, false, true, false, DotCMIS.Enums.IncludeRelationshipsFlag.None, null, true, null, true, 100);
             string remoteRootFolder = syncFolder.RemotePath;
             string localRootFolder = syncFolder.LocalPath.Substring(ConfigManager.CurrentConfig.FoldersPath.Length + 1);
 
