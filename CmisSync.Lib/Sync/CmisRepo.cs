@@ -60,14 +60,6 @@ namespace CmisSync.Lib.Sync
             base.Resume();
         }
 
-        /// <summary>
-        /// Some file activity has been detected, add to queue
-        /// </summary>
-        public void OnFileActivity(object sender, FileSystemEventArgs args)
-        {
-            synchronizedFolder.Queue.AddEvent(new FSEvent(args.ChangeType, args.FullPath));
-        }
-
 
         /// <summary>
         /// Dispose pattern implementation.
