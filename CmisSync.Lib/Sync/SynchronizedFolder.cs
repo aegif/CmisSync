@@ -24,7 +24,6 @@ namespace CmisSync.Lib.Sync
         // Log.
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisRepo));
 
-
         /// <summary>
         /// Synchronization with a particular CMIS folder.
         /// </summary>
@@ -35,25 +34,21 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private static readonly ILog Logger = LogManager.GetLogger(typeof(SynchronizedFolder));
 
-
             /// <summary>
             /// Interval for which sync will wait while paused before retrying sync.
             /// </summary>
             private static readonly int SYNC_SUSPEND_SLEEP_INTERVAL = 1 * 1000; //five seconds
-
 
             /// <summary>
             /// An object for locking the sync method (one thread at a time can run sync).
             /// </summary>
             private Object syncLock = new Object();
 
-
             /// <summary>
             /// Whether sync is bidirectional or only from server to client.
             /// TODO make it a CMIS folder - specific setting
             /// </summary>
             private bool BIDIRECTIONAL = true;
-
 
             /// <summary>
             /// At which degree the repository supports Change Logs.
@@ -80,19 +75,16 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool IsPropertyChangesSupported = false;
 
-
             /// <summary>
             /// Session to the CMIS repository.
             /// </summary>
             private ISession session;
-
 
             /// <summary>
             /// Path of the root in the remote repository.
             /// Example: "/User Homes/nicolas.raoul/demos"
             /// </summary>
             private string remoteFolderPath;
-
 
             /// <summary>
             /// Syncing lock.
@@ -101,79 +93,66 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool syncing;
 
-
             /// <summary>
             /// Whether sync is actually being in pause right now.
             /// This is different from CmisRepo.Status, which means "paused, or will be paused as soon as possible"
             /// </summary>
             private bool suspended = false;
 
-
             /// <summary>
             /// Listener we inform about activity (used by spinner).
             /// </summary>
             private IActivityListener activityListener;
-
 
             /// <summary>
             /// Parameters to use for all CMIS requests.
             /// </summary>
             private Dictionary<string, string> cmisParameters;
 
-
             /// <summary>
             /// Track whether <c>Dispose</c> has been called.
             /// </summary>
             private bool disposed = false;
-
 
             /// <summary>
             /// Track whether <c>Dispose</c> has been called.
             /// </summary>
             private Object disposeLock = new Object();
 
-
             /// <summary>
             /// Database to cache remote information from the CMIS server.
             /// </summary>
             private Database.Database database;
-
 
             /// <summary>
             /// Configuration of the CmisSync synchronized folder, as defined in the XML configuration file.
             /// </summary>
             private RepoInfo repoinfo;
 
-
             /// <summary>
             /// Link to parent object.
             /// </summary>
             private RepoBase repo;
 
-            
             /// <summary>
             /// EventQueue
             /// </summary>
             public SyncEventQueue Queue {get; private set;}
-            
 
             /// <summary>
             /// Set for first sync.
             /// </summary>
             private bool firstSync = false;
 
-
             /// <summary>
             /// Background worker for sync.
             /// </summary>
             private BackgroundWorker syncWorker;
 
-
             /// <summary>
             /// Event to notify that the sync has completed.
             /// </summary>
             private AutoResetEvent autoResetEvent = new AutoResetEvent(true);
-
 
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
@@ -241,7 +220,6 @@ namespace CmisSync.Lib.Sync
                 );
             }
 
-
             /// <summary>
             /// This method is called, every time the config changes
             /// </summary>
@@ -272,7 +250,6 @@ namespace CmisSync.Lib.Sync
                 cmisParameters[SessionParameter.ReadTimeout] = "60000"; // One Minute
             }
 
-
             /// <summary>
             ///  Update Settings.
             /// </summary>
@@ -296,7 +273,6 @@ namespace CmisSync.Lib.Sync
                 Dispose(false);
             }
 
-
             /// <summary>
             /// Implement IDisposable interface. 
             /// </summary>
@@ -305,7 +281,6 @@ namespace CmisSync.Lib.Sync
                 Dispose(true);
                 GC.SuppressFinalize(this);
             }
-
 
             /// <summary>
             /// Dispose pattern implementation.
@@ -325,7 +300,6 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
-
             /// <summary>
             /// Resets all the failed upload to zero.
             /// </summary>
@@ -333,7 +307,6 @@ namespace CmisSync.Lib.Sync
             {
                 database.DeleteAllFailedOperations();
             }
-
 
             /// <summary>
             /// Connect to the CMIS repository.
@@ -385,7 +358,6 @@ namespace CmisSync.Lib.Sync
                     session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
             }
 
-
             /// <summary>
             /// Whether this folder's synchronization is running right now.
             /// </summary>
@@ -393,7 +365,6 @@ namespace CmisSync.Lib.Sync
             {
                 return this.syncing;
             }
-
 
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
@@ -403,7 +374,6 @@ namespace CmisSync.Lib.Sync
                 return syncWorker.IsBusy;
             }
 
-
             /// <summary>
             /// Whether this folder's synchronization is suspended right now.
             /// </summary>
@@ -411,7 +381,6 @@ namespace CmisSync.Lib.Sync
             {
                 return this.suspended;
             }
-
 
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
@@ -421,12 +390,10 @@ namespace CmisSync.Lib.Sync
                 Sync(true);
             }
 
-            
             /// <summary>
             /// Track whether a full sync is done
             /// </summary>
             private bool syncFull = false;
-
 
             /// <summary>
             /// Forces the full sync independent of FS events or Remote events.
@@ -1603,10 +1570,10 @@ namespace CmisSync.Lib.Sync
                 return metadata;
             }
 
-            /// <summary>
+/*          /// <summary>
             /// Rename a file remotely.
             /// </summary>
-/*            private bool RenameFile(string directory, string newFilename, IDocument remoteFile)
+            private bool RenameFile(string directory, string newFilename, IDocument remoteFile)
             {
                 SleepWhileSuspended();
 

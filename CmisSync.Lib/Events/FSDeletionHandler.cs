@@ -9,6 +9,7 @@ using CmisSync.Lib.Database;
 
 namespace CmisSync.Lib.Events
 {
+    /// <summary></summary>
     public class FSDeletionHandler : SyncEventHandler
     {
         private Database.Database database;
@@ -19,6 +20,9 @@ namespace CmisSync.Lib.Events
 
         private static readonly int FSDELETIONPRIORITY = 100;
 
+        /// <summary></summary>
+        /// <param name="database"></param>
+        /// <param name="session"></param>
         public FSDeletionHandler(Database.Database database, ISession session)
         {
             if (database == null)
@@ -33,6 +37,9 @@ namespace CmisSync.Lib.Events
             this.session = session;
         }
 
+        /// <summary></summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         public override bool Handle(ISyncEvent e)
         {
             if(!(e is FSEvent))
@@ -47,6 +54,7 @@ namespace CmisSync.Lib.Events
             return true;
         }
 
+        /// <summary></summary>
         public override int Priority
         {
             get {return FSDELETIONPRIORITY;}

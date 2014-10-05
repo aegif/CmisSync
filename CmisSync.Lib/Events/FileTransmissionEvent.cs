@@ -35,6 +35,9 @@ namespace CmisSync.Lib.Events
         /// </value>
         public string CachePath { get; private set; }
 
+        /// <summary></summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public delegate void TransmissionEventHandler(object sender, TransmissionProgressEventArgs e);
 
         /// <summary>

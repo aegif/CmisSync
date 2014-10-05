@@ -5,10 +5,10 @@ using System.Text;
 
 namespace CmisSync.Auth
 {
-    /// <summary>
+/*  /// <summary>
     /// CmisPassword.
     /// </summary>
-    /*public class CmisPassword
+    public class CmisPassword
     {
         private string password = null;
 

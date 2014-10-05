@@ -6,6 +6,7 @@ using log4net;
 
 namespace CmisSync.Lib.Events
 {
+    /// <summary></summary>
     public class SyncEventQueue : IDisposable {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncEventQueue));
 
@@ -17,9 +18,7 @@ namespace CmisSync.Lib.Events
 
         private bool alreadyDisposed = false;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        /// <summary>Constructor.</summary>
         public SyncEventQueue(SyncEventManager manager)
         {
             if (manager == null)
@@ -64,7 +63,9 @@ namespace CmisSync.Lib.Events
             Logger.Debug("Stopping to listen on SyncEventQueue");
         }
 
-        /// <exception cref="InvalidOperationException">When Listener is already stopped</exception>
+        /// <summary></summary>
+        /// <param name="newEvent"></param>
+        /// <exception cref="InvalidOperationException"></exception>
         public void AddEvent(ISyncEvent newEvent) {
             if(alreadyDisposed) {
                 throw new ObjectDisposedException("SyncEventQueue", "Called AddEvent on Disposed object");
@@ -72,6 +73,7 @@ namespace CmisSync.Lib.Events
             this.queue.Add(newEvent);
         } 
 
+        /// <summary></summary>
         public void StopListener() {
             if(alreadyDisposed) {
                 return;
@@ -79,17 +81,21 @@ namespace CmisSync.Lib.Events
             this.queue.CompleteAdding();
         }            
         
+        /// <summary></summary>
         public bool IsStopped {
             get { 
                 return this.consumer.IsCompleted; 
             }
         }
 
+        /// <summary></summary>
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary></summary>
+        /// <param name="isDisposing"></param>
         protected virtual void Dispose(bool isDisposing) {
             if(alreadyDisposed) {
                 return;

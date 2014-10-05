@@ -11,6 +11,7 @@ namespace TestLibrary
     using CmisSync.Lib;
     using CmisSync.Lib.Events;
 
+    /// <summary></summary>
     [TestFixture]
     public class SyncEventQueueTest
     {

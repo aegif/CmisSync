@@ -10,6 +10,7 @@ namespace TestLibrary
 {
     using NUnit.Framework;
 
+    /// <summary></summary>
     [TestFixture]
     public class WatcherTest
     {
@@ -48,7 +49,6 @@ namespace TestLibrary
             File.Delete(oldnameOut);
             File.Delete(newnameOut);
         }
-
 
         [Test, Category("Fast")]
         public void TestEnableRaisingEvents()
@@ -89,8 +89,10 @@ namespace TestLibrary
             }
         }
 
+        /// <summary></summary>
         public class FileSystemEventCount
         {
+            /// <summary></summary>
             public int Count { get; private set; }
 
             public void OnFileSystemEvent(object e, FileSystemEventArgs args)
@@ -606,6 +608,10 @@ namespace TestLibrary
             Thread.Sleep(milliseconds);
         }
 
+        /// <summary></summary>
+        /// <param name="milliseconds"></param>
+        /// <param name="watcher"></param>
+        /// <param name="expect"></param>
         public static void WaitWatcher(int milliseconds, Watcher watcher, int expect)
         {
 #if __MonoCS__
@@ -623,6 +629,10 @@ namespace TestLibrary
             Console.WriteLine("Timeout");
         }
 
+        /// <summary></summary>
+        /// <param name="milliseconds"></param>
+        /// <param name="watcher"></param>
+        /// <param name="checkStop"></param>
         public static void WaitWatcher(int milliseconds, Watcher watcher, Func<Watcher,bool> checkStop)
         {
 #if __MonoCS__

@@ -24,7 +24,6 @@ using System.Timers;
 
 namespace CmisSync
 {
-
     /// <summary>
     /// State of the CmisSync status icon.
     /// </summary>
@@ -44,13 +43,11 @@ namespace CmisSync
         Error
     }
 
-
     /// <summary>
     /// MVC controller for the CmisSync status icon.
     /// </summary>
     public class StatusIconController
     {
-
         /// <summary>
         /// Log.
         /// </summary>
@@ -60,6 +57,7 @@ namespace CmisSync
         /// Update icon event.
         /// </summary>
         public event UpdateIconEventHandler UpdateIconEvent = delegate { };
+
         /// <summary>
         /// Update icon event.
         /// </summary>
@@ -69,6 +67,7 @@ namespace CmisSync
         /// Update menu event.
         /// </summary>
         public event UpdateMenuEventHandler UpdateMenuEvent = delegate { };
+
         /// <summary>
         /// Update menu event.
         /// </summary>
@@ -78,6 +77,7 @@ namespace CmisSync
         /// Update status event.
         /// </summary>
         public event UpdateStatusItemEventHandler UpdateStatusItemEvent = delegate { };
+
         /// <summary>
         /// Update status event.
         /// </summary>
@@ -87,12 +87,20 @@ namespace CmisSync
         /// Update suspended sync folder event.
         /// </summary>
         public event UpdateSuspendSyncFolderEventHandler UpdateSuspendSyncFolderEvent = delegate { };
+
         /// <summary>
         /// Update suspended sync folder event.
         /// </summary>
         public delegate void UpdateSuspendSyncFolderEventHandler(string reponame);
 
+        /// <summary>
+        /// 
+        /// </summary>
         public event UpdateTransmissionMenuEventHandler UpdateTransmissionMenuEvent = delegate { };
+
+        /// <summary>
+        /// 
+        /// </summary>
         public delegate void UpdateTransmissionMenuEventHandler();
 
         /// <summary>
@@ -100,24 +108,20 @@ namespace CmisSync
         /// </summary>
         public IconState CurrentState = IconState.Idle;
 
-
         /// <summary>
         /// Short text shown at the top of the menu of the CmisSync tray icon.
         /// </summary>
         public string StateText = Properties_Resources.Welcome;
-
 
         /// <summary>
         /// Maximum number of remote folders in the menu before the overflow menu appears.
         /// </summary>
         public readonly int MenuOverflowThreshold = 9;
 
-
         /// <summary>
         /// Minimum number of remote folders to populate the overflow menu.
         /// </summary>
         public readonly int MinSubmenuOverflowCount = 3;
-
 
         /// <summary>
         /// The list of remote folders to show in the CmisSync tray menu.
@@ -135,7 +139,6 @@ namespace CmisSync
             }
         }
 
-
         /// <summary>
         /// The list of remote folders to show in the CmisSync tray's overflow menu.
         /// </summary>
@@ -151,7 +154,6 @@ namespace CmisSync
                     return new string[0];
             }
         }
-
 
         /// <summary>
         /// Total disk space taken by the sum of the remote folders.
@@ -172,19 +174,16 @@ namespace CmisSync
             }
         }
 
-
         /// <summary>
         /// Timer for the animation that appears when downloading/uploading a file.
         /// </summary>
         private Timer animation;
-
 
         /// <summary>
         /// Current frame of the animation being shown.
         /// First frame is the still icon.
         /// </summary>
         private int animation_frame_number;
-
 
         /// <summary>
         /// Constructor.
@@ -244,7 +243,6 @@ namespace CmisSync
                 this.animation.Start();
             };
 
-
             // Error.
             Program.Controller.OnError += delegate(Tuple<string, Exception> error)
             {
@@ -303,7 +301,6 @@ namespace CmisSync
             };
         }
 
-
         /// <summary>
         /// With the local file explorer, open the folder where the local synchronized folders are.
         /// </summary>
@@ -312,7 +309,6 @@ namespace CmisSync
             Program.Controller.OpenCmisSyncFolder(reponame);
         }
 
-        
         /// <summary>
         /// With the default web browser, open the remote folder of a CmisSync synchronized folder.
         /// </summary>
@@ -339,7 +335,6 @@ namespace CmisSync
             Program.Controller.ShowSetupWindow(PageType.Settings);
         }
 
-
         /// <summary>
         /// Open the remote folder addition wizard.
         /// </summary>
@@ -347,7 +342,6 @@ namespace CmisSync
         {
             Program.Controller.ShowSetupWindow(PageType.Add1);
         }
-
 
         /// <summary>
         /// Open the CmisSync log with a text file viewer.
@@ -357,7 +351,6 @@ namespace CmisSync
             Program.Controller.ShowLog(ConfigManager.CurrentConfig.GetLogFilePath());
         }
 
-
         /// <summary>
         /// Show the About dialog.
         /// </summary>
@@ -365,7 +358,6 @@ namespace CmisSync
         {
             Program.Controller.ShowAboutWindow();
         }
-
 
         /// <summary>
         /// Quit CmisSync.
@@ -375,7 +367,6 @@ namespace CmisSync
             Program.Controller.Quit();
         }
 
-
         /// <summary>
         /// Suspend synchronization for a particular folder.
         /// </summary>
@@ -384,7 +375,6 @@ namespace CmisSync
             Program.Controller.StartOrSuspendRepository(reponame);
             UpdateSuspendSyncFolderEvent(reponame);
         }
-
 
         /// <summary>
         /// Tries to remove a given repo from sync
@@ -423,7 +413,6 @@ namespace CmisSync
         {
             Program.Controller.ManualSync(reponame);
         }
-
 
         /// <summary>
         /// Edit a particular folder.
