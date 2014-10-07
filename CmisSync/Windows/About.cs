@@ -52,7 +52,7 @@ namespace CmisSync {
             Title      = Properties_Resources.ResourceManager.GetString("About", CultureInfo.CurrentCulture);
             ResizeMode = ResizeMode.NoResize;
             Height     = 288;
-            Width      = 1640;
+            Width      = 640;
             Icon = UIHelpers.GetImageSource("cmissync-app", "ico");
 
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
