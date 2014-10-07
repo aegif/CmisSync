@@ -50,14 +50,13 @@ namespace TestLibrary
     using NUnit.Framework;
     using CmisSync.Auth;
 
+    /// <summary></summary>
     [TestFixture]
     public class CmisSyncTests
     {
-
         private readonly string CMISSYNCDIR = ConfigManager.CurrentConfig.FoldersPath;
         private readonly int HeavyNumber = 10;
         private readonly int HeavyFileSize = 1024;
-
 
         public CmisSyncTests()
         {
@@ -100,6 +99,7 @@ namespace TestLibrary
             }
         }
 
+        /// <summary></summary>
         public static IEnumerable<object[]> TestServers
         {
             get
@@ -117,7 +117,7 @@ namespace TestLibrary
             }
         }
 
-
+        /// <summary></summary>
         public static IEnumerable<object[]> TestServersFuzzy
         {
             get
@@ -135,7 +135,9 @@ namespace TestLibrary
             }
         }
 
-
+        /// <summary></summary>
+        /// <param name="localDirectory"></param>
+        /// <param name="synchronizedFolder"></param>
         private void Clean(string localDirectory, CmisRepo.SynchronizedFolder synchronizedFolder)
         {
 
@@ -148,7 +150,6 @@ namespace TestLibrary
             Directory.Delete(localDirectory);
         }
 
-
         private void DeleteDirectoryIfExists(string path)
         {
             if (Directory.Exists(path))
@@ -156,7 +157,6 @@ namespace TestLibrary
                 Directory.Delete(path, true);
             }
         }
-
 
         private void CleanDirectory(string path)
         {
@@ -180,7 +180,6 @@ namespace TestLibrary
             // Prepare empty directory.
             Directory.CreateDirectory(path);
         }
-
 
         private void CleanAll(string path)
         {
@@ -225,7 +224,6 @@ namespace TestLibrary
             }
         }
 
-
         private ISession CreateSession(RepoInfo repoInfo)
         {
             Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
@@ -238,7 +236,6 @@ namespace TestLibrary
 
             return SessionFactory.NewInstance().CreateSession(cmisParameters);
         }
-
 
         public IDocument CreateDocument(IFolder folder, string name, string content)
         {
@@ -255,7 +252,6 @@ namespace TestLibrary
             return folder.CreateDocument(properties, contentStream, null);
         }
 
-
         public IFolder CreateFolder(IFolder folder, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
@@ -264,7 +260,6 @@ namespace TestLibrary
 
             return folder.CreateFolder(properties);
         }
-
 
         public IDocument CopyDocument(IFolder folder, IDocument source, string name)
         {
@@ -275,7 +270,6 @@ namespace TestLibrary
             return folder.CreateDocumentFromSource(source, properties, null);
         }
 
-
         public IDocument RenameDocument(IDocument source, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
@@ -284,7 +278,6 @@ namespace TestLibrary
             return (IDocument)source.UpdateProperties(properties);
         }
 
-
         public IFolder RenameFolder(IFolder source, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
@@ -292,7 +285,6 @@ namespace TestLibrary
 
             return (IFolder)source.UpdateProperties(properties);
         }
-
 
         public void CreateHeavyFolder(string root)
         {
@@ -315,7 +307,6 @@ namespace TestLibrary
                 }
             }
         }
-
 
         public bool CheckHeavyFolder(string root)
         {
@@ -358,7 +349,6 @@ namespace TestLibrary
             return true;
         }
 
-
         public void CreateHeavyFolderRemote(IFolder root)
         {
             for (int iFolder = 0; iFolder < HeavyNumber; ++iFolder)
@@ -372,16 +362,13 @@ namespace TestLibrary
             }
         }
 
-
         // /////////////////////////// TESTS ///////////////////////////
-
 
         [Test, Category("Fast")]
         public void Placebo()
         {
             Assert.AreEqual(4, 2 + 2);
         }
-
 
         [Test, Category("Fast")]
         public void TestCrypto()
@@ -393,7 +380,6 @@ namespace TestLibrary
                 Assert.AreEqual(Crypto.Deobfuscate(crypted), pass);
             }
         }
-
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
@@ -412,7 +398,6 @@ namespace TestLibrary
             }
             Assert.NotNull(repos);
         }
-
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void Sync(string canonical_name, string localPath, string remoteFolderPath,
@@ -452,7 +437,6 @@ namespace TestLibrary
                 }
             }
         }
-
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
@@ -519,7 +503,6 @@ namespace TestLibrary
             }
         }
 
-
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
         public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
@@ -583,7 +566,6 @@ namespace TestLibrary
                 }
             }
         }
-
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
@@ -721,7 +703,6 @@ namespace TestLibrary
                 Clean(localDirectory2, synchronizedFolder2);
             }
         }
-
 
         // Goal: Make sure that CmisSync works for uploading modified files.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
@@ -991,7 +972,6 @@ namespace TestLibrary
             }
         }
 
-
         // Goal: Make sure that CmisSync works for remote heavy folder changes.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
@@ -1090,8 +1070,8 @@ namespace TestLibrary
                 }
             }
         }
-
-                // Goal: Make sure that CmisSync works for equality.
+        
+        // Goal: Make sure that CmisSync works for equality.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncRenamedFiles(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -1209,8 +1189,6 @@ namespace TestLibrary
                 Assert.AreEqual(1, localFilesCount2, String.Format("There should exist only one file in the local folder, but there are {0}", localFilesCount2));
             }
         }
-
-
 
         // Goal: Make sure that CmisSync works for equality.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
@@ -1570,7 +1548,6 @@ namespace TestLibrary
             }
         }
 
-
         // Goal: Make sure that CmisSync works for heavy folder.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
@@ -1693,7 +1670,6 @@ namespace TestLibrary
             }
         }
 
-
         // Goal: Make sure that CmisSync works for concurrent heavy folder.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
@@ -1806,7 +1782,6 @@ namespace TestLibrary
             }
         }
 
-
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -1853,7 +1828,6 @@ namespace TestLibrary
                 }
             }
         }
-
 
         // Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
@@ -1930,7 +1904,6 @@ namespace TestLibrary
                 }
             }
         }
-
 
         // Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
@@ -2011,7 +1984,6 @@ namespace TestLibrary
             }
         }
 
-
         // Write a file and immediately check whether it has been created.
         // Should help to find out whether CMIS servers are synchronous or not.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
@@ -2071,7 +2043,6 @@ namespace TestLibrary
             doc.DeleteAllVersions();
         }
 
-
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
         public void DotCmisToIBMConnections(string canonical_name, string localPath, string remoteFolderPath,
@@ -2109,7 +2080,6 @@ namespace TestLibrary
                 }
             }
         }
-
 
         [Test, TestCaseSource("TestServersFuzzy"), Category("Slow")]
         public void GetRepositoriesFuzzy(string url, string user, string password)
@@ -2192,6 +2162,5 @@ namespace TestLibrary
             Console.WriteLine("Wait was not successful");
             return false;
         }
-
     }
 }

@@ -12,6 +12,7 @@ namespace TestLibrary
     using CmisSync.Lib.Cmis;
     using DotCMIS.Client;
 
+    /// <summary></summary>
     [TestFixture]
     public class FSDeletionHandlerTest
     {
@@ -23,7 +24,6 @@ namespace TestLibrary
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
-
         [Test]
         public void ToStringTest() {
             var handler = new FSDeletionHandler(new Mock<IDatabase>().Object, new Mock<ISession>().Object);
@@ -33,8 +33,7 @@ namespace TestLibrary
         [Test]
         public void PriorityTest() {
             var handler = new FSDeletionHandler(new Mock<IDatabase>().Object, new Mock<ISession>().Object);
-            Assert.AreEqual(100, handler.Priority);
-            
+            Assert.AreEqual(100, handler.Priority); 
         }
         
         [Test]
@@ -50,6 +49,5 @@ namespace TestLibrary
             bool handled = handler.Handle(new Mock<FSEvent>(WatcherChangeTypes.Created, "").Object);
             Assert.False(handled);            
         }
-        
     }
 }

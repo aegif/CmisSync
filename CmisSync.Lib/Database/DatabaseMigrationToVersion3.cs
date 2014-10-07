@@ -35,7 +35,7 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// Migrate from database version 0,2 to version 3.
         /// </summary>
-        /// <param name="filePath">File path.</param>
+        /// <param name="syncFolder">File path.</param>
         /// <param name="connection">Connection.</param>
         /// <param name="currentVersion">Current database schema version.</param>
         public void Migrate(Config.SyncConfig.Folder syncFolder, SQLiteConnection connection, int currentVersion)
@@ -50,12 +50,11 @@ namespace CmisSync.Lib.Database
             SetDatabaseVersion(connection, currentVersion);
         }
 
-
         /// <summary>
         /// Add columns and other database schema manipulation.
         /// </summary>
-        /// <param name="dbFilePath">Db file path.</param>
-        /// <param name="folderName">Folder name.</param>
+        /// <param name="syncFolder">Folder name.</param>
+        /// <param name="connection"></param>
         public static void MigrateSchema(Config.SyncConfig.Folder syncFolder, SQLiteConnection connection)
         {
             // Add columns

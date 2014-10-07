@@ -5,16 +5,20 @@ using System.Collections.Generic;
 
 namespace CmisSync.Lib.Events
 {
+    /// <summary></summary>
     public class SyncEventManager
     {
         private static readonly ILog logger = LogManager.GetLogger(typeof(SyncEventManager));
 
         private List<SyncEventHandler> handler = new List<SyncEventHandler>();
         
+        /// <summary></summary>
         public SyncEventManager()
         {
         }
 
+        /// <summary></summary>
+        /// <param name="h"></param>
         public void AddEventHandler(SyncEventHandler h)
         {
             //The zero-based index of item in the sorted List<T>, 
@@ -28,6 +32,8 @@ namespace CmisSync.Lib.Events
             handler.Insert(pos, h);
         }
 
+        /// <summary></summary>
+        /// <param name="e"></param>
         public virtual void Handle(ISyncEvent e) {
             for(int i = handler.Count-1; i >= 0; i--)
             {
@@ -39,6 +45,8 @@ namespace CmisSync.Lib.Events
             }
         }
 
+        /// <summary></summary>
+        /// <param name="h"></param>
         public void RemoveEventHandler(SyncEventHandler h)
         {
             handler.Remove(h);

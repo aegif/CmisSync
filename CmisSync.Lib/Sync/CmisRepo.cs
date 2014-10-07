@@ -21,7 +21,7 @@ using CmisSync.Lib.Events;
 
 namespace CmisSync.Lib.Sync
 {
-
+    /// <summary></summary>
     public partial class CmisRepo : RepoBase
     {
         /// <summary>
@@ -29,12 +29,10 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private SynchronizedFolder synchronizedFolder;
 
-
         /// <summary>
         /// Track whether <c>Dispose</c> has been called.
         /// </summary>
         private bool disposed = false;
-
 
         /// <summary>
         /// Constructor.
@@ -48,7 +46,7 @@ namespace CmisSync.Lib.Sync
             Logger.Info(synchronizedFolder);
         }
 
-
+        /// <summary></summary>
         public override void Resume()
         {
             if(this.synchronizedFolder != null)
@@ -61,13 +59,14 @@ namespace CmisSync.Lib.Sync
         }
 
         /// <summary>
-        /// Some file activity has been detected, add to queue
+        /// Some file activity has been detected, add to queue.
         /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void OnFileActivity(object sender, FileSystemEventArgs args)
         {
             synchronizedFolder.Queue.AddEvent(new FSEvent(args.ChangeType, args.FullPath));
         }
-
 
         /// <summary>
         /// Dispose pattern implementation.
@@ -85,7 +84,6 @@ namespace CmisSync.Lib.Sync
             base.Dispose(disposing);
         }
 
-
         /// <summary>
         /// Whether this folder's synchronization is running right now.
         /// </summary>
@@ -94,7 +92,6 @@ namespace CmisSync.Lib.Sync
             return this.synchronizedFolder.isSyncing();
         }
 
-
         /// <summary>
         /// Whether this folder's synchronization is suspended right now.
         /// </summary>
@@ -102,7 +99,6 @@ namespace CmisSync.Lib.Sync
         {
             return this.synchronizedFolder.isSuspended();
         }
-
 
         /// <summary>
         /// Synchronize.
@@ -123,7 +119,6 @@ namespace CmisSync.Lib.Sync
             }
         }
 
-
         /// <summary>
         /// Synchronize.
         /// The synchronization is performed in the background, so that the UI stays usable.
@@ -132,7 +127,6 @@ namespace CmisSync.Lib.Sync
         {
             SyncInBackground(true);
         }
-
 
         /// <summary>
         /// Synchonize.
@@ -153,7 +147,6 @@ namespace CmisSync.Lib.Sync
                 }
             }
         }
-
 
         /// <summary>
         /// The synchronization is performed in synchronous.

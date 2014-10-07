@@ -4,11 +4,15 @@ using System.IO;
 
 namespace CmisSync.Lib
 {
+    /// <summary></summary>
     public class ChunkedStream : Stream
     {
         private Stream source;
         private long chunkSize;
 
+        /// <summary></summary>
+        /// <param name="stream"></param>
+        /// <param name="chunk"></param>
         public ChunkedStream(Stream stream, long chunk)
         {
             source = stream;
@@ -20,12 +24,21 @@ namespace CmisSync.Lib
             //}
         }
 
+        /// <summary></summary>
         public override bool CanRead { get { return source.CanRead; } }
+
+        /// <summary></summary>
         public override bool CanWrite { get { return source.CanWrite; } }
+
+        /// <summary></summary>
         public override bool CanSeek { get { return source.CanSeek; } }
+
+        /// <summary></summary>
         public override void Flush() { source.Flush(); }
 
         private long chunkPosition;
+
+        /// <summary></summary>
         public long ChunkPosition
         {
             get
@@ -40,6 +53,7 @@ namespace CmisSync.Lib
             }
         }
 
+        /// <summary></summary>
         public override long Length
         {
             get
@@ -63,6 +77,8 @@ namespace CmisSync.Lib
         }
 
         private long position;
+
+        /// <summary></summary>
         public override long Position
         {
             get
@@ -90,6 +106,11 @@ namespace CmisSync.Lib
             }
         }
 
+        /// <summary></summary>
+        /// <param name="buffer"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (offset < 0)
@@ -110,6 +131,10 @@ namespace CmisSync.Lib
             return count;
         }
 
+        /// <summary></summary>
+        /// <param name="buffer"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (offset < 0)
@@ -129,12 +154,18 @@ namespace CmisSync.Lib
             position += count;
         }
 
+        /// <summary></summary>
+        /// <param name="offset"></param>
+        /// <param name="origin"></param>
+        /// <returns></returns>
         public override long Seek(long offset, SeekOrigin origin)
         {
             Debug.Assert(false, "TODO");
             return source.Seek(offset, origin);
         }
 
+        /// <summary></summary>
+        /// <param name="value"></param>
         public override void SetLength(long value)
         {
             Debug.Assert(false, "TODO");

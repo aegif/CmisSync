@@ -114,11 +114,7 @@ namespace CmisSync.Lib
             return writeAllow && !writeDeny;
         }
 
-
-        /// <summary>
         /// Names of files that must be excluded from synchronization.
-
-        /// </summary>
         private static HashSet<String> ignoredFilenames = new HashSet<String>{
             "~", // gedit and emacs
             "thumbs.db", "desktop.ini", // Windows
@@ -256,9 +252,9 @@ namespace CmisSync.Lib
             return true;
         }
 
+        /// <summary>
         /// Check whether the file is worth syncing or not.
         /// This optionally excludes blank files or files too large.
-
         /// </summary>
         public static bool IsFileWorthSyncing(string filepath, RepoInfo repoInfo)
         {
@@ -267,7 +263,6 @@ namespace CmisSync.Lib
                 bool allowBlankFiles = true; //TODO: add a preference repoInfo.allowBlankFiles
                 bool limitFilesize = false; //TODO: add preference for filesize limiting
                 long filesizeLimit = 256 * 1024 * 1024; //TODO: add a preference for filesize limit
-
 
                 FileInfo fileInfo = new FileInfo(filepath);
 
@@ -315,21 +310,17 @@ namespace CmisSync.Lib
                 IsFileWorthSyncing(Path.Combine(localDirectory, filename), repoInfo);
         }
 
+        /// <summary>
         /// Determines whether this instance is valid ISO-8859-1 specified input.
         /// </summary>
-        /// <returns>
-        /// <c>true</c> if this instance is valid ISO-8859-1 specified input; otherwise, <c>false</c>.
-        /// </returns>
-        /// <param name='input'>
-        /// If set to <c>true</c> input.
-        /// </param>
+        /// <param name="input">If set to <c>true</c> input.</param>
+        /// <returns><c>true</c> if this instance is valid ISO-8859-1 specified input; otherwise, <c>false</c>.</returns>
         public static bool IsValidISO88591(string input)
         {
             byte[] bytes = Encoding.GetEncoding(28591).GetBytes(input);
             String result = Encoding.GetEncoding(28591).GetString(bytes);
             return String.Equals(input, result);
         }
-
 
         /// <summary>
         /// Check whether the file is worth syncing or not.
@@ -379,13 +370,11 @@ namespace CmisSync.Lib
             return ret;
         }
 
-
         /// <summary>
         /// Regular expression to check whether a file name is valid or not.
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:/\\|<>*") + "]");
-
 
         /// <summary>
         /// Check whether a folder name is valid or not.
@@ -402,13 +391,11 @@ namespace CmisSync.Lib
             return ret;
         }
 
-
         /// <summary>
         /// Regular expression to check whether a filename is valid or not.
         /// </summary>
         private static Regex invalidFolderNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?:/\\|<>*") + "]");
-
 
         /// <summary>
         /// Find an available conflict free filename for this file.
@@ -447,8 +434,7 @@ namespace CmisSync.Lib
                 while (true);
             }
         }
-        
-        
+
         /// <summary>
         /// Format a file size nicely.
         /// Example: 1048576 becomes "1 MB"
@@ -513,7 +499,6 @@ namespace CmisSync.Lib
             return FormatBandwidth((double) bitsPerSecond);
         }
 
-        
         /// <summary>
         /// Whether a file or directory is a symbolic link.
         /// </summary>
