@@ -49,6 +49,7 @@ namespace TestLibrary
     using log4net.Appender;
     using NUnit.Framework;
     using CmisSync.Auth;
+    using CmisSync.Lib.Database;
 
     /// <summary></summary>
     [TestFixture]
@@ -438,7 +439,7 @@ namespace TestLibrary
             }
         }
 
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        /*[Test, TestCaseSource("TestServers"), Category("Slow")]
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -565,7 +566,7 @@ namespace TestLibrary
                     Clean(localDirectory, synchronizedFolder);
                 }
             }
-        }
+        }*/
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
@@ -1072,7 +1073,7 @@ namespace TestLibrary
         }
         
         // Goal: Make sure that CmisSync works for equality.
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        /*[Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncRenamedFiles(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -1546,7 +1547,7 @@ namespace TestLibrary
                     }, 1);
                     }, 20));
             }
-        }
+        }*/
 
         // Goal: Make sure that CmisSync works for heavy folder.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
