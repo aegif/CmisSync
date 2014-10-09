@@ -43,8 +43,6 @@ namespace CmisSync.Lib.Sync
             : base(repoInfo, activityListener)
         {
             this.synchronizedFolder = new SynchronizedFolder(repoInfo, this, activityListener);
-            //this.Watcher.ChangeEvent += OnFileActivity;
-            //this.Watcher.EnableEvent = true;
             Logger.Info(synchronizedFolder);
         }
 
