@@ -41,8 +41,6 @@ namespace CmisSync.Lib.Sync
             : base(repoInfo, activityListener)
         {
             this.synchronizedFolder = new SynchronizedFolder(repoInfo, this, activityListener);
-            this.Watcher.ChangeEvent += OnFileActivity;
-            this.Watcher.EnableEvent = true;
             Logger.Info(synchronizedFolder);
         }
 
@@ -58,15 +56,6 @@ namespace CmisSync.Lib.Sync
             base.Resume();
         }
 
-        /// <summary>
-        /// Some file activity has been detected, add to queue.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        public void OnFileActivity(object sender, FileSystemEventArgs args)
-        {
-            synchronizedFolder.Queue.AddEvent(new FSEvent(args.ChangeType, args.FullPath));
-        }
 
         /// <summary>
         /// Dispose pattern implementation.

@@ -14,7 +14,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
-using CmisSync.Lib.Events;
 using CmisSync.Lib.Database;
 
 namespace CmisSync.Lib.Sync
@@ -133,11 +132,7 @@ namespace CmisSync.Lib.Sync
             /// Link to parent object.
             /// </summary>
             private RepoBase repo;
-
-            /// <summary>
-            /// EventQueue
-            /// </summary>
-            public SyncEventQueue Queue {get; private set;}
+            
 
             /// <summary>
             /// Set for first sync.
@@ -171,8 +166,6 @@ namespace CmisSync.Lib.Sync
 
                 suspended = this.repoinfo.IsSuspended;
 
-                Queue = repoCmis.Queue;
-
                 // Database is the user's AppData/Roaming
                 database = new Database.Database(repoinfo.CmisDatabase);
 
@@ -188,7 +181,6 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
                     }
                 }
-                repoCmis.EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(10, RepoInfoChanged));
 
                 syncWorker = new BackgroundWorker();
                 syncWorker.WorkerSupportsCancellation = true;
@@ -218,20 +210,6 @@ namespace CmisSync.Lib.Sync
                         }
                     }
                 );
-            }
-
-            /// <summary>
-            /// This method is called, every time the config changes
-            /// </summary>
-            private bool RepoInfoChanged(ISyncEvent e)
-            {
-                if (e is RepoConfigChangedEvent)
-                {
-                    repoinfo = (e as RepoConfigChangedEvent).RepoInfo;
-                    UpdateCmisParameters();
-                    ForceFullSyncAtNextSync();
-                }
-                return false;
             }
 
             /// <summary>
@@ -449,31 +427,36 @@ namespace CmisSync.Lib.Sync
 
                     if (firstSync)
                     {
-                        Logger.Debug("Invoke a full crawl sync");
+                        Logger.Debug("First sync, invoke a full crawl sync");
                         CrawlSync(remoteFolder, localFolder);
                         firstSync = false;
+                    }
+
+                    if (!syncFull)
+                    {
+                        // Apply changes locally noticed by the filesystem watcher.
+                        WatcherSync(remoteFolderPath, localFolder);
                     }
 
                     if ( false /* ChangeLog disabled for now TODO */ && ChangeLogCapability)
                     {
                         Logger.Debug("Invoke a remote change log sync");
                         ChangeLogSync(remoteFolder);
-                        if(repo.Watcher.GetChangeList().Count > 0)
+                        /*if(repo.Watcher.GetChangeList().Count > 0)
                         {
                             Logger.Debug("Changes on the local file system detected => starting crawl sync");
-                            repo.Watcher.RemoveAll();
+                            repo.Watcher.Clear();
                             // TODO if(!CrawlSync(remoteFolder,localFolder))
                             // TODO    repo.Watcher.InsertChange("/", Watcher.ChangeTypes.Changed);
-                        }
+                        }*/
                     }
                     else
                     {
                         //  have to crawl remote
                         Logger.Debug("Invoke a remote crawl sync");
-                        repo.Watcher.RemoveAll();
+                        repo.Watcher.Clear();
                         CrawlSync(remoteFolder, localFolder);
                     }
-
                 }
             }
 
@@ -1590,10 +1573,12 @@ namespace CmisSync.Lib.Sync
                     IDocument updatedDocument = (IDocument)remoteFile.UpdateProperties(properties);
 
                     // Update the path in the database...
-                    database.MoveFile(oldPathname, newPathname);
+                    database.MoveFile(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo), SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo));
 
                     // Update timestamp in database.
-                    database.SetFileServerSideModificationDate(newPathname, ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());
+                    database.SetFileServerSideModificationDate(
+                        SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo),
+                        ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());
 
                     Logger.InfoFormat("Renamed file: {0} -> {1}", oldPathname, newPathname);
                     return true;
@@ -1625,7 +1610,7 @@ namespace CmisSync.Lib.Sync
                     IFolder updatedFolder = (IFolder)remoteFolder.UpdateProperties(properties);
 
                     // Update the path in the database...
-                    database.MoveFolder(oldPathname, newPathname);      // database query
+                    database.MoveFolder(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo), SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo));      // database query
 
                     Logger.InfoFormat("Renamed folder: {0} -> {1}", oldPathname, newPathname);
                     return true;
@@ -1655,10 +1640,12 @@ namespace CmisSync.Lib.Sync
                     IDocument updatedDocument = (IDocument)remoteFile.Move(oldRemoteFolder, newRemoteFolder);
 
                     // Update the path in the database...
-                    database.MoveFile(oldPathname, newPathname);        // database query
+                    database.MoveFile(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo), SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo));        // database query
 
                     // Update timestamp in database.
-                    database.SetFileServerSideModificationDate(newPathname, ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());    // database query
+                    database.SetFileServerSideModificationDate(
+                        SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo),
+                        ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());    // database query
 
                     Logger.InfoFormat("Moved file: {0} -> {1}", oldPathname, newPathname);
                     return true;
@@ -1688,7 +1675,7 @@ namespace CmisSync.Lib.Sync
                     IFolder updatedFolder = (IFolder)remoteFolder.Move(oldRemoteFolder, newRemoteFolder);
 
                     // Update the path in the database...
-                    database.MoveFolder(oldPathname, newPathname);      // database query
+                    database.MoveFolder(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo), SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo));      // database query
 
                     Logger.InfoFormat("Moved folder: {0} -> {1}", oldPathname, newPathname);
                     return true;
@@ -1698,7 +1685,7 @@ namespace CmisSync.Lib.Sync
                     ProcessRecoverableException(String.Format("Could not move folder: {0} -> {1}", oldPathname, newPathname), e);
                     return false;
                 }
-            }*/
+            }
 
 
             /// <summary>
