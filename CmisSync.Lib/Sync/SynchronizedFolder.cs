@@ -1553,7 +1553,7 @@ namespace CmisSync.Lib.Sync
                 return metadata;
             }
 
-/*          /// <summary>
+            /// <summary>
             /// Rename a file remotely.
             /// </summary>
             private bool RenameFile(string directory, string newFilename, IDocument remoteFile)
