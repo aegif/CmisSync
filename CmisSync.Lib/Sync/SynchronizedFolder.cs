@@ -14,7 +14,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
-//using CmisSync.Lib.Events;
 using CmisSync.Lib.Database;
 
 namespace CmisSync.Lib.Sync
@@ -201,7 +200,6 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
                     }
                 }
-                //repoCmis.EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(10, RepoInfoChanged));
 
                 syncWorker = new BackgroundWorker();
                 syncWorker.WorkerSupportsCancellation = true;
@@ -233,20 +231,6 @@ namespace CmisSync.Lib.Sync
                 );
             }
 
-
-            /// <summary>
-            /// This method is called, every time the config changes
-            /// </summary>
-            /*private bool RepoInfoChanged(ISyncEvent e)
-            {
-                if (e is RepoConfigChangedEvent)
-                {
-                    repoinfo = (e as RepoConfigChangedEvent).RepoInfo;
-                    UpdateCmisParameters();
-                    ForceFullSyncAtNextSync();
-                }
-                return false;
-            }*/
 
             /// <summary>
             /// Loads the CmisParameter from repoinfo. If repoinfo has been changed, this method sets the new informations for the next session
@@ -479,6 +463,12 @@ namespace CmisSync.Lib.Sync
                         firstSync = false;
                     }
 
+                    if (!syncFull)
+                    {
+                        // Apply changes locally noticed by the filesystem watcher.
+                        WatcherSync(remoteFolderPath, localFolder);
+                    }
+
                     if ( false /* ChangeLog disabled for now TODO */ && ChangeLogCapability)
                     {
                         Logger.Debug("Invoke a remote change log sync");
@@ -498,9 +488,6 @@ namespace CmisSync.Lib.Sync
                         repo.Watcher.Clear();
                         CrawlSync(remoteFolder, localFolder);
                     }
-
-                    // Apply changes locally noticed by the filesystem watcher.
-                    WatcherSync(remoteFolderPath, localFolder);
                 }
             }
 
