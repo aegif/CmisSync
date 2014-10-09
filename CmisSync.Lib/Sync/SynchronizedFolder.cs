@@ -14,7 +14,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
-using CmisSync.Lib.Events;
+//using CmisSync.Lib.Events;
 using CmisSync.Lib.Database;
 
 namespace CmisSync.Lib.Sync
@@ -201,7 +201,7 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
                     }
                 }
-                repoCmis.EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(10, RepoInfoChanged));
+                //repoCmis.EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(10, RepoInfoChanged));
 
                 syncWorker = new BackgroundWorker();
                 syncWorker.WorkerSupportsCancellation = true;
@@ -237,7 +237,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// This method is called, every time the config changes
             /// </summary>
-            private bool RepoInfoChanged(ISyncEvent e)
+            /*private bool RepoInfoChanged(ISyncEvent e)
             {
                 if (e is RepoConfigChangedEvent)
                 {
@@ -246,7 +246,7 @@ namespace CmisSync.Lib.Sync
                     ForceFullSyncAtNextSync();
                 }
                 return false;
-            }
+            }*/
 
             /// <summary>
             /// Loads the CmisParameter from repoinfo. If repoinfo has been changed, this method sets the new informations for the next session

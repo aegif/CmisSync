@@ -131,13 +131,13 @@ namespace CmisSync.Lib
         /// Event Queue for this repository.
         /// Use this to notifiy events for this repository.
         /// </summary>
-        public SyncEventQueue Queue { get; private set; }
+        //public SyncEventQueue Queue { get; private set; }
 
         /// <summary>
         /// Event Manager for this repository.
         /// Use this for adding and removing SyncEventHandler for this repository.
         /// </summary>
-        public SyncEventManager EventManager { get; private set; }
+        //public SyncEventManager EventManager { get; private set; }
 
         /// <summary>
         /// Return the synchronized folder's information.
@@ -197,10 +197,10 @@ namespace CmisSync.Lib
         /// </summary>
         public RepoBase(RepoInfo repoInfo, IActivityListener activityListener)
         {
-            EventManager = new SyncEventManager();
-            EventManager.AddEventHandler(new DebugLoggingHandler());
-            EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(0, RepoInfoChanged));
-            Queue = new SyncEventQueue(EventManager);
+            //EventManager = new SyncEventManager();
+            //EventManager.AddEventHandler(new DebugLoggingHandler());
+            //EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(0, RepoInfoChanged));
+            //Queue = new SyncEventQueue(EventManager);
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = repoInfo.Name;
@@ -289,7 +289,7 @@ namespace CmisSync.Lib
                     this.local_timer.Dispose();
                     this.Watcher.Dispose();
                     // this.folderLock.Dispose(); Folder lock disabled.
-                    this.Queue.Dispose();
+                    //this.Queue.Dispose();
                 }
                 this.disposed = true;
             }

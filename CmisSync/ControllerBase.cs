@@ -94,7 +94,7 @@ namespace CmisSync
         /// </summary>
         public event Action FolderListChanged = delegate { };
 
-        public event Action OnTransmissionListChanged = delegate { };
+        //public event Action OnTransmissionListChanged = delegate { };
 
         /// <summary>
         /// Called with status changes to idle.
@@ -189,7 +189,7 @@ namespace CmisSync
         private IActivityListener activityListenerAggregator;
 
 
-        private ActiveActivitiesManager activitiesManager;
+        //private ActiveActivitiesManager activitiesManager;
 
 
         /// <summary>
@@ -210,15 +210,15 @@ namespace CmisSync
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
             FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
-            activitiesManager = new ActiveActivitiesManager();
+            /*activitiesManager = new ActiveActivitiesManager();
             this.activitiesManager.ActiveTransmissions.CollectionChanged += delegate(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
                 OnTransmissionListChanged();
-            };
+            };*/
         }
 
-        public List<FileTransmissionEvent> ActiveTransmissions() {
-            return this.activitiesManager.ActiveTransmissions.ToList<FileTransmissionEvent>();
-        }
+        //public List<FileTransmissionEvent> ActiveTransmissions() {
+        //    return this.activitiesManager.ActiveTransmissions.ToList<FileTransmissionEvent>();
+        //}
 
 
         /// <summary>
@@ -278,11 +278,11 @@ namespace CmisSync
             RepoBase repo = null;
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
 
-            repo.EventManager.AddEventHandler(
+            /*repo.EventManager.AddEventHandler(
                 new GenericSyncEventHandler<FileTransmissionEvent>( 50, delegate(ISyncEvent e){
                 this.activitiesManager.AddTransmission(e as FileTransmissionEvent);
                 return false;
-            }));
+            }));*/
             this.repositories.Add(repo);
             repo.Initialize();
         }
