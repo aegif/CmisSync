@@ -292,8 +292,7 @@ namespace CmisSync.Lib.Sync
             public void Connect()
             {
                 // Create session factory.
-                SessionFactory factory = SessionFactory.NewInstance();
-                session = factory.CreateSession(cmisParameters);
+                session = Auth.Auth.GetCmisSession(repoinfo.Address.ToString(), repoinfo.User, repoinfo.Password.ToString(), repoinfo.RepoID);
                 // Detect whether the repository has the ChangeLog capability.
                     Logger.Debug("Created CMIS session: " + session.ToString());
                 ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All

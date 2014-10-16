@@ -20,8 +20,7 @@ namespace CmisSync.Auth
         /// </summary>
         public static IList<IRepository> GetCmisRepositories(Uri url, string user, string obfuscatedPassword)
         {
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            parameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            Dictionary<string, string> parameters = GetParameters();
             parameters[SessionParameter.AtomPubUrl] = url.ToString();
             parameters[SessionParameter.User] = user;
             parameters[SessionParameter.Password] = Crypto.Deobfuscate(obfuscatedPassword);
@@ -39,8 +38,7 @@ namespace CmisSync.Auth
         /// </summary>
         public static ISession GetCmisSession(string url, string user, string password, string repositoryId)
         {
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            parameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            Dictionary<string, string> parameters = GetParameters();
             parameters[SessionParameter.AtomPubUrl] = url;
             parameters[SessionParameter.User] = user;
             parameters[SessionParameter.Password] = password;
@@ -51,6 +49,19 @@ namespace CmisSync.Auth
 
             // Return session.
             return factory.CreateSession(parameters);
+        }
+
+
+        private static Dictionary<string, string> GetParameters()
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            // AtomPub is the most reliable/well-tested CMIS implementation for pretty much all servers.
+            parameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            // Sets the Connect Timeout to infinite
+            parameters[SessionParameter.ConnectTimeout] = "1200000"; // Twenty minutes
+            // Sets the Read Timeout to infinite
+            parameters[SessionParameter.ReadTimeout] = "1200000"; // Twenty minutes
+            return parameters;
         }
     }
 }
