@@ -53,12 +53,12 @@ namespace CmisSync.Auth
 
             // Create session.
             ISession session = factory.CreateSession(parameters);
-            Logger.Debug("VendorName: " + session.RepositoryInfo.VendorName);
-            Logger.Debug("ProductName: " + session.RepositoryInfo.ProductName);
-            Logger.Debug("ProductVersion: " + session.RepositoryInfo.ProductVersion);
-            Logger.Debug("CmisVersionSupported: " + session.RepositoryInfo.CmisVersionSupported);
-            Logger.Debug("Name: " + session.RepositoryInfo.Name);
-            Logger.Debug("Description: " + session.RepositoryInfo.Description);
+            Logger.Info("VendorName: " + session.RepositoryInfo.VendorName);
+            Logger.Info("ProductName: " + session.RepositoryInfo.ProductName);
+            Logger.Info("ProductVersion: " + session.RepositoryInfo.ProductVersion);
+            Logger.Info("CmisVersionSupported: " + session.RepositoryInfo.CmisVersionSupported);
+            Logger.Info("Name: " + session.RepositoryInfo.Name);
+            Logger.Info("Description: " + session.RepositoryInfo.Description);
             return session;
         }
 
