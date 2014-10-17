@@ -5,6 +5,7 @@ using System.Text;
 using DotCMIS;
 using DotCMIS.Client;
 using DotCMIS.Client.Impl;
+using log4net;
 
 namespace CmisSync.Auth
 {
@@ -14,6 +15,9 @@ namespace CmisSync.Auth
     /// </summary>
     public class Auth
     {
+        // Log.
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Auth));
+
         /// <summary>
         /// Connect to a CMIS server and get the list of repositories.
         /// This method takes a obfuscated password, unlike the next method.
@@ -47,8 +51,15 @@ namespace CmisSync.Auth
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
 
-            // Return session.
-            return factory.CreateSession(parameters);
+            // Create session.
+            ISession session = factory.CreateSession(parameters);
+            Logger.Debug("VendorName: " + session.RepositoryInfo.VendorName);
+            Logger.Debug("ProductName: " + session.RepositoryInfo.ProductName);
+            Logger.Debug("ProductVersion: " + session.RepositoryInfo.ProductVersion);
+            Logger.Debug("CmisVersionSupported: " + session.RepositoryInfo.CmisVersionSupported);
+            Logger.Debug("Name: " + session.RepositoryInfo.Name);
+            Logger.Debug("Description: " + session.RepositoryInfo.Description);
+            return session;
         }
 
 
@@ -58,9 +69,9 @@ namespace CmisSync.Auth
             // AtomPub is the most reliable/well-tested CMIS implementation for pretty much all servers.
             parameters[SessionParameter.BindingType] = BindingType.AtomPub;
             // Sets the Connect Timeout to infinite
-            parameters[SessionParameter.ConnectTimeout] = "1200000"; // Twenty minutes
+            parameters[SessionParameter.ConnectTimeout] = "60000"; // One minute
             // Sets the Read Timeout to infinite
-            parameters[SessionParameter.ReadTimeout] = "1200000"; // Twenty minutes
+            parameters[SessionParameter.ReadTimeout] = "1200000"; // Twenty minutes (to allow for huge GetDescendants operations)
             return parameters;
         }
     }
