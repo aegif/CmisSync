@@ -443,7 +443,7 @@ namespace CmisSync.Lib
         /// </summary>
         public void OnSyncError(Exception exception)
         {
-            Logger.Info("Sync Error: " + exception.Message);
+            Logger.Info("Sync Error: " + exception.GetType() + ", " + exception.Message);
             activityListener.ActivityError(new Tuple<string, Exception>(Name, exception));
         }
 
