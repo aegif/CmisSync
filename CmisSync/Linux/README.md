@@ -65,7 +65,7 @@ Run the following commands:
 ```
 $ sudo make install
 $ sudo cp Extras/DotCMIS.dll /usr/local/lib/cmissync/
-$ sudo cp Extras/Newtonsoft.Json.dll /usr/local/lib/cmissync/
+$ sudo cp Extras/OpenDataSpaceDotCMIS/Newtonsoft.Json.dll /usr/local/lib/cmissync/
 ```
 
 Done! You can now run CmisSync with this command: `cmissync start`
