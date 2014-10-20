@@ -121,235 +121,238 @@
     <value>Dodaj</value>
   </data>
   <data name="AddARemoteFolder" xml:space="preserve">
-    <value>Dodaj zdalny folder ...</value>
+    <value>Dodaj oddaljeno mapo…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Dodawanie synchronizowanych folderów do CmisSync</value>
+    <value>Dodajanje sinhroniziranih map v CmisSync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
-    <value>Dodawanie folderu</value>
+    <value>Dodajanje mape</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Wstecz</value>
+    <value>Nazaj</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Anuluj</value>
+    <value>Prekliči</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync tworzy specjalny folder na komputerze, gdzie dokumenty są synchronizowane.</value>
+    <value>CmisSync v računalniku ustvari posebno mapo, kjer se dokumenti sinhronizirajo.</value>
   </data>
   <data name="Continue" xml:space="preserve">
-    <value>Kontynuuj</value>
+    <value>Nadaljuj</value>
   </data>
   <data name="Customize" xml:space="preserve">
-    <value>Dostosowanie nazwy folderu lokalnego</value>
+    <value>Prilagodite ime lokalne mape</value>
   </data>
   <data name="DocumentsAre" xml:space="preserve">
-    <value>Dokumenty są automatycznie aktualizowane w celu uwzględnienia najnowszych zmian od swoich kolegów, i zmiany są wysyłane do serwera automatycznie.</value>
+    <value>Dokumenti so samodejno posodobljeni, da odražajo najnovejše spremembe vaših kolegov in tudi vaše spremembe se samodejno pošljejo na strežnik.</value>
   </data>
   <data name="EmptyURLNotAllowed" xml:space="preserve">
-    <value>Pusty adres URL</value>
+    <value>Prazen URL</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Wprowadź nazwę folderu lokalnego, gdzie dokumenty mają być synchronizowane</value>
+    <value>Vnesite ime za lokalno mapo, kjer se dokumenti sinhronizirajo</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Wprowadź adres internetowy gdzie można zobaczyć dokumenty:</value>
+    <value>Vnesite spletni naslov, kjer so razvidni dokumenti:</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Wyjście</value>
+    <value>Izhod</value>
   </data>
   <data name="FailedToSendSomeChanges" xml:space="preserve">
-    <value>Nie udało się wysłać niektórych zmian</value>
+    <value>Pošiljanje nekaterih sprememb ni uspelo</value>
   </data>
   <data name="FilesUpToDate" xml:space="preserve">
-    <value>Pliki zsynchronizowane</value>
+    <value>Datoteke so ažurne</value>
   </data>
   <data name="Finish" xml:space="preserve">
-    <value>Ukończone</value>
+    <value>Dokončaj</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Folder w folderze głównym CmisSync</value>
+    <value>Mapa je že v CmisSync korenski mapi</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Pomoc</value>
+    <value>Pomoč</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync na bieżąco synchronizuje Twoje pliki z serwerami w firmie i pozwala pracować zarówno w trybie online jak i offline.
-Działa podobnie do Dropbox.</value>
+    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+
+It is like Dropbox for Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>Nazwa folderu jest nieprawidłowa. Znaki specjalne nie są dozwolone.</value>
+    <value>The folder name is invalid. Special characters are not allowed.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
-    <value>Nieprawidłowy adres URL</value>
+    <value>Neveljaven URL</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
-    <value>Może to potrwać dłuższa chwilę w zależności od rozmiaru folderu.</value>
+    <value>This may either take a short or a long time depending on the folder's size.</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
-    <value>Otwieranie folderu synchronizowanego</value>
+    <value>Open the synchronized folder</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Hasło</value>
+    <value>Geslo</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>Serwer CMIS odmawia dostępu . Sprawdź nazwę użytkownika i hasło.</value>
+    <value>CMIS server found, but permission denied. Please check username/password.</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>Dokumenty są teraz synchronizowane</value>
+    <value>Your documents are now being synchronized</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
-    <value>Odbieranie zmian...</value>
+    <value>Receiving changes…</value>
   </data>
   <data name="SendingChanges" xml:space="preserve">
-    <value>Wysyłanie zmian...</value>
+    <value>Pošiljanje sprememb…</value>
   </data>
   <data name="SkipTutorial" xml:space="preserve">
-    <value>Pomiń samouczek</value>
+    <value>Preskoči Vodič</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Niestety, nie można połączyć się z serwerem CMIS pod podanym adresem. Proszę skontaktować się z administratorem systemu CMIS żeby upewnić się że adres jest prawidłowy. Jeśli jesteś przekonany że adres jest prawidłowy, otwórz go prosze w przeglądarce, a treść która zostanie wyświetlona prześlij do cmissync@aegif.jp
-</value>
+    <value>Sorry, CmisSync can not find a CMIS server at this address.
+Please ask your server administrator for the CMIS endpoint URL.
+If you are sure about the address, open it in a browser and send
+the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Dodaj CmisSync do autostartu</value>
+    <value>Add CmisSync to startup items</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>Ikona stanu jest tutaj, aby pomóc</value>
+    <value>The status icon is here to help</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>Ikona CmisSync pokazuje stan i postęp synchronizacji oraz zapewnia łatwy dostęp do folderów.</value>
+    <value>CmisSync's status icon shows the syncing progress, and provides easy access to your folders.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
-    <value>Synchronizacja</value>
+    <value>Sinhronizacija</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
-    <value>Synchronizowanie zmian...</value>
+    <value>Sinhroniziranje sprememb…</value>
   </data>
   <data name="User" xml:space="preserve">
-    <value>Użytkownik</value>
+    <value>Uporabnik</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Witamy w CmisSync!</value>
+    <value>Dobrodošli v CmisSync!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>Co się dzieje dalej?</value>
+    <value>What's happening next?</value>
   </data>
   <data name="Where" xml:space="preserve">
-    <value>Gdzie jest serwer w firmie?</value>
+    <value>Where is your organization's server?</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>Gdzie można znaleźć ten adres</value>
+    <value>Where to find this address</value>
   </data>
   <data name="Which" xml:space="preserve">
-    <value>Które zdalne foldery chcesz synchronizować?</value>
+    <value>Which remote folder do you want to sync?</value>
   </data>
   <data name="YouCan" xml:space="preserve">
-    <value>Możesz łatwo dodać nowy folder CMIS w dowolnym momencie.</value>
+    <value>You can easily add a new CMIS folder at any time.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Można je znaleźć w folderze CmisSync.</value>
+    <value>You can find them in your CmisSync folder.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Zmiana ścieżki lokalnej dla tego repozytorium:</value>
+    <value>Change the local path of this repository:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Lokalny folder o tej samej nazwie już istnieje, proszę użyć innej nazwy.</value>
+    <value>A local folder with the same name already exist, please use a different name.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
-    <value>Wstrzymaj synchronizacje</value>
+    <value>Pause sync</value>
   </data>
   <data name="ResumeSync" xml:space="preserve">
-    <value>Wznów synchronizacje</value>
+    <value>Nadaljevanje sinhronizacije</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
-    <value>Przeglądanie folderu zdalnego</value>
+    <value>Prebrskajte oddaljeno mapo</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
-    <value>Otwórz folder lokalny</value>
+    <value>Open local folder</value>
   </data>
   <data name="About" xml:space="preserve">
     <value>O CmisSync</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
-    <value>Pokaż dziennik</value>
+    <value>Ogled dnevnika</value>
   </data>
   <data name="ConnectFailure" xml:space="preserve">
-    <value>Nie udało się połączyć z serwerem!.
-Prosimy o sprawdzenie podanego adresu i upewnienie się że jest prawidłowy. Jeśli adres jest poprawny a mimo to nie można się połączyć, skontaktuj się z administratorem serwera.</value>
+    <value>Failed to connect to server!
+Please check the given URL for misspelled host name.
+If the URL is correct, please contact your server administrator!</value>
   </data>
   <data name="LoginFailedForbidden" xml:space="preserve">
-    <value>Logowanie niepomyślne!
-Prosimy o sprawdzenie nazwy użytkownika i hasła oraz upewnienie się że podany jest prawidłowy adres serwera.</value>
+    <value>Login failed!
+Please check your user credentials and potentially the server URL.</value>
   </data>
   <data name="SendFailureHttps" xml:space="preserve">
-    <value>Nie udało się połączyć z serwerem!.
-Prosimy o sprawdzenie podanego adresu i upewnienie się że jest prawidłowy. Zwróć uwagę czy zawiera właściwy protokół (https).
-Jeśli adres jest poprawny a mimo to nie można się połączyć, skontaktuj się z administratorem serwera.</value>
+    <value>Failed to communicate with the given server!
+Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https</value>
   </data>
   <data name="DoNotIgnoreFolder" xml:space="preserve">
-    <value>Aktualizuj ten folder podczas synchronizacji</value>
+    <value>Enable folder for synchronization</value>
   </data>
   <data name="IgnoreFolder" xml:space="preserve">
-    <value>Pomijaj ten folder podczas synchronizacji</value>
+    <value>Prezri mapo ob sinhronizaciji</value>
   </data>
   <data name="LoadingStatusLOADING" xml:space="preserve">
-    <value>ładowanie...</value>
+    <value>nalaganje...</value>
   </data>
   <data name="LoadingStatusSTART" xml:space="preserve">
-    <value>proszę czekać...</value>
+    <value>čakanje...</value>
   </data>
   <data name="RemoveFolderFromSync" xml:space="preserve">
-    <value>Usuń folder z synchronizacji</value>
+    <value>Odstranite mapo iz sinhronizacije</value>
   </data>
   <data name="DoYouTrustTheCertificate" xml:space="preserve">
-    <value>Czy ufasz temu certyfikatowi? (Tak == zawsze, Anuluj = tylko teraz)</value>
+    <value>Ali zaupate temu potrdilu? (Da = Vedno, Prekliči = Samo zdaj)</value>
   </data>
   <data name="TrustFailure" xml:space="preserve">
-    <value>Nie udało się nawiązać bezpiecznego połączenia z serwerem. Powiadom administratora systemu.</value>
+    <value>Vzpostavitev zaupanja vredne povezave ni uspelo. Obvestite skrbnika strežnika.</value>
   </data>
   <data name="UntrustedCertificate" xml:space="preserve">
-    <value>Certyfikat niezaufany</value>
+    <value>Potrdilo brez zaupanja</value>
   </data>
   <data name="ManualSync" xml:space="preserve">
-    <value>Uruchom synchronizację teraz</value>
+    <value>Zaženi sinhronizacijo zdaj</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Ustawienia...</value>
+    <value>Nastavitve...</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Zapisz</value>
+    <value>Shrani</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
     <value>CmisSync</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
-    <value>Częstość synchronizacji</value>
+    <value>Interval sinhronizacije</value>
   </data>
   <data name="Hours" xml:space="preserve">
-    <value>godziny</value>
+    <value>ur</value>
   </data>
   <data name="Minutes" xml:space="preserve">
-    <value>minuty</value>
+    <value>minut</value>
   </data>
   <data name="Day" xml:space="preserve">
-    <value>dni</value>
+    <value>dan</value>
   </data>
   <data name="Hour" xml:space="preserve">
-    <value>godziny</value>
+    <value>ura</value>
   </data>
   <data name="WebAddress" xml:space="preserve">
-    <value>Adres repozytorium</value>
+    <value>URL repozitorija</value>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>Błąd</value>
+    <value>Napaka</value>
   </data>
   <data name="SyncError" xml:space="preserve">
-    <value>Nie można zsynchronizować "{0}": {1}</value>
+    <value>Could not sync "{0}": {1}</value>
   </data>
   <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
-    <value>Czy na pewno chcesz się rozłączyć z tym repozytorium?  Żadne pliki nie zostaną usunięte z systemu, ale nie będą one synchronizowane.</value>
+    <value>Are you sure you want to disconnect this repository?  No files will be deleted from your system but they will no longer be synchronized.</value>
   </data>
   <data name="Minute" xml:space="preserve">
     <value>minut</value>

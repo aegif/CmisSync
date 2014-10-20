@@ -118,243 +118,237 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Dodaj</value>
+    <value>Aggiungi</value>
   </data>
   <data name="AddARemoteFolder" xml:space="preserve">
-    <value>Dodaj zdalny folder ...</value>
+    <value>Nuova cartella remota…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Dodawanie synchronizowanych folderów do CmisSync</value>
+    <value>Sincronizzazione cartelle per CmisSync in corso</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
-    <value>Dodawanie folderu</value>
+    <value>Aggiunta cartella</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Wstecz</value>
+    <value>Indietro</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Anuluj</value>
+    <value>Annulla</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync tworzy specjalny folder na komputerze, gdzie dokumenty są synchronizowane.</value>
+    <value>CmisSync crea una cartella speciale sul computer dove vengono sincronizzati i documenti.</value>
   </data>
   <data name="Continue" xml:space="preserve">
-    <value>Kontynuuj</value>
+    <value>Continua</value>
   </data>
   <data name="Customize" xml:space="preserve">
-    <value>Dostosowanie nazwy folderu lokalnego</value>
+    <value>Modifica il nome della cartella locale</value>
   </data>
   <data name="DocumentsAre" xml:space="preserve">
-    <value>Dokumenty są automatycznie aktualizowane w celu uwzględnienia najnowszych zmian od swoich kolegów, i zmiany są wysyłane do serwera automatycznie.</value>
+    <value>I documenti vengono aggiornati automaticamente con le ultime modifiche dei tuoi colleghi, cosi come le tue modifiche vengono inviate al server automaticamente.</value>
   </data>
   <data name="EmptyURLNotAllowed" xml:space="preserve">
-    <value>Pusty adres URL</value>
+    <value>URL vuoto</value>
   </data>
   <data name="EnterLocalFolderName" xml:space="preserve">
-    <value>Wprowadź nazwę folderu lokalnego, gdzie dokumenty mają być synchronizowane</value>
+    <value>Immetti un nome per la cartella locale dove vengono sincronizzati i documenti</value>
   </data>
   <data name="EnterWebAddress" xml:space="preserve">
-    <value>Wprowadź adres internetowy gdzie można zobaczyć dokumenty:</value>
+    <value>Immetti un indirizzo Web dove si possono vedere i documenti:</value>
   </data>
   <data name="Exit" xml:space="preserve">
-    <value>Wyjście</value>
+    <value>Esci</value>
   </data>
   <data name="FailedToSendSomeChanges" xml:space="preserve">
-    <value>Nie udało się wysłać niektórych zmian</value>
+    <value>Impossibile inviare alcune modifiche</value>
   </data>
   <data name="FilesUpToDate" xml:space="preserve">
-    <value>Pliki zsynchronizowane</value>
+    <value>File aggiornati</value>
   </data>
   <data name="Finish" xml:space="preserve">
-    <value>Ukończone</value>
+    <value>Finito</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Folder w folderze głównym CmisSync</value>
+    <value>Una cartella esiste già nella cartella radice CmisSync</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Pomoc</value>
+    <value>Guida</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync na bieżąco synchronizuje Twoje pliki z serwerami w firmie i pozwala pracować zarówno w trybie online jak i offline.
-Działa podobnie do Dropbox.</value>
+    <value>CmisSync consente di mantenere la sincronizzazione con qualsiasi server CMIS ed utilizzare i tuoi documenti anche quando non sei in linea.  È come Dropbox per Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
-    <value>Nazwa folderu jest nieprawidłowa. Znaki specjalne nie są dozwolone.</value>
+    <value>Il nome della cartella non è valido. Non sono ammessi caratteri speciali.</value>
   </data>
   <data name="InvalidURL" xml:space="preserve">
-    <value>Nieprawidłowy adres URL</value>
+    <value>URL non valido</value>
   </data>
   <data name="MayTakeTime" xml:space="preserve">
-    <value>Może to potrwać dłuższa chwilę w zależności od rozmiaru folderu.</value>
+    <value>In base alla dimensione della cartella questo processo potrebbe durare a lungo.</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
-    <value>Otwieranie folderu synchronizowanego</value>
+    <value>Apri la cartella sincronizzata</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Hasło</value>
+    <value>Password</value>
   </data>
   <data name="PermissionDenied" xml:space="preserve">
-    <value>Serwer CMIS odmawia dostępu . Sprawdź nazwę użytkownika i hasło.</value>
+    <value>Server CMIS trovato, ma permesso negato. Si prega di verificare username e password.</value>
   </data>
   <data name="Ready" xml:space="preserve">
-    <value>Dokumenty są teraz synchronizowane</value>
+    <value>I documenti sono ora sincronizzati</value>
   </data>
   <data name="ReceivingChanges" xml:space="preserve">
-    <value>Odbieranie zmian...</value>
+    <value>Ricezione modifiche…</value>
   </data>
   <data name="SendingChanges" xml:space="preserve">
-    <value>Wysyłanie zmian...</value>
+    <value>Invio delle modifiche…</value>
   </data>
   <data name="SkipTutorial" xml:space="preserve">
-    <value>Pomiń samouczek</value>
+    <value>Salta Tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Niestety, nie można połączyć się z serwerem CMIS pod podanym adresem. Proszę skontaktować się z administratorem systemu CMIS żeby upewnić się że adres jest prawidłowy. Jeśli jesteś przekonany że adres jest prawidłowy, otwórz go prosze w przeglądarce, a treść która zostanie wyświetlona prześlij do cmissync@aegif.jp
-</value>
+    <value>Siamo spiacenti, CmisSync non riesce a trovare un server CMIS a questo indirizzo. Per favore richiedi il CMIS endpoint URL all'amministratore del server. Se si è sicuri dell'indirizzo, aprirlo in un browser e inviare il documento XML risultante a cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Dodaj CmisSync do autostartu</value>
+    <value>Aggiungere CmisSync all'avvio automatico</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
-    <value>Ikona stanu jest tutaj, aby pomóc</value>
+    <value>L'icona di stato è qui per aiutarti</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>Ikona CmisSync pokazuje stan i postęp synchronizacji oraz zapewnia łatwy dostęp do folderów.</value>
+    <value>L'Icona di stato di CmisSync mostra l'avanzamento della sincronizzazione e offre un facile accesso alle tue cartelle.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
-    <value>Synchronizacja</value>
+    <value>Sincronizzazione</value>
   </data>
   <data name="SyncingChanges" xml:space="preserve">
-    <value>Synchronizowanie zmian...</value>
+    <value>Sincronizzo le modifiche...</value>
   </data>
   <data name="User" xml:space="preserve">
-    <value>Użytkownik</value>
+    <value>Utente</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Witamy w CmisSync!</value>
+    <value>Benvenuti in CmisSync!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
-    <value>Co się dzieje dalej?</value>
+    <value>Cosa succede dopo?</value>
   </data>
   <data name="Where" xml:space="preserve">
-    <value>Gdzie jest serwer w firmie?</value>
+    <value>Dove è il server dell'organizzazione?</value>
   </data>
   <data name="WhereToFind" xml:space="preserve">
-    <value>Gdzie można znaleźć ten adres</value>
+    <value>Dove trovare questo indirizzo</value>
   </data>
   <data name="Which" xml:space="preserve">
-    <value>Które zdalne foldery chcesz synchronizować?</value>
+    <value>Quale cartella remota si desidera sincronizzare?</value>
   </data>
   <data name="YouCan" xml:space="preserve">
-    <value>Możesz łatwo dodać nowy folder CMIS w dowolnym momencie.</value>
+    <value>È possibile aggiungere facilmente  una nuova cartella CMISin qualsiasi momento.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Można je znaleźć w folderze CmisSync.</value>
+    <value>E' possibile trovarli nella cartella CmisSync.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
-    <value>Zmiana ścieżki lokalnej dla tego repozytorium:</value>
+    <value>Modificare il percorso locale di questo repository:</value>
   </data>
   <data name="LocalDirectoryExist" xml:space="preserve">
-    <value>Lokalny folder o tej samej nazwie już istnieje, proszę użyć innej nazwy.</value>
+    <value>Una cartella locale con lo stesso nome esiste già, si prega di utilizzare un nome diverso.</value>
   </data>
   <data name="PauseSync" xml:space="preserve">
-    <value>Wstrzymaj synchronizacje</value>
+    <value>Sospendi Sincronizzazione</value>
   </data>
   <data name="ResumeSync" xml:space="preserve">
-    <value>Wznów synchronizacje</value>
+    <value>Riprendi la sincronizzazione</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
-    <value>Przeglądanie folderu zdalnego</value>
+    <value>Sfoglia la cartella remota</value>
   </data>
   <data name="OpenLocalFolder" xml:space="preserve">
-    <value>Otwórz folder lokalny</value>
+    <value>Apri cartella locale</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>O CmisSync</value>
+    <value>About CmisSync</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
-    <value>Pokaż dziennik</value>
+    <value>Visualizza log</value>
   </data>
   <data name="ConnectFailure" xml:space="preserve">
-    <value>Nie udało się połączyć z serwerem!.
-Prosimy o sprawdzenie podanego adresu i upewnienie się że jest prawidłowy. Jeśli adres jest poprawny a mimo to nie można się połączyć, skontaktuj się z administratorem serwera.</value>
+    <value>Impossibile connettersi al server! Si prega di controllare l'URL specificato. Se l'URL è corretto, si prega di contattare l'amministratore del server!</value>
   </data>
   <data name="LoginFailedForbidden" xml:space="preserve">
-    <value>Logowanie niepomyślne!
-Prosimy o sprawdzenie nazwy użytkownika i hasła oraz upewnienie się że podany jest prawidłowy adres serwera.</value>
+    <value>Accesso non riuscito! Si prega di controllare le credenziali di accesso e l'URL del server.</value>
   </data>
   <data name="SendFailureHttps" xml:space="preserve">
-    <value>Nie udało się połączyć z serwerem!.
-Prosimy o sprawdzenie podanego adresu i upewnienie się że jest prawidłowy. Zwróć uwagę czy zawiera właściwy protokół (https).
-Jeśli adres jest poprawny a mimo to nie można się połączyć, skontaktuj się z administratorem serwera.</value>
+    <value>Impossibile comunicare con il server specificato! Si prega di controllare la parte di protocollo dell'URL specificato. Forse il server non è in grado di comunicare tramite https</value>
   </data>
   <data name="DoNotIgnoreFolder" xml:space="preserve">
-    <value>Aktualizuj ten folder podczas synchronizacji</value>
+    <value>Abilita la cartella per la sincronizzazione</value>
   </data>
   <data name="IgnoreFolder" xml:space="preserve">
-    <value>Pomijaj ten folder podczas synchronizacji</value>
+    <value>Ignora la cartella per la sincronizzazione</value>
   </data>
   <data name="LoadingStatusLOADING" xml:space="preserve">
-    <value>ładowanie...</value>
+    <value>caricamento...</value>
   </data>
   <data name="LoadingStatusSTART" xml:space="preserve">
-    <value>proszę czekać...</value>
+    <value>in sospeso...</value>
   </data>
   <data name="RemoveFolderFromSync" xml:space="preserve">
-    <value>Usuń folder z synchronizacji</value>
+    <value>Rimuovi la cartella dalla sincronizzazione</value>
   </data>
   <data name="DoYouTrustTheCertificate" xml:space="preserve">
-    <value>Czy ufasz temu certyfikatowi? (Tak == zawsze, Anuluj = tylko teraz)</value>
+    <value>Ti fidi di questo certificato? (Sì = sempre, Cancel = solo ora)</value>
   </data>
   <data name="TrustFailure" xml:space="preserve">
-    <value>Nie udało się nawiązać bezpiecznego połączenia z serwerem. Powiadom administratora systemu.</value>
+    <value>Impossibile stabilire una connessione fidata. Si prega di informare l'amministratore del server.</value>
   </data>
   <data name="UntrustedCertificate" xml:space="preserve">
-    <value>Certyfikat niezaufany</value>
+    <value>Certificato non attendibile</value>
   </data>
   <data name="ManualSync" xml:space="preserve">
-    <value>Uruchom synchronizację teraz</value>
+    <value>Esegui la sincronizzazione ora</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Ustawienia...</value>
+    <value>Impostazioni...</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Zapisz</value>
+    <value>Salva</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
     <value>CmisSync</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
-    <value>Częstość synchronizacji</value>
+    <value>Intervallo di sincronizzazione</value>
   </data>
   <data name="Hours" xml:space="preserve">
-    <value>godziny</value>
+    <value>ore</value>
   </data>
   <data name="Minutes" xml:space="preserve">
-    <value>minuty</value>
+    <value>minuti</value>
   </data>
   <data name="Day" xml:space="preserve">
-    <value>dni</value>
+    <value>giorno</value>
   </data>
   <data name="Hour" xml:space="preserve">
-    <value>godziny</value>
+    <value>ora</value>
   </data>
   <data name="WebAddress" xml:space="preserve">
-    <value>Adres repozytorium</value>
+    <value>Repository URL</value>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>Błąd</value>
+    <value>Errore</value>
   </data>
   <data name="SyncError" xml:space="preserve">
-    <value>Nie można zsynchronizować "{0}": {1}</value>
+    <value>Impossibile sincronizzare "{0}": {1}</value>
   </data>
   <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
-    <value>Czy na pewno chcesz się rozłączyć z tym repozytorium?  Żadne pliki nie zostaną usunięte z systemu, ale nie będą one synchronizowane.</value>
+    <value>Sei sicuro di voler disconnettere questo repository? Non verrà cancellato nessun file dal tuo sistema, ma la cartella non sarà più sincronizzata.</value>
   </data>
   <data name="Minute" xml:space="preserve">
-    <value>minut</value>
+    <value>minuto</value>
   </data>
   <data name="Seconds" xml:space="preserve">
-    <value>sekund</value>
+    <value>secondi</value>
   </data>
 </root>
