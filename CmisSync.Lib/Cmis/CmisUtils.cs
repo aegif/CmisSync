@@ -41,9 +41,10 @@ namespace CmisSync.Lib.Cmis
     /// </summary>
     public static class CmisUtils
     {
+        // Log.
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
-        /// <summary></summary>
+        /// <summary>Character that separates two folders in a CMIS path.</summary>
         public static char CMIS_FILE_SEPARATOR = '/';
 
         /// <summary>

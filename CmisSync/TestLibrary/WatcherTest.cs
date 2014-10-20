@@ -38,7 +38,7 @@ namespace TestLibrary
             WaitWatcher();
         }
 
-        [TearDown]
+        /*[TearDown]
         public void TestCleanup()
         {
             if (Directory.Exists(TestFolder))
@@ -87,7 +87,7 @@ namespace TestLibrary
                 Assert.AreEqual(3, watcher.GetChangeList().Count);
                 Assert.AreEqual(name, watcher.GetChangeList()[2]);
             }
-        }
+        }*/
 
         /// <summary></summary>
         public class FileSystemEventCount
@@ -161,7 +161,7 @@ namespace TestLibrary
             }
         }
 
-        [Test, Category("Fast")]
+        /*[Test, Category("Fast")]
         public void TestRemove()
         {
             using (Watcher watcher = new Watcher(TestFolder))
@@ -521,7 +521,7 @@ namespace TestLibrary
                 WaitWatcher();
                 Assert.AreEqual(0, watcher.GetChangeList().Count);
             }
-        }
+        }*/
 
         [Test, Category("Slow")]
         [Ignore]
@@ -612,7 +612,7 @@ namespace TestLibrary
         /// <param name="milliseconds"></param>
         /// <param name="watcher"></param>
         /// <param name="expect"></param>
-        public static void WaitWatcher(int milliseconds, Watcher watcher, int expect)
+        /*public static void WaitWatcher(int milliseconds, Watcher watcher, int expect)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -627,7 +627,7 @@ namespace TestLibrary
                 milliseconds = milliseconds - 10;
             }
             Console.WriteLine("Timeout");
-        }
+        }*/
 
         /// <summary></summary>
         /// <param name="milliseconds"></param>
