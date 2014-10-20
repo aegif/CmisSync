@@ -240,8 +240,14 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties.Resources.cs.resx" />
+    <EmbeddedResource Include="Properties.Resources.da.resx" />
+    <EmbeddedResource Include="Properties.Resources.it.resx" />
     <EmbeddedResource Include="Properties.Resources.nl.resx" />
+    <EmbeddedResource Include="Properties.Resources.no.resx" />
     <EmbeddedResource Include="Properties.Resources.pl.resx" />
+    <EmbeddedResource Include="Properties.Resources.pt-PT.resx" />
+    <EmbeddedResource Include="Properties.Resources.ru.resx" />
+    <EmbeddedResource Include="Properties.Resources.sl.resx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />
