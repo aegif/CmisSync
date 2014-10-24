@@ -14,7 +14,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
-using CmisSync.Lib.Events;
 using CmisSync.Lib.Database;
 
 namespace CmisSync.Lib.Sync
@@ -105,11 +104,6 @@ namespace CmisSync.Lib.Sync
             private IActivityListener activityListener;
 
             /// <summary>
-            /// Parameters to use for all CMIS requests.
-            /// </summary>
-            private Dictionary<string, string> cmisParameters;
-
-            /// <summary>
             /// Track whether <c>Dispose</c> has been called.
             /// </summary>
             private bool disposed = false;
@@ -133,11 +127,7 @@ namespace CmisSync.Lib.Sync
             /// Link to parent object.
             /// </summary>
             private RepoBase repo;
-
-            /// <summary>
-            /// EventQueue
-            /// </summary>
-            public SyncEventQueue Queue {get; private set;}
+            
 
             /// <summary>
             /// Set for first sync.
@@ -171,16 +161,12 @@ namespace CmisSync.Lib.Sync
 
                 suspended = this.repoinfo.IsSuspended;
 
-                Queue = repoCmis.Queue;
-
                 // Database is the user's AppData/Roaming
                 database = new Database.Database(repoinfo.CmisDatabase);
 
                 // Get path on remote repository.
                 remoteFolderPath = repoInfo.RemotePath;
 
-                cmisParameters = new Dictionary<string, string>();
-                UpdateCmisParameters();
                 if (Logger.IsInfoEnabled)
                 {
                     foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
@@ -188,7 +174,6 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("The folder \"" + ignoredFolder + "\" will be ignored");
                     }
                 }
-                repoCmis.EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(10, RepoInfoChanged));
 
                 syncWorker = new BackgroundWorker();
                 syncWorker.WorkerSupportsCancellation = true;
@@ -220,35 +205,6 @@ namespace CmisSync.Lib.Sync
                 );
             }
 
-            /// <summary>
-            /// This method is called, every time the config changes
-            /// </summary>
-            private bool RepoInfoChanged(ISyncEvent e)
-            {
-                if (e is RepoConfigChangedEvent)
-                {
-                    repoinfo = (e as RepoConfigChangedEvent).RepoInfo;
-                    UpdateCmisParameters();
-                    ForceFullSyncAtNextSync();
-                }
-                return false;
-            }
-
-            /// <summary>
-            /// Loads the CmisParameter from repoinfo. If repoinfo has been changed, this method sets the new informations for the next session
-            /// </summary>
-            private void UpdateCmisParameters()
-            {
-                cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-                cmisParameters[SessionParameter.AtomPubUrl] = repoinfo.Address.ToString();
-                cmisParameters[SessionParameter.User] = repoinfo.User;
-                cmisParameters[SessionParameter.Password] = repoinfo.Password.ToString();
-                cmisParameters[SessionParameter.RepositoryId] = repoinfo.RepoID;
-                // Sets the Connect Timeout to infinite
-                cmisParameters[SessionParameter.ConnectTimeout] = "60000"; // One minute
-                // Sets the Read Timeout to infinite
-                cmisParameters[SessionParameter.ReadTimeout] = "60000"; // One Minute
-            }
 
             /// <summary>
             ///  Update Settings.
@@ -262,7 +218,6 @@ namespace CmisSync.Lib.Sync
                 session = null;
 
                 this.repoinfo = repoInfo;
-                cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
             }
 
             /// <summary>
@@ -313,49 +268,49 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             public void Connect()
             {
-                // Create session factory.
-                SessionFactory factory = SessionFactory.NewInstance();
-                session = factory.CreateSession(cmisParameters);
-                // Detect whether the repository has the ChangeLog capability.
-                    Logger.Debug("Created CMIS session: " + session.ToString());
+                // Create session.
+                session = Auth.Auth.GetCmisSession(repoinfo.Address.ToString(), repoinfo.User, repoinfo.Password.ToString(), repoinfo.RepoID);
+                Logger.Debug("Created CMIS session: " + session.ToString());
+                
+                // Detect repository capabilities.
                 ChangeLogCapability = session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All
                         || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
-                    IsGetDescendantsSupported = session.RepositoryInfo.Capabilities.IsGetDescendantsSupported == true;
-                    IsGetFolderTreeSupported = session.RepositoryInfo.Capabilities.IsGetFolderTreeSupported == true;
-                    Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(this.repoinfo.Name);
-                    if (folder != null)
+                IsGetDescendantsSupported = session.RepositoryInfo.Capabilities.IsGetDescendantsSupported == true;
+                IsGetFolderTreeSupported = session.RepositoryInfo.Capabilities.IsGetFolderTreeSupported == true;
+                Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(this.repoinfo.Name);
+                if (folder != null)
+                {
+                    Config.Feature features = folder.SupportedFeatures;
+                    if (features != null)
                     {
-                        Config.Feature features = folder.SupportedFeatures;
-                        if (features != null)
-                        {
-                            if (IsGetDescendantsSupported && features.GetDescendantsSupport == false)
-                                IsGetDescendantsSupported = false;
-                            if (IsGetFolderTreeSupported && features.GetFolderTreeSupport == false)
-                                IsGetFolderTreeSupported = false;
-                            if (ChangeLogCapability && features.GetContentChangesSupport == false)
-                                ChangeLogCapability = false;
-                            if(ChangeLogCapability && session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All 
-                                || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.Properties)
-                                IsPropertyChangesSupported = true;
-                        }
+                        if (IsGetDescendantsSupported && features.GetDescendantsSupport == false)
+                            IsGetDescendantsSupported = false;
+                        if (IsGetFolderTreeSupported && features.GetFolderTreeSupport == false)
+                            IsGetFolderTreeSupported = false;
+                        if (ChangeLogCapability && features.GetContentChangesSupport == false)
+                            ChangeLogCapability = false;
+                        if(ChangeLogCapability && session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All 
+                            || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.Properties)
+                            IsPropertyChangesSupported = true;
                     }
-                    Logger.Debug("ChangeLog capability: " + ChangeLogCapability.ToString());
-                    Logger.Debug("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
-                    Logger.Debug("Get descendants support: " + IsGetDescendantsSupported.ToString());
-                    if(repoinfo.ChunkSize>0) {
-                        Logger.Debug("Chunked Up/Download enabled: chunk size = "+ repoinfo.ChunkSize.ToString() + " byte");
-                    }else {
-                        Logger.Debug("Chunked Up/Download disabled");
-                    }
-                    HashSet<string> filters = new HashSet<string>();
-                    filters.Add("cmis:objectId");
-                    filters.Add("cmis:name");
-                    filters.Add("cmis:contentStreamFileName");
-                    filters.Add("cmis:contentStreamLength");
-                    filters.Add("cmis:lastModificationDate");
-                    filters.Add("cmis:lastModifiedBy");
-                    filters.Add("cmis:path");
-                    session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
+                }
+                Logger.Debug("ChangeLog capability: " + ChangeLogCapability.ToString());
+                Logger.Debug("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
+                Logger.Debug("Get descendants support: " + IsGetDescendantsSupported.ToString());
+                if(repoinfo.ChunkSize>0) {
+                    Logger.Debug("Chunked Up/Download enabled: chunk size = "+ repoinfo.ChunkSize.ToString() + " byte");
+                }else {
+                    Logger.Debug("Chunked Up/Download disabled");
+                }
+                HashSet<string> filters = new HashSet<string>();
+                filters.Add("cmis:objectId");
+                filters.Add("cmis:name");
+                filters.Add("cmis:contentStreamFileName");
+                filters.Add("cmis:contentStreamLength");
+                filters.Add("cmis:lastModificationDate");
+                filters.Add("cmis:lastModifiedBy");
+                filters.Add("cmis:path");
+                session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
             }
 
             /// <summary>
@@ -449,31 +404,36 @@ namespace CmisSync.Lib.Sync
 
                     if (firstSync)
                     {
-                        Logger.Debug("Invoke a full crawl sync");
+                        Logger.Debug("First sync, invoke a full crawl sync");
                         CrawlSync(remoteFolder, localFolder);
                         firstSync = false;
+                    }
+
+                    if (!syncFull)
+                    {
+                        // Apply changes locally noticed by the filesystem watcher.
+                        WatcherSync(remoteFolderPath, localFolder);
                     }
 
                     if ( false /* ChangeLog disabled for now TODO */ && ChangeLogCapability)
                     {
                         Logger.Debug("Invoke a remote change log sync");
                         ChangeLogSync(remoteFolder);
-                        if(repo.Watcher.GetChangeList().Count > 0)
+                        /*if(repo.Watcher.GetChangeList().Count > 0)
                         {
                             Logger.Debug("Changes on the local file system detected => starting crawl sync");
-                            repo.Watcher.RemoveAll();
+                            repo.Watcher.Clear();
                             // TODO if(!CrawlSync(remoteFolder,localFolder))
                             // TODO    repo.Watcher.InsertChange("/", Watcher.ChangeTypes.Changed);
-                        }
+                        }*/
                     }
                     else
                     {
                         //  have to crawl remote
                         Logger.Debug("Invoke a remote crawl sync");
-                        repo.Watcher.RemoveAll();
+                        repo.Watcher.Clear();
                         CrawlSync(remoteFolder, localFolder);
                     }
-
                 }
             }
 
@@ -1570,7 +1530,7 @@ namespace CmisSync.Lib.Sync
                 return metadata;
             }
 
-/*          /// <summary>
+            /// <summary>
             /// Rename a file remotely.
             /// </summary>
             private bool RenameFile(string directory, string newFilename, IDocument remoteFile)
@@ -1590,10 +1550,12 @@ namespace CmisSync.Lib.Sync
                     IDocument updatedDocument = (IDocument)remoteFile.UpdateProperties(properties);
 
                     // Update the path in the database...
-                    database.MoveFile(oldPathname, newPathname);
+                    database.MoveFile(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo), SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo));
 
                     // Update timestamp in database.
-                    database.SetFileServerSideModificationDate(newPathname, ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());
+                    database.SetFileServerSideModificationDate(
+                        SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo),
+                        ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());
 
                     Logger.InfoFormat("Renamed file: {0} -> {1}", oldPathname, newPathname);
                     return true;
@@ -1625,7 +1587,7 @@ namespace CmisSync.Lib.Sync
                     IFolder updatedFolder = (IFolder)remoteFolder.UpdateProperties(properties);
 
                     // Update the path in the database...
-                    database.MoveFolder(oldPathname, newPathname);      // database query
+                    database.MoveFolder(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo), SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo));      // database query
 
                     Logger.InfoFormat("Renamed folder: {0} -> {1}", oldPathname, newPathname);
                     return true;
@@ -1655,10 +1617,12 @@ namespace CmisSync.Lib.Sync
                     IDocument updatedDocument = (IDocument)remoteFile.Move(oldRemoteFolder, newRemoteFolder);
 
                     // Update the path in the database...
-                    database.MoveFile(oldPathname, newPathname);        // database query
+                    database.MoveFile(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo), SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo));        // database query
 
                     // Update timestamp in database.
-                    database.SetFileServerSideModificationDate(newPathname, ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());    // database query
+                    database.SetFileServerSideModificationDate(
+                        SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo),
+                        ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime());    // database query
 
                     Logger.InfoFormat("Moved file: {0} -> {1}", oldPathname, newPathname);
                     return true;
@@ -1688,7 +1652,7 @@ namespace CmisSync.Lib.Sync
                     IFolder updatedFolder = (IFolder)remoteFolder.Move(oldRemoteFolder, newRemoteFolder);
 
                     // Update the path in the database...
-                    database.MoveFolder(oldPathname, newPathname);      // database query
+                    database.MoveFolder(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo), SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo));      // database query
 
                     Logger.InfoFormat("Moved folder: {0} -> {1}", oldPathname, newPathname);
                     return true;
@@ -1698,7 +1662,7 @@ namespace CmisSync.Lib.Sync
                     ProcessRecoverableException(String.Format("Could not move folder: {0} -> {1}", oldPathname, newPathname), e);
                     return false;
                 }
-            }*/
+            }
 
 
             /// <summary>

@@ -90,11 +90,6 @@ namespace CmisSync
         public event Action FolderListChanged = delegate { };
 
         /// <summary>
-        /// 
-        /// </summary>
-        public event Action OnTransmissionListChanged = delegate { };
-
-        /// <summary>
         /// Called with status changes to idle.
         /// </summary>
         public event Action OnIdle = delegate { };
@@ -183,10 +178,6 @@ namespace CmisSync
         /// </summary>
         private IActivityListener activityListenerAggregator;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private ActiveActivitiesManager activitiesManager;
 
         /// <summary>
         /// A folder lock for the base directory.
@@ -205,16 +196,6 @@ namespace CmisSync
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
             FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
-            activitiesManager = new ActiveActivitiesManager();
-            this.activitiesManager.ActiveTransmissions.CollectionChanged += delegate(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
-                OnTransmissionListChanged();
-            };
-        }
-
-        /// <summary></summary>
-        /// <returns></returns>
-        public List<FileTransmissionEvent> ActiveTransmissions() {
-            return this.activitiesManager.ActiveTransmissions.ToList<FileTransmissionEvent>();
         }
 
         /// <summary>
@@ -271,12 +252,6 @@ namespace CmisSync
         {
             RepoBase repo = null;
             repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
-
-            repo.EventManager.AddEventHandler(
-                new GenericSyncEventHandler<FileTransmissionEvent>( 50, delegate(ISyncEvent e){
-                this.activitiesManager.AddTransmission(e as FileTransmissionEvent);
-                return false;
-            }));
             this.repositories.Add(repo);
             repo.Initialize();
         }

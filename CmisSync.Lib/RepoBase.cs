@@ -128,18 +128,6 @@ namespace CmisSync.Lib
         }
 
         /// <summary>
-        /// Event Queue for this repository.
-        /// Use this to notifiy events for this repository.
-        /// </summary>
-        public SyncEventQueue Queue { get; private set; }
-
-        /// <summary>
-        /// Event Manager for this repository.
-        /// Use this for adding and removing SyncEventHandler for this repository.
-        /// </summary>
-        public SyncEventManager EventManager { get; private set; }
-
-        /// <summary>
         /// Return the synchronized folder's information.
         /// </summary>
         protected RepoInfo RepoInfo { get; set; }
@@ -197,10 +185,6 @@ namespace CmisSync.Lib
         /// </summary>
         public RepoBase(RepoInfo repoInfo, IActivityListener activityListener)
         {
-            EventManager = new SyncEventManager();
-            EventManager.AddEventHandler(new DebugLoggingHandler());
-            EventManager.AddEventHandler(new GenericSyncEventHandler<RepoConfigChangedEvent>(0, RepoInfoChanged));
-            Queue = new SyncEventQueue(EventManager);
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
             Name = repoInfo.Name;
@@ -289,7 +273,6 @@ namespace CmisSync.Lib
                     this.local_timer.Dispose();
                     this.Watcher.Dispose();
                     // this.folderLock.Dispose(); Folder lock disabled.
-                    this.Queue.Dispose();
                 }
                 this.disposed = true;
             }
@@ -437,7 +420,7 @@ namespace CmisSync.Lib
             if (Watcher.GetChangeCount() > 0)
             {
                 //Watcher was stopped (due to error) so clear and restart sync
-                Watcher.RemoveAll();
+                Watcher.Clear();
             }
 
             Watcher.EnableRaisingEvents = true;
@@ -460,7 +443,7 @@ namespace CmisSync.Lib
         /// </summary>
         public void OnSyncError(Exception exception)
         {
-            Logger.Info("Sync Error: " + exception.Message);
+            Logger.Info("Sync Error: " + exception.GetType() + ", " + exception.Message);
             activityListener.ActivityError(new Tuple<string, Exception>(Name, exception));
         }
 
