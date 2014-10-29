@@ -101,58 +101,6 @@ namespace CmisSync {
             // If we return true here, Notification will show up even if your app is TopMost.
             notificationCenter.ShouldPresentNotification = (c, n) => { return true; };
 
-            OnTransmissionListChanged += delegate {
-
-                using (var a = new NSAutoreleasePool()) {
-                    notificationCenter.BeginInvokeOnMainThread(delegate {
-                        lock (transmissionLock) {
-                            List<FileTransmissionEvent> transmissions = ActiveTransmissions();
-                            NSUserNotification[] notifications = notificationCenter.DeliveredNotifications;
-                            List<NSUserNotification> finishedNotifications = new List<NSUserNotification> ();
-                            foreach (NSUserNotification notification in notifications) {
-                                FileTransmissionEvent transmission = transmissions.Find( (FileTransmissionEvent e)=>{return (e.Path == notification.InformativeText);});
-                                if (transmission == null) {
-                                    finishedNotifications.Add (notification);
-                                } else {
-                                    if (transmissionFiles.ContainsKey (transmission.Path)) {
-                                        transmissions.Remove(transmission);
-                                    } else {
-                                        notificationCenter.RemoveDeliveredNotification (notification);
-                                    }
-                                }
-                            }
-                            finishedNotifications.Sort (new ComparerNSUserNotification ());
-                            for (int i = 0; i<(notifications.Length - notificationKeep) && i<finishedNotifications.Count; ++i) {
-                                notificationCenter.RemoveDeliveredNotification (finishedNotifications[i]);
-                            }
-                            foreach (FileTransmissionEvent transmission in transmissions) {
-                                if (transmission.Status.Aborted == true) {
-                                    continue;
-                                }
-                                if (transmission.Status.Completed == true) {
-                                    continue;
-                                }
-                                if (transmission.Status.FailedException != null) {
-                                    continue;
-                                }
-                                var notification = new UserNotification(UserNotification.NotificationKind.Transmission); 
-                                // NSUserNotification notification = new NSUserNotification();
-                                notification.Title = Path.GetFileName (transmission.Path);
-                                notification.Subtitle = TransmissionStatus(transmission);
-                                notification.InformativeText = transmission.Path;
-                                notificationMessages.Add(notification.Id, transmission.Path);
-//                                notification.SoundName = NSUserNotification.NSUserNotificationDefaultSoundName;
-                                transmission.TransmissionStatus += TransmissionReport;
-                                // notification.DeliveryDate = NSDate.Now;
-                                notificationCenter.DeliverNotification (notification);
-                                transmissionFiles.Add (transmission.Path, notification.DeliveryDate);
-                                UpdateFileStatus (transmission, null);
-                            }
-                        }
-                    });
-                }
-            };
-
             AlertNotificationRaised += delegate(string title, string message) {
                 var alert = new NSAlert {
                     MessageText = message,

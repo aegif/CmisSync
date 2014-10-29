@@ -117,27 +117,6 @@ namespace CmisSync {
                     });
                 }
             };
-
-            // TODO Need to implement this method like the COCOA way to do it
-            Controller.UpdateTransmissionMenuEvent += delegate
-            {
-                using (var a = new NSAutoreleasePool()) {
-                    InvokeOnMainThread(delegate {
-                        List<FileTransmissionEvent> transmissions =    Program.Controller.ActiveTransmissions();
-                        NSMenu transmissionmenu = new NSMenu();
-                        foreach(FileTransmissionEvent transmission in transmissions) {
-                            NSMenuItem transmissionItem = new TransmissionMenuItem(transmission);
-                            transmissionmenu.AddItem(transmissionItem);
-                        }
-                        if(transmissions.Count > 0) {
-                            state_item.Submenu = transmissionmenu;
-                            state_item.Enabled = true;
-                        }else{
-                            state_item.Enabled = false;
-                        }
-                    });
-                }
-            };
         }
 
         NSMenuItem CreateFolderMenuItem(string folder_name)
