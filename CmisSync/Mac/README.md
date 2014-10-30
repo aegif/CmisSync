@@ -14,9 +14,9 @@ Latest MonoDevelop(Xamarin Studio 4.x.x) contains the MonoMac add-in.
 You may need to adjust some environment variables to let the build environment tools find mono:
    
 ```bash
-$ export PATH=/Library/Frameworks/Mono.framework/Versions/Current/bin:$PATH
-$ export PKG_CONFIG=/Library/Frameworks/Mono.framework/Versions/Current/bin/pkg-config
-$ export PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig
+export PATH=/Library/Frameworks/Mono.framework/Versions/Current/bin:$PATH
+export PKG_CONFIG=/Library/Frameworks/Mono.framework/Versions/Current/bin/pkg-config
+export PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/pkgconfig
 ```
 
 Install <tt>automake</tt>, <tt>libtool</tt> and <tt>intltool</tt> using <tt>MacPorts</tt>:
