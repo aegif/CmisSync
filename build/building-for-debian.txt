@@ -13,6 +13,8 @@ mkdir usr/local/share
 cp -r /usr/local/share/cmissync/ usr/local/share/
 mkdir usr/local/share/applications
 cp /usr/local/share/applications/cmissync.desktop usr/local/share/applications/
+cp -r build/DEBIAN .
+cd ..
 
 Then update the version number in DEBIAN/control and run:
 
