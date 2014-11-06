@@ -167,7 +167,7 @@ namespace CmisSync
 
         void ShowWelcomePage()
         {
-            Header.StringValue = Properties_Resources.Ready;
+            Header.StringValue = Properties_Resources.Welcome;
             Description.StringValue = "";
             SubController = new SetupSubWelcomeController (Controller);
             Content.ContentView = SubController.View;

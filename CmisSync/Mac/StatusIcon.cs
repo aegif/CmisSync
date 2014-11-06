@@ -313,9 +313,9 @@ namespace CmisSync {
         {
             return delegate
             {
-                NSAlert alert = NSAlert.WithMessage(Properties_Resources.RemoveSyncQuestion,"No, please continue syncing","Yes, stop syncing",null,"");
+                NSAlert alert = NSAlert.WithMessage(
+                    Properties_Resources.RemoveSyncQuestion, "No", "Yes", null, "");
                 alert.Icon = this.caution_image;
-                alert.Window.OrderFrontRegardless();
                 int i = alert.RunModal();
                 if(i == 0)
                     Controller.RemoveFolderFromSyncClicked(name);
