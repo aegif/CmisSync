@@ -5,9 +5,9 @@
 	<key>CFBundleIconFile</key>
 	<string>cmissync-app</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.graudata.dataspacesync</string>
+	<string>jp.aegif.cmissync</string>
 	<key>CFBundleName</key>
-	<string>DataSpace Sync</string>
+	<string>CmisSync</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
@@ -21,7 +21,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>CFBundleDisplayName</key>
-	<string>DataSpace Sync</string>
+	<string>CmisSync</string>
 	<key>CFBundleShortVersionString</key>
 	<string>@VERSION@</string>
 </dict>

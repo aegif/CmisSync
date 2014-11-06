@@ -208,10 +208,10 @@
     <value>Einführung überspringen</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Leider kann DataSpace Sync keinen CMIS-Server unter dieser Adresse finden. Bitte prüfen Sie angegebene Adresse. Wenn Sie sich sicher sind das die Adresse stimmt, öffnen Sie diese in einem Browser und posten Sie die XML Antwort nach cmissync@aegif.jp</value>
+    <value>Leider kann CmisSync keinen CMIS-Server unter dieser Adresse finden. Bitte prüfen Sie angegebene Adresse. Wenn Sie sich sicher sind das die Adresse stimmt, öffnen Sie diese in einem Browser und posten Sie die XML Antwort nach cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>DataSpace Sync im Autostart hinzufügen</value>
+    <value>CmisSync im Autostart hinzufügen</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>Das Symbol ist in der Statusleiste zu finden</value>
