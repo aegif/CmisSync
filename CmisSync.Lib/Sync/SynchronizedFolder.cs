@@ -1293,7 +1293,7 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception e)
                     {
-                        ProcessRecoverableException(String.Format("Exception when create remote folder for local folder {0}: {1}", localFolder), e);
+                        ProcessRecoverableException(String.Format("Exception when create remote folder for local folder {0}: {1}", localFolder, e.Message), e);
                         return;
                     }
 
