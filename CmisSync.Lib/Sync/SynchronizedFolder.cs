@@ -21,7 +21,7 @@ namespace CmisSync.Lib.Sync
     public partial class CmisRepo : RepoBase
     {
         // Log.
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisRepo));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisRepo)); // TODO why 2 loggers in this file?
 
         /// <summary>
         /// Synchronization with a particular CMIS folder.
