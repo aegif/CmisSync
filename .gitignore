@@ -30,6 +30,7 @@ CmisSync/Linux/dataspacesync
 CmisSync/Mac/git
 CmisSync.Lib/Defines.cs
 CmisSync/Linux/Defines.cs
+CmisSync/MacConsole/packages
 gnome-doc-utils.make
 desktop.ini
 _ReSharper.*
