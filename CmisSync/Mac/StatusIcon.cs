@@ -24,12 +24,16 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
+using log4net;
+
 using CmisSync.Lib;
 using CmisSync.Lib.Events;
 
 namespace CmisSync {
 
     public class StatusIcon : NSObject {
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StatusIcon));
 
         public StatusIconController Controller = new StatusIconController ();
 
@@ -75,6 +79,8 @@ namespace CmisSync {
             
 
             Controller.UpdateIconEvent += delegate (int icon_frame) {
+                Logger.Debug("StatusIcon UpdateIconEvent " + icon_frame);
+
                 using (var a = new NSAutoreleasePool ())
                 {
                     BeginInvokeOnMainThread (delegate {
@@ -178,6 +184,7 @@ namespace CmisSync {
         }
 
         private void setSyncItemState(NSMenuItem item, SyncStatus status) {
+            Logger.Debug("setSyncItemState " + status);
             switch (status)
             {
                 case SyncStatus.Idle:
@@ -361,7 +368,20 @@ namespace CmisSync {
     
     
     public class StatusIconMenuDelegate : NSMenuDelegate {
-        
+
+        // Log.
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StatusIconMenuDelegate));
+
+        // Empty constructor.
+        public StatusIconMenuDelegate() {
+            // Empty.
+        }
+
+        // Pointer constructor for debugging issue https://github.com/aegif/CmisSync/issues/472
+        public StatusIconMenuDelegate(System.IntPtr pointer) {
+            Logger.Debug("StatusIconMenuDelegate pointer constructor invoked, pointer=" + pointer);
+        }
+
         public override void MenuWillHighlightItem (NSMenu menu, NSMenuItem item)
         {
         }

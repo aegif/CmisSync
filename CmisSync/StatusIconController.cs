@@ -225,7 +225,9 @@ namespace CmisSync
 
                 UpdateStatusItemEvent(StateText);
 
-                this.animation.Stop();
+                //this.animation.Stop();
+                //this.animation_frame_number = 0; // Idle status icon
+                //UpdateIconEvent(this.animation_frame_number);
 
 //NOTGDS2: begin
                 UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
@@ -235,12 +237,15 @@ namespace CmisSync
             // Syncing.
             Program.Controller.OnSyncing += delegate
             {
+                Logger.Debug("StatusIconController OnSyncing");
                 CurrentState = IconState.Syncing;
                 StateText = Properties_Resources.SyncingChanges;
 
                 UpdateStatusItemEvent(StateText);
 
-                this.animation.Start();
+                //this.animation.Start();
+                this.animation_frame_number = 3; // Syncing icon
+                UpdateIconEvent(this.animation_frame_number);
             };
 
             // Error.
@@ -429,7 +434,10 @@ namespace CmisSync
         /// </summary>
         private void InitAnimation()
         {
-            this.animation_frame_number = 0;
+            this.animation_frame_number = 3; // Syncing icon
+            UpdateIconEvent(this.animation_frame_number);
+
+            /*this.animation_frame_number = 0;
 
             this.animation = new Timer()
             {
@@ -438,13 +446,14 @@ namespace CmisSync
 
             this.animation.Elapsed += delegate
             {
+                Logger.Debug("StatusIconController Animation Elapsed " + this.animation_frame_number);
                 if (this.animation_frame_number < 4)
                     this.animation_frame_number++;
                 else
                     this.animation_frame_number = 0;
 
-                UpdateIconEvent(this.animation_frame_number);
-            };
+                UpdateIconEvent(3);//this.animation_frame_number);
+            };*/
         }
     }
 }
