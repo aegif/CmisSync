@@ -14,6 +14,9 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#if (__MonoCS__)
+#define MonoBug24381 // https://bugzilla.xamarin.com/show_bug.cgi?id=24381
+#endif
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
@@ -225,11 +228,14 @@ namespace CmisSync
 
                 UpdateStatusItemEvent(StateText);
 
-                //this.animation.Stop();
-                //this.animation_frame_number = 0; // Idle status icon
-                //UpdateIconEvent(this.animation_frame_number);
+#if MonoBug24381
+                this.animation_frame_number = 0; // Idle status icon
+                UpdateIconEvent(this.animation_frame_number);
+#else
+                this.animation.Stop();
+#endif
 
-//NOTGDS2: begin
+                //NOTGDS2: begin
                 UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
                 UpdateMenuEvent(CurrentState);
             };
@@ -243,9 +249,12 @@ namespace CmisSync
 
                 UpdateStatusItemEvent(StateText);
 
-                //this.animation.Start();
+#if MonoBug24381
                 this.animation_frame_number = 3; // Syncing icon
                 UpdateIconEvent(this.animation_frame_number);
+#else
+                this.animation.Start();
+#endif
             };
 
             // Error.
@@ -434,10 +443,12 @@ namespace CmisSync
         /// </summary>
         private void InitAnimation()
         {
+#if MonoBug24381
+
             this.animation_frame_number = 3; // Syncing icon
             UpdateIconEvent(this.animation_frame_number);
-
-            /*this.animation_frame_number = 0;
+#else
+            this.animation_frame_number = 0;
 
             this.animation = new Timer()
             {
@@ -452,8 +463,9 @@ namespace CmisSync
                 else
                     this.animation_frame_number = 0;
 
-                UpdateIconEvent(3);//this.animation_frame_number);
-            };*/
+                UpdateIconEvent(this.animation_frame_number);
+            };
+#endif
         }
     }
 }
