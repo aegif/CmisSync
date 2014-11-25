@@ -9,6 +9,7 @@ namespace TestLibrary
     using CmisSync.Lib;
     using CmisSync.Lib.Events;
 
+    /// <summary></summary>
     [TestFixture]
     public class DebugLoggingHandlerTest
     {
@@ -20,7 +21,6 @@ namespace TestLibrary
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
 
-
         [Test]
         public void ToStringTest() {
             var handler = new DebugLoggingHandler();
@@ -31,7 +31,6 @@ namespace TestLibrary
         public void PriorityTest() {
             var handler = new DebugLoggingHandler();
             Assert.AreEqual(10000, handler.Priority);
-            
         }
         
     }

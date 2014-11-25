@@ -249,7 +249,7 @@ the resulting XML on the cmissync forum.</value>
     <value>Which remote folder do you want to sync?</value>
   </data>
   <data name="YouCan" xml:space="preserve">
-    <value>You can easily add a new CMIS folder at any time.</value>
+    <value>You can easily add a new folder to synchronize, at any time.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
     <value>You can find them in your CmisSync folder.</value>

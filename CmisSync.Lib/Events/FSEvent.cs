@@ -3,6 +3,7 @@ using System.IO;
 
 namespace CmisSync.Lib.Events
 {
+    /// <summary></summary>
     public class FSEvent : ISyncEvent
     {
         /// <summary>
@@ -28,6 +29,8 @@ namespace CmisSync.Lib.Events
             Path = path;
         }
 
+        /// <summary></summary>
+        /// <returns></returns>
         public override string ToString() {
             return string.Format("FSEvent with type \"{0}\" on path \"{1}\"", Type, Path);
         }

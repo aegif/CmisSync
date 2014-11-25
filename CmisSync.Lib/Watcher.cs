@@ -21,6 +21,8 @@ using System.IO;
 using System.Collections.Generic;
 
 using log4net;
+using System.Security.Permissions;
+using CmisSync.Lib.Cmis;
 
 
 namespace CmisSync.Lib
@@ -41,13 +43,13 @@ namespace CmisSync.Lib
         /// <summary>
         /// the file/folder pathname (relative to <c>Path</c>) list for changes
         /// </summary>
-        private List<string> changeList = new List<string>();
+        private List<FileSystemEventArgs> changeList = new List<FileSystemEventArgs>();
 
         /// <summary>
         /// supported change type
         /// rename a file: <c>Deleted</c> for the old name, and <c>Created</c> for the new name
         /// </summary>
-        public enum ChangeTypes
+        /*public enum ChangeTypes
         {
             /// <summary>
             /// no change for the file/folder
@@ -68,15 +70,15 @@ namespace CmisSync.Lib
             /// the file/folder is deleted
             /// </summary>
             Deleted
-        };
+        };*/
 
         /// <summary>
         /// key is the element in <c>changeList</c>
         /// </summary>
-        private Dictionary<string, ChangeTypes> changes = new Dictionary<string, ChangeTypes>();
+        //private Dictionary<string, ChangeTypes> changes = new Dictionary<string, ChangeTypes>();
 
 
-        /// <summary>
+        /*/// <summary>
         /// <returns>the file/folder pathname (relative to <c>Path</c>) list for changes</returns>
         /// </summary>
         public List<string> GetChangeList()
@@ -142,11 +144,12 @@ namespace CmisSync.Lib
             }
         }
 
-
         /// <summary>
-        /// insert <param name="name">the file/folder</param> for <param name="change"/> in changes
-        /// It should do nothing if <param name="name">the file/folder</param> exists in changes
+        /// Insert the file/folder for change parameter.
+        /// It should do nothing if the file/folder exists in changes.
         /// </summary>
+        /// <param name="name">the file/folder</param>
+        /// <param name="change"></param>
         public void InsertChange(string name, ChangeTypes change)
         {
             if (ChangeTypes.None == change)
@@ -187,7 +190,7 @@ namespace CmisSync.Lib
             {
                 return changeList.Count;
             }
-        }
+        }*/
 
 
         /// <summary>
@@ -212,61 +215,141 @@ namespace CmisSync.Lib
             Changed += new FileSystemEventHandler(OnChanged);
             Renamed += new RenamedEventHandler(OnRenamed);
 
-            EnableRaisingEvents = false;
-            EnableEvent = false;
+            EnableRaisingEvents = true;
+            EnableEvent = true;
         }
 
 
-        private void OnCreated(object source, FileSystemEventArgs e)
-        {
-            Logger.Debug("FS Object creation detected: " + e.FullPath);
-            List<ChangeTypes> checks = new List<ChangeTypes>();
-            checks.Add(ChangeTypes.Deleted);
-            ChangeHandle(e.FullPath, ChangeTypes.Created, checks);
-            InvokeChangeEvent(e);
-        }
-
-
-        private void OnDeleted(object source, FileSystemEventArgs e)
-        {
-            Logger.Debug("FS Object deletion detected: " + e.FullPath);
-            List<ChangeTypes> checks = new List<ChangeTypes>();
-            checks.Add(ChangeTypes.Created);
-            checks.Add(ChangeTypes.Changed);
-            ChangeHandle(e.FullPath, ChangeTypes.Deleted, checks);
-            InvokeChangeEvent(e);
-        }
-
-
-        private void OnChanged(object source, FileSystemEventArgs e)
-        {
-            Logger.Debug("FS Object change detected: " + e.FullPath);
-            List<ChangeTypes> checks = new List<ChangeTypes>();
-            checks.Add(ChangeTypes.Created);
-            checks.Add(ChangeTypes.Changed);
-            ChangeHandle(e.FullPath, ChangeTypes.Changed, checks);
-            InvokeChangeEvent(e);
-        }
-
-
-        private void ChangeHandle(string name, ChangeTypes type, List<ChangeTypes> checks)
+        /// <summary>
+        /// Get the change queue.
+        /// </summary>
+        public Queue<FileSystemEventArgs> GetChangeQueue()
         {
             lock (changeLock)
             {
-                Debug.Assert(name.StartsWith(Path));
-                ChangeTypes oldType;
-                if (changes.TryGetValue(name, out oldType))
+                Queue<FileSystemEventArgs> changeQueue = new Queue<FileSystemEventArgs>();
+                int changeListCount = changeList.Count;
+                for (int i = 0; i < changeListCount; i++)
                 {
-                    Debug.Assert(checks.Contains(oldType));
-                    changeList.Remove(name);
+                    FileSystemEventArgs change = changeList[i];
+                    string fileName = System.IO.Path.GetFileName(change.FullPath);
+                    string dirName = System.IO.Path.GetDirectoryName(change.FullPath);
+                    bool redundantChange = false;
+                    if (change.ChangeType == WatcherChangeTypes.Deleted)
+                    {
+                        //Detect a file/folder move...
+                        FileSystemEventArgs nextChange = ((i + 1) < changeListCount) ? changeList[i + 1] : null;
+                        if (nextChange != null)
+                        {
+                            string nextFileName = System.IO.Path.GetFileName(nextChange.FullPath);
+                            string nextDirName = System.IO.Path.GetDirectoryName(nextChange.FullPath);
+                            if (nextChange.ChangeType == WatcherChangeTypes.Created &&
+                            nextFileName.Equals(fileName) && !nextDirName.Equals(dirName))
+                            {
+                                //Move detected...
+                                change = new MovedEventArgs(WatcherChangeTypes.Renamed, dirName, nextDirName, fileName);
+                                ++i; //Skip nextChange
+                            }
+                        }
+                    }
+                    else if (change.ChangeType == WatcherChangeTypes.Changed)
+                    {
+                        //Detect redundant changes...
+                        for (int j = i - 1; j >= 0; j--)
+                        {
+                            //Iterate backwards through the list of changes, find the most recent operation on this specific file
+                            if (change.FullPath.Equals(changeList[j].FullPath))
+                            {
+                                //If the most recent operation is a created or changed operation this operation is redundant
+                                if (changeList[j].ChangeType == WatcherChangeTypes.Created ||
+                                changeList[j].ChangeType == WatcherChangeTypes.Changed)
+                                {
+                                    redundantChange = true;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (!redundantChange)
+                    {
+                        changeQueue.Enqueue(change);
+                    }
                 }
-                changeList.Add(name);
-                changes[name] = type;
+                return changeQueue;
             }
         }
 
 
+        /// <summary>
+        /// Get the change queue.
+        /// </summary>
+        public int GetChangeCount()
+        {
+            lock (changeLock)
+            {
+                return changeList.Count;
+            }
+        }
+
+        /// <summary>
+        /// insert <param name="change"/> in changes.
+        /// </summary>
+        private void AddChange(FileSystemEventArgs change)
+        {
+            lock (changeLock)
+            {
+                Logger.DebugFormat("{0}: {1}", change.ChangeType, change.FullPath);
+                changeList.Add(change);
+            }
+        }
+        /// <summary>
+        /// remove all from changes
+        /// </summary>
+        public void Clear()
+        {
+            lock (changeLock)
+            {
+                if (Logger.IsDebugEnabled)
+                {
+                    foreach (FileSystemEventArgs change in changeList)
+                    {
+                        Logger.Debug("Removing -> " + change.ChangeType + ": " + change.Name);
+                    }
+                }
+                changeList.Clear();
+            }
+        }
+
+        private void OnCreated(object source, FileSystemEventArgs e)
+        {
+            ChangeHandle(e);
+        }
+        private void OnDeleted(object source, FileSystemEventArgs e)
+        {
+            ChangeHandle(e);
+        }
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
+            ChangeHandle(e);
+        }
         private void OnRenamed(object source, RenamedEventArgs e)
+        {
+            ChangeHandle(e);
+        }
+        private void ChangeHandle(FileSystemEventArgs change)
+        {
+            Debug.Assert(change.FullPath.StartsWith(Path), String.Format("Invalid change path {0} for watcher {1}.", change.FullPath, Path));
+            AddChange(change);
+            InvokeChangeEvent(change);
+        }
+        private void OnError(object source, ErrorEventArgs e)
+        {
+            Logger.Error("Error occurred for FileSystemWatcher");
+            EnableRaisingEvents = false;
+        }
+
+
+        /*private void OnRenamed(object source, RenamedEventArgs e)
         {
             Logger.Debug("FS Object renaming detected: " + e.OldFullPath + " to " + e.FullPath);
             string oldname = e.OldFullPath;
@@ -288,14 +371,7 @@ namespace CmisSync.Lib
                 OnCreated(source, eventCreate);
             }
             InvokeChangeEvent(e);
-        }
-
-
-        private void OnError(object source, ErrorEventArgs e)
-        {
-            Logger.Warn("Error occurred for FileSystemWatcher");
-            EnableRaisingEvents = false;
-        }
+        }*/
 
 
         /// <summary>
@@ -336,6 +412,49 @@ namespace CmisSync.Lib
             if (EnableEvent)
             {
                 ChangeEvent(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Provides data for a file moved event.
+        /// </summary>
+        public class MovedEventArgs : FileSystemEventArgs
+        {
+            private string oldDirectory;
+            private string oldFullPath;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            public MovedEventArgs(WatcherChangeTypes changeType, string oldDirectory, string directory, string name)
+                : base(changeType, directory, name)
+            {
+                // Ensure that the directory name ends with a "\"
+                if (!oldDirectory.EndsWith("\\", StringComparison.Ordinal))
+                {
+                    oldDirectory = oldDirectory + "\\";
+                }
+
+                // Ensure that the directory name ends with a "\"
+                if (!directory.EndsWith("\\", StringComparison.Ordinal))
+                {
+                    directory = directory + "\\";
+                }
+                
+                this.oldDirectory = oldDirectory;
+                this.oldFullPath = CmisUtils.PathCombine(oldDirectory, name);
+            }
+
+            /// <summary>
+            /// Gets the previous fully qualified path of the affected file or directory.
+            /// </summary>
+            public string OldFullPath
+            {
+                get
+                {
+                    new FileIOPermission(FileIOPermissionAccess.Read, System.IO.Path.GetPathRoot(oldFullPath)).Demand();
+                    return oldFullPath;
+                }
             }
         }
     }

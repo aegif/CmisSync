@@ -1,4 +1,4 @@
-using DotCMIS;
+﻿using DotCMIS;
 using DotCMIS.Client;
 using DotCMIS.Client.Impl;
 using DotCMIS.Exceptions;
@@ -36,14 +36,16 @@ namespace CmisSync.Lib.Cmis
         }
     }
 
-
     /// <summary>
     /// Useful CMIS methods.
     /// </summary>
     public static class CmisUtils
     {
+        // Log.
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
+        /// <summary>Character that separates two folders in a CMIS path.</summary>
+        public static char CMIS_FILE_SEPARATOR = '/';
 
         /// <summary>
         /// Try to find the CMIS server associated to any URL.
@@ -245,14 +247,20 @@ namespace CmisSync.Lib.Cmis
             /// Children.
             /// </summary>
             public List<FolderTree> Children = new List<FolderTree>();
+
             /// <summary>
             /// Folder path.
             /// </summary>
             public string Path;
+
             /// <summary>
             /// Folder name.
             /// </summary>
             public string Name { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
             public bool Finished { get; set; }
 
             /// <summary>
@@ -430,6 +438,22 @@ namespace CmisSync.Lib.Cmis
                 }
             }
             return null;
+        }
+
+
+        /// <summary>
+        /// Equivalent of .NET Path.Combine, but for CMIS paths.
+        /// CMIS paths always use forward slashes.
+        /// </summary>
+        public static string PathCombine(string path1, string path2)
+        {
+            if (String.IsNullOrEmpty(path1))
+                return path2;
+
+            if (String.IsNullOrEmpty(path2))
+                return path1;
+
+            return path1 + CMIS_FILE_SEPARATOR + path2;
         }
     }
 }

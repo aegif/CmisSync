@@ -6,6 +6,7 @@ using System.Text;
 
 namespace TestLibrary
 {
+    /// <summary></summary>
     [TestFixture]
     public class EncodingTest
     {

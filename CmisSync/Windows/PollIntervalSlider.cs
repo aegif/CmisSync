@@ -20,12 +20,10 @@ namespace CmisSync
     {
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(PollIntervalSlider));
 
-
         /// <summary>
         /// Tooltip that shows poll interval  when mouse goes over the slider.
         /// </summary>
         private ToolTip _autoToolTip;
-
 
         /// <summary>
         /// Poll interval shown/tuned by the slider.
@@ -38,7 +36,6 @@ namespace CmisSync
                 this.Value = LogScaleConverter.Convert(value);
             }
         }
-
 
         /// <summary>
         /// Constructor.
@@ -68,13 +65,11 @@ namespace CmisSync
             this.Ticks = tickMarks;
         }
 
-
         protected override void OnThumbDragStarted(DragStartedEventArgs e)
         {
             base.OnThumbDragStarted(e);
             this.FormatAutoToolTipContent();
         }
-
 
         protected override void OnThumbDragDelta(DragDeltaEventArgs e)
         {
@@ -82,18 +77,21 @@ namespace CmisSync
             this.FormatAutoToolTipContent();
         }
 
-
+        /// <summary></summary>
+        /// <returns></returns>
         public string FormattedMaximum()
         {
             return FormatToolTip((int)this.Maximum);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public string FormattedMinimum()
         {
             return FormatToolTip((int)this.Minimum);
         }
-
 
         private string FormatToolTip(int value)
         {
@@ -125,12 +123,10 @@ namespace CmisSync
             }
         }
 
-
         private void FormatAutoToolTipContent()
         {
             this.AutoToolTip.Content = FormatToolTip((int)this.Value);
         }
-
 
         private ToolTip AutoToolTip
         {
@@ -147,18 +143,23 @@ namespace CmisSync
         }
     }
 
-
+    /// <summary></summary>
     public class LogScaleConverter
     {
+        /// <summary></summary>
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(LogScaleConverter));
 
-
+        /// <summary></summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static int Convert(int value)
         {
             return (int)Math.Log((double)value);
         }
 
-
+        /// <summary></summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static int ConvertBack(int value)
         {
             Logger.Debug("ConvertBack " + value + " type:" + value.GetType());

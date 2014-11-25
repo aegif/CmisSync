@@ -11,6 +11,7 @@ using CmisSync.Lib.Cmis;
 namespace TestLibrary
 {
     using NUnit.Framework;
+    using CmisSync.Lib.Database;
 
     [TestFixture]
     class CmisDatabaseTest
@@ -39,7 +40,7 @@ namespace TestLibrary
         {
             File.Delete(DatabasePath);
         }
-
+        /*
         [Test, Category("Database")]
         public void TestSpecialCharacter()
         {
@@ -203,7 +204,7 @@ namespace TestLibrary
                 Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.CHANGE) == 0);
                 Assert.True(database.GetOperationRetryCounter(path, Database.OperationType.DELETE) == 0);
             }
-        }
+        }*/
 
         private void CreateTestFile(string path, int sizeInKB)
         {

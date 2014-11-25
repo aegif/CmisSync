@@ -52,6 +52,7 @@ namespace CmisSync.Lib.Sync
                     CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null);
                     
                     Logger.Info("Succeeded to sync from remote, update ChangeLog token: " + lastTokenOnServer);
+
                     database.SetChangeLogToken(lastTokenOnServer);
                 }
 
@@ -242,13 +243,13 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Info(String.Format("New remote file ({0}) found.", remotePath));
                     //  check moveObject
-                    string savedDocumentPath = database.GetFilePath(change.ObjectId);
+                    string savedDocumentPath = database.GetRemoteFilePath(change.ObjectId);
                     if ((null != savedDocumentPath) && (savedDocumentPath != localPath))
                     {
                         if (File.Exists(localPath))
                         {
                             File.Delete(savedDocumentPath);
-                            database.RemoveFile(savedDocumentPath);
+                            database.RemoveFile(SyncItemFactory.CreateFromRemotePath(savedDocumentPath, repoinfo));
                         }
                         else
                         {
@@ -261,7 +262,7 @@ namespace CmisSync.Lib.Sync
                                 }
                                 File.Move(savedDocumentPath, localPath);
                             }
-                            database.MoveFile(savedDocumentPath, localPath);
+                            database.MoveFile(SyncItemFactory.CreateFromRemotePath(savedDocumentPath, repoinfo), SyncItemFactory.CreateFromLocalPath(savedDocumentPath, repoinfo));
                         }
                     }
 
@@ -311,25 +312,27 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Warn("Exception when GetObject for " + change.ObjectId + " : ", e);
                 }
-
-                string savedDocumentPath = database.GetFilePath(change.ObjectId);
+                string savedDocumentPath = database.GetRemoteFilePath(change.ObjectId); // FIXME use SyncItem to differentiate between local path and remote path
                 if (null != savedDocumentPath)
                 {
                     Logger.Info("Remove local document: " + savedDocumentPath);
-                    if(File.Exists(savedDocumentPath))
+                    if (File.Exists(savedDocumentPath))
+                    {
                         File.Delete(savedDocumentPath);
-                    database.RemoveFile(savedDocumentPath);
+                    }
+
+                    database.RemoveFile(SyncItemFactory.CreateFromRemotePath(savedDocumentPath, repoinfo));
                     Logger.Info("Removed local document: " + savedDocumentPath);
                     return true;
                 }
-
+                    
                 string savedFolderPath = database.GetFolderPath(change.ObjectId);
                 if (null != savedFolderPath)
                 {
                     Logger.Info("Remove local folder: " + savedFolderPath);
                     if(Directory.Exists(savedFolderPath)) {
                         Directory.Delete(savedFolderPath, true);
-                        database.RemoveFolder(savedFolderPath);
+                        database.RemoveFolder(SyncItemFactory.CreateFromRemotePath(savedFolderPath, repoinfo));
                     }
                     Logger.Info("Removed local folder: " + savedFolderPath);
                     return true;

@@ -36,7 +36,7 @@ debian-package:
 apple-package:
 	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Release -t:Clean
 	"/Applications/Xamarin Studio.app/Contents/MacOS/mdtool" build CmisSync/Mac/CmisSync.sln -c:Release
-	(cd build; ./dmg-creator.sh ../bin/DataSpace\ Sync.app/; cd ..)
+	(cd build; ./dmg-creator.sh ../bin/CmisSync.app/; cd ..)
 
 none:
 install-exec-hook:

@@ -10,6 +10,7 @@ namespace TestLibrary
 {
     using NUnit.Framework;
 
+    /// <summary></summary>
     [TestFixture]
     public class WatcherTest
     {
@@ -37,7 +38,7 @@ namespace TestLibrary
             WaitWatcher();
         }
 
-        [TearDown]
+        /*[TearDown]
         public void TestCleanup()
         {
             if (Directory.Exists(TestFolder))
@@ -48,7 +49,6 @@ namespace TestLibrary
             File.Delete(oldnameOut);
             File.Delete(newnameOut);
         }
-
 
         [Test, Category("Fast")]
         public void TestEnableRaisingEvents()
@@ -87,10 +87,12 @@ namespace TestLibrary
                 Assert.AreEqual(3, watcher.GetChangeList().Count);
                 Assert.AreEqual(name, watcher.GetChangeList()[2]);
             }
-        }
+        }*/
 
+        /// <summary></summary>
         public class FileSystemEventCount
         {
+            /// <summary></summary>
             public int Count { get; private set; }
 
             public void OnFileSystemEvent(object e, FileSystemEventArgs args)
@@ -159,7 +161,7 @@ namespace TestLibrary
             }
         }
 
-        [Test, Category("Fast")]
+        /*[Test, Category("Fast")]
         public void TestRemove()
         {
             using (Watcher watcher = new Watcher(TestFolder))
@@ -519,7 +521,7 @@ namespace TestLibrary
                 WaitWatcher();
                 Assert.AreEqual(0, watcher.GetChangeList().Count);
             }
-        }
+        }*/
 
         [Test, Category("Slow")]
         [Ignore]
@@ -606,7 +608,11 @@ namespace TestLibrary
             Thread.Sleep(milliseconds);
         }
 
-        public static void WaitWatcher(int milliseconds, Watcher watcher, int expect)
+        /// <summary></summary>
+        /// <param name="milliseconds"></param>
+        /// <param name="watcher"></param>
+        /// <param name="expect"></param>
+        /*public static void WaitWatcher(int milliseconds, Watcher watcher, int expect)
         {
 #if __MonoCS__
             milliseconds = milliseconds * 10;
@@ -621,8 +627,12 @@ namespace TestLibrary
                 milliseconds = milliseconds - 10;
             }
             Console.WriteLine("Timeout");
-        }
+        }*/
 
+        /// <summary></summary>
+        /// <param name="milliseconds"></param>
+        /// <param name="watcher"></param>
+        /// <param name="checkStop"></param>
         public static void WaitWatcher(int milliseconds, Watcher watcher, Func<Watcher,bool> checkStop)
         {
 #if __MonoCS__

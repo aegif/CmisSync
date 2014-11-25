@@ -9,6 +9,7 @@ namespace TestLibrary
     using CmisSync.Lib;
     using CmisSync.Lib.Events;
 
+    /// <summary></summary>
     [TestFixture]
     public class EventTypesTest
     {
@@ -19,7 +20,6 @@ namespace TestLibrary
         {
             log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
         }
-
 
         [Test]
         public void FSEventTest() {

@@ -124,10 +124,10 @@
     <value>Добавить удаленную папку...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Добавление синхронизирующейся папки для CmisSync</value>
+    <value>Добавить папки для синхронизации в CmisSync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
-    <value>Добавить папки</value>
+    <value>Добавление папки</value>
   </data>
   <data name="Back" xml:space="preserve">
     <value>Назад</value>
@@ -208,10 +208,7 @@
     <value>Пропустить обучение</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
-Please ask your server administrator for the CMIS endpoint URL.
-If you are sure about the address, open it in a browser and send
-the resulting XML to cmissync@aegif.jp</value>
+    <value>К сожалению, CmisSync не может найти сервер CMIS по этому адресу. Пожалуйста, обратитесь к администратору сервера для уточнения URL-адреса CMIS. Если вы уверены, в адресе, откройте его в браузере и отправьте результат XML на cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Добавить CmisSync в автозагрузку</value>
@@ -277,86 +274,81 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Просмотр журнала</value>
   </data>
   <data name="ConnectFailure" xml:space="preserve">
-    <value>Failed to connect to server!
-Please check the given URL for misspelled host name.
-If the URL is correct, please contact your server administrator!</value>
+    <value>Не удалось подключиться к серверу! Пожалуйста, проверьте заданный URL-адрес узла . Если URL-адрес правильный, пожалуйста, обратитесь к администратору сервера!</value>
   </data>
   <data name="LoginFailedForbidden" xml:space="preserve">
-    <value>Login failed!
-Please check your user credentials and potentially the server URL.</value>
+    <value>Ошибка входа! Пожалуйста проверьте учетные данные пользователя и, возможно, URL-адрес сервера.</value>
   </data>
   <data name="SendFailureHttps" xml:space="preserve">
-    <value>Failed to communicate with the given server!
-Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https</value>
+    <value>Не удалось связаться с данным сервером! Пожалуйста, проверьте протокол данного URL-адреса. Может быть ваш сервер не способен общаться по протоколу https</value>
   </data>
   <data name="DoNotIgnoreFolder" xml:space="preserve">
-    <value>Enable folder for synchronization</value>
+    <value>Включить папку для синхронизации</value>
   </data>
   <data name="IgnoreFolder" xml:space="preserve">
-    <value>Ignore folder on synchronization</value>
+    <value>Игнорировать папку синхронизации</value>
   </data>
   <data name="LoadingStatusLOADING" xml:space="preserve">
-    <value>loading ...</value>
+    <value>Загрузка...</value>
   </data>
   <data name="LoadingStatusSTART" xml:space="preserve">
-    <value>pending ...</value>
+    <value>ожидание...</value>
   </data>
   <data name="RemoveFolderFromSync" xml:space="preserve">
-    <value>Remove the folder from synchronization</value>
+    <value>Удалить папку из синхронизации</value>
   </data>
   <data name="DoYouTrustTheCertificate" xml:space="preserve">
-    <value>Do you trust this certificate?
-(Yes == Always, Cancel = Just Now)</value>
+    <value>Вы доверяете этому сертификату? (Да == всегда, отмена = только сейчас)</value>
   </data>
   <data name="TrustFailure" xml:space="preserve">
-    <value>Failed to establish a trusted Connection. Please inform your server administrator.</value>
+    <value>Не удалось установить доверенное соединение. Пожалуйста, сообщите администратору сервера.</value>
   </data>
   <data name="UntrustedCertificate" xml:space="preserve">
-    <value>Untrusted Certificate</value>
+    <value>Ненадежный сертификат</value>
   </data>
   <data name="ManualSync" xml:space="preserve">
-    <value>Run sync now</value>
+    <value>Запустить синхронизацию</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings...</value>
+    <value>Параметры...</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Сохранить</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
     <value>CmisSync</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
-    <value>Sync Interval</value>
+    <value>Интервал синхронизации</value>
   </data>
   <data name="Hours" xml:space="preserve">
-    <value>hours</value>
+    <value>Часы</value>
   </data>
   <data name="Minutes" xml:space="preserve">
-    <value>minutes</value>
+    <value>минуты</value>
   </data>
   <data name="Day" xml:space="preserve">
-    <value>day</value>
+    <value>день</value>
   </data>
   <data name="Hour" xml:space="preserve">
-    <value>hour</value>
+    <value>час</value>
   </data>
   <data name="WebAddress" xml:space="preserve">
-    <value>Repository URL</value>
+    <value>URL-адрес хранилища</value>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>Error</value>
+    <value>Ошибка</value>
   </data>
   <data name="SyncError" xml:space="preserve">
-    <value>Could not sync "{0}": {1}</value>
+    <value>Не может синхронизировать «{0}»: {1}</value>
   </data>
   <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
-    <value>Are you sure you want to disconnect this repository?  No files will be deleted from your system but they will no longer be synchronized.</value>
+    <value>Вы уверены, что вы хотите отключить этот репозиторий?  Файлы не будут удалены из вашей системы, но они больше не будут синхронизированы.</value>
   </data>
   <data name="Minute" xml:space="preserve">
-    <value>minute</value>
+    <value>минута</value>
   </data>
   <data name="Seconds" xml:space="preserve">
-    <value>seconds</value>
+    <value>секунды</value>
   </data>
 </root>

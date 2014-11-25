@@ -119,10 +119,11 @@ namespace CmisSync.Lib
         /// </value>
         public long MaxUploadRetries { get; set; }
 
+        /// <summary></summary>
         public long MaxDownloadRetries { get; set; }
 
+        /// <summary></summary>
         public long MaxDeletionRetries { get; set; }
-
 
         /// <summary>
         /// Simple constructor.
@@ -134,7 +135,6 @@ namespace CmisSync.Lib
             name = name.Replace("/", "_");
             CmisDatabase = Path.Combine(cmisDatabaseFolder, name + ".cmissync");
         }
-
 
         /// <summary>
         /// Full constructor.

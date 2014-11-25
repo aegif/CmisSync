@@ -17,6 +17,7 @@
     <ReleaseVersion>
     </ReleaseVersion>
     <UseMSBuildEngine>False</UseMSBuildEngine>
+    <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -161,6 +162,7 @@
       <DependentUpon>SetupSubSetting.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI.cs" />
+    <Compile Include="OSXPathRepresentationConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

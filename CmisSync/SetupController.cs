@@ -29,7 +29,6 @@ using CmisSync.Auth;
 
 namespace CmisSync
 {
-
     /// <summary>
     /// Kind of pages that are used in the folder addition wizards.
     /// </summary>
@@ -67,6 +66,9 @@ namespace CmisSync
         /// Settings page.
         /// </summary>
         Settings,
+        /// <summary>
+        /// 
+        /// </summary>
 		Syncing
     }
 
@@ -83,6 +85,7 @@ namespace CmisSync
         /// Show window event.
         /// </summary>
         public event Action ShowWindowEvent = delegate { };
+
         /// <summary>
         /// Hide window event.
         /// </summary>
@@ -92,6 +95,7 @@ namespace CmisSync
         /// Change page event.
         /// </summary>
         public event ChangePageEventHandler ChangePageEvent = delegate { };
+
         /// <summary>
         /// Change page event.
         /// </summary>
@@ -101,6 +105,7 @@ namespace CmisSync
         /// Update progress bar event.
         /// </summary>
         public event UpdateProgressBarEventHandler UpdateProgressBarEvent = delegate { };
+
         /// <summary>
         /// Update progress bar event.
         /// </summary>
@@ -110,6 +115,7 @@ namespace CmisSync
         /// Update setup continue button.
         /// </summary>
         public event UpdateSetupContinueButtonEventHandler UpdateSetupContinueButtonEvent = delegate { };
+
         /// <summary>
         /// Update setup continue button.
         /// </summary>
@@ -119,6 +125,7 @@ namespace CmisSync
         /// Update add project button event.
         /// </summary>
         public event UpdateAddProjectButtonEventHandler UpdateAddProjectButtonEvent = delegate { };
+
         /// <summary>
         /// Update add project button event.
         /// </summary>
@@ -128,6 +135,7 @@ namespace CmisSync
         /// Change address field event.
         /// </summary>
         public event ChangeAddressFieldEventHandler ChangeAddressFieldEvent = delegate { };
+
         /// <summary>
         /// Change address field event.
         /// </summary>
@@ -137,6 +145,7 @@ namespace CmisSync
         /// Change repository field event.
         /// </summary>
         public event ChangeRepositoryFieldEventHandler ChangeRepositoryFieldEvent = delegate { };
+
         /// <summary>
         /// Change repository field event.
         /// </summary>
@@ -146,6 +155,7 @@ namespace CmisSync
         /// Change path field event.
         /// </summary>
         public event ChangePathFieldEventHandler ChangePathFieldEvent = delegate { };
+
         /// <summary>
         /// Change path field event.
         /// </summary>
@@ -155,6 +165,7 @@ namespace CmisSync
         /// Change user field.
         /// </summary>
         public event ChangeUserFieldEventHandler ChangeUserFieldEvent = delegate { };
+
         /// <summary>
         /// Change user field.
         /// </summary>
@@ -164,12 +175,22 @@ namespace CmisSync
         /// Change password event.
         /// </summary>
         public event ChangePasswordFieldEventHandler ChangePasswordFieldEvent = delegate { };
+
         /// <summary>
         /// Change password event.
         /// </summary>
         public delegate void ChangePasswordFieldEventHandler(string text, string example_text);
 
+        /// <summary>
+        /// 
+        /// </summary>
         public event LocalPathExistsEventHandler LocalPathExists;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public delegate bool LocalPathExistsEventHandler(string path);
 
         /// <summary>
@@ -191,22 +212,27 @@ namespace CmisSync
         /// Previous address.
         /// </summary>
         public Uri PreviousAddress { get; private set; }
+
         /// <summary>
         /// Event.
         /// </summary>
         public string PreviousPath { get; private set; }
+
         /// <summary>
         /// Previous repository.
         /// </summary>
         public string PreviousRepository { get; private set; }
+
         /// <summary>
         /// Syncing repository name.
         /// </summary>
         public string SyncingReponame { get; private set; }
+
         /// <summary>
         /// Default repository path..
         /// </summary>
         public string DefaultRepoPath { get; private set; }
+
         /// <summary>
         /// Progress bar percentage.
         /// </summary>
@@ -216,30 +242,37 @@ namespace CmisSync
         /// Saved address.
         /// </summary>
         public Uri saved_address = null;
+
         /// <summary>
         /// Saved remote path.
         /// </summary>
         public string saved_remote_path = "";
+
         /// <summary>
         /// Saved user.
         /// </summary>
         public string saved_user = "";
+
         /// <summary>
         /// Saved password.
         /// </summary>
         public string saved_password = "";
+
         /// <summary>
         /// Saved repository.
         /// </summary>
         public string saved_repository = "";
+
         /// <summary>
         /// Saved sync interval.
         /// </summary>
         public int saved_sync_interval = 15;
+
         /// <summary>
         /// Saved sync at startup
         /// </summary>
         public bool saved_syncatstartup = true;
+
         /// <summary>
         /// Ignored paths.
         /// </summary>
@@ -254,7 +287,6 @@ namespace CmisSync
         /// Whether CmisSync should be started automatically at login.
         /// </summary>
         private bool create_startup_item = true;
-
 
         /// <summary>
         /// Load repositories information from a CMIS endpoint.
@@ -271,7 +303,6 @@ namespace CmisSync
             }
 
         }
-
 
         /// <summary>
         /// Get the list of subfolders contained in a CMIS folder.
@@ -305,7 +336,6 @@ namespace CmisSync
         /// </summary>
         Regex RepositoryRegex = new Regex(@"^([a-zA-Z0-9][^*/><?\|:]*)$");
         Regex RepositoryRegexLinux = new Regex(@"^([a-zA-Z0-9][^*\\><?\|:]*)$");
-
 
         /// <summary>
         /// Constructor.
@@ -365,7 +395,6 @@ namespace CmisSync
             Logger.Debug("SetupController - Exiting constructor.");
         }
 
-
         /// <summary>
         /// User pressed the "Cancel" button, hide window.
         /// </summary>
@@ -380,7 +409,6 @@ namespace CmisSync
             HideWindowEvent();
         }
 
-
         /// <summary>
         /// Check setup page.
         /// </summary>
@@ -389,7 +417,6 @@ namespace CmisSync
             UpdateSetupContinueButtonEvent(true);
         }
 
-
         /// <summary>
         /// First-time wizard has been cancelled, so quit CmisSync.
         /// </summary>
@@ -397,7 +424,6 @@ namespace CmisSync
         {
             Program.Controller.Quit();
         }
-
 
         /// <summary>
         /// Move to second page of the tutorial.
@@ -408,7 +434,6 @@ namespace CmisSync
             ChangePageEvent(PageType.Tutorial);
         }
 
-
         /// <summary>
         /// Tutorial has been skipped, go to last step of wizard.
         /// </summary>
@@ -417,7 +442,6 @@ namespace CmisSync
             TutorialCurrentPage = 4;
             ChangePageEvent(PageType.Tutorial);
         }
-
 
         /// <summary>
         /// Go to next step of the tutorial.
@@ -446,7 +470,6 @@ namespace CmisSync
             }
         }
 
-
         /// <summary>
         /// Checkbox to add CmisSync to the list of programs to be started up when the user logs into Windows.
         /// </summary>
@@ -454,7 +477,6 @@ namespace CmisSync
         {
             this.create_startup_item = create_startup_item;
         }
-
 
         /// <summary>
         /// Check whether the address is syntaxically valid.
@@ -534,7 +556,8 @@ namespace CmisSync
             }
         }
 
-
+        /// <summary></summary>
+        /// <param name="localpath"></param>
         public void CheckRepoPathExists(string localpath)
         {
             if (Directory.Exists(localpath))
@@ -553,7 +576,6 @@ namespace CmisSync
             ChangePageEvent(PageType.Add2);
         }
 
-
         /// <summary>
         /// Switch back from second to first step, presumably to change server or user.
         /// </summary>
@@ -563,7 +585,6 @@ namespace CmisSync
             PreviousPath = saved_user;
             ChangePageEvent(PageType.Add1);
         }
-
 
         /// <summary>
         /// Second step of remote folder addition wizard is complete, switch to customization step.
@@ -595,7 +616,6 @@ namespace CmisSync
         {
             Add2PageCompleted(repository, remote_path, new string[] { }, new string[] { });
         }
-
 
         /// <summary>
         /// Customization step of remote folder addition wizard is complete, start CmisSync.
@@ -641,7 +661,6 @@ namespace CmisSync
             ChangePageEvent(PageType.Finished);
         }
 
-
         /// <summary>
         /// Switch back from customization to step 2 of the remote folder addition wizard.
         /// </summary>
@@ -661,7 +680,6 @@ namespace CmisSync
             FinishPageCompleted();
         }
 
-
         /// <summary>
         /// Folder addition wizard is over, reset it for next use.
         /// </summary>
@@ -673,7 +691,6 @@ namespace CmisSync
             this.FolderAdditionWizardCurrentPage = PageType.None;
             HideWindowEvent();
         }
-
 
         /// <summary>
         /// Repository settings page.

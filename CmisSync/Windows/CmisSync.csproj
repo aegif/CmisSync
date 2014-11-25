@@ -31,6 +31,8 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -111,6 +113,7 @@
       <Link>Program.cs</Link>
     </Compile>
     <Compile Include="Utils.cs" />
+    <Compile Include="WindowsPathRepresentationConverter.cs" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
@@ -237,8 +240,14 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties.Resources.cs.resx" />
+    <EmbeddedResource Include="Properties.Resources.da.resx" />
+    <EmbeddedResource Include="Properties.Resources.it.resx" />
     <EmbeddedResource Include="Properties.Resources.nl.resx" />
+    <EmbeddedResource Include="Properties.Resources.no.resx" />
     <EmbeddedResource Include="Properties.Resources.pl.resx" />
+    <EmbeddedResource Include="Properties.Resources.pt-PT.resx" />
+    <EmbeddedResource Include="Properties.Resources.ru.resx" />
+    <EmbeddedResource Include="Properties.Resources.sl.resx" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />
@@ -285,6 +294,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Plugins\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent>Mkdir "$(ProjectDir)$(OutDir)x86"

@@ -124,7 +124,7 @@
     <value>Dodaj zdalny folder ...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Dodawaniesynchronizowanych folderów do CmisSync</value>
+    <value>Dodawanie synchronizowanych folderów do CmisSync</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Dodawanie folderu</value>
@@ -139,7 +139,7 @@
     <value>CmisSync tworzy specjalny folder na komputerze, gdzie dokumenty są synchronizowane.</value>
   </data>
   <data name="Continue" xml:space="preserve">
-    <value>Kontunuuj</value>
+    <value>Kontynuuj</value>
   </data>
   <data name="Customize" xml:space="preserve">
     <value>Dostosowanie nazwy folderu lokalnego</value>
@@ -160,7 +160,7 @@
     <value>Wyjście</value>
   </data>
   <data name="FailedToSendSomeChanges" xml:space="preserve">
-    <value>Nie udało się wysłać kilka zmian</value>
+    <value>Nie udało się wysłać niektórych zmian</value>
   </data>
   <data name="FilesUpToDate" xml:space="preserve">
     <value>Pliki zsynchronizowane</value>
@@ -175,9 +175,8 @@
     <value>Pomoc</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
-
-It is like Dropbox for Enterprise Content Management!</value>
+    <value>CmisSync na bieżąco synchronizuje Twoje pliki z serwerami w firmie i pozwala pracować zarówno w trybie online jak i offline.
+Działa podobnie do Dropbox.</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
     <value>Nazwa folderu jest nieprawidłowa. Znaki specjalne nie są dozwolone.</value>
@@ -210,10 +209,8 @@ It is like Dropbox for Enterprise Content Management!</value>
     <value>Pomiń samouczek</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
-Please ask your server administrator for the CMIS endpoint URL.
-If you are sure about the address, open it in a browser and send
-the resulting XML to cmissync@aegif.jp</value>
+    <value>Niestety, nie można połączyć się z serwerem CMIS pod podanym adresem. Proszę skontaktować się z administratorem systemu CMIS żeby upewnić się że adres jest prawidłowy. Jeśli jesteś przekonany że adres jest prawidłowy, otwórz go prosze w przeglądarce, a treść która zostanie wyświetlona prześlij do cmissync@aegif.jp
+</value>
   </data>
   <data name="Startup" xml:space="preserve">
     <value>Dodaj CmisSync do autostartu</value>
@@ -279,86 +276,85 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Pokaż dziennik</value>
   </data>
   <data name="ConnectFailure" xml:space="preserve">
-    <value>Failed to connect to server!
-Please check the given URL for misspelled host name.
-If the URL is correct, please contact your server administrator!</value>
+    <value>Nie udało się połączyć z serwerem!.
+Prosimy o sprawdzenie podanego adresu i upewnienie się że jest prawidłowy. Jeśli adres jest poprawny a mimo to nie można się połączyć, skontaktuj się z administratorem serwera.</value>
   </data>
   <data name="LoginFailedForbidden" xml:space="preserve">
-    <value>Login failed!
-Please check your user credentials and potentially the server URL.</value>
+    <value>Logowanie niepomyślne!
+Prosimy o sprawdzenie nazwy użytkownika i hasła oraz upewnienie się że podany jest prawidłowy adres serwera.</value>
   </data>
   <data name="SendFailureHttps" xml:space="preserve">
-    <value>Failed to communicate with the given server!
-Please check the protocol part of the given URL. Maybe your server is not capable to communicate over https</value>
+    <value>Nie udało się połączyć z serwerem!.
+Prosimy o sprawdzenie podanego adresu i upewnienie się że jest prawidłowy. Zwróć uwagę czy zawiera właściwy protokół (https).
+Jeśli adres jest poprawny a mimo to nie można się połączyć, skontaktuj się z administratorem serwera.</value>
   </data>
   <data name="DoNotIgnoreFolder" xml:space="preserve">
-    <value>Enable folder for synchronization</value>
+    <value>Aktualizuj ten folder podczas synchronizacji</value>
   </data>
   <data name="IgnoreFolder" xml:space="preserve">
-    <value>Ignore folder on synchronization</value>
+    <value>Pomijaj ten folder podczas synchronizacji</value>
   </data>
   <data name="LoadingStatusLOADING" xml:space="preserve">
-    <value>loading ...</value>
+    <value>ładowanie...</value>
   </data>
   <data name="LoadingStatusSTART" xml:space="preserve">
-    <value>pending ...</value>
+    <value>proszę czekać...</value>
   </data>
   <data name="RemoveFolderFromSync" xml:space="preserve">
-    <value>Remove the folder from synchronization</value>
+    <value>Usuń folder z synchronizacji</value>
   </data>
   <data name="DoYouTrustTheCertificate" xml:space="preserve">
-    <value>Do you trust this certificate?
-(Yes == Always, Cancel = Just Now)</value>
+    <value>Czy ufasz temu certyfikatowi? (Tak == zawsze, Anuluj = tylko teraz)</value>
   </data>
   <data name="TrustFailure" xml:space="preserve">
-    <value>Failed to establish a trusted Connection. Please inform your server administrator.</value>
+    <value>Nie udało się nawiązać bezpiecznego połączenia z serwerem. Powiadom administratora systemu.</value>
   </data>
   <data name="UntrustedCertificate" xml:space="preserve">
-    <value>Untrusted Certificate</value>
+    <value>Certyfikat niezaufany</value>
   </data>
   <data name="ManualSync" xml:space="preserve">
-    <value>Run sync now</value>
+    <value>Uruchom synchronizację teraz</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings...</value>
+    <value>Ustawienia...</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>Zapisz</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
     <value>CmisSync</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
-    <value>Sync Interval</value>
+    <value>Częstość synchronizacji</value>
   </data>
   <data name="Hours" xml:space="preserve">
-    <value>hours</value>
+    <value>godziny</value>
   </data>
   <data name="Minutes" xml:space="preserve">
-    <value>minutes</value>
+    <value>minuty</value>
   </data>
   <data name="Day" xml:space="preserve">
-    <value>day</value>
+    <value>dni</value>
   </data>
   <data name="Hour" xml:space="preserve">
-    <value>hour</value>
+    <value>godziny</value>
   </data>
   <data name="WebAddress" xml:space="preserve">
-    <value>Repository URL</value>
+    <value>Adres repozytorium</value>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>Error</value>
+    <value>Błąd</value>
   </data>
   <data name="SyncError" xml:space="preserve">
-    <value>Could not sync "{0}": {1}</value>
+    <value>Nie można zsynchronizować "{0}": {1}</value>
   </data>
   <data name="RemoveFolderFromSyncConfirm" xml:space="preserve">
-    <value>Are you sure you want to disconnect this repository?  No files will be deleted from your system but they will no longer be synchronized.</value>
+    <value>Czy na pewno chcesz się rozłączyć z tym repozytorium?  Żadne pliki nie zostaną usunięte z systemu, ale nie będą one synchronizowane.</value>
   </data>
   <data name="Minute" xml:space="preserve">
-    <value>minute</value>
+    <value>minut</value>
   </data>
   <data name="Seconds" xml:space="preserve">
-    <value>seconds</value>
+    <value>sekund</value>
   </data>
 </root>

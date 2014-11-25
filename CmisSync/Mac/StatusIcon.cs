@@ -24,12 +24,16 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using MonoMac.ObjCRuntime;
 
+using log4net;
+
 using CmisSync.Lib;
 using CmisSync.Lib.Events;
 
 namespace CmisSync {
 
     public class StatusIcon : NSObject {
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StatusIcon));
 
         public StatusIconController Controller = new StatusIconController ();
 
@@ -75,6 +79,8 @@ namespace CmisSync {
             
 
             Controller.UpdateIconEvent += delegate (int icon_frame) {
+                Logger.Debug("StatusIcon UpdateIconEvent " + icon_frame);
+
                 using (var a = new NSAutoreleasePool ())
                 {
                     BeginInvokeOnMainThread (delegate {
@@ -113,27 +119,6 @@ namespace CmisSync {
                         NSMenuItem PauseItem;
                         if(FolderItems.TryGetValue(reponame,out PauseItem)){
                             setSyncItemState(PauseItem, getSyncStatus(reponame));
-                        }
-                    });
-                }
-            };
-
-            // TODO Need to implement this method like the COCOA way to do it
-            Controller.UpdateTransmissionMenuEvent += delegate
-            {
-                using (var a = new NSAutoreleasePool()) {
-                    InvokeOnMainThread(delegate {
-                        List<FileTransmissionEvent> transmissions =    Program.Controller.ActiveTransmissions();
-                        NSMenu transmissionmenu = new NSMenu();
-                        foreach(FileTransmissionEvent transmission in transmissions) {
-                            NSMenuItem transmissionItem = new TransmissionMenuItem(transmission);
-                            transmissionmenu.AddItem(transmissionItem);
-                        }
-                        if(transmissions.Count > 0) {
-                            state_item.Submenu = transmissionmenu;
-                            state_item.Enabled = true;
-                        }else{
-                            state_item.Enabled = false;
                         }
                     });
                 }
@@ -199,6 +184,7 @@ namespace CmisSync {
         }
 
         private void setSyncItemState(NSMenuItem item, SyncStatus status) {
+            Logger.Debug("setSyncItemState " + status);
             switch (status)
             {
                 case SyncStatus.Idle:
@@ -334,9 +320,9 @@ namespace CmisSync {
         {
             return delegate
             {
-                NSAlert alert = NSAlert.WithMessage(Properties_Resources.RemoveSyncQuestion,"No, please continue syncing","Yes, stop syncing",null,"");
+                NSAlert alert = NSAlert.WithMessage(
+                    Properties_Resources.RemoveSyncQuestion, "No", "Yes", null, "");
                 alert.Icon = this.caution_image;
-                alert.Window.OrderFrontRegardless();
                 int i = alert.RunModal();
                 if(i == 0)
                     Controller.RemoveFolderFromSyncClicked(name);
@@ -382,7 +368,20 @@ namespace CmisSync {
     
     
     public class StatusIconMenuDelegate : NSMenuDelegate {
-        
+
+        // Log.
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StatusIconMenuDelegate));
+
+        // Empty constructor.
+        public StatusIconMenuDelegate() {
+            // Empty.
+        }
+
+        // Pointer constructor for debugging issue https://github.com/aegif/CmisSync/issues/472
+        public StatusIconMenuDelegate(System.IntPtr pointer) {
+            Logger.Debug("StatusIconMenuDelegate pointer constructor invoked, pointer=" + pointer);
+        }
+
         public override void MenuWillHighlightItem (NSMenu menu, NSMenuItem item)
         {
         }

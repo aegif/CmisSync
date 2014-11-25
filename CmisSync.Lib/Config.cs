@@ -465,6 +465,7 @@ namespace CmisSync.Lib
                 [XmlElement("lastsuccessedsync")]
                 public DateTime LastSuccessedSync { get; set; }
 
+                /// <summary></summary>
                 [XmlElement("syncatstartup")]
                 public bool SyncAtStartup { get; set; }
 
@@ -491,6 +492,8 @@ namespace CmisSync.Lib
                 }
 
                 private int uploadRetries = 2;
+
+                /// <summary></summary>
                 [XmlElement("maxUploadRetries", IsNullable=true)]
                 public int? UploadRetries
                 {
@@ -504,6 +507,8 @@ namespace CmisSync.Lib
                 }
 
                 private int downloadRetries = 2;
+
+                /// <summary></summary>
                 [XmlElement("maxDownloadRetries", IsNullable=true)]
                 public int? DownLoadRetries
                 {
@@ -517,6 +522,8 @@ namespace CmisSync.Lib
                 }
 
                 private int deletionRetries = 2;
+
+                /// <summary></summary>
                 [XmlElement("maxDeletionRetries", IsNullable=true)]
                 public int? DeletionRetries
                 {
@@ -529,6 +536,7 @@ namespace CmisSync.Lib
                     }
                 }
 
+                /// <summary></summary>
                 [XmlElement("features", IsNullable=true)]
                 public Feature SupportedFeatures { get; set;}
 
@@ -539,6 +547,8 @@ namespace CmisSync.Lib
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
 
                 private long chunkSize = DefaultChunkSize;
+
+                /// <summary></summary>
                 [XmlElement("chunkSize"), System.ComponentModel.DefaultValue(DefaultChunkSize)]
                 public long ChunkSize
                 {
@@ -555,7 +565,6 @@ namespace CmisSync.Lib
                         }
                     }
                 }
-
 
                 /// <summary>
                 /// Get all the configured info about a synchronized folder.
@@ -631,24 +640,30 @@ namespace CmisSync.Lib
             public string EMail { get; set; }
         }
 
-
+        /// <summary></summary>
         public class Feature {
+            /// <summary></summary>
             [XmlElement("getFolderTree", IsNullable=true)]
             public bool? GetFolderTreeSupport {get; set;}
+            /// <summary></summary>
             [XmlElement("getDescendants", IsNullable=true)]
             public bool? GetDescendantsSupport {get; set;}
+            /// <summary></summary>
             [XmlElement("getContentChanges", IsNullable=true)]
             public bool? GetContentChangesSupport {get; set;}
+            /// <summary></summary>
             [XmlElement("fileSystemWatcher", IsNullable=true)]
             public bool? FileSystemWatcherSupport {get; set;}
+            /// <summary></summary>
             [XmlElement("maxContentChanges", IsNullable=true)]
             public int? MaxNumberOfContentChanges {get; set;}
+            /// <summary></summary>
             [XmlElement("chunkedSupport", IsNullable=true)]
             public bool? ChunkedSupport {get;set;}
+            /// <summary></summary>
             [XmlElement("chunkedDownloadSupport", IsNullable=true)]
             public bool? ChunkedDownloadSupport {get;set;}
         }
-
 
         /// <summary>
         /// XML URI.
