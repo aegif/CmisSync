@@ -85,24 +85,25 @@ namespace CmisSync.Lib.Cmis
             // See https://github.com/aegif/CmisSync/wiki/What-address for the list of ECM products prefixes
             // Please send us requests to support more CMIS servers: https://github.com/aegif/CmisSync/issues
             string[] suffixes = {
-                "/cmis/atom11",
-                "/alfresco/cmisatom",
-                "/alfresco/service/cmis",
-                "/cmis/resources/",
-                "/emc-cmis-ea/resources/",
-                "/emc-cmis-weblogic/resources/",
-                "/emc-cmis-wls/resources/",
-                "/emc-cmis-was61/resources/",
-                "/emc-cmis-wls1030/resources/",
-                "/xcmis/rest/cmisatom",
-                "/files/basic/cmis/my/servicedoc",
-                "/p8cmis/resources/Service",
-                "/_vti_bin/cmis/rest?getRepositories",
-                "/nemakiware/atom/bedroom", // TODO: different port, typically 8080 for Web UI and 3000 for CMIS
-                "/nuxeo/atom/cmis",
+                "/alfresco/cmisatom", // Alfresco
+                "/alfresco/service/cmis", // Alfresco
+                "/cmis/atom11", // OpenDataSpace
+                "/rest/private/cmisatom/", // eXo Platform
+                "/xcmis/rest/cmisatom", // xCMIS
+                "/files/basic/cmis/my/servicedoc", // IBM Connections
+                "/p8cmis/resources/Service", // IBM FileNet
+                "/_vti_bin/cmis/rest?getRepositories", // Microsoft SharePoint
+                "/nemakiware/atom/bedroom", // NemakiWare  TODO: different port, typically 8080 for Web UI and 3000 for CMIS
+                "/nuxeo/atom/cmis", // Nuxeo
                 "/cmis/atom",
-                "/docushare/ds_mobile_connector/atom",
-                "/documents/ds_mobile_connector/atom" // TODO: can be anything instead of "documents"
+                "/cmis/resources/", // EMC Documentum
+                "/emc-cmis-ea/resources/", // EMC Documentum
+                "/emc-cmis-weblogic/resources/", // EMC Documentum
+                "/emc-cmis-wls/resources/", // EMC Documentum
+                "/emc-cmis-was61/resources/", // EMC Documentum
+                "/emc-cmis-wls1030/resources/", // EMC Documentum
+                "/docushare/ds_mobile_connector/atom", // Xerox DocuShare
+                "/documents/ds_mobile_connector/atom" // Xerox DocuShare  TODO: can be anything instead of "documents"
             };
             string bestUrl = null;
             // Try all suffixes
