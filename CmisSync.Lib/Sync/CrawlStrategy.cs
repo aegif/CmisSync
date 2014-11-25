@@ -64,7 +64,7 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
 
-                if (IsGetDescendantsSupported)
+                /*if (IsGetDescendantsSupported)  Disabled because it causes server-side problems for folders with a huge number of files.
                 {
                     IList<ITree<IFileableCmisObject>> desc;
                     try
@@ -80,7 +80,7 @@ namespace CmisSync.Lib.Sync
                         throw;
                     }
                     CrawlDescendants(remoteFolder, desc, localFolder);
-                }
+                }*/
 
                 // Lists of files/folders, to delete those that have been removed on the server.
                 IList<string> remoteFiles = new List<string>();
