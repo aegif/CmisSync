@@ -1224,14 +1224,12 @@ namespace CmisSync.Lib.Sync
                         contentStream.Length = file.Length;
                         contentStream.Stream = hashstream;
 
-                        Logger.Debug("Upload Start: " + filePath + " as " + remoteFolder.Path + Path.PathSeparator.ToString() + remoteFileName);
+                        Logger.Debug("Uploading: " + syncItem.LocalPath + " as "
+                            + remoteFolder.Path + Path.DirectorySeparatorChar + remoteFileName);
                         remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                        Logger.Debug("remoteFolder.CreateDocument finished.");
+                        Logger.Debug("Uploaded: " + syncItem.LocalPath);
                         filehash = hashAlg.Hash;
                     }
-
-                    // Metadata.
-                    Logger.Info("Uploaded: " + syncItem.LocalPath);
 
                     // Get metadata. Some metadata has probably been automatically added by the server.
                     Dictionary<string, string[]> metadata = FetchMetadata(remoteDocument);
