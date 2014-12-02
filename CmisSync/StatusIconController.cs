@@ -229,14 +229,14 @@ namespace CmisSync
                 UpdateStatusItemEvent(StateText);
 
 #if MonoBug24381
-                this.animation_frame_number = 0; // Idle status icon
-                UpdateIconEvent(this.animation_frame_number);
+                //this.animation_frame_number = 0; // Idle status icon
+                //UpdateIconEvent(this.animation_frame_number);
 #else
                 this.animation.Stop();
+                UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
 #endif
 
                 //NOTGDS2: begin
-                UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
                 UpdateMenuEvent(CurrentState);
             };
 
@@ -250,8 +250,8 @@ namespace CmisSync
                 UpdateStatusItemEvent(StateText);
 
 #if MonoBug24381
-                this.animation_frame_number = 3; // Syncing icon
-                UpdateIconEvent(this.animation_frame_number);
+                //this.animation_frame_number = 3; // Syncing icon
+                //UpdateIconEvent(this.animation_frame_number);
 #else
                 this.animation.Start();
 #endif
@@ -270,10 +270,12 @@ namespace CmisSync
 
                 UpdateStatusItemEvent(StateText);
 
+#if ! MonoBug24381
                 this.animation.Stop();
 
                 UpdateIconEvent(-1);
                 UpdateMenuEvent(CurrentState);
+#endif
 
                 if (error.Item2 is PermissionDeniedException)
                 {
@@ -445,8 +447,8 @@ namespace CmisSync
         {
 #if MonoBug24381
 
-            this.animation_frame_number = 3; // Syncing icon
-            UpdateIconEvent(this.animation_frame_number);
+            //this.animation_frame_number = 3; // Syncing icon
+            //UpdateIconEvent(this.animation_frame_number);
 #else
             this.animation_frame_number = 0;
 
