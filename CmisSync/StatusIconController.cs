@@ -235,7 +235,6 @@ namespace CmisSync
                 this.animation.Stop();
 #endif
 
-                //NOTGDS2: begin
                 UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
                 UpdateMenuEvent(CurrentState);
             };
@@ -290,28 +289,6 @@ namespace CmisSync
             Program.Controller.OnErrorResolved += delegate
             {
                 CurrentState = IconState.Idle;
-//NOTGDS2: end
-// GDS2:
-/*
-                UpdateIconEvent (0);
-//                UpdateMenuEvent (CurrentState);
-            };
-
-            Program.Controller.OnTransmissionListChanged += delegate {
-                UpdateTransmissionMenuEvent();
-            };
-
-            // Syncing.
-            Program.Controller.OnSyncing += delegate {
-                if (CurrentState != IconState.Syncing)
-                {
-                    CurrentState = IconState.Syncing;
-                    StateText = Properties_Resources.SyncingChanges;
-                    UpdateStatusItemEvent(StateText);
-
-                    this.animation.Start();
-                }
-*/
             };
         }
 

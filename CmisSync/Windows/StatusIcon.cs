@@ -395,7 +395,7 @@ namespace CmisSync
 	            UIHelpers.GetIcon ("process-syncing-iiii"),
 	            UIHelpers.GetIcon ("process-syncing-iiiii")
 			};
-            this.errorIcon = UIHelpers.GetIcon("process-syncing-error"); // NOTGDS2
+            this.errorIcon = UIHelpers.GetIcon("process-syncing-error");
         }
 
 
@@ -422,7 +422,7 @@ namespace CmisSync
         /// <summary>
         /// MouseEventListener function for popping up context menu.
         /// </summary>
-        private void TrayIcon_MouseClick(Object sender, MouseEventArgs e) // NOTGDS2
+        private void TrayIcon_MouseClick(Object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
