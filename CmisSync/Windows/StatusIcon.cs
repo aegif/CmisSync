@@ -252,14 +252,13 @@ namespace CmisSync
                     openLocalFolderItem.Click += OpenLocalFolderDelegate(folderName);
 
                     // Sub-item: open remotely.
-                    /*ToolStripMenuItem openRemoteFolderItem = new ToolStripMenuItem()
+                    ToolStripMenuItem openRemoteFolderItem = new ToolStripMenuItem()
                     {
                         Text = CmisSync.Properties_Resources.BrowseRemoteFolder,
                         Name = "openRemote",
                         Image = UIHelpers.GetBitmap("classic_folder_web"),
                     };
                     openRemoteFolderItem.Click += OpenRemoteFolderDelegate(folderName);
-                    */
 
                     // Sub-item: suspend sync.
                     ToolStripMenuItem suspendFolderItem = new ToolStripMenuItem()
@@ -308,7 +307,7 @@ namespace CmisSync
 
                     // Add the sub-items.
                     subfolderItem.DropDownItems.Add(openLocalFolderItem);
-                    //subfolderItem.DropDownItems.Add(openRemoteFolderItem);
+                    subfolderItem.DropDownItems.Add(openRemoteFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
                     subfolderItem.DropDownItems.Add(manualSyncItem);
@@ -395,7 +394,7 @@ namespace CmisSync
 	            UIHelpers.GetIcon ("process-syncing-iiii"),
 	            UIHelpers.GetIcon ("process-syncing-iiiii")
 			};
-            this.errorIcon = UIHelpers.GetIcon("process-syncing-error"); // NOTGDS2
+            this.errorIcon = UIHelpers.GetIcon("process-syncing-error");
         }
 
 
@@ -422,13 +421,25 @@ namespace CmisSync
         /// <summary>
         /// MouseEventListener function for popping up context menu.
         /// </summary>
-        private void TrayIcon_MouseClick(Object sender, MouseEventArgs e) // NOTGDS2
+        private void TrayIcon_MouseClick(Object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
                 MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
                 mi.Invoke(trayicon, null);
             }
+        }
+
+
+        /// <summary>
+        /// Delegate for opening the remote folder.
+        /// </summary>
+        private EventHandler OpenRemoteFolderDelegate(string reponame)
+        {
+            return delegate
+            {
+                Controller.RemoteFolderClicked(reponame);
+            };
         }
 
 
