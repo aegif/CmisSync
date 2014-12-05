@@ -280,7 +280,6 @@ namespace CmisSync.Lib
                 UserName = repoInfo.User,
                 ObfuscatedPassword = repoInfo.Password.ObfuscatedPassword,
                 PollInterval = repoInfo.PollInterval,
-                LastSuccessedSync = repoInfo.LastSuccessedSync,
                 IsSuspended = repoInfo.IsSuspended,
                 SyncAtStartup = repoInfo.SyncAtStartup,
                 SupportedFeatures = null
@@ -459,12 +458,6 @@ namespace CmisSync.Lib
                 [XmlElement("issuspended")]
                 public bool IsSuspended { get; set; }
 
-                /// <summary>
-                /// Last Success Time Sync
-                /// </summary>
-                [XmlElement("lastsuccessedsync")]
-                public DateTime LastSuccessedSync { get; set; }
-
                 /// <summary></summary>
                 [XmlElement("syncatstartup")]
                 public bool SyncAtStartup { get; set; }
@@ -584,7 +577,6 @@ namespace CmisSync.Lib
                     repoInfo.MaxDeletionRetries = deletionRetries;
                     if (PollInterval < 1) PollInterval = Config.DEFAULT_POLL_INTERVAL;
                     repoInfo.PollInterval = PollInterval;
-                    repoInfo.LastSuccessedSync = LastSuccessedSync;
                     repoInfo.IsSuspended = IsSuspended;
                     repoInfo.SyncAtStartup = SyncAtStartup;
 

@@ -429,12 +429,7 @@ namespace CmisSync.Lib
 
             // Save last sync
             RepoInfo.LastSuccessedSync = DateTime.Now;
-
-            //Get configuration
-            Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
-            syncConfig.LastSuccessedSync = RepoInfo.LastSuccessedSync;
-            config.Save();
+            // TODO write it to database.
         }
 
 
