@@ -442,7 +442,7 @@ namespace CmisSync.Lib
                 }
                 
                 this.oldDirectory = oldDirectory;
-                this.oldFullPath = CmisUtils.PathCombine(oldDirectory, name);
+                this.oldFullPath = System.IO.Path.Combine(oldDirectory, name);
             }
 
             /// <summary>
