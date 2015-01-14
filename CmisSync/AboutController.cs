@@ -85,7 +85,7 @@ namespace CmisSync {
             Program.Controller.ShowAboutWindowEvent += delegate
             {
                 ShowWindowEvent();
-                CheckForNewVersion();
+                // CheckForNewVersion();
             };
         }
 
