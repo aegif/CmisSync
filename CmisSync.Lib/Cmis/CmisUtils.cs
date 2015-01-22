@@ -192,7 +192,10 @@ namespace CmisSync.Lib.Cmis
             // Populate the result list with identifier and name of each repository.
             foreach (IRepository repo in repositories)
             {
-                result.Add(repo.Id, repo.Name);
+                // Repo name is sometimes empty (ex: Alfresco), in such case show the repo id instead.
+                string name = repo.Name.Length == 0 ? repo.Id : repo.Name;
+
+                result.Add(repo.Id, name);
             }
 
             return result;
