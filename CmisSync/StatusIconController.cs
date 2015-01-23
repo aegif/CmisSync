@@ -436,7 +436,7 @@ namespace CmisSync
 
             this.animation.Elapsed += delegate
             {
-                Logger.Debug("StatusIconController Animation Elapsed " + this.animation_frame_number);
+                //Logger.Debug("StatusIconController Animation Elapsed " + this.animation_frame_number);
                 if (this.animation_frame_number < 4)
                     this.animation_frame_number++;
                 else
