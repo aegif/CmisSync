@@ -408,31 +408,30 @@ namespace CmisSync.Lib.Sync
                         CrawlSync(remoteFolder, localFolder);
                         firstSync = false;
                     }
-
-                    if (!syncFull)
+                    else
                     {
                         // Apply changes locally noticed by the filesystem watcher.
                         WatcherSync(remoteFolderPath, localFolder);
-                    }
 
-                    if ( false /* ChangeLog disabled for now TODO */ && ChangeLogCapability)
-                    {
-                        Logger.Debug("Invoke a remote change log sync");
-                        ChangeLogSync(remoteFolder);
-                        /*if(repo.Watcher.GetChangeList().Count > 0)
+                        if (false /* ChangeLog disabled for now TODO */ && ChangeLogCapability)
                         {
-                            Logger.Debug("Changes on the local file system detected => starting crawl sync");
+                            Logger.Debug("Invoke a remote change log sync");
+                            ChangeLogSync(remoteFolder);
+                            /*if(repo.Watcher.GetChangeList().Count > 0)
+                            {
+                                Logger.Debug("Changes on the local file system detected => starting crawl sync");
+                                repo.Watcher.Clear();
+                                // TODO if(!CrawlSync(remoteFolder,localFolder))
+                                // TODO    repo.Watcher.InsertChange("/", Watcher.ChangeTypes.Changed);
+                            }*/
+                        }
+                        else
+                        {
+                            //  Have to crawl remote.
+                            Logger.Debug("Invoke a full crawl sync");
                             repo.Watcher.Clear();
-                            // TODO if(!CrawlSync(remoteFolder,localFolder))
-                            // TODO    repo.Watcher.InsertChange("/", Watcher.ChangeTypes.Changed);
-                        }*/
-                    }
-                    else
-                    {
-                        //  have to crawl remote
-                        Logger.Debug("Invoke a remote crawl sync");
-                        repo.Watcher.Clear();
-                        CrawlSync(remoteFolder, localFolder);
+                            CrawlSync(remoteFolder, localFolder);
+                        }
                     }
                 }
             }
