@@ -413,7 +413,7 @@ namespace CmisSync.Lib.Sync
                         // Apply changes locally noticed by the filesystem watcher.
                         WatcherSync(remoteFolderPath, localFolder);
 
-                        if (false /* ChangeLog disabled for now TODO */ && ChangeLogCapability)
+                        if (ChangeLogCapability)
                         {
                             Logger.Debug("Invoke a remote change log sync");
                             ChangeLogSync(remoteFolder);

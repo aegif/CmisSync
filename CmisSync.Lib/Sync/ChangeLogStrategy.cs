@@ -49,7 +49,7 @@ namespace CmisSync.Lib.Sync
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just sync everything from remote.
-                    CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null);
+                    CrawlRemote(remoteFolder, repoinfo.TargetDirectory, new List<string>(), new List<string>());
                     
                     Logger.Info("Succeeded to sync from remote, update ChangeLog token: " + lastTokenOnServer);
 
@@ -77,7 +77,7 @@ namespace CmisSync.Lib.Sync
                                     goto case ChangeType.Updated;
                                 case ChangeType.Updated:
                                     if(change.ChangeType == ChangeType.Updated)
-                                        Logger.Info("Remote object ("+change.ObjectId + ") has been changed remotely.");
+                                        Logger.Info("Remote object ("+change.ObjectId + ") has been updated remotely.");
                                     success = ApplyRemoteChangeUpdate(change) && success;
                                     break;
                                 case ChangeType.Deleted:
