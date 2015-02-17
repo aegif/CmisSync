@@ -310,6 +310,7 @@ namespace CmisSync.Lib.Sync
                 filters.Add("cmis:lastModificationDate");
                 filters.Add("cmis:lastModifiedBy");
                 filters.Add("cmis:path");
+                filters.Add("cmis:changeToken"); // Needed to send update commands, see https://github.com/aegif/CmisSync/issues/326
                 session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
             }
 
@@ -1107,7 +1108,7 @@ namespace CmisSync.Lib.Sync
                             }
                             else // Server side file was modified, but local file was not modified.
                             {
-                                Logger.Debug(String.Format("Deleteing old local file {0}", filepath));
+                                Logger.Debug(String.Format("Deleting old local file {0}", filepath));
                                 File.Delete(filepath);
 
                                 Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpfilepath, filepath));
