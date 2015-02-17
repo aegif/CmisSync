@@ -310,7 +310,7 @@ namespace CmisSync.Lib.Sync
                 filters.Add("cmis:lastModificationDate");
                 filters.Add("cmis:lastModifiedBy");
                 filters.Add("cmis:path");
-                filters.Add("cmis:changeToken"); // Needed to send update commands, see https://github.com/aegif/CmisSync/issues/326
+                filters.Add("cmis:changeToken"); // Needed to send update commands, see https://github.com/aegif/CmisSync/issues/516
                 session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
             }
 
