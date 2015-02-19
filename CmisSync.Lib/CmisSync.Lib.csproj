@@ -80,6 +80,7 @@
     <Compile Include="Events\SyncEventHandler.cs" />
     <Compile Include="Events\SyncEventManager.cs" />
     <Compile Include="Events\SyncEventQueue.cs" />
+    <Compile Include="Sync\ChangeLogThenCrawlStrategy.cs" />
     <Compile Include="UserNotificationListener.cs" />
     <Compile Include="Cmis\BaseException.cs" />
     <Compile Include="Database\Database.cs" />

@@ -243,7 +243,10 @@ namespace CmisSync.Lib.Database
                 return path;
             }
             // Insert path prefix
-            return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, path).Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(
+                pathPrefix,
+                path.Replace('/', Path.DirectorySeparatorChar)
+            );
         }
 
         /// <summary>
@@ -474,8 +477,8 @@ namespace CmisSync.Lib.Database
             parameters.Add("path", item.RemoteRelativePath + "/%");
             ExecuteSQLAction("DELETE FROM files WHERE path LIKE @path", parameters);
         }
-
-
+        
+        
         /// <summary>
         /// Move a file.
         /// </summary>
@@ -916,6 +919,16 @@ namespace CmisSync.Lib.Database
         }
 
         /// <summary>
+        /// <returns>path field in files table for <paramref name="id"/></returns>
+        /// </summary>
+        public string GetFilePath(string id)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("id", id);
+            return Denormalize((string)ExecuteSQLFunction("SELECT path FROM files WHERE id=@id", parameters));
+        }
+
+        /// <summary>
         /// <returns>path field in folders table for <paramref name="id"/></returns>
         /// </summary>
         public string GetFolderPath(string id)
@@ -989,6 +1002,7 @@ namespace CmisSync.Lib.Database
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("token", token);
             ExecuteSQLAction(command, parameters);
+            Logger.Info("Database ChangeLog token set to: " + token);
         }
 
         const string PathPrefixKey = "PathPrefix";

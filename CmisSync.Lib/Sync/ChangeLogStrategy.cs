@@ -74,7 +74,7 @@ namespace CmisSync.Lib.Sync
                             {
                                 case ChangeType.Created:
                                     Logger.Info("New remote object ("+change.ObjectId+") found.");
-                                    goto case ChangeType.Updated;
+                                    goto case ChangeType.Updated; // TODO optimisation: process creation only?
                                 case ChangeType.Updated:
                                     if(change.ChangeType == ChangeType.Updated)
                                         Logger.Info("Remote object ("+change.ObjectId + ") has been updated remotely.");
@@ -90,14 +90,14 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (Exception e)
                         {
-                            Logger.Warn("Exception when apply the change: ", e);
+                            Logger.Warn("Exception when applying change: ", e);
                             success = false;
                         }
                     }
 
                     if (success)
                     {
-                        // Save change log token locally.
+                        // Save ChangeLog token locally.
                         if (changes.HasMoreItems == true)
                         {
                             lastTokenOnClient = changes.LatestChangeLogToken;
@@ -114,7 +114,7 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         Logger.Warn("Failure to sync the changes on server, force crawl sync from remote");
-                        CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null);
+                        CrawlRemote(remoteFolder, repoinfo.TargetDirectory, null, null); // TODO why not a full CrawlSync?
                         Logger.Info("Succeeded to sync from remote, update ChangeLog token: " + lastTokenOnServer);
                         database.SetChangeLogToken(lastTokenOnServer);
                         return;
@@ -126,6 +126,7 @@ namespace CmisSync.Lib.Sync
 
             /// <summary>
             /// Apply a remote change for Created or Updated.
+            /// <returns>Whether the change was applied successfully</returns>
             /// </summary>
             private bool ApplyRemoteChangeUpdate(IChangeEvent change)
             {
@@ -133,36 +134,39 @@ namespace CmisSync.Lib.Sync
                 IFolder remoteFolder = null;
                 IDocument remoteDocument = null;
                 string remotePath = null;
-                ICmisObject remoteObject = null;
                 IFolder remoteParent = null;
 
+                // Get the remote changed object.
                 try
                 {
                     cmisObject = session.GetObject(change.ObjectId);
                 }
                 catch(CmisObjectNotFoundException)
                 {
-                    Logger.Info("Ignore the missed object for " + change.ObjectId);
+                    Logger.Info("Ignore change as its target object can not be found anymore:" + change.ObjectId);
                     return true;
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " :", e);
+                    Logger.Warn("Ignore change as an exception occurred:" + change.ObjectId + " :", e);
                     return false;
                 }
 
+                // Check whether change is about a document or folder.
                 remoteDocument = cmisObject as IDocument;
                 remoteFolder = cmisObject as IFolder;
                 if (remoteDocument == null && remoteFolder == null)
                 {
-                    Logger.Info("Change in no sync object: " + change.ObjectId);
+                    Logger.Info("Ignore change as it is not about a document nor folder: " + change.ObjectId);
                     return true;
                 }
+
+                // Check whether it is a document worth syncing.
                 if (remoteDocument != null)
                 {
-                    if (!Utils.IsFileWorthSyncing(remoteDocument.Name, repoinfo))
+                    if ( ! Utils.IsFileWorthSyncing(remoteDocument.Name, repoinfo))
                     {
-                        Logger.Info("Change in remote unworth syncing file: " + remoteDocument.Paths);
+                        Logger.Info("Ignore change as it is about a document unworth syncing: " + remoteDocument.Paths);
                         return true;
                     }
                     if (remoteDocument.Paths.Count == 0)
@@ -174,13 +178,15 @@ namespace CmisSync.Lib.Sync
                     remotePath = remoteDocument.Paths[0];
                     remoteParent = remoteDocument.Parents[0];
                 }
+
+                // Check whether it is a folder worth syncing.
                 if (remoteFolder != null)
                 {
                     remotePath = remoteFolder.Path;
                     remoteParent = remoteFolder.FolderParent;
                     foreach (string name in remotePath.Split('/'))
                     {
-                        if (!String.IsNullOrEmpty(name) && Utils.IsInvalidFolderName(name))
+                        if ( ! String.IsNullOrEmpty(name) && Utils.IsInvalidFolderName(name))
                         {
                             Logger.Info(String.Format("Change in illegal syncing path name {0}: {1}", name, remotePath));
                             return true;
@@ -188,61 +194,41 @@ namespace CmisSync.Lib.Sync
                     }
                 }
 
-                if (!remotePath.StartsWith(this.remoteFolderPath))
+                // Ignore the change if not in a synchronized folder.
+                if ( ! remotePath.StartsWith(this.remoteFolderPath))
                 {
-                    Logger.Info("Change in unrelated path: " + remotePath);
-                    return true;    // The change is not under the folder we care about.
-                }
-
-                if (this.repoinfo.isPathIgnored(remotePath))
-                {
-                    Logger.Info("Change in ignored path: " + remotePath);
+                    Logger.Info("Ignore change as it is not in the synchronized folder's path: " + remotePath);
                     return true;
                 }
-
+                if (this.repoinfo.isPathIgnored(remotePath))
+                {
+                    Logger.Info("Ignore change as it is in a path configured to be ignored: " + remotePath);
+                    return true;
+                }
                 string relativePath = remotePath.Substring(remoteFolderPath.Length);
                 if (relativePath.Length <= 0)
                 {
-                    Logger.Info("Ignore change in root path: " + remotePath);
+                    Logger.Info("Ignore change as it is above the synchronized folder's path:: " + remotePath);
                     return true;
                 }
+
+                /*
                 if (relativePath[0] == '/')
                 {
                     relativePath = relativePath.Substring(1);
                 }
 
-                try
-                {
-                    remoteObject = session.GetObjectByPath(remotePath);
-                }
-                catch(CmisObjectNotFoundException)
-                {
-                    Logger.Info(String.Format("Ignore remote path {0} deleted from id {1}", remotePath, cmisObject.Id));
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    Logger.Warn("Exception when GetObject for " + remotePath + " : ", e);
-                    return false;
-                }
-
-                if (remoteObject.Id != cmisObject.Id)
-                {
-                    Logger.Info(String.Format("Ignore remote path {0} changed from id {1} to id {2}", remotePath, cmisObject.Id, remoteObject.Id));
-                    return true;
-                }
-
                 string localPath = Path.Combine(repoinfo.TargetDirectory, relativePath).Replace('/', Path.DirectorySeparatorChar);
-                if (!DownloadFolder(remoteParent, Path.GetDirectoryName(localPath)))
+                if ( ! DownloadFolder(remoteParent, Path.GetDirectoryName(localPath)))
                 {
                     Logger.Warn("Failed to download the parent folder for " + localPath);
                     return false;
                 }
 
+                // Case of a document.
                 if (null != remoteDocument)
                 {
-                    Logger.Info(String.Format("New remote file ({0}) found.", remotePath));
-                    //  check moveObject
+                    Logger.Info(String.Format("New remote document ({0}) found.", remotePath));
                     string savedDocumentPath = database.GetRemoteFilePath(change.ObjectId);
                     if ((null != savedDocumentPath) && (savedDocumentPath != localPath))
                     {
@@ -269,15 +255,15 @@ namespace CmisSync.Lib.Sync
                     return SyncDownloadFile(remoteDocument, Path.GetDirectoryName(localPath));
                 }
 
+                // Case of a folder.
                 if (null != remoteFolder)
                 {
                     Logger.Info(String.Format("New remote folder ({0}) found.", remotePath));
-                    //  check moveObject
                     string savedFolderPath = database.GetFolderPath(change.ObjectId);
                     if ((null != savedFolderPath) && (savedFolderPath != localPath))
                     {
-// TODO                        MoveFolderLocally(savedFolderPath, localPath);
-                        CrawlSync(remoteFolder, localPath);
+                        Utils.MoveFolderLocally(savedFolderPath, localPath);
+                        // TODO CrawlSync folder content?
                     }
                     else
                     {
@@ -285,8 +271,8 @@ namespace CmisSync.Lib.Sync
                         CrawlSync(remoteFolder,localPath);
                     }
                 }
-
-                return true;
+                */
+                return false; // Still need to perform a CrawlSync
             }
 
 
@@ -295,49 +281,27 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool ApplyRemoteChangeDelete(IChangeEvent change)
             {
-                try
+                // Maybe it is a folder?
+                string path = database.GetFolderPath(change.ObjectId);
+                if (path != null)
                 {
-                    ICmisObject remoteObject = session.GetObject(change.ObjectId);
-                    if (null != remoteObject)
+                    // Remove the folder from filesystem.
+                    Directory.Delete(path);
+                    // Remove the folder from database.
+                    database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(path, repoinfo)); // TODO optimisation: remove by id
+                }
+                else
+                {
+                    // Or maybe it is a file?
+                    path = database.GetFilePath(change.ObjectId);
+                    if (path != null)
                     {
-                        //  should be moveObject
-                        Logger.Info("Ignore moveObject for id " + change.ObjectId);
-                        return true;
+                        // Remove the file from filesystem.
+                        File.Delete(path);
+                        // Remove the file from database.
+                        database.RemoveFile(SyncItemFactory.CreateFromLocalPath(path, repoinfo)); // TODO optimisation: remove by id
                     }
                 }
-                catch (CmisObjectNotFoundException)
-                {
-                }
-                catch (Exception e)
-                {
-                    Logger.Warn("Exception when GetObject for " + change.ObjectId + " : ", e);
-                }
-                string savedDocumentPath = database.GetRemoteFilePath(change.ObjectId); // FIXME use SyncItem to differentiate between local path and remote path
-                if (null != savedDocumentPath)
-                {
-                    Logger.Info("Remove local document: " + savedDocumentPath);
-                    if (File.Exists(savedDocumentPath))
-                    {
-                        File.Delete(savedDocumentPath);
-                    }
-
-                    database.RemoveFile(SyncItemFactory.CreateFromRemotePath(savedDocumentPath, repoinfo));
-                    Logger.Info("Removed local document: " + savedDocumentPath);
-                    return true;
-                }
-                    
-                string savedFolderPath = database.GetFolderPath(change.ObjectId);
-                if (null != savedFolderPath)
-                {
-                    Logger.Info("Remove local folder: " + savedFolderPath);
-                    if(Directory.Exists(savedFolderPath)) {
-                        Directory.Delete(savedFolderPath, true);
-                        database.RemoveFolder(SyncItemFactory.CreateFromRemotePath(savedFolderPath, repoinfo));
-                    }
-                    Logger.Info("Removed local folder: " + savedFolderPath);
-                    return true;
-                }
-
                 return true;
             }
 

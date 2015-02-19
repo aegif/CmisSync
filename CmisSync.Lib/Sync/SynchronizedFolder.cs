@@ -417,7 +417,7 @@ namespace CmisSync.Lib.Sync
                         if (ChangeLogCapability)
                         {
                             Logger.Debug("Invoke a remote change log sync");
-                            ChangeLogSync(remoteFolder);
+                            ChangeLogThenCrawlSync(remoteFolder, localFolder);
                             /*if(repo.Watcher.GetChangeList().Count > 0)
                             {
                                 Logger.Debug("Changes on the local file system detected => starting crawl sync");
@@ -719,7 +719,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool SyncDownloadFolder(IFolder remoteSubFolder, string localFolder)
             {
-                var syncItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+                var syncItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoinfo);//database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                 string localName = PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name);
                 // string remotePathname = remoteSubFolder.Path;
                 // string localSubFolder = Path.Combine(localFolder, localName);
@@ -772,9 +772,9 @@ namespace CmisSync.Lib.Sync
                     {
                         Logger.Info("Skipping download of folder with illegal name: " + localName);
                     }
-                    else if (repoinfo.isPathIgnored(syncItem.RemotePath))
+                    else if (repoinfo.isPathIgnored(syncItem.RemoteRelativePath))
                     {
-                        Logger.Info("Skipping dowload of ignored folder: " + syncItem.RemotePath);
+                        Logger.Info("Skipping dowload of ignored folder: " + syncItem.RemoteRelativePath);
                     }
                     else
                     {

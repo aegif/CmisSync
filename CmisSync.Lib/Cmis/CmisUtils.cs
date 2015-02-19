@@ -446,6 +446,21 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// Get the latest ChangeLog token.
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public static string GetChangeLogToken(ISession session)
+        {
+            session.Clear(); // Clear all caches.
+            session.Binding.GetRepositoryService().GetRepositoryInfos(null);
+            string token = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
+            Logger.Debug("Server token:" + token);
+            return token;
+        }
+
+
+        /// <summary>
         /// Equivalent of .NET Path.Combine, but for CMIS paths.
         /// CMIS paths always use forward slashes.
         /// </summary>

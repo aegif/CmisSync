@@ -372,6 +372,8 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// Regular expression to check whether a file name is valid or not.
+        /// In particular, CmisSync forbids characters that would not be allowed on Windows:
+        /// https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#file_and_directory_names
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:/\\|<>*") + "]");
@@ -525,6 +527,14 @@ namespace CmisSync.Lib
         public static bool IsSymlink(FileSystemInfo fsi)
         {
             return ((fsi.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
+        }
+
+
+        public static void MoveFolderLocally(string origin, string destination)
+        {
+            //string destinationBase = Path.GetDirectoryName(destination);
+
+            Directory.Move(origin, Path.Combine(destination)); // TODO might be more complex when a folder is moved to a non-yet-existing folder hierarchy
         }
     }
 }
