@@ -79,6 +79,11 @@ namespace CmisSync.Lib
         public bool SingleRepository { get { return configXml.SingleRepository; } set { configXml.SingleRepository = value; } }
 
         /// <summary>
+        /// Frozen configuration: The configuration can not be modified from the UI
+        /// </summary>
+        public bool FrozenConfiguration { get { return configXml.FrozenConfiguration; } set { configXml.FrozenConfiguration = value; } }
+
+        /// <summary>
         /// Folder.
         /// </summary>
         public List<SyncConfig.Folder> Folder { get { return configXml.Folders; } }
@@ -233,7 +238,8 @@ namespace CmisSync.Lib
                     Name = userName
                 },
                 Notifications = true,
-                SingleRepository = false, //Multiple repository for CmisSync
+                SingleRepository = false, // Multiple repository for CmisSync, but some CmisSync-derived products have different defaults.
+                FrozenConfiguration = false,
                 Log4Net = createDefaultLog4NetElement()
             };
 
@@ -387,6 +393,11 @@ namespace CmisSync.Lib
             /// </summary>
             [XmlElement("singleRepository")]
             public Boolean SingleRepository { get; set; }
+            /// <summary>
+            /// Frozen configuration: The configuration can not be modified from the UI.
+            /// </summary>
+            [XmlElement("frozenConfiguration")]
+            public Boolean FrozenConfiguration { get; set; }
             /// <summary>
             /// Logging config.
             /// </summary>

@@ -311,10 +311,15 @@ namespace CmisSync
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
                     subfolderItem.DropDownItems.Add(manualSyncItem);
-                    subfolderItem.DropDownItems.Add(new ToolStripSeparator());
-                    subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
-                    subfolderItem.DropDownItems.Add(new ToolStripSeparator());
-                    subfolderItem.DropDownItems.Add(settingsItem);
+
+                    // Add the configuration modification sub-items, if configuration is not frozen.
+                    if ( ! ConfigManager.CurrentConfig.FrozenConfiguration)
+                    {
+                        subfolderItem.DropDownItems.Add(new ToolStripSeparator());
+                        subfolderItem.DropDownItems.Add(removeFolderFromSyncItem);
+                        subfolderItem.DropDownItems.Add(new ToolStripSeparator());
+                        subfolderItem.DropDownItems.Add(settingsItem);
+                    }
 
                     // Add the main item.
                     this.traymenu.Items.Add(subfolderItem);
@@ -330,10 +335,15 @@ namespace CmisSync
                 Image = UIHelpers.GetBitmap("connect")
             };
 
+            // Depending on configuration, disable or hide some elements.
             if (ConfigManager.CurrentConfig.SingleRepository && ConfigManager.CurrentConfig.Folder.Count > 0)
             {
                 //Configured for single repository and repository count 1 or more so disable menu item.
                 addFolderItem.Enabled = false;
+            }
+            if (ConfigManager.CurrentConfig.FrozenConfiguration)
+            {
+                addFolderItem.Visible = false;
             }
 
             addFolderItem.Click += delegate
