@@ -96,6 +96,8 @@ namespace CmisSync.Lib.Sync
                 IDocument remoteDocument = null;
                 string remotePath = null;
                 IFolder remoteParent = null;
+                var changeIdForDebug = change.Properties.ContainsKey("cmis:name") ?
+                    change.Properties["cmis:name"][0] : change.Properties["cmis:objectId"][0];
 
                 // Get the remote changed object.
                 try
@@ -104,7 +106,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch(CmisObjectNotFoundException)
                 {
-                    Logger.Info("Removed object, syncing might be needed:" + change.Properties["cmis:name"][0]);
+                    Logger.Info("Removed object, syncing might be needed:" + changeIdForDebug);
                     return true;
                 }
                 catch (Exception e)
@@ -118,7 +120,7 @@ namespace CmisSync.Lib.Sync
                 remoteFolder = cmisObject as IFolder;
                 if (remoteDocument == null && remoteFolder == null)
                 {
-                    Logger.Info("Ignore change as it is not about a document nor folder: " + change.Properties["cmis:name"][0]);
+                    Logger.Info("Ignore change as it is not about a document nor folder: " + changeIdForDebug);
                     return false;
                 }
 
@@ -127,12 +129,12 @@ namespace CmisSync.Lib.Sync
                 {
                     if ( ! Utils.IsFileWorthSyncing(remoteDocument.Name, repoinfo))
                     {
-                        Logger.Info("Ignore change as it is about a document unworth syncing: " + change.Properties["cmis:name"][0]);
+                        Logger.Info("Ignore change as it is about a document unworth syncing: " + changeIdForDebug);
                         return false;
                     }
                     if (remoteDocument.Paths.Count == 0)
                     {
-                        Logger.Info("Ignore the unfiled object: " + change.Properties["cmis:name"][0]);
+                        Logger.Info("Ignore the unfiled object: " + changeIdForDebug);
                         return false;
                     }
                     // TODO: Support Multiple Paths
@@ -173,7 +175,7 @@ namespace CmisSync.Lib.Sync
                     return false;
                 }
 
-                Logger.Debug("Change is applicable:" + change.Properties["cmis:name"][0]);
+                Logger.Debug("Change is applicable:" + changeIdForDebug);
                 return true;
             }
         }
