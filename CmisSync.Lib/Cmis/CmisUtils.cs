@@ -85,8 +85,10 @@ namespace CmisSync.Lib.Cmis
             // See https://github.com/aegif/CmisSync/wiki/What-address for the list of ECM products prefixes
             // Please send us requests to support more CMIS servers: https://github.com/aegif/CmisSync/issues
             string[] suffixes = {
-                "/alfresco/cmisatom", // Alfresco
-                "/alfresco/service/cmis", // Alfresco
+                "/alfresco/api/-default-/public/cmis/versions/1.1/atom", // Alfresco 4.2 CMIS 1.1
+                "/alfresco/api/-default-/public/cmis/versions/1.0/atom", // Alfresco 4.2 CMIS 1.0
+                "/alfresco/cmisatom", // Alfresco 4.0 and 4.1
+                "/alfresco/service/cmis", // Alfresco 3.x
                 "/cmis/atom11", // OpenDataSpace
                 "/rest/private/cmisatom/", // eXo Platform
                 "/xcmis/rest/cmisatom", // xCMIS
