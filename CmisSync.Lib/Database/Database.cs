@@ -986,10 +986,20 @@ namespace CmisSync.Lib.Database
 
         /// <summary>
         /// Get the ChangeLog token that was stored at the end of the last successful CmisSync synchronization.
+        /// If no ChangeLog has ever been stored, return null.
         /// </summary>
         public string GetChangeLogToken()
         {
-            return (string)ExecuteSQLFunction("SELECT value FROM general WHERE key=\"ChangeLogToken\"", null);
+            var token = ExecuteSQLFunction("SELECT value FROM general WHERE key=\"ChangeLogToken\"", null);
+
+            if (token is DBNull)
+            {
+                return null;
+            }
+            else
+            {
+                return (string)token;
+            }
         }
 
         /// <summary>

@@ -86,7 +86,6 @@
     <Compile Include="Database\Database.cs" />
     <Compile Include="FolderLock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sync\ChangeLogStrategy.cs" />
     <Compile Include="ConfigMigration.cs" />
     <Compile Include="Sync\SynchronizedFolder.cs" />
     <Compile Include="Sync\CrawlStrategy.cs" />

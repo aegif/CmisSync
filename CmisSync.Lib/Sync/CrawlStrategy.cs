@@ -86,12 +86,8 @@ namespace CmisSync.Lib.Sync
                 IList<string> remoteFiles = new List<string>();
                 IList<string> remoteSubfolders = new List<string>();
 
-
                 try
                 {
-                    // Get ChangeLog token.
-                    string token = CmisUtils.GetChangeLogToken(session);
-
                     // Crawl remote children.
                     // Logger.LogInfo("Sync", String.Format("Crawl remote folder {0}", this.remoteFolderPath));
                     CrawlRemote(remoteFolder, localFolder, remoteFiles, remoteSubfolders);
@@ -103,13 +99,22 @@ namespace CmisSync.Lib.Sync
                     // Crawl local folders.
                     // Logger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
                     CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
-
-                    database.SetChangeLogToken(token); // TODO only if the crawl sync has been 100% successful
                 }
                 catch (CmisBaseException e)
                 {
                     ProcessRecoverableException("Could not crawl folder: " + remoteFolder.Path, e);
                 }
+            }
+
+
+            private void CrawlSyncAndUpdateChangeLogToken(IFolder remoteFolder, string localFolder)
+            {
+                // Get ChangeLog token.
+                string token = CmisUtils.GetChangeLogToken(session);
+
+                CrawlSync(remoteFolder, localFolder);
+
+                database.SetChangeLogToken(token); // TODO only if the crawl sync has been 100% successful
             }
 
 

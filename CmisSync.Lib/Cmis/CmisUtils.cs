@@ -449,6 +449,7 @@ namespace CmisSync.Lib.Cmis
 
         /// <summary>
         /// Get the latest ChangeLog token.
+        /// Alfresco sends a null token if no change has ever happened. In that case, return empty string. See https://issues.alfresco.com/jira/browse/ALF-21276
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
@@ -458,7 +459,7 @@ namespace CmisSync.Lib.Cmis
             session.Binding.GetRepositoryService().GetRepositoryInfos(null);
             string token = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
             Logger.Debug("Server token:" + token);
-            return token;
+            return token ?? string.Empty;
         }
 
 

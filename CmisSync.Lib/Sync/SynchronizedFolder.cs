@@ -406,7 +406,7 @@ namespace CmisSync.Lib.Sync
                     if (firstSync)
                     {
                         Logger.Debug("First sync, invoke a full crawl sync");
-                        CrawlSync(remoteFolder, localFolder);
+                        CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
                         firstSync = false;
                     }
                     else
@@ -431,7 +431,7 @@ namespace CmisSync.Lib.Sync
                             //  Have to crawl remote.
                             Logger.Debug("Invoke a full crawl sync");
                             repo.Watcher.Clear();
-                            CrawlSync(remoteFolder, localFolder);
+                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
                         }
                     }
                 }
@@ -672,9 +672,11 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
+
             /// <summary>
-            /// Download a single folder from the CMIS server.
+            /// Download a single folder from the CMIS server, by simple recursive copy.
             /// </summary>
+            /// <returns>true if successful</returns>
             private bool DownloadDirectory(IFolder remoteFolder, string localFolder)
             {
                 SleepWhileSuspended();
@@ -717,15 +719,15 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download a single folder from the CMIS server for sync.
             /// </summary>
+            /// <returns>true if successful</returns>
             private bool SyncDownloadFolder(IFolder remoteSubFolder, string localFolder)
             {
-                var syncItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoinfo);//database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+                var syncItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoinfo);
                 string localName = PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name);
-                // string remotePathname = remoteSubFolder.Path;
-                // string localSubFolder = Path.Combine(localFolder, localName);
+
+                // If the target folder has been removed/renamed, then relaunch sync.
                 if (!Directory.Exists(localFolder))
                 {
-                    // The target folder has been removed/renamed => relaunch sync
                     Logger.Warn("The target folder has been removed/renamed: " + localFolder);
                     return false;
                 }
@@ -793,8 +795,34 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            private bool DownloadFolder(IFolder remoteFolder, string localFolder)
+            {
+                if (Directory.Exists(localFolder))
+                {
+                    return true;
+                }
+                if (remoteFolder == null)
+                {
+                    return false;
+                }
+                if (!Directory.Exists(Path.GetDirectoryName(localFolder)))
+                {
+                    if (!DownloadFolder(remoteFolder.FolderParent, Path.GetDirectoryName(localFolder)))
+                    {
+                        return false;
+                    }
+                }
+                return SyncDownloadFolder(remoteFolder, Path.GetDirectoryName(localFolder));
+            }
+            
+            
+            /// <summary>
             /// Download a single file from the CMIS server for sync.
             /// </summary>
+            /// <returns>true if successful</returns>
             private bool SyncDownloadFile(IDocument remoteDocument, string localFolder, IList<string> remoteFiles = null)
             {
                 string remotePath = remoteDocument.Paths[0];
@@ -907,8 +935,8 @@ namespace CmisSync.Lib.Sync
 
                 return success;
             }
-            
-            
+
+
             /// <summary>
             /// Set the last modification date of a local file to whatever a remote document's last modfication date is.
             /// </summary>

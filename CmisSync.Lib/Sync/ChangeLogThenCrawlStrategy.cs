@@ -37,12 +37,11 @@ namespace CmisSync.Lib.Sync
                 string lastTokenOnServer = CmisUtils.GetChangeLogToken(session);
 
                 // Get last change token that had been saved on client side.
-                // TODO catch exception invalidArgument which means that changelog has been truncated and this token is not found anymore.
                 string lastTokenOnClient = database.GetChangeLogToken();
 
                 if (lastTokenOnClient == lastTokenOnServer)
                 {
-                    Logger.Debug("No changes to sync, tokens on server and client are equal: " + lastTokenOnClient);
+                    Logger.Debug("No changes to sync, tokens on server and client are equal: \"" + lastTokenOnClient + "\"");
                     return;
                 }
 
@@ -61,7 +60,7 @@ namespace CmisSync.Lib.Sync
                     Config.Feature features = null;
                     if(ConfigManager.CurrentConfig.getFolder(repoinfo.Name)!=null)
                         features = ConfigManager.CurrentConfig.getFolder(repoinfo.Name).SupportedFeatures;
-                    int maxNumItems = (features!=null && features.MaxNumberOfContentChanges!=null)?
+                    int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
                         (int)features.MaxNumberOfContentChanges : 100;
 
                     // Check which documents/folders have changed.
@@ -74,7 +73,7 @@ namespace CmisSync.Lib.Sync
                         if (ChangeIsApplicable(change))
                         {
                             // Launch a CrawlSync (which means syncing everything indistinctively).
-                            CrawlSync(remoteFolder, localFolder);
+                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
 
                             // A single CrawlSync takes care of all pending changes, so no need to analyze the rest of the changes.
                             return;
