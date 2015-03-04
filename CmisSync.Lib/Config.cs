@@ -723,6 +723,14 @@ namespace CmisSync.Lib
             {
                 writer.WriteValue(_Value.ToString());
             }
+
+            /// <summary>
+            /// String representation of the URI.
+            /// </summary>
+            public string ToString()
+            {
+                return _Value.ToString();
+            }
         }
     }
 }

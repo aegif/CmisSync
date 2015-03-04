@@ -54,33 +54,43 @@ namespace CmisSync.Lib.Sync
                     database.SetChangeLogToken(lastTokenOnServer);
                 }
 
+                // Calculate queryable number of changes.
+                Config.Feature features = null;
+                if (ConfigManager.CurrentConfig.getFolder(repoinfo.Name) != null)
+                    features = ConfigManager.CurrentConfig.getFolder(repoinfo.Name).SupportedFeatures;
+                int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
+                    (int)features.MaxNumberOfContentChanges : 100;
+
+                IChangeEvents changes;
+
                 do
                 {
-                    // Calculate queryable number of changes.
-                    Config.Feature features = null;
-                    if(ConfigManager.CurrentConfig.getFolder(repoinfo.Name)!=null)
-                        features = ConfigManager.CurrentConfig.getFolder(repoinfo.Name).SupportedFeatures;
-                    int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
-                        (int)features.MaxNumberOfContentChanges : 100;
-
                     // Check which documents/folders have changed.
-                    IChangeEvents changes = session.GetContentChanges(lastTokenOnClient, IsPropertyChangesSupported, maxNumItems);
+                    changes = session.GetContentChanges(lastTokenOnClient, IsPropertyChangesSupported, maxNumItems);
 
                     // Apply changes.
                     foreach (IChangeEvent change in changes.ChangeEventList)
                     {
                         // Check whether change is applicable.
+                        // For instance, we dont care about changes to non-synced folders.
                         if (ChangeIsApplicable(change))
                         {
                             // Launch a CrawlSync (which means syncing everything indistinctively).
                             CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
 
                             // A single CrawlSync takes care of all pending changes, so no need to analyze the rest of the changes.
+                            // It will also update the last client-side ChangeLog token, more accurately than we can do here.
                             return;
                         }
                     }
+
+                    // No applicable changes, update ChangeLog token.
+                    lastTokenOnClient = changes.LatestChangeLogToken;
+                    database.SetChangeLogToken(lastTokenOnClient);
                 }
-                while (!lastTokenOnServer.Equals(lastTokenOnClient));
+                // Repeat if there were two many changes to fit in a single response.
+                // Only reached if none of the changes in this iteration were non-applicable.
+                while (changes.HasMoreItems ?? false);
             }
 
 
