@@ -56,8 +56,8 @@ namespace CmisSync.Lib.Sync
 
                 // Calculate queryable number of changes.
                 Config.Feature features = null;
-                if (ConfigManager.CurrentConfig.getFolder(repoinfo.Name) != null)
-                    features = ConfigManager.CurrentConfig.getFolder(repoinfo.Name).SupportedFeatures;
+                if (ConfigManager.CurrentConfig.GetFolder(repoinfo.Name) != null)
+                    features = ConfigManager.CurrentConfig.GetFolder(repoinfo.Name).SupportedFeatures;
                 int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
                     (int)features.MaxNumberOfContentChanges : 100;
 

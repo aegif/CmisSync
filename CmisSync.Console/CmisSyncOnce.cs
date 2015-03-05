@@ -58,7 +58,7 @@ namespace CmisSync.Console
 		private void Init (string folderName)
 		{
 			Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder folder = config.getFolder(folderName);
+            CmisSync.Lib.Config.SyncConfig.Folder folder = config.GetFolder(folderName);
             if (folder == null)
             {
                 System.Console.WriteLine("No folder found with this name: " + folderName);

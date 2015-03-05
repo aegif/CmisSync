@@ -22,7 +22,7 @@ namespace TestLibrary
                 Config config = new Config(configpath);
                 //Notifications should be switched on by default
                 Assert.IsTrue(config.Notifications);
-                Assert.AreEqual(config.Folder.Count, 0);
+                Assert.AreEqual(config.Folders.Count, 0);
                 config.Save();
                 config = new Config(configpath);
             }

@@ -336,7 +336,7 @@ namespace CmisSync
             };
 
             // Depending on configuration, disable or hide some elements.
-            if (ConfigManager.CurrentConfig.SingleRepository && ConfigManager.CurrentConfig.Folder.Count > 0)
+            if (ConfigManager.CurrentConfig.SingleRepository && ConfigManager.CurrentConfig.Folders.Count > 0)
             {
                 //Configured for single repository and repository count 1 or more so disable menu item.
                 addFolderItem.Enabled = false;

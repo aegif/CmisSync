@@ -315,7 +315,7 @@ namespace CmisSync
         /// </summary>
         public void SettingsClicked(string reponame)
         {
-            CmisSync.Lib.Config.SyncConfig.Folder repository = ConfigManager.CurrentConfig.getFolder(reponame);
+            CmisSync.Lib.Config.SyncConfig.Folder repository = ConfigManager.CurrentConfig.GetFolder(reponame);
             Program.UI.Setup.Controller.saved_repository = reponame;
             if (repository != null)
             {

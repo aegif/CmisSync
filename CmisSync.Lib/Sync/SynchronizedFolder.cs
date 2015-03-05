@@ -277,7 +277,7 @@ namespace CmisSync.Lib.Sync
                         || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.ObjectIdsOnly;
                 IsGetDescendantsSupported = session.RepositoryInfo.Capabilities.IsGetDescendantsSupported == true;
                 IsGetFolderTreeSupported = session.RepositoryInfo.Capabilities.IsGetFolderTreeSupported == true;
-                Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(this.repoinfo.Name);
+                Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.GetFolder(this.repoinfo.Name);
                 if (folder != null)
                 {
                     Config.Feature features = folder.SupportedFeatures;

@@ -107,7 +107,7 @@ namespace CmisSync.Lib
 
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
             syncConfig.IsSuspended = true;
             config.Save();
         }
@@ -122,7 +122,7 @@ namespace CmisSync.Lib
 
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
             syncConfig.IsSuspended = false;
             config.Save();
         }
@@ -319,7 +319,7 @@ namespace CmisSync.Lib
         {
             //Get configuration
             Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.getFolder(this.Name);
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
 
             //Pause sync
             this.remote_timer.Stop();

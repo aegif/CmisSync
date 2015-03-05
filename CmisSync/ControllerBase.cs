@@ -150,7 +150,7 @@ namespace CmisSync
             get
             {
                 List<string> folders = new List<string>();
-                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
+                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folders)
                     folders.Add(f.DisplayName);
                 folders.Sort();
 
@@ -277,7 +277,7 @@ namespace CmisSync
         /// </summary>
         public void RemoveRepositoryFromSync(string reponame)
         {
-            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
+            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.GetFolder(reponame);
             if (f != null)
             {
                 RemoveRepository(f);
@@ -388,7 +388,7 @@ namespace CmisSync
             {
                 List<Config.SyncConfig.Folder> toBeDeleted = new List<Config.SyncConfig.Folder>();
                 // If folder has been deleted, remove it from configuration too.
-                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
+                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folders)
                 {
                     string folder_name = f.DisplayName;
                     string folder_path = f.LocalPath;
@@ -409,7 +409,7 @@ namespace CmisSync
 
                 foreach (Config.SyncConfig.Folder f in toBeDeleted)
                 {
-                    ConfigManager.CurrentConfig.Folder.Remove(f);
+                    ConfigManager.CurrentConfig.Folders.Remove(f);
                 }
                 if (toBeDeleted.Count > 0)
                     ConfigManager.CurrentConfig.Save();

@@ -32,6 +32,11 @@ namespace CmisSync.Lib
     public class Config
     {
         /// <summary>
+        /// The current config schema version.
+        /// </summary>
+        public const int SchemaVersion = 1;
+
+        /// <summary>
         /// Chunk size for chunked transfers (not implemented yet)
         /// </summary>
         private const long DefaultChunkSize = 1024 * 1024;
@@ -68,6 +73,13 @@ namespace CmisSync.Lib
         /// </summary>
         public string ConfigPath { get; private set; }
 
+        // XML elements.
+
+        /// <summary>
+        /// Config schema version.
+        /// </summary>
+        public int ConfigSchemaVersion { get { return configXml.ConfigSchemaVersion; } set { configXml.ConfigSchemaVersion = value; } }
+
         /// <summary>
         /// Notifications.
         /// </summary>
@@ -86,12 +98,12 @@ namespace CmisSync.Lib
         /// <summary>
         /// Folder.
         /// </summary>
-        public List<SyncConfig.Folder> Folder { get { return configXml.Folders; } }
+        public List<SyncConfig.Folder> Folders { get { return configXml.Folders; } }
 
         /// <summary>
         /// Get folder based on name.
         /// </summary>
-        public SyncConfig.Folder getFolder(string name)
+        public SyncConfig.Folder GetFolder(string name)
         {
             foreach (SyncConfig.Folder folder in configXml.Folders)
             {
@@ -104,7 +116,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Get a folder based on RemoteUrl, UserName, and RepositoryId.
         /// </summary>
-        public SyncConfig.Folder getFolder(string RemoteUrl, string UserName, string RepositoryId)
+        public SyncConfig.Folder GetFolder(string RemoteUrl, string UserName, string RepositoryId)
         {
             foreach (SyncConfig.Folder folder in configXml.Folders)
             {
@@ -305,7 +317,7 @@ namespace CmisSync.Lib
         /// </summary>
         public void RemoveFolder(string repoName)
         {
-            this.configXml.Folders.Remove(getFolder(repoName));
+            this.configXml.Folders.Remove(GetFolder(repoName));
             Logger.Info("Removed sync config: " + repoName);
             Save();
         }
@@ -383,32 +395,44 @@ namespace CmisSync.Lib
         /// </summary>
         [XmlRoot("CmisSync", Namespace = null)]
         public class SyncConfig {
+
+            /// <summary>
+            /// Config schema version.
+            /// </summary>
+            [XmlElement("configSchemaVersion")]
+            public Int32 ConfigSchemaVersion { get; set; }
+            
             /// <summary>
             /// Notifications.
             /// </summary>
             [XmlElement("notifications")]
             public Boolean Notifications { get; set; }
+            
             /// <summary>
-            /// Single Repository.
+            /// Single repository.
             /// </summary>
             [XmlElement("singleRepository")]
             public Boolean SingleRepository { get; set; }
+            
             /// <summary>
             /// Frozen configuration: The configuration can not be modified from the UI.
             /// </summary>
             [XmlElement("frozenConfiguration")]
             public Boolean FrozenConfiguration { get; set; }
+            
             /// <summary>
             /// Logging config.
             /// </summary>
             [XmlAnyElement("log4net")]
             public XmlNode Log4Net { get; set; }
+            
             /// <summary>
             /// List of the CmisSync synchronized folders.
             /// </summary>
             [XmlArray("folders")]
             [XmlArrayItem("folder")]
             public List<SyncConfig.Folder> Folders { get; set; }
+            
             /// <summary>
             /// User.
             /// </summary>
@@ -679,6 +703,7 @@ namespace CmisSync.Lib
             /// Constructor.
             /// </summary>
             public XmlUri() { }
+
             /// <summary>
             /// Constructor.
             /// </summary>
