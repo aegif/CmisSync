@@ -33,11 +33,20 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private void ChangeLogThenCrawlSync(IFolder remoteFolder, string localFolder)
             {
-                // Get last change log token on server side.
-                string lastTokenOnServer = CmisUtils.GetChangeLogToken(session);
+                // Calculate queryable number of changes.
+                Config.Feature features = null;
+                if (ConfigManager.CurrentConfig.GetFolder(repoinfo.Name) != null)
+                    features = ConfigManager.CurrentConfig.GetFolder(repoinfo.Name).SupportedFeatures;
+                int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
+                    (int)features.MaxNumberOfContentChanges : 100;
+
+                IChangeEvents changes;
 
                 // Get last change token that had been saved on client side.
                 string lastTokenOnClient = database.GetChangeLogToken();
+
+                // Get last change log token on server side.
+                string lastTokenOnServer = CmisUtils.GetChangeLogToken(session);
 
                 if (lastTokenOnClient == lastTokenOnServer)
                 {
@@ -54,15 +63,7 @@ namespace CmisSync.Lib.Sync
                     database.SetChangeLogToken(lastTokenOnServer);
                 }
 
-                // Calculate queryable number of changes.
-                Config.Feature features = null;
-                if (ConfigManager.CurrentConfig.GetFolder(repoinfo.Name) != null)
-                    features = ConfigManager.CurrentConfig.GetFolder(repoinfo.Name).SupportedFeatures;
-                int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
-                    (int)features.MaxNumberOfContentChanges : 100;
-
-                IChangeEvents changes;
-
+                // ChangeLog tokens are different, so checking changes is needed.
                 do
                 {
                     // Check which documents/folders have changed.
@@ -85,12 +86,13 @@ namespace CmisSync.Lib.Sync
                     }
 
                     // No applicable changes, update ChangeLog token.
-                    lastTokenOnClient = changes.LatestChangeLogToken;
-                    database.SetChangeLogToken(lastTokenOnClient);
+                    lastTokenOnClient = changes.LatestChangeLogToken; // But dont save to database as latest server token is actually a later token.
                 }
                 // Repeat if there were two many changes to fit in a single response.
                 // Only reached if none of the changes in this iteration were non-applicable.
                 while (changes.HasMoreItems ?? false);
+
+                database.SetChangeLogToken(lastTokenOnServer);
             }
 
 
