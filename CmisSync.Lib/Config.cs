@@ -243,16 +243,17 @@ namespace CmisSync.Lib
             // Define the default XML configuration file.
             configXml = new SyncConfig()
             {
+                ConfigSchemaVersion = Config.SchemaVersion,
+                Notifications = true,
+                SingleRepository = false, // Multiple repository for CmisSync, but some CmisSync-derived products have different defaults.
+                FrozenConfiguration = false,
+                Log4Net = createDefaultLog4NetElement(),
                 Folders = new List<SyncConfig.Folder>(),
                 User = new User()
                 {
                     EMail = "Unknown",
                     Name = userName
-                },
-                Notifications = true,
-                SingleRepository = false, // Multiple repository for CmisSync, but some CmisSync-derived products have different defaults.
-                FrozenConfiguration = false,
-                Log4Net = createDefaultLog4NetElement()
+                }
             };
 
             // Save it as an XML file.
