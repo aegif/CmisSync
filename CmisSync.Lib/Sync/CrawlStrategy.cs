@@ -60,7 +60,7 @@ namespace CmisSync.Lib.Sync
             ///     else:
             ///       upload recursively               // if BIDIRECTIONAL
             /// </summary>
-            private void CrawlSync(IFolder remoteFolder, string localFolder)
+            private bool CrawlSync(IFolder remoteFolder, string localFolder)
             {
                 SleepWhileSuspended();
 
@@ -99,10 +99,13 @@ namespace CmisSync.Lib.Sync
                     // Crawl local folders.
                     // Logger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
                     CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
+
+                    return true;
                 }
                 catch (CmisBaseException e)
                 {
                     ProcessRecoverableException("Could not crawl folder: " + remoteFolder.Path, e);
+                    return false;
                 }
             }
 
@@ -112,9 +115,18 @@ namespace CmisSync.Lib.Sync
                 // Get ChangeLog token.
                 string token = CmisUtils.GetChangeLogToken(session);
 
-                CrawlSync(remoteFolder, localFolder);
+                // Sync.
+                bool success = CrawlSync(remoteFolder, localFolder);
 
-                database.SetChangeLogToken(token); // TODO only if the crawl sync has been 100% successful
+                // Update ChangeLog token if sync has been successful.
+                if (success)
+                {
+                    database.SetChangeLogToken(token);
+                }
+                else
+                {
+                    Logger.Info("ChangeLog token not updated as an error occurred during sync.");
+                }
             }
 
 

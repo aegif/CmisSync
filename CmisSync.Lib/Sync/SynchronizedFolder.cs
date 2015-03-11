@@ -411,20 +411,13 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        // Apply changes locally noticed by the filesystem watcher.
+                        // Apply local changes noticed by the filesystem watcher.
                         WatcherSync(remoteFolderPath, localFolder);
 
                         if (ChangeLogCapability)
                         {
                             Logger.Debug("Invoke a remote change log sync");
                             ChangeLogThenCrawlSync(remoteFolder, localFolder);
-                            /*if(repo.Watcher.GetChangeList().Count > 0)
-                            {
-                                Logger.Debug("Changes on the local file system detected => starting crawl sync");
-                                repo.Watcher.Clear();
-                                // TODO if(!CrawlSync(remoteFolder,localFolder))
-                                // TODO    repo.Watcher.InsertChange("/", Watcher.ChangeTypes.Changed);
-                            }*/
                         }
                         else
                         {
@@ -1278,8 +1271,9 @@ namespace CmisSync.Lib.Sync
             /// Upload folder recursively.
             /// After execution, the hierarchy on server will be: .../remoteBaseFolder/localFolder/...
             /// </summary>
-            private void UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
+            private bool UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
             {
+                bool success = true;
                 SleepWhileSuspended();
 
                 IFolder folder = null;
@@ -1314,13 +1308,15 @@ namespace CmisSync.Lib.Sync
                         if (folder == null)
                         {
                             Logger.Warn("Remote file conflict with local folder " + syncItem.LocalFileName);
-                            return;
+                            // TODO Show error message
+                            return false;
                         }
+                        success = false;
                     }
                     catch (Exception e)
                     {
                         ProcessRecoverableException(String.Format("Exception when create remote folder for local folder {0}: {1}", localFolder, e.Message), e);
-                        return;
+                        return false;
                     }
 
 
@@ -1332,7 +1328,7 @@ namespace CmisSync.Lib.Sync
                 catch (CmisBaseException e)
                 {
                     ProcessRecoverableException("Could not create remote directory: " + remoteBaseFolder.Path + "/" + Path.GetFileName(localFolder), e);
-                    return;
+                    return false;
                 }
 
                 try
@@ -1342,7 +1338,7 @@ namespace CmisSync.Lib.Sync
                     {
                         if (Utils.WorthSyncing(localFolder, Path.GetFileName(file), repoinfo))
                         {
-                            UploadFile(file, folder);
+                            success &= UploadFile(file, folder);
                         }
                     }
 
@@ -1351,14 +1347,16 @@ namespace CmisSync.Lib.Sync
                     {
                         if (Utils.WorthSyncing(localFolder, Path.GetFileName(subfolder), repoinfo))
                         {
-                            UploadFolderRecursively(folder, subfolder);
+                            success &= UploadFolderRecursively(folder, subfolder);
                         }
                     }
                 }
                 catch (Exception e)
                 {
                     ProcessRecoverableException("Could not uploading folder: " + localFolder, e);
+                    return false;
                 }
+                return success;
             }
 
 

@@ -21,7 +21,7 @@ namespace CmisSync.Lib.Sync
         public partial class SynchronizedFolder
         {
             /// <summary>
-            /// Watchers the sync.
+            /// Synchronization based on local filesystem monitoring ("watcher").
             /// </summary>
             /// <param name="remoteFolder">Remote folder.</param>
             /// <param name="localFolder">Local folder.</param>
@@ -91,10 +91,11 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
-            /// Sync move file.
+            /// An event was received from the filesystem watcher, analyze the change and apply it.
             /// </summary>
-            private void WatchSyncMove(string remoteFolder, string localFolder, string oldPathname, string newPathname)
+            private bool WatchSyncMove(string remoteFolder, string localFolder, string oldPathname, string newPathname)
             {
+                bool success = true;
                 SleepWhileSuspended();
                 string oldDirectory = Path.GetDirectoryName(oldPathname);
                 string oldFilename = Path.GetFileName(oldPathname);
@@ -113,7 +114,7 @@ namespace CmisSync.Lib.Sync
                 if ((rename && move) || (!rename && !move))
                 {
                     Logger.ErrorFormat("Not a valid rename/move: {0} -> {1}", oldPathname, newPathname);
-                    return;
+                    return true; // It is not our problem that watcher data is not valid.
                 }
                 try
                 {
@@ -124,8 +125,8 @@ namespace CmisSync.Lib.Sync
                             if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo)))
                             {
                                 //database already contains path so revert back to delete/update
-                                WatcherSyncDelete(remoteFolder, localFolder, oldPathname);
-                                WatcherSyncUpdate(remoteFolder, localFolder, newPathname);
+                                success &= WatcherSyncDelete(remoteFolder, localFolder, oldPathname);
+                                success &= WatcherSyncUpdate(remoteFolder, localFolder, newPathname);
                             }
                             else
                             {
@@ -133,7 +134,7 @@ namespace CmisSync.Lib.Sync
                                 {
                                     //rename file...
                                     IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName);
-                                    RenameFile(oldDirectory, newFilename, remoteDocument);
+                                    success &= RenameFile(oldDirectory, newFilename, remoteDocument);
                                 }
                                 else //move
                                 {
@@ -141,7 +142,7 @@ namespace CmisSync.Lib.Sync
                                     IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName);
                                     IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName);
                                     IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName);
-                                    MoveFile(oldDirectory, newDirectory, oldRemoteFolder, newRemoteFolder, remoteDocument);
+                                    success &= MoveFile(oldDirectory, newDirectory, oldRemoteFolder, newRemoteFolder, remoteDocument);
                                 }
                             }
                         }
@@ -150,8 +151,8 @@ namespace CmisSync.Lib.Sync
                             if (database.ContainsFolder(newPathname))
                             {
                                 //database already contains path so revert back to delete/update
-                                WatcherSyncDelete(remoteFolder, localFolder, oldPathname);
-                                WatcherSyncUpdate(remoteFolder, localFolder, newPathname);
+                                success &= WatcherSyncDelete(remoteFolder, localFolder, oldPathname);
+                                success &= WatcherSyncUpdate(remoteFolder, localFolder, newPathname);
                             }
                             else
                             {
@@ -159,7 +160,7 @@ namespace CmisSync.Lib.Sync
                                 {
                                     //rename folder...
                                     IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName);
-                                    RenameFolder(oldDirectory, newFilename, remoteFolderObject);
+                                    success &= RenameFolder(oldDirectory, newFilename, remoteFolderObject);
                                 }
                                 else //move
                                 {
@@ -167,25 +168,25 @@ namespace CmisSync.Lib.Sync
                                     IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName);
                                     IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName);
                                     IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName);
-                                    MoveFolder(oldDirectory, newDirectory, oldRemoteFolder, newRemoteFolder, remoteFolderObject);
+                                    success &= MoveFolder(oldDirectory, newDirectory, oldRemoteFolder, newRemoteFolder, remoteFolderObject);
                                 }
                             }
                         }
                         else
                         {
                             //File/Folder has not been synced before so simply update
-                            WatcherSyncUpdate(remoteFolder, localFolder, newPathname);
+                            success &= WatcherSyncUpdate(remoteFolder, localFolder, newPathname);
                         }
                     }
                     else if (oldPathnameWorthSyncing && !newPathnameWorthSyncing)
                     {
                         //New path not worth syncing
-                        WatcherSyncDelete(remoteFolder, localFolder, oldPathname);
+                        success &= WatcherSyncDelete(remoteFolder, localFolder, oldPathname);
                     }
                     else if (!oldPathnameWorthSyncing && newPathnameWorthSyncing)
                     {
                         //Old path not worth syncing
-                        WatcherSyncUpdate(remoteFolder, localFolder, newPathname);
+                        success &= WatcherSyncUpdate(remoteFolder, localFolder, newPathname);
                     }
                     else
                     {
@@ -194,24 +195,26 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
+                    success = false;
                     ProcessRecoverableException("Could process watcher sync move: " + oldPathname + " -> " + newPathname, e);
                 }
+                return success;
             }
 
 
             /// <summary>
-            /// Watchers the sync update.
+            /// Sync update.
             /// </summary>
             /// <param name="remoteFolder">Remote folder.</param>
             /// <param name="localFolder">Local folder.</param>
             /// <param name="pathname">Pathname.</param>
-            private void WatcherSyncUpdate(string remoteFolder, string localFolder, string pathname)
+            private bool WatcherSyncUpdate(string remoteFolder, string localFolder, string pathname)
             {
                 SleepWhileSuspended();
                 string filename = Path.GetFileName(pathname);
                 if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), filename, repoinfo))
                 {
-                    return;
+                    return true;
                 }
                 try
                 {
@@ -225,13 +228,13 @@ namespace CmisSync.Lib.Sync
                         if (null == remoteBase)
                         {
                             Logger.WarnFormat("The remote base folder {0} for local {1} does not exist, ignore for the update action", remoteBaseName, pathname);
-                            return;
+                            return true; // Ignore is not a failure.
                         }
                     }
                     else
                     {
                         Logger.InfoFormat("The file/folder {0} is deleted, ignore for the update action", pathname);
-                        return;
+                        return true; 
                     }
                     if (File.Exists(pathname))
                     {
@@ -254,14 +257,19 @@ namespace CmisSync.Lib.Sync
                             success = UploadFile(pathname, remoteBase);
                             Logger.InfoFormat("Upload {0}: {1}", pathname, success);
                         }
-                        if (!success)
+                        if (success)
+                        {
+                            return true;
+                        }
+                        else
                         {
                             Logger.WarnFormat("Failure to update: {0}", pathname);
+                            return false;
                         }
-                        return;
                     }
                     if (Directory.Exists(pathname))
                     {
+                        bool success = true;
                         if (database.ContainsFolder(pathname))
                         {
                             Logger.InfoFormat("Folder exists in Database {0}, ignore for the update action", pathname);
@@ -269,16 +277,18 @@ namespace CmisSync.Lib.Sync
                         else
                         {
                             Logger.InfoFormat("Create locally created folder on server: {0}", pathname);
-                            UploadFolderRecursively(remoteBase, pathname);
+                            success &= UploadFolderRecursively(remoteBase, pathname);
                         }
-                        return;
+                        return success;
                     }
                     Logger.InfoFormat("The file/folder {0} is deleted, ignore for the update action", pathname);
                 }
                 catch (Exception e)
                 {
                     ProcessRecoverableException("Could process watcher sync update: " + pathname, e);
+                    return false;
                 }
+                return true;
             }
 
             /// <summary>
@@ -287,14 +297,16 @@ namespace CmisSync.Lib.Sync
             /// <param name="remoteFolder">Remote folder.</param>
             /// <param name="localFolder">Local folder.</param>
             /// <param name="pathname">Pathname.</param>
-            private void WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
+            private bool WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
                 SleepWhileSuspended();
                 string filename = Path.GetFileName(pathname);
                 if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), filename, repoinfo))
                 {
-                    return;
+                    return true;
                 }
+
+                bool success = true;
                 try
                 {
                     string name = pathname.Substring(localFolder.Length + 1);
@@ -312,7 +324,8 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (Exception ex)
                         {
-                            Logger.Warn(String.Format("Exception when operate remote {0}", remoteName), ex);
+                            success = false;
+                            Logger.Warn(String.Format("Exception when remotely deleting {0}", remoteName), ex);
                         }
                         database.RemoveFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
@@ -329,7 +342,8 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (Exception ex)
                         {
-                            Logger.Warn(String.Format("Exception when operate remote {0}", remoteName), ex);
+                            success = false;
+                            Logger.Warn(String.Format("Exception when deleting remote folder {0}", remoteName), ex);
                         }
                         database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
                     }
@@ -340,8 +354,10 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
+                    success = false;
                     ProcessRecoverableException("Could process watcher sync update: " + pathname, e);
                 }
+                return success;
             }
         }
     }
