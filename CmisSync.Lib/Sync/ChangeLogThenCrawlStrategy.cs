@@ -27,12 +27,31 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public partial class SynchronizedFolder
         {
+            private int changeLogIterationCounter = 0;
 
             /// <summary>
             /// Synchronize using the ChangeLog feature of CMIS to trigger CrawlStrategy.
             /// </summary>
             private void ChangeLogThenCrawlSync(IFolder remoteFolder, string localFolder)
             {
+                // Once in a while, run a crawl sync, to make up for any server-side ChangeLog bug.
+                // The frequency of this is calculated based on the poll interval, so that:
+                // Interval=5 seconds -> every 6 hours -> about every 2160 iterations
+                // Interval=1 hours -> every 3 days -> about every 72 iterations
+                // Thus a good formula is: nb of iterations = 1 + 263907 / (pollInterval + 117)
+                double pollInterval = ConfigManager.CurrentConfig.GetFolder(repoinfo.Name).PollInterval;
+                if (changeLogIterationCounter > 263907 / (pollInterval + 117))
+                {
+                    Logger.Debug("It has been a while since the last crawl sync, so launching a crawl sync now.");
+                    CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
+                    changeLogIterationCounter = 0;
+                    return;
+                }
+                else
+                {
+                    changeLogIterationCounter++;
+                }
+
                 // Calculate queryable number of changes.
                 Config.Feature features = null;
                 if (ConfigManager.CurrentConfig.GetFolder(repoinfo.Name) != null)
