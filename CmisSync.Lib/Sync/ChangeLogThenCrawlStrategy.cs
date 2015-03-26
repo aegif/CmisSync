@@ -40,7 +40,7 @@ namespace CmisSync.Lib.Sync
                 // Interval=1 hours -> every 3 days -> about every 72 iterations
                 // Thus a good formula is: nb of iterations = 1 + 263907 / (pollInterval + 117)
                 double pollInterval = ConfigManager.CurrentConfig.GetFolder(repoinfo.Name).PollInterval;
-                if (changeLogIterationCounter > 263907 / (pollInterval + 117))
+                if (changeLogIterationCounter > 263907 / (pollInterval/1000 + 117))
                 {
                     Logger.Debug("It has been a while since the last crawl sync, so launching a crawl sync now.");
                     CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
