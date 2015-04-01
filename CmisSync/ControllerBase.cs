@@ -398,7 +398,7 @@ namespace CmisSync
                         RemoveRepository(f);
                         toBeDeleted.Add(f);
 
-                        Logger.Info("Controller | Removed folder '" + folder_name + "' from config");
+                        Logger.Info("ControllerBase | Removed folder '" + folder_name + "' from config");
 
                     }
                     else

@@ -289,7 +289,7 @@ namespace CmisSync.Lib.Sync
                             IsGetFolderTreeSupported = false;
                         if (ChangeLogCapability && features.GetContentChangesSupport == false)
                             ChangeLogCapability = false;
-                        if(ChangeLogCapability && session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All 
+                        if (ChangeLogCapability && session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.All 
                             || session.RepositoryInfo.Capabilities.ChangesCapability == CapabilityChanges.Properties)
                             IsPropertyChangesSupported = true;
                     }
@@ -297,9 +297,12 @@ namespace CmisSync.Lib.Sync
                 Logger.Debug("ChangeLog capability: " + ChangeLogCapability.ToString());
                 Logger.Debug("Get folder tree support: " + IsGetFolderTreeSupported.ToString());
                 Logger.Debug("Get descendants support: " + IsGetDescendantsSupported.ToString());
-                if(repoinfo.ChunkSize>0) {
-                    Logger.Debug("Chunked Up/Download enabled: chunk size = "+ repoinfo.ChunkSize.ToString() + " byte");
-                }else {
+                if (repoinfo.ChunkSize > 0)
+                {
+                    Logger.Debug("Chunked Up/Download enabled: chunk size = " + repoinfo.ChunkSize.ToString() + " byte");
+                }
+                else
+                {
                     Logger.Debug("Chunked Up/Download disabled");
                 }
                 HashSet<string> filters = new HashSet<string>();
@@ -346,6 +349,7 @@ namespace CmisSync.Lib.Sync
                 Sync(true);
             }
 
+
             /// <summary>
             /// Track whether a full sync is done
             /// </summary>
@@ -386,7 +390,8 @@ namespace CmisSync.Lib.Sync
                         Connect();
                         firstSync = true;
                     }
-                    else {
+                    else
+                    {
                         //  Force to reset the cache for each Sync
                         session.Clear();
                     }

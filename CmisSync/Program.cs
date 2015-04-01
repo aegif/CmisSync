@@ -89,7 +89,6 @@ namespace CmisSync
                 Backend.Platform != PlatformID.MacOSX &&
                 Backend.Platform != PlatformID.Win32NT)
             {
-
                 string n = Environment.NewLine;
 
                 Console.WriteLine(n +
