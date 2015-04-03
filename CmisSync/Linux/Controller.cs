@@ -168,7 +168,7 @@ namespace CmisSync {
 
         public void OpenCmisSyncFolder(string name)
         {
-            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(name);
+            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.GetFolder(name);
             if(f!=null)
                 Utils.OpenFolder(f.LocalPath);
             else if(String.IsNullOrWhiteSpace(name)){
@@ -180,7 +180,7 @@ namespace CmisSync {
 
         public void OpenRemoteFolder(string name)
         {
-            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(name);
+            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.GetFolder(name);
             if(f!=null){
                 RepoInfo repo = f.GetRepoInfo();
                 Process.Start(CmisUtils.GetBrowsableURL(repo));

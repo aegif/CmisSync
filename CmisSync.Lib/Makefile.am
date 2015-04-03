@@ -39,7 +39,6 @@ SOURCES =  \
 	RepoBase.cs \
 	RepoInfo.cs \
 	SyncItem.cs \
-	Sync/ChangeLogStrategy.cs \
 	Sync/ChangeLogThenCrawlStrategy.cs \
 	Sync/CmisRepo.cs \
 	Sync/CrawlStrategy.cs \
