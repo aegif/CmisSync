@@ -17,7 +17,7 @@ $ sudo apt-get install libappindicator0.1-cil-dev gtk-sharp2 mono-runtime mono-d
 $ sudo yum install gtk-sharp2 gtk-sharp2-devel mono-core mono-devel monodevelop \
   ndesk-dbus-devel ndesk-dbus-glib-devel nant \
   notify-sharp-devel webkit-sharp-devel webkitgtk-devel libtool intltool \
-  desktop-file-utils
+  desktop-file-utils log4net-devel
 ```
 
 #### Debian
