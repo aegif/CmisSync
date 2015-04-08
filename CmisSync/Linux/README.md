@@ -11,15 +11,6 @@ $ sudo apt-get install libappindicator0.1-cil-dev gtk-sharp2 mono-runtime mono-d
   liblog4net-cil-dev libnewtonsoft-json-cil-dev gvfs
 ```
 
-#### Fedora
-
-```bash
-$ sudo yum install gtk-sharp2 gtk-sharp2-devel mono-core mono-devel monodevelop \
-  ndesk-dbus-devel ndesk-dbus-glib-devel nant \
-  notify-sharp-devel webkit-sharp-devel webkitgtk-devel libtool intltool \
-  desktop-file-utils log4net-devel
-```
-
 #### Debian
 
 ```bash
@@ -27,6 +18,15 @@ $ sudo apt-get install gtk-sharp2 mono-runtime mono-devel monodevelop \
   libndesk-dbus1.0-cil-dev nant libnotify-cil-dev libgtk2.0-cil-dev mono-mcs mono-gmcs \
   libwebkit-cil-dev intltool libtool libndesk-dbus-glib1.0-cil-dev \
   desktop-file-utils
+```
+
+#### RedHat/Fedora
+
+```bash
+$ sudo yum install gtk-sharp2 gtk-sharp2-devel mono-core mono-devel monodevelop \
+  ndesk-dbus-devel ndesk-dbus-glib-devel nant \
+  notify-sharp-devel webkit-sharp-devel webkitgtk-devel libtool intltool \
+  desktop-file-utils log4net-devel
 ```
 
 #### openSUSE
