@@ -32,7 +32,7 @@ namespace CmisSync.Lib
         /// Component which will receive notifications intended for the end-user.
         /// A GUI program might raise a pop-up, a CLI program might print a line.
         /// </summary>
-        private static UserNotificationListener UserNotificationListener;
+        private static UserNotificationListener userNotificationListener;
 
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static void SetUserNotificationListener(UserNotificationListener listener)
         {
-            UserNotificationListener = listener;
+            userNotificationListener = listener;
         }
 
 
@@ -49,7 +49,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static void NotifyUser(string message)
         {
-            UserNotificationListener.NotifyUser(message);
+            userNotificationListener.NotifyUser(message);
         }
 
 

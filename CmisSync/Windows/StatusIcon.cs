@@ -326,32 +326,30 @@ namespace CmisSync
                 }
             }
             this.traymenu.Items.Add(new ToolStripSeparator());
-
+            
             // Create the menu item that lets the user add a new synchronized folder.
-            ToolStripMenuItem addFolderItem = new ToolStripMenuItem()
+            // Depending on configuration, disable or skip some elements.
+            if (!ConfigManager.CurrentConfig.FrozenConfiguration)
             {
-                Text = CmisSync.Properties_Resources.AddARemoteFolder,
-                Name = "add",
-                Image = UIHelpers.GetBitmap("connect")
-            };
+                ToolStripMenuItem addFolderItem = new ToolStripMenuItem()
+                {
+                    Text = CmisSync.Properties_Resources.AddARemoteFolder,
+                    Name = "add",
+                    Image = UIHelpers.GetBitmap("connect")
+                };
+                addFolderItem.Click += delegate
+                {
+                    Controller.AddRemoteFolderClicked();
+                };
+                this.traymenu.Items.Add(addFolderItem);
+                this.traymenu.Items.Add(new ToolStripSeparator());
 
-            // Depending on configuration, disable or hide some elements.
-            if (ConfigManager.CurrentConfig.SingleRepository && ConfigManager.CurrentConfig.Folders.Count > 0)
-            {
-                //Configured for single repository and repository count 1 or more so disable menu item.
-                addFolderItem.Enabled = false;
+                if (ConfigManager.CurrentConfig.SingleRepository && ConfigManager.CurrentConfig.Folders.Count > 0)
+                {
+                    //Configured for single repository and repository count 1 or more so disable menu item.
+                    addFolderItem.Enabled = false;
+                }
             }
-            if (ConfigManager.CurrentConfig.FrozenConfiguration)
-            {
-                addFolderItem.Visible = false;
-            }
-
-            addFolderItem.Click += delegate
-            {
-                Controller.AddRemoteFolderClicked();
-            };
-            this.traymenu.Items.Add(addFolderItem);
-            this.traymenu.Items.Add(new ToolStripSeparator());
 
             // Create the menu item that lets the user view the log.
             ToolStripMenuItem log_item = new ToolStripMenuItem()

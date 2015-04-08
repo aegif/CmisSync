@@ -195,7 +195,6 @@ namespace CmisSync
         public ControllerBase()
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
-            FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
         }
 
         /// <summary>
@@ -205,6 +204,8 @@ namespace CmisSync
         public virtual void Initialize(Boolean firstRun)
         {
             this.firstRun = firstRun;
+
+            FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
 
             // Create the CmisSync folder and add it to the bookmarks
             bool syncFolderCreated = CreateCmisSyncFolder();
@@ -230,18 +231,15 @@ namespace CmisSync
             if (firstRun)
             {
                 ShowSetupWindow(PageType.Setup);
+            }
 
-            }
-            else
+            new Thread(() =>
             {
-                new Thread(() =>
-                {
-                    CheckRepositories();
-                    RepositoriesLoaded = true;
-                    // Update GUI.
-                    FolderListChanged();
-                }).Start();
-            }
+                CheckRepositories();
+                RepositoriesLoaded = true;
+                // Update GUI.
+                FolderListChanged();
+            }).Start();
         }
 
         /// <summary>

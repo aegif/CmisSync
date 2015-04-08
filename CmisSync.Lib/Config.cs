@@ -36,10 +36,12 @@ namespace CmisSync.Lib
         /// </summary>
         public const int SchemaVersion = 1;
 
+
         /// <summary>
         /// Chunk size for chunked transfers (not implemented yet)
         /// </summary>
         private const long DefaultChunkSize = 1024 * 1024;
+
 
         /// <summary>
         /// Default poll interval.
@@ -173,7 +175,7 @@ namespace CmisSync.Lib
 
             // Create an empty XML configuration file if none is present yet.
             if (!File.Exists(FullPath))
-                CreateInitialConfig();
+                CreateInitialConfigFile();
 
             // Load the XML configuration.
             try
@@ -182,11 +184,11 @@ namespace CmisSync.Lib
             }
             catch (TypeInitializationException)
             {
-                CreateInitialConfig();
+                CreateInitialConfigFile();
             }
             catch (FileNotFoundException)
             {
-                CreateInitialConfig();
+                CreateInitialConfigFile();
             }
             catch (XmlException)
             {
@@ -196,7 +198,7 @@ namespace CmisSync.Lib
                 if (file.Length == 0)
                 {
                     File.Delete(FullPath);
-                    CreateInitialConfig();
+                    CreateInitialConfigFile();
                 }
                 else
                 {
@@ -210,11 +212,22 @@ namespace CmisSync.Lib
             }
         }
 
+        /// <summary>
+        /// Create the initial XML configuration file.
+        /// </summary>
+        private void CreateInitialConfigFile()
+        {
+            CreateConfigFromScratch();
+
+            // Save it as an XML file.
+            Save();
+        }
+
 
         /// <summary>
-        /// Create an initial XML configuration file with default settings and zero remote folders.
+        /// Create an initial XML configuration with default settings and zero remote folders.
         /// </summary>
-        private void CreateInitialConfig()
+        private void CreateConfigFromScratch()
         {
             // Get the user name.
             string userName = "Unknown";
@@ -255,9 +268,6 @@ namespace CmisSync.Lib
                     Name = userName
                 }
             };
-
-            // Save it as an XML file.
-            Save();
         }
 
 
