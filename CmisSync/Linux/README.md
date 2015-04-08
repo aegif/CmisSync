@@ -37,6 +37,7 @@ $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
   notify-sharp-devel webkit-sharp libwebkitgtk-devel libtool intltool make log4net
 ```
 
+(Packages sometimes change, if you find that other packages are needed please let us know at CmisSync@aegif.jp thanks!)
 
 ### 2) Make sure you have a recent Mono
 
