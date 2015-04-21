@@ -26,7 +26,7 @@ Build log4net (`<mdtool path>` is often `/Applications/Xamarin\ Studio.app/Conte
 $ <mdtool path>/mdtool build Extras/log4net-1.2.11/src/log4net.vs2010.csproj
 ```
 
-Copy MonoMac.dll from MonoDevelop AddIns folder (often `~/.config/MonoDevelop/addins/`):
+Copy MonoMac.dll from `/Applications/Xamarin Studio.app/Contents/MacOS/MonoDoc.app/Contents/MonoBundle/` or from the MonoDevelop AddIns folder (often `~/.config/MonoDevelop/addins/`):
 ```bash
 $ cp <your MonoDevelop AddIns folder>/MonoMac.dll Extras
 ```
