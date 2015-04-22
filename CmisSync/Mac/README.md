@@ -18,7 +18,7 @@ export PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/Versions/Current/lib/p
 Install <tt>automake</tt>, <tt>libtool</tt> and <tt>intltool</tt> using <tt>MacPorts</tt>:
 
 ```bash
-$ sudo port install automake intltool libtool
+$ sudo port install automake intltool libtool pkgconfig
 ```
 
 Build log4net (`<mdtool path>` is often `/Applications/Xamarin\ Studio.app/Contents/MacOS/` or `/Applications/MonoDevelop.app/Contents/MacOS/`):
