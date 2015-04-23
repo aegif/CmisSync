@@ -75,9 +75,9 @@ namespace CmisSync.Auth
             // If too long, users will not be warned early enough about network problems.
 
             // Connect Timeout: Time to connect to the server, the first time. Does not depend on file size.
-            parameters[SessionParameter.ConnectTimeout] = "60000"; // One minute
+            parameters[SessionParameter.ConnectTimeout] = "180000"; // Three minutes, as a trial to solve https://github.com/aegif/CmisSync/issues/418
             // Read Timeout: Time to download a document. Depends on document size and network speed.
-            parameters[SessionParameter.ReadTimeout] = "-1"; // Infinite, as a trial to solve https://github.com/aegif/CmisSync/issues/418
+            parameters[SessionParameter.ReadTimeout] = "1200000"; // Twenty minutes
             // Write Timeout: Time to upload a document. Depends on document size and network speed.
             //parameters[SessionParameter.WriteTimeout] = "1200000"; // Twenty minutes // Apparently DotCMIS uses the same setting for both read and write, see https://github.com/aegif/chemistry-dotcmis/blob/trunk/DotCMIS/binding/http.cs#L155
             return parameters;
