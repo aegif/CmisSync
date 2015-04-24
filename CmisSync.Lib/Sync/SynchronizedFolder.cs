@@ -402,9 +402,21 @@ namespace CmisSync.Lib.Sync
                     // Add ACL in the context, or ACL is null
                     // OperationContext context = new OperationContext();
                     // context.IncludeAcls = true;
-
                     // IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, context);
-                    IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+
+                    IFolder remoteFolder = null;
+                    try
+                    {
+                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                    }
+                    catch (PermissionDeniedException e)
+                    {
+                        // The session might have been cut by the remote server, so try to reconnect.
+                        Connect();
+
+                        // Retry the same operation.
+                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                    }
 
                     string localFolder = repoinfo.TargetDirectory;
 
