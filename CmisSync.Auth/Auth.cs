@@ -66,12 +66,20 @@ namespace CmisSync.Auth
         private static Dictionary<string, string> GetParameters()
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
+
             // AtomPub is the most reliable/well-tested CMIS implementation for pretty much all servers.
             parameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            // Sets the Connect Timeout to infinite
-            parameters[SessionParameter.ConnectTimeout] = "60000"; // One minute
-            // Sets the Read Timeout to infinite
-            parameters[SessionParameter.ReadTimeout] = "1200000"; // Twenty minutes (to allow for huge GetDescendants operations)
+
+            // Timeout settings.
+            // If too short, it might cut before the action gets a chance to complete.
+            // If too long, users will not be warned early enough about network problems.
+
+            // Connect Timeout: Time to connect to the server, the first time. Does not depend on file size.
+            parameters[SessionParameter.ConnectTimeout] = "-1"; // Infinite, as a trial to solve https://github.com/aegif/CmisSync/issues/418
+            // Read Timeout: Time to download a document. Depends on document size and network speed.
+            parameters[SessionParameter.ReadTimeout] = "-1"; // Infinite, as a trial to solve https://github.com/aegif/CmisSync/issues/418
+            // Write Timeout: Time to upload a document. Depends on document size and network speed.
+            //parameters[SessionParameter.WriteTimeout] = "1200000"; // Twenty minutes // Apparently DotCMIS uses the same setting for both read and write, see https://github.com/aegif/chemistry-dotcmis/blob/trunk/DotCMIS/binding/http.cs#L155
             return parameters;
         }
     }
