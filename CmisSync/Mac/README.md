@@ -8,7 +8,7 @@ You can choose to build CmisSync from source or to download the CmisSync bundle.
 Install [Xcode](https://developer.apple.com/xcode/), [MacPorts](https://www.macports.org), the [Mono Framework](http://www.mono-project.com) (both MRE and MDK) and [MonoDevelop](http://monodevelop.com) (which actually installs with the name "Xamarin Studio").
 
 You may need to adjust some environment variables to let the build environment tools find mono:
-   
+
 ```bash
 export PATH=/Library/Frameworks/Mono.framework/Versions/Current/bin:$PATH
 export PKG_CONFIG=/Library/Frameworks/Mono.framework/Versions/Current/bin/pkg-config
@@ -43,5 +43,7 @@ $ ./configure --with-dotcmis=Extras/DotCMIS.dll \
 $ make
 ```
 
+Even if the last `make` step fails, Monodevelop (or Xamarin Studio) might be able to compile it better.
+
 Now that you have compiled the libraries, open `CmisSync/Mac/CmisSync.sln` in
-MonoDevelop and start the build (Build > Build All).
+MonoDevelop (or Xamarin Studio) and start the build (Build > Build All).
