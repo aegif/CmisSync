@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -144,13 +144,13 @@
     <Compile Include="SetupSubTutorialEnd.designer.cs">
       <DependentUpon>SetupSubTutorialEnd.cs</DependentUpon>
     </Compile>
-    <Compile Include="SetupSubRepoSelectController.cs" />
     <Compile Include="FolderTreeMVC\NodeModel.cs">
       <Link>NodeModel.cs</Link>
     </Compile>
     <Compile Include="FolderTreeMVC\NodeLoader.cs">
       <Link>NodeLoader.cs</Link>
     </Compile>
+    <Compile Include="SetupSubRepoSelectController.cs" />
     <Compile Include="FolderTreeMVC\LoadingStatusModel.cs">
       <Link>CmisTree\LoadingStatusModel.cs</Link>
     </Compile>
