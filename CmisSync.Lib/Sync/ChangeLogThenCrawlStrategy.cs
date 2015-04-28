@@ -134,14 +134,27 @@ namespace CmisSync.Lib.Sync
                 {
                     cmisObject = session.GetObject(change.ObjectId);
                 }
-                catch(CmisObjectNotFoundException)
+                catch (CmisObjectNotFoundException)
                 {
-                    Logger.Info("Removed object, syncing might be needed:" + changeIdForDebug);
+                    Logger.Info("Removed object, syncing might be needed: " + changeIdForDebug);
                     return true;
+                }
+                catch (CmisRuntimeException e)
+                {
+                    if (e.Message.Equals("Unauthorized"))
+                    {
+                        Logger.Info("We can not read the object id, so it is not an object we can sync anyway: " + changeIdForDebug);
+                        return false;
+                    }
+                    else
+                    {
+                        Logger.Info("A CMIS exception occured: " + changeIdForDebug + " :", e);
+                        return true;
+                    }
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn("An exception occurred:" + change.ObjectId + " :", e);
+                    Logger.Warn("An exception occurred: " + change.ObjectId + " :", e);
                     return true; // Better be on the safe side and sync.
                 }
 
