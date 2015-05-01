@@ -9,6 +9,7 @@ using System.Data.Common;
 using DotCMIS;
 using DotCMIS.Client;
 using CmisSync.Lib.Cmis;
+using System.Threading;
 
 
 namespace CmisSync.Lib.Sync
@@ -300,64 +301,18 @@ namespace CmisSync.Lib.Sync
             private bool WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
             {
                 SleepWhileSuspended();
-                string filename = Path.GetFileName(pathname);
-                if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), filename, repoinfo))
-                {
-                    return true;
-                }
 
-                bool success = true;
-                try
-                {
-                    string name = pathname.Substring(localFolder.Length + 1);
-                    string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/'); // FIXME
-                    if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo)))
-                    {
-                        Logger.InfoFormat("Removing locally deleted file on server: {0}", pathname);
-                        try
-                        {
-                            IDocument remote = (IDocument)session.GetObjectByPath(remoteName);
-                            if (remote != null)
-                            {
-                                remote.DeleteAllVersions();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            success = false;
-                            Logger.Warn(String.Format("Exception when remotely deleting {0}", remoteName), ex);
-                        }
-                        database.RemoveFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
-                    }
-                    else if (database.ContainsFolder(pathname))
-                    {
-                        Logger.InfoFormat("Removing locally deleted folder on server: {0}", pathname);
-                        try
-                        {
-                            IFolder remote = (IFolder)session.GetObjectByPath(remoteName);
-                            if (remote != null)
-                            {
-                                remote.DeleteTree(true, null, true);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            success = false;
-                            Logger.Warn(String.Format("Exception when deleting remote folder {0}", remoteName), ex);
-                        }
-                        database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo));
-                    }
-                    else
-                    {
-                        Logger.InfoFormat("Ignore the delete action for the local created and deleted file/folder: {0}", pathname);
-                    }
-                }
-                catch (Exception e)
-                {
-                    success = false;
-                    ProcessRecoverableException("Could process watcher sync update: " + pathname, e);
-                }
-                return success;
+                // In many programs (like Microsoft Word), deletion is often just a save:
+                // 1. Save data to temporary file ~wrdxxxx.tmp
+                // 2. Delete Example.doc
+                // 3. Rename ~wrdxxxx.tmp to Example.doc
+                // See https://support.microsoft.com/en-us/kb/211632
+                // So, upon deletion, wait a bit for any save operation to hopefully finalize, then sync.
+                // This is not 100% foolproof, as saving can last for more than GRACE_TIME, but probably
+                // the best we can do without mind-reading third-party programs.
+                int GRACE_TIME = 15000; // 15 seconds.
+                Thread.Sleep(GRACE_TIME);
+                return false; // Perform a sync.
             }
         }
     }
