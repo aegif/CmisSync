@@ -6,6 +6,12 @@ system_themedir = $(datadir)/icons/$(theme)
 app_themedir = $(pkgdatadir)/icons/$(theme)
 
 system_theme_icons = \
+	status,process-syncing-i-24.png \
+	status,process-syncing-ii-24.png \
+	status,process-syncing-iii-24.png \
+	status,process-syncing-iiii-24.png \
+	status,process-syncing-iiiii-24.png \
+	status,process-syncing-error-24.png	\
 	apps,app-cmissync-16.png \
 	apps,app-cmissync-22.png	\
 	apps,app-cmissync-24.png \
