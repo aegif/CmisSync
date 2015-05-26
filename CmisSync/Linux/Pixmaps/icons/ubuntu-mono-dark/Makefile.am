@@ -1,5 +1,5 @@
 dark_theme = ubuntu-mono-dark
-dark_themedir = /usr/share/icons/$(dark_theme)
+dark_themedir = /usr/local/share/icons/$(dark_theme)
 
 dark_theme_icons = \
 	status,process-syncing-i-24.png \
