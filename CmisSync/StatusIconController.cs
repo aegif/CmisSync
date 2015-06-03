@@ -412,9 +412,7 @@ namespace CmisSync
         /// </summary>
         public void EditFolderClicked(string reponame)
         {
-            // TODO fix EditRepositoryFolder
-            // Program.Controller.EditRepositoryFolder(reponame);
-            Logger.Error ("Call Program.Controller.EditRepositoryFolder(" + reponame + ")");
+			SettingsClicked (reponame);
         }
 
         /// <summary>

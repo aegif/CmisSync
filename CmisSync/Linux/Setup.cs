@@ -805,6 +805,202 @@ namespace CmisSync {
 
         }
 
+		public void ShowSettingsPage()
+		{
+			SetSizeRequest (680, 470);
+			Header = CmisSync.Properties_Resources.Settings;
+			string localfoldername = Controller.saved_address.ToString();
+			string username = Controller.saved_user;
+
+			Label url_label = new Label() {
+				Xalign = 0,
+				UseMarkup = true,
+				Markup = "<b>"+CmisSync.Properties_Resources.WebAddress+"</b>"
+			};
+
+			Entry url_entry = new Entry() {
+				Text = localfoldername,
+				IsEditable = false,
+				Sensitive=false
+			};
+
+			Label user_label = new Label() {
+				Xalign = 0,
+				UseMarkup = true,
+				Markup = "<b>"+CmisSync.Properties_Resources.User+"</b>"
+			};
+
+			Entry user_entry = new Entry() {
+				Text = username,
+				IsEditable = false,
+				Sensitive=false
+			};
+
+			Label password_label = new Label() {
+				Xalign = 0,
+				UseMarkup = true,
+				Markup = "<b>"+CmisSync.Properties_Resources.Password+"</b>",
+			};
+
+			Label authentification_error_label = new Label() {
+				Xalign = 0,
+				UseMarkup = true,
+				Visible = false
+			};
+
+			Entry password_entry = new Entry() {
+				Text = "",
+				ActivatesDefault = false
+			};
+			String password = "";
+			password_entry.TextInserted+=delegate {
+				password+=password_entry.Text[password_entry.Text.Length-1];
+				password_entry.Text=password_entry.Text.Replace(password_entry.Text[password_entry.Text.Length-1],'*');
+			};
+
+			CheckButton launcAtStartup = new CheckButton (CmisSync.Properties_Resources.SyncAtStartup);
+			if (Controller.saved_syncatstartup)
+				launcAtStartup.Active = true;
+
+			Label syncInterval_label = new Label() {
+				Xalign = 0,
+				UseMarkup = true,
+				Markup = "<b>"+CmisSync.Properties_Resources.SyncInterval+"(Secondes)"+"</b>"
+			};
+
+			//sync interval is between 5s and 1day
+			HScale syncInterval_hscale = new HScale(new Adjustment(0,5,86401,5,5,1));
+			syncInterval_hscale.DrawValue = true;
+			// syncinterval is converted in secondes
+			syncInterval_hscale.Value=Controller.saved_sync_interval/1000;
+			syncInterval_hscale.Digits = 0;
+			syncInterval_hscale.ValueChanged += delegate {
+				Application.Invoke (delegate {
+					syncInterval_hscale.TooltipText=syncInterval_hscale.Value+" s";
+				});
+			};
+
+
+			Button cancel_button = new Button(cancelText);
+			cancel_button.Clicked += delegate {
+				Controller.PageCancelled();
+			};
+
+
+			Button save_button = new Button(
+				CmisSync.Properties_Resources.Save
+				);
+
+			VBox layout_vertical   = new VBox (false, 10);
+
+			layout_vertical.PackStart (new Label(""), false, false, 0);
+			layout_vertical.PackStart (url_label, false, false, 0);
+			layout_vertical.PackStart (url_entry, false, false, 0);
+			layout_vertical.PackStart (user_label, false, false, 0);
+			layout_vertical.PackStart (user_entry, false, false, 0);
+			layout_vertical.PackStart (password_label, false, false, 0);
+			layout_vertical.PackStart (password_entry, false, false, 0);
+			layout_vertical.PackStart (authentification_error_label, false, false, 0);
+			layout_vertical.PackStart (launcAtStartup, false, false, 0);
+			layout_vertical.PackStart (syncInterval_label, false, false, 0);
+			layout_vertical.PackStart (syncInterval_hscale, false, false, 0);
+			//layout_vertical.PackStart (scale2, false, false, 0);
+
+			ScrolledWindow scrolledWindow = new ScrolledWindow();
+			scrolledWindow.SetPolicy(PolicyType.Never, PolicyType.Automatic);
+
+			scrolledWindow.AddWithViewport(layout_vertical);
+			scrolledWindow.ShadowType=ShadowType.None;
+
+			Add(scrolledWindow);
+			AddButton(save_button);
+			AddButton(cancel_button);
+
+			save_button.Clicked += delegate {
+				//save password not masked
+				String verypassword="";
+
+				for (int i=0;i<password.Length;i++){
+					if (!password[i].Equals('*'))
+						verypassword+=password[i];
+				}
+				//reset 
+				password="";
+
+				if (!String.IsNullOrEmpty(verypassword))
+				{
+					// Show wait cursor
+					this.GdkWindow.Cursor = wait_cursor;
+
+					// Try to find the CMIS server (asynchronous using a delegate)
+					GetRepositoriesFuzzyDelegate dlgt =
+						new GetRepositoriesFuzzyDelegate(CmisUtils.GetRepositoriesFuzzy);
+					ServerCredentials credentials = new ServerCredentials() {
+						UserName = user_entry.Text,
+						Password = verypassword,
+						Address = new Uri(url_entry.Text)
+					};
+					IAsyncResult ar = dlgt.BeginInvoke(credentials, null, null);
+					while (!ar.AsyncWaitHandle.WaitOne(100)) {
+						while (Application.EventsPending()) {
+							Application.RunIteration();
+						}
+					}
+					Tuple<CmisServer, Exception> result = dlgt.EndInvoke(ar);
+					CmisServer cmisServer = result.Item1;
+					if(cmisServer != null)
+					{
+						Controller.repositories = cmisServer.Repositories;
+						url_entry.Text = cmisServer.Url.ToString();
+					}
+					else
+					{
+						Controller.repositories = null;
+					}
+					// Hide wait cursor
+					this.GdkWindow.Cursor = default_cursor;
+
+					if (Controller.repositories == null)
+					{
+						// Show warning
+						string warning = "";
+						string message = result.Item2.Message;
+						Exception e = result.Item2;
+						if (e is CmisPermissionDeniedException)
+						{
+							warning = Properties_Resources.LoginFailedForbidden;
+						}
+
+						else if (e.Message == "SendFailure" && cmisServer.Url.Scheme.StartsWith("https"))
+						{
+							warning = Properties_Resources.SendFailureHttps;
+						}
+						else if (e.Message == "TrustFailure")
+						{
+							warning = Properties_Resources.TrustFailure;
+						}
+						else
+						{
+							warning = message + Environment.NewLine + Properties_Resources.Sorry;
+						}
+						authentification_error_label.Markup = "<span foreground=\"red\">" + warning + "</span>";
+						authentification_error_label.Show();
+					}
+					else
+					{
+						// update settings
+						// syncinterval is converted in millisecondes
+						Controller.SettingsPageCompleted(verypassword,(int)(syncInterval_hscale.Value*1000),launcAtStartup.Active);
+					}
+				}
+				else
+				{
+					Controller.SettingsPageCompleted(null, (int)syncInterval_hscale.Value*1000, launcAtStartup.Active);
+				}
+			};
+
+		}
+
         public Setup () : base ()
         {
             Controller.HideWindowEvent += delegate {
@@ -852,6 +1048,10 @@ namespace CmisSync {
                         case PageType.Tutorial:
                         ShowTutorialPage();
                         break;
+
+						case PageType.Settings:
+						ShowSettingsPage();
+						break;
                         }
 
                         ShowAll ();
