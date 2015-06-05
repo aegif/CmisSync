@@ -84,6 +84,11 @@ namespace CmisSync
         /// </summary>
         public event Action ShowAboutWindowEvent = delegate { };
 
+		/// <summary>
+		/// Show sync size window event.
+		/// </summary>
+		public event Action ShowSyncSizeWindowEvent = delegate { };
+
         /// <summary>
         /// Folder list changed.
         /// </summary>
@@ -507,6 +512,14 @@ namespace CmisSync
         {
             ShowAboutWindowEvent();
         }
+
+		// <summary>
+		/// Show info about CmisSync
+		/// </summary>
+		public void ShowSyncSizeWindow()
+		{
+			ShowSyncSizeWindowEvent();
+		}
 
         /// <summary>
         /// Show an alert to the user.

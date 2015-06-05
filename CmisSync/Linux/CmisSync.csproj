@@ -95,6 +95,8 @@
     <Compile Include="Resources.Designer.cs" />
     <Compile Include="Defines.cs" />
     <Compile Include="UserNotificationListenerLinux.cs" />
+    <Compile Include="SyncSize.cs" />
+    <Compile Include="..\SyncSizeController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">

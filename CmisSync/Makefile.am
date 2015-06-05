@@ -9,6 +9,7 @@ endif
 EXTRA_DIST =  \
 	Program.cs \
 	AboutController.cs \
+	SyncSizeController.cs \
 	BubblesController.cs \
 	ControllerBase.cs \
 	EditController.cs \
