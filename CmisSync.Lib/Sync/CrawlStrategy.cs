@@ -220,7 +220,8 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        Logger.Warn("Unknown object type: " + cmisObject.ObjectType.DisplayName);
+                        Logger.Debug("Unknown object type: " + cmisObject.ObjectType.DisplayName
+                            + " for object " + remoteFolder + "/" + cmisObject.Name);
                     }
                 }
             }
