@@ -21,14 +21,14 @@ Install <tt>automake</tt>, <tt>libtool</tt> and <tt>intltool</tt> using <tt>MacP
 $ sudo port install automake intltool libtool pkgconfig
 ```
 
-Build log4net (`<mdtool path>` is often `/Applications/Xamarin\ Studio.app/Contents/MacOS/` or `/Applications/MonoDevelop.app/Contents/MacOS/`):
+Build log4net (if not Xamarin, `mdtoolpath` is in `/Applications/MonoDevelop.app/Contents/MacOS/`):
 ```bash
-$ <mdtool path>/mdtool build Extras/log4net-1.2.11/src/log4net.vs2010.csproj
+$ /Applications/Xamarin\ Studio.app/Contents/MacOS/mdtool build Extras/log4net-1.2.11/src/log4net.vs2010.csproj
 ```
 
-Copy MonoMac.dll from `/Applications/Xamarin Studio.app/Contents/MacOS/MonoDoc.app/Contents/MonoBundle/` or from the MonoDevelop AddIns folder (often `~/.config/MonoDevelop/addins/`):
+Copy MonoMac.dll to `Extars` (if not Xamarin, `MonoMac.dll` might be in the MonoDevelop AddIns folder, often `~/.config/MonoDevelop/addins/`):
 ```bash
-$ cp <your MonoDevelop AddIns folder>/MonoMac.dll Extras
+$ cp /Applications/Xamarin\ Studio.app/Contents/MacOS/MonoDoc.app/Contents/MonoBundle/MonoMac.dll Extras
 ```
 
 Start the first part of the build:
