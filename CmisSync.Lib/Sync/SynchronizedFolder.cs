@@ -1158,6 +1158,14 @@ namespace CmisSync.Lib.Sync
                         }
                         else // No conflict
                         {
+                            // Should the local file be made read-only?
+                            // Check ther permissions of the current user to the remote document.
+                            bool readOnly = remoteDocument.AllowableActions.Actions.Contains(PermissionMappingKeys.CanSetContentDocument);
+                            if (readOnly)
+                            {
+                                File.SetAttributes(tmpfilepath, FileAttributes.ReadOnly);
+                            }
+
                             Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpfilepath, filepath));
                             // Remove the ".sync" suffix.
                             File.Move(tmpfilepath, filepath);
