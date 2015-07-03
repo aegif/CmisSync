@@ -795,6 +795,14 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("Creating local directory: " + syncItem.LocalPath);
                         Directory.CreateDirectory(syncItem.LocalPath);
 
+                        // Should the local folder be made read-only?
+                        // Check ther permissions of the current user to the remote document.
+                        bool readOnly = ! remoteSubFolder.AllowableActions.Actions.Contains(PermissionMappingKeys.CanAddToFolderObject);
+                        if (readOnly)
+                        {
+                            new DirectoryInfo(syncItem.LocalPath).Attributes =  FileAttributes.ReadOnly;
+                        }
+
                         // Create database entry for this folder.
                         // TODO - Yannick - Add metadata
                         database.AddFolder(syncItem, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
@@ -1160,7 +1168,7 @@ namespace CmisSync.Lib.Sync
                         {
                             // Should the local file be made read-only?
                             // Check ther permissions of the current user to the remote document.
-                            bool readOnly = remoteDocument.AllowableActions.Actions.Contains(PermissionMappingKeys.CanSetContentDocument);
+                            bool readOnly = ! remoteDocument.AllowableActions.Actions.Contains(PermissionMappingKeys.CanSetContentDocument);
                             if (readOnly)
                             {
                                 File.SetAttributes(tmpfilepath, FileAttributes.ReadOnly);
