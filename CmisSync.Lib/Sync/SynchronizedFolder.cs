@@ -796,7 +796,7 @@ namespace CmisSync.Lib.Sync
                         Directory.CreateDirectory(syncItem.LocalPath);
 
                         // Should the local folder be made read-only?
-                        // Check ther permissions of the current user to the remote document.
+                        // Check ther permissions of the current user to the remote folder.
                         bool readOnly = ! remoteSubFolder.AllowableActions.Actions.Contains(PermissionMappingKeys.CanAddToFolderObject);
                         if (readOnly)
                         {
