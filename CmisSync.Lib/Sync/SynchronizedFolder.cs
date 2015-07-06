@@ -1177,20 +1177,13 @@ namespace CmisSync.Lib.Sync
                         }
                         else // No conflict
                         {
-                            // Should the local file be made read-only?
-                            // Check ther permissions of the current user to the remote document.
-                            bool readOnly = ! remoteDocument.AllowableActions.Actions.Contains(PermissionMappingKeys.CanSetContentDocument);
-                            if (readOnly)
-                            {
-                                File.SetAttributes(tmpfilepath, FileAttributes.ReadOnly);
-                            }
-
                             Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpfilepath, filepath));
                             // Remove the ".sync" suffix.
                             File.Move(tmpfilepath, filepath);
                             SetLastModifiedDate(remoteDocument, filepath, metadata);
                         }
 
+                        //here the file is surely not-read-ony
 
                         if (null != remoteDocument.CreationDate)
                         {
@@ -1199,6 +1192,17 @@ namespace CmisSync.Lib.Sync
                         if (null != remoteDocument.LastModificationDate)
                         {
                             File.SetLastWriteTime(filepath, (DateTime)remoteDocument.LastModificationDate);
+                        }
+
+                        // Should the local file be made read-only?
+                        // Check ther permissions of the current user to the remote document.
+                        // (eventually set read only after we finish to manipulate the file or we can get an error if it's read only)
+                        bool canSetContent = remoteDocument.AllowableActions.Actions.Contains(PermissionMappingKeys.CanSetContentDocument);
+                        //FIXME: alfresco reporst "canSetContentStream" instead of "canSetContent.Document"
+                        canSetContent = canSetContent || remoteDocument.AllowableActions.Actions.Contains("canSetContentStream");
+                        if (!canSetContent)
+                        {
+                            File.SetAttributes(tmpfilepath, FileAttributes.ReadOnly);
                         }
 
                         // Create database entry for this file.
