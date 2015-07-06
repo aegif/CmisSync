@@ -352,7 +352,30 @@ namespace CmisSync
         /// Pause or un-pause synchronization for a particular folder.
         /// </summary>
         /// <param name="repoName">the folder to pause/unpause</param>
-        public void StartOrSuspendRepository(string repoName)
+        public void SuspendOrResumeRepositorySynchronization(string repoName)
+        {
+            lock (this.repo_lock)
+            {
+                //FIXME: why are we sospendig all repositories instead of the one passed?
+                foreach (RepoBase aRepo in this.repositories)
+                {
+                    if (aRepo.Status != SyncStatus.Suspend)
+                    {
+                        SuspendRepositorySynchronization(repoName);
+                    }
+                    else
+                    {
+                        ResumeRepositorySynchronization(repoName);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Pause synchronization for a particular folder.
+        /// </summary>
+        /// <param name="repoName">the folder to pause</param>
+        public void SuspendRepositorySynchronization(string repoName)
         {
             lock (this.repo_lock)
             {
@@ -364,14 +387,22 @@ namespace CmisSync
                         aRepo.Suspend();
                         Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                     }
-                    else
-                    {
-                        if (aRepo.Status != SyncStatus.Suspend)
-                        {
-                            aRepo.Suspend();
-                            Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
                         }
-                        else
+            }
+        }
+
+        /// <summary>
+        /// Un-pause synchronization for a particular folder.
+        /// </summary>
+        /// <param name="repoName">the folder to unpause</param>
+        public void ResumeRepositorySynchronization(string repoName)
+        {
+            lock (this.repo_lock)
+            {
+                //FIXME: why are we sospendig all repositories instead of the one passed?
+                foreach (RepoBase aRepo in this.repositories)
+                {
+                    if (aRepo.Status == SyncStatus.Suspend)
                         {
                             aRepo.Resume();
                             Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
@@ -379,7 +410,6 @@ namespace CmisSync
                     }
                 }
             }
-        }
 
         /// <summary>
         /// Check the configured CmisSync synchronized folders.
