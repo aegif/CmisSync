@@ -384,6 +384,8 @@ namespace CmisSync.Lib.Sync
                     autoResetEvent.Reset();
                     repo.OnSyncStart(syncFull);
 
+                    SleepWhileSuspended();
+
                     // If not connected, connect.
                     if (session == null)
                     {
@@ -395,8 +397,6 @@ namespace CmisSync.Lib.Sync
                         //  Force to reset the cache for each Sync
                         session.Clear();
                     }
-
-                    SleepWhileSuspended();
 
 
                     // Add ACL in the context, or ACL is null
