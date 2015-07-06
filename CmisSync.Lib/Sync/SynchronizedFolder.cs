@@ -439,7 +439,7 @@ namespace CmisSync.Lib.Sync
                         else
                         {
                             //  Have to crawl remote.
-                            Logger.Debug("Invoke a full crawl sync");
+                            Logger.Warn("Invoke a full crawl sync (the remote does not support ChangeLog)");
                             repo.Watcher.Clear();
                             CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
                         }
@@ -624,6 +624,7 @@ namespace CmisSync.Lib.Sync
 
                 Logger.Error(logMessage, exception);
 
+                //FIXME: should we remove the file after an error?
                 if (!recoverable)
                 {
                     throw exception;
