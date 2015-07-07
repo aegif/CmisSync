@@ -218,14 +218,31 @@ namespace CmisSync.Lib.Sync
                         IDocument remoteDocument = (IDocument)cmisObject;
                         CrawlRemoteDocument(remoteDocument, localFolder, remoteFiles);
                     }
+                    else if (isLink(cmisObject))
+                    {
+                        Logger.Debug("Ignoring file '" + remoteFolder + "/" + cmisObject.Name + "' of type '" +
+                            cmisObject.ObjectType.Description + "'. Links are not currently handled.");
+                    }
                     else
                     {
-                        Logger.Warn("Unknown object type: " + cmisObject.ObjectType.DisplayName
-                            + " for object " + remoteFolder + "/" + cmisObject.Name);
+                        Logger.Warn("Unknown object type: '" + cmisObject.ObjectType.Description + "' (" + cmisObject.ObjectType.DisplayName
+                            + ") for object " + remoteFolder + "/" + cmisObject.Name);
                     }
                 }
             }
 
+            private bool isLink(ICmisObject cmisObject)
+            {
+                IObjectType parent = cmisObject.ObjectType.GetParentType();
+                while (parent != null)
+                {
+                    if(parent.Id.Equals("I:cm:link")){
+                    return true;
+                    }
+                    parent = parent.GetParentType();
+                }
+                return false;
+            }
 
             /// <summary>
             /// Crawl remote subfolder, syncing down if needed.
