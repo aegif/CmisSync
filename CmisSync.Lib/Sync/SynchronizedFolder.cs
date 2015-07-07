@@ -193,6 +193,10 @@ namespace CmisSync.Lib.Sync
                         {
                             repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
                         }
+                        catch (CmisMissingSyncFolderException e) 
+                        {
+                            repo.OnSyncError(new MissingSyncFolderException("Missing sync folder.", e));
+                        }
                         catch (Exception e)
                         {
                             repo.OnSyncError(new BaseException(e));
@@ -384,6 +388,8 @@ namespace CmisSync.Lib.Sync
                     autoResetEvent.Reset();
                     repo.OnSyncStart(syncFull);
 
+                    SleepWhileSuspended();
+
                     // If not connected, connect.
                     if (session == null)
                     {
@@ -395,8 +401,6 @@ namespace CmisSync.Lib.Sync
                         //  Force to reset the cache for each Sync
                         session.Clear();
                     }
-
-                    SleepWhileSuspended();
 
 
                     // Add ACL in the context, or ACL is null
@@ -428,6 +432,12 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
+                        //fix #559 Content remotely deleted if synced folder removed while CmisSync is running
+                        if (!Directory.Exists(localFolder)) { 
+                            //the user has deleted/moved/rebnamed the local root folder.
+                            throw new CmisMissingSyncFolderException("Missing " + localFolder + ".");
+                        }
+
                         // Apply local changes noticed by the filesystem watcher.
                         WatcherSync(remoteFolderPath, localFolder);
 
@@ -439,7 +449,7 @@ namespace CmisSync.Lib.Sync
                         else
                         {
                             //  Have to crawl remote.
-                            Logger.Debug("Invoke a full crawl sync");
+                            Logger.Warn("Invoke a full crawl sync (the remote does not support ChangeLog)");
                             repo.Watcher.Clear();
                             CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
                         }
@@ -624,6 +634,7 @@ namespace CmisSync.Lib.Sync
 
                 Logger.Error(logMessage, exception);
 
+                //FIXME: should we remove the file after an error?
                 if (!recoverable)
                 {
                     throw exception;
@@ -1166,20 +1177,13 @@ namespace CmisSync.Lib.Sync
                         }
                         else // No conflict
                         {
-                            // Should the local file be made read-only?
-                            // Check ther permissions of the current user to the remote document.
-                            bool readOnly = ! remoteDocument.AllowableActions.Actions.Contains(PermissionMappingKeys.CanSetContentDocument);
-                            if (readOnly)
-                            {
-                                File.SetAttributes(tmpfilepath, FileAttributes.ReadOnly);
-                            }
-
                             Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpfilepath, filepath));
                             // Remove the ".sync" suffix.
                             File.Move(tmpfilepath, filepath);
                             SetLastModifiedDate(remoteDocument, filepath, metadata);
                         }
 
+                        //here the file is surely not-read-ony
 
                         if (null != remoteDocument.CreationDate)
                         {
@@ -1188,6 +1192,17 @@ namespace CmisSync.Lib.Sync
                         if (null != remoteDocument.LastModificationDate)
                         {
                             File.SetLastWriteTime(filepath, (DateTime)remoteDocument.LastModificationDate);
+                        }
+
+                        // Should the local file be made read-only?
+                        // Check ther permissions of the current user to the remote document.
+                        // (eventually set read only after we finish to manipulate the file or we can get an error if it's read only)
+                        bool canSetContent = remoteDocument.AllowableActions.Actions.Contains(PermissionMappingKeys.CanSetContentDocument);
+                        //FIXME: alfresco reporst "canSetContentStream" instead of "canSetContent.Document"
+                        canSetContent = canSetContent || remoteDocument.AllowableActions.Actions.Contains("canSetContentStream");
+                        if (!canSetContent)
+                        {
+                            File.SetAttributes(tmpfilepath, FileAttributes.ReadOnly);
                         }
 
                         // Create database entry for this file.

@@ -200,7 +200,7 @@ namespace CmisSync.Lib
 
             if (fullPath.Length > (int)maxPathField.GetValue(null))
             {
-                Logger.DebugFormat("Skipping {0}: path too long", fullPath);
+                Logger.WarnFormat("Skipping {0}: path too long", fullPath);
                 return false;
 
             }

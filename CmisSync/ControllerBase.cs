@@ -352,10 +352,34 @@ namespace CmisSync
         /// Pause or un-pause synchronization for a particular folder.
         /// </summary>
         /// <param name="repoName">the folder to pause/unpause</param>
-        public void StartOrSuspendRepository(string repoName)
+        public void SuspendOrResumeRepositorySynchronization(string repoName)
         {
             lock (this.repo_lock)
             {
+                //FIXME: why are we sospendig all repositories instead of the one passed?
+                foreach (RepoBase aRepo in this.repositories)
+                {
+                    if (aRepo.Status != SyncStatus.Suspend)
+                    {
+                        SuspendRepositorySynchronization(repoName);
+                    }
+                    else
+                    {
+                        ResumeRepositorySynchronization(repoName);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Pause synchronization for a particular folder.
+        /// </summary>
+        /// <param name="repoName">the folder to pause</param>
+        public void SuspendRepositorySynchronization(string repoName)
+        {
+            lock (this.repo_lock)
+            {
+                //FIXME: why are we sospendig all repositories instead of the one passed?
                 foreach (RepoBase aRepo in this.repositories)
                 {
                     if (aRepo.Status != SyncStatus.Suspend)
@@ -363,18 +387,25 @@ namespace CmisSync
                         aRepo.Suspend();
                         Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                     }
-                    else
+                }
+            }
+        }
+
+        /// <summary>
+        /// Un-pause synchronization for a particular folder.
+        /// </summary>
+        /// <param name="repoName">the folder to unpause</param>
+        public void ResumeRepositorySynchronization(string repoName)
+        {
+            lock (this.repo_lock)
+            {
+                //FIXME: why are we sospendig all repositories instead of the one passed?
+                foreach (RepoBase aRepo in this.repositories)
+                {
+                    if (aRepo.Status == SyncStatus.Suspend)
                     {
-                        if (aRepo.Status != SyncStatus.Suspend)
-                        {
-                            aRepo.Suspend();
-                            Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
-                        }
-                        else
-                        {
-                            aRepo.Resume();
-                            Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
-                        }
+                        aRepo.Resume();
+                        Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
                     }
                 }
             }
@@ -404,10 +435,9 @@ namespace CmisSync
                     }
                 }
 
-                Config.SyncConfig.Folder missingFolder;
                 while (missingFolders.Count != 0)
                 {
-                    handleMissingFolder(missingFolders.Dequeue());
+                    handleMissingSyncFolder(missingFolders.Dequeue());
                 }
 
                 ConfigManager.CurrentConfig.Save();
@@ -417,7 +447,7 @@ namespace CmisSync
             FolderListChanged();
         }
 
-        private void handleMissingFolder(Config.SyncConfig.Folder f)
+        private void handleMissingSyncFolder(Config.SyncConfig.Folder f)
         {
             bool handled = false;
 
@@ -477,6 +507,10 @@ namespace CmisSync
                     throw new InvalidOperationException();
                 }
             }
+            //handled == true
+            //now resume the sincronization (if ever was suspended)
+            //FIXME: the problem is that if the user suspended this repo it will get resumed anyway (ignoring the user setting)
+            Program.Controller.ResumeRepositorySynchronization(f.DisplayName);
         }
 
         /// <summary>
@@ -613,6 +647,32 @@ namespace CmisSync
         /// </summary>
         public void ActivityError(Tuple<string, Exception> error)
         {
+            //FIXME: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
+            String reponame = error.Item1;
+            Exception exception = error.Item2;
+
+            if (exception is MissingSyncFolderException)
+            {
+                //Suspend sync... (should be resumed after the user has handled the error)
+                Program.Controller.SuspendRepositorySynchronization(reponame);
+                //FIXME: should update the suspended menu item, but i can't from here
+                //UpdateSuspendSyncFolderEvent(reponame);
+                
+                //handle in a new thread, becouse this is the syncronization one and can be killed if the user decide to remove the repo or resync it
+                Thread t = new Thread(() =>
+                {
+                    handleMissingSyncFolder(ConfigManager.CurrentConfig.GetFolder(reponame));
+                });
+                t.SetApartmentState(ApartmentState.STA);
+                t.Start();
+
+                //dont resume here, the handler thread will if needed (or kill this thread)
+                //Program.Controller.ResumeRepositorySynchronization(reponame);
+
+                //handled, no need to do anything else
+                return;
+            }
+
             OnError(error);
         }
     }
