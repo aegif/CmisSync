@@ -727,6 +727,12 @@ namespace CmisSync
                                     }
                                 };
 
+                                //expand the repository if there is only one
+                                if (Controller.repositories.Count == 1)
+                                {
+                                    ((TreeViewItem)treeView.Items[0]).IsSelected = true;
+                                }
+
                                 Button cancel_button = new Button()
                                 {
                                     Content = Properties_Resources.Cancel
