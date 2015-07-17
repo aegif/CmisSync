@@ -432,9 +432,9 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        //fix #559 Content remotely deleted if synced folder removed while CmisSync is running
-                        if (!Directory.Exists(localFolder)) { 
-                            //the user has deleted/moved/renamed the local root folder.
+                        // The user has deleted/moved/renamed the local root folder while CmisSync was running.
+                        if ( ! Directory.Exists(localFolder))
+                        {
                             throw new CmisMissingSyncFolderException("Missing " + localFolder + ".");
                         }
 
@@ -565,7 +565,8 @@ namespace CmisSync.Lib.Sync
                 else if (exception is CmisRuntimeException)
                 {
                     // Any other cause not expressible by another CMIS exception (any method)
-                    recoverable = false;
+                    // True because it might be only for a single document and not for the others.
+                    recoverable = true;
                 }
                 else if (exception is CmisConstraintException)
                 {
