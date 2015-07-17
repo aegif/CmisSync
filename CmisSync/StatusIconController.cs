@@ -259,9 +259,13 @@ namespace CmisSync
             // Error.
             Program.Controller.OnError += delegate(Tuple<string, Exception> error)
             {
-                Logger.Error(String.Format("Error syncing '{0}': {1}", error.Item1, error.Item2.Message), error.Item2);
+                //FIXME: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
+                String reponame = error.Item1;
+                Exception exception = error.Item2;
 
-                string message = String.Format(Properties_Resources.SyncError, error.Item1, error.Item2.Message);
+                Logger.Error(String.Format("Error syncing '{0}': {1}", reponame, exception.Message), exception);
+
+                string message = String.Format(Properties_Resources.SyncError, reponame, exception.Message);
 
                 IconState PreviousState = CurrentState;
                 CurrentState = IconState.Error;
@@ -276,10 +280,11 @@ namespace CmisSync
                 UpdateMenuEvent(CurrentState);
 #endif
 
-                if (error.Item2 is PermissionDeniedException)
+                if (exception is PermissionDeniedException)
                 {
+                    //FIXME: why it get suspended? Instead i should ask the user if the password has changed and he want to enter a new one
                     //Suspend sync...
-                    SuspendSyncClicked(error.Item1);
+                    SuspendSyncClicked(reponame);
                 }
 
                 if (PreviousState != IconState.Error)
@@ -365,7 +370,8 @@ namespace CmisSync
         /// </summary>
         public void SuspendSyncClicked(string reponame)
         {
-            Program.Controller.StartOrSuspendRepository(reponame);
+            Program.Controller.SuspendOrResumeRepositorySynchronization(reponame);
+            //TODO: the StatusIcon should listen the controlleo or the repository for Suspended changes instead of call UpdateSuspendSyncFolderEvent
             UpdateSuspendSyncFolderEvent(reponame);
         }
 

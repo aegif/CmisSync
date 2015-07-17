@@ -98,6 +98,10 @@
       <DependentUpon>Properties.Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="CertPolicyWindow.cs" />
+    <Compile Include="MissingFolderDialog.cs" />
+    <Compile Include="MissingFolderDialog.designer.cs">
+      <DependentUpon>MissingFolderDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="PollIntervalSlider.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
@@ -238,6 +242,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MissingFolderDialog.it.resx">
+      <DependentUpon>MissingFolderDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MissingFolderDialog.resx">
+      <DependentUpon>MissingFolderDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties.Resources.cs.resx" />
     <EmbeddedResource Include="Properties.Resources.da.resx" />

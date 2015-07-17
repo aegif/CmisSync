@@ -193,6 +193,10 @@ namespace CmisSync.Lib.Sync
                         {
                             repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
                         }
+                        catch (CmisMissingSyncFolderException e) 
+                        {
+                            repo.OnSyncError(new MissingSyncFolderException("Missing sync folder.", e));
+                        }
                         catch (Exception e)
                         {
                             repo.OnSyncError(new BaseException(e));
@@ -384,6 +388,8 @@ namespace CmisSync.Lib.Sync
                     autoResetEvent.Reset();
                     repo.OnSyncStart(syncFull);
 
+                    SleepWhileSuspended();
+
                     // If not connected, connect.
                     if (session == null)
                     {
@@ -395,8 +401,6 @@ namespace CmisSync.Lib.Sync
                         //  Force to reset the cache for each Sync
                         session.Clear();
                     }
-
-                    SleepWhileSuspended();
 
 
                     // Add ACL in the context, or ACL is null
@@ -428,6 +432,12 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
+                        //fix #559 Content remotely deleted if synced folder removed while CmisSync is running
+                        if (!Directory.Exists(localFolder)) { 
+                            //the user has deleted/moved/renamed the local root folder.
+                            throw new CmisMissingSyncFolderException("Missing " + localFolder + ".");
+                        }
+
                         // Apply local changes noticed by the filesystem watcher.
                         WatcherSync(remoteFolderPath, localFolder);
 
@@ -439,7 +449,7 @@ namespace CmisSync.Lib.Sync
                         else
                         {
                             //  Have to crawl remote.
-                            Logger.Debug("Invoke a full crawl sync");
+                            Logger.Warn("Invoke a full crawl sync (the remote does not support ChangeLog)");
                             repo.Watcher.Clear();
                             CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
                         }
@@ -627,6 +637,7 @@ namespace CmisSync.Lib.Sync
 
                 if ( ! recoverable)
                 {
+                    // TODO Any temporary file to clean maybe?
                     throw exception;
                 }
             }

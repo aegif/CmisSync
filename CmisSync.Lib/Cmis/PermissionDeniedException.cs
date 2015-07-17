@@ -34,4 +34,36 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         protected PermissionDeniedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
+    
+    /// <summary>
+    /// Exception launched when the root sync folder is not found.
+    /// </summary>
+    [Serializable]
+    public class MissingSyncFolderException : BaseException
+    {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public MissingSyncFolderException() { }
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public MissingSyncFolderException(string message) : base(message) { }
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public MissingSyncFolderException(string message, Exception inner) : base(message, inner) { }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public MissingSyncFolderException(Exception inner) : base(inner) { }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        protected MissingSyncFolderException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+    }
 }
