@@ -385,11 +385,28 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
+                        // The remote file does not exist locally.
+
                         if (database.ContainsFile(syncItem))
                         {
-                            if (!(bool)remoteDocument.IsVersionSeriesCheckedOut)
+                            // The file used to be present locally (as revealed by the database), but does not exist anymore locally.
+                            // So, it must have been deleted locally by the user.
+                            // Thus, CmisSync must remove the file from the server too.
+
+                            string message0 = "CmisSync Warning: You have deleted file " + syncItem.LocalPath + "\nCmisSync will now delete it from the server. If you actually did not delete this file, please report a bug at CmisSync@aegif.jp";
+                            Logger.Info(message0);
+                            Utils.NotifyUser(message0);
+
+                            if ((bool)remoteDocument.IsVersionSeriesCheckedOut)
+                            {
+                                string message = String.Format("File {0} is checked out on the server by another user: {1}", syncItem.LocalPath, remoteDocument.CheckinComment);
+                                Logger.Info(message);
+                                Utils.NotifyUser(message);
+                            }
+                            else
                             {
                                 // File has been recently removed locally, so remove it from server too.
+
                                 activityListener.ActivityStarted();
                                 Logger.Info("Removing locally deleted file on server: " + syncItem.RemotePath);
                                 remoteDocument.DeleteAllVersions();
@@ -397,17 +414,11 @@ namespace CmisSync.Lib.Sync
                                 database.RemoveFile(syncItem);
                                 activityListener.ActivityStopped();
                             }
-                            else
-                            {
-                                string message = String.Format("File {0} is checked out on the server by another user: {1}", syncItem.LocalPath, remoteDocument.CheckinComment);
-                                // throw new IOException("File is checked out on the server");
-                                Logger.Info(message);
-                                Utils.NotifyUser(message);
-                            }
                         }
                         else
                         {
                             // New remote file, download it.
+
                             Logger.Info("New remote file: " + syncItem.RemotePath);
                             activityListener.ActivityStarted();
                             DownloadFile(remoteDocument, localFolder);
