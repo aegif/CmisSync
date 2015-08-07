@@ -152,7 +152,7 @@ namespace CmisSync
         /// <param name="name">Name of the synchronized folder</param>
         public void OpenCmisSyncFolder(string name)
         {
-            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.GetFolder(name);
             if (folder != null)
                 Utils.OpenFolder(folder.LocalPath);
             else if (String.IsNullOrWhiteSpace(name))
@@ -167,7 +167,7 @@ namespace CmisSync
         /// <param name="name">Name of the synchronized folder</param>
         public void OpenRemoteFolder(string name)
         {
-            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.getFolder(name);
+            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.GetFolder(name);
             if (folder != null)
             {
                 RepoInfo repo = folder.GetRepoInfo();

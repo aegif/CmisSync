@@ -65,6 +65,8 @@ namespace CmisSync
             Environment.SetEnvironmentVariable("MONO_XMLSERIALIZER_THS", "no");
 #endif
 
+            Controller = new Controller();
+
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
             ServicePointManager.CertificatePolicy = new CertPolicyHandler();
@@ -89,7 +91,6 @@ namespace CmisSync
                 Backend.Platform != PlatformID.MacOSX &&
                 Backend.Platform != PlatformID.Win32NT)
             {
-
                 string n = Environment.NewLine;
 
                 Console.WriteLine(n +
@@ -121,7 +122,6 @@ namespace CmisSync
 
             try
             {
-                Controller = new Controller();
                 Controller.Initialize(firstRun);
 
                 UI = new GUI();

@@ -28,6 +28,8 @@ using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Events;
 using CmisSync.Auth;
 
+using System.Windows.Forms;
+
 #if __COCOA__
 // using Edit = CmisSync.EditWizardController;
 #endif
@@ -150,7 +152,7 @@ namespace CmisSync
             get
             {
                 List<string> folders = new List<string>();
-                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
+                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folders)
                     folders.Add(f.DisplayName);
                 folders.Sort();
 
@@ -195,7 +197,6 @@ namespace CmisSync
         public ControllerBase()
         {
             activityListenerAggregator = new ActivityListenerAggregator(this);
-            FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
         }
 
         /// <summary>
@@ -205,6 +206,8 @@ namespace CmisSync
         public virtual void Initialize(Boolean firstRun)
         {
             this.firstRun = firstRun;
+
+            FoldersPath = ConfigManager.CurrentConfig.FoldersPath;
 
             // Create the CmisSync folder and add it to the bookmarks
             bool syncFolderCreated = CreateCmisSyncFolder();
@@ -230,18 +233,17 @@ namespace CmisSync
             if (firstRun)
             {
                 ShowSetupWindow(PageType.Setup);
+            }
 
-            }
-            else
+            Thread t = new Thread(() =>
             {
-                new Thread(() =>
-                {
-                    CheckRepositories();
-                    RepositoriesLoaded = true;
-                    // Update GUI.
-                    FolderListChanged();
-                }).Start();
-            }
+                CheckRepositories();
+                RepositoriesLoaded = true;
+                // Update GUI.
+                FolderListChanged();
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
         }
 
         /// <summary>
@@ -277,7 +279,7 @@ namespace CmisSync
         /// </summary>
         public void RemoveRepositoryFromSync(string reponame)
         {
-            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.getFolder(reponame);
+            Config.SyncConfig.Folder f = ConfigManager.CurrentConfig.GetFolder(reponame);
             if (f != null)
             {
                 RemoveRepository(f);
@@ -350,10 +352,34 @@ namespace CmisSync
         /// Pause or un-pause synchronization for a particular folder.
         /// </summary>
         /// <param name="repoName">the folder to pause/unpause</param>
-        public void StartOrSuspendRepository(string repoName)
+        public void SuspendOrResumeRepositorySynchronization(string repoName)
         {
             lock (this.repo_lock)
             {
+                //FIXME: why are we sospendig all repositories instead of the one passed?
+                foreach (RepoBase aRepo in this.repositories)
+                {
+                    if (aRepo.Status != SyncStatus.Suspend)
+                    {
+                        SuspendRepositorySynchronization(repoName);
+                    }
+                    else
+                    {
+                        ResumeRepositorySynchronization(repoName);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Pause synchronization for a particular folder.
+        /// </summary>
+        /// <param name="repoName">the folder to pause</param>
+        public void SuspendRepositorySynchronization(string repoName)
+        {
+            lock (this.repo_lock)
+            {
+                //FIXME: why are we sospendig all repositories instead of the one passed?
                 foreach (RepoBase aRepo in this.repositories)
                 {
                     if (aRepo.Status != SyncStatus.Suspend)
@@ -361,18 +387,25 @@ namespace CmisSync
                         aRepo.Suspend();
                         Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                     }
-                    else
+                }
+            }
+        }
+
+        /// <summary>
+        /// Un-pause synchronization for a particular folder.
+        /// </summary>
+        /// <param name="repoName">the folder to unpause</param>
+        public void ResumeRepositorySynchronization(string repoName)
+        {
+            lock (this.repo_lock)
+            {
+                //FIXME: why are we sospendig all repositories instead of the one passed?
+                foreach (RepoBase aRepo in this.repositories)
+                {
+                    if (aRepo.Status == SyncStatus.Suspend)
                     {
-                        if (aRepo.Status != SyncStatus.Suspend)
-                        {
-                            aRepo.Suspend();
-                            Logger.Debug("Requested to syspend sync of repo " + aRepo.Name);
-                        }
-                        else
-                        {
-                            aRepo.Resume();
-                            Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
-                        }
+                        aRepo.Resume();
+                        Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
                     }
                 }
             }
@@ -380,26 +413,21 @@ namespace CmisSync
 
         /// <summary>
         /// Check the configured CmisSync synchronized folders.
-        /// Remove the ones whose folders have been deleted.
         /// </summary>
         private void CheckRepositories()
         {
             lock (this.repo_lock)
             {
-                List<Config.SyncConfig.Folder> toBeDeleted = new List<Config.SyncConfig.Folder>();
-                // If folder has been deleted, remove it from configuration too.
-                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folder)
+                Queue<Config.SyncConfig.Folder> missingFolders = new Queue<Config.SyncConfig.Folder>();
+                foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folders)
                 {
-                    string folder_name = f.DisplayName;
                     string folder_path = f.LocalPath;
 
                     if (!Directory.Exists(folder_path))
                     {
-                        RemoveRepository(f);
-                        toBeDeleted.Add(f);
-
-                        Logger.Info("Controller | Removed folder '" + folder_name + "' from config");
-
+                        // If folder has been deleted, ask the user what to do.
+                        Logger.Info("ControllerBase | Found missing folder '" + f.DisplayName + "'");
+                        missingFolders.Enqueue(f);
                     }
                     else
                     {
@@ -407,16 +435,82 @@ namespace CmisSync
                     }
                 }
 
-                foreach (Config.SyncConfig.Folder f in toBeDeleted)
+                while (missingFolders.Count != 0)
                 {
-                    ConfigManager.CurrentConfig.Folder.Remove(f);
+                    handleMissingSyncFolder(missingFolders.Dequeue());
                 }
-                if (toBeDeleted.Count > 0)
-                    ConfigManager.CurrentConfig.Save();
+
+                ConfigManager.CurrentConfig.Save();
             }
 
             // Update GUI.
             FolderListChanged();
+        }
+
+        private void handleMissingSyncFolder(Config.SyncConfig.Folder f)
+        {
+            bool handled = false;
+
+            while (handled == false)
+            {
+                MissingFolderDialog dialog = new MissingFolderDialog(f);
+                dialog.ShowDialog();
+                if (dialog.action == MissingFolderDialog.Action.MOVE)
+                {
+                    String startPath = Directory.GetParent(f.LocalPath).FullName;
+                    FolderBrowserDialog fbd = new FolderBrowserDialog();
+                    fbd.SelectedPath = startPath;
+                    fbd.Description = "Select the folder you have moved or renamed";
+                    fbd.ShowNewFolderButton = false;
+                    DialogResult result = fbd.ShowDialog();
+
+                    if (result == DialogResult.OK && fbd.SelectedPath.Length > 0)
+                    {
+                        if (!Directory.Exists(fbd.SelectedPath))
+                        {
+                            throw new InvalidDataException();
+                        }
+                        Logger.Info("ControllerBase | Folder '" + f.DisplayName + "' ('" + f.LocalPath + "') moved to '" + fbd.SelectedPath + "'");
+                        f.LocalPath = fbd.SelectedPath;
+
+                        AddRepository(f.GetRepoInfo());
+                        handled = true;
+                    }
+                }
+                else if (dialog.action == MissingFolderDialog.Action.REMOVE)
+                {
+                    RemoveRepository(f);
+                    ConfigManager.CurrentConfig.Folders.Remove(f);
+
+                    Logger.Info("ControllerBase | Removed folder '" + f.DisplayName + "' from config");
+                    handled = true;
+                }
+                else if (dialog.action == MissingFolderDialog.Action.RECREATE)
+                {
+                    RepoInfo info = f.GetRepoInfo();
+                    RemoveRepository(f);
+                    ConfigManager.CurrentConfig.Folders.Remove(f);
+                    CreateRepository(info.Name,
+                        info.Address,
+                        info.User,
+                        info.Password.ToString(),
+                        info.RepoID,
+                        info.RemotePath,
+                        info.TargetDirectory,
+                        info.getIgnoredPaths().OfType<String>().ToList(),
+                        info.SyncAtStartup);
+                    Logger.Info("ControllerBase | Folder '" + f.DisplayName + "' recreated");
+                    handled = true;
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+            //handled == true
+            //now resume the sincronization (if ever was suspended)
+            //FIXME: the problem is that if the user suspended this repo it will get resumed anyway (ignoring the user setting)
+            Program.Controller.ResumeRepositorySynchronization(f.DisplayName);
         }
 
         /// <summary>
@@ -553,6 +647,32 @@ namespace CmisSync
         /// </summary>
         public void ActivityError(Tuple<string, Exception> error)
         {
+            //FIXME: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
+            String reponame = error.Item1;
+            Exception exception = error.Item2;
+
+            if (exception is MissingSyncFolderException)
+            {
+                //Suspend sync... (should be resumed after the user has handled the error)
+                Program.Controller.SuspendRepositorySynchronization(reponame);
+                //FIXME: should update the suspended menu item, but i can't from here
+                //UpdateSuspendSyncFolderEvent(reponame);
+                
+                //handle in a new thread, becouse this is the syncronization one and can be killed if the user decide to remove the repo or resync it
+                Thread t = new Thread(() =>
+                {
+                    handleMissingSyncFolder(ConfigManager.CurrentConfig.GetFolder(reponame));
+                });
+                t.SetApartmentState(ApartmentState.STA);
+                t.Start();
+
+                //dont resume here, the handler thread will if needed (or kill this thread)
+                //Program.Controller.ResumeRepositorySynchronization(reponame);
+
+                //handled, no need to do anything else
+                return;
+            }
+
             OnError(error);
         }
     }

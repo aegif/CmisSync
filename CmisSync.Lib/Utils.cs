@@ -32,7 +32,7 @@ namespace CmisSync.Lib
         /// Component which will receive notifications intended for the end-user.
         /// A GUI program might raise a pop-up, a CLI program might print a line.
         /// </summary>
-        private static UserNotificationListener UserNotificationListener;
+        private static UserNotificationListener userNotificationListener;
 
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static void SetUserNotificationListener(UserNotificationListener listener)
         {
-            UserNotificationListener = listener;
+            userNotificationListener = listener;
         }
 
 
@@ -49,7 +49,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static void NotifyUser(string message)
         {
-            UserNotificationListener.NotifyUser(message);
+            userNotificationListener.NotifyUser(message);
         }
 
 
@@ -200,7 +200,7 @@ namespace CmisSync.Lib
 
             if (fullPath.Length > (int)maxPathField.GetValue(null))
             {
-                Logger.DebugFormat("Skipping {0}: path too long", fullPath);
+                Logger.WarnFormat("Skipping {0}: path too long", fullPath);
                 return false;
 
             }
@@ -372,6 +372,8 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// Regular expression to check whether a file name is valid or not.
+        /// In particular, CmisSync forbids characters that would not be allowed on Windows:
+        /// https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#file_and_directory_names
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:/\\|<>*") + "]");
@@ -525,6 +527,14 @@ namespace CmisSync.Lib
         public static bool IsSymlink(FileSystemInfo fsi)
         {
             return ((fsi.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint);
+        }
+
+
+        public static void MoveFolderLocally(string origin, string destination)
+        {
+            //string destinationBase = Path.GetDirectoryName(destination);
+
+            Directory.Move(origin, Path.Combine(destination)); // TODO might be more complex when a folder is moved to a non-yet-existing folder hierarchy
         }
     }
 }

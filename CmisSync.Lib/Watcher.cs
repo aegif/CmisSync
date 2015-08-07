@@ -313,7 +313,7 @@ namespace CmisSync.Lib
                 {
                     foreach (FileSystemEventArgs change in changeList)
                     {
-                        Logger.Debug("Removing -> " + change.ChangeType + ": " + change.Name);
+                        Logger.Debug("Clearing from change list: " + change.ChangeType + ": " + change.Name);
                     }
                 }
                 changeList.Clear();
@@ -442,7 +442,7 @@ namespace CmisSync.Lib
                 }
                 
                 this.oldDirectory = oldDirectory;
-                this.oldFullPath = CmisUtils.PathCombine(oldDirectory, name);
+                this.oldFullPath = System.IO.Path.Combine(oldDirectory, name);
             }
 
             /// <summary>

@@ -45,7 +45,7 @@ namespace CmisSync.Lib.Database
         /// <param name="dbFile">Database file.</param>
         public static void Migrate(string dbFile)
         {
-            var syncFolder = ConfigManager.CurrentConfig.Folder.Find((f) => f.GetRepoInfo().CmisDatabase == dbFile);
+            var syncFolder = ConfigManager.CurrentConfig.Folders.Find((f) => f.GetRepoInfo().CmisDatabase == dbFile);
 
             int currentDbVersion = Database.SchemaVersion;
             string dbPath = syncFolder.GetRepoInfo().CmisDatabase;
@@ -61,15 +61,17 @@ namespace CmisSync.Lib.Database
 
                 using (var connection = GetConnection(dbPath))
                 {
+                    // Check database version.
                     int dbVersion = GetDatabaseVersion(connection);
 
+                    // Skip migration if up-to-date.
                     if (dbVersion >= currentDbVersion)
                     {
-                        return;     // migration is not needed
+                        return;
                     }
 
-                    Logger.DebugFormat("Current Database Schema must be updated from {0} to {0}", dbVersion, currentDbVersion);
-
+                    // Migrate with various step according to the version.
+                    Logger.DebugFormat("Current database schema must be updated from {0} to {0}", dbVersion, currentDbVersion);
                     switch (dbVersion)
                     {
                         case 0:

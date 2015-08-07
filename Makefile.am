@@ -11,7 +11,7 @@ EXTRA_DIST = \
 	legal/TRADEMARK.txt \
 	legal/AUTHORS.txt \
 	Extras/DotCMIS.dll \
-	Extras/Newtonsoft.Json.dll \
+	Extras/OpenDataSpaceDotCMIS/Newtonsoft.Json.dll \
 	Extras/nunit.framework.dll
 
 DISTCLEANFILES = \

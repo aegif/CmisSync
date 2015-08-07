@@ -24,50 +24,51 @@ namespace CmisSync.Console
         /// <summary>
         /// Configured synchronized folder on which the synchronization must be performed.
         /// </summary>
-		private CmisRepo cmisRepo;
+		private List<RepoInfo> repos = new List<RepoInfo>();
 
         /// <summary>
         /// Main method, pass folder name as argument.
         /// </summary>
 		public static void Main (string[] args)
 		{
-            // Check arguments.
-            if (args.Length < 1)
+            CmisSyncOnce once = new CmisSyncOnce();
+
+            // Load the specified synchronized folders, or all if none is specified.
+            if (args.Length > 1)
             {
-				#if __COCOA__
-				System.Console.WriteLine("Usage: cmissync_once mysyncedfolder");
-				System.Console.WriteLine("Example: cmissync_once \"192.168.0.22\\Main Repository\"");
-				System.Console.WriteLine("See your folders names in /Users/you/.config/cmissync/config.xml or similar");
-				#else
-				System.Console.WriteLine("Usage: CmisSyncOnce.exe mysyncedfolder");
-				System.Console.WriteLine("Example: CmisSyncOnce.exe \"192.168.0.22\\Main Repository\"");
-				System.Console.WriteLine("See your folders names in C:\\Users\\you\\AppData\\Roaming\\cmissync\\config.xml or similar");
-				#endif
-                return;
+                for (int i = 0; i < args.Length; i++)
+                {
+                    once.AddSynchronizedFolder(args[i]);
+                }
+            }
+            else
+            {
+                Config config = ConfigManager.CurrentConfig;
+                foreach (CmisSync.Lib.Config.SyncConfig.Folder folder in config.Folders)
+                {
+                    RepoInfo repoInfo = folder.GetRepoInfo();
+                    once.repos.Add(repoInfo);
+                }
             }
 
-            // Load and synchronize.
-			CmisSyncOnce once = new CmisSyncOnce();
-			once.Init(args[0]);
+            // Synchronize all
             once.Sync();
 		}
 
         /// <summary>
         /// Load folder configuration.
         /// </summary>
-		private void Init (string folderName)
+        private void AddSynchronizedFolder(string folderName)
 		{
 			Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder folder = config.getFolder(folderName);
+            CmisSync.Lib.Config.SyncConfig.Folder folder = config.GetFolder(folderName);
             if (folder == null)
             {
                 System.Console.WriteLine("No folder found with this name: " + folderName);
                 return;
             }
 			RepoInfo repoInfo = folder.GetRepoInfo();
-
-			ConsoleController controller = new ConsoleController ();
-			cmisRepo = new CmisRepo (repoInfo, controller);
+            repos.Add(repoInfo);
 		}
 
         /// <summary>
@@ -75,7 +76,13 @@ namespace CmisSync.Console
         /// </summary>
 		private void Sync ()
 		{
-            cmisRepo.SyncInNotBackground();
+            ConsoleController controller = new ConsoleController();
+
+            foreach (RepoInfo repoInfo in repos)
+            {
+                CmisRepo cmisRepo = new CmisRepo (repoInfo, controller);
+                cmisRepo.SyncInNotBackground();
+            }
 		}
 	}
 }

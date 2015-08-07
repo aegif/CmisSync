@@ -14,6 +14,9 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#if (__MonoCS__)
+#define MonoBug24381 // https://bugzilla.xamarin.com/show_bug.cgi?id=24381
+#endif
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
@@ -225,12 +228,14 @@ namespace CmisSync
 
                 UpdateStatusItemEvent(StateText);
 
-                //this.animation.Stop();
+#if MonoBug24381
                 //this.animation_frame_number = 0; // Idle status icon
                 //UpdateIconEvent(this.animation_frame_number);
-
-//NOTGDS2: begin
+#else
+                this.animation.Stop();
                 UpdateIconEvent(CurrentState == IconState.Error ? -1 : 0);
+#endif
+
                 UpdateMenuEvent(CurrentState);
             };
 
@@ -243,17 +248,24 @@ namespace CmisSync
 
                 UpdateStatusItemEvent(StateText);
 
-                //this.animation.Start();
-                this.animation_frame_number = 3; // Syncing icon
-                UpdateIconEvent(this.animation_frame_number);
+#if MonoBug24381
+                //this.animation_frame_number = 3; // Syncing icon
+                //UpdateIconEvent(this.animation_frame_number);
+#else
+                this.animation.Start();
+#endif
             };
 
             // Error.
             Program.Controller.OnError += delegate(Tuple<string, Exception> error)
             {
-                Logger.Error(String.Format("Error syncing '{0}': {1}", error.Item1, error.Item2.Message), error.Item2);
+                //FIXME: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
+                String reponame = error.Item1;
+                Exception exception = error.Item2;
 
-                string message = String.Format(Properties_Resources.SyncError, error.Item1, error.Item2.Message);
+                Logger.Error(String.Format("Error syncing '{0}': {1}", reponame, exception.Message), exception);
+
+                string message = String.Format(Properties_Resources.SyncError, reponame, exception.Message);
 
                 IconState PreviousState = CurrentState;
                 CurrentState = IconState.Error;
@@ -261,15 +273,18 @@ namespace CmisSync
 
                 UpdateStatusItemEvent(StateText);
 
+#if ! MonoBug24381
                 this.animation.Stop();
 
                 UpdateIconEvent(-1);
                 UpdateMenuEvent(CurrentState);
+#endif
 
-                if (error.Item2 is PermissionDeniedException)
+                if (exception is PermissionDeniedException)
                 {
+                    //FIXME: why it get suspended? Instead i should ask the user if the password has changed and he want to enter a new one
                     //Suspend sync...
-                    SuspendSyncClicked(error.Item1);
+                    SuspendSyncClicked(reponame);
                 }
 
                 if (PreviousState != IconState.Error)
@@ -281,28 +296,6 @@ namespace CmisSync
             Program.Controller.OnErrorResolved += delegate
             {
                 CurrentState = IconState.Idle;
-//NOTGDS2: end
-// GDS2:
-/*
-                UpdateIconEvent (0);
-//                UpdateMenuEvent (CurrentState);
-            };
-
-            Program.Controller.OnTransmissionListChanged += delegate {
-                UpdateTransmissionMenuEvent();
-            };
-
-            // Syncing.
-            Program.Controller.OnSyncing += delegate {
-                if (CurrentState != IconState.Syncing)
-                {
-                    CurrentState = IconState.Syncing;
-                    StateText = Properties_Resources.SyncingChanges;
-                    UpdateStatusItemEvent(StateText);
-
-                    this.animation.Start();
-                }
-*/
             };
         }
 
@@ -327,7 +320,7 @@ namespace CmisSync
         /// </summary>
         public void SettingsClicked(string reponame)
         {
-            CmisSync.Lib.Config.SyncConfig.Folder repository = ConfigManager.CurrentConfig.getFolder(reponame);
+            CmisSync.Lib.Config.SyncConfig.Folder repository = ConfigManager.CurrentConfig.GetFolder(reponame);
             Program.UI.Setup.Controller.saved_repository = reponame;
             if (repository != null)
             {
@@ -377,7 +370,8 @@ namespace CmisSync
         /// </summary>
         public void SuspendSyncClicked(string reponame)
         {
-            Program.Controller.StartOrSuspendRepository(reponame);
+            Program.Controller.SuspendOrResumeRepositorySynchronization(reponame);
+            //TODO: the StatusIcon should listen the controlleo or the repository for Suspended changes instead of call UpdateSuspendSyncFolderEvent
             UpdateSuspendSyncFolderEvent(reponame);
         }
 
@@ -424,9 +418,7 @@ namespace CmisSync
         /// </summary>
         public void EditFolderClicked(string reponame)
         {
-            // TODO fix EditRepositoryFolder
-            // Program.Controller.EditRepositoryFolder(reponame);
-            Logger.Error ("Call Program.Controller.EditRepositoryFolder(" + reponame + ")");
+			SettingsClicked (reponame);
         }
 
         /// <summary>
@@ -434,10 +426,12 @@ namespace CmisSync
         /// </summary>
         private void InitAnimation()
         {
-            this.animation_frame_number = 3; // Syncing icon
-            UpdateIconEvent(this.animation_frame_number);
+#if MonoBug24381
 
-            /*this.animation_frame_number = 0;
+            //this.animation_frame_number = 3; // Syncing icon
+            //UpdateIconEvent(this.animation_frame_number);
+#else
+            this.animation_frame_number = 0;
 
             this.animation = new Timer()
             {
@@ -446,14 +440,15 @@ namespace CmisSync
 
             this.animation.Elapsed += delegate
             {
-                Logger.Debug("StatusIconController Animation Elapsed " + this.animation_frame_number);
+                //Logger.Debug("StatusIconController Animation Elapsed " + this.animation_frame_number);
                 if (this.animation_frame_number < 4)
                     this.animation_frame_number++;
                 else
                     this.animation_frame_number = 0;
 
-                UpdateIconEvent(3);//this.animation_frame_number);
-            };*/
+                UpdateIconEvent(this.animation_frame_number);
+            };
+#endif
         }
     }
 }

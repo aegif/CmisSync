@@ -243,7 +243,10 @@ namespace CmisSync.Lib.Database
                 return path;
             }
             // Insert path prefix
-            return Path.Combine(ConfigManager.CurrentConfig.FoldersPath, path).Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(
+                pathPrefix,
+                path.Replace('/', Path.DirectorySeparatorChar)
+            );
         }
 
         /// <summary>
@@ -474,8 +477,8 @@ namespace CmisSync.Lib.Database
             parameters.Add("path", item.RemoteRelativePath + "/%");
             ExecuteSQLAction("DELETE FROM files WHERE path LIKE @path", parameters);
         }
-
-
+        
+        
         /// <summary>
         /// Move a file.
         /// </summary>
@@ -916,6 +919,16 @@ namespace CmisSync.Lib.Database
         }
 
         /// <summary>
+        /// <returns>path field in files table for <paramref name="id"/></returns>
+        /// </summary>
+        public string GetFilePath(string id)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("id", id);
+            return Denormalize((string)ExecuteSQLFunction("SELECT path FROM files WHERE id=@id", parameters));
+        }
+
+        /// <summary>
         /// <returns>path field in folders table for <paramref name="id"/></returns>
         /// </summary>
         public string GetFolderPath(string id)
@@ -973,10 +986,20 @@ namespace CmisSync.Lib.Database
 
         /// <summary>
         /// Get the ChangeLog token that was stored at the end of the last successful CmisSync synchronization.
+        /// If no ChangeLog has ever been stored, return null.
         /// </summary>
         public string GetChangeLogToken()
         {
-            return (string)ExecuteSQLFunction("SELECT value FROM general WHERE key=\"ChangeLogToken\"", null);
+            var token = ExecuteSQLFunction("SELECT value FROM general WHERE key=\"ChangeLogToken\"", null);
+
+            if (token is DBNull)
+            {
+                return null;
+            }
+            else
+            {
+                return (string)token;
+            }
         }
 
         /// <summary>
@@ -989,6 +1012,7 @@ namespace CmisSync.Lib.Database
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("token", token);
             ExecuteSQLAction(command, parameters);
+            Logger.Info("Database ChangeLog token set to: " + token);
         }
 
         const string PathPrefixKey = "PathPrefix";
@@ -1006,7 +1030,7 @@ namespace CmisSync.Lib.Database
             // Migration of databases, which do not have any prefix saved
             if (result == null)
             {
-                var syncFolder = ConfigManager.CurrentConfig.Folder.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
+                var syncFolder = ConfigManager.CurrentConfig.Folders.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
                 string oldprefix = syncFolder.LocalPath;
                 SetPathPrefix(oldprefix);
                 return oldprefix;
@@ -1043,7 +1067,7 @@ namespace CmisSync.Lib.Database
             object result = GetGeneralTableValue(RemotePathPrefixKey);
             if (result == null)
             {
-                var syncFolder = ConfigManager.CurrentConfig.Folder.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
+                var syncFolder = ConfigManager.CurrentConfig.Folders.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
                 string oldprefix = syncFolder.RemotePath;
                 SetRemotePathPrefix(oldprefix);
                 return oldprefix;

@@ -139,13 +139,24 @@ namespace CmisSync.CmisTree
         {
             foreach (Node newChild in children)
             {
+                // Workaround for a DotCMIS bug where Name is null if the name of the folder is "null".
+                if (newChild.Name == null)
+                {
+                    newChild.Name = "null";
+                }
+
+                // Add nodes
                 try {
                     Node equalNode = node.Children.First(x => x.Name.Equals(newChild.Name));
                     MergeFolderTrees(equalNode, newChild.Children.ToList());
                     MergeNewNodeIntoOldNode(equalNode, newChild);
-                } catch ( InvalidOperationException ) {
+                }
+                // No existing node with this name, so create a new one.
+                catch ( InvalidOperationException ) {
                     if (node.Selected == false)
+                    {
                         newChild.Selected = false;
+                    }
                     node.Children.Add(newChild);
                     newChild.Parent = node;
                 }

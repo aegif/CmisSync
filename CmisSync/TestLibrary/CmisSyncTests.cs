@@ -1996,7 +1996,6 @@ namespace TestLibrary
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url;
             cmisParameters[SessionParameter.User] = user;
-//NOTGDS2            cmisParameters[SessionParameter.Password] = CmisSync.Auth.Crypto.Deobfuscate(password);
             cmisParameters[SessionParameter.Password] = password;
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 
@@ -2053,7 +2052,6 @@ namespace TestLibrary
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
             cmisParameters[SessionParameter.AtomPubUrl] = url;
             cmisParameters[SessionParameter.User] = user;
-//NOTGDS2            cmisParameters[SessionParameter.Password] = CmisSync.Auth.Crypto.Deobfuscate(password);
             cmisParameters[SessionParameter.Password] = password;
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
 

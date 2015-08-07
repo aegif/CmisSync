@@ -85,24 +85,27 @@ namespace CmisSync.Lib.Cmis
             // See https://github.com/aegif/CmisSync/wiki/What-address for the list of ECM products prefixes
             // Please send us requests to support more CMIS servers: https://github.com/aegif/CmisSync/issues
             string[] suffixes = {
-                "/cmis/atom11",
-                "/alfresco/cmisatom",
-                "/alfresco/service/cmis",
-                "/cmis/resources/",
-                "/emc-cmis-ea/resources/",
-                "/emc-cmis-weblogic/resources/",
-                "/emc-cmis-wls/resources/",
-                "/emc-cmis-was61/resources/",
-                "/emc-cmis-wls1030/resources/",
-                "/xcmis/rest/cmisatom",
-                "/files/basic/cmis/my/servicedoc",
-                "/p8cmis/resources/Service",
-                "/_vti_bin/cmis/rest?getRepositories",
-                "/nemakiware/atom/bedroom", // TODO: different port, typically 8080 for Web UI and 3000 for CMIS
-                "/nuxeo/atom/cmis",
+                "/alfresco/api/-default-/public/cmis/versions/1.1/atom", // Alfresco 4.2 CMIS 1.1
+                "/alfresco/api/-default-/public/cmis/versions/1.0/atom", // Alfresco 4.2 CMIS 1.0
+                "/alfresco/cmisatom", // Alfresco 4.0 and 4.1
+                "/alfresco/service/cmis", // Alfresco 3.x
+                "/cmis/atom11", // OpenDataSpace
+                "/rest/private/cmisatom/", // eXo Platform
+                "/xcmis/rest/cmisatom", // xCMIS
+                "/files/basic/cmis/my/servicedoc", // IBM Connections
+                "/p8cmis/resources/Service", // IBM FileNet
+                "/_vti_bin/cmis/rest?getRepositories", // Microsoft SharePoint
+                "/nemakiware/atom/bedroom", // NemakiWare  TODO: different port, typically 8080 for Web UI and 3000 for CMIS
+                "/nuxeo/atom/cmis", // Nuxeo
                 "/cmis/atom",
-                "/docushare/ds_mobile_connector/atom",
-                "/documents/ds_mobile_connector/atom" // TODO: can be anything instead of "documents"
+                "/cmis/resources/", // EMC Documentum
+                "/emc-cmis-ea/resources/", // EMC Documentum
+                "/emc-cmis-weblogic/resources/", // EMC Documentum
+                "/emc-cmis-wls/resources/", // EMC Documentum
+                "/emc-cmis-was61/resources/", // EMC Documentum
+                "/emc-cmis-wls1030/resources/", // EMC Documentum
+                "/docushare/ds_mobile_connector/atom", // Xerox DocuShare
+                "/documents/ds_mobile_connector/atom" // Xerox DocuShare  TODO: can be anything instead of "documents"
             };
             string bestUrl = null;
             // Try all suffixes
@@ -191,7 +194,10 @@ namespace CmisSync.Lib.Cmis
             // Populate the result list with identifier and name of each repository.
             foreach (IRepository repo in repositories)
             {
-                result.Add(repo.Id, repo.Name);
+                // Repo name is sometimes empty (ex: Alfresco), in such case show the repo id instead.
+                string name = repo.Name.Length == 0 ? repo.Id : repo.Name;
+
+                result.Add(repo.Id, name);
             }
 
             return result;
@@ -438,6 +444,22 @@ namespace CmisSync.Lib.Cmis
                 }
             }
             return null;
+        }
+
+
+        /// <summary>
+        /// Get the latest ChangeLog token.
+        /// Alfresco sends a null token if no change has ever happened. In that case, return empty string. See https://issues.alfresco.com/jira/browse/ALF-21276
+        /// </summary>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public static string GetChangeLogToken(ISession session)
+        {
+            session.Clear(); // Clear all caches.
+            session.Binding.GetRepositoryService().GetRepositoryInfos(null);
+            string token = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
+            Logger.Debug("Server token:" + token);
+            return token ?? string.Empty;
         }
 
 
