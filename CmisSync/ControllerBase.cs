@@ -507,9 +507,9 @@ namespace CmisSync
                     throw new InvalidOperationException();
                 }
             }
-            //handled == true
-            //now resume the sincronization (if ever was suspended)
-            //FIXME: the problem is that if the user suspended this repo it will get resumed anyway (ignoring the user setting)
+            // handled == true
+            // now resume the synchronization (if ever was suspended)
+            // FIXME: the problem is that if the user suspended this repo it will get resumed anyway (ignoring the user setting)
             Program.Controller.ResumeRepositorySynchronization(f.DisplayName);
         }
 
