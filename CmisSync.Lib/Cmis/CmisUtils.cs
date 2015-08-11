@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using CmisSync.Auth;
+using System.IO;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -476,6 +477,20 @@ namespace CmisSync.Lib.Cmis
                 return path1;
 
             return path1 + CMIS_FILE_SEPARATOR + path2;
+        }
+
+
+        /// <summary>
+        /// Should the local file/folder be made read-only?
+        /// Check the permissions of the current user to the remote file/folder.
+        /// </summary>
+        public static void MakeReadOnlyIfCannotModifyRemote(IFileableCmisObject remoteObject, string localPath)
+        {
+            bool readOnly = !remoteObject.AllowableActions.Actions.Contains(PermissionMappingKeys.CanAddToFolderObject);
+            if (readOnly)
+            {
+                new DirectoryInfo(localPath).Attributes = FileAttributes.ReadOnly;
+            }
         }
     }
 }

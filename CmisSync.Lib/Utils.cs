@@ -536,5 +536,12 @@ namespace CmisSync.Lib
 
             Directory.Move(origin, Path.Combine(destination)); // TODO might be more complex when a folder is moved to a non-yet-existing folder hierarchy
         }
+
+
+        public static void DeleteEvenIfReadOnly(string filePath)
+        {
+            File.SetAttributes(filePath, FileAttributes.Normal); // Might have been made read-only.
+            File.Delete(filePath);
+        }
     }
 }

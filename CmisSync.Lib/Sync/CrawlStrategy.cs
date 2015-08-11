@@ -221,7 +221,7 @@ namespace CmisSync.Lib.Sync
                             if (File.Exists(subFolderItem.LocalPath))
                             {
                                 activityListener.ActivityStarted();
-                                File.Delete(subFolderItem.LocalPath);
+                                Utils.DeleteEvenIfReadOnly(subFolderItem.LocalPath);
                                 activityListener.ActivityStopped();
                             }
 
@@ -248,7 +248,7 @@ namespace CmisSync.Lib.Sync
                                     // We don't have the permission to delete this folder. Warn and recreate it.
                                     Utils.NotifyUser("You don't have the necessary permissions to delete folder " + remoteSubFolder.Path
                                         + "\nIf you feel you should be able to delete it, please contact your server administrator");
-                                    DownloadFolder(remoteSubFolder, localFolder);
+                                    RecursiveFolderCopy(remoteSubFolder, subFolderItem.LocalPath);
                                 }
 
                                 // Delete the folder from database.
@@ -385,7 +385,7 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        // The remote file does not exist locally.
+                        // The remote file exists locally.
 
                         if (database.ContainsFile(syncItem))
                         {
@@ -502,6 +502,10 @@ namespace CmisSync.Lib.Sync
                                         activityListener.ActivityStarted();
                                         // Rename locally modified file.
                                         String newFilePath = Utils.CreateConflictFilename(filePath, repoinfo.User);
+
+                                        // The file might be ReadOnly, so make it writable first, otherwise the move will fail.
+                                        File.SetAttributes(filePath, FileAttributes.Normal);
+
                                         File.Move(filePath, newFilePath);
 
                                         // Delete file from database.
@@ -516,6 +520,11 @@ namespace CmisSync.Lib.Sync
                                     // File has been deleted on server, so delete it locally.
                                     Logger.Info("Removing remotely deleted file: " + filePath);
                                     activityListener.ActivityStarted();
+
+                                    // The file might be ReadOnly, so make it writable first, otherwise removal will fail.
+                                    File.SetAttributes(filePath, FileAttributes.Normal);
+
+                                    // Delete from the local filesystem.
                                     File.Delete(filePath);
 
                                     // Delete file from database.
