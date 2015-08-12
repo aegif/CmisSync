@@ -46,4 +46,4 @@ $ make
 Even if the last `make` step fails, Monodevelop (or Xamarin Studio) might be able to compile it better.
 
 Now that you have compiled the libraries, open `CmisSync/Mac/CmisSync.sln` in
-MonoDevelop (or Xamarin Studio) and start the build (Build > Build All).
+MonoDevelop (or Xamarin Studio) and start the build (Build > Build All). Xamarin Studio proposes to migrate the project from MonoMac to Xamarin.Mac, just refuse.
