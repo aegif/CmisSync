@@ -437,7 +437,7 @@ namespace CmisSync
 
                 while (missingFolders.Count != 0)
                 {
-                    handleMissingSyncFolder(missingFolders.Dequeue());
+                    // Disabled because incompatible wit Mac OS X: handleMissingSyncFolder(missingFolders.Dequeue());
                 }
 
                 ConfigManager.CurrentConfig.Save();
@@ -447,7 +447,7 @@ namespace CmisSync
             FolderListChanged();
         }
 
-        private void handleMissingSyncFolder(Config.SyncConfig.Folder f)
+        /*private void handleMissingSyncFolder(Config.SyncConfig.Folder f)
         {
             bool handled = false;
 
@@ -511,7 +511,7 @@ namespace CmisSync
             // now resume the synchronization (if ever was suspended)
             // FIXME: the problem is that if the user suspended this repo it will get resumed anyway (ignoring the user setting)
             Program.Controller.ResumeRepositorySynchronization(f.DisplayName);
-        }
+        }*/
 
         /// <summary>
         /// Fix the file attributes of a folder, recursively.
@@ -659,12 +659,12 @@ namespace CmisSync
                 //UpdateSuspendSyncFolderEvent(reponame);
                 
                 //handle in a new thread, becouse this is the syncronization one and can be killed if the user decide to remove the repo or resync it
-                Thread t = new Thread(() =>
+                /* Disabled because incompatible with Mac OS X: Thread t = new Thread(() =>
                 {
                     handleMissingSyncFolder(ConfigManager.CurrentConfig.GetFolder(reponame));
                 });
                 t.SetApartmentState(ApartmentState.STA);
-                t.Start();
+                t.Start();*/
 
                 //dont resume here, the handler thread will if needed (or kill this thread)
                 //Program.Controller.ResumeRepositorySynchronization(reponame);
