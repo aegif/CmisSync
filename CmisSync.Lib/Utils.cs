@@ -200,7 +200,7 @@ namespace CmisSync.Lib
 
             if (fullPath.Length > (int)maxPathField.GetValue(null))
             {
-                Logger.DebugFormat("Skipping {0}: path too long", fullPath);
+                Logger.WarnFormat("Skipping {0}: path too long", fullPath);
                 return false;
 
             }
@@ -535,6 +535,13 @@ namespace CmisSync.Lib
             //string destinationBase = Path.GetDirectoryName(destination);
 
             Directory.Move(origin, Path.Combine(destination)); // TODO might be more complex when a folder is moved to a non-yet-existing folder hierarchy
+        }
+
+
+        public static void DeleteEvenIfReadOnly(string filePath)
+        {
+            File.SetAttributes(filePath, FileAttributes.Normal); // Might have been made read-only.
+            File.Delete(filePath);
         }
     }
 }

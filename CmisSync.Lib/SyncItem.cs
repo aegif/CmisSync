@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CmisSync.Lib.Cmis;
+using log4net;
 
 
 namespace CmisSync.Lib
@@ -8,6 +9,9 @@ namespace CmisSync.Lib
     /// <summary></summary>
     abstract public class SyncItem
     {
+        // Log.
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncItem));
+
         /// <summary>local Repository root folder</summary>
         protected string localRoot;
 
@@ -65,7 +69,9 @@ namespace CmisSync.Lib
         /// <returns></returns>
         virtual public bool ExistsLocal()
         {
-            return File.Exists(LocalPath);
+            bool exists = File.Exists(LocalPath);
+            Logger.Debug("File.Exists(" + LocalPath + ") = " + exists);
+            return exists;
         }
     }
 
