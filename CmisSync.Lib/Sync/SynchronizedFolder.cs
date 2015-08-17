@@ -162,7 +162,7 @@ namespace CmisSync.Lib.Sync
                 suspended = this.repoinfo.IsSuspended;
 
                 // Database is the user's AppData/Roaming
-                database = new Database.Database(repoinfo.CmisDatabase);
+                database = new Database.Database(repoinfo.CmisDatabase, repoCmis.LocalPath, repoInfo.RemotePath);
 
                 // Get path on remote repository.
                 remoteFolderPath = repoInfo.RemotePath;
