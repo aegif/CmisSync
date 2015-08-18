@@ -103,13 +103,13 @@ namespace CmisSync.Lib.Sync
                 string oldLocalName = oldPathname.Substring(localFolder.Length + 1);
                 string oldRemoteName = Path.Combine(remoteFolder, oldLocalName).Replace('\\', '/'); // FIXME
                 string oldRemoteBaseName = Path.GetDirectoryName(oldRemoteName).Replace('\\', '/');
-                bool oldPathnameWorthSyncing = Utils.WorthSyncing(oldDirectory, oldFilename, repoinfo);
+                bool oldPathnameWorthSyncing = Utils.WorthSyncing(oldDirectory, oldFilename, repoInfo);
                 string newDirectory = Path.GetDirectoryName(newPathname);
                 string newFilename = Path.GetFileName(newPathname);
                 string newLocalName = newPathname.Substring(localFolder.Length + 1);
                 string newRemoteName = Path.Combine(remoteFolder, newLocalName).Replace('\\', '/');
                 string newRemoteBaseName = Path.GetDirectoryName(newRemoteName).Replace('\\', '/');
-                bool newPathnameWorthSyncing = Utils.WorthSyncing(newDirectory, newFilename, repoinfo);
+                bool newPathnameWorthSyncing = Utils.WorthSyncing(newDirectory, newFilename, repoInfo);
                 bool rename = oldDirectory.Equals(newDirectory) && !oldFilename.Equals(newFilename);
                 bool move = !oldDirectory.Equals(newDirectory) && oldFilename.Equals(newFilename);
                 if ((rename && move) || (!rename && !move))
@@ -121,9 +121,9 @@ namespace CmisSync.Lib.Sync
                 {
                     if (oldPathnameWorthSyncing && newPathnameWorthSyncing)
                     {
-                        if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(oldPathname, repoinfo)))
+                        if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(oldPathname, repoInfo)))
                         {
-                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(newPathname, repoinfo)))
+                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(newPathname, repoInfo)))
                             {
                                 //database already contains path so revert back to delete/update
                                 success &= WatcherSyncDelete(remoteFolder, localFolder, oldPathname);
@@ -213,7 +213,7 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
                 string filename = Path.GetFileName(pathname);
-                if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), filename, repoinfo))
+                if (!Utils.WorthSyncing(Path.GetDirectoryName(pathname), filename, repoInfo))
                 {
                     return true;
                 }
@@ -240,7 +240,7 @@ namespace CmisSync.Lib.Sync
                     if (File.Exists(pathname))
                     {
                         bool success = false;
-                        if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoinfo)))
+                        if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoInfo)))
                         {
                             if (database.LocalFileHasChanged(pathname))
                             {

@@ -198,14 +198,14 @@ namespace CmisSync.Lib.Sync
 
                 try
                 {
-                    if (Utils.WorthSyncing(localFolder, remoteSubFolder.Name, repoinfo))
+                    if (Utils.WorthSyncing(localFolder, remoteSubFolder.Name, repoInfo))
                     {
                         // Logger.Debug("CrawlRemote localFolder:\"" + localFolder + "\" remoteSubFolder.Path:\"" + remoteSubFolder.Path + "\" remoteSubFolder.Name:\"" + remoteSubFolder.Name + "\"");
                         remoteFolders.Add(remoteSubFolder.Name);
                         var subFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                         if (null == subFolderItem)
                         {
-                            subFolderItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoinfo);
+                            subFolderItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoInfo);
                         }
 
                         // Check whether local folder exists.
@@ -297,7 +297,7 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
 
-                if (Utils.WorthSyncing(localFolder, remoteDocument.Name, repoinfo))
+                if (Utils.WorthSyncing(localFolder, remoteDocument.Name, repoInfo))
                 {
                     // We use the filename of the document's content stream.
                     // This can be different from the name of the document.
@@ -321,7 +321,7 @@ namespace CmisSync.Lib.Sync
                     var syncItem = database.GetSyncItemFromRemotePath(remoteDocument.Paths[0]);
                     if (null == syncItem)
                     {
-                        syncItem = SyncItemFactory.CreateFromRemotePath(remoteDocument.Paths[0], repoinfo);
+                        syncItem = SyncItemFactory.CreateFromRemotePath(remoteDocument.Paths[0], repoInfo);
                     }
 
                     if (syncItem.ExistsLocal())
@@ -353,7 +353,7 @@ namespace CmisSync.Lib.Sync
                                     Logger.Info("- Checksum of local file: " + Database.Database.Checksum(syncItem.LocalPath));
 
                                     // Rename locally modified file.
-                                    String newFilePath = Utils.CreateConflictFilename(syncItem.LocalPath, repoinfo.User);
+                                    String newFilePath = Utils.CreateConflictFilename(syncItem.LocalPath, repoInfo.User);
                                     File.Move(syncItem.LocalPath, newFilePath);
 
                                     // Download server version
@@ -471,19 +471,19 @@ namespace CmisSync.Lib.Sync
                     var item = database.GetSyncItemFromLocalPath(filePath);
                     if (null == item)
                     {
-                        item = SyncItemFactory.CreateFromLocalPath(filePath, repoinfo);
+                        item = SyncItemFactory.CreateFromLocalPath(filePath, repoInfo);
                     }
 
                     // string fileName = Path.GetFileName(filePath);
                     string fileName = item.RemoteFileName;
 
-                    if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoinfo))
+                    if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoInfo))
                     {
                         if (!remoteFiles.Contains(fileName))
                         {
                             // This local file is not on the CMIS server now, so
                             // check whether it used invalidFolderNameRegex to exist on server or not.
-                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(filePath, repoinfo)))
+                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(filePath, repoInfo)))
                             {
                                 if (database.LocalFileHasChanged(filePath))
                                 {
@@ -501,7 +501,7 @@ namespace CmisSync.Lib.Sync
                                         Logger.Info("Conflict with file: " + filePath + ", backing up locally modified version.");
                                         activityListener.ActivityStarted();
                                         // Rename locally modified file.
-                                        String newFilePath = Utils.CreateConflictFilename(filePath, repoinfo.User);
+                                        String newFilePath = Utils.CreateConflictFilename(filePath, repoInfo.User);
 
                                         // The file might be ReadOnly, so make it writable first, otherwise the move will fail.
                                         File.SetAttributes(filePath, FileAttributes.Normal);
@@ -611,10 +611,10 @@ namespace CmisSync.Lib.Sync
                     var syncFolderItem = database.GetFolderSyncItemFromLocalPath(localSubFolder);
                     if (null == syncFolderItem)
                     {
-                        syncFolderItem = SyncItemFactory.CreateFromLocalPath(localSubFolder, repoinfo);
+                        syncFolderItem = SyncItemFactory.CreateFromLocalPath(localSubFolder, repoInfo);
                     }
 
-                    if (Utils.WorthSyncing(Path.GetDirectoryName(localSubFolder), folderName, repoinfo))
+                    if (Utils.WorthSyncing(Path.GetDirectoryName(localSubFolder), folderName, repoInfo))
                     {
                         if (!remoteFolders.Contains(syncFolderItem.RemoteFileName))
                         {
