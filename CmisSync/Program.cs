@@ -75,15 +75,7 @@ namespace CmisSync
             if ( ! firstRun )
                 ConfigMigration.Migrate();
 
-            FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));
-            if(alternativeLog4NetConfigFile.Exists)
-            {
-                log4net.Config.XmlConfigurator.ConfigureAndWatch(alternativeLog4NetConfigFile);
-            }
-            else
-            {
-                log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
-            }
+            CmisSync.Lib.Utils.ConfigureLogging();
 
             Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);
 

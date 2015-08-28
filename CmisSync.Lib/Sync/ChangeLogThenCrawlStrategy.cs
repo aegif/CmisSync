@@ -32,7 +32,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Synchronize using the ChangeLog feature of CMIS to trigger CrawlStrategy.
             /// </summary>
-            private void ChangeLogThenCrawlSync(IFolder remoteFolder, string localFolder)
+            private void ChangeLogThenCrawlSync(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 // Once in a while, run a crawl sync, to make up for any server-side ChangeLog bug.
                 // The frequency of this is calculated based on the poll interval, so that:
@@ -43,7 +43,7 @@ namespace CmisSync.Lib.Sync
                 if (changeLogIterationCounter > 263907 / (pollInterval/1000 + 117))
                 {
                     Logger.Debug("It has been a while since the last crawl sync, so launching a crawl sync now.");
-                    CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
+                    CrawlSyncAndUpdateChangeLogToken(remoteFolder, remotePath, localFolder);
                     changeLogIterationCounter = 0;
                     return;
                 }
@@ -76,7 +76,7 @@ namespace CmisSync.Lib.Sync
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just sync everything from remote.
-                    CrawlRemote(remoteFolder, repoInfo.TargetDirectory, new List<string>(), new List<string>());
+                    CrawlRemote(remoteFolder, remotePath, repoInfo.TargetDirectory, new List<string>(), new List<string>());
                     
                     Logger.Info("Synced from remote, updating ChangeLog token: " + lastTokenOnServer);
                     database.SetChangeLogToken(lastTokenOnServer);
@@ -96,7 +96,7 @@ namespace CmisSync.Lib.Sync
                         if (ChangeIsApplicable(change))
                         {
                             // Launch a CrawlSync (which means syncing everything indistinctively).
-                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
+                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, remotePath, localFolder);
 
                             // A single CrawlSync takes care of all pending changes, so no need to analyze the rest of the changes.
                             // It will also update the last client-side ChangeLog token, more accurately than we can do here.
@@ -180,7 +180,7 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("Ignore the unfiled object: " + changeIdForDebug);
                         return false;
                     }
-                    // TODO: Support Multiple Paths
+                    // FIXME: Support Multiple Paths
                     remotePath = remoteDocument.Paths[0];
                     remoteParent = remoteDocument.Parents[0];
                 }

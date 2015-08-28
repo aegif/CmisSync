@@ -164,7 +164,6 @@ namespace CmisSync.Lib
                 return false;
             }
 
-
             filename = filename.ToLower();
 
             if (ignoredFilenames.Contains(filename) ||
@@ -172,18 +171,22 @@ namespace CmisSync.Lib
             {
                 Logger.DebugFormat("Skipping {0}: ignored file", filename);
                 return false;
-
             }
 
-            if (ignoredExtensions.Contains(Path.GetExtension(filename)))
+            // Check filename extension if there is one.
+            if (filename.Contains('.'))
             {
-                Logger.DebugFormat("Skipping {0}: ignored file extension", filename);
-                return false;
+                string extension = filename.Split('.').Last();
 
+                if (ignoredExtensions.Contains(extension))
+                {
+                    Logger.DebugFormat("Skipping {0}: ignored file extension", filename);
+                    return false;
+                }
             }
 
-            //Check filename length
-            String fullPath = Path.Combine(localDirectory, filename);
+            // Check resulting file path length
+            string fullPath = PathCombine(localDirectory, filename);
 
             #if __COCOA__ || __MonoCS__
             // TODO Check filename length for OS X
@@ -191,7 +194,8 @@ namespace CmisSync.Lib
             // * FileName encoding is UTF-16 (Modified NFD).
 
             #else
-            // reflection
+            // Get Path.MaxPath
+            // It is not a public field so reflection is necessary.
 
 			FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
                 BindingFlags.Static |
@@ -202,12 +206,10 @@ namespace CmisSync.Lib
             {
                 Logger.WarnFormat("Skipping {0}: path too long", fullPath);
                 return false;
-
             }
             #endif
 
             return true;
-
         }
 
 
@@ -307,7 +309,7 @@ namespace CmisSync.Lib
         {
             return IsFilenameWorthSyncing(localDirectory, filename) &&
                 IsDirectoryWorthSyncing(localDirectory, repoInfo) &&
-                IsFileWorthSyncing(Path.Combine(localDirectory, filename), repoInfo);
+                IsFileWorthSyncing(PathCombine(localDirectory, filename), repoInfo);
         }
 
         /// <summary>
@@ -391,6 +393,16 @@ namespace CmisSync.Lib
             }
 
             return ret;
+        }
+
+
+        /// <summary>
+        /// Like Path.Combine, but does not choke on special characters.
+        /// Special characters are a separate concern, use this method if it is not the current concern.
+        /// </summary>
+        public static string PathCombine(string localDirectory, string filename)
+        {
+            return localDirectory + Path.DirectorySeparatorChar + filename;
         }
 
         /// <summary>
@@ -553,6 +565,19 @@ namespace CmisSync.Lib
         public static string GetLeafOfCmisPath(string cmisPath)
         {
             return cmisPath.Split('/').Last();
+        }
+
+        public static void ConfigureLogging()
+        {
+            FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));
+            if (alternativeLog4NetConfigFile.Exists)
+            {
+                log4net.Config.XmlConfigurator.ConfigureAndWatch(alternativeLog4NetConfigFile);
+            }
+            else
+            {
+                log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
+            }
         }
     }
 }

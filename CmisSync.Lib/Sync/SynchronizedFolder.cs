@@ -312,8 +312,11 @@ namespace CmisSync.Lib.Sync
                 HashSet<string> filters = new HashSet<string>();
                 filters.Add("cmis:objectId");
                 filters.Add("cmis:name");
-                filters.Add("cmis:contentStreamFileName");
-                filters.Add("cmis:contentStreamLength");
+                if (!CmisUtils.IsDocumentum(session))
+                {
+                    filters.Add("cmis:contentStreamFileName");
+                    filters.Add("cmis:contentStreamLength");
+                }
                 filters.Add("cmis:lastModificationDate");
                 filters.Add("cmis:lastModifiedBy");
                 filters.Add("cmis:path");
@@ -394,6 +397,7 @@ namespace CmisSync.Lib.Sync
                     if (session == null)
                     {
                         Connect();
+
                         firstSync = true;
                     }
                     else
@@ -426,7 +430,7 @@ namespace CmisSync.Lib.Sync
                     if (firstSync)
                     {
                         Logger.Debug("First sync, invoke a full crawl sync");
-                        CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
+                        CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
                         firstSync = false;
                     }
                     else
@@ -443,14 +447,14 @@ namespace CmisSync.Lib.Sync
                         if (ChangeLogCapability)
                         {
                             Logger.Debug("Invoke a remote change log sync");
-                            ChangeLogThenCrawlSync(remoteFolder, localFolder);
+                            ChangeLogThenCrawlSync(remoteFolder, remoteFolderPath, localFolder);
                         }
                         else
                         {
                             //  Have to crawl remote.
                             Logger.Warn("Invoke a full crawl sync (the remote does not support ChangeLog)");
                             repo.Watcher.Clear();
-                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
+                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
                         }
                     }
                 }
@@ -645,7 +649,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download all content from a CMIS folder.
             /// </summary>
-            private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
+            private void RecursiveFolderCopy(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 SleepWhileSuspended();
 
@@ -663,6 +667,7 @@ namespace CmisSync.Lib.Sync
                 // List all children.
                 foreach (ICmisObject cmisObject in children)
                 {
+                    string remoteSubPath = remotePath + CmisUtils.CMIS_FILE_SEPARATOR + cmisObject.Name;
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
@@ -676,7 +681,7 @@ namespace CmisSync.Lib.Sync
 
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoInfo))
                         {
-                            DownloadDirectory(remoteSubFolder, localSubFolderItem.LocalPath);
+                            DownloadDirectory(remoteSubFolder, remoteSubPath, localSubFolderItem.LocalPath);
                         }
                     }
                     else if (cmisObject is DotCMIS.Client.Impl.Document)
@@ -684,7 +689,7 @@ namespace CmisSync.Lib.Sync
                         if (Utils.WorthSyncing(localFolder, cmisObject.Name, repoInfo))
                         {
                             // It is a file, just download it.
-                            DownloadFile((IDocument)cmisObject, localFolder);
+                            DownloadFile((IDocument)cmisObject, remoteSubPath, localFolder);
                         }
                     }
                     else
@@ -700,7 +705,7 @@ namespace CmisSync.Lib.Sync
             /// Download a single folder from the CMIS server, by simple recursive copy.
             /// </summary>
             /// <returns>true if successful</returns>
-            private bool DownloadDirectory(IFolder remoteFolder, string localFolder)
+            private bool DownloadDirectory(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 SleepWhileSuspended();
                 try
@@ -733,7 +738,7 @@ namespace CmisSync.Lib.Sync
                 Logger.Info("Added folder to database: " + localFolder);
 
                 // Recurse into folder.
-                RecursiveFolderCopy(remoteFolder, localFolder);
+                RecursiveFolderCopy(remoteFolder, remotePath, localFolder);
 
                 return true;
             }
@@ -814,14 +819,14 @@ namespace CmisSync.Lib.Sync
             /// Create CmisSync database entry for this file
             /// 
             /// </summary>
-            private bool DownloadFile(IDocument remoteDocument, string localFolder)
+            private bool DownloadFile(IDocument remoteDocument, string remotePath, string localFolder)
             {
                 SleepWhileSuspended();
 
-                var syncItem = database.GetSyncItemFromRemotePath(remoteDocument.Paths[0]);
+                var syncItem = database.GetSyncItemFromRemotePath(remotePath);
                 if (null == syncItem)
                 {
-                    syncItem = SyncItemFactory.CreateFromRemotePath(remoteDocument.Paths[0], repoInfo);
+                    syncItem = SyncItemFactory.CreateFromRemotePath(remotePath, repoInfo);
                 }
 
                 Logger.Info("Downloading: " + syncItem.RemoteFileName);

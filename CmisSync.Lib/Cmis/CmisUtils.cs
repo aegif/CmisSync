@@ -492,5 +492,11 @@ namespace CmisSync.Lib.Cmis
                 new DirectoryInfo(localPath).Attributes = FileAttributes.ReadOnly;
             }
         }
+
+
+        public static bool IsDocumentum(ISession session)
+        {
+            return session.RepositoryInfo.ProductName.Contains("Documentum");
+        }
     }
 }
