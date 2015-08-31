@@ -101,7 +101,6 @@ Global
 		{009FDCD7-1D57-4202-BB6D-8477D8C6B8EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = CmisSync.csproj
 		version = 
 	EndGlobalSection
 EndGlobal

@@ -63,13 +63,13 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// the prefix to remove before storing paths.
         /// </summary>
-        private string pathPrefix;
+        private string localPathPrefix;
 
 
         /// <summary>
         /// Length of the prefix to remove before storing paths.
         /// </summary>
-        private int pathPrefixSize;
+        private int localPathPrefixSize;
 
         /// <summary>
         /// The prefix to remove before storing remote paths.
@@ -84,14 +84,17 @@ namespace CmisSync.Lib.Database
 
         /// <summary>
         /// Constructor.
+        /// dataPath: Local path to the database file
+        /// localPathPrefix: Path to the synchronized files, ex: C:\Users\win7pro32bit\CmisSync\agency
+        /// remotePathPrefix: Path on the remote server, ex: /Sites/swsdp/documentLibrary/Agency Files
         /// </summary>
-        public Database(string dataPath)
+        public Database(string databaseFileName, string localPathPrefix, string remotePathPrefix)
         {
-            this.databaseFileName = dataPath;
-            pathPrefix = GetPathPrefix();
-            pathPrefixSize = pathPrefix.Length + 1;
-            remotePathPrefix = GetRemotePathPrefix();
-            remotePathPrefixSize = remotePathPrefix.Length + 1;
+            this.databaseFileName = databaseFileName;
+            this.localPathPrefix = localPathPrefix;
+            this.localPathPrefixSize = localPathPrefix.Length + 1;
+            this.remotePathPrefix = remotePathPrefix;
+            this.remotePathPrefixSize = remotePathPrefix.Length + 1;
         }
 
         /// <summary>
@@ -217,10 +220,10 @@ namespace CmisSync.Lib.Database
         /// </summary>
         private string RemoveLocalPrefix(string path)
         {
-            if (path.StartsWith(pathPrefix))
+            if (path.StartsWith(localPathPrefix))
             {
                 // Remove path prefix
-                path = path.Substring(pathPrefixSize, path.Length - pathPrefixSize);
+                path = path.Substring(localPathPrefixSize, path.Length - localPathPrefixSize);
                 // RemoveLocalPrefix all slashes to forward slash
                 //path = path.Replace('\\', '/');
             }
@@ -244,7 +247,7 @@ namespace CmisSync.Lib.Database
             }
             // Insert path prefix
             return Path.Combine(
-                pathPrefix,
+                localPathPrefix,
                 path.Replace('/', Path.DirectorySeparatorChar)
             );
         }
@@ -809,7 +812,7 @@ namespace CmisSync.Lib.Database
             string remotePath = (string)result["path"];
             object localPathObj = result["localPath"];
             string localPath = (localPathObj is DBNull) ? remotePath : (string)localPathObj;
-            return SyncItemFactory.CreateFromPaths(pathPrefix, localPath, remotePathPrefix, remotePath);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, remotePath);
         }
 
         /// <summary>
@@ -828,7 +831,7 @@ namespace CmisSync.Lib.Database
                 return null;
             }
 
-            return SyncItemFactory.CreateFromPaths(pathPrefix, normalizedLocalPath, remotePathPrefix, path);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, normalizedLocalPath, remotePathPrefix, path);
         }
 
         /// <summary>
@@ -847,7 +850,7 @@ namespace CmisSync.Lib.Database
                 return null;
             }
 
-            return SyncItemFactory.CreateFromPaths(pathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
         }
 
         /// <summary>
@@ -866,7 +869,7 @@ namespace CmisSync.Lib.Database
                 return null;
             }
 
-            return SyncItemFactory.CreateFromPaths(pathPrefix, normalizedLocalPath, remotePathPrefix, path);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, normalizedLocalPath, remotePathPrefix, path);
         }
 
         /// <summary>
@@ -885,7 +888,7 @@ namespace CmisSync.Lib.Database
                 return null;
             }
 
-            return SyncItemFactory.CreateFromPaths(pathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
         }
 
         /// <summary>
@@ -1013,46 +1016,6 @@ namespace CmisSync.Lib.Database
             parameters.Add("token", token);
             ExecuteSQLAction(command, parameters);
             Logger.Info("Database ChangeLog token set to: " + token);
-        }
-
-        const string PathPrefixKey = "PathPrefix";
-
-        /// <summary>
-        /// Gets the path prefix.
-        /// If no prefix has been found, the db will be migrated and the old one will be returned
-        /// </summary>
-        /// <returns>
-        /// The path prefix.
-        /// </returns>
-        private string GetPathPrefix()
-        {
-            object result = GetGeneralTableValue(PathPrefixKey);
-            // Migration of databases, which do not have any prefix saved
-            if (result == null)
-            {
-                var syncFolder = ConfigManager.CurrentConfig.Folders.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
-                string oldprefix = syncFolder.LocalPath;
-                SetPathPrefix(oldprefix);
-                return oldprefix;
-            }
-            else
-            {
-                return (string)result;
-            }
-        }
-
-        /// <summary>
-        /// Sets the path prefix.
-        /// </summary>
-        /// <param name='pathprefix'>
-        /// Pathprefix.
-        /// </param>
-        private void SetPathPrefix(string pathprefix)
-        {
-            SetGeneralTableValue(PathPrefixKey, pathprefix);
-
-            this.pathPrefix = pathprefix;
-            this.pathPrefixSize = pathprefix.Length + 1;
         }
 
         const string RemotePathPrefixKey = "RemotePathPrefix";

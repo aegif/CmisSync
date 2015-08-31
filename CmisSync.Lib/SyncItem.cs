@@ -2,6 +2,7 @@
 using System.IO;
 using CmisSync.Lib.Cmis;
 using log4net;
+using DotCMIS.Client;
 
 
 namespace CmisSync.Lib
@@ -321,7 +322,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(localRoot, localPath);
+                return Utils.PathCombine(localRoot, localPath);
             }
         }
 

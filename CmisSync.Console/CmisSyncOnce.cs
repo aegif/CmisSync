@@ -31,6 +31,8 @@ namespace CmisSync.Console
         /// </summary>
 		public static void Main (string[] args)
 		{
+            Utils.ConfigureLogging();
+
             CmisSyncOnce once = new CmisSyncOnce();
 
             // Load the specified synchronized folders, or all if none is specified.

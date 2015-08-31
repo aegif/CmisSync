@@ -32,18 +32,18 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Synchronize using the ChangeLog feature of CMIS to trigger CrawlStrategy.
             /// </summary>
-            private void ChangeLogThenCrawlSync(IFolder remoteFolder, string localFolder)
+            private void ChangeLogThenCrawlSync(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 // Once in a while, run a crawl sync, to make up for any server-side ChangeLog bug.
                 // The frequency of this is calculated based on the poll interval, so that:
                 // Interval=5 seconds -> every 6 hours -> about every 2160 iterations
                 // Interval=1 hours -> every 3 days -> about every 72 iterations
                 // Thus a good formula is: nb of iterations = 1 + 263907 / (pollInterval + 117)
-                double pollInterval = ConfigManager.CurrentConfig.GetFolder(repoinfo.Name).PollInterval;
+                double pollInterval = ConfigManager.CurrentConfig.GetFolder(repoInfo.Name).PollInterval;
                 if (changeLogIterationCounter > 263907 / (pollInterval/1000 + 117))
                 {
                     Logger.Debug("It has been a while since the last crawl sync, so launching a crawl sync now.");
-                    CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
+                    CrawlSyncAndUpdateChangeLogToken(remoteFolder, remotePath, localFolder);
                     changeLogIterationCounter = 0;
                     return;
                 }
@@ -54,8 +54,8 @@ namespace CmisSync.Lib.Sync
 
                 // Calculate queryable number of changes.
                 Config.Feature features = null;
-                if (ConfigManager.CurrentConfig.GetFolder(repoinfo.Name) != null)
-                    features = ConfigManager.CurrentConfig.GetFolder(repoinfo.Name).SupportedFeatures;
+                if (ConfigManager.CurrentConfig.GetFolder(repoInfo.Name) != null)
+                    features = ConfigManager.CurrentConfig.GetFolder(repoInfo.Name).SupportedFeatures;
                 int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
                     (int)features.MaxNumberOfContentChanges : 100;
 
@@ -76,7 +76,7 @@ namespace CmisSync.Lib.Sync
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just sync everything from remote.
-                    CrawlRemote(remoteFolder, repoinfo.TargetDirectory, new List<string>(), new List<string>());
+                    CrawlRemote(remoteFolder, remotePath, repoInfo.TargetDirectory, new List<string>(), new List<string>());
                     
                     Logger.Info("Synced from remote, updating ChangeLog token: " + lastTokenOnServer);
                     database.SetChangeLogToken(lastTokenOnServer);
@@ -96,7 +96,7 @@ namespace CmisSync.Lib.Sync
                         if (ChangeIsApplicable(change))
                         {
                             // Launch a CrawlSync (which means syncing everything indistinctively).
-                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, localFolder);
+                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, remotePath, localFolder);
 
                             // A single CrawlSync takes care of all pending changes, so no need to analyze the rest of the changes.
                             // It will also update the last client-side ChangeLog token, more accurately than we can do here.
@@ -170,7 +170,7 @@ namespace CmisSync.Lib.Sync
                 // Check whether it is a document worth syncing.
                 if (remoteDocument != null)
                 {
-                    if ( ! Utils.IsFileWorthSyncing(remoteDocument.Name, repoinfo))
+                    if ( ! Utils.IsFileWorthSyncing(remoteDocument.Name, repoInfo))
                     {
                         Logger.Info("Ignore change as it is about a document unworth syncing: " + changeIdForDebug);
                         return false;
@@ -180,7 +180,7 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("Ignore the unfiled object: " + changeIdForDebug);
                         return false;
                     }
-                    // TODO: Support Multiple Paths
+                    // FIXME: Support Multiple Paths
                     remotePath = remoteDocument.Paths[0];
                     remoteParent = remoteDocument.Parents[0];
                 }
@@ -206,7 +206,7 @@ namespace CmisSync.Lib.Sync
                     Logger.Info("Ignore change as it is not in the synchronized folder's path: " + remotePath);
                     return false;
                 }
-                if (this.repoinfo.isPathIgnored(remotePath))
+                if (this.repoInfo.isPathIgnored(remotePath))
                 {
                     Logger.Info("Ignore change as it is in a path configured to be ignored: " + remotePath);
                     return false;
