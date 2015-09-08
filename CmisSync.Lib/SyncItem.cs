@@ -114,7 +114,7 @@ namespace CmisSync.Lib
         /// <returns></returns>
         public static SyncItem CreateFromRemotePath(string folder, string fileName, RepoInfo repoInfo)
         {
-            return new RemotePathSyncItem(Path.Combine(folder, fileName), repoInfo);
+            return new RemotePathSyncItem(CmisUtils.PathCombine(folder, fileName), repoInfo);
         }
 
         /// <summary></summary>
@@ -235,7 +235,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(this.remoteRoot, this.remotePath);
+                return CmisUtils.PathCombine(this.remoteRoot, this.remotePath);
             }
         }
 
@@ -253,7 +253,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.GetFileName(this.remotePath);
+                return CmisUtils.GetLeafOfCmisPath(this.remotePath);
             }
         }
     }
@@ -322,7 +322,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Utils.PathCombine(localRoot, localPath);
+                return Path.Combine(localRoot, localPath);
             }
         }
 
@@ -331,7 +331,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(remoteRoot, remotePath);
+                return CmisUtils.PathCombine(remoteRoot, remotePath);
             }
         }
 
@@ -349,7 +349,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.GetFileName(remotePath);
+                return CmisUtils.GetLeafOfCmisPath(remotePath);
             }
         }
     }

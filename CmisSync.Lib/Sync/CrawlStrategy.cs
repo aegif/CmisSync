@@ -260,26 +260,19 @@ namespace CmisSync.Lib.Sync
                             }
                             else
                             {
-                                if (Utils.IsInvalidFileName(remoteSubFolder.Name))
-                                {
-                                    Logger.Warn("Skipping remote folder with name invalid on local filesystem: " + remoteSubFolder.Name);
-                                }
-                                else
-                                {
-                                    // The folder has been recently created on server, so download it.
-                                    activityListener.ActivityStarted();
-                                    Directory.CreateDirectory(subFolderItem.LocalPath);
+                                // The folder has been recently created on server, so download it.
+                                activityListener.ActivityStarted();
+                                Directory.CreateDirectory(subFolderItem.LocalPath);
 
-                                    // Create database entry for this folder.
-                                    // TODO - Yannick - Add metadata
-                                    database.AddFolder(subFolderItem, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
-                                    Logger.Info("Added folder to database: " + subFolderItem.LocalPath);
+                                // Create database entry for this folder.
+                                // TODO - Yannick - Add metadata
+                                database.AddFolder(subFolderItem, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
+                                Logger.Info("Added folder to database: " + subFolderItem.LocalPath);
 
-                                    // Recursive copy of the whole folder.
-                                    RecursiveFolderCopy(remoteSubFolder, remotePath, subFolderItem.LocalPath);
+                                // Recursive copy of the whole folder.
+                                RecursiveFolderCopy(remoteSubFolder, remotePath, subFolderItem.LocalPath);
 
-                                    activityListener.ActivityStopped();
-                                }
+                                activityListener.ActivityStopped();
                             }
                         }
                     }

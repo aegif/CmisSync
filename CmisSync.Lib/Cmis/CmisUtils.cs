@@ -481,6 +481,18 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// Get the last part of a CMIS path
+        /// Example: "/the/path/< 9000/theleaf" returns "theleaf"
+        /// Why not use Path.GetFileName ? Because it chokes on characters that are not authorized on the local filesystem.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetLeafOfCmisPath(string cmisPath)
+        {
+            return cmisPath.Split('/').Last();
+        }
+
+
+        /// <summary>
         /// Should the local file/folder be made read-only?
         /// Check the permissions of the current user to the remote file/folder.
         /// </summary>

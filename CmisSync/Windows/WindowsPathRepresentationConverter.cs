@@ -17,7 +17,12 @@ namespace CmisSync
                 return localPath;
             }
 
-            return localPath.Replace('\\', '/');
+            string path = localPath.Replace('\\', '/');
+
+            path = path.Replace('＜', '<');
+            path = path.Replace('＞', '>');
+
+            return path;
         }
 
         /// <summary></summary>
@@ -30,7 +35,12 @@ namespace CmisSync
                 return remotePath;
             }
 
-            return remotePath.Replace('/', '\\');
+            string path = remotePath.Replace('/', '\\');
+
+            path = path.Replace('<', '＜');
+            path = path.Replace('>', '＞');
+
+            return path;
         }
     }
 }
