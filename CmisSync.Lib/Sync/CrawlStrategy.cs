@@ -462,10 +462,11 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("Skipping symbolic linked file: " + filePath);
                         return;
                     }
-                        
+                    
                     var item = database.GetSyncItemFromLocalPath(filePath);
                     if (null == item)
                     {
+                        // The file has been recently created locally (not synced from server).
                         item = SyncItemFactory.CreateFromLocalPath(filePath, repoInfo);
                     }
 
@@ -479,7 +480,7 @@ namespace CmisSync.Lib.Sync
                             (CmisUtils.IsDocumentum(session) && remoteFiles.Contains(fileName + ".zip"))))
                         {
                             // This local file is not on the CMIS server now, so
-                            // check whether it used invalidFolderNameRegex to exist on server or not.
+                            // check whether it used to exist on server or not.
                             if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(filePath, repoInfo)))
                             {
                                 if (database.LocalFileHasChanged(filePath))
