@@ -21,6 +21,11 @@ namespace CmisSync
 
             path = path.Replace('＜', '<');
             path = path.Replace('＞', '>');
+            path = path.Replace('￥', '\\');
+            path = path.Replace('：', ':');
+            path = path.Replace('＊', '*');
+            path = path.Replace('？', '?');
+            path = path.Replace('｜', '|');
 
             return path;
         }
@@ -39,6 +44,11 @@ namespace CmisSync
 
             path = path.Replace('<', '＜');
             path = path.Replace('>', '＞');
+            path = path.Replace('\\', '￥');
+            path = path.Replace(':', '：');
+            path = path.Replace('*', '＊');
+            path = path.Replace('?', '？');
+            path = path.Replace('|', '｜');
 
             return path;
         }
