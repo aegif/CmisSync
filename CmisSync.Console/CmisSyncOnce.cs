@@ -36,7 +36,7 @@ namespace CmisSync.Console
             CmisSyncOnce once = new CmisSyncOnce();
 
             // Load the specified synchronized folders, or all if none is specified.
-            if (args.Length > 1)
+            if (args.Length > 0)
             {
                 for (int i = 0; i < args.Length; i++)
                 {

@@ -116,18 +116,16 @@ namespace CmisSync.Lib.Sync
 
 
             /// <summary>
-            /// Apply a remote change for Created or Updated.
-            /// <returns>Whether the change was applied successfully</returns>
+            /// Check whether a change is relevant for the current synchronized folder.
             /// </summary>
             private bool ChangeIsApplicable(IChangeEvent change)
             {
                 ICmisObject cmisObject = null;
                 IFolder remoteFolder = null;
                 IDocument remoteDocument = null;
-                string remotePath = null;
-                IFolder remoteParent = null;
+                IList<string> remotePaths = null;
                 var changeIdForDebug = change.Properties.ContainsKey("cmis:name") ?
-                    change.Properties["cmis:name"][0] : change.Properties["cmis:objectId"][0];
+                    change.Properties["cmis:name"][0] : change.Properties["cmis:objectId"][0]; // TODO is it different from change.ObjectId ?
 
                 // Get the remote changed object.
                 try
@@ -136,7 +134,8 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (CmisObjectNotFoundException)
                 {
-                    Logger.Info("Removed object, syncing might be needed: " + changeIdForDebug);
+                    Logger.Info("Changed object has already been deleted on the server. Syncing just in case: " + changeIdForDebug);
+                    // Unfortunately, in this case we can not know whether the object was relevant or not.
                     return true;
                 }
                 catch (CmisRuntimeException e)
@@ -148,14 +147,14 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        Logger.Info("A CMIS exception occured: " + changeIdForDebug + " :", e);
+                        Logger.Info("A CMIS exception occured when querying the change. Syncing just in case: " + changeIdForDebug + " :", e);
                         return true;
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Warn("An exception occurred: " + change.ObjectId + " :", e);
-                    return true; // Better be on the safe side and sync.
+                    Logger.Warn("An exception occurred, syncing just in case: " + changeIdForDebug + " :", e);
+                    return true;
                 }
 
                 // Check whether change is about a document or folder.
@@ -170,7 +169,7 @@ namespace CmisSync.Lib.Sync
                 // Check whether it is a document worth syncing.
                 if (remoteDocument != null)
                 {
-                    if ( ! Utils.IsFileWorthSyncing(remoteDocument.Name, repoInfo))
+                    if (!Utils.IsFileWorthSyncing(remoteDocument.Name, repoInfo))
                     {
                         Logger.Info("Ignore change as it is about a document unworth syncing: " + changeIdForDebug);
                         return false;
@@ -180,45 +179,53 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("Ignore the unfiled object: " + changeIdForDebug);
                         return false;
                     }
-                    // FIXME: Support Multiple Paths
-                    remotePath = remoteDocument.Paths[0];
-                    remoteParent = remoteDocument.Parents[0];
+
+                    // We will check the remote document's path(s) at the end of this method.
+                    remotePaths = remoteDocument.Paths;
                 }
 
                 // Check whether it is a folder worth syncing.
                 if (remoteFolder != null)
                 {
-                    remotePath = remoteFolder.Path;
-                    remoteParent = remoteFolder.FolderParent;
-                    foreach (string name in remotePath.Split('/'))
+                    remotePaths = new List<string>();
+                    remotePaths.Add(remoteFolder.Path);
+                }
+
+                // Check the object's path(s)
+                foreach (string remotePath in remotePaths)
+                {
+                    if (PathIsApplicable(remotePath))
                     {
-                        if ( ! String.IsNullOrEmpty(name) && Utils.IsInvalidFolderName(name))
-                        {
-                            Logger.Info(String.Format("Ignore change as it is in a path unworth syncing:  {0}: {1}", name, remotePath));
-                            return false;
-                        }
+                        Logger.Debug("Change is applicable. Sync:" + changeIdForDebug);
+                        return true;
                     }
                 }
 
+                // No path was relevant, so ignore the change.
+                return false;
+            }
+            
+            
+            /// <summary>
+            /// Check whether a path is relevant for the current synchronized folder.
+            /// </summary>
+            private bool PathIsApplicable(string remotePath)
+            {
                 // Ignore the change if not in a synchronized folder.
                 if ( ! remotePath.StartsWith(this.remoteFolderPath))
                 {
                     Logger.Info("Ignore change as it is not in the synchronized folder's path: " + remotePath);
                     return false;
                 }
+
+                // Ignore if configured to be ignored.
                 if (this.repoInfo.isPathIgnored(remotePath))
                 {
                     Logger.Info("Ignore change as it is in a path configured to be ignored: " + remotePath);
                     return false;
                 }
-                string relativePath = remotePath.Substring(remoteFolderPath.Length);
-                if (relativePath.Length <= 0)
-                {
-                    Logger.Info("Ignore change as it is above the synchronized folder's path:: " + remotePath);
-                    return false;
-                }
 
-                Logger.Debug("Change is applicable:" + changeIdForDebug);
+                // In other case, the change is probably applicable.
                 return true;
             }
         }
