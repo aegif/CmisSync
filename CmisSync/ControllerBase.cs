@@ -383,7 +383,7 @@ namespace CmisSync
                         aRepo.Suspend();
                         Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                     }
-                }
+                        }
             }
         }
 
@@ -399,13 +399,13 @@ namespace CmisSync
                 foreach (RepoBase aRepo in this.repositories)
                 {
                     if (aRepo.Status == SyncStatus.Suspend)
-                    {
-                        aRepo.Resume();
-                        Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        {
+                            aRepo.Resume();
+                            Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        }
                     }
                 }
             }
-        }
 
         /// <summary>
         /// Check the configured CmisSync synchronized folders.
@@ -583,31 +583,6 @@ namespace CmisSync
         public void ActivityError(Tuple<string, Exception> error)
         {
             //FIXME: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
-            String reponame = error.Item1;
-            Exception exception = error.Item2;
-
-            if (exception is MissingSyncFolderException)
-            {
-                //Suspend sync... (should be resumed after the user has handled the error)
-                Program.Controller.SuspendRepositorySynchronization(reponame);
-                //FIXME: should update the suspended menu item, but i can't from here
-                //UpdateSuspendSyncFolderEvent(reponame);
-                
-                //handle in a new thread, becouse this is the syncronization one and can be killed if the user decide to remove the repo or resync it
-                /* Disabled because incompatible with Mac OS X: Thread t = new Thread(() =>
-                {
-                    handleMissingSyncFolder(ConfigManager.CurrentConfig.GetFolder(reponame));
-                });
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();*/
-
-                //dont resume here, the handler thread will if needed (or kill this thread)
-                //Program.Controller.ResumeRepositorySynchronization(reponame);
-
-                //handled, no need to do anything else
-                return;
-            }
-
             OnError(error);
         }
     }
