@@ -19,7 +19,6 @@ using log4net;
 using System;
 using System.IO;
 using Timers = System.Timers;
-using CmisSync.Lib.Events;
 using CmisSync.Lib.Auth;
 using DotCMIS.Exceptions;
 using CmisSync.Lib.Cmis;

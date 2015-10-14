@@ -33,8 +33,6 @@ using System.Security.Cryptography;
 using System.Threading;
 using CmisSync.Lib.Database;
 
-using CmisSync.Lib.Events;
-
 namespace CmisSync.Lib.Sync
 {
     /// <summary></summary>

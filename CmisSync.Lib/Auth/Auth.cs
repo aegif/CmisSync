@@ -27,7 +27,7 @@ namespace CmisSync.Lib.Auth
             Dictionary<string, string> parameters = GetParameters();
             parameters[SessionParameter.AtomPubUrl] = url.ToString();
             parameters[SessionParameter.User] = user;
-            parameters[SessionParameter.Password] = Crypto.Deobfuscate(obfuscatedPassword.ObfuscatedPassword);
+            parameters[SessionParameter.Password] = CryptoUtils.Deobfuscate(obfuscatedPassword.ObfuscatedPassword);
 
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();

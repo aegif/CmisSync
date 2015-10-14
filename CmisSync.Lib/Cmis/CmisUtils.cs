@@ -14,31 +14,6 @@ using System.Collections.ObjectModel;
 namespace CmisSync.Lib.Cmis
 {
     /// <summary>
-    /// Data object representing a CMIS server.
-    /// </summary>
-    public class CmisServer
-    {
-        /// <summary>
-        /// URL of the CMIS server.
-        /// </summary>
-        public Uri Url { get; private set; }
-
-        /// <summary>
-        /// Repositories contained in the CMIS server.
-        /// </summary>
-        public Dictionary<string, string> Repositories { get; private set; }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public CmisServer(Uri url, Dictionary<string, string> repositories)
-        {
-            Url = url;
-            Repositories = repositories;
-        }
-    }
-
-    /// <summary>
     /// Useful CMIS methods.
     /// </summary>
     public static class CmisUtils
@@ -253,97 +228,6 @@ namespace CmisSync.Lib.Cmis
             }
             return result.ToArray();
         }
-
-
-        /// <summary>
-        /// Folder tree.
-        /// </summary>
-        public class FolderTree
-        {
-            /// <summary>
-            /// Children.
-            /// </summary>
-            public List<FolderTree> Children = new List<FolderTree>();
-
-            /// <summary>
-            /// Folder path.
-            /// </summary>
-            public string Path;
-
-            /// <summary>
-            /// Folder name.
-            /// </summary>
-            public string Name { get; set; }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public bool Finished { get; set; }
-
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            public FolderTree(IList<ITree<IFileableCmisObject>> trees, IFolder folder, int depth)
-            {
-                this.Path = folder.Path;
-                this.Name = folder.Name;
-                if (depth == 0)
-                {
-                    this.Finished = false;
-                }
-                else
-                {
-                    this.Finished = true;
-                }
-
-                if (trees != null)
-                {
-                    foreach (ITree<IFileableCmisObject> tree in trees)
-                    {
-                        Folder f = tree.Item as Folder;
-                        if (f != null)
-                            this.Children.Add(new FolderTree(tree.Children, f, depth - 1));
-                    }
-                }
-            }
-        }
-
-        ///// <summary>
-        ///// Get the sub-folders of a particular CMIS folder.
-        ///// </summary>
-        ///// <returns>Full path of each sub-folder, including leading slash.</returns>
-        //static public FolderTree GetSubfolderTree( CmisRepoCredentials credentials, string path, int depth)
-        //{
-        //    // Connect to the CMIS repository.
-        //    ISession session = Auth.Auth.GetCmisSession(credentials.Address.ToString(), credentials.UserName, credentials.Password.ToString(), credentials.RepoId);
-
-        //    // Get the folder.
-        //    IFolder folder;
-        //    try
-        //    {
-        //        folder = (IFolder)session.GetObjectByPath(path);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}", path), ex);
-        //        throw;
-        //    }
-
-        //    // Debug the properties count, which allows to check whether a particular CMIS implementation is compliant or not.
-        //    // For instance, IBM Connections is known to send an illegal count.
-        //    Logger.Info("CmisUtils | folder.Properties.Count:" + folder.Properties.Count.ToString());
-        //    try
-        //    {
-        //        IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
-        //        return new FolderTree(trees, folder, depth);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Logger.Info("CmisUtils getSubFolderTree | Exception " + e.Message, e);
-        //        throw;
-        //    }
-        //}
-
 
         /// <summary>
         /// Guess the web address where files can be seen using a browser.

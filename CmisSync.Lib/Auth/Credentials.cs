@@ -69,7 +69,7 @@ namespace CmisSync.Lib.Auth
         /// <param name="password">as plain text</param>
         public Password(string password)
         {
-            this.password = Crypto.Obfuscate(password);
+            this.password = CryptoUtils.Obfuscate(password);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace CmisSync.Lib.Auth
         {
             if (password == null)
                 return null;
-            return Crypto.Deobfuscate(password);
+            return CryptoUtils.Deobfuscate(password);
         }
 
         /// <summary>

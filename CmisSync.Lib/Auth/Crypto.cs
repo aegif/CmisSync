@@ -9,7 +9,7 @@ namespace CmisSync.Lib.Auth
     /// Obfuscation for sensitive data, making password harvesting a little less straightforward.
     /// Web browsers employ the same technique to store user passwords.
     /// </summary>
-    public static class Crypto
+    public static class CryptoUtils
     {
         /// <summary>
         /// Obfuscate a string.
