@@ -17,7 +17,7 @@ namespace CmisSync.Lib
         {
             this.stream = stream;
             this.length = streamlength;
-            this.prefix = String.Format("{0} {1}: ", prefix, filename, Utils.FormatSize(Length));
+            this.prefix = String.Format("{0} {1}: ", prefix, filename, SyncUtils.FormatSize(Length));
         }
         public override bool CanRead
         {
@@ -89,8 +89,8 @@ namespace CmisSync.Lib
                 long percentage = (readpos * 100)/ (Length>0?Length:100);
                 Logger.Debug(String.Format("{0}% {1} of {2}",
                                            percentage,
-                                           Utils.FormatSize(this.readpos),
-                                           Utils.FormatSize(Length)));
+                                           SyncUtils.FormatSize(this.readpos),
+                                           SyncUtils.FormatSize(Length)));
                 return result;
             }
             else
@@ -112,8 +112,8 @@ namespace CmisSync.Lib
                 long percentage = (writepos * 100)/ (Length>0?Length:100);
                 Logger.Debug(String.Format("{0}% {1} of {2})",
                                            percentage,
-                                           Utils.FormatSize(this.writepos),
-                                           Utils.FormatSize(Length)));
+                                           SyncUtils.FormatSize(this.writepos),
+                                           SyncUtils.FormatSize(Length)));
             }
         }
         protected override void Dispose(bool disposing)

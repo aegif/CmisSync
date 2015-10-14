@@ -1,0 +1,40 @@
+﻿<Window x:Class="CmisSync.Views.SyncronizerEventsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
+        xmlns:converters="clr-namespace:CmisSync.Views.Converters"
+        xmlns:vm="clr-namespace:CmisSync.ViewModels"
+        mc:Ignorable="d"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        Title="SyncronizerEventsWindow" Height="300" Width="600">
+    <Grid>
+        <DataGrid ItemsSource="{Binding Events, Mode=OneWay}" 
+                  AutoGenerateColumns="False" 
+                  CanUserAddRows="False" 
+                  CanUserDeleteRows="False" 
+                  IsReadOnly="True"
+                  HorizontalAlignment="Stretch" 
+                  HorizontalContentAlignment="Stretch">
+            <DataGrid.Resources>
+                <converters:LevelToImagePath x:Key="levelToImage"/>
+            </DataGrid.Resources>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding CopyRowCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" Header="Copy" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Level">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Level, Converter={StaticResource levelToImage}}" Height="13" VerticalAlignment="Stretch"></Image>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding Path=Date}" Header="Date"/>
+                <DataGridTextColumn Binding="{Binding Path=Exception.Message}" Header="Message" Width="Auto"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Window>

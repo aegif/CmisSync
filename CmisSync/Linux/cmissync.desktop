@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=CmisSync
-Exec=cmissync start
-Icon=app-cmissync
-Terminal=false
-X-GNOME-Autostart-enabled=true
-Categories=Network;

@@ -7,8 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using CmisSync.Auth;
-using System.IO;
+using CmisSync.Lib.Auth;
+using CmisSync.Lib;
+using System.Collections.ObjectModel;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -45,28 +46,32 @@ namespace CmisSync.Lib.Cmis
         // Log.
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
-        /// <summary>Character that separates two folders in a CMIS path.</summary>
-        public static char CMIS_FILE_SEPARATOR = '/';
+        static public ReadOnlyCollection<Config.SyncConfig.RemoteRepository> GetRepositories(Config.SyncConfig.Account account)
+        {
+            return GetRepositories(account, false);
+        }
 
         /// <summary>
         /// Try to find the CMIS server associated to any URL.
         /// Users can provide the URL of the web interface, and we have to return the CMIS URL
         /// Returns the list of repositories as well.
         /// </summary>
-        static public Tuple<CmisServer, Exception> GetRepositoriesFuzzy(ServerCredentials credentials)
+        static public ReadOnlyCollection<Config.SyncConfig.RemoteRepository> GetRepositories(Config.SyncConfig.Account account, bool discoverCorrectUriAndUpdate)
         {
-            Dictionary<string, string> repositories = null;
+            List<Config.SyncConfig.RemoteRepository> repositories = null;
             Exception firstException = null;
 
             // Try the given URL, maybe user directly entered the CMIS AtomPub endpoint URL.
             try
             {
-                repositories = GetRepositories(credentials);
+                repositories = doGetRepositories(account);
             }
             catch (CmisRuntimeException e)
             {
                 if (e.Message == "ConnectFailure")
-                    return new Tuple<CmisServer, Exception>(new CmisServer(credentials.Address, null), new ServerNotFoundException(e.Message, e));
+                {
+                    throw new NetworkException(e);
+                }
                 firstException = e;
             }
             catch (Exception e)
@@ -77,11 +82,16 @@ namespace CmisSync.Lib.Cmis
             if (repositories != null)
             {
                 // Found!
-                return new Tuple<CmisServer, Exception>(new CmisServer(credentials.Address, repositories), null);
+                return new ReadOnlyCollection<Config.SyncConfig.RemoteRepository>(repositories);
+            }
+
+            if (discoverCorrectUriAndUpdate == false)
+            {
+                throw firstException;
             }
 
             // Extract protocol and server name or IP address
-            string prefix = credentials.Address.GetLeftPart(UriPartial.Authority);
+            string prefix = account.RemoteUrl.GetLeftPart(UriPartial.Authority);
 
             // See https://github.com/aegif/CmisSync/wiki/What-address for the list of ECM products prefixes
             // Please send us requests to support more CMIS servers: https://github.com/aegif/CmisSync/issues
@@ -108,25 +118,21 @@ namespace CmisSync.Lib.Cmis
                 "/docushare/ds_mobile_connector/atom", // Xerox DocuShare
                 "/documents/ds_mobile_connector/atom" // Xerox DocuShare  TODO: can be anything instead of "documents"
             };
+            Uri originalUrl = account.RemoteUrl;
             string bestUrl = null;
             // Try all suffixes
-            for (int i=0; i < suffixes.Length; i++)
+            for (int i = 0; i < suffixes.Length; i++)
             {
                 string fuzzyUrl = prefix + suffixes[i];
                 Logger.Info("Sync | Trying with " + fuzzyUrl);
                 try
                 {
-                    ServerCredentials cred = new ServerCredentials()
-                    {
-                        UserName = credentials.UserName,
-                        Password = credentials.Password.ToString(),
-                        Address = new Uri(fuzzyUrl)
-                    };
-                    repositories = GetRepositories(cred);
+                    account.RemoteUrl = new Uri(fuzzyUrl);
+                    repositories = doGetRepositories(account);
                 }
                 catch (CmisPermissionDeniedException e)
                 {
-                    firstException = new PermissionDeniedException(e.Message, e);
+                    firstException = e;
                     bestUrl = fuzzyUrl;
                 }
                 catch (Exception e)
@@ -137,12 +143,17 @@ namespace CmisSync.Lib.Cmis
                 if (repositories != null)
                 {
                     // Found!
-                    return new Tuple<CmisServer, Exception>( new CmisServer(new Uri(fuzzyUrl), repositories), null);
+                    return new ReadOnlyCollection<Config.SyncConfig.RemoteRepository>(repositories);
                 }
             }
 
+            //restore the original url
+            account.RemoteUrl = originalUrl;
             // Not found. Return also the first exception to inform the user correctly
-            return new Tuple<CmisServer,Exception>(new CmisServer(bestUrl==null?credentials.Address:new Uri(bestUrl), null), firstException);
+            throw new ServerNotFoundException(firstException)
+            {
+                BestTryedUrl = new Uri(bestUrl)
+            };
         }
 
 
@@ -151,20 +162,18 @@ namespace CmisSync.Lib.Cmis
         /// Each item contains id +
         /// </summary>
         /// <returns>The list of repositories. Each item contains the identifier and the human-readable name of the repository.</returns>
-        static public Dictionary<string,string> GetRepositories(ServerCredentials credentials)
+        static private List<Config.SyncConfig.RemoteRepository> doGetRepositories(Config.SyncConfig.Account account)
         {
-            Dictionary<string,string> result = new Dictionary<string,string>();
-
             // If no URL was provided, return empty result.
-            if (credentials.Address == null )
+            if (account.RemoteUrl == null)
             {
-                return result;
+                throw new System.ArgumentException();
             }
 
             IList<IRepository> repositories;
             try
             {
-                repositories = Auth.Auth.GetCmisRepositories(credentials.Address, credentials.UserName, credentials.Password.ToString());
+                repositories = Auth.Auth.GetCmisRepositories(account.RemoteUrl, account.Credentials.UserName, account.Credentials.Password);
             }
             catch (CmisPermissionDeniedException e)
             {
@@ -192,13 +201,14 @@ namespace CmisSync.Lib.Cmis
                 throw;
             }
 
+            List<Config.SyncConfig.RemoteRepository> result = new List<Config.SyncConfig.RemoteRepository>();
             // Populate the result list with identifier and name of each repository.
             foreach (IRepository repo in repositories)
             {
                 // Repo name is sometimes empty (ex: Alfresco), in such case show the repo id instead.
                 string name = repo.Name.Length == 0 ? repo.Id : repo.Name;
 
-                result.Add(repo.Id, name);
+                result.Add(new Config.SyncConfig.RemoteRepository(account, repo.Id, name));
             }
 
             return result;
@@ -210,12 +220,12 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         /// <returns>Full path of each sub-folder, including leading slash.</returns>
         static public string[] GetSubfolders(string repositoryId, string path,
-            string url, string user, string password)
+            Uri url, UserCredentials credentials)
         {
             List<string> result = new List<string>();
 
             // Connect to the CMIS repository.
-            ISession session = Auth.Auth.GetCmisSession(url, user, password, repositoryId);
+            ISession session = Auth.Auth.GetCmisSession(url, credentials, repositoryId);
 
             // Get the folder.
             IFolder folder;
@@ -298,48 +308,48 @@ namespace CmisSync.Lib.Cmis
             }
         }
 
-        /// <summary>
-        /// Get the sub-folders of a particular CMIS folder.
-        /// </summary>
-        /// <returns>Full path of each sub-folder, including leading slash.</returns>
-        static public FolderTree GetSubfolderTree(CmisRepoCredentials credentials, string path, int depth)
-        {
-            // Connect to the CMIS repository.
-            ISession session = Auth.Auth.GetCmisSession(credentials.Address.ToString(), credentials.UserName, credentials.Password.ToString(), credentials.RepoId);
+        ///// <summary>
+        ///// Get the sub-folders of a particular CMIS folder.
+        ///// </summary>
+        ///// <returns>Full path of each sub-folder, including leading slash.</returns>
+        //static public FolderTree GetSubfolderTree( CmisRepoCredentials credentials, string path, int depth)
+        //{
+        //    // Connect to the CMIS repository.
+        //    ISession session = Auth.Auth.GetCmisSession(credentials.Address.ToString(), credentials.UserName, credentials.Password.ToString(), credentials.RepoId);
 
-            // Get the folder.
-            IFolder folder;
-            try
-            {
-                folder = (IFolder)session.GetObjectByPath(path);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}", path), ex);
-                throw;
-            }
+        //    // Get the folder.
+        //    IFolder folder;
+        //    try
+        //    {
+        //        folder = (IFolder)session.GetObjectByPath(path);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Warn(String.Format("CmisUtils | exception when session GetObjectByPath for {0}", path), ex);
+        //        throw;
+        //    }
 
-            // Debug the properties count, which allows to check whether a particular CMIS implementation is compliant or not.
-            // For instance, IBM Connections is known to send an illegal count.
-            Logger.Info("CmisUtils | folder.Properties.Count:" + folder.Properties.Count.ToString());
-            try
-            {
-                IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
-                return new FolderTree(trees, folder, depth);
-            }
-            catch (Exception e)
-            {
-                Logger.Info("CmisUtils getSubFolderTree | Exception " + e.Message, e);
-                throw;
-            }
-        }
+        //    // Debug the properties count, which allows to check whether a particular CMIS implementation is compliant or not.
+        //    // For instance, IBM Connections is known to send an illegal count.
+        //    Logger.Info("CmisUtils | folder.Properties.Count:" + folder.Properties.Count.ToString());
+        //    try
+        //    {
+        //        IList<ITree<IFileableCmisObject>> trees = folder.GetFolderTree(depth);
+        //        return new FolderTree(trees, folder, depth);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.Info("CmisUtils getSubFolderTree | Exception " + e.Message, e);
+        //        throw;
+        //    }
+        //}
 
 
         /// <summary>
         /// Guess the web address where files can be seen using a browser.
         /// Not bulletproof. It depends on the server, and on some servers there is no web UI at all.
         /// </summary>
-        static public string GetBrowsableURL(RepoInfo repo)
+        static public string GetBrowsableURL(Config.SyncConfig.SyncFolder repo)
         {
             if (null == repo)
             {
@@ -349,16 +359,16 @@ namespace CmisSync.Lib.Cmis
             // Case of Alfresco.
             string suffix1 = "alfresco/cmisatom";
             string suffix2 = "alfresco/service/cmis";
-            if (repo.Address.AbsoluteUri.EndsWith(suffix1) || repo.Address.AbsoluteUri.EndsWith(suffix2))
+            if (repo.Account.RemoteUrl.AbsoluteUri.EndsWith(suffix1) || repo.Account.RemoteUrl.AbsoluteUri.EndsWith(suffix2))
             {
                 // Detect suffix length.
                 int suffixLength = 0;
-                if (repo.Address.AbsoluteUri.EndsWith(suffix1))
+                if (repo.Account.RemoteUrl.AbsoluteUri.EndsWith(suffix1))
                     suffixLength = suffix1.Length;
-                if (repo.Address.AbsoluteUri.EndsWith(suffix2))
+                if (repo.Account.RemoteUrl.AbsoluteUri.EndsWith(suffix2))
                     suffixLength = suffix2.Length;
 
-                string root = repo.Address.AbsoluteUri.Substring(0, repo.Address.AbsoluteUri.Length - suffixLength);
+                string root = repo.Account.RemoteUrl.AbsoluteUri.Substring(0, repo.Account.RemoteUrl.AbsoluteUri.Length - suffixLength);
                 if (repo.RemotePath.StartsWith("/Sites"))
                 {
                     // Case of Alfresco Share.
@@ -403,13 +413,13 @@ namespace CmisSync.Lib.Cmis
                 try
                 {
                     // Connect to the CMIS repository.
-                    ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
+                    ISession session = Auth.Auth.GetCmisSession(repo.Account.RemoteUrl, repo.Account.Credentials, repo.RepositoryId);
 
                     if (session.RepositoryInfo.ThinClientUri == null
                         || String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))
                     {
-                        Logger.Error("CmisUtils GetBrowsableURL | Repository does not implement ThinClientUri: " + repo.Address.AbsoluteUri);
-                        return repo.Address.AbsoluteUri + repo.RemotePath;
+                        Logger.Error("CmisUtils GetBrowsableURL | Repository does not implement ThinClientUri: " + repo.Account.RemoteUrl.AbsoluteUri);
+                        return repo.Account.RemoteUrl.AbsoluteUri + repo.RemotePath;
                     }
                     else
                     {
@@ -421,7 +431,7 @@ namespace CmisSync.Lib.Cmis
                 {
                     Logger.Error("CmisUtils GetBrowsableURL | Exception " + e.Message, e);
                     // Server down or authentication problem, no way to know the right URL, so just open server.
-                    return repo.Address.AbsoluteUri + repo.RemotePath;
+                    return repo.Account.RemoteUrl.AbsoluteUri + repo.RemotePath;
                 }
             }
         }
@@ -463,12 +473,23 @@ namespace CmisSync.Lib.Cmis
             return token ?? string.Empty;
         }
 
+        public static void TestAccount(Config.SyncConfig.Account account)
+        {
+            //TODO: can we perform a simplier test?
+            ReadOnlyCollection<Config.SyncConfig.RemoteRepository> repositories = CmisUtils.GetRepositories(account, true);
+        }
+    }
+
+    public class CmisPath
+    {
+        /// <summary>Character that separates two folders in a CMIS path.</summary>
+        public static char DirectorySeparatorChar = '/';
 
         /// <summary>
         /// Equivalent of .NET Path.Combine, but for CMIS paths.
         /// CMIS paths always use forward slashes.
         /// </summary>
-        public static string PathCombine(string path1, string path2)
+        public static string Combine(string path1, string path2)
         {
             if (String.IsNullOrEmpty(path1))
                 return path2;
@@ -476,27 +497,26 @@ namespace CmisSync.Lib.Cmis
             if (String.IsNullOrEmpty(path2))
                 return path1;
 
-            return path1 + CMIS_FILE_SEPARATOR + path2;
-        }
-
-
-        /// <summary>
-        /// Should the local file/folder be made read-only?
-        /// Check the permissions of the current user to the remote file/folder.
-        /// </summary>
-        public static void MakeReadOnlyIfCannotModifyRemote(IFileableCmisObject remoteObject, string localPath)
-        {
-            bool readOnly = !remoteObject.AllowableActions.Actions.Contains(PermissionMappingKeys.CanAddToFolderObject);
-            if (readOnly)
-            {
-                new DirectoryInfo(localPath).Attributes = FileAttributes.ReadOnly;
+            if (path1.EndsWith(DirectorySeparatorChar.ToString())) {
+                path1 = path1.Remove(path1.Length - 1, 1);
             }
+
+            return path1 + DirectorySeparatorChar + path2;
         }
 
-
-        public static bool IsDocumentum(ISession session)
+        internal static string GetFileName(string path)
         {
-            return session.RepositoryInfo.ProductName.Contains("Documentum");
+            return path.Substring(path.LastIndexOf(DirectorySeparatorChar) + 1);
+        }
+
+        internal static string GetFolderName(string path)
+        {
+            return GetFileName(path);
+        }
+
+        internal static bool IsPathRooted(string remotePath)
+        {
+            return remotePath.StartsWith(DirectorySeparatorChar.ToString());
         }
     }
 }

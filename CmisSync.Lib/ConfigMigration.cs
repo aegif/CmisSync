@@ -7,7 +7,7 @@ using System.IO;
 using log4net;
 using System.Text.RegularExpressions;
 using CmisSync.Lib.Cmis;
-using CmisSync.Auth;
+using CmisSync.Lib.Auth;
 
 namespace CmisSync.Lib.Sync
 {
@@ -132,18 +132,18 @@ namespace CmisSync.Lib.Sync
             bool modified = false;
 
             // Loop through all repositories.
-            foreach (CmisSync.Lib.Config.SyncConfig.Folder folder in ConfigManager.CurrentConfig.Folders)
+            foreach (CmisSync.Lib.Config.SyncConfig.SyncFolder repo in ConfigManager.CurrentConfig.SyncFolders)
             {
-                string oldUrl = folder.RemoteUrl.ToString();
+                string oldUrl = repo.Account.RemoteUrl.ToString();
 
                 // Replace old pattern from Alfresco 4.0 and 4.1
                 if (oldUrl.EndsWith("/alfresco/cmisatom"))
                 {
-                    string newUrl = oldUrl.Replace("/alfresco/cmisatom", "/alfresco/api/-default-/public/cmis/versions/1.1/atom");
+                    Uri newUrl = new Uri(oldUrl.Replace("/alfresco/cmisatom", "/alfresco/api/-default-/public/cmis/versions/1.1/atom"));
 
-                    if (IsAlfresco42OrLater(folder, newUrl))
+                    if (IsAlfresco42OrLater(repo, newUrl))
                     {
-                        folder.RemoteUrl = new CmisSync.Lib.Config.XmlUri(new Uri(newUrl));
+                        repo.Account.RemoteUrl = newUrl;
                         modified = true;
                     }
                 }
@@ -155,16 +155,15 @@ namespace CmisSync.Lib.Sync
             }
         }
 
-        private static bool IsAlfresco42OrLater(CmisSync.Lib.Config.SyncConfig.Folder folder, string newUrl)
+        private static bool IsAlfresco42OrLater(CmisSync.Lib.Config.SyncConfig.SyncFolder repo, Uri newUrl)
         {
             try
             {
                 CmisUtils.GetSubfolders(
-                    folder.RepositoryId,
-                    folder.RemotePath,
+                    repo.RepositoryId,
+                    repo.RemotePath,
                     newUrl,
-                    folder.UserName,
-                    Crypto.Deobfuscate(folder.ObfuscatedPassword));
+                    repo.Account.Credentials);
 
                 return true;
             }

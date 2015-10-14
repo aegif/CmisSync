@@ -1,0 +1,49 @@
+﻿<Window x:Class="CmisSync.Views.MainNotifyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:view="clr-namespace:CmisSync.ViewModels"
+        Title="MainWindow" Height="350" Width="348.881"
+        ShowInTaskbar="False"
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        ResizeMode="NoResize"
+        Visibility="Visible" 
+        Topmost="True" 
+        BorderThickness="1" BorderBrush="Black">
+    <Window.Resources>
+        <ResourceDictionary>
+            <!-- Import the resource dictionary which contains the DataTemplate for the RaceHorse class. -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SyncFolderSyncronizerDataTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- This RotateTransform is referenced by the ItemsControl (race track) and Slider. -->
+            <RotateTransform x:Key="RaceTrackRotateTrans" Angle="0" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <DockPanel Margin="3">
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                <Image Source="pack://application:,,,/Resources/cmissync-app.ico" Height="32" />
+                <Label Content="CmisSync" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"></Label>
+            </StackPanel>
+            <Button Margin="1" DockPanel.Dock="Right" Height="20" HorizontalAlignment="Right" Background="{x:Null}" Click="menuButton_Click">
+                <Image Source="pack://application:,,,/Resources/menu.png"></Image>
+                <Button.ContextMenu>                    
+                    <ContextMenu Placement="Bottom">
+                        <MenuItem Header="Add New..." Command="{Binding newRepositoryCommand}"/>
+                        <Separator></Separator>
+                        <MenuItem Header="Exit" Command="{Binding exitCommand}"/>
+                    </ContextMenu>
+                </Button.ContextMenu >
+            </Button>
+        </DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Width="347">
+            <Label Content="Status:"/>
+            <Label x:Name="status" Content="{Binding CurrentWorkStateText}"/>
+        </StackPanel>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Background="#FFE2DEDE" Margin="10">
+            <ItemsControl x:Name="FoldersList" ItemsSource="{Binding SyncFolders}" />
+        </ScrollViewer>
+    </DockPanel>
+</Window>

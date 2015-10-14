@@ -17,11 +17,13 @@
 
 using System;
 using System.IO;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Xml;
 using log4net;
-using CmisSync.Auth;
+using CmisSync.Lib.Auth;
+using CmisSync.Lib.Cmis;
 
 namespace CmisSync.Lib
 {
@@ -35,22 +37,7 @@ namespace CmisSync.Lib
         /// The current config schema version.
         /// </summary>
         public const int SchemaVersion = 1;
-
-
-        /// <summary>
-        /// Chunk size for chunked transfers (not implemented yet)
-        /// </summary>
-        private const long DefaultChunkSize = 1024 * 1024;
-
-
-        /// <summary>
-        /// Default poll interval.
-        /// It is used for any newly created synchronized folder.
-        /// In milliseconds.
-        /// </summary>
-        public static readonly int DEFAULT_POLL_INTERVAL = 5 * 1000; // 5 seconds.
-
-
+                
         /// <summary>
         /// Log.
         /// </summary>
@@ -61,19 +48,17 @@ namespace CmisSync.Lib
         /// data structure storing the configuration.
         /// </summary>
         private SyncConfig configXml;
-
-
+        
         /// <summary>
         /// Full path to the XML configuration file.
         /// </summary>
-        public string FullPath { get; private set; }
-
-
+        public string ConfigurationFileFullPath { get; private set; }
+        
         /// <summary>
         /// Path of the folder where configuration files are.
         /// These files are in particular the XML configuration file, the database files, and the log file.
         /// </summary>
-        public string ConfigPath { get; private set; }
+        public string ConfigurationDirectoryPath { get; private set; }
 
         // XML elements.
 
@@ -98,45 +83,9 @@ namespace CmisSync.Lib
         public bool FrozenConfiguration { get { return configXml.FrozenConfiguration; } set { configXml.FrozenConfiguration = value; } }
 
         /// <summary>
-        /// Folder.
-        /// </summary>
-        public List<SyncConfig.Folder> Folders { get { return configXml.Folders; } }
-
-        /// <summary>
-        /// Get folder based on name.
-        /// </summary>
-        public SyncConfig.Folder GetFolder(string name)
-        {
-            foreach (SyncConfig.Folder folder in configXml.Folders)
-            {
-                if( folder.DisplayName.Equals(name))
-                    return folder;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Get a folder based on RemoteUrl, UserName, and RepositoryId.
-        /// </summary>
-        public SyncConfig.Folder GetFolder(string RemoteUrl, string UserName, string RepositoryId)
-        {
-            foreach (SyncConfig.Folder folder in configXml.Folders)
-            {
-                Uri RemoteUri = folder.RemoteUrl;
-                if (RemoteUri.ToString().Equals(RemoteUrl) &&
-                    folder.UserName.Equals(UserName) &&
-                    folder.RepositoryId.Equals(RepositoryId))
-                {
-                    return folder;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Path to the user's home folder.
         /// </summary>
-        public string HomePath
+        public string UserHomePath
         {
             get
             {
@@ -151,11 +100,11 @@ namespace CmisSync.Lib
         /// <summary>
         /// Path where the synchronized folders are stored by default.
         /// </summary>
-        public string FoldersPath
+        public string DefaultSyncFolderRootFolderPath
         {
             get
             {
-                return Path.Combine(HomePath, "CmisSync");
+                return Path.Combine(UserHomePath, "CmisSync");
             }
         }
 
@@ -165,17 +114,19 @@ namespace CmisSync.Lib
         /// </summary>
         public Config(string fullPath)
         {
-            FullPath = fullPath;
-            ConfigPath = Path.GetDirectoryName(FullPath);
-            Console.WriteLine("FullPath:" + FullPath);
+            ConfigurationFileFullPath = fullPath;
+            ConfigurationDirectoryPath = Path.GetDirectoryName(ConfigurationFileFullPath);
+            Console.WriteLine("FullPath:" + ConfigurationFileFullPath);
 
             // Create configuration folder if it does not exist yet.
-            if (!Directory.Exists(ConfigPath))
-                Directory.CreateDirectory(ConfigPath);
+            if (!Directory.Exists(ConfigurationDirectoryPath))
+                Directory.CreateDirectory(ConfigurationDirectoryPath);
 
             // Create an empty XML configuration file if none is present yet.
-            if (!File.Exists(FullPath))
+            if (!File.Exists(ConfigurationFileFullPath))
+            {
                 CreateInitialConfigFile();
+            }
 
             // Load the XML configuration.
             try
@@ -192,23 +143,28 @@ namespace CmisSync.Lib
             }
             catch (XmlException)
             {
-                FileInfo file = new FileInfo(FullPath);
+                FileInfo file = new FileInfo(ConfigurationFileFullPath);
 
                 // If the XML configuration file exists but with file size zero, then recreate it.
                 if (file.Length == 0)
                 {
-                    File.Delete(FullPath);
+                    File.Delete(ConfigurationFileFullPath);
                     CreateInitialConfigFile();
                 }
                 else
                 {
-                    throw new XmlException(FullPath + " does not contain a valid config XML structure.");
+                    throw new XmlException(ConfigurationFileFullPath + " does not contain a valid config XML structure.");
                 }
 
             }
-            finally
+
+            //try again
+            try
             {
                 Load();
+            }
+            catch (Exception e) {
+                throw;
             }
         }
 
@@ -229,30 +185,6 @@ namespace CmisSync.Lib
         /// </summary>
         private void CreateConfigFromScratch()
         {
-            // Get the user name.
-            string userName = "Unknown";
-            if (Backend.Platform == PlatformID.Unix ||
-                Backend.Platform == PlatformID.MacOSX)
-            {
-                userName = Environment.UserName;
-                if (string.IsNullOrEmpty(userName))
-                {
-                    userName = String.Empty;
-                }
-                else
-                {
-                    userName = userName.TrimEnd(",".ToCharArray());
-                }
-            }
-            else
-            {
-                userName = Environment.UserName;
-            }
-
-            if (string.IsNullOrEmpty(userName))
-            {
-                userName = "Unknown";
-            }
             // Define the default XML configuration file.
             configXml = new SyncConfig()
             {
@@ -261,12 +193,7 @@ namespace CmisSync.Lib
                 SingleRepository = false, // Multiple repository for CmisSync, but some CmisSync-derived products have different defaults.
                 FrozenConfiguration = false,
                 Log4Net = createDefaultLog4NetElement(),
-                Folders = new List<SyncConfig.Folder>(),
-                User = new User()
-                {
-                    EMail = "Unknown",
-                    Name = userName
-                }
+                Accounts = new ObservableCollection<SyncConfig.Account>()
             };
         }
 
@@ -293,43 +220,71 @@ namespace CmisSync.Lib
         /// <summary>
         /// Add a synchronized folder to the configuration.
         /// </summary>
-        public void AddFolder(RepoInfo repoInfo)
+        public void AddSyncFolder(SyncConfig.SyncFolder repoInfo)
         {
             if (null == repoInfo)
             {
                 return;
             }
-            SyncConfig.Folder folder = new SyncConfig.Folder() {
-                DisplayName = repoInfo.Name,
-                LocalPath = repoInfo.TargetDirectory,
-                IgnoredFolders = new List<IgnoredFolder>(),
-                RemoteUrl = repoInfo.Address,
-                RepositoryId = repoInfo.RepoID,
-                RemotePath = repoInfo.RemotePath,
-                UserName = repoInfo.User,
-                ObfuscatedPassword = repoInfo.Password.ObfuscatedPassword,
-                PollInterval = repoInfo.PollInterval,
-                IsSuspended = repoInfo.IsSuspended,
-                SyncAtStartup = repoInfo.SyncAtStartup,
-                SupportedFeatures = null
-            };
-            foreach (string ignoredFolder in repoInfo.getIgnoredPaths())
+
+            // Check that the CmisSync root folder exists.
+            if (!Directory.Exists(ConfigManager.CurrentConfig.DefaultSyncFolderRootFolderPath))
             {
-                folder.IgnoredFolders.Add(new IgnoredFolder(){Path = ignoredFolder});
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} does not exist", ConfigManager.CurrentConfig.DefaultSyncFolderRootFolderPath));
+                throw new DirectoryNotFoundException("Root folder don't exist !");
             }
-            this.configXml.Folders.Add(folder);
+
+            // Check that the folder is writable.
+            if (!CmisSync.Lib.SyncUtils.HasWritePermissionOnDir(ConfigManager.CurrentConfig.DefaultSyncFolderRootFolderPath))
+            {
+                Logger.Fatal(String.Format("Fetcher | ERROR - Cmis Default Folder {0} is not writable", ConfigManager.CurrentConfig.DefaultSyncFolderRootFolderPath));
+                throw new UnauthorizedAccessException("Root folder is not writable!");
+            }
+
+            SyncConfig.Account acc = repoInfo.Account;
+            if (acc == null) {
+                throw new ArgumentException("Unable to add a LocalRepository without a linked account. Please set the account before call AddLocalRepository.");
+            }
+            if (!this.configXml.Accounts.Contains(acc)) {
+                Logger.Warn("The accout linked to the passed LocalRepository is not part of the actual configuration. It will be added: " + acc);
+                AddAccount(acc);
+            }
+
+            acc.SyncFolders.Add(repoInfo);
 
             Save();
+        }
+
+        public ObservableCollection<SyncConfig.Account> Accounts { get {
+            return this.configXml.Accounts;
+        } }
+        public List<SyncConfig.SyncFolder> SyncFolders {get{
+            return this.configXml.LocalRepositories;
+        }}
+
+        private void AddAccount(SyncConfig.Account account)
+        {
+            //TODO: check if already present
+            this.configXml.Accounts.Add(account);
         }
 
 
         /// <summary>
         /// Remove a synchronized folder from the configuration.
         /// </summary>
-        public void RemoveFolder(string repoName)
+        public void RemoveSyncFolder(SyncConfig.SyncFolder repo)
         {
-            this.configXml.Folders.Remove(GetFolder(repoName));
-            Logger.Info("Removed sync config: " + repoName);
+            SyncConfig.Account acc = repo.Account;
+            if (acc == null)
+            {
+                throw new ArgumentException("Unable to remove a LocalRepository without a linked account (it should not be in the configuration anyway).");
+            }
+            if (!this.configXml.Accounts.Contains(acc)) {
+                Logger.Warn("The account linked to the LocalRepository does not seem to exist in the configuration. Nothing to remove since it will not get saved: " + acc);
+            
+            }
+            acc.SyncFolders.Remove(repo);
+            Logger.Info("Removed sync config: " + repo);
             Save();
         }
 
@@ -339,7 +294,7 @@ namespace CmisSync.Lib
         /// </summary>
         public string GetLogFilePath()
         {
-            return Path.Combine(ConfigPath, "debug_log.txt");
+            return Path.Combine(ConfigurationDirectoryPath, "debug_log.txt");
         }
 
         private string GetLogLevel()
@@ -358,7 +313,7 @@ namespace CmisSync.Lib
         public void Save()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(SyncConfig));
-            using (TextWriter textWriter = new StreamWriter(FullPath))
+            using (TextWriter textWriter = new StreamWriter(ConfigurationFileFullPath))
             {
                 serializer.Serialize(textWriter, this.configXml);
             }
@@ -368,7 +323,7 @@ namespace CmisSync.Lib
         private void Load()
         {
             XmlSerializer deserializer = new XmlSerializer(typeof(SyncConfig));
-            using (TextReader textReader = new StreamReader(FullPath))
+            using (TextReader textReader = new StreamReader(ConfigurationFileFullPath))
             {
                 this.configXml = (SyncConfig)deserializer.Deserialize(textReader);
             }
@@ -436,25 +391,177 @@ namespace CmisSync.Lib
             /// </summary>
             [XmlAnyElement("log4net")]
             public XmlNode Log4Net { get; set; }
-            
+
             /// <summary>
-            /// List of the CmisSync synchronized folders.
+            /// 
             /// </summary>
-            [XmlArray("folders")]
-            [XmlArrayItem("folder")]
-            public List<SyncConfig.Folder> Folders { get; set; }
-            
+            [XmlArray("accounts")]
+            [XmlArrayItem("account")]
+            public ObservableCollection<SyncConfig.Account> Accounts { get; set; }
+
             /// <summary>
-            /// User.
+            /// List of the CmisSync synchronized folders for all accounts.
             /// </summary>
-            [XmlElement("user", typeof(User))]
-            public User User { get; set; }
+            [XmlIgnore]
+            public List<SyncConfig.SyncFolder> LocalRepositories
+            {
+                get
+                {
+                    List<SyncFolder> localRepositories = new List<SyncFolder>();
+                    foreach (Account account in Accounts) {
+                        localRepositories.AddRange(account.SyncFolders);
+                    }
+                    return localRepositories;
+                }
+            }
+
+            public class Account
+            {
+
+                public Account() {
+                    this.SyncFolders = new SyncFoldersInfoList(this);
+                }
+
+                /// <summary>
+                /// Name.
+                /// </summary>
+                [XmlElement("name")]
+                public string DisplayName { get; set; }
+
+                /// <summary>
+                /// URL.
+                /// </summary>
+                [XmlElement("url")]
+                public XmlUri RemoteUrl { get; set; }
+
+                [XmlElement("credentials")]
+                public UserCredentials Credentials { get; set; }
+
+                /// <summary>
+                /// All the configured repositories to be sinced locally
+                /// </summary>
+                [XmlArray("syncFolders")]
+                [XmlArrayItem("syncFolder")]
+                public SyncFoldersInfoList SyncFolders { get; internal set; }
+
+                //TODO: remove?
+                [XmlIgnore]
+                private ReadOnlyCollection<RemoteRepository> _remoteRepositories;
+                [XmlIgnore]
+                public ReadOnlyCollection<RemoteRepository> RemoteRepositories
+                {
+                    get
+                    {
+                        if (_remoteRepositories == null)
+                        {
+                            _remoteRepositories = CmisUtils.GetRepositories(this);
+                        }
+                        return _remoteRepositories;
+                    }
+                }
+            }
+
+            public class RemoteFolder
+            {
+                private RemoteFolder parent;
+                
+                public RemoteFolder(RemoteFolder parent, string name)
+                {
+                    this.parent = parent;
+                    this.Name = name;
+                }
+
+                public virtual RemoteRepository Repository
+                {
+                    get
+                    {
+                        return parent.Repository;
+                    }
+                }
+
+                public string Name { get; internal set; }
+
+                public ReadOnlyCollection<RemoteFolder> _subfolders;
+                public ReadOnlyCollection<RemoteFolder> Subfolders
+                {
+                    get
+                    {
+                        if (_subfolders == null)
+                        {
+                            List<RemoteFolder> folders = new List<RemoteFolder>();
+                            foreach (string path in CmisUtils.GetSubfolders(Repository.Id, Path, Repository.Account.RemoteUrl, Repository.Account.Credentials))
+                            {
+                                //remove first /
+                                folders.Add(new RemoteFolder(this, CmisPath.GetFolderName(path)));
+                            }
+                            _subfolders = new ReadOnlyCollection<RemoteFolder>(folders);
+                        }
+                        return _subfolders;
+                    }
+                }
+
+                public virtual string Path { get { return parent==null?"/":(CmisPath.Combine(parent.Path, Name)); } }
+            }
+
+            public class RemoteRepository : RemoteFolder
+            {
+                public Account Account { get; internal set; }
+                public string Id { get; internal set; }
+
+                public RemoteRepository(Account account, string id, string name) : base(null, name)
+                {
+                    this.Account = account;
+                    this.Id = id;
+                }
+
+                public override RemoteRepository Repository {
+                    get {
+                        return this;
+                    }
+                }
+
+                public virtual string Path {
+                    get {
+                        return String.Empty;
+                    }
+                }
+            }
+
+            public class SyncFoldersInfoList : List<SyncFolder>
+            {
+                private Account _owner;
+
+                public SyncFoldersInfoList(Account owner) {
+                    this._owner = owner;
+                }
+
+                public new void Add(SyncFolder item)
+                {
+                    if (item.Account != null && item.Account != this._owner) {
+                        throw new System.ArgumentException("Cannot add a SyncFolder to an account if already assigned to another");
+                    }
+                    item.Account = _owner;
+                    base.Add(item);
+                }
+            }
 
             /// <summary>
             /// Folder definition.
             /// </summary>
-            public class Folder
+            public class SyncFolder : ModelBase
             {
+
+                private readonly int MAX_FILE_NAME_TRY = 30;
+
+                public SyncFolder() { 
+                    IgnoredFolders = new List<IgnoredFolder>();
+                }
+
+                [XmlIgnore]
+                public Account Account
+                { 
+                    get; set;
+                }
 
                 /// <summary>
                 /// Name.
@@ -467,13 +574,8 @@ namespace CmisSync.Lib
                 /// </summary>
                 [XmlElement("path")]
                 public string LocalPath { get; set; }
-
-                /// <summary>
-                /// URL.
-                /// </summary>
-                [XmlElement("url")]
-                public XmlUri RemoteUrl { get; set; }
-
+            
+                //FIXME: remove and replace with object Repository
                 /// <summary>
                 /// Repository ID.
                 /// </summary>
@@ -487,91 +589,105 @@ namespace CmisSync.Lib
                 public string RemotePath { get; set; }
 
                 /// <summary>
-                /// Username.
-                /// </summary>
-                [XmlElement("user")]
-                public string UserName { get; set; }
-
-                /// <summary>
-                /// Password.
-                /// </summary>
-                [XmlElement("password")]
-                public string ObfuscatedPassword { get; set; }
-
-                /// <summary>
                 /// IsSuspended
                 /// </summary>
-                [XmlElement("issuspended")]
+                [XmlElement("isSuspended")]
                 public bool IsSuspended { get; set; }
 
                 /// <summary></summary>
-                [XmlElement("syncatstartup")]
+                [XmlElement("syncAtStartup")]
                 public bool SyncAtStartup { get; set; }
 
-                private double pollInterval = DEFAULT_POLL_INTERVAL;
-
+                
                 /// <summary>
-                /// Poll interval.
+                /// Default poll interval.
+                /// It is used for any newly created synchronized folder.
+                /// In milliseconds.
                 /// </summary>
-                [XmlElement("pollinterval")]
-                public double PollInterval {
-                    get { return pollInterval; }
-                    set {
+                [XmlIgnore]
+                public static readonly int DEFAULT_POLL_INTERVAL = 60 * 1000; // 5 seconds.
+                [XmlElement("pollInterval")]
+                public int? _pollInterval;
+                /// <summary></summary>
+                [XmlIgnore]
+                public int PollInterval
+                {
+                    get
+                    {
+                        return _pollInterval ?? DEFAULT_POLL_INTERVAL;
+                    }
+                    set
+                    {
                         if (value <= 0)
                         {
-                            Logger.Warn("Poll interval value is invalid, "
-                                + "using default poll interval: " + DEFAULT_POLL_INTERVAL);
-                            pollInterval = DEFAULT_POLL_INTERVAL;
+                            throw new System.ArgumentException("PollInterval value is not valid");
                         }
-                        else
-                        {
-                            pollInterval = value;
-                        }
+                        _pollInterval = value;
                     }
                 }
 
-                private int uploadRetries = 2;
-
+                [XmlIgnore]
+                public int DEFAULT_MAX_UPLOAD_RETRIES = 2;
+                [XmlElement("maxUploadRetries")]
+                public int? _uploadRetries;
                 /// <summary></summary>
-                [XmlElement("maxUploadRetries", IsNullable=true)]
+                [XmlIgnore]
                 public int? UploadRetries
                 {
-                    get { return uploadRetries; }
+                    get 
+                    {
+                        return _uploadRetries ?? DEFAULT_MAX_UPLOAD_RETRIES;
+                    }
                     set {
-                        if( value==null || value < 0 )
-                            uploadRetries = 2;
-                        else
-                            uploadRetries = (int) value;
+                        if (value < 0)
+                        {
+                            throw new System.ArgumentException("UploadRetries value is not valid");
+                        }
+                        _uploadRetries = value;
                     }
                 }
 
-                private int downloadRetries = 2;
-
+                [XmlIgnore]
+                public int DEFAULT_MAX_DOWNLOAD_RETRIES = 2;
+                [XmlElement("maxDownloadRetries", IsNullable = true)]
+                public int? _downloadRetries;
                 /// <summary></summary>
-                [XmlElement("maxDownloadRetries", IsNullable=true)]
-                public int? DownLoadRetries
+                [XmlIgnore]
+                public int? MaxDownloadRetries
                 {
-                    get { return downloadRetries; }
-                    set {
-                        if( value == null || value < 0 )
-                            downloadRetries = 2;
-                        else
-                            downloadRetries = (int) value;
+                    get
+                    {
+                        return _downloadRetries ?? DEFAULT_MAX_DOWNLOAD_RETRIES;
+                    }
+                    set
+                    {
+                        if (value < 0)
+                        {
+                            throw new System.ArgumentException("DownloadRetries value is not valid");
+                        }
+                        _downloadRetries = value;
                     }
                 }
 
-                private int deletionRetries = 2;
-
+                [XmlIgnore]
+                public int DEFAULT_MAX_DELETION_RETRIES = 2;
+                [XmlElement("maxDeletionRetries", IsNullable = true)]
+                public int? _deletionRetries;
                 /// <summary></summary>
-                [XmlElement("maxDeletionRetries", IsNullable=true)]
+                [XmlIgnore]
                 public int? DeletionRetries
                 {
-                    get { return deletionRetries; }
-                    set {
-                        if ( value == null || value < 0 )
-                            deletionRetries = 2;
-                        else
-                            deletionRetries = (int) value;
+                    get
+                    {
+                        return _deletionRetries ?? DEFAULT_MAX_DELETION_RETRIES;
+                    }
+                    set
+                    {
+                        if (value < 0)
+                        {
+                            throw new System.ArgumentException("DeletionRetries value is not valid");
+                        }
+                        _deletionRetries = value;
                     }
                 }
 
@@ -584,68 +700,112 @@ namespace CmisSync.Lib
                 /// </summary>
                 [XmlElement("ignoreFolder", IsNullable = true)]
                 public List<IgnoredFolder> IgnoredFolders { get; set; }
-
-                private long chunkSize = DefaultChunkSize;
-
+                                
+                /// <summary>
+                /// Chunk size for chunked transfers (not implemented yet)
+                /// </summary>
+                [XmlIgnore]
+                private const long DEFAULT_CHUNK_SIZE = 1024 * 1024;
+                [XmlElement("chunkSize")]
+                public long? _chunkSize;
                 /// <summary></summary>
-                [XmlElement("chunkSize"), System.ComponentModel.DefaultValue(DefaultChunkSize)]
-                public long ChunkSize
+                [XmlIgnore]
+                public long? ChunkSize
                 {
-                    get { return chunkSize; }
+                    get
+                    {
+                        if (_chunkSize == null)
+                        {
+                            return DEFAULT_CHUNK_SIZE;
+                        }
+                        return _chunkSize;
+                    }
                     set
                     {
-                        if (value < 0)
+                        if (value <= 0)
                         {
-                            chunkSize = 0;
+                            throw new System.ArgumentException("ChunkSize value is not valid");
                         }
-                        else
-                        {
-                            chunkSize = value;
-                        }
+                        _chunkSize = value;
                     }
+                }
+
+                [XmlIgnore]
+                private string _cmisDatabasePath;
+                /// <summary>
+                /// Full path to the local database.
+                /// For instance: C:\\Users\\win7pro32bit\\AppData\\Roaming\\cmissync\\User Homes.cmissync
+                /// </summary>
+                [XmlElement("cmisDatabasePath")]
+                public string CmisDatabasePath { 
+                    get 
+                    {
+                        if (_cmisDatabasePath == null) {
+                            _cmisDatabasePath = getNewCmisDatabasePath();
+                        }
+                        return _cmisDatabasePath;
+                    } 
+                    set 
+                    {
+                        _cmisDatabasePath = value;
+                    } 
                 }
 
                 /// <summary>
-                /// Get all the configured info about a synchronized folder.
+                /// Get a new DatabasePath.
+                /// The path will allways point to a non existing file.
                 /// </summary>
-                public RepoInfo GetRepoInfo()
-                {
-                    RepoInfo repoInfo = new RepoInfo(DisplayName, ConfigManager.CurrentConfig.ConfigPath);
-                    repoInfo.User = UserName;
-                    repoInfo.Password = new Password();
-                    repoInfo.Password.ObfuscatedPassword = ObfuscatedPassword;
-                    repoInfo.Address = RemoteUrl;
-                    repoInfo.RepoID = RepositoryId;
-                    repoInfo.RemotePath = RemotePath;
-                    repoInfo.TargetDirectory = LocalPath;
-                    repoInfo.MaxUploadRetries = uploadRetries;
-                    repoInfo.MaxDownloadRetries = downloadRetries;
-                    repoInfo.MaxDeletionRetries = deletionRetries;
-                    if (PollInterval < 1) PollInterval = Config.DEFAULT_POLL_INTERVAL;
-                    repoInfo.PollInterval = PollInterval;
-                    repoInfo.IsSuspended = IsSuspended;
-                    repoInfo.SyncAtStartup = SyncAtStartup;
-
-                    foreach (IgnoredFolder ignoredFolder in IgnoredFolders)
+                /// <returns></returns>
+                public string getNewCmisDatabasePath() {
+                    string name = DisplayName.Replace(" ", "_");
+                    foreach (char c in System.IO.Path.GetInvalidFileNameChars())
                     {
-                        repoInfo.addIgnorePath(ignoredFolder.Path);
+                        name = name.Replace(c.ToString(), "");
                     }
-
-                    if(SupportedFeatures != null && SupportedFeatures.ChunkedSupport != null && SupportedFeatures.ChunkedSupport == true)
+                    string path;
+                    int serial = 0;
+                    do
                     {
-                        repoInfo.ChunkSize = ChunkSize;
-                        repoInfo.DownloadChunkSize = ChunkSize;
-                    }
-                    else
-                    {
-                        repoInfo.ChunkSize = 0;
-                        repoInfo.DownloadChunkSize = 0;
-                    }
-                    if(SupportedFeatures != null && SupportedFeatures.ChunkedDownloadSupport!=null && SupportedFeatures.ChunkedDownloadSupport == true)
-                        repoInfo.DownloadChunkSize = ChunkSize;
-
-                    return repoInfo;
+                        path = Path.Combine(ConfigManager.CurrentConfig.ConfigurationDirectoryPath, name + ((serial != 0) ? "_" + serial : "") + ".cmissync");
+                        serial++;
+                        if (serial > MAX_FILE_NAME_TRY) {
+                            throw new System.InvalidOperationException("Unable to find a name for a new database");
+                        }
+                    } while (File.Exists(path));
+                    
+                    return path;
                 }
+
+                /// <summary>
+                /// Define the last successed sync time
+                /// </summary>
+                [XmlIgnore]
+                public DateTime LastSuccessedSync { get; set; }
+
+                /// <summary>
+                /// If the given path should be ignored, TRUE will be returned,
+                /// otherwise FALSE.
+                /// </summary>
+                /// <param name="path"></param>
+                /// <returns></returns>
+                public bool isPathIgnored(string path)
+                {
+                    if(SyncUtils.IsInvalidFolderName(path.Replace("/", "").Replace("\"","")))
+                        return true;
+                    foreach(IgnoredFolder ignoredFolder in IgnoredFolders) 
+                    {
+                        if(ignoredFolder.Match(path))
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                public override string ToString() {
+                    return this.DisplayName + "(" + this.LocalPath + "<->" + this.Account.RemoteUrl + "/" + this.RemotePath + ")";
+                }
+
             }
         }
 
@@ -659,6 +819,15 @@ namespace CmisSync.Lib
             /// </summary>
             [XmlAttribute("path")]
             public string Path { get; set; }
+        
+            public bool Match(string path)
+            {
+ 	            if(String.IsNullOrEmpty(path)) {
+                    return false;
+                }
+                //FIXME: use regex
+                return path.StartsWith(Path);
+            }
         }
 
         /// <summary>
@@ -701,72 +870,6 @@ namespace CmisSync.Lib
             /// <summary></summary>
             [XmlElement("chunkedDownloadSupport", IsNullable=true)]
             public bool? ChunkedDownloadSupport {get;set;}
-        }
-
-        /// <summary>
-        /// XML URI.
-        /// </summary>
-        public class XmlUri : IXmlSerializable
-        {
-            private Uri _Value;
-
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            public XmlUri() { }
-
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            public XmlUri(Uri source) { _Value = source; }
-
-            /// <summary>
-            /// implicit.
-            /// </summary>
-            public static implicit operator Uri(XmlUri o)
-            {
-                return o == null ? null : o._Value;
-            }
-
-            /// <summary>
-            /// implicit.
-            /// </summary>
-            public static implicit operator XmlUri(Uri o)
-            {
-                return o == null ? null : new XmlUri(o);
-            }
-
-            /// <summary>
-            /// Get schema.
-            /// </summary>
-            public System.Xml.Schema.XmlSchema GetSchema()
-            {
-                return null;
-            }
-
-            /// <summary>
-            /// Read XML.
-            /// </summary>
-            public void ReadXml(XmlReader reader)
-            {
-                _Value = new Uri(reader.ReadElementContentAsString());
-            }
-
-            /// <summary>
-            /// Write XML.
-            /// </summary>
-            public void WriteXml(XmlWriter writer)
-            {
-                writer.WriteValue(_Value.ToString());
-            }
-
-            /// <summary>
-            /// String representation of the URI.
-            /// </summary>
-            public string ToString()
-            {
-                return _Value.ToString();
-            }
         }
     }
 }

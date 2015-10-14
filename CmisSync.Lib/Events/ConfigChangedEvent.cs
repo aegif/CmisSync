@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CmisSync.Lib;
 
 namespace CmisSync.Lib.Events
 {
@@ -20,11 +21,12 @@ namespace CmisSync.Lib.Events
     public class RepoConfigChangedEvent : ConfigChangedEvent
     {
         /// <summary></summary>
-        public readonly RepoInfo RepoInfo;
+        public readonly Config.SyncConfig.SyncFolder RepoInfo;
 
         /// <summary></summary>
         /// <param name="repoInfo"></param>
-        public RepoConfigChangedEvent(RepoInfo repoInfo) {
+        public RepoConfigChangedEvent(Config.SyncConfig.SyncFolder repoInfo)
+        {
             RepoInfo = repoInfo;
         }
 
@@ -32,7 +34,7 @@ namespace CmisSync.Lib.Events
         /// <returns></returns>
         public override string ToString()
         {
-            return String.Format("RepoConfigChangedEvent: {0}", RepoInfo.Name);
+            return String.Format("RepoConfigChangedEvent: {0}", RepoInfo.DisplayName);
         }
     }
 }

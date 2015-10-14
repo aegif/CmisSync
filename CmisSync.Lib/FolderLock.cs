@@ -1,6 +1,6 @@
-using log4net;
 using System;
 using System.IO;
+using log4net;
 
 namespace CmisSync.Lib
 {
