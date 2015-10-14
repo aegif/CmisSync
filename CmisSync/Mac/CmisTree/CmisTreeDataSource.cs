@@ -165,6 +165,7 @@ namespace CmisSync.CmisTree
             return cmis.Children.Count > 0;
         }
 
+        // Get the number of children in "item"
         public override int GetChildrenCount(NSOutlineView outlineView, NSObject item)
         {
             UpdateItem (ref item);
