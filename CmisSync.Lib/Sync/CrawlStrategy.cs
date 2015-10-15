@@ -397,7 +397,7 @@ namespace CmisSync.Lib.Sync
 
                             string message0 = "CmisSync Warning: You have deleted file " + syncItem.LocalPath + "\nCmisSync will now delete it from the server. If you actually did not delete this file, please report a bug at CmisSync@aegif.jp";
                             Logger.Info(message0);
-                            Utils.NotifyUser(message0);
+                            //Utils.NotifyUser(message0);
 
                             if ((bool)remoteDocument.IsVersionSeriesCheckedOut)
                             {
