@@ -153,19 +153,10 @@ namespace CmisSync.Lib.Sync
         }
 
         /// <summary>
-        /// Implement IDisposable interface. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
         /// Dispose pattern implementation.
         /// </summary>
-        protected void Dispose(bool disposing)
-        {
+        protected override void Dispose(bool disposing)
+        {            
             if (!this.disposed)
             {
                 if (disposing)
@@ -174,6 +165,7 @@ namespace CmisSync.Lib.Sync
                 }
                 this.disposed = true;
             }
+            base.Dispose(disposing);
         }
 
         /// <summary>
@@ -312,7 +304,7 @@ namespace CmisSync.Lib.Sync
                 {
                     return (IFolder)getSession().GetObjectByPath(remoteFolderPath);
                 }
-                catch (CmisBaseException e)
+                catch (CmisBaseException)
                 {
                     //maybe a temporary error, retry
                     tries--;

@@ -126,7 +126,7 @@ namespace CmisSync.ViewModels
                 }
                 ConfigManager.CurrentConfig.Save();
                 window.Close();
-            }catch(Exception e){
+            }catch(Exception){
                 MessageBox.Show("Unable to obtain the corrct url or wrong credentials.", "Error");
             }
         }

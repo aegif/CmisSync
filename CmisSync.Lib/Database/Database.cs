@@ -983,7 +983,6 @@ namespace CmisSync.Lib.Database
         }
 
         const string RemotePathPrefixKey = "RemotePathPrefix";
-        private Config.SyncConfig.SyncFolder repoinfo;
 
         /// <summary>
         /// Checks whether the database contains a given folders's id.

@@ -163,7 +163,7 @@ namespace CmisSync.Lib
             {
                 Load();
             }
-            catch (Exception e) {
+            catch (Exception) {
                 throw;
             }
         }
@@ -520,7 +520,7 @@ namespace CmisSync.Lib
                     }
                 }
 
-                public virtual string Path {
+                public override string Path {
                     get {
                         return String.Empty;
                     }

@@ -34,7 +34,7 @@ namespace CmisSync.Lib.Sync
             int configSchemaVersion = ConfigManager.CurrentConfig.ConfigSchemaVersion;
 
             // Skip migration if up-to-date.
-            if (configSchemaVersion == null || configSchemaVersion >= Config.SchemaVersion)
+            if (configSchemaVersion >= Config.SchemaVersion)
             {
                 return;
             }
@@ -167,7 +167,7 @@ namespace CmisSync.Lib.Sync
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

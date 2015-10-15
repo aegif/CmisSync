@@ -279,7 +279,7 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Dispose pattern implementation.
         /// </summary>
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!this.disposed)
             {

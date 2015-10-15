@@ -66,7 +66,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// String representation of the URI.
         /// </summary>
-        public string ToString()
+        public override string ToString()
         {
             return _value.ToString();
         }

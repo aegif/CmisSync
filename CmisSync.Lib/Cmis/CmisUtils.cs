@@ -350,6 +350,7 @@ namespace CmisSync.Lib.Cmis
         /// <returns></returns>
         public static string GetChangeLogToken(ISession session)
         {
+            //FIXME: should not clear cache!
             session.Clear(); // Clear all caches.
             session.Binding.GetRepositoryService().GetRepositoryInfos(null);
             string token = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
