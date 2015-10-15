@@ -69,7 +69,7 @@ namespace ExtendedWindowsControls
             set
             {
                 this.icon = value;
-                if (animation != null && animation.Enabled == false)
+                if (animation == null || animation.Enabled == false)
                 {
                     notifyIcon.Icon = Icon;
                 }
