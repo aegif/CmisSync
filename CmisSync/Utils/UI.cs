@@ -11,7 +11,12 @@ namespace CmisSync.Utils
 {
     class UI
     {
-        public static void runInUiThread(Action action) {
+        public static void runInUiThread(Action action)
+        {
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Input, new ThreadStart(action));
+        }
+
+        public static void runInUiThreadAsync(Action action) {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Input, new ThreadStart(action));
         }
     }

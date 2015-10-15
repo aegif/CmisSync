@@ -72,7 +72,7 @@ namespace CmisSync
             {
                 if ("IsSyncing".Equals(e.PropertyName))
                 {
-                    notifyIcon.Animation.Enabled = SyncFolders.IsSyncing;                  
+                    notifyIcon.Animation.Enabled = SyncFolders.IsSyncing;
                 }
             };
 
@@ -87,7 +87,7 @@ namespace CmisSync
         {
             System.IO.Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,/Resources/tryIcon.ico")).Stream;
             notifyIcon.Icon = new System.Drawing.Icon(iconStream);
-            
+
             System.IO.Stream animationStream = Application.GetResourceStream(new Uri("pack://application:,,/Resources/tryIconAnimation.png")).Stream;
             Bitmap animationBitmap = new Bitmap(animationStream);
             notifyIcon.Animation = new Animation(animationBitmap);
@@ -189,23 +189,23 @@ namespace CmisSync
             System.IO.Directory.CreateDirectory(repositoryInfo.LocalPath);
 
             CmisSync.Lib.Sync.SyncFolderSyncronizer syncronizer = new CmisSync.Lib.Sync.SyncFolderSyncronizer(repositoryInfo);
-            syncronizer.Events.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(Syncronizer_Events_CollectionChanged);
+            syncronizer.Event += syncronizer_Event;
             this.SyncFolders.Add(syncronizer);
             syncronizer.Initialize();
         }
 
-        private void Syncronizer_Events_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void syncronizer_Event(SyncronizerEvent e)
         {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            if (e.Exception is MissingRootSyncFolderException)
             {
-                foreach (SyncronizerEvent item in e.NewItems)
+                handleMissingSyncFolder(e.SyncFolderInfo);
+            }
+            else
+            {
+                if (e.Level == EventLevel.WARN || e.Level == EventLevel.ERROR)
                 {
-                    if (item.Exception is MissingRootSyncFolderException) {
-                        handleMissingSyncFolder(item.SyncFolderInfo);
-                    }else{
-                        NotifyEvent(item);
-                    }
-                }
+                    Utils.UI.runInUiThreadAsync(() => NotifyEvent(e));
+                }                
             }
         }
 
@@ -213,7 +213,7 @@ namespace CmisSync
         {
             string imgUrl = "";
             switch (item.Level)
-            { 
+            {
                 case EventLevel.ERROR:
                     imgUrl = "pack://application:,,,/Resources/error_67.png";
                     break;
@@ -225,10 +225,11 @@ namespace CmisSync
                     break;
             }
 
-            notifications.AddNotification(new Notification { 
+            notifications.AddNotification(new Notification
+            {
                 Title = item.SyncFolderInfo.DisplayName,
-                ImageUrl = imgUrl, 
-                Message = item.Exception.Message
+                ImageUrl = imgUrl,
+                Message = item.Message
             });
         }
 
@@ -300,7 +301,8 @@ namespace CmisSync
                 }
             }
 
-            if (found == false) {
+            if (found == false)
+            {
                 Logger.Warn("StopAndRemoveSyncFolderSyncronization(Config.SyncConfig.SyncFolder) cant find a SyncFolderSyncronizer for the provided SyncFolder (" + syncFolderInfo + "). The configuration will be removed from the CurrentConfig, but might be some leftover (local files, database, ecc...)");
                 ConfigManager.CurrentConfig.RemoveSyncFolder(syncFolderInfo);
             }
@@ -313,9 +315,13 @@ namespace CmisSync
             if (result == MessageBoxResult.Yes)
             {
                 keepLocalFiles = false;
-            }else if(result == MessageBoxResult.No) {
+            }
+            else if (result == MessageBoxResult.No)
+            {
                 keepLocalFiles = true;
-            }else{
+            }
+            else
+            {
                 //abort
                 return;
             }
@@ -332,7 +338,8 @@ namespace CmisSync
         /// </summary>
         public void AddAndStartNewSyncFolderSyncronization(Config.SyncConfig.SyncFolder syncFolderInfo)
         {
-            if (syncFolderInfo.CmisDatabasePath == null) { 
+            if (syncFolderInfo.CmisDatabasePath == null)
+            {
                 syncFolderInfo.CmisDatabasePath = ConfigManager.CurrentConfig.ConfigurationDirectoryPath;
             }
             //TODO: check repoInfo data
@@ -392,7 +399,8 @@ namespace CmisSync
 
         internal void editAccount(CmisSync.Lib.Config.SyncConfig.Account account)
         {
-            if (account == null) {
+            if (account == null)
+            {
                 return;
             }
 
@@ -407,19 +415,21 @@ namespace CmisSync
                 return false;
             }
 
-            if (account.SyncFolders.Count != 0) {
+            if (account.SyncFolders.Count != 0)
+            {
                 MessageBox.Show("There are " + account.SyncFolders.Count + " synced folders commected to this account, remove them first.", "Unable to delete active Account");
                 return false;
             }
 
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to remove the account '" + account.DisplayName + "' (pointing to '"+(account.RemoteUrl!=null?account.RemoteUrl.ToString():"")+"')", "Delete Account", MessageBoxButton.YesNoCancel);
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to remove the account '" + account.DisplayName + "' (pointing to '" + (account.RemoteUrl != null ? account.RemoteUrl.ToString() : "") + "')", "Delete Account", MessageBoxButton.YesNoCancel);
             if (result == MessageBoxResult.Yes)
             {
                 ConfigManager.CurrentConfig.Accounts.Remove(account);
                 ConfigManager.CurrentConfig.Save();
                 return true;
             }
-            else {
+            else
+            {
                 return false;
             }
         }

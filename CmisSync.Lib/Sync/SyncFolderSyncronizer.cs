@@ -362,7 +362,7 @@ namespace CmisSync.Lib.Sync
             if (isRecoverableException(e))
             {
                 Logger.Info(exception.Message);
-                NotifySyncEvent(EventLevel.WARN, exception);
+                NotifySyncException(EventLevel.WARN, exception);
                 return;
             }
             else

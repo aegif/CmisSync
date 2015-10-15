@@ -7,14 +7,20 @@ namespace CmisSync.Lib.Sync
     public enum EventLevel { INFO, WARN, ERROR }
 
     [Serializable]
-    public class SyncronizerEvent
+    public abstract class SyncronizerEvent
     {
         public DateTime Date { get; internal set; }
         public SyncFolderSyncronizerBase Source { get; internal set; }
         public Config.SyncConfig.SyncFolder SyncFolderInfo { get { return Source.SyncFolderInfo; } }
+        private String _message;
         public CmisBaseException Exception { get; internal set; }
         public EventLevel Level { get; internal set; }
 
+        public SyncronizerEvent(SyncFolderSyncronizerBase source, string message, EventLevel level)
+            : this(source, (CmisBaseException)null, level) 
+        {
+                _message = message;
+        }
         public SyncronizerEvent(SyncFolderSyncronizerBase source, CmisBaseException exception, EventLevel level)
             : this(DateTime.Now, source, exception, level) { }
         public SyncronizerEvent(DateTime date, SyncFolderSyncronizerBase source, CmisBaseException exception, EventLevel level)
@@ -23,6 +29,27 @@ namespace CmisSync.Lib.Sync
             this.Source = source;
             this.Exception = exception;
             this.Level = level;
+        }
+
+        public String Message
+        {
+            get
+            {
+                string message = _message;
+                if (Exception != null && !string.IsNullOrEmpty(Exception.Message))
+                {
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        message += ": ";
+                    }
+                    else
+                    {
+                        message = "";
+                    }
+                    message += Exception.Message;
+                }
+                return message;
+            }
         }
 
         public override bool Equals(object obj)
@@ -43,9 +70,33 @@ namespace CmisSync.Lib.Sync
         {
             unchecked
             {
-                return this.Source.GetHashCode() + 7 * this.Exception.GetHashCode();
+                return this.Source.GetHashCode() + 7 * Objects.GetHashCode(this.Exception);
             }
         }
+    }
+
+    [Serializable]
+    public class SyncronizationStarted : SyncronizerEvent
+    {
+        public SyncronizationStarted(SyncFolderSyncronizerBase source)
+            : base(source, "Syncronization started", EventLevel.INFO)
+        { }
+    }
+
+    [Serializable]
+    public class SyncronizationException : SyncronizerEvent
+    {
+        public SyncronizationException(SyncFolderSyncronizerBase source, CmisBaseException exception, EventLevel level)
+            : base(source, exception, level)
+        { }
+    }
+
+    [Serializable]
+    public class SyncronizationComleted : SyncronizerEvent
+    {
+        public SyncronizationComleted(SyncFolderSyncronizerBase source)
+            : base(source, "Syncronization completed", EventLevel.INFO)
+        { }
     }
 }
 

@@ -15,20 +15,29 @@ namespace CmisSync.ViewModels
     public class SyncFolderSyncronizerViewModel : ViewModelBase, Utils.MVVMWrapper.IItemWrapper<CmisSync.Lib.Sync.SyncFolderSyncronizer>
     {
         private readonly CmisSync.Lib.Sync.SyncFolderSyncronizer model;
+        private EventsObservableCollection _events;
 
-        /// <summary>
-        /// Only For DesignTime
-        /// </summary>
-        public SyncFolderSyncronizerViewModel()
-            : base(null)
-        {
-        }
-
-        public SyncFolderSyncronizerViewModel(Controller controller, CmisSync.Lib.Sync.SyncFolderSyncronizer model) : base(controller)
+        public SyncFolderSyncronizerViewModel(Controller controller, CmisSync.Lib.Sync.SyncFolderSyncronizer model)
+            : base(controller)
         {
             this.model = model;
+            this.model.PropertyChanged += model_PropertyChanged;
 
-            this.model.PropertyChanged += model_PropertyChanged;            
+            _events = new EventsObservableCollection();
+            this.model.Event += model_Event;
+        }
+
+        private void model_Event(SyncronizerEvent e)
+        {
+            if (e is SyncronizationStarted)
+            {
+                _events.MarkAllToBeRemoved();
+            }
+            else if (e is SyncronizationComleted)
+            {
+                _events.RemoveAllMarked();
+            }
+            _events.Add(e);
         }
 
         private void model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -38,7 +47,8 @@ namespace CmisSync.ViewModels
                 switch (e.PropertyName)
                 {
                     case "RepoInfo":
-                        if (this.model.SyncFolderInfo != null) {
+                        if (this.model.SyncFolderInfo != null)
+                        {
                             this.model.SyncFolderInfo.PropertyChanged += model_PropertyChanged;
                         }
                         NotifyOfPropertyChanged(e.PropertyName);
@@ -49,7 +59,8 @@ namespace CmisSync.ViewModels
                         break;
                 }
             }
-            else if (sender == this.model.SyncFolderInfo) {
+            else if (sender == this.model.SyncFolderInfo)
+            {
                 switch (e.PropertyName)
                 {
                     case "DisplayName":
@@ -57,12 +68,14 @@ namespace CmisSync.ViewModels
                         break;
                 }
             }
-        }       
+        }
 
         #region Properties
 
-        public String DisplayName {
-            get {
+        public String DisplayName
+        {
+            get
+            {
                 return model.SyncFolderInfo.DisplayName;
             }
         }
@@ -74,7 +87,7 @@ namespace CmisSync.ViewModels
 
         public EventsObservableCollection Events
         {
-            get { return model.Events; }
+            get { return _events; }
         }
 
         #endregion
@@ -142,16 +155,16 @@ namespace CmisSync.ViewModels
         {
             Clipboard.SetText(
                 "Date:         " + e.Date + "\n" +
-                "Level:        "+ e.Level + "\n" +
+                "Level:        " + e.Level + "\n" +
                 "SyncFolder:   " + e.SyncFolderInfo.DisplayName + "\n" +
-                "Account:      " + e.SyncFolderInfo.Account.DisplayName + "\n" + 
+                "Account:      " + e.SyncFolderInfo.Account.DisplayName + "\n" +
                 "LocalFolder:  " + e.SyncFolderInfo.LocalPath + "\n" +
-                "RemoteFolder: " + e.SyncFolderInfo.RemotePath + "\n" + 
-                "Message:      " + e.Exception.Message + "\n" + 
+                "RemoteFolder: " + e.SyncFolderInfo.RemotePath + "\n" +
+                "Message:      " + e.Message + "\n" +
                 "Exception:    " + e.Exception);
         }
 
-        #endregion 
+        #endregion
 
         public bool IsItemWrapper(CmisSync.Lib.Sync.SyncFolderSyncronizer item)
         {

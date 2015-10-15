@@ -513,17 +513,9 @@ namespace CmisSync.Lib.Sync
                 {
                     if (SyncUtils.IsConflictFile(fileName))
                     {
-                        //TODO: too heavy
-                        bool conflicFileCreatedByThisSyncRun = false;
-                        foreach (SyncronizerEvent e in Events) {
-                            if (e.Exception != null && e.Exception is FileConflictException && Object.Equals(((FileConflictException)e.Exception).ConflictFilename, filePath))
-                            {
-                                conflicFileCreatedByThisSyncRun = true;
-                            }
-                        }
-                        if (!conflicFileCreatedByThisSyncRun)
-                        {
-                            NotifySyncEvent(EventLevel.WARN, new ConflictFileStillPresentException(filePath));
+                        if (new FileInfo(fileName).CreationTime.AddMinutes(10) <= DateTime.Now) { 
+                            //if the file has been just created, delay a bit before remainding it to the user
+                            NotifySyncException(EventLevel.WARN, new ConflictFileStillPresentException(filePath));
                         }
                     }
                 }

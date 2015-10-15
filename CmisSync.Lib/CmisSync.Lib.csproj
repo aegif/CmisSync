@@ -92,6 +92,7 @@
     <Compile Include="Sync\SyncFolderSyncronizer_CrawlStrategy.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer_exceptions.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer_WatcherStrategy.cs" />
+    <Compile Include="Utils\Objects.cs" />
     <Compile Include="Utils\SyncUtils.cs" />
     <Compile Include="Utils\ObservableDictionary.cs" />
     <Compile Include="Utils\ThreadSafeObservableCollection.cs" />

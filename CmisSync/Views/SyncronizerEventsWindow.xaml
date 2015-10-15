@@ -24,15 +24,15 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Level">
+                <DataGridTemplateColumn Header="">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Source="{Binding Level, Converter={StaticResource levelToImage}}" Height="13" VerticalAlignment="Stretch"></Image>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding Path=Date}" Header="Date"/>
-                <DataGridTextColumn Binding="{Binding Path=Exception.Message}" Header="Message" Width="Auto"/>
+                <DataGridTextColumn Binding="{Binding Path=Date}" Header="Date" SortDirection="Descending"/>
+                <DataGridTextColumn Binding="{Binding Path=Message}" Header="Message" Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
 

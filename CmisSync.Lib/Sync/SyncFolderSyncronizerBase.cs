@@ -151,7 +151,19 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool disposed = false;
 
-        public EventsObservableCollection Events { get; private set; }
+        //public EventsObservableCollection Events { get; private set; }
+
+        public delegate void SyncronizerEventHandler(SyncronizerEvent e);
+        public event SyncronizerEventHandler Event;
+
+        protected virtual void OnEvent(SyncronizerEvent e)
+        {
+            SyncronizerEventHandler handler = Event;
+            if (handler != null)
+            {
+                handler(e);
+            }
+        }
 
         /// <summary>
         /// Constructor.
@@ -198,9 +210,7 @@ namespace CmisSync.Lib.Sync
                     SyncMode syncMode = (SyncMode)args.Argument;
                     Sync(syncMode);
                 }
-            );
-
-            Events = new EventsObservableCollection();        
+            );        
         }
 
         protected virtual void configure()
@@ -346,7 +356,7 @@ namespace CmisSync.Lib.Sync
                 watcher.EnableRaisingEvents = false; //Disable events while syncing...
                 watcher.EnableEvent = false;
 
-                Events.MarkAllToBeRemoved();
+                OnEvent(new SyncronizationStarted(this));
 
                 try
                 {
@@ -358,30 +368,30 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (CmisPermissionDeniedException e)
                 {
-                    NotifySyncEvent(EventLevel.ERROR, e);
+                    NotifySyncException(EventLevel.ERROR, e);
                 }
                 catch (MissingRootSyncFolderException e)
                 {
-                    NotifySyncEvent(EventLevel.ERROR, e);
+                    NotifySyncException(EventLevel.ERROR, e);
                 }
                 catch (CmisConnectionException e)
                 {
                     if (e.Message.StartsWith("Cannot access"))
                     {
-                        NotifySyncEvent(EventLevel.ERROR, new NetworkException(e));
+                        NotifySyncException(EventLevel.ERROR, new NetworkException(e));
                         //probably a network error (or the network cable disconnected)
                     }
                     else
                     {
-                        NotifySyncEvent(EventLevel.ERROR, e);
+                        NotifySyncException(EventLevel.ERROR, e);
                     }
                 }
                 catch (UnhandledException e) {
-                    NotifySyncEvent(EventLevel.ERROR, e);
+                    NotifySyncException(EventLevel.ERROR, e);
                 }
                 catch (Exception e)
                 {
-                    NotifySyncEvent(EventLevel.ERROR, new UnhandledException(e));
+                    NotifySyncException(EventLevel.ERROR, new UnhandledException(e));
                 }
                 finally
                 {
@@ -411,7 +421,8 @@ namespace CmisSync.Lib.Sync
                     syncAutoResetEvent.Set();
                     Status = SyncStatus.Idle;
 
-                    Events.RemoveAllMarked();
+                    //TODO: signal if the syncronization has ended normally or has been interrupted
+                    OnEvent(new SyncronizationComleted(this));
                 }
             }
             else
@@ -579,7 +590,7 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Called when sync encounters a critical error (the syncronization has been stopped).
         /// </summary>
-        protected void NotifySyncEvent(EventLevel level, CmisBaseException exception)
+        protected void NotifySyncException(EventLevel level, CmisBaseException exception)
         {
             if(level == EventLevel.ERROR){
                 Logger.Error("Sync event ("+level+"): " + exception.GetType() + ", " + exception.Message, exception);
@@ -588,7 +599,7 @@ namespace CmisSync.Lib.Sync
             }
             
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {
-                Events.Add(new SyncronizerEvent(this, exception, level));
+                OnEvent(new SyncronizationException(this, exception, level));
             }));
         }
     }
