@@ -394,7 +394,7 @@ namespace CmisSync.Lib.Cmis
             return path.Substring(path.LastIndexOf(DirectorySeparatorChar) + 1);
         }
 
-        internal static string GetFolderName(string path)
+        internal static string GetDirectoryName(string path)
         {
             return GetFileName(path);
         }

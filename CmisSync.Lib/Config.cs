@@ -492,7 +492,7 @@ namespace CmisSync.Lib
                             foreach (string path in CmisUtils.GetSubfolders(Repository.Id, Path, Repository.Account.RemoteUrl, Repository.Account.Credentials))
                             {
                                 //remove first /
-                                folders.Add(new RemoteFolder(this, CmisPath.GetFolderName(path)));
+                                folders.Add(new RemoteFolder(this, CmisPath.GetDirectoryName(path)));
                             }
                             _subfolders = new ReadOnlyCollection<RemoteFolder>(folders);
                         }

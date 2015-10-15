@@ -274,7 +274,11 @@ namespace CmisSync.Lib.Sync
             else if (syncMode == SyncMode.PARTIAL)
             {
                 // Apply local changes noticed by the filesystem watcher.
-                WatcherSync(remoteFolderPath, SyncFolderInfo.LocalPath);
+                bool succes = WatcherSync(remoteFolderPath, SyncFolderInfo.LocalPath);
+                if (succes == false) {
+                    //something went wrong, but just slightly
+                    CrawlSyncAndUpdateChangeLogToken(remoteFolder, SyncFolderInfo.LocalPath);
+                }
 
                 if (ChangeLogCapability)
                 {

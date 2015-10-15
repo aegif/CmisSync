@@ -591,5 +591,11 @@ namespace CmisSync.Lib
                 return hash;
             }
         }
+
+        internal static string GetLocalRelativePath(string pathname, string folderPath)
+        {
+            //TODO: check if pathname is inside the folder
+            return pathname.Substring(folderPath.Length + 1);
+        }
     }
 }

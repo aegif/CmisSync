@@ -22,12 +22,15 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         /// <param name="remoteFolder">Remote folder.</param>
         /// <param name="localFolder">Local folder.</param>
-        private void WatcherSync(string remoteFolder, string localFolder)
+        /// <returns>Wether the sync has been a complete success or a partial failure (may need a subsequent crawl sync)</returns>
+        private bool WatcherSync(string remoteFolder, string localFolder)
         {
+            bool success = true;
             Logger.Debug("WatcherSync(" + remoteFolder + ", " + localFolder + ")");
             SleepWhileSuspended();
             Queue<FileSystemEventArgs> changeQueue = watcher.GetChangeQueue();
             this.watcher.Clear();
+
             if (Logger.IsDebugEnabled)
             {
                 foreach (FileSystemEventArgs change in changeQueue)
@@ -40,12 +43,11 @@ namespace CmisSync.Lib.Sync
 
             while (changeQueue.Count > 0)
             {
-
                 FileSystemEventArgs earliestChange = changeQueue.Dequeue();
                 string pathname = earliestChange.FullPath;
                 if (!pathname.StartsWith(localFolder))
                 {
-                    Logger.ErrorFormat("Invalid pathname {0} for target {1}.", pathname, localFolder);
+                    Logger.WarnFormat("Path {0} does not apply for target {1}.", pathname, localFolder);
                     continue;
                 }
                 if (pathname == localFolder)
@@ -57,14 +59,14 @@ namespace CmisSync.Lib.Sync
                     //Move
                     CmisSync.Lib.Watcher.MovedEventArgs change = (CmisSync.Lib.Watcher.MovedEventArgs)earliestChange;
                     Logger.DebugFormat("Processing 'Moved': {0} -> {1}.", change.OldFullPath, pathname);
-                    WatchSyncMove(remoteFolder, localFolder, change.OldFullPath, pathname);
+                    success &= WatchSyncMove(remoteFolder, localFolder, change.OldFullPath, pathname);
                 }
                 else if (earliestChange is RenamedEventArgs)
                 {
                     //Rename
                     RenamedEventArgs change = (RenamedEventArgs)earliestChange;
                     Logger.DebugFormat("Processing 'Renamed': {0} -> {1}.", change.OldFullPath, pathname);
-                    WatchSyncMove(remoteFolder, localFolder, change.OldFullPath, pathname);
+                    success &= WatchSyncMove(remoteFolder, localFolder, change.OldFullPath, pathname);
                 }
                 else
                 {
@@ -73,10 +75,10 @@ namespace CmisSync.Lib.Sync
                     {
                         case WatcherChangeTypes.Created:
                         case WatcherChangeTypes.Changed:
-                            WatcherSyncUpdate(remoteFolder, localFolder, pathname);
+                            success &= WatcherSyncUpdate(remoteFolder, localFolder, pathname);
                             break;
                         case WatcherChangeTypes.Deleted:
-                            WatcherSyncDelete(remoteFolder, localFolder, pathname);
+                            success &= WatcherSyncDelete(remoteFolder, localFolder, pathname);
                             break;
                         default:
                             Logger.ErrorFormat("Invalid change -> '{0}': {1}.", earliestChange.ChangeType, pathname);
@@ -84,6 +86,7 @@ namespace CmisSync.Lib.Sync
                     }
                 }
             }
+            return success;
         }
 
 
@@ -96,16 +99,8 @@ namespace CmisSync.Lib.Sync
             SleepWhileSuspended();
             string oldDirectory = Path.GetDirectoryName(oldPathname);
             string oldFilename = Path.GetFileName(oldPathname);
-            string oldLocalName = oldPathname.Substring(localFolder.Length + 1);
-            string oldRemoteName = Path.Combine(remoteFolder, oldLocalName).Replace('\\', '/'); // FIXME
-            string oldRemoteBaseName = Path.GetDirectoryName(oldRemoteName).Replace('\\', '/');
-            bool oldPathnameWorthSyncing = SyncUtils.IsWorthSyncing(oldDirectory, oldFilename, SyncFolderInfo);
             string newDirectory = Path.GetDirectoryName(newPathname);
             string newFilename = Path.GetFileName(newPathname);
-            string newLocalName = newPathname.Substring(localFolder.Length + 1);
-            string newRemoteName = Path.Combine(remoteFolder, newLocalName).Replace('\\', '/');
-            string newRemoteBaseName = Path.GetDirectoryName(newRemoteName).Replace('\\', '/');
-            bool newPathnameWorthSyncing = SyncUtils.IsWorthSyncing(newDirectory, newFilename, SyncFolderInfo);
             bool rename = oldDirectory.Equals(newDirectory) && !oldFilename.Equals(newFilename);
             bool move = !oldDirectory.Equals(newDirectory) && oldFilename.Equals(newFilename);
             if ((rename && move) || (!rename && !move))
@@ -115,8 +110,18 @@ namespace CmisSync.Lib.Sync
             }
             try
             {
+                bool oldPathnameWorthSyncing = SyncUtils.IsWorthSyncing(oldDirectory, oldFilename, SyncFolderInfo);
+                bool newPathnameWorthSyncing = SyncUtils.IsWorthSyncing(newDirectory, newFilename, SyncFolderInfo);
                 if (oldPathnameWorthSyncing && newPathnameWorthSyncing)
                 {
+
+                    string oldLocalName = SyncUtils.GetLocalRelativePath(oldPathname, localFolder);
+                    string oldRemoteName = CmisPath.Combine(remoteFolder, PathRepresentationConverter.LocalToRemote(oldLocalName));
+                    string oldRemoteBaseName = CmisPath.GetDirectoryName(oldRemoteName);
+                    string newLocalName = SyncUtils.GetLocalRelativePath(newPathname, localFolder);
+                    string newRemoteName = CmisPath.Combine(remoteFolder, PathRepresentationConverter.LocalToRemote(newLocalName));
+                    string newRemoteBaseName = CmisPath.GetDirectoryName(newRemoteName);
+
                     if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(oldPathname, SyncFolderInfo)))
                     {
                         if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(newPathname, SyncFolderInfo)))
