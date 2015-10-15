@@ -35,7 +35,7 @@ namespace CmisSync.Lib.Sync
             this.Level = level;
         }
 
-        public String Message
+        public virtual String Message
         {
             get
             {
@@ -94,6 +94,50 @@ namespace CmisSync.Lib.Sync
         public SyncronizationCancelledByUser(SyncFolderSyncronizerBase source)
             : base(source, "Syncronization cancelled by the user", EventLevel.INFO)
         { }
+    }
+
+    [Serializable]
+    public class FileUploadedEvent : SyncronizerEvent{
+        public string LocalFilePath { get; internal set; }
+        public string RemoteFilePath { get; internal set; }
+
+        public override string Message
+        {
+            get
+            {
+                return base.Message + ": " + LocalFilePath + " to " + RemoteFilePath ;
+            }
+        }
+
+        public FileUploadedEvent(SyncFolderSyncronizerBase source, string localFilePath, string remoteFilePath)
+            : base(source, "File Uploaded", EventLevel.INFO)
+        {
+            LocalFilePath = localFilePath;
+            RemoteFilePath = remoteFilePath;
+        }
+    }
+
+    [Serializable]
+    public class FileDownloadedEvent : SyncronizerEvent
+    {        
+        public string RemoteFilePath { get; internal set; }
+        public string LocalFilePath { get; internal set; }
+
+        public override string Message
+        {
+            get
+            {
+                return base.Message + ": " + RemoteFilePath + " to " + LocalFilePath;
+            }
+        }
+
+        public FileDownloadedEvent(SyncFolderSyncronizerBase source, string remoteFilePath, string localFilePath)
+            : base(source, "File Downloaded", EventLevel.INFO)
+        {
+        
+            RemoteFilePath = remoteFilePath;
+            LocalFilePath = localFilePath;
+        }
     }
 
     [Serializable]

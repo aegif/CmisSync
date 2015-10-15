@@ -92,6 +92,22 @@ namespace CmisSync.ViewModels
 
             _events = new EventsObservableCollection();
             this.model.Event += model_Event;
+
+            _events.CollectionChanged += _events_CollectionChanged;
+        }
+
+        void _events_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            { 
+                foreach(SyncronizerEvent ev in e.NewItems)
+                {
+                    if (ev.Level == EventLevel.WARN || ev.Level == EventLevel.ERROR)
+                    {
+                        Utils.UI.runInUiThreadAsync(() => Controller.NotifyEvent(ev));
+                    }
+                }
+            }
         }
 
         private void model_Event(SyncronizerEvent e)

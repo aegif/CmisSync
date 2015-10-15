@@ -1118,6 +1118,7 @@ namespace CmisSync.Lib.Sync
                 database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                 Logger.Info("Added file to database: " + filepath);
 
+                OnEvent(new FileDownloadedEvent(this, syncItem.RemoteRelativePath, filepath));
                 return true;
             }
             catch (Exception e)
@@ -1185,6 +1186,7 @@ namespace CmisSync.Lib.Sync
                 properties.Add(PropertyIds.CreationDate, File.GetCreationTime(syncItem.LocalPath));
                 properties.Add(PropertyIds.LastModificationDate, File.GetLastWriteTime(syncItem.LocalPath));
 
+                string remoteFilePath = remoteFolder.Path + "/" + remoteFileName;
                 // Prepare content stream
                 using (Stream file = File.Open(syncItem.LocalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (SHA1 hashAlg = new SHA1Managed())
@@ -1197,7 +1199,7 @@ namespace CmisSync.Lib.Sync
                     contentStream.Stream = hashstream;
 
                     Logger.Debug("Uploading: " + syncItem.LocalPath + " as "
-                        + remoteFolder.Path + "/" + remoteFileName);
+                        + remoteFilePath);
                     remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
                     Logger.Debug("Uploaded: " + syncItem.LocalPath);
                     filehash = hashAlg.Hash;
@@ -1209,6 +1211,8 @@ namespace CmisSync.Lib.Sync
                 // Create database entry for this file.
                 database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                 Logger.Info("Added file to database: " + syncItem.LocalPath);
+
+                OnEvent(new FileUploadedEvent(this, filePath, remoteFilePath));
                 return true;
             }
             catch (Exception e)

@@ -200,16 +200,9 @@ namespace CmisSync
             {
                 handleMissingSyncFolder(e.SyncFolderInfo);
             }
-            else
-            {
-                if (e.Level == EventLevel.WARN || e.Level == EventLevel.ERROR)
-                {
-                    Utils.UI.runInUiThreadAsync(() => NotifyEvent(e));
-                }                
-            }
         }
 
-        private void NotifyEvent(SyncronizerEvent item)
+        public void NotifyEvent(SyncronizerEvent item)
         {
             string imgUrl = "";
             switch (item.Level)
