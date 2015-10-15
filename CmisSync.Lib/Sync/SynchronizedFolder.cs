@@ -432,7 +432,11 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         // Apply local changes noticed by the filesystem watcher.
-                        WatcherSync(remoteFolderPath, localFolder);
+                        bool locallyModified = WatcherSync(remoteFolderPath, localFolder);
+                        if (locallyModified)
+                        {
+                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
+                        }
 
                         if (ChangeLogCapability)
                         {
