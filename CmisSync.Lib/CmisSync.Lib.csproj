@@ -84,7 +84,6 @@
     <Compile Include="FolderLock.cs" />
     <Compile Include="ModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sync\EventsObservableCollection.cs" />
     <Compile Include="Sync\SyncFolderSyncronizerBase.cs" />
     <Compile Include="SyncItem.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer_ChangeLogThenCrawlStrategy.cs" />
