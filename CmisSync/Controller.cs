@@ -326,7 +326,7 @@ namespace CmisSync
                 return;
             }
 
-            syncFolderSyncronizer.CancelSync();
+            syncFolderSyncronizer.CancelSyncronization();
             syncFolderSyncronizer.deleteResources(keepLocalFiles);
             syncFolderSyncronizer.Dispose();
             this.SyncFolders.Remove(syncFolderSyncronizer);

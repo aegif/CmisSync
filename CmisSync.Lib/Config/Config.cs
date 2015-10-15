@@ -157,15 +157,6 @@ namespace CmisSync.Lib
                 }
 
             }
-
-            //try again
-            try
-            {
-                Load();
-            }
-            catch (Exception) {
-                throw;
-            }
         }
 
         /// <summary>
@@ -312,17 +303,33 @@ namespace CmisSync.Lib
         /// </summary>
         public void Save()
         {
+            //firstly backup the actual config
+            File.Copy(ConfigurationFileFullPath, ConfigurationFileFullPath + ".bk");
+
             XmlSerializer serializer = new XmlSerializer(typeof(SyncConfig));
             using (TextWriter textWriter = new StreamWriter(ConfigurationFileFullPath))
             {
                 serializer.Serialize(textWriter, this.configXml);
             }
+
+            //if all goes wll delete the backup
+            File.Delete(ConfigurationFileFullPath + ".bk");
         }
 
 
         private void Load()
         {
-            XmlSerializer deserializer = new XmlSerializer(typeof(SyncConfig));
+            if (File.Exists(ConfigurationFileFullPath + ".bk"))
+            {
+                Logger.Error("The config backup file is still present. Something went wrong in the last save. Restoring it.");
+                //the backup file is still present, something went wrong in the last save
+                File.Delete(ConfigurationFileFullPath);
+                File.Move(ConfigurationFileFullPath + ".bk", ConfigurationFileFullPath);
+            }
+
+            new System.Xml.Serialization.XmlSerializer(typeof(string));
+
+            XmlSerializer deserializer = new System.Xml.Serialization.XmlSerializer(typeof(SyncConfig));
             using (TextReader textReader = new StreamReader(ConfigurationFileFullPath))
             {
                 this.configXml = (SyncConfig)deserializer.Deserialize(textReader);

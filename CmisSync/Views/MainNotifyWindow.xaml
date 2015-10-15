@@ -37,11 +37,7 @@
                     </ContextMenu>
                 </Button.ContextMenu >
             </Button>
-        </DockPanel>
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Width="347">
-            <Label Content="Status:"/>
-            <Label x:Name="status" Content="{Binding CurrentWorkStateText}"/>
-        </StackPanel>
+        </DockPanel>        
         <ScrollViewer VerticalScrollBarVisibility="Auto" Background="#FFE2DEDE" Margin="10">
             <ItemsControl x:Name="FoldersList" ItemsSource="{Binding SyncFolders}" />
         </ScrollViewer>

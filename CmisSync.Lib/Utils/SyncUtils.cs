@@ -597,5 +597,16 @@ namespace CmisSync.Lib
             //TODO: check if pathname is inside the folder
             return pathname.Substring(folderPath.Length + 1);
         }
+
+        public static bool IsCausedByOperationCanceledException(Exception exception)
+        {
+            while (exception != null) {
+                if (exception is OperationCanceledException) {
+                    return true;
+                }
+                exception = exception.InnerException;
+            }
+            return false;
+        }
     }
 }

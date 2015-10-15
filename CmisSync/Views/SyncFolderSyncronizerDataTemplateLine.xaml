@@ -34,19 +34,19 @@
         <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center"></TextBlock>
 
         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-            <TextBlock Visibility="{Binding Path=Events.EventsTypeCount[(sync:EventLevel)ERROR], Converter={StaticResource visibilityConverter}, Mode=OneWay}">
-                <Hyperlink Command="{Binding ShowEventsCommand}">
-                    <Image Source="/CmisSync;component/Resources/error_16.png" Height="13" VerticalAlignment="Stretch"></Image>
-                    <TextBlock Text="{Binding Path=Events.EventsTypeCount[(sync:EventLevel)ERROR]}"></TextBlock>
+            <TextBlock>
+                <Hyperlink Command="{Binding ShowEventsCommand}" TextDecorations="none">
+                    <TextBlock Visibility="{Binding Path=Events.EventsTypeCount[(sync:EventLevel)ERROR], Converter={StaticResource visibilityConverter}, Mode=OneWay}">
+                        <Image Source="/CmisSync;component/Resources/error_16.png" Height="13" VerticalAlignment="Stretch"></Image>
+                        <TextBlock Text="{Binding Path=Events.EventsTypeCount[(sync:EventLevel)ERROR]}"></TextBlock>
+                    </TextBlock>
+                    <TextBlock Visibility="{Binding Path=Events.EventsTypeCount[(sync:EventLevel)WARN], Converter={StaticResource visibilityConverter}, Mode=OneWay}">
+                        <Image Source="/CmisSync;component/Resources/warn_16.png" Height="13"></Image>
+                        <TextBlock Text="{Binding Path=Events.EventsTypeCount[(sync:EventLevel)WARN]}"></TextBlock>
+                    </TextBlock>
+                    <Image Source="{Binding Status, Converter={StaticResource StatusIconConverter}}" Height="16" Width="16"></Image>
                 </Hyperlink>
             </TextBlock>
-            <TextBlock Visibility="{Binding Path=Events.EventsTypeCount[(sync:EventLevel)WARN], Converter={StaticResource visibilityConverter}, Mode=OneWay}">
-                <Hyperlink Command="{Binding ShowEventsCommand}">
-                    <Image Source="/CmisSync;component/Resources/warn_16.png" Height="13"></Image>
-                    <TextBlock Text="{Binding Path=Events.EventsTypeCount[(sync:EventLevel)WARN]}"></TextBlock>
-                </Hyperlink>
-            </TextBlock>
-            <Image Source="{Binding Status, Converter={StaticResource StatusIconConverter}}" Height="16"></Image>
         </StackPanel>
     </DockPanel>
 </UserControl>

@@ -77,9 +77,9 @@
     <Compile Include="Backend.cs" />
     <Compile Include="Cmis\CmisUtils.cs" />
     <Compile Include="Cmis\MimeType.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="ConfigManager.cs" />
-    <Compile Include="ConfigMigration.cs" />
+    <Compile Include="Config\Config.cs" />
+    <Compile Include="Config\ConfigManager.cs" />
+    <Compile Include="Config\ConfigMigration.cs" />
     <Compile Include="Database\Database.cs" />
     <Compile Include="FolderLock.cs" />
     <Compile Include="ModelBase.cs" />
@@ -89,6 +89,7 @@
     <Compile Include="Sync\SyncFolderSyncronizer_ChangeLogThenCrawlStrategy.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer_CrawlStrategy.cs" />
+    <Compile Include="Sync\SyncFolderSyncronizer_events.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer_exceptions.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer_WatcherStrategy.cs" />
     <Compile Include="Utils\Objects.cs" />

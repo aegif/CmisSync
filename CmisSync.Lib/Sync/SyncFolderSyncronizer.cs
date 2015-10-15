@@ -127,7 +127,7 @@ namespace CmisSync.Lib.Sync
 
         public void deleteResources(bool keepLocalFiles)
         {
-            if (Status != SyncStatus.Idle || Status != SyncStatus.Idle_Suspended)
+            if (IsSyncingInProgress())
             {
                 throw new InvalidOperationException();
             }
@@ -253,7 +253,7 @@ namespace CmisSync.Lib.Sync
                 _forceFullSyncAtNextSync = false;
             }
 
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             // Add ACL in the context, or ACL is null
             // OperationContext context = new OperationContext();
@@ -358,6 +358,14 @@ namespace CmisSync.Lib.Sync
             if (isRecoverableException(e))
             {
                 Logger.Info(exception.Message);
+                if (Status == SyncStatus.Cancelling || Status == SyncStatus.Suspended) { 
+                    //the user has cancelled the syncronization
+                    if (SyncUtils.IsCausedByOperationCanceledException(exception))
+                    {
+                        OnEvent(new SyncronizationCancelledByUser(this));
+                        return;
+                    }
+                }
                 NotifySyncException(EventLevel.WARN, exception);
                 return;
             }
@@ -470,6 +478,9 @@ namespace CmisSync.Lib.Sync
                     // File contains characters not valid for .NET, for instance carriage return.
                     return true;
                 }
+                else if (e is OperationCanceledException) {
+                    return true;
+                }
                 else
                 {
                     e = e.InnerException;
@@ -484,7 +495,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private void RecursiveFolderCopy(IFolder remoteFolder, string localFolder)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             IItemEnumerable<ICmisObject> children;
             try
@@ -539,7 +550,7 @@ namespace CmisSync.Lib.Sync
         /// <returns>true if successful</returns>
         private bool DownloadDirectory(IFolder remoteFolder, string localFolder)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
             try
             {
                 // Create local folder.
@@ -956,7 +967,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool DownloadFile(IDocument remoteDocument, string localFolder)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             SyncItem syncItem = getSyncItemFromRemotePath(remoteDocument.Paths[0]);
             Logger.Info("Downloading: " + syncItem.RemoteFileName);
@@ -1152,7 +1163,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool UploadFile(string filePath, IFolder remoteFolder) // TODO make SyncItem
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             var syncItem = database.GetSyncItemFromLocalPath(filePath);
             if (null == syncItem)
@@ -1214,7 +1225,7 @@ namespace CmisSync.Lib.Sync
         private bool UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
         {
             bool success = true;
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             IFolder folder = null;
             try
@@ -1284,7 +1295,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool UpdateFile(string filePath, ref IDocument remoteFile)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
             try
             {
                 SyncItem syncItem = getSyncItemFromLocalPath(filePath);
@@ -1355,7 +1366,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool UpdateFile(string filePath, IFolder remoteFolder)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
             try
             {
                 // Find the document within the folder.
@@ -1402,7 +1413,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool RemoveFolderLocally(string folderPath)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
             // Folder has been deleted on server, delete it locally too.
             try
             {
@@ -1473,7 +1484,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool RenameRemoteFile(string directory, string newFilename, IDocument remoteFile)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             string oldPathname = Path.Combine(directory, remoteFile.Name);
             string newPathname = Path.Combine(directory, newFilename);
@@ -1511,7 +1522,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool RenameRemoteFolder(string directory, string newFilename, IFolder remoteFolder)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             string oldPathname = Path.Combine(directory, remoteFolder.Name);
             string newPathname = Path.Combine(directory, newFilename);
@@ -1543,7 +1554,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool MoveFile(string oldDirectory, string newDirectory, IFolder oldRemoteFolder, IFolder newRemoteFolder, IDocument remoteFile)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             string oldPathname = Path.Combine(oldDirectory, remoteFile.Name);
             string newPathname = Path.Combine(newDirectory, remoteFile.Name);
@@ -1578,7 +1589,7 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         private bool MoveFolder(string oldDirectory, string newDirectory, IFolder oldRemoteFolder, IFolder newRemoteFolder, IFolder remoteFolder)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             string oldPathname = Path.Combine(oldDirectory, remoteFolder.Name);
             string newPathname = Path.Combine(newDirectory, remoteFolder.Name);

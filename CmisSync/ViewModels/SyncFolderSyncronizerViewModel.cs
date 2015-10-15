@@ -190,7 +190,7 @@ namespace CmisSync.ViewModels
         }
         public bool canResumeSync()
         {
-            return model.Status == SyncStatus.Idle_Suspended || model.Status == SyncStatus.Syncing_Suspended;
+            return model.Status == SyncStatus.Suspended;
         }
 
         public RelayCommand RemoveCommand { get { return new RelayCommand(remove); } }

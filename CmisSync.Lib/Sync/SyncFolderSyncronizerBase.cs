@@ -45,19 +45,31 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Still not started nor configured
         /// </summary>
-        Init,
+        Init = -1,
         /// <summary>
         /// Normal operation.
         /// </summary>
-        Idle,
+        Idle = 0,
 
-        Syncing,
+        /// <summary>
+        /// Going to Syncing but still blocked by something (probably by a signal)
+        /// </summary>
+        Waiting = 1,
+
+        /// <summary>
+        /// All going, currently syncing
+        /// </summary>
+        Syncing = 2,
+
+        /// <summary>
+        /// Cancellation requested, waiting for the nest check point
+        /// </summary>
+        Cancelling = 3,
 
         /// <summary>
         /// Synchronization is suspended.
         /// </summary>
-        Syncing_Suspended,
-        Idle_Suspended
+        Suspended = 5
     }
 
     /// <summary>
@@ -85,27 +97,15 @@ namespace CmisSync.Lib.Sync
             get { return _status; }
             private set
             {
-                _status = value; NotifyOfPropertyChanged("Status");
+                if (_status != value)
+                {
+                    _status = value;
+                    NotifyOfPropertyChanged("Status");
+                }
+
             }
         }
-
-        /// <summary>
-        /// Interval for which sync will wait while paused before retrying sync.
-        /// </summary>
-        private static readonly int SYNC_SUSPEND_SLEEP_INTERVAL = 5 * 1000; //five seconds
-        /// <summary>
-        /// Whether sync is actually being in pause right now.
-        /// This is different from CmisStatus, which means "paused, or will be paused as soon as possible"
-        /// </summary>
-        private bool suspended = false;
-        /// <summary>
-        /// Whether this folder's synchronization is suspended right now.
-        /// </summary>
-        public bool isSuspended()
-        {
-            return this.suspended;
-        }
-
+        
         /// <summary>
         /// Return the synchronized folder's information.
         /// </summary>
@@ -210,7 +210,7 @@ namespace CmisSync.Lib.Sync
                     SyncMode syncMode = (SyncMode)args.Argument;
                     Sync(syncMode);
                 }
-            );        
+            );
         }
 
         protected virtual void configure()
@@ -235,7 +235,7 @@ namespace CmisSync.Lib.Sync
 
             if (this.SyncFolderInfo.IsSuspended)
             {
-                Status = SyncStatus.Idle_Suspended;
+                Status = SyncStatus.Suspended;
             }
             else
             {
@@ -365,6 +365,9 @@ namespace CmisSync.Lib.Sync
                 catch (OperationCanceledException e)
                 {
                     Logger.Info("OperationCanceled: " + e.Message);
+                    if(Status != SyncStatus.Suspended){
+                        Status = SyncStatus.Idle;
+                    }                     
                 }
                 catch (CmisPermissionDeniedException e)
                 {
@@ -386,7 +389,8 @@ namespace CmisSync.Lib.Sync
                         NotifySyncException(EventLevel.ERROR, e);
                     }
                 }
-                catch (UnhandledException e) {
+                catch (UnhandledException e)
+                {
                     NotifySyncException(EventLevel.ERROR, e);
                 }
                 catch (Exception e)
@@ -419,7 +423,9 @@ namespace CmisSync.Lib.Sync
                     ConfigManager.CurrentConfig.Save();
 
                     syncAutoResetEvent.Set();
-                    Status = SyncStatus.Idle;
+                    if (Status != SyncStatus.Suspended) {
+                        Status = SyncStatus.Idle;
+                    }
 
                     //TODO: signal if the syncronization has ended normally or has been interrupted
                     OnEvent(new SyncronizationComleted(this));
@@ -434,18 +440,11 @@ namespace CmisSync.Lib.Sync
         protected abstract void doSync(SyncMode syncMode);
 
         /// <summary>
-        /// Synchronize between CMIS folder and local folder.
+        /// Tell if the sync is in progress (even if the Status is Suspended the the sync thread may sill run)
         /// </summary>
-        public bool isSyncingInProgress()
+        public bool IsSyncingInProgress()
         {
-            if (Logger.IsDebugEnabled)
-            {
-                if (syncWorker.IsBusy && Status != SyncStatus.Syncing)
-                {
-                    throw new InvalidOperationException("The syncWorker is busy but the Status is not Syncing.");
-                }
-            }
-            return Status == SyncStatus.Syncing;
+            return syncWorker.IsBusy;
         }
 
         /// <summary>
@@ -464,7 +463,7 @@ namespace CmisSync.Lib.Sync
         {
             if (this.Status == SyncStatus.Idle)
             {
-                if (isSyncingInProgress())
+                if (IsSyncingInProgress())
                 {
                     Logger.Debug("Sync already running in background: " + SyncFolderInfo.LocalPath);
                     return;
@@ -482,46 +481,46 @@ namespace CmisSync.Lib.Sync
         /// Will send message the currently running sync thread (if one exists) to stop syncing as soon as the next
         /// blockign operation completes.
         /// </summary>
-        public void CancelSync()
+        public void CancelSyncronization() { CancelSyncronization(true); }
+
+        /// <summary>
+        /// Will send message the currently running sync thread (if one exists) to stop syncing as soon as the next
+        /// blockign operation completes.
+        /// <param name="async">if the method should return immediatly or wait for the sync thread to stop</param>
+        /// </summary>
+        public void CancelSyncronization(bool async)
         {
-            if (isSyncingInProgress())
+            if (IsSyncingInProgress())
             {
                 Logger.Info("Cancel Sync Requested...");
+                Status = SyncStatus.Cancelling;
                 syncWorker.CancelAsync();
-                Logger.Debug("Wait for thread to complete...");
-                syncAutoResetEvent.WaitOne();
-                Logger.Debug("...cancel completed.");
+                if (async == false)
+                {
+                    Logger.Debug("Wait for thread to complete...");
+                    syncAutoResetEvent.WaitOne();
+                    Logger.Debug("...cancel completed.");
+                }
             }
         }
 
-
         /// <summary>
-        /// Stop syncing momentarily.
-        /// <param name="persist">if the suspended status should be also persisted to the config file or only in memory</param>
+        /// Stop syncing and avoid any further sync until resumed.
         /// </summary>
         public void Suspend(bool persist)
         {
-            if (Status != SyncStatus.Idle_Suspended && Status != SyncStatus.Syncing_Suspended)
+            if (Status != SyncStatus.Suspended)
             {
-                switch (Status)
-                {
-                    case SyncStatus.Idle:
-                        Status = SyncStatus.Idle_Suspended;
-                        break;
-                    case SyncStatus.Syncing:
-                        Status = SyncStatus.Syncing_Suspended;
-                        break;
-                    default:
-                        return;
-                }
-
                 this.remote_timer.Stop();
+                watcher.EnableRaisingEvents = false;
+                CancelSyncronization();
                 if (persist)
                 {
                     //Get configuration
                     SyncFolderInfo.IsSuspended = true;
                     ConfigManager.CurrentConfig.Save();
                 }
+                Status = SyncStatus.Suspended;
             }
         }
 
@@ -530,52 +529,38 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         public virtual void Resume()
         {
-            switch (Status)
+            if (Status == SyncStatus.Suspended)
             {
-                case SyncStatus.Idle_Suspended:
+                this.remote_timer.Start();
+                watcher.EnableRaisingEvents = true;  
+                if (!IsSyncingInProgress())
+                {                                      
                     Status = SyncStatus.Idle;
                     //sync now
                     SyncInBackground();
-                    break;
-                case SyncStatus.Syncing_Suspended:
+                }
+                else
+                {
+                    //the sync is still in progress (yet not reached any cancellation check point)
                     Status = SyncStatus.Syncing;
-                    break;
-                default:
-                    return;
+                    //it should reach the check point, find all clear and go on
+                }
             }
 
             SyncFolderInfo.IsSuspended = false;
             ConfigManager.CurrentConfig.Save();
-            this.remote_timer.Start();
-            
         }
 
         /// <summary>
         /// Sleep while suspended.
         /// </summary>
-        protected void SleepWhileSuspended()
+        protected void CheckPendingCancelation()
         {
             if (syncWorker.CancellationPending)
             {
                 //Sync was cancelled...
                 throw new OperationCanceledException("Sync was cancelled by user.");
             }
-
-            //TODO: use signaling instead of Sleep
-            while (Status == SyncStatus.Idle_Suspended || Status == SyncStatus.Syncing_Suspended)
-            {
-                suspended = true;
-                Logger.DebugFormat("Sync of {0} is suspend, next retry in {1}ms", SyncFolderInfo.DisplayName, SYNC_SUSPEND_SLEEP_INTERVAL);
-                System.Threading.Thread.Sleep(SYNC_SUSPEND_SLEEP_INTERVAL);
-
-                if (syncWorker.CancellationPending)
-                {
-                    //Sync was cancelled...
-                    Resume();
-                    throw new OperationCanceledException("Suspended sync was cancelled by user.");
-                }
-            }
-            suspended = false;
         }
 
         /// <summary>
@@ -592,13 +577,17 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         protected void NotifySyncException(EventLevel level, CmisBaseException exception)
         {
-            if(level == EventLevel.ERROR){
-                Logger.Error("Sync event ("+level+"): " + exception.GetType() + ", " + exception.Message, exception);
-            }else{
+            if (level == EventLevel.ERROR)
+            {
+                Logger.Error("Sync event (" + level + "): " + exception.GetType() + ", " + exception.Message, exception);
+            }
+            else
+            {
                 Logger.Info("Sync event (" + level + "): " + exception.GetType() + ", " + exception.Message);
             }
-            
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => {
+
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
+            {
                 OnEvent(new SyncronizationException(this, exception, level));
             }));
         }

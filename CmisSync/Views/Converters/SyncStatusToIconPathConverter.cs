@@ -17,11 +17,14 @@ namespace CmisSync.Views.Converters
             switch ((SyncStatus)value)
             {
                 case SyncStatus.Idle:
-                    return "/CmisSync;component/Resources/idle.gif";
+                    return null;
+                case SyncStatus.Waiting:
+                    return "/CmisSync;component/Resources/waiting.gif";
                 case SyncStatus.Syncing:
                     return "/CmisSync;component/Resources/sync.gif";
-                case SyncStatus.Idle_Suspended:
-                case SyncStatus.Syncing_Suspended:
+                case SyncStatus.Cancelling:
+                    return "/CmisSync;component/Resources/waiting.gif";
+                case SyncStatus.Suspended:
                     return "/CmisSync;component/Resources/pause.gif";
                 default:
                     throw new ArgumentException();

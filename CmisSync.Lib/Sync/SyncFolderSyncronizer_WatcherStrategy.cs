@@ -27,7 +27,7 @@ namespace CmisSync.Lib.Sync
         {
             bool success = true;
             Logger.Debug("WatcherSync(" + remoteFolder + ", " + localFolder + ")");
-            SleepWhileSuspended();
+            CheckPendingCancelation();
             Queue<FileSystemEventArgs> changeQueue = watcher.GetChangeQueue();
             this.watcher.Clear();
 
@@ -96,7 +96,7 @@ namespace CmisSync.Lib.Sync
         private bool WatchSyncMove(string remoteFolder, string localFolder, string oldPathname, string newPathname)
         {
             bool success = true;
-            SleepWhileSuspended();
+            CheckPendingCancelation();
             string oldDirectory = Path.GetDirectoryName(oldPathname);
             string oldFilename = Path.GetFileName(oldPathname);
             string newDirectory = Path.GetDirectoryName(newPathname);
@@ -214,7 +214,7 @@ namespace CmisSync.Lib.Sync
         /// <param name="pathname">Pathname.</param>
         private bool WatcherSyncUpdate(string remoteFolder, string localFolder, string pathname)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
             string filename = Path.GetFileName(pathname);
             if (!SyncUtils.IsWorthSyncing(Path.GetDirectoryName(pathname), filename, SyncFolderInfo))
             {
@@ -304,7 +304,7 @@ namespace CmisSync.Lib.Sync
         /// <param name="pathname">Pathname.</param>
         private bool WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
         {
-            SleepWhileSuspended();
+            CheckPendingCancelation();
 
             // In many programs (like Microsoft Word), deletion is often just a save:
             // 1. Save data to temporary file ~wrdxxxx.tmp

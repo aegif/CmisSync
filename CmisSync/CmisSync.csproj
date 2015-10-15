@@ -293,7 +293,7 @@
     <Resource Include="Resources\sync.gif" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\idle.gif" />
+    <Resource Include="Resources\waiting.gif" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\error_16.png" />
