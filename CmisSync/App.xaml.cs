@@ -71,13 +71,6 @@ namespace CmisSync
             
             controller = new Controller();
             controller.startBackgroundWork();
-
-            // -------------------
-
-            if (firstRun)
-            {
-                ShowSetupWindow();
-            }
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -85,11 +78,6 @@ namespace CmisSync
             base.OnExit(e);
 
             controller.Dispose();
-        }
-
-        private void ShowSetupWindow()
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>

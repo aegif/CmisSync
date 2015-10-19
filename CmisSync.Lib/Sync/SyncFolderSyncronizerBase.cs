@@ -54,7 +54,7 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Going to Syncing but still blocked by something (probably by a signal)
         /// </summary>
-        Waiting = 1,
+        Starting = 1,
 
         /// <summary>
         /// All going, currently syncing
@@ -100,7 +100,7 @@ namespace CmisSync.Lib.Sync
                 if (_status != value)
                 {
                     _status = value;
-                    NotifyOfPropertyChanged("Status");
+                    OnPropertyChanged("Status");
                 }
 
             }
@@ -177,7 +177,7 @@ namespace CmisSync.Lib.Sync
 
             this.SyncFolderInfo = syncFolderInfo;
             configure();
-            this.SyncFolderInfo.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(syncFolderInfo_propertyChanged);
+            this.SyncFolderInfo.PropertyChanged += syncFolderInfo_propertyChanged;
 
             // Folder lock.
             // Disabled for now. Can be an interesting feature, but should be made opt-in, as
@@ -215,7 +215,7 @@ namespace CmisSync.Lib.Sync
 
         protected virtual void configure()
         {
-            if (this.Status != SyncStatus.Init)
+            if (this.Status != SyncStatus.Init && this.Status != SyncStatus.Suspended)
             {
                 throw new InvalidOperationException();
             }
@@ -233,28 +233,30 @@ namespace CmisSync.Lib.Sync
             Logger.Info("Repo " + SyncFolderInfo.DisplayName + " - Set poll interval to " + SyncFolderInfo.PollInterval + "ms");
             remote_timer.Interval = SyncFolderInfo.PollInterval;
 
-            if (this.SyncFolderInfo.IsSuspended)
+            if (this.Status == SyncStatus.Init)
             {
-                Status = SyncStatus.Suspended;
-            }
-            else
-            {
-                Status = SyncStatus.Idle;
+                if (this.SyncFolderInfo.IsSuspended)
+                {
+                    Status = SyncStatus.Suspended;
+                }
+                else
+                {
+                    Status = SyncStatus.Idle;
+                }
             }
         }
 
         private void syncFolderInfo_propertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            //TODO
-            throw new NotImplementedException();
-
-            ////Pause sync            
-            //Suspend(false);
-
-            //configure();
-
-            ////Always resume sync...
-            //Resume();
+            Thread t = new Thread(() =>
+            {
+                CancelSyncronization(false);
+                Suspend(false);
+                configure();
+                Resume();
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();            
         }
 
         /// <summary>
@@ -502,6 +504,11 @@ namespace CmisSync.Lib.Sync
                     Logger.Debug("...cancel completed.");
                 }
             }
+        }
+
+        public void Suspend()
+        {
+            Suspend(true);
         }
 
         /// <summary>

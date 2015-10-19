@@ -13,7 +13,6 @@ namespace CmisSync.ViewModels
 {
     public class AccountViewModel : ViewModelBase
     {
-
         private Config.SyncConfig.Account _account;
 
         public AccountViewModel(Controller controller)
@@ -32,7 +31,7 @@ namespace CmisSync.ViewModels
         public String DisplayName
         {
             get { return _account.DisplayName; }
-            set { _account.DisplayName = value; NotifyOfPropertyChanged("DisplayName"); }
+            set { _account.DisplayName = value; OnPropertyChanged("DisplayName"); }
         }
 
         public String ServerUrl
@@ -52,7 +51,7 @@ namespace CmisSync.ViewModels
                     errors.Add("ServerUrl", e.Message);
                     throw;
                 } 
-                NotifyOfPropertyChanged("ServerUrl");
+                OnPropertyChanged("ServerUrl");
             }
         }
 
@@ -76,7 +75,7 @@ namespace CmisSync.ViewModels
                     _account.Credentials = new CmisSync.Lib.Auth.UserCredentials();
                 }
                 _account.Credentials.UserName = value;
-                NotifyOfPropertyChanged("UserName");
+                OnPropertyChanged("UserName");
             }
         }
 
@@ -101,7 +100,7 @@ namespace CmisSync.ViewModels
                     _account.Credentials = new CmisSync.Lib.Auth.UserCredentials();
                 }
                 _account.Credentials.Password = new CmisSync.Lib.Auth.Password(value);
-                NotifyOfPropertyChanged("Password");
+                OnPropertyChanged("Password");
             }
         }
 

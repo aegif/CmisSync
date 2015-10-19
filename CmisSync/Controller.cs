@@ -470,5 +470,12 @@ namespace CmisSync
         }
 
         #endregion
+
+        internal void ShowSettingsWindow(SyncFolderSyncronizer syncFolderSyncronizer)
+        {
+            Views.SettingsWindow w = new Views.SettingsWindow();
+            w.DataContext = new SyncFolderSettingsViewModel(this, syncFolderSyncronizer.SyncFolderInfo);
+            w.Show();
+        }
     }
 }

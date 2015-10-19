@@ -10,19 +10,36 @@ namespace CmisSync.Lib
 {
     public class ModelBase : INotifyPropertyChanged
     {
-#region INotifyPropertyChanged
+        #region INotifyPropertyChanged
                 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void NotifyOfPropertyChanged(string propertyName)
+        protected void OnPropertyChanged(string propertyName)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// Raises the <see cref="E:PropertyChanged"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.ComponentModel.PropertyChangedEventArgs"/> instance containing the event data.</param>
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            if (this.PropertyChanged != null)
             {
-                handler(this, new PropertyChangedEventArgs(propertyName));
+                this.PropertyChanged(this, e);
             }
         }
 
-#endregion INotifyPropertyChanged
+        #endregion INotifyPropertyChanged
+
+        protected void setPropertyValue<T>(string name, ref T property, T value)
+        {
+            if (!Object.Equals(property, value))
+            {
+                property = value;
+                OnPropertyChanged(name);
+            }
+        }
     }
 }

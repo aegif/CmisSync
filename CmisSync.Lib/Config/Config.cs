@@ -564,46 +564,79 @@ namespace CmisSync.Lib
                     IgnoredFolders = new List<IgnoredFolder>();
                 }
 
+                private Account _account;
                 [XmlIgnore]
                 public Account Account
-                { 
-                    get; set;
+                {
+                    get { return _account; }
+                    set { setPropertyValue("Account", ref _account, value); }
                 }
 
+                
+                private string _displayName;
                 /// <summary>
                 /// Name.
                 /// </summary>
                 [XmlElement("name")]
-                public string DisplayName { get; set; }
+                public string DisplayName
+                {
+                    get { return _displayName; }
+                    set { setPropertyValue("DisplayName", ref _displayName, value); }
+                }
 
+                public string _localPath;
                 /// <summary>
                 /// Path.
                 /// </summary>
                 [XmlElement("path")]
-                public string LocalPath { get; set; }
-            
+                public string LocalPath
+                {
+                    get { return _localPath; }
+                    set { setPropertyValue("LocalPath", ref _localPath, value); }
+                }
+
+                public string _repositoryId;
                 //FIXME: remove and replace with object Repository
                 /// <summary>
                 /// Repository ID.
                 /// </summary>
                 [XmlElement("repository")]
-                public string RepositoryId { get; set; }
+                public string RepositoryId
+                {
+                    get { return _repositoryId; }
+                    set { setPropertyValue("RepositoryId", ref _repositoryId, value); }
+                }
 
+                public string _remotePath;
                 /// <summary>
                 /// Remote path.
                 /// </summary>
                 [XmlElement("remoteFolder")]
-                public string RemotePath { get; set; }
+                public string RemotePath
+                {
+                    get { return _remotePath; }
+                    set { setPropertyValue("RemotePath", ref _remotePath, value); }
+                }
 
+                public bool _isSuspended;
                 /// <summary>
                 /// IsSuspended
                 /// </summary>
                 [XmlElement("isSuspended")]
-                public bool IsSuspended { get; set; }
+                public bool IsSuspended
+                {
+                    get { return _isSuspended; }
+                    set { setPropertyValue("IsSuspended", ref _isSuspended, value); }
+                }
 
+                public bool _syncAtStartup;
                 /// <summary></summary>
                 [XmlElement("syncAtStartup")]
-                public bool SyncAtStartup { get; set; }
+                public bool SyncAtStartup
+                {
+                    get { return _syncAtStartup; }
+                    set { setPropertyValue("SyncAtStartup", ref _syncAtStartup, value); }
+                }
 
                 
                 /// <summary>
@@ -612,11 +645,11 @@ namespace CmisSync.Lib
                 /// In milliseconds.
                 /// </summary>
                 [XmlIgnore]
-                public static readonly int DEFAULT_POLL_INTERVAL = 60 * 1000; // 5 seconds.
-                [XmlElement("pollInterval")]
-                public int? _pollInterval;
+                public static readonly int DEFAULT_POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes.
+                
+                private int? _pollInterval;
                 /// <summary></summary>
-                [XmlIgnore]
+                [XmlElement("pollInterval")]
                 public int PollInterval
                 {
                     get
@@ -629,17 +662,17 @@ namespace CmisSync.Lib
                         {
                             throw new System.ArgumentException("PollInterval value is not valid");
                         }
-                        _pollInterval = value;
+                        setPropertyValue("PollInterval", ref _pollInterval, value);
                     }
                 }
 
                 [XmlIgnore]
                 public int DEFAULT_MAX_UPLOAD_RETRIES = 2;
-                [XmlElement("maxUploadRetries")]
-                public int? _uploadRetries;
+                
+                private int? _uploadRetries;
                 /// <summary></summary>
-                [XmlIgnore]
-                public int? UploadRetries
+                [XmlElement("maxUploadRetries")]
+                public int? MaxUploadRetries
                 {
                     get 
                     {
@@ -650,16 +683,16 @@ namespace CmisSync.Lib
                         {
                             throw new System.ArgumentException("UploadRetries value is not valid");
                         }
-                        _uploadRetries = value;
+                        setPropertyValue("MaxUploadRetries", ref _uploadRetries, value);
                     }
                 }
 
                 [XmlIgnore]
                 public int DEFAULT_MAX_DOWNLOAD_RETRIES = 2;
-                [XmlElement("maxDownloadRetries", IsNullable = true)]
-                public int? _downloadRetries;
+                
+                private int? _downloadRetries;
                 /// <summary></summary>
-                [XmlIgnore]
+                [XmlElement("maxDownloadRetries", IsNullable = true)]
                 public int? MaxDownloadRetries
                 {
                     get
@@ -672,17 +705,17 @@ namespace CmisSync.Lib
                         {
                             throw new System.ArgumentException("DownloadRetries value is not valid");
                         }
-                        _downloadRetries = value;
+                        setPropertyValue("MaxDownloadRetries", ref _downloadRetries, value);
                     }
                 }
 
                 [XmlIgnore]
                 public int DEFAULT_MAX_DELETION_RETRIES = 2;
-                [XmlElement("maxDeletionRetries", IsNullable = true)]
-                public int? _deletionRetries;
+                
+                private int? _deletionRetries;
                 /// <summary></summary>
-                [XmlIgnore]
-                public int? DeletionRetries
+                [XmlElement("maxDeletionRetries", IsNullable = true)]
+                public int? MaxDeletionRetries
                 {
                     get
                     {
@@ -694,39 +727,43 @@ namespace CmisSync.Lib
                         {
                             throw new System.ArgumentException("DeletionRetries value is not valid");
                         }
-                        _deletionRetries = value;
+                        setPropertyValue("MaxDeletionRetries", ref _deletionRetries, value);
                     }
                 }
 
+                private Feature _supportedFeatures;
                 /// <summary></summary>
                 [XmlElement("features", IsNullable=true)]
-                public Feature SupportedFeatures { get; set;}
+                public Feature SupportedFeatures
+                {
+                    get { return _supportedFeatures; }
+                    set { setPropertyValue("SupportedFeatures", ref _supportedFeatures, value); }
+                }
 
+                public List<IgnoredFolder> _ignoredFolders;
                 /// <summary>
                 /// Ignored folders.
                 /// </summary>
                 [XmlElement("ignoreFolder", IsNullable = true)]
-                public List<IgnoredFolder> IgnoredFolders { get; set; }
+                public List<IgnoredFolder> IgnoredFolders
+                {
+                    get { return _ignoredFolders; }
+                    set { setPropertyValue("IgnoredFolders", ref _ignoredFolders, value); }
+                }
                                 
                 /// <summary>
                 /// Chunk size for chunked transfers (not implemented yet)
                 /// </summary>
                 [XmlIgnore]
                 private const long DEFAULT_CHUNK_SIZE = 1024 * 1024;
-                [XmlElement("chunkSize")]
-                public long? _chunkSize;
+
+                
+                private long? _chunkSize;
                 /// <summary></summary>
-                [XmlIgnore]
+                [XmlElement("chunkSize")]
                 public long? ChunkSize
                 {
-                    get
-                    {
-                        if (_chunkSize == null)
-                        {
-                            return DEFAULT_CHUNK_SIZE;
-                        }
-                        return _chunkSize;
-                    }
+                    get { return _chunkSize==null?DEFAULT_CHUNK_SIZE:_chunkSize; }
                     set
                     {
                         if (value <= 0)
@@ -734,6 +771,7 @@ namespace CmisSync.Lib
                             throw new System.ArgumentException("ChunkSize value is not valid");
                         }
                         _chunkSize = value;
+                        setPropertyValue("ChunkSize", ref _chunkSize, value);
                     }
                 }
 
@@ -754,7 +792,7 @@ namespace CmisSync.Lib
                     } 
                     set 
                     {
-                        _cmisDatabasePath = value;
+                        setPropertyValue("CmisDatabasePath", ref _cmisDatabasePath, value);
                     } 
                 }
 
@@ -763,7 +801,7 @@ namespace CmisSync.Lib
                 /// The path will allways point to a non existing file.
                 /// </summary>
                 /// <returns></returns>
-                public string getNewCmisDatabasePath() {
+                private string getNewCmisDatabasePath() {
                     string name = DisplayName.Replace(" ", "_");
                     foreach (char c in System.IO.Path.GetInvalidFileNameChars())
                     {

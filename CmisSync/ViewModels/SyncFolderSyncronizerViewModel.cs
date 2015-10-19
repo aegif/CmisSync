@@ -88,6 +88,7 @@ namespace CmisSync.ViewModels
             : base(controller)
         {
             this.model = model;
+            this._syncFolderViewModel = new SyncFolderViewModel(controller, model.SyncFolderInfo);
             this.model.PropertyChanged += model_PropertyChanged;
 
             _events = new EventsObservableCollection();
@@ -134,11 +135,11 @@ namespace CmisSync.ViewModels
                         {
                             this.model.SyncFolderInfo.PropertyChanged += model_PropertyChanged;
                         }
-                        NotifyOfPropertyChanged(e.PropertyName);
+                        OnPropertyChanged(e.PropertyName);
                         break;
                     case "Status":
                     case "Events":
-                        NotifyOfPropertyChanged(e.PropertyName);
+                        OnPropertyChanged(e.PropertyName);
                         break;
                 }
             }
@@ -147,7 +148,7 @@ namespace CmisSync.ViewModels
                 switch (e.PropertyName)
                 {
                     case "DisplayName":
-                        NotifyOfPropertyChanged(e.PropertyName);
+                        OnPropertyChanged(e.PropertyName);
                         break;
                 }
             }
@@ -155,13 +156,16 @@ namespace CmisSync.ViewModels
 
         #region Properties
 
-        public String DisplayName
+        private SyncFolderViewModel _syncFolderViewModel;
+        public SyncFolderViewModel Info 
         {
             get
             {
-                return model.SyncFolderInfo.DisplayName;
+                return _syncFolderViewModel;
             }
         }
+
+        public string DisplayName { get { return model.SyncFolderInfo.DisplayName; } }
 
         public SyncStatus Status
         {
@@ -224,7 +228,8 @@ namespace CmisSync.ViewModels
         public RelayCommand OpenSettingsCommand { get { return new RelayCommand(openSettings); } }
         public void openSettings()
         {
-            throw new NotImplementedException();
+            Controller.ShowSettingsWindow(this.model);
+            
         }
 
         public RelayCommand ShowEventsCommand { get { return new RelayCommand(showEvents); } }

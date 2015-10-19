@@ -145,6 +145,8 @@
     <Compile Include="ViewModels\AccountViewModel.cs" />
     <Compile Include="ViewModels\SyncFolderSyncronizerViewModel.cs" />
     <Compile Include="ViewModels\CmisSyncViewModel.cs" />
+    <Compile Include="ViewModels\SyncFolderViewModel.cs" />
+    <Compile Include="ViewModels\SyncFolderSettingsViewModel.cs" />
     <Compile Include="ViewModels\SyncFolderWizardViewModel.cs" />
     <Compile Include="ViewModels\SyncFolderWizard\AccountPageViewModel.cs" />
     <Compile Include="ViewModels\SyncFolderWizard\LocalPageViewModel.cs" />
@@ -160,6 +162,7 @@
     </Compile>
     <Compile Include="Views\Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Views\Converters\GreatherThanZeroToVisibilityConvertor.cs" />
+    <Compile Include="Views\Converters\IntToPollIntervalConverter.cs" />
     <Compile Include="Views\Converters\LevelToImage.cs" />
     <Compile Include="Views\Converters\SyncStatusToIconPathConverter.cs" />
     <Compile Include="Views\MainNotifyWindow.xaml.cs">
@@ -189,6 +192,9 @@
     </Compile>
     <Compile Include="Views\SyncronizerEventsWindow.xaml.cs">
       <DependentUpon>SyncronizerEventsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\SyncFolderSyncronizerDataTemplate.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -234,6 +240,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\SettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -274,6 +284,10 @@
     <ProjectReference Include="..\CmisSync.Lib\CmisSync.Lib.csproj">
       <Project>{b4516837-a333-4c0f-8a2a-51007e638aa3}</Project>
       <Name>CmisSync.Lib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Extras\BindingOriented.Adapters\BindingOriented.Adapters.csproj">
+      <Project>{754109f0-0f3a-45c5-ab97-3a2a153a481f}</Project>
+      <Name>BindingOriented.Adapters</Name>
     </ProjectReference>
     <ProjectReference Include="..\Extras\ExtendedWindowsControls\ExtendedWindowsControls.csproj">
       <Project>{ef9d9a9b-c739-4606-b1ef-4f662dcf5ef9}</Project>

@@ -22,13 +22,20 @@ namespace CmisSync.ViewModels
             this._controller = controller;
         }
 
-        protected void NotifyOfPropertyChanged(string propertyName)
+        protected void OnPropertyChanged(string propertyName)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
+            this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        }
 
-            if (handler != null)
+        /// <summary>
+        /// Raises the <see cref="E:PropertyChanged"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.ComponentModel.PropertyChangedEventArgs"/> instance containing the event data.</param>
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            if (this.PropertyChanged != null)
             {
-                handler(this, new PropertyChangedEventArgs(propertyName));
+                this.PropertyChanged(this, e);
             }
         }
 
@@ -65,7 +72,7 @@ namespace CmisSync.ViewModels
                 {
                     errors.Remove(columnName);
                 }
-                NotifyOfPropertyChanged("Error");
+                OnPropertyChanged("Error");
                 return msg;
             }
         }

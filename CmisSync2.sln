@@ -17,6 +17,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Inst
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "InstallerBootstrapper", "InstallerBootstrapper\InstallerBootstrapper.wixproj", "{419109DB-39AB-4A87-9224-3A79277EEDA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BindingOriented.Adapters", "Extras\BindingOriented.Adapters\BindingOriented.Adapters.csproj", "{754109F0-0F3A-45C5-AB97-3A2A153A481F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +197,27 @@ Global
 		{419109DB-39AB-4A87-9224-3A79277EEDA1}.Release|x64.Build.0 = Release|x64
 		{419109DB-39AB-4A87-9224-3A79277EEDA1}.Release|x86.ActiveCfg = Release|x86
 		{419109DB-39AB-4A87-9224-3A79277EEDA1}.Release|x86.Build.0 = Release|x86
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Debug|ia64.ActiveCfg = Debug|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Publish|Any CPU.Build.0 = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Publish|ia64.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Publish|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Publish|Mixed Platforms.Build.0 = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Publish|x64.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Publish|x86.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Release|ia64.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Release|x64.ActiveCfg = Release|Any CPU
+		{754109F0-0F3A-45C5-AB97-3A2A153A481F}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

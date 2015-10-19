@@ -11,15 +11,11 @@ using CmisSync.Lib;
 
 namespace CmisSync.ViewModels
 {
-    public class SyncFolderWizardViewModel : ViewModelBase
+    public class SyncFolderWizardViewModel : SyncFolderViewModel
     {
-        private Config.SyncConfig.SyncFolder SyncFolderInfo;
-
-        public SyncFolderWizardViewModel(Controller controller, Config.SyncConfig.SyncFolder repoInfo)
-            : base(controller)
+        public SyncFolderWizardViewModel(Controller controller, Config.SyncConfig.SyncFolder model)
+            : base(controller, model)
         {
-            this.SyncFolderInfo = repoInfo;
-
             Pages = new List<Object>
             {
                 new ViewModels.SyncFolderWizard.AccountPageViewModel(Controller, this),
@@ -28,56 +24,11 @@ namespace CmisSync.ViewModels
             };
         }
 
-        public IList<Object> Pages
-        {
-            get;
-            private set;
-        }
-
-        public String DisplayName
-        {
-            get { return SyncFolderInfo.DisplayName; }
-            set { SyncFolderInfo.DisplayName = value; NotifyOfPropertyChanged("DisplayName"); }
-        }
-
-        public CmisSync.Lib.Config.SyncConfig.Account Account
-        {
-            get { return SyncFolderInfo.Account; }
-            set
-            {
-                SyncFolderInfo.Account = value;
-                NotifyOfPropertyChanged("Account");
-            }
-        }
-
-        public SyncFolderWizard.RemotePage.FolderViewModel RemoteFolder
-        {
-            set {
-                SyncFolderInfo.RepositoryId = value.Repository.Id;
-                SyncFolderInfo.RemotePath = value.Path;
-                NotifyOfPropertyChanged("RemoteFolder");
-            }
-
-        }
-
-        public string RepositoryId { get { return SyncFolderInfo.RepositoryId; } }
-
-        public string RemotePath { get { return SyncFolderInfo.RemotePath; } }
-
-        public string LocalPath {
-            get { return SyncFolderInfo.LocalPath; }
-            set { SyncFolderInfo.LocalPath = value; NotifyOfPropertyChanged("LocalPath"); }
-        }
-
-
-        protected override string validate(string columnName)
-        {
-            return String.Empty;          
-        }
-
+        public IList<Object> Pages { get; private set; }
+        
         internal void Finished(Window window)
         {
-            Controller.AddAndStartNewSyncFolderSyncronization(SyncFolderInfo);
+            Controller.AddAndStartNewSyncFolderSyncronization(Model);
             window.Close();
         }
     }

@@ -772,7 +772,7 @@ namespace CmisSync.Lib.Sync
                     if (database.ContainsFile(syncItem))
                     {
                         long retries = database.GetOperationRetryCounter(syncItem.LocalPath, Database.Database.OperationType.DELETE);
-                        if (retries <= SyncFolderInfo.DeletionRetries)
+                        if (retries <= SyncFolderInfo.MaxDeletionRetries)
                         {
                             // File has been recently removed locally, so remove it from server too.
                             Logger.Info("Removing locally deleted file on server: " + syncItem.LocalPath);  //?
@@ -792,7 +792,7 @@ namespace CmisSync.Lib.Sync
                         }
                         else
                         {
-                            Logger.Info(String.Format("Skipped deletion of remote file {0} because of too many failed retries ({1} max={2})", syncItem.RemotePath, retries, SyncFolderInfo.DeletionRetries));  // ???
+                            Logger.Info(String.Format("Skipped deletion of remote file {0} because of too many failed retries ({1} max={2})", syncItem.RemotePath, retries, SyncFolderInfo.MaxDeletionRetries));  // ???
                         }
                     }
                     else

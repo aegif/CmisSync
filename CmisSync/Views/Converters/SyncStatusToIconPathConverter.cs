@@ -18,7 +18,7 @@ namespace CmisSync.Views.Converters
             {
                 case SyncStatus.Idle:
                     return null;
-                case SyncStatus.Waiting:
+                case SyncStatus.Starting:
                     return "/CmisSync;component/Resources/waiting.gif";
                 case SyncStatus.Syncing:
                     return "/CmisSync;component/Resources/sync.gif";
