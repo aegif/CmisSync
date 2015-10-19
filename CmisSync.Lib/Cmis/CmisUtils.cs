@@ -197,6 +197,11 @@ namespace CmisSync.Lib.Cmis
         static public string[] GetSubfolders(string repositoryId, string path,
             Uri url, UserCredentials credentials)
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentException("path");
+            }
+
             List<string> result = new List<string>();
 
             // Connect to the CMIS repository.

@@ -303,8 +303,11 @@ namespace CmisSync.Lib
         /// </summary>
         public void Save()
         {
-            //firstly backup the actual config
-            File.Copy(ConfigurationFileFullPath, ConfigurationFileFullPath + ".bk");
+            if (File.Exists(ConfigurationFileFullPath))
+            {
+                //firstly backup the actual config
+                File.Copy(ConfigurationFileFullPath, ConfigurationFileFullPath + ".bk");
+            }
 
             XmlSerializer serializer = new XmlSerializer(typeof(SyncConfig));
             using (TextWriter textWriter = new StreamWriter(ConfigurationFileFullPath))
@@ -507,7 +510,7 @@ namespace CmisSync.Lib
                     }
                 }
 
-                public virtual string Path { get { return parent==null?"/":(CmisPath.Combine(parent.Path, Name)); } }
+                public virtual string Path { get { return parent==null?(CmisPath.DirectorySeparatorChar+""):(CmisPath.Combine(parent.Path, Name)); } }
             }
 
             public class RemoteRepository : RemoteFolder
@@ -529,7 +532,7 @@ namespace CmisSync.Lib
 
                 public override string Path {
                     get {
-                        return String.Empty;
+                        return CmisPath.DirectorySeparatorChar.ToString();
                     }
                 }
             }
