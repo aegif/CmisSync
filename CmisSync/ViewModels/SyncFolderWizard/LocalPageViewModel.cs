@@ -23,7 +23,7 @@ namespace CmisSync.ViewModels.SyncFolderWizard
             PropertyChanged += model_PropertyChanged;
 
             InitializeCommand = new Utils.RelayCommand(init);
-            
+
         }
 
         private void updateNextStatus()
@@ -40,13 +40,15 @@ namespace CmisSync.ViewModels.SyncFolderWizard
             }
         }
 
-        private void init() {
+        private void init()
+        {
             LocalPath = Path.Combine(
                     CmisSync.Lib.ConfigManager.CurrentConfig.DefaultSyncFolderRootFolderPath,
                     model.DisplayName);
         }
 
-        internal void validate() {
+        internal void validate()
+        {
             Error = ValidateLocalPath();
         }
 
@@ -69,14 +71,15 @@ namespace CmisSync.ViewModels.SyncFolderWizard
         public String DisplayName
         {
             get { return model.DisplayName; }
-            set {
+            set
+            {
 
                 if (LocalPath != null && LocalPath.EndsWith(model.DisplayName))
                 {
                     String dir = LocalPath.Substring(0, LocalPath.Length - model.DisplayName.Length - 1);
                     LocalPath = Path.Combine(dir, value);
                 }
-                model.DisplayName = value;                
+                model.DisplayName = value;
                 NotifyOfPropertyChanged("DisplayName");
             }
         }
@@ -84,9 +87,10 @@ namespace CmisSync.ViewModels.SyncFolderWizard
         public string LocalPath
         {
             get { return model.LocalPath; }
-            set {
-                model.LocalPath = value; 
-                NotifyOfPropertyChanged("LocalPath"); 
+            set
+            {
+                model.LocalPath = value;
+                NotifyOfPropertyChanged("LocalPath");
             }
         }
 
@@ -94,10 +98,14 @@ namespace CmisSync.ViewModels.SyncFolderWizard
         public String Error { get { return _error; } internal set { _error = value; NotifyOfPropertyChanged("Error"); } }
 
         public RelayCommand browseLocalPathCommand { get { return new RelayCommand(browseLocalPath); } }
-
-        private void browseLocalPath() {
-            LocalPath = Controller.browseLocalPath(LocalPath);
-        }      
+        private void browseLocalPath()
+        {
+            string path = Controller.browseLocalPath(LocalPath);
+            if (!string.IsNullOrEmpty(path))
+            {
+                LocalPath = Path.Combine(path, DisplayName);
+            }
+        }
 
     }
 }

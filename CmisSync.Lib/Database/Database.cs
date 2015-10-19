@@ -416,9 +416,9 @@ namespace CmisSync.Lib.Database
             parameters.Add("path", item.RemoteRelativePath);
             ExecuteSQLAction("DELETE FROM files WHERE path=@path", parameters);
 
-            parameters = new Dictionary<string, object>();
-            parameters.Add("path", item.RemoteRelativePath);
-            ExecuteSQLAction("DELETE FROM downloads WHERE path=@path", parameters);
+            //parameters = new Dictionary<string, object>();
+            //parameters.Add("path", item.RemoteRelativePath);
+            //ExecuteSQLAction("DELETE FROM downloads WHERE path=@path", parameters);
         }
 
 

@@ -1118,7 +1118,6 @@ namespace CmisSync.Lib.Sync
                 database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                 Logger.Info("Added file to database: " + filepath);
 
-                OnEvent(new FileDownloadedEvent(this, syncItem.RemoteRelativePath, filepath));
                 return true;
             }
             catch (Exception e)
@@ -1212,7 +1211,6 @@ namespace CmisSync.Lib.Sync
                 database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                 Logger.Info("Added file to database: " + syncItem.LocalPath);
 
-                OnEvent(new FileUploadedEvent(this, filePath, remoteFilePath));
                 return true;
             }
             catch (Exception e)

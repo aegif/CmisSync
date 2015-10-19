@@ -96,49 +96,49 @@ namespace CmisSync.Lib.Sync
         { }
     }
 
-    [Serializable]
-    public class FileUploadedEvent : SyncronizerEvent{
-        public string LocalFilePath { get; internal set; }
-        public string RemoteFilePath { get; internal set; }
+    //[Serializable]
+    //public class FileUploadedEvent : SyncronizerEvent{
+    //    public string LocalFilePath { get; internal set; }
+    //    public string RemoteFilePath { get; internal set; }
 
-        public override string Message
-        {
-            get
-            {
-                return base.Message + ": " + LocalFilePath + " to " + RemoteFilePath ;
-            }
-        }
+    //    public override string Message
+    //    {
+    //        get
+    //        {
+    //            return base.Message + ": " + LocalFilePath + " to " + RemoteFilePath ;
+    //        }
+    //    }
 
-        public FileUploadedEvent(SyncFolderSyncronizerBase source, string localFilePath, string remoteFilePath)
-            : base(source, "File Uploaded", EventLevel.INFO)
-        {
-            LocalFilePath = localFilePath;
-            RemoteFilePath = remoteFilePath;
-        }
-    }
+    //    public FileUploadedEvent(SyncFolderSyncronizerBase source, string localFilePath, string remoteFilePath)
+    //        : base(source, "File Uploaded", EventLevel.INFO)
+    //    {
+    //        LocalFilePath = localFilePath;
+    //        RemoteFilePath = remoteFilePath;
+    //    }
+    //}
 
-    [Serializable]
-    public class FileDownloadedEvent : SyncronizerEvent
-    {        
-        public string RemoteFilePath { get; internal set; }
-        public string LocalFilePath { get; internal set; }
+    //[Serializable]
+    //public class FileDownloadedEvent : SyncronizerEvent
+    //{        
+    //    public string RemoteFilePath { get; internal set; }
+    //    public string LocalFilePath { get; internal set; }
 
-        public override string Message
-        {
-            get
-            {
-                return base.Message + ": " + RemoteFilePath + " to " + LocalFilePath;
-            }
-        }
+    //    public override string Message
+    //    {
+    //        get
+    //        {
+    //            return base.Message + ": " + RemoteFilePath + " to " + LocalFilePath;
+    //        }
+    //    }
 
-        public FileDownloadedEvent(SyncFolderSyncronizerBase source, string remoteFilePath, string localFilePath)
-            : base(source, "File Downloaded", EventLevel.INFO)
-        {
+    //    public FileDownloadedEvent(SyncFolderSyncronizerBase source, string remoteFilePath, string localFilePath)
+    //        : base(source, "File Downloaded", EventLevel.INFO)
+    //    {
         
-            RemoteFilePath = remoteFilePath;
-            LocalFilePath = localFilePath;
-        }
-    }
+    //        RemoteFilePath = remoteFilePath;
+    //        LocalFilePath = localFilePath;
+    //    }
+    //}
 
     [Serializable]
     public class SyncronizationException : SyncronizerEvent
