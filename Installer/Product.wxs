@@ -43,6 +43,11 @@
         <File Id="log4net.dll" Name="log4net.dll" Source="$(var.CmisSync.TargetDir)\log4net.dll" DiskId="1" />
         <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.CmisSync.TargetDir)\Newtonsoft.Json.dll" DiskId="1" />
         <File Id="System.Data.SQLite.dll" Name="System.Data.SQLite.dll" Source="$(var.CmisSync.TargetDir)\System.Data.SQLite.dll" DiskId="1" />
+        <File Id="WPFGrowlNotification.dll" Name="WPFGrowlNotification.dll" Source="$(var.CmisSync.TargetDir)\WPFGrowlNotification.dll" DiskId="1" />
+        <File Id="ExtendedWindowsControls.dll" Name="ExtendedWindowsControls.dll" Source="$(var.CmisSync.TargetDir)\ExtendedWindowsControls.dll" DiskId="1" />
+        <File Id="System.Windows.Interactivity.dll" Name="System.Windows.Interactivity.dll" Source="$(var.CmisSync.TargetDir)\System.Windows.Interactivity.dll" DiskId="1" />
+        <File Id="AvalonWizard.dll" Name="AvalonWizard.dll" Source="$(var.CmisSync.TargetDir)\AvalonWizard.dll" DiskId="1" />
+        <File Id="AvalonWizard.Mvvm.dll" Name="AvalonWizard.Mvvm.dll" Source="$(var.CmisSync.TargetDir)\AvalonWizard.Mvvm.dll" DiskId="1" />
         <File Id="cmissync_app.ico" Name="cmissync.ico" Source="$(var.CmisSync.ProjectDir)Resources\cmissync-app.ico" DiskId="1" />
       </Component>
     </DirectoryRef>
