@@ -401,7 +401,12 @@ namespace CmisSync.Lib.Cmis
 
         internal static string GetDirectoryName(string path)
         {
-            return GetFileName(path);
+            int index = path.LastIndexOf(DirectorySeparatorChar);
+            if(index >= 0){
+                return path.Substring(0, index);
+            }else{
+                return "";
+            }
         }
 
         internal static bool IsPathRooted(string remotePath)

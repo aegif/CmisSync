@@ -501,8 +501,7 @@ namespace CmisSync.Lib
                             List<RemoteFolder> folders = new List<RemoteFolder>();
                             foreach (string path in CmisUtils.GetSubfolders(Repository.Id, Path, Repository.Account.RemoteUrl, Repository.Account.Credentials))
                             {
-                                //remove first /
-                                folders.Add(new RemoteFolder(this, CmisPath.GetDirectoryName(path)));
+                                folders.Add(new RemoteFolder(this, CmisPath.GetFileName(path)));
                             }
                             _subfolders = new ReadOnlyCollection<RemoteFolder>(folders);
                         }

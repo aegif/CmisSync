@@ -141,7 +141,10 @@ namespace CmisSync.Lib.Sync
 
         private void deleteLocalFiles()
         {
-            Directory.Delete(SyncFolderInfo.LocalPath, true);
+            if (File.Exists(SyncFolderInfo.LocalPath))
+            {
+                Directory.Delete(SyncFolderInfo.LocalPath, true);
+            }
         }
 
         /// <summary>

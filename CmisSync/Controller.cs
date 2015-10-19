@@ -258,7 +258,7 @@ namespace CmisSync
                 }
                 else if (dialog.Result == Views.MissingFolderDialog.Action.REMOVE)
                 {
-                    StopAndRemoveSyncFolderSyncronization(syncFolderInfo);
+                    StopAndRemoveSyncFolderSyncronization(syncFolderInfo, true);
                     ConfigManager.CurrentConfig.SyncFolders.Remove(syncFolderInfo);
 
                     Logger.Info("ControllerBase | Removed folder '" + syncFolderInfo.DisplayName + "' from config");
@@ -266,7 +266,7 @@ namespace CmisSync
                 }
                 else if (dialog.Result == Views.MissingFolderDialog.Action.RECREATE)
                 {
-                    StopAndRemoveSyncFolderSyncronization(syncFolderInfo);
+                    StopAndRemoveSyncFolderSyncronization(syncFolderInfo, true);
                     AddAndStartNewSyncFolderSyncronization(syncFolderInfo);
                     //TODO: also remove and recreate the config to ensure a fresh start
                     Logger.Info("ControllerBase | Folder '" + syncFolderInfo.DisplayName + "' recreated");
@@ -279,7 +279,7 @@ namespace CmisSync
             }
         }
 
-        private void StopAndRemoveSyncFolderSyncronization(Config.SyncConfig.SyncFolder syncFolderInfo)
+        private void StopAndRemoveSyncFolderSyncronization(Config.SyncConfig.SyncFolder syncFolderInfo, bool? keepLocalFiles = null)
         {
             bool found = false;
             //search and stop the syncher if already started
@@ -288,7 +288,7 @@ namespace CmisSync
                 //FIXME: can we identify a synced folder by it's localPath?
                 if (syncFolderInfo.LocalPath.Equals(syncher.SyncFolderInfo.LocalPath))
                 {
-                    StopAndRemoveSyncFolderSyncronization(syncher);
+                    StopAndRemoveSyncFolderSyncronization(syncher, keepLocalFiles);
                     found = true;
                     break;
                 }
@@ -301,26 +301,29 @@ namespace CmisSync
             }
         }
 
-        public void StopAndRemoveSyncFolderSyncronization(SyncFolderSyncronizer syncFolderSyncronizer)
+        public void StopAndRemoveSyncFolderSyncronization(SyncFolderSyncronizer syncFolderSyncronizer, bool? keepLocalFiles = null)
         {
-            bool keepLocalFiles;
-            MessageBoxResult result = MessageBox.Show("Do you want to also remove local files?", "Local Files", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-            if (result == MessageBoxResult.Yes)
+            if (!keepLocalFiles.HasValue)
             {
-                keepLocalFiles = false;
-            }
-            else if (result == MessageBoxResult.No)
-            {
-                keepLocalFiles = true;
-            }
-            else
-            {
-                //abort
-                return;
+                MessageBoxResult result = MessageBox.Show("Do you want to also remove local files?", "Local Files", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    keepLocalFiles = false;
+                }
+                else if (result == MessageBoxResult.No)
+                {
+                    keepLocalFiles = true;
+                }
+                else
+                {
+                    //abort
+                    return;
+                }
             }
 
             syncFolderSyncronizer.CancelSyncronization();
-            syncFolderSyncronizer.deleteResources(keepLocalFiles);
+            syncFolderSyncronizer.deleteResources(keepLocalFiles.Value);
+            ConfigManager.CurrentConfig.RemoveSyncFolder(syncFolderSyncronizer.SyncFolderInfo);
             syncFolderSyncronizer.Dispose();
             this.SyncFolders.Remove(syncFolderSyncronizer);
             Logger.Info("Removed Repository: " + syncFolderSyncronizer.SyncFolderInfo.DisplayName);
@@ -331,10 +334,6 @@ namespace CmisSync
         /// </summary>
         public void AddAndStartNewSyncFolderSyncronization(Config.SyncConfig.SyncFolder syncFolderInfo)
         {
-            if (syncFolderInfo.CmisDatabasePath == null)
-            {
-                syncFolderInfo.CmisDatabasePath = ConfigManager.CurrentConfig.ConfigurationDirectoryPath;
-            }
             //TODO: check repoInfo data
 
             checkDefaultRepositoryStncFolder();
