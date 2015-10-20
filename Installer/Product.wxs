@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" >
+
+  <Product Name="CmisSync" Id="*" UpgradeCode="4C725498-9D2D-43BF-8966-FEEACE102830"
+    Language="1033" Codepage="1252" Version="$(var.BuildVersion)" Manufacturer="Aegif">
+
+    <Package Id="*" Keywords="Installer" Description="CmisSync Setup" Manufacturer="Aegif"
+      InstallerVersion="100" Languages="1033" Compressed="yes" SummaryCodepage="1252" InstallScope="perMachine" />
+
+    <PropertyRef Id="NETFRAMEWORK40CLIENT" />
+    <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again. Download: http://www.microsoft.com/en-us/download/details.aspx?id=17113">
+      <![CDATA[Installed OR NETFRAMEWORK40CLIENT]]>
+    </Condition>
+
+    <Media Id="1" Cabinet="CmisSync.cab" EmbedCab="yes"/>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLDIR" Name="CmisSync">
+          <Directory Id="DIR_x86" Name="x86"/>
+          <Directory Id="DIR_x64" Name="x64"/>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="CmisSyncProgramsFolder" Name="CmisSync"/>
+      </Directory>
+      <Directory Id="DesktopFolder"/>
+      <Directory Id="StartupFolder"/>
+    </Directory>
+
+    <DirectoryRef Id="INSTALLDIR">
+      <Component Id="CmisSync.exe" Guid="A4C9FAFF-7698-4B7A-A055-5EC4847CA133">
+        <File Id="CmisSync.exe" Name="CmisSync.exe" Source="$(var.CmisSync.TargetPath)" KeyPath="yes" DiskId="1" />
+      </Component>
+      <!--
+      <Component Id="CmisSync.Console.exe" Guid="4F59D72E-28DE-4B09-98B9-92E440ED2BC9">
+        <File Id="CmisSync.Console.exe" Name="CmisSync.Console.exe" Source="$(var.CmisSync.Console.TargetPath)" KeyPath="yes" DiskId="1" />
+      </Component>
+      -->
+      <Component Id="Libraries" Guid="00062076-DE98-41BD-A0E4-CA3BD1A6AB41">
+        <File Id="CmisSync.Lib.dll" Name="CmisSync.Lib.dll" Source="$(var.CmisSync.TargetDir)\CmisSync.Lib.dll" KeyPath="yes" DiskId="1" />
+        <File Id="DotCMIS.dll" Name="DotCMIS.dll" Source="$(var.CmisSync.TargetDir)\DotCMIS.dll" DiskId="1" />
+        <File Id="log4net.dll" Name="log4net.dll" Source="$(var.CmisSync.TargetDir)\log4net.dll" DiskId="1" />
+        <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.CmisSync.TargetDir)\Newtonsoft.Json.dll" DiskId="1" />
+        <File Id="System.Data.SQLite.dll" Name="System.Data.SQLite.dll" Source="$(var.CmisSync.TargetDir)\System.Data.SQLite.dll" DiskId="1" />
+        <File Id="cmissync_app.ico" Name="cmissync.ico" Source="$(var.CmisSync.ProjectDir)Resources\cmissync-app.ico" DiskId="1" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DIR_x86">
+      <Component Id="COMP_x86" Guid="0D70581F-8A17-42A2-9D34-682AC663ACEC">
+        <CreateFolder />
+        <File Id="SQLite_x86" Name="SQLite.Interop.dll" Source="$(var.CmisSync.TargetDir)\x86\SQLite.Interop.dll" KeyPath="yes" DiskId="1" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DIR_x64">
+      <Component Id="COMP_x64" Guid="B9D4DB30-71D6-4FD8-90B4-2B0E72E6BB66">
+        <CreateFolder />
+        <File Id="SQLite_x64" Name="SQLite.Interop.dll" Source="$(var.CmisSync.TargetDir)\x64\SQLite.Interop.dll" KeyPath="yes" DiskId="1" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="CmisSyncProgramsFolder">
+      <Component Id="StartMenuShortcut" Guid="FCFFE059-4D1F-4E0C-AFE7-8F5B77390EE3">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="CmisSync"
+                  Target="[INSTALLDIR]CmisSync.exe"
+                  WorkingDirectory="INSTALLDIR"/>
+        <RemoveFolder Id="CmisSyncProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="34192850-2445-4C0B-A0A2-2EEDC2BE03DF">
+        <Shortcut Id="ApplicationDesktopShortcut"
+                  Name="CmisSync"
+                  Target="[INSTALLDIR]CmisSync.exe"
+                  WorkingDirectory="INSTALLDIR"/>
+        <RemoveFile Id="DesktopFolder" Name="CmisSync.lnk" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="StartupFolder">
+      <Component Id="StartupMenuItem" Guid="46C6E4A6-74C4-4D1B-AD7E-38F2F92144F6">
+        <RemoveFile Id="RemoveStartupItem" Name="CmisSync.lnk" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="StartupMenuItem" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="CmisSyncFeature" Title="CmisSync" Description="CmisSync" Level="1" AllowAdvertise="no">
+      <ComponentRef Id="CmisSync.exe" />
+      <!--
+      <ComponentRef Id="CmisSync.Console.exe" />
+      -->
+      <ComponentRef Id="Libraries" />
+      <ComponentRef Id="COMP_x86" />
+      <ComponentRef Id="COMP_x64" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+      <ComponentRef Id="StartupMenuItem" />
+    </Feature>
+
+    <WixVariable Id="WixUILicenseRtf" Value="Resources\license.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="Resources\WixUIBanner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="Resources\WixUIDialog.bmp" />
+    <UI>
+      <UIRef Id="WixUI_Minimal"/>
+    </UI>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+
+    <Icon Id="icon.ico" SourceFile="$(var.CmisSync.ProjectDir)Resources\cmissync-app.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="icon.ico" />
+
+    <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+    <Upgrade Id="4C725498-9D2D-43BF-8966-FEEACE102830">
+      <UpgradeVersion
+         Minimum="1.0.0.0" Maximum="99.0.0.0"
+         Property="PREVIOUSVERSIONSINSTALLED"
+         IncludeMinimum="yes" IncludeMaximum="no" />
+    </Upgrade>
+
+    <MajorUpgrade
+      Schedule="afterInstallInitialize"
+      DowngradeErrorMessage="A later version of CmisSync is already installed. Setup will now exit." />
+  </Product>
+</Wix>

@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=CmisSayncInviteOpener
-Exec=cmissync open %U
-Terminal=false
-MimeType=application/x-cmissync;x-scheme-handler/cmissync;application/x-cmissync-unsafe;x-scheme-handler/cmissync-unsafe;
-NoDisplay=true
-Name[en_US]=cmissync-invite-opener

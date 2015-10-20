@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <Bundle
+    Name="CmisSync"
+    Version="$(var.BuildVersion)"
+    Manufacturer="Aegif"
+    IconSourceFile="$(var.CmisSync.ProjectDir)Resources\cmissync-app.ico"
+    UpgradeCode="12F52B78-05B3-4A20-9BAE-2211A807A3E7">
+
+    <Variable Name="InstallFolder" Type="string" Value="[ProgramFilesFolder]CmisSync"/>
+
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLargeLicense">
+      <bal:WixStandardBootstrapperApplication
+          LaunchTarget="[InstallFolder]\CmisSync.exe"
+          LicenseFile="Resources\license.rtf"
+          LogoFile="Resources\logo.png"
+          ShowVersion="yes"
+          SuppressDowngradeFailure="no"
+          SuppressOptionsUI="no"
+          SuppressRepair="no"
+          ThemeFile="Resources\CustomTheme.xml"
+          LocalizationFile="Resources\CustomTheme.wxl"
+      />
+    </BootstrapperApplicationRef>
+
+    <Chain>
+      <PackageGroupRef Id="NetFx40ClientWeb" />
+      <RollbackBoundary />
+      <MsiPackage
+          DisplayName="CmisSync Application"
+          SourceFile="$(var.Installer.TargetPath)"
+          DisplayInternalUI="no"
+          Visible="no"
+          Vital="yes"
+          Permanent="no"
+          Cache="no">
+        <MsiProperty Name="INSTALLDIR" Value="[InstallFolder]" />
+      </MsiPackage>
+    </Chain>
+  </Bundle>
+</Wix>

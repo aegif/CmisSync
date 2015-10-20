@@ -1,3 +1,6 @@
 [submodule "Extras/OpenDataSpaceDotCMIS"]
 	path = Extras/OpenDataSpaceDotCMIS
-	url = https://github.com/aegif/chemistry-dotcmis.git
+	url = https://github.com/lelmarir/chemistry-dotcmis.git
+[submodule "Extras/WPFGrowlNotification"]
+	path = Extras/WPFGrowlNotification
+	url = https://github.com/lelmarir/WPFGrowlNotification.git

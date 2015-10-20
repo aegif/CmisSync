@@ -1,150 +1,129 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2C914413-B31C-4362-93C7-1AE34F09112A}</ProjectGuid>
+    <ProjectGuid>{B4516837-A333-4C0F-8A2A-51007E638AA3}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CmisSync.Lib</RootNamespace>
     <AssemblyName>CmisSync.Lib</AssemblyName>
-    <ReleaseVersion>
-    </ReleaseVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>6f091e5d</NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\$(Configuration)\CmisSync.Lib.XML</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <OutputPath>bin\Debug\</OutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-    <DebugType>full</DebugType>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>False</Optimize>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>bin\$(Configuration)\CmisSync.Lib.XML</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Mac Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;__COCOA__;</DefineConstants>
-    <DocumentationFile>bin\Debug\CmisSync.Lib.XML</DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Extras\OpenDataSpaceDotCMIS\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.Data" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.98.1\lib\net45\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.98.1\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.98.1\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="System.Data.SQLite">
-      <HintPath>..\Extras\sqlite-netFx40-binary-Win32-2010-1.0.84.0\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Data.Sqlite" />
-    <Reference Include="Mono.Posix" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChunkedStream.cs" />
-    <Compile Include="Database\DatabaseMigrationBase.cs" />
-    <Compile Include="Database\DatabaseMigration.cs" />
-    <Compile Include="Events\ActiveActivitiesManager.cs" />
-    <Compile Include="Events\ConfigChangedEvent.cs" />
-    <Compile Include="Events\DebugLoggingHandler.cs" />
-    <Compile Include="Events\FileConflictEvent.cs" />
-    <Compile Include="Events\FileTransmissionEvent.cs" />
-    <Compile Include="Events\FSDeletionHandler.cs" />
-    <Compile Include="Events\FSEvent.cs" />
-    <Compile Include="Events\GenericSyncEventHandler.cs" />
-    <Compile Include="Events\ISyncEvent.cs" />
-    <Compile Include="Events\SyncEventHandler.cs" />
-    <Compile Include="Events\SyncEventManager.cs" />
-    <Compile Include="Events\SyncEventQueue.cs" />
-    <Compile Include="Sync\ChangeLogThenCrawlStrategy.cs" />
-    <Compile Include="UserNotificationListener.cs" />
-    <Compile Include="Cmis\BaseException.cs" />
-    <Compile Include="Database\Database.cs" />
-    <Compile Include="FolderLock.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ConfigMigration.cs" />
-    <Compile Include="Sync\SynchronizedFolder.cs" />
-    <Compile Include="Sync\CrawlStrategy.cs" />
-    <Compile Include="Cmis\PermissionDeniedException.cs" />
-    <Compile Include="Cmis\ServerNotFoundException.cs" />
+    <Compile Include="Auth\Auth.cs" />
+    <Compile Include="Auth\Credentials.cs" />
+    <Compile Include="Auth\Crypto.cs" />
+    <Compile Include="Auth\Password.cs" />
+    <Compile Include="Backend.cs" />
     <Compile Include="Cmis\CmisUtils.cs" />
     <Compile Include="Cmis\MimeType.cs" />
-    <Compile Include="Sync\CmisRepo.cs" />
-    <Compile Include="Sync\WatcherStrategy.cs" />
-    <Compile Include="ConfigManager.cs" />
-    <Compile Include="RepoBase.cs" />
-    <Compile Include="RepoInfo.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="Backend.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="Config\Config.cs" />
+    <Compile Include="Config\ConfigManager.cs" />
+    <Compile Include="Config\ConfigMigration.cs" />
+    <Compile Include="Database\Database.cs" />
+    <Compile Include="FolderLock.cs" />
+    <Compile Include="ModelBase.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sync\SyncFolderSyncronizerBase.cs" />
+    <Compile Include="SyncItem.cs" />
+    <Compile Include="Sync\SyncFolderSyncronizer_ChangeLogThenCrawlStrategy.cs" />
+    <Compile Include="Sync\SyncFolderSyncronizer.cs" />
+    <Compile Include="Sync\SyncFolderSyncronizer_CrawlStrategy.cs" />
+    <Compile Include="Sync\SyncFolderSyncronizer_events.cs" />
+    <Compile Include="Sync\SyncFolderSyncronizer_exceptions.cs" />
+    <Compile Include="Sync\SyncFolderSyncronizer_WatcherStrategy.cs" />
+    <Compile Include="Utils\Objects.cs" />
+    <Compile Include="Utils\SyncUtils.cs" />
+    <Compile Include="Utils\ObservableDictionary.cs" />
+    <Compile Include="Utils\ThreadSafeObservableCollection.cs" />
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="IActivityListener.cs" />
-    <Compile Include="ActivityListenerAggregator.cs" />
-    <Compile Include="SyncItem.cs" />
-    <Compile Include="Database\DatabaseMigrationToVersion3.cs" />
+    <Compile Include="XmlUri.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
-      <Project>{FDB085EB-D424-434D-9C55-D31A8994F7B4}</Project>
-      <Name>CmisSync.Auth</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Extras\log4net-1.2.11\src\log4net.vs2010.csproj">
-      <Project>{181FE707-E161-4722-9F38-6AAAB6FAA106}</Project>
-      <Name>log4net.vs2010</Name>
-    </ProjectReference>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Extras\OpenDataSpaceDotCMIS\DotCMIS\DotCMIS.csproj">
-      <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
+      <Project>{529ef90f-a34c-4426-a4f9-65113ac23841}</Project>
       <Name>DotCMIS</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Policies>
-          <TextStylePolicy inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentSwitchBody="True" AnonymousMethodBraceStyle="NextLine" PropertyBraceStyle="NextLine" PropertyGetBraceStyle="NextLine" PropertySetBraceStyle="NextLine" EventBraceStyle="NextLine" EventAddBraceStyle="NextLine" EventRemoveBraceStyle="NextLine" StatementBraceStyle="NextLine" ElseNewLinePlacement="NewLine" CatchNewLinePlacement="NewLine" FinallyNewLinePlacement="NewLine" WhileNewLinePlacement="DoNotCare" ArrayInitializerWrapping="DoNotChange" ArrayInitializerBraceStyle="NextLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
-        </Policies>
-        <MonoDevelop.Autotools.MakefileInfo RelativeMakefileName="Makefile.am">
-          <BuildFilesVar Sync="True" Name="SOURCES" />
-          <DeployFilesVar />
-          <ResourcesVar />
-          <OthersVar />
-          <GacRefVar />
-          <AsmRefVar />
-          <ProjectRefVar />
-        </MonoDevelop.Autotools.MakefileInfo>
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.98.1\build\net45\System.Data.SQLite.Core.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

@@ -1,0 +1,28 @@
+﻿<Window x:Class="CmisSync.Views.MissingFolderDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MissingFolderDialog" Height="176.596" Width="367.021" DataContext="{Binding RelativeSource={RelativeSource Self}}" ResizeMode="NoResize">
+    <StackPanel Margin="2">
+        <Label Content="The local folder for the synced repository is missing."/>
+        <Grid Margin="6,2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Content="Local Folder" Grid.Row="0" Grid.Column="0"/>
+            <Label Content="Label" Grid.Row="1" Grid.Column="0"/>
+            <Label Content="{Binding repo.LocalPath}" Grid.Row="0" Grid.Column="1"/>
+            <Label Content="{Binding repo.RemotePath}" Grid.Row="1" Grid.Column="1"/>
+        </Grid>
+        <Label Content="How do you want to procede?"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Select new Path" Command="{Binding selectNewCommand}" Margin="2"/>
+            <Button Content="Remove from Sync" Command="{Binding removeFromSyncCommand}" Margin="2"/>
+            <Button Content="Resync" Command="{Binding resyncCommand}" Margin="2"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

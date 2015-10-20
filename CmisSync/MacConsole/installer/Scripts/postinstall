@@ -1,3 +1,0 @@
-#!/bin/sh
-ln -s /usr/local/lib/cmissync.console/cmissync_once /usr/local/bin/cmissync_once
-exit $?

@@ -1,0 +1,54 @@
+﻿<Window x:Class="CmisSync.Views.AccountWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:view="clr-namespace:CmisSync.ViewModels"
+        xmlns:utils="clr-namespace:CmisSync.Utils"
+        Title="Window1" Height="249.582" Width="633.791" SizeToContent="Height">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Resources/ValidationErrorTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <StackPanel Margin="5">
+        <TextBlock Text="Descrizione..."/>
+        <Grid Margin="10">
+            <Grid.Resources>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Margin" Value="5"></Setter>
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Content="Name" Grid.Row="0" Grid.Column="0"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding DisplayName, ValidatesOnDataErrors=True,ValidatesOnExceptions=True}" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}"></TextBox>
+            <Label Content="Server URL" Grid.Row="1" Grid.Column="0"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding ServerUrl, ValidatesOnDataErrors=True,ValidatesOnExceptions=True}" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}"></TextBox>
+            <Label Content="User Name" Grid.Row="2" Grid.Column="0"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding UserName}"></TextBox>
+            <Label Content="Password" Grid.Row="3" Grid.Column="0"/>
+            <PasswordBox  Grid.Row="3" Grid.Column="1" 
+                          utils:PasswordBoxAssistant.BindPassword="true"  
+                          utils:PasswordBoxAssistant.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></PasswordBox>
+        </Grid>
+        <TextBlock Text="{Binding IDataErrorInfo.Error}"></TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="20,0">
+            <Button Content="Save" Margin="3" 
+                    Command="{Binding saveCommand}" 
+                    CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" 
+                    />
+            <Button Content="Cancel" Margin="3" Command="{Binding cancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
+        </StackPanel>
+
+    </StackPanel>
+</Window>
