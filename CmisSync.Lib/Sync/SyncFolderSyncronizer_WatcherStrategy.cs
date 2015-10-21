@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -11,6 +10,8 @@ using DotCMIS.Client;
 using CmisSync.Lib.Cmis;
 using System.Threading;
 using DotCMIS.Exceptions;
+using CmisSync.Lib.Utils;
+using System.Collections.Generic;
 
 
 namespace CmisSync.Lib.Sync
@@ -28,22 +29,20 @@ namespace CmisSync.Lib.Sync
             bool success = true;
             Logger.Debug("WatcherSync(" + remoteFolder + ", " + localFolder + ")");
             CheckPendingCancelation();
-            Queue<FileSystemEventArgs> changeQueue = watcher.GetChangeQueue();
-            this.watcher.Clear();
-
+            LinkedList<FileSystemEventArgs> changes = watcher.GetChanges();
+            
             if (Logger.IsDebugEnabled)
             {
-                foreach (FileSystemEventArgs change in changeQueue)
+                foreach (FileSystemEventArgs change in changes)
                 {
                     if (change is CmisSync.Lib.Watcher.MovedEventArgs) Logger.DebugFormat("Moved: {0} -> {1}", ((CmisSync.Lib.Watcher.MovedEventArgs)change).OldFullPath, change.FullPath);
                     else if (change is RenamedEventArgs) Logger.DebugFormat("Renamed: {0} -> {1}", ((RenamedEventArgs)change).OldFullPath, change.FullPath);
                     else Logger.DebugFormat("{0}: {1}", change.ChangeType, change.FullPath);
                 }
-            }            
+            }
 
-            while (changeQueue.Count > 0)
+            foreach(FileSystemEventArgs earliestChange in changes)
             {
-                FileSystemEventArgs earliestChange = changeQueue.Dequeue();
                 string pathname = earliestChange.FullPath;
                 if (!pathname.StartsWith(localFolder))
                 {
@@ -222,13 +221,12 @@ namespace CmisSync.Lib.Sync
             }
             try
             {
-                //FIXME
-                string name = pathname.Substring(localFolder.Length + 1);
-                string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
+                string relativeNamePath = SyncUtils.GetLocalRelativePath(pathname, localFolder);
+                string remoteName = CmisPath.Combine(remoteFolder, PathRepresentationConverter.LocalToRemote(relativeNamePath));
                 IFolder remoteBase = null;
                 if (File.Exists(pathname) || Directory.Exists(pathname))
                 {
-                    string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/');
+                    string remoteBaseName = CmisPath.GetDirectoryName(remoteName);
                     remoteBase = (IFolder)getSession().GetObjectByPath(remoteBaseName);
                     if (null == remoteBase)
                     {
@@ -301,22 +299,42 @@ namespace CmisSync.Lib.Sync
         /// </summary>
         /// <param name="remoteFolder">Remote folder.</param>
         /// <param name="localFolder">Local folder.</param>
-        /// <param name="pathname">Pathname.</param>
-        private bool WatcherSyncDelete(string remoteFolder, string localFolder, string pathname)
+        /// <param name="localNamePath">Pathname.</param>
+        private bool WatcherSyncDelete(string remoteFolder, string localFolder, string localNamePath)
         {
             CheckPendingCancelation();
 
-            // In many programs (like Microsoft Word), deletion is often just a save:
-            // 1. Save data to temporary file ~wrdxxxx.tmp
-            // 2. Delete Example.doc
-            // 3. Rename ~wrdxxxx.tmp to Example.doc
-            // See https://support.microsoft.com/en-us/kb/211632
-            // So, upon deletion, wait a bit for any save operation to hopefully finalize, then sync.
-            // This is not 100% foolproof, as saving can last for more than GRACE_TIME, but probably
-            // the best we can do without mind-reading third-party programs.
-            int GRACE_TIME = 15000; // 15 seconds.
-            Thread.Sleep(GRACE_TIME);
-            return false; // Perform a sync.
+            //Note that with the continueOnFailure parameter set to true, folders and documents are deleted individually. If a document or folder cannot be deleted, the method moves to the next document or folder in the list. When the method completes, it returns a list of the document IDs and folder IDs that were not deleted.
+            //With the continueOnFailure parameter set to false, all of the folders and documents can be deleted in a single batch, which, depending on the repository design, may improve performance. If a document or folder cannot be deleted, an exception is raised. Some repository implementations will attempt the delete transactionally, so if it fails, no objects are deleted. In other repositories a failed delete may have deleted some, but not all, objects in the tree.
+
+            SyncItem item = getSyncItemFromLocalPath(localNamePath);
+            
+            IFolder folder;
+            try
+            {
+                folder = tryGetObjectByPath(item.RemotePath);
+            }
+            catch (CmisObjectNotFoundException e)
+            {
+                Logger.Warn("Unable to locate the remote file or folder: " + item.RemotePath, e);
+                return true;
+            }
+            try
+            {
+                IList<string> result = folder.DeleteTree(true, null, false);
+                bool succes = result == null || result.Count == 0;
+
+                if (succes)
+                {
+                    database.RemoveFolder(item);
+                }
+                return succes;
+            }
+            catch (Exception e)
+            {
+                HandleException(new DeleteRemoteFolderException(item.RemotePath, e));
+                return false;
+            }
         }
     }
 }

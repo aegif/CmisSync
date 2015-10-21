@@ -265,7 +265,7 @@ namespace CmisSync.Lib.Sync
 
             //reset cache
             getSession().Clear();
-            IFolder remoteFolder = tryGetObjectByPath(remoteFolderPath, 2);
+            IFolder remoteFolder = tryGetObjectByPath(remoteFolderPath);
 
             checkDirectories();
 
@@ -283,19 +283,20 @@ namespace CmisSync.Lib.Sync
                     CrawlSyncAndUpdateChangeLogToken(remoteFolder, SyncFolderInfo.LocalPath);
                 }
 
-                if (ChangeLogCapability)
-                {
-                    Logger.Debug("Invoke a remote change log sync");
-                    ChangeLogThenCrawlSync(remoteFolder, SyncFolderInfo.LocalPath);
-                }
-                else
-                {
-                    //  Have to crawl remote.
-                    Logger.Warn("Invoke a full crawl sync (the remote does not support ChangeLog)");
-                    //FIXME: why do we need to clear the watcher? it should already be
-                    watcher.Clear();
-                    CrawlSyncAndUpdateChangeLogToken(remoteFolder, SyncFolderInfo.LocalPath);
-                }
+                ////TODO: should not crawn on Partial Sync
+                //if (ChangeLogCapability)
+                //{
+                //    Logger.Debug("Invoke a remote change log sync");
+                //    ChangeLogThenCrawlSync(remoteFolder, SyncFolderInfo.LocalPath);
+                //}
+                //else
+                //{
+                //    //  Have to crawl remote.
+                //    Logger.Warn("Invoke a full crawl sync (the remote does not support ChangeLog)");
+                //    //FIXME: why do we need to clear the watcher? it should already be
+                //    watcher.Clear();
+                //    CrawlSyncAndUpdateChangeLogToken(remoteFolder, SyncFolderInfo.LocalPath);
+                //}
             }
             else
             {
@@ -303,7 +304,7 @@ namespace CmisSync.Lib.Sync
             }
         }
 
-        private IFolder tryGetObjectByPath(string remoteFolderPath, int tries)
+        internal IFolder tryGetObjectByPath(string remoteFolderPath, int tries = 2)
         {
             while (tries > 0)
             {

@@ -224,8 +224,6 @@ namespace CmisSync.Lib.Sync
                             // If there was previously a folder with this name, it means that
                             // the user has deleted it voluntarily, so delete it from server too.
 
-
-
                             // Delete the folder from the remote server.
                             try
                             {

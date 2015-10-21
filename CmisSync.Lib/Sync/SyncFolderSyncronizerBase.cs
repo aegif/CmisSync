@@ -122,20 +122,10 @@ namespace CmisSync.Lib.Sync
         private Timers.Timer remote_timer = new Timers.Timer();
 
         /// <summary>
-        /// Timer to delay syncing after local change is made.
-        /// </summary>
-        private Timers.Timer local_timer = new Timers.Timer();
-
-        /// <summary>
         /// Event to notify that the sync has completed.
         /// </summary>
         private AutoResetEvent syncAutoResetEvent = new AutoResetEvent(true);
-
-        /// <summary>
-        /// Timer for syncing after local change is made.
-        /// </summary>
-        private readonly double localSyncDelayInterval = 5 * 1000; //5 seconds.
-
+        
         /// <summary>
         /// When the last full sync completed.
         /// </summary>
@@ -193,15 +183,6 @@ namespace CmisSync.Lib.Sync
             };
             remote_timer.AutoReset = true;
 
-            //Partial sync interval..
-            local_timer.Elapsed += delegate
-            {
-                // Run partial sync.
-                SyncInBackground(SyncMode.PARTIAL);
-            };
-            local_timer.AutoReset = false;
-            local_timer.Interval = localSyncDelayInterval;
-
             syncWorker = new BackgroundWorker();
             syncWorker.WorkerSupportsCancellation = true;
             syncWorker.DoWork += new DoWorkEventHandler(
@@ -227,7 +208,6 @@ namespace CmisSync.Lib.Sync
                 watcher.Dispose();
             }
             watcher = new Watcher(SyncFolderInfo.LocalPath);
-            watcher.EnableRaisingEvents = true;
             watcher.ChangeEvent += OnFileActivity;
 
             Logger.Info("Repo " + SyncFolderInfo.DisplayName + " - Set poll interval to " + SyncFolderInfo.PollInterval + "ms");
@@ -289,8 +269,6 @@ namespace CmisSync.Lib.Sync
                 {
                     this.remote_timer.Stop();
                     this.remote_timer.Dispose();
-                    this.local_timer.Stop();
-                    this.local_timer.Dispose();
                     this.watcher.Dispose();
                     //this.folderLock.Dispose();
                 }
@@ -353,10 +331,8 @@ namespace CmisSync.Lib.Sync
                 if (syncMode == SyncMode.FULL)
                 {
                     remote_timer.Stop();
-                    local_timer.Stop();
                 }
-                watcher.EnableRaisingEvents = false; //Disable events while syncing...
-                watcher.EnableEvent = false;
+                watcher.Enable = false;//Disable events while syncing...
 
                 OnEvent(new SyncronizationStarted(this));
 
@@ -416,8 +392,7 @@ namespace CmisSync.Lib.Sync
                         watcher.Clear();
                     }
 
-                    watcher.EnableRaisingEvents = true;
-                    watcher.EnableEvent = true;
+                    watcher.Enable = true;
                     Logger.Info((syncMode == SyncMode.FULL ? "Full" : "Partial") + " Sync Completed: " + SyncFolderInfo.LocalPath);
 
                     // Save last sync
@@ -519,7 +494,7 @@ namespace CmisSync.Lib.Sync
             if (Status != SyncStatus.Suspended)
             {
                 this.remote_timer.Stop();
-                watcher.EnableRaisingEvents = false;
+                watcher.Enable = false;
                 CancelSyncronization();
                 if (persist)
                 {
@@ -539,7 +514,7 @@ namespace CmisSync.Lib.Sync
             if (Status == SyncStatus.Suspended)
             {
                 this.remote_timer.Start();
-                watcher.EnableRaisingEvents = true;  
+                watcher.Enable = true;  
                 if (!IsSyncingInProgress())
                 {                                      
                     Status = SyncStatus.Idle;
@@ -573,10 +548,10 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Some file activity has been detected, sync changes.
         /// </summary>
-        protected void OnFileActivity(object sender, FileSystemEventArgs args)
+        protected void OnFileActivity(object sender, EventArgs args)
         {
-            local_timer.Stop();
-            local_timer.Start(); //Restart the local timer...
+            // Run partial sync.
+            SyncInBackground(SyncMode.PARTIAL);
         }
 
         /// <summary>

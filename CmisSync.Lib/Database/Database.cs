@@ -205,8 +205,14 @@ namespace CmisSync.Lib.Database
         private string relativeLocalPath(string path)
         {
             //TODO: check for null
-            path = path.Substring(localPathPrefix.Length+1);
-            return path;
+            if (path.StartsWith(localPathPrefix))
+            {
+                path = path.Substring(localPathPrefix.Length + 1);
+                return path;
+            }
+            else {
+                throw new ArgumentException("The path don't seem to be a subpath of the localPathPrefix");
+            }
         }
 
 

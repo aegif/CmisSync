@@ -92,13 +92,13 @@
     <Compile Include="Sync\SyncFolderSyncronizer_events.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer_exceptions.cs" />
     <Compile Include="Sync\SyncFolderSyncronizer_WatcherStrategy.cs" />
+    <Compile Include="Utils\LimitedQueue.cs" />
+    <Compile Include="Utils\LinkedListIterator.cs" />
     <Compile Include="Utils\Objects.cs" />
     <Compile Include="Utils\SyncUtils.cs" />
     <Compile Include="Utils\ObservableDictionary.cs" />
     <Compile Include="Utils\ThreadSafeObservableCollection.cs" />
-    <Compile Include="Watcher.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Watcher.cs" />
     <Compile Include="XmlUri.cs" />
   </ItemGroup>
   <ItemGroup>
