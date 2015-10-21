@@ -570,7 +570,7 @@ namespace CmisSync.Lib.Sync
                     Path.GetFileName(localSubFolderPath), 
                     SyncFolderInfo))
                 {
-                    SyncItem syncFolderItem = getSyncItemFromLocalPath(localFolderPath);
+                    SyncItem syncFolderItem = getSyncItemFromLocalPath(localSubFolderPath);
                     if (!remoteSubFolders.Contains(syncFolderItem.RemoteFileName))
                     {
                         // This local folder is not on the CMIS server now, so
