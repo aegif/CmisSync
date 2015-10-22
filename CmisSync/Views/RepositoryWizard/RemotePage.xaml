@@ -12,7 +12,7 @@
         <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=aw:Wizard}"></Binding>
     </UserControl.DataContext>-->
     <DockPanel LastChildFill="True">
-        <Label DockPanel.Dock="Top">Descrizione...</Label>
+        <TextBlock Margin="5" TextWrapping="Wrap" DockPanel.Dock="Top">Select the remote folder.</TextBlock>
         <TreeView Margin="5" ItemsSource="{Binding RemoteFolders}" SelectedItemChanged="TreeView_SelectedItemChanged">
             <TreeView.ItemContainerStyle>
                 <!-- 

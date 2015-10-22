@@ -10,14 +10,14 @@
         <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=aw:Wizard}"></Binding>
     </UserControl.DataContext>-->
     <StackPanel>
-        <Label Content="Desctizione....."></Label>
+        <TextBlock Margin="5" Text="Select the Profile in which is the folder you want to syncronize, or create a new one." TextWrapping="Wrap"/>
         <Grid Margin="0, 10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="279*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label Content="Account" Margin="0,0,8,0" Grid.Column="0"/>
+            <Label Content="Profile" Margin="0,0,8,0" Grid.Column="0"/>
             <ComboBox Grid.Column="1" 
                       ItemsSource="{Binding Accounts}" 
                       SelectedItem="{Binding DataContext.Account, RelativeSource={RelativeSource AncestorType=aw:Wizard}}" 

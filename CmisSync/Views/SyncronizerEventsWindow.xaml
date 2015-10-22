@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:CmisSync.ViewModels"
         mc:Ignorable="d"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        Title="SyncronizerEventsWindow" Height="300" Width="600">
+        Title="SyncronizerEventsWindow" Height="300" Width="600" Icon="/CmisSync;component/Resources/cmissync-app.ico">
     <Grid>
         <DataGrid ItemsSource="{Binding Events, Mode=OneWay}" 
                   AutoGenerateColumns="False" 

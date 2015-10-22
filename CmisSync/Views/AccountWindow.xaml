@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:view="clr-namespace:CmisSync.ViewModels"
         xmlns:utils="clr-namespace:CmisSync.Utils"
-        Title="Window1" Height="249.582" Width="633.791" SizeToContent="Height">
+        Title="Profile" Height="249.582" Width="633.791" SizeToContent="Height" Icon="/CmisSync;component/Resources/cmissync-app.ico">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -12,7 +12,6 @@
         </ResourceDictionary>
     </Window.Resources>
     <StackPanel Margin="5">
-        <TextBlock Text="Descrizione..."/>
         <Grid Margin="10">
             <Grid.Resources>
                 <Style TargetType="{x:Type TextBox}">
@@ -31,7 +30,7 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <Label Content="Name" Grid.Row="0" Grid.Column="0"/>
-            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding DisplayName, ValidatesOnDataErrors=True,ValidatesOnExceptions=True}" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}"></TextBox>
+            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding DisplayName, ValidatesOnDataErrors=True,ValidatesOnExceptions=True}" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}" ToolTip="The profile name, to allow you to identify it."></TextBox>
             <Label Content="Server URL" Grid.Row="1" Grid.Column="0"/>
             <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding ServerUrl, ValidatesOnDataErrors=True,ValidatesOnExceptions=True}" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}"></TextBox>
             <Label Content="User Name" Grid.Row="2" Grid.Column="0"/>
@@ -39,7 +38,8 @@
             <Label Content="Password" Grid.Row="3" Grid.Column="0"/>
             <PasswordBox  Grid.Row="3" Grid.Column="1" 
                           utils:PasswordBoxAssistant.BindPassword="true"  
-                          utils:PasswordBoxAssistant.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></PasswordBox>
+                          utils:PasswordBoxAssistant.BoundPassword="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                          Margin="5,2"></PasswordBox>
         </Grid>
         <TextBlock Text="{Binding Error}"></TextBlock>
         <StackPanel Orientation="Horizontal" Margin="20,0">

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <StackPanel>
-        <Label Content="Desctizione....."></Label>
+        <TextBlock Margin="5" Text="Select the path in wich syncronize the remote folder." TextWrapping="Wrap"></TextBlock>
         <Grid>
             <Grid.Resources>
                 <Style TargetType="{x:Type TextBox}">

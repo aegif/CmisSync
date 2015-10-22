@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:CmisSync.Views.Converters"
-        Title="Settings" MinWidth="300" MaxWidth="600" SizeToContent="WidthAndHeight">
+        Title="Settings" MinWidth="300" MaxWidth="600" SizeToContent="WidthAndHeight" Icon="/CmisSync;component/Resources/cmissync-app.ico">
     <StackPanel Margin="10">
         <Grid>
             <Grid.Resources>
@@ -23,6 +23,13 @@
                 </Style>
                 <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type FrameworkElement}}"/>
                 <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type FrameworkElement}}"/>
+                <Style TargetType="{x:Type TextBox}">
+                    <Style.Triggers>
+                        <Trigger Property="IsReadOnly" Value="True">
+                            <Setter Property="Background" Value="#FFF1F1F1"></Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
 
                 <converters:IntToPollIntervalConverter x:Key="intToPollIntervalConverter"/>
             </Grid.Resources>
@@ -41,26 +48,26 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Nome:" Grid.Row="0" Grid.Column="0"/>
-            <TextBlock Text="{Binding DisplayName}" Grid.Row="0" Grid.Column="1"/>
+            <TextBlock Text="Name:" Grid.Row="0" Grid.Column="0"/>
+            <TextBox IsReadOnly="True" Text="{Binding DisplayName, Mode=OneWay}" Grid.Row="0" Grid.Column="1"/>
 
             <TextBlock Text="LastSuccessedSync:" Grid.Row="1" Grid.Column="0"/>
-            <TextBlock Text="{Binding LastSuccessedSync}" Grid.Row="1" Grid.Column="1"/>
+            <TextBox IsReadOnly="True" Text="{Binding LastSuccessedSync, Mode=OneWay}" Grid.Row="1" Grid.Column="1"/>
 
-            <TextBlock Text="Account:" Grid.Row="2" Grid.Column="0"/>
-            <TextBlock Text="{Binding Account.DisplayName}" Grid.Row="2" Grid.Column="1"/>
+            <TextBlock Text="Profile:" Grid.Row="2" Grid.Column="0"/>
+            <TextBox IsReadOnly="True" Text="{Binding Account.DisplayName, Mode=OneWay}" Grid.Row="2" Grid.Column="1"/>
 
             <TextBlock Text="Server Url:" Grid.Row="3" Grid.Column="0"/>
-            <TextBlock Text="{Binding Account.RemoteUrl}" Grid.Row="3" Grid.Column="1"/>
+            <TextBox IsReadOnly="True" Text="{Binding Account.RemoteUrl, Mode=OneWay}" Grid.Row="3" Grid.Column="1"/>
 
             <TextBlock Text="User:" Grid.Row="4" Grid.Column="0"/>
-            <TextBlock Text="{Binding Account.Credentials.UserName}" Grid.Row="4" Grid.Column="1"/>
+            <TextBox IsReadOnly="True" Text="{Binding Account.Credentials.UserName, Mode=OneWay}" Grid.Row="4" Grid.Column="1"/>
 
             <TextBlock Text="Remote Path:" Grid.Row="5" Grid.Column="0"/>
-            <TextBlock Text="{Binding RemotePath}" Grid.Row="5" Grid.Column="1"/>
+            <TextBox IsReadOnly="True" Text="{Binding RemotePath, Mode=OneWay}" Grid.Row="5" Grid.Column="1"/>
 
             <TextBlock Text="Local Path:" Grid.Row="6" Grid.Column="0"/>
-            <TextBlock Text="{Binding LocalPath}" Grid.Row="6" Grid.Column="1"/>
+            <TextBox IsReadOnly="True" Text="{Binding LocalPath, Mode=OneWay}" Grid.Row="6" Grid.Column="1"/>
 
             <TextBlock Text="Sync at Startup:" Grid.Row="7" Grid.Column="0"/>
             <CheckBox IsChecked="{Binding SyncAtStartup}" Grid.Row="7" Grid.Column="1"/>
