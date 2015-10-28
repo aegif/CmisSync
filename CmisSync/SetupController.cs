@@ -316,13 +316,13 @@ namespace CmisSync
         /// <summary>
         /// Regex to check an HTTP/HTTPS URL.
         /// </summary>
-        private Regex UrlRegex = new Regex(@"^" +
+        private Regex UrlRegex = new Regex(@"^" + // FIXME use http://stackoverflow.com/questions/161738/what-is-the-best-regular-expression-to-check-if-a-string-is-a-valid-url
                     "(https?)://" +                                                 // protocol
                     "(([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+" +        // username
                     "(:([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+)?" +     // password
                     "@)?(?#" +                                                      // auth delimiter
-                    ")((([a-z\\d]\\.|[a-z\\d][a-z\\d-]*[a-z\\d]\\.)*" +             // domain segments AND
-                    "[a-z][a-z\\d-]*[a-z\\d]" +                                     // top level domain OR
+                    ")((([a-z0-9\\d]\\.|[a-z0-9\\d][a-z0-9\\d-]*[a-z0-9\\d]\\.)*" +             // domain segments AND
+                    "[a-z0-9][a-z0-9\\d-]*[a-z0-9\\d]" +                                     // top level domain OR
                     "|((\\d|\\d\\d|1\\d{2}|2[0-4]\\d|25[0-5])\\.){3}" +             // IP address
                     "(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])" +                    //
                     ")(:\\d+)?" +                                                   // port
