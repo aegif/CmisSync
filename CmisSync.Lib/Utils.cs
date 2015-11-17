@@ -144,13 +144,13 @@ namespace CmisSync.Lib
         /// Extensions of files that must be excluded from synchronization.
         /// </summary>
         private static HashSet<String> ignoredExtensions = new HashSet<String>{
-            ".autosave", // Various autosaving apps
-            ".~lock", // LibreOffice
-            ".part", ".crdownload", // Firefox and Chromium temporary download files
-            ".un~", ".swp", ".swo", // vi(m)
-            ".tmp", // Microsoft Office
-            ".sync", // CmisSync download
-            ".cmissync", // CmisSync database
+            "autosave", // Various autosaving apps
+            "~lock", // LibreOffice
+            "part", "crdownload", // Firefox and Chromium temporary download files
+            "un~", "swp", "swo", // vi(m)
+            "tmp", // Microsoft Office
+            "sync", // CmisSync download
+            "cmissync", // CmisSync database
         };
 
         /// <summary>
