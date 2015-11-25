@@ -1088,7 +1088,7 @@ namespace CmisSync
                                     Content = Properties_Resources.SyncAtStartup,
                                     IsChecked = Controller.saved_syncatstartup,
                                     FontWeight = FontWeights.Bold,
-                                    Width = 400,
+                                    Width = 400
                                 };
 
                                 // Sync duration input GUI.
@@ -1096,10 +1096,16 @@ namespace CmisSync
                                 {
                                     Text = Properties_Resources.SyncInterval + ":",
                                     FontWeight = FontWeights.Bold,
-                                    Width = 200,
+                                    Width = 100
                                 };
 
-                                PollIntervalSlider slider = new PollIntervalSlider()
+                                TextBlock slider_value = new TextBlock()
+                                {
+                                    FontWeight = FontWeights.Bold,
+                                    Width = 100
+                                };
+
+                                PollIntervalSlider slider = new PollIntervalSlider(slider_value)
                                 {
                                     Width = 400,
                                     PollInterval = Controller.saved_sync_interval
@@ -1108,7 +1114,7 @@ namespace CmisSync
                                 TextBlock slider_min_label = new TextBlock()
                                 {
                                     Text = slider.FormattedMinimum(),
-                                    Width = 200,
+                                    Width = 200
                                 };
 
                                 TextBlock slider_max_label = new TextBlock()
@@ -1173,6 +1179,10 @@ namespace CmisSync
                                 ContentCanvas.Children.Add(slider_label);
                                 Canvas.SetTop(slider_label, 250);
                                 Canvas.SetLeft(slider_label, 185);
+
+                                ContentCanvas.Children.Add(slider_value);
+                                Canvas.SetTop(slider_value, 250);
+                                Canvas.SetLeft(slider_value, 285);
 
                                 ContentCanvas.Children.Add(slider);
                                 Canvas.SetTop(slider, 270);
