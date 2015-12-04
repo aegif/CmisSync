@@ -162,7 +162,7 @@ namespace CmisSync
                 {
                     //Only show balloon tips when notifications are on
 
-                    SystemSounds.Exclamation.Play();
+                    // SystemSounds.Exclamation.Play(); Disabled because annoying.
 
                     trayicon.ShowBalloonTip(25000, title, message, ToolTipIcon.Error);
 
