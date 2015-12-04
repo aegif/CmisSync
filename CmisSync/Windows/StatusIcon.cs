@@ -115,8 +115,12 @@ namespace CmisSync
 
                     BeginInvoke((Action)delegate
                     {
-                        this.stateItem.Text = state_text;
-                        this.trayicon.Text = Utils.Ellipsis(Properties_Resources.CmisSync + "\n" + state_text, 63);
+                        stateItem.Text = state_text;
+                        string iconText = Utils.Ellipsis(Properties_Resources.CmisSync + "\n" + state_text, 63);
+                        if (!iconText.Equals(trayicon.Text)) // TODO Useful? http://stackoverflow.com/q/34083778
+                        {
+                            trayicon.Text = iconText;
+                        }
                     });
                 }
             };
@@ -128,7 +132,7 @@ namespace CmisSync
                 {
                     BeginInvoke((Action)delegate
                     {
-                        CreateMenu();
+                        this.trayicon.Text = Utils.Ellipsis(Properties_Resources.CmisSync + "\n" + Controller.StateText, 63);
                     });
                 }
             };
@@ -164,7 +168,7 @@ namespace CmisSync
 
                     // SystemSounds.Exclamation.Play(); Disabled because annoying.
 
-                    trayicon.ShowBalloonTip(25000, title, message, ToolTipIcon.Error);
+                    //trayicon.ShowBalloonTip(25000, title, message, ToolTipIcon.Error);
 
                     //System.Windows.Forms.MessageBox.Show(message, title,
                     //    System.Windows.Forms.MessageBoxButtons.OK,
