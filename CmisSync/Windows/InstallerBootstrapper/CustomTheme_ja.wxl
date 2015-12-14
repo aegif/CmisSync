@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="ja-JP" Language="1041" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <String Id="Caption">[WixBundleName] セットアップ</String>
+  <String Id="Title">[WixBundleName] セットアップウィザード</String>
+  <String Id="InstallVersion">Version [WixBundleVersion]</String>
+  <String Id="ConfirmCancelMessage">本当にキャンセルしてよろしいですか？</String>
+  <String Id="ExecuteUpgradeRelatedBundleMessage">前のバージョン</String>
+  <String Id="HelpHeader">Setup Help</String>
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
+   creates a complete local copy of the bundle in directory. Install is the default.
+
+/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
+   no prompts. By default UI and all prompts are displayed.
+
+/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
+/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
+  <String Id="HelpCloseButton">閉じる(&amp;C)e</String>
+  <String Id="InstallDescription">[WixBundleName] をコンピュータにインストールします。以下のライセンス条項をよく読んでください。</String>
+  <String Id="InstallAcceptCheckbox">ライセンスの条件に同意する(&amp;a)</String>
+  <String Id="InstallOptionsButton">オプション(&amp;O)</String>
+  <String Id="InstallInstallButton">インストール(&amp;I)</String>
+  <String Id="InstallCloseButton">閉じる(&amp;C)</String>
+  <String Id="OptionsHeader">セットアップオプション</String>
+  <String Id="OptionsLocationLabel">インストール先：</String>
+  <String Id="OptionsBrowseButton">参照(&amp;B)</String>
+  <String Id="OptionsOkButton">OK(&amp;O)</String>
+  <String Id="OptionsCancelButton">キャンセル(&amp;C)</String>
+  <String Id="ProgressHeader">セットアップ</String>
+  <String Id="ProgressLabel">状況：</String>
+  <String Id="OverallProgressPackageText">初期化しています……</String>
+  <String Id="ProgressCancelButton">キャンセル(&amp;C)</String>
+  <String Id="ModifyHeader">セットアップの変更</String>
+	<String Id="ModifyDescription">修復もしくはアンインストールの前に、[WixBundleName] を終了させてください。</String>
+  <String Id="ModifyRepairButton">修復(&amp;R)</String>
+  <String Id="ModifyUninstallButton">アンインストール(&amp;U)</String>
+  <String Id="ModifyCloseButton">閉じる(&amp;C)</String>
+  <String Id="SuccessHeader">セットアップ完了</String>
+  <String Id="SuccessLaunchButton">[WixBundleName] を起動(&amp;L)</String>
+  <String Id="SuccessRestartText">ソフトウェアを実行する前に、コンピュータを再起動する必要があります。</String>
+  <String Id="SuccessRestartButton">再起動(&amp;R)</String>
+  <String Id="SuccessCloseButton">閉じる(&amp;C)</String>
+  <String Id="FailureHeader">Setup Failed</String>
+  <String Id="FailureHyperlinkLogText">問題が発生したため、セットアップに失敗しました。ログファイル（ &lt;a href="#"&gt;log file&lt;/a&gt; ）を参照してください。</String>
+  <String Id="FailureRestartText">ソフトウェアをロールバックするために、コンピュータを再起動する必要があります。</String>
+  <String Id="FailureRestartButton">再起動(&amp;R)</String>
+  <String Id="FailureCloseButton">閉じる(&amp;C)</String>
+</WixLocalization>
