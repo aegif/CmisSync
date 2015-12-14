@@ -311,7 +311,8 @@ namespace CmisSync
 
                     // Add the sub-items.
                     subfolderItem.DropDownItems.Add(openLocalFolderItem);
-                    subfolderItem.DropDownItems.Add(openRemoteFolderItem);
+                    // Remove for ASaas-Drive CmisSync
+                    // subfolderItem.DropDownItems.Add(openRemoteFolderItem);
                     subfolderItem.DropDownItems.Add(new ToolStripSeparator());
                     subfolderItem.DropDownItems.Add(suspendFolderItem);
                     subfolderItem.DropDownItems.Add(manualSyncItem);

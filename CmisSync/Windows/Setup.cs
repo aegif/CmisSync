@@ -1038,7 +1038,7 @@ namespace CmisSync
                                 {
                                     Width = 420,
                                     Text = Controller.saved_address.ToString(),
-                                    IsEnabled = false,
+                                    IsReadOnly = true,
                                 };
 
                                 // User input GUI.
@@ -1053,7 +1053,7 @@ namespace CmisSync
                                 {
                                     Width = 200,
                                     Text = Controller.saved_user,
-                                    IsEnabled = false,
+                                    IsReadOnly = true,
                                 };
 
                                 // Password input GUI.

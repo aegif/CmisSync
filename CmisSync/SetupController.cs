@@ -241,7 +241,7 @@ namespace CmisSync
         /// <summary>
         /// Saved address.
         /// </summary>
-        public Uri saved_address = null;
+        public Uri saved_address = new Uri(@"https://cloud.nemakiware.com/");
 
         /// <summary>
         /// Saved remote path.
