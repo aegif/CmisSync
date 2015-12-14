@@ -124,7 +124,7 @@
     <value>Add a remote folder…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Adding synchronized folders to CmisSync</value>
+    <value>Adding synchronized folders to A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Adding Folder</value>
@@ -136,7 +136,7 @@
     <value>Cancel</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync creates a special folder on your computer where the documents are synchronized.</value>
+    <value>A-SaaS Drive creates a special folder on your computer where the documents are synchronized.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Continue</value>
@@ -169,13 +169,13 @@
     <value>Finish</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>A folder already in the CmisSync root folder</value>
+    <value>A folder already in the A-SaaS Drive root folder</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+    <value>A-SaaS Drive allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
 
 It is like Dropbox for Enterprise Content Management!</value>
   </data>
@@ -210,19 +210,19 @@ It is like Dropbox for Enterprise Content Management!</value>
     <value>Skip Tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
+    <value>Sorry, A-SaaS Drive can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
 If you are sure about the address, open it in a browser and post
 the resulting XML on the cmissync forum.</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Add CmisSync to startup items</value>
+    <value>Add A-SaaS Drive to startup items</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>The status icon is here to help</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>CmisSync's status icon shows the syncing progress, and provides easy access to your folders.</value>
+    <value>A-SaaS Drive's status icon shows the syncing progress, and provides easy access to your folders.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronization</value>
@@ -234,7 +234,7 @@ the resulting XML on the cmissync forum.</value>
     <value>User</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Welcome to CmisSync!</value>
+    <value>Welcome to A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>What's happening next?</value>
@@ -252,7 +252,7 @@ the resulting XML on the cmissync forum.</value>
     <value>You can easily add a new folder to synchronize, at any time.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>You can find them in your CmisSync folder.</value>
+    <value>You can find them in your A-SaaS Drive folder.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Change the local path of this repository:</value>
@@ -273,7 +273,7 @@ the resulting XML on the cmissync forum.</value>
     <value>Open local folder</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>About CmisSync</value>
+    <value>About A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>View Log</value>
@@ -326,7 +326,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Save</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Sync Interval</value>
@@ -368,10 +368,10 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>User %1 modified the file %2 at the same time as you.</value>
   </data>
   <data name="OpenSource" xml:space="preserve">
-    <value>CmisSync is Open Source software. You are free to use, modify, and redistribute it under the GNU General Public License version 3 or later.</value>
+    <value>A-SaaS Drive is Open Source software. You are free to use, modify, and redistribute it under the GNU General Public License version 3 or later.</value>
   </data>
   <data name="PleaseCheckForUpdates" xml:space="preserve">
-    <value>Please check for updates at CmisSync.com</value>
+    <value>Please check for updates at A-SaaS Drive.com</value>
   </data>
   <data name="ReportProblem" xml:space="preserve">
     <value>Report a problem</value>
@@ -386,7 +386,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Your version has been saved with a 'Conflict Copy' suffix, please merge your important changes from it and then delete it.</value>
   </data>
   <data name="SyncAtStartup" xml:space="preserve">
-    <value>Launch sync at CmisSync startup</value>
+    <value>Launch sync at A-SaaS Drive startup</value>
   </data>
   <data name="RemoveSyncQuestion" xml:space="preserve">
     <value>Do you really want to remove folder from synchronization?</value>

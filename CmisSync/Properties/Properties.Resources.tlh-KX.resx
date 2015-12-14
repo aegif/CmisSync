@@ -136,7 +136,7 @@
     <value>qIl</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>navmey rapmoHlu'bogh De'wI'lIjDaq ngaswI' le' chenmoH CmisSync.</value>
+    <value>navmey rapmoHlu'bogh De'wI'lIjDaq ngaswI' le' chenmoH A-SaaS Drive.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>taH</value>
@@ -169,13 +169,13 @@
     <value>rInmoH</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>CmisSync ngaSwI''a'Daq ngaSwI' tu'lu'pu'</value>
+    <value>A-SaaS Drive ngaSwI''a'Daq ngaSwI' tu'lu'pu'</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>QaH</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>rarbe'DI' CMIS lobbogh 'entepray' tebwI'Daq rapmoHtaH 'e' chaw' CmisSync.
+    <value>rarbe'DI' CMIS lobbogh 'entepray' tebwI'Daq rapmoHtaH 'e' chaw' A-SaaS Drive.
 
 'entepray' ngaStaHghach vu'meH Dropbox rur!</value>
   </data>
@@ -210,17 +210,17 @@
     <value>DevmeH mIw buSHa'</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>pIQoS, QuvvamDaq CMIS De'wI''a' tu'laHbe' CmisSync. yInuDqa'.
-lughchugh Quvvam, chIjwI'Daq yIpoSmoH 'ej CmisSync vaSDaq XMLvetlh yIngeH.</value>
+    <value>pIQoS, QuvvamDaq CMIS De'wI''a' tu'laHbe' A-SaaS Drive. yInuDqa'.
+lughchugh Quvvam, chIjwI'Daq yIpoSmoH 'ej A-SaaS Drive vaSDaq XMLvetlh yIngeH.</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>chu'meH tetlhDaq CmisSync chel</value>
+    <value>chu'meH tetlhDaq A-SaaS Drive chel</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>naDev DuQaHmeH Dotlh mIllogh tu'lu'</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>rapmoHlI'bogh mIw 'agh CmisSync Dotlh mIllogh, 'ej naw' ngeD chaw'.</value>
+    <value>rapmoHlI'bogh mIw 'agh A-SaaS Drive Dotlh mIllogh, 'ej naw' ngeD chaw'.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>rapmoHghach</value>
@@ -250,7 +250,7 @@ lughchugh Quvvam, chIjwI'Daq yIpoSmoH 'ej CmisSync vaSDaq XMLvetlh yIngeH.</valu
     <value>Hochlogh CMIS ngaSwI' chu' chellaH.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>CmisSync ngaSwI'lIjDaq Datu'laH.</value>
+    <value>A-SaaS Drive ngaSwI'lIjDaq Datu'laH.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>polmeH janvamDaq De' Quv choH:</value>

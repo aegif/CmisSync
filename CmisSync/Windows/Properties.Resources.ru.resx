@@ -124,7 +124,7 @@
     <value>Добавить удаленную папку...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Добавить папки для синхронизации в CmisSync</value>
+    <value>Добавить папки для синхронизации в A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Добавление папки</value>
@@ -136,7 +136,7 @@
     <value>Отмена</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync создает специальную папку на вашем компьютере, где выполняется синхронизация документов.</value>
+    <value>A-SaaS Drive создает специальную папку на вашем компьютере, где выполняется синхронизация документов.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Продолжить</value>
@@ -169,13 +169,13 @@
     <value>Завершить</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Папка уже в корневой папке CmisSync</value>
+    <value>Папка уже в корневой папке A-SaaS Drive</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Справка</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync позволяет синхронизироваться с любым CMIS-совместимым сервером предприятия и использовать ваши документы даже в автономном режиме.  Это как Dropbox для управления корпоративным информационным содержимым!</value>
+    <value>A-SaaS Drive позволяет синхронизироваться с любым CMIS-совместимым сервером предприятия и использовать ваши документы даже в автономном режиме.  Это как Dropbox для управления корпоративным информационным содержимым!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
     <value>Недопустимое имя папки. Специальные символы не допускаются.</value>
@@ -208,16 +208,16 @@
     <value>Пропустить обучение</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>К сожалению, CmisSync не может найти сервер CMIS по этому адресу. Пожалуйста, обратитесь к администратору сервера для уточнения URL-адреса CMIS. Если вы уверены, в адресе, откройте его в браузере и отправьте результат XML на cmissync@aegif.jp</value>
+    <value>К сожалению, A-SaaS Drive не может найти сервер CMIS по этому адресу. Пожалуйста, обратитесь к администратору сервера для уточнения URL-адреса CMIS. Если вы уверены, в адресе, откройте его в браузере и отправьте результат XML на cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Добавить CmisSync в автозагрузку</value>
+    <value>Добавить A-SaaS Drive в автозагрузку</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>Значок состояния, чтобы помочь</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>CmisSync значок состояния показывает ход выполнения синхронизации и обеспечивает легкий доступ к своим папкам.</value>
+    <value>A-SaaS Drive значок состояния показывает ход выполнения синхронизации и обеспечивает легкий доступ к своим папкам.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Синхронизация</value>
@@ -229,7 +229,7 @@
     <value>Пользователь</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Добро пожаловать в CmisSync!</value>
+    <value>Добро пожаловать в A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>Что происходит дальше?</value>
@@ -247,7 +247,7 @@
     <value>Вы можете легко добавить новую папку в CMIS, в любое время.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Вы можете найти их в папке CmisSync.</value>
+    <value>Вы можете найти их в папке A-SaaS Drive.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Измените локальный путь этого репозитория:</value>
@@ -268,7 +268,7 @@
     <value>Открыть локальную папку</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>О CmisSync</value>
+    <value>О A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>Просмотр журнала</value>
@@ -316,7 +316,7 @@
     <value>Сохранить</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Интервал синхронизации</value>

@@ -124,7 +124,7 @@
     <value>Dodaj oddaljeno mapo…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Dodajanje sinhroniziranih map v CmisSync</value>
+    <value>Dodajanje sinhroniziranih map v A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Dodajanje mape</value>
@@ -136,7 +136,7 @@
     <value>Prekliči</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync v računalniku ustvari posebno mapo, kjer se dokumenti sinhronizirajo.</value>
+    <value>A-SaaS Drive v računalniku ustvari posebno mapo, kjer se dokumenti sinhronizirajo.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Nadaljuj</value>
@@ -169,13 +169,13 @@
     <value>Dokončaj</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Mapa je že v CmisSync korenski mapi</value>
+    <value>Mapa je že v A-SaaS Drive korenski mapi</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Pomoč</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+    <value>A-SaaS Drive allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
 
 It is like Dropbox for Enterprise Content Management!</value>
   </data>
@@ -210,19 +210,19 @@ It is like Dropbox for Enterprise Content Management!</value>
     <value>Preskoči Vodič</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
+    <value>Sorry, A-SaaS Drive can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
 If you are sure about the address, open it in a browser and send
 the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Add CmisSync to startup items</value>
+    <value>Add A-SaaS Drive to startup items</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>The status icon is here to help</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>CmisSync's status icon shows the syncing progress, and provides easy access to your folders.</value>
+    <value>A-SaaS Drive's status icon shows the syncing progress, and provides easy access to your folders.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Sinhronizacija</value>
@@ -234,7 +234,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Uporabnik</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Dobrodošli v CmisSync!</value>
+    <value>Dobrodošli v A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>What's happening next?</value>
@@ -252,7 +252,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>You can easily add a new CMIS folder at any time.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>You can find them in your CmisSync folder.</value>
+    <value>You can find them in your A-SaaS Drive folder.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Change the local path of this repository:</value>
@@ -273,7 +273,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Open local folder</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>O CmisSync</value>
+    <value>O A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>Ogled dnevnika</value>
@@ -325,7 +325,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Shrani</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Interval sinhronizacije</value>

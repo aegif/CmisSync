@@ -124,7 +124,7 @@
     <value>Legge til en ekstern mappe…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Legge til synkroniserte mapper til CmisSync</value>
+    <value>Legge til synkroniserte mapper til A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>legger til mappen</value>
@@ -136,7 +136,7 @@
     <value>Avbryt</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync oppretter en spesiell mappe på datamaskinen hvor dokumentene synkroniseres.</value>
+    <value>A-SaaS Drive oppretter en spesiell mappe på datamaskinen hvor dokumentene synkroniseres.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Fortsett</value>
@@ -169,13 +169,13 @@
     <value>Fullfør</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>A folder already in the CmisSync root folder</value>
+    <value>A folder already in the A-SaaS Drive root folder</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
+    <value>A-SaaS Drive allows you to keep in sync with any CMIS-compliant enterprise server, and use your documents even when offline.
 
 It is like Dropbox for Enterprise Content Management!</value>
   </data>
@@ -210,19 +210,19 @@ It is like Dropbox for Enterprise Content Management!</value>
     <value>Skip Tutorial</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
+    <value>Sorry, A-SaaS Drive can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
 If you are sure about the address, open it in a browser and send
 the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Add CmisSync to startup items</value>
+    <value>Add A-SaaS Drive to startup items</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>The status icon is here to help</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>CmisSync's status icon shows the syncing progress, and provides easy access to your folders.</value>
+    <value>A-SaaS Drive's status icon shows the syncing progress, and provides easy access to your folders.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronization</value>
@@ -234,7 +234,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>User</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Welcome to CmisSync!</value>
+    <value>Welcome to A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>What's happening next?</value>
@@ -252,7 +252,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>You can easily add a new CMIS folder at any time.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>You can find them in your CmisSync folder.</value>
+    <value>You can find them in your A-SaaS Drive folder.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Change the local path of this repository:</value>
@@ -273,7 +273,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Open local folder</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>About CmisSync</value>
+    <value>About A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>View Log</value>
@@ -326,7 +326,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Save</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Sync Interval</value>

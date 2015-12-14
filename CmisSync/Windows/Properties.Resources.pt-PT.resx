@@ -124,7 +124,7 @@
     <value>Adicione uma pasta remota...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Adicionando pastas sincronizadas ao CmisSync</value>
+    <value>Adicionando pastas sincronizadas ao A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Adicionando pasta</value>
@@ -136,7 +136,7 @@
     <value>Cancelar</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>O CmisSync cria uma pasta especial no seu computador onde os documentos são sincronizados.</value>
+    <value>O A-SaaS Drive cria uma pasta especial no seu computador onde os documentos são sincronizados.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Continuar</value>
@@ -169,13 +169,13 @@
     <value>Finalizar</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>A pasta já existe na pasta raiz do CmisSync</value>
+    <value>A pasta já existe na pasta raiz do A-SaaS Drive</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Ajuda</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>O CmisSync permite que você se mantenha em sincronia com qualquer servidor corporativo compatível com CMIS, e usar seus documentos mesmo quando offline.  
+    <value>O A-SaaS Drive permite que você se mantenha em sincronia com qualquer servidor corporativo compatível com CMIS, e usar seus documentos mesmo quando offline.  
 É como o Dropbox para gerenciamento de conteúdo corporativo!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
@@ -212,13 +212,13 @@
     <value>Desculpe, o cmissync não consegue encontrar um servidor CMIS neste endereço. Por favor, solicite ao administrador do seu servidor a URL de acesso. Se você tem certeza sobre o endereço, abra-o em um navegador e envie o XML resultante para cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Adicionar o CmisSync aos itens de inicialização</value>
+    <value>Adicionar o A-SaaS Drive aos itens de inicialização</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>O ícone de status está aqui para ajudar</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>O ícone de status do CmisSync mostra o progresso da sincronização e oferece fácil acesso às suas pastas.</value>
+    <value>O ícone de status do A-SaaS Drive mostra o progresso da sincronização e oferece fácil acesso às suas pastas.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Sincronização</value>
@@ -230,7 +230,7 @@
     <value>Usuário</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Bem-vindo ao CmisSync!</value>
+    <value>Bem-vindo ao A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>O que vai acontecer agora?</value>
@@ -248,7 +248,7 @@
     <value>Você pode facilmente adicionar uma nova pasta CMIS a qualquer momento.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Você pode encontrá-los na pasta CmisSync.</value>
+    <value>Você pode encontrá-los na pasta A-SaaS Drive.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Altere o caminho local deste repositório:</value>
@@ -269,7 +269,7 @@
     <value>Abrir pasta local</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>About CmisSync</value>
+    <value>About A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>View Log</value>
@@ -322,7 +322,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Save</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Sync Interval</value>

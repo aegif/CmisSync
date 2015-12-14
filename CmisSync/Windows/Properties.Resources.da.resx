@@ -124,7 +124,7 @@
     <value>Tilføj en fjernmappe…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Føjer synkroniserede mapper til CmisSync</value>
+    <value>Føjer synkroniserede mapper til A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Tilføjer mappe</value>
@@ -136,7 +136,7 @@
     <value>Annullér</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync opretter en specialmappe på din computer, når dokumenterne er synkroniserede.</value>
+    <value>A-SaaS Drive opretter en specialmappe på din computer, når dokumenterne er synkroniserede.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Fortsæt</value>
@@ -169,13 +169,13 @@
     <value>Færdiggør</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>En mappe findes allerede i CmisSync-rodmappen</value>
+    <value>En mappe findes allerede i A-SaaS Drive-rodmappen</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Hjælp</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync gør det muligt for dig at forblive synkroniseret med enhver CMIS-kompatibel virksomhedsserver samt at tilgå dine dokumenter selv i offline-tilstand.
+    <value>A-SaaS Drive gør det muligt for dig at forblive synkroniseret med enhver CMIS-kompatibel virksomhedsserver samt at tilgå dine dokumenter selv i offline-tilstand.
 
 Det svarer i store træk til Dropbox for Enterprise Content Management!</value>
   </data>
@@ -210,19 +210,19 @@ Det svarer i store træk til Dropbox for Enterprise Content Management!</value>
     <value>Spring indtruktionen over</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Beklager, CmisSync Kan ikke finde en CMIS-server på denne adresse.
+    <value>Beklager, A-SaaS Drive Kan ikke finde en CMIS-server på denne adresse.
 Spørg venligst din serveradministrator om CMIS-destinations-URL.
 Er du sikker på adressen, så åbn den i en browser og afsend
 den resulterende XML-fil til cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Føj CmisSync til opstartselementer</value>
+    <value>Føj A-SaaS Drive til opstartselementer</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>Statusikonet er til din hjælp</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>CmisSync's statusikon viser synkroniseringsforløbet, og giver dig en nem adgang til dine mapper.</value>
+    <value>A-SaaS Drive's statusikon viser synkroniseringsforløbet, og giver dig en nem adgang til dine mapper.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synkronisering</value>
@@ -234,7 +234,7 @@ den resulterende XML-fil til cmissync@aegif.jp</value>
     <value>Bruger</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Velkommen til CmisSync!</value>
+    <value>Velkommen til A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>Hvad er næste punkt?</value>
@@ -252,7 +252,7 @@ den resulterende XML-fil til cmissync@aegif.jp</value>
     <value>Du kan til enhver tid nemt tilføje en ny CMIS-mappe.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Du kan finde dem i din CmisSync-mappe.</value>
+    <value>Du kan finde dem i din A-SaaS Drive-mappe.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Ændr den lokale sti på dette opbevaringssted:</value>
@@ -273,7 +273,7 @@ den resulterende XML-fil til cmissync@aegif.jp</value>
     <value>Åbn lokalmappe</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>Om CmisSync</value>
+    <value>Om A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>Vis Log</value>
@@ -326,7 +326,7 @@ Kontrollér venligst protokoldelen af den aktuelle URL. Din server understøtter
     <value>Gem</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Synk-interval</value>

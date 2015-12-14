@@ -124,7 +124,7 @@
     <value>Přidat vzdálenou složku...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Přidání synchronizované složky do CmisSync</value>
+    <value>Přidání synchronizované složky do A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Přidat složku</value>
@@ -136,7 +136,7 @@
     <value>Storno</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync vytváří speciální složku ve Vašem počítači, kde jsou dokumenty synchronizovány.</value>
+    <value>A-SaaS Drive vytváří speciální složku ve Vašem počítači, kde jsou dokumenty synchronizovány.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Pokračovat</value>
@@ -169,13 +169,13 @@
     <value>Dokončit</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Složka již je v kořenové složce CmisSync</value>
+    <value>Složka již je v kořenové složce A-SaaS Drive</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Pomoc</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync umožňuje synchronizovat s jakýmkoli standardem CMIS enterprise serverem a používat vaše dokumenty, i když v režimu offline.  Je to jako Dropbox pro Enterprise Content Management!</value>
+    <value>A-SaaS Drive umožňuje synchronizovat s jakýmkoli standardem CMIS enterprise serverem a používat vaše dokumenty, i když v režimu offline.  Je to jako Dropbox pro Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
     <value>Název složky je neplatný. Zvláštní znaky nejsou povoleny.</value>
@@ -208,19 +208,19 @@
     <value>Přeskočit kurz</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
+    <value>Sorry, A-SaaS Drive can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
 If you are sure about the address, open it in a browser and send
 the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Přidat CmisSync do položek po spuštění</value>
+    <value>Přidat A-SaaS Drive do položek po spuštění</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>Ikona stavu je zde k nápomoci</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>Ikona stavu CmisSync ukazuje průběh synchronizace a poskytuje snadný přístup k vašim složkám.</value>
+    <value>Ikona stavu A-SaaS Drive ukazuje průběh synchronizace a poskytuje snadný přístup k vašim složkám.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronizace</value>
@@ -232,7 +232,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Uživatel</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Vítejte v CmisSync!</value>
+    <value>Vítejte v A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>Co se stane dál?</value>
@@ -250,7 +250,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Můžete snadno kdykoliv přidat novou CMIS složku.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Najdete je ve své CmisSync složce.</value>
+    <value>Najdete je ve své A-SaaS Drive složce.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Změňte místní cestu do tohoto úložiště:</value>
@@ -324,7 +324,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Save</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Sync Interval</value>

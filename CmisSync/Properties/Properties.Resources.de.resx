@@ -124,7 +124,7 @@
     <value>Fügen Sie einen Remote Ordner ein...</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Hinzufügen von synchronisierten Ordnern zu CmisSync</value>
+    <value>Hinzufügen von synchronisierten Ordnern zu A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Ordner hinzufügen</value>
@@ -136,7 +136,7 @@
     <value>Abbrechen</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync erstellt einen speziellen Ordner auf Ihrem Computer, in welchem die Dokumente synchronisiert werden.</value>
+    <value>A-SaaS Drive erstellt einen speziellen Ordner auf Ihrem Computer, in welchem die Dokumente synchronisiert werden.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Weiter</value>
@@ -169,13 +169,13 @@
     <value>Fertig stellen</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Der Ordner existiert bereits im Stammordner CmisSync</value>
+    <value>Der Ordner existiert bereits im Stammordner A-SaaS Drive</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Hilfe</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>Mit CmisSync können Sie mit jedem CMIS-konformen Server ihre Daten synchron halten, und Ihre Dokumente auch im Offlinemodus verwenden.  Funktioniert wie Dropbox für Enterprise Content Management!</value>
+    <value>Mit A-SaaS Drive können Sie mit jedem CMIS-konformen Server ihre Daten synchron halten, und Ihre Dokumente auch im Offlinemodus verwenden.  Funktioniert wie Dropbox für Enterprise Content Management!</value>
   </data>
   <data name="InvalidFolderName" xml:space="preserve">
     <value>Der Ordnername ist ungültig. Sonderzeichen sind nicht erlaubt.</value>
@@ -208,16 +208,16 @@
     <value>Einführung überspringen</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Leider kann CmisSync keinen CMIS-Server unter dieser Adresse finden. Bitte prüfen Sie angegebene Adresse. Wenn Sie sich sicher sind das die Adresse stimmt, öffnen Sie diese in einem Browser und posten Sie die XML Antwort nach cmissync@aegif.jp</value>
+    <value>Leider kann A-SaaS Drive keinen CMIS-Server unter dieser Adresse finden. Bitte prüfen Sie angegebene Adresse. Wenn Sie sich sicher sind das die Adresse stimmt, öffnen Sie diese in einem Browser und posten Sie die XML Antwort nach cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>CmisSync im Autostart hinzufügen</value>
+    <value>A-SaaS Drive im Autostart hinzufügen</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>Das Symbol ist in der Statusleiste zu finden</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>Das CmisSync Status-Symbol zeigt den Fortschritt der Synchronisierung und bietet einfachen Zugriff auf Ihre Ordner.</value>
+    <value>Das A-SaaS Drive Status-Symbol zeigt den Fortschritt der Synchronisierung und bietet einfachen Zugriff auf Ihre Ordner.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronisation</value>
@@ -229,7 +229,7 @@
     <value>Benutzer</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Willkommen zu CmisSync!</value>
+    <value>Willkommen zu A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>Was passiert als nächstes?</value>
@@ -247,7 +247,7 @@
     <value>Sie können einen neuen CMIS-Ordner jederzeit problemlos hinzufügen.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Sie finden den im Ordner CmisSync.</value>
+    <value>Sie finden den im Ordner A-SaaS Drive.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Ändern Sie den lokalen Pfad dieses Archivs:</value>
@@ -268,7 +268,7 @@
     <value>Lokalen Ordner öffnen</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>Über CmisSync</value>
+    <value>Über A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>Protokoll anzeigen</value>
@@ -322,7 +322,7 @@ Eventuell ist der Server nicht in der Lage sicher per https zu kommunizieren. Ä
     <value>Speichern</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Synchronisierungsintervall</value>

@@ -124,7 +124,7 @@
     <value>Ajouter un dossier distant…</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Ajouter des dossiers synchronisés à CmisSync</value>
+    <value>Ajouter des dossiers synchronisés à A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Ajouter un dossier</value>
@@ -136,7 +136,7 @@
     <value>Annuler</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync crée un dossier spécial sur votre ordinateur où les documents sont synchronisés.</value>
+    <value>A-SaaS Drive crée un dossier spécial sur votre ordinateur où les documents sont synchronisés.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Continuer</value>
@@ -169,13 +169,13 @@
     <value>Terminer</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Un dossier porte déjà ce nom dans le dossier racine de CmisSync</value>
+    <value>Un dossier porte déjà ce nom dans le dossier racine de A-SaaS Drive</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Aide</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync permet de rester synchronisé avec n'importe quel serveur d'entreprise conforme CMIS et d'utiliser vos documents même si vous n'êtes pas connecté.
+    <value>A-SaaS Drive permet de rester synchronisé avec n'importe quel serveur d'entreprise conforme CMIS et d'utiliser vos documents même si vous n'êtes pas connecté.
 
 C'est comme Dropbox pour les serveurs de gestion de contenu d'Entreprise (ECM) !</value>
   </data>
@@ -211,18 +211,18 @@ Veuillez vérifier votre nom d'utilisateur et votre mot de passe.</value>
     <value>Passer le tutoriel</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Désolé, CmisSync ne trouve pas de serveur CMIS à cette adresse.
+    <value>Désolé, A-SaaS Drive ne trouve pas de serveur CMIS à cette adresse.
 Demandez l'adresse CMIS à votre administrateur.
-Si vous êtes certain de l'adresse, ouvrez-la dans un navigateur et envoyez le résultat XML à CmisSync@aegif.jp</value>
+Si vous êtes certain de l'adresse, ouvrez-la dans un navigateur et envoyez le résultat XML à A-SaaS Drive@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>Ajouter CmisSync dans le menu démarrer</value>
+    <value>Ajouter A-SaaS Drive dans le menu démarrer</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>L'icône de statut est là pour vous aider</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>L'icône d'état de CmisSync affiche la progression de la synchronisation et offre un accès simplifié à vos dossiers.</value>
+    <value>L'icône d'état de A-SaaS Drive affiche la progression de la synchronisation et offre un accès simplifié à vos dossiers.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronisation</value>
@@ -234,7 +234,7 @@ Si vous êtes certain de l'adresse, ouvrez-la dans un navigateur et envoyez le r
     <value>Utilisateur</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Bienvenue dans CmisSync!</value>
+    <value>Bienvenue dans A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>Que se passe-t-il ensuite ?</value>
@@ -252,7 +252,7 @@ Si vous êtes certain de l'adresse, ouvrez-la dans un navigateur et envoyez le r
     <value>Vous pouvez ajouter facilement un nouveau dossier CMIS à tout moment.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Vous pouvez les trouver dans votre dossier CmisSync.</value>
+    <value>Vous pouvez les trouver dans votre dossier A-SaaS Drive.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Modifier le chemin local de ce dossier synchronisé :</value>
@@ -273,7 +273,7 @@ Si vous êtes certain de l'adresse, ouvrez-la dans un navigateur et envoyez le r
     <value>Ouvrir le dossier local</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>A Propos de CmisSync</value>
+    <value>A Propos de A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>Afficher le journal</value>
@@ -327,7 +327,7 @@ Si l'adresse est correcte, contactez l'administrateur du serveur.</value>
     <value>Enregistrer</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Intervalle de synchronisation</value>

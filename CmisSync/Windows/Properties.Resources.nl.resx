@@ -124,7 +124,7 @@
     <value>Externe map toevoegen</value>
   </data>
   <data name="AddFolders" xml:space="preserve">
-    <value>Gesynchroniseerde mappen toevoegen aan CmisSync</value>
+    <value>Gesynchroniseerde mappen toevoegen aan A-SaaS Drive</value>
   </data>
   <data name="AddingFolder" xml:space="preserve">
     <value>Map wordt toevoegd</value>
@@ -136,7 +136,7 @@
     <value>Annuleren</value>
   </data>
   <data name="CmisSyncCreates" xml:space="preserve">
-    <value>CmisSync maakt een speciale map op jouw computer aan waar de documenten worden gesynchroniseerd.</value>
+    <value>A-SaaS Drive maakt een speciale map op jouw computer aan waar de documenten worden gesynchroniseerd.</value>
   </data>
   <data name="Continue" xml:space="preserve">
     <value>Doorgaan</value>
@@ -169,13 +169,13 @@
     <value>Beëindigen</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>Een map die reeds in de CmisSync hoofdmap is</value>
+    <value>Een map die reeds in de A-SaaS Drive hoofdmap is</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
   </data>
   <data name="Intro" xml:space="preserve">
-    <value>CmisSync laat je toe gesynchroniseerd te zijn met eender welke CMIS-compatibele bedrijfsserver, en zelfs offline jouw documenten te gebruiken.
+    <value>A-SaaS Drive laat je toe gesynchroniseerd te zijn met eender welke CMIS-compatibele bedrijfsserver, en zelfs offline jouw documenten te gebruiken.
 
 Het is zoals Dropbox voor Enterprise Content Management!</value>
   </data>
@@ -210,19 +210,19 @@ Het is zoals Dropbox voor Enterprise Content Management!</value>
     <value>Introductie overslaan</value>
   </data>
   <data name="Sorry" xml:space="preserve">
-    <value>Sorry, CmisSync can not find a CMIS server at this address.
+    <value>Sorry, A-SaaS Drive can not find a CMIS server at this address.
 Please ask your server administrator for the CMIS endpoint URL.
 If you are sure about the address, open it in a browser and send
 the resulting XML to cmissync@aegif.jp</value>
   </data>
   <data name="Startup" xml:space="preserve">
-    <value>CmisSync toevoegen aan opstartitems</value>
+    <value>A-SaaS Drive toevoegen aan opstartitems</value>
   </data>
   <data name="StatusIcon" xml:space="preserve">
     <value>Het status icon staat ter uw beschikking</value>
   </data>
   <data name="StatusIconShows" xml:space="preserve">
-    <value>Het CmisSync status icon toont het synchronisatieproces en biedt gemakkelijk toegang tot jouw mappen.</value>
+    <value>Het A-SaaS Drive status icon toont het synchronisatieproces en biedt gemakkelijk toegang tot jouw mappen.</value>
   </data>
   <data name="Synchronization" xml:space="preserve">
     <value>Synchronisatie</value>
@@ -234,7 +234,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Gebruiker</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Welkom bij CmisSync!</value>
+    <value>Welkom bij A-SaaS Drive!</value>
   </data>
   <data name="WhatsNext" xml:space="preserve">
     <value>Wat kan u weldra verwachten?</value>
@@ -252,7 +252,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Je kan op elk moment eenvoudig een nieuwe CMIS map toevoegen.</value>
   </data>
   <data name="YouCanFind" xml:space="preserve">
-    <value>Je kan ze vinden in jouw CmisSync map.</value>
+    <value>Je kan ze vinden in jouw A-SaaS Drive map.</value>
   </data>
   <data name="ChangeRepoPath" xml:space="preserve">
     <value>Verander het lokale pad van deze repository:</value>
@@ -273,7 +273,7 @@ the resulting XML to cmissync@aegif.jp</value>
     <value>Lokale map openen</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>About CmisSync</value>
+    <value>About A-SaaS Drive</value>
   </data>
   <data name="ViewLog" xml:space="preserve">
     <value>View Log</value>
@@ -326,7 +326,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>Save</value>
   </data>
   <data name="CmisSync" xml:space="preserve">
-    <value>CmisSync</value>
+    <value>A-SaaS Drive</value>
   </data>
   <data name="SyncInterval" xml:space="preserve">
     <value>Sync Interval</value>

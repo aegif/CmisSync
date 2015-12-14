@@ -220,14 +220,18 @@
     <EmbeddedResource Include="..\Linux\Pixmaps\icons\process-working-22.png">
       <Link>Pixmaps\process-working-22.png</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Properties\Properties.Resources.de.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.de.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\Properties\Properties.Resources.es-ES.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="..\Properties\Properties.Resources.fr.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\Properties\Properties.Resources.tlh-KX.resx" />
+    <EmbeddedResource Include="..\Properties\Properties.Resources.tlh-KX.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\Properties\Properties.Resources.uk.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -239,15 +243,33 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties.Resources.cs.resx" />
-    <EmbeddedResource Include="Properties.Resources.da.resx" />
-    <EmbeddedResource Include="Properties.Resources.it.resx" />
-    <EmbeddedResource Include="Properties.Resources.nl.resx" />
-    <EmbeddedResource Include="Properties.Resources.no.resx" />
-    <EmbeddedResource Include="Properties.Resources.pl.resx" />
-    <EmbeddedResource Include="Properties.Resources.pt-PT.resx" />
-    <EmbeddedResource Include="Properties.Resources.ru.resx" />
-    <EmbeddedResource Include="Properties.Resources.sl.resx" />
+    <EmbeddedResource Include="Properties.Resources.cs.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.da.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.it.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.nl.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.no.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.pl.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.pt-PT.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.ru.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties.Resources.sl.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pixmaps\folder.png" />
