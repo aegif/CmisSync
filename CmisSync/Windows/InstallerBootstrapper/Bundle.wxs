@@ -1,25 +1,25 @@
 <?xml version="1.0"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
   <Bundle
-    Name="CmisSync"
+    Name="A-SaaS Drive"
     Version="$(var.BuildVersion)"
     Manufacturer="Aegif"
     IconSourceFile="$(var.CmisSync.ProjectDir)\Pixmaps\cmissync-app.ico"
     UpgradeCode="12F52B78-05B3-4A20-9BAE-2211A807A3E7">
 
-    <Variable Name="InstallFolder" Type="string" Value="[ProgramFilesFolder]CmisSync"/>
+    <Variable Name="InstallFolder" Type="string" Value="[ProgramFilesFolder]A-SaaS Drive"/>
 
     <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLargeLicense">
       <bal:WixStandardBootstrapperApplication
           LaunchTarget="[InstallFolder]\CmisSync.exe"
-          LicenseFile="license.rtf"
+          LicenseFile="license_ja.rtf"
           LogoFile="logo.png"
           ShowVersion="yes"
           SuppressDowngradeFailure="no"
           SuppressOptionsUI="no"
           SuppressRepair="no"
           ThemeFile="CustomTheme.xml"
-          LocalizationFile="CustomTheme.wxl"
+          LocalizationFile="CustomTheme_ja.wxl"
       />
     </BootstrapperApplicationRef>
 
@@ -27,7 +27,7 @@
       <PackageGroupRef Id="NetFx40ClientWeb" />
       <RollbackBoundary />
       <MsiPackage
-          DisplayName="CmisSync Application"
+          DisplayName="A-SaaS Drive Application"
           SourceFile="$(var.Installer.TargetPath)"
           DisplayInternalUI="no"
           Visible="no"

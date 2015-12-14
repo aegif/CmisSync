@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" >
 
-  <Product Name="CmisSync" Id="*" UpgradeCode="4C725498-9D2D-43BF-8966-FEEACE102830"
-    Language="1033" Codepage="1252" Version="$(var.BuildVersion)" Manufacturer="Aegif">
+  <Product Name="A-SaaS Drive" Id="*" UpgradeCode="D0C6DB5C-D3DA-430C-B5EE-E44478C8668B"
+    Language="1041" Codepage="932" Version="$(var.BuildVersion)" Manufacturer="Aegif">
 
-    <Package Id="*" Keywords="Installer" Description="CmisSync Setup" Manufacturer="Aegif"
-      InstallerVersion="100" Languages="1033" Compressed="yes" SummaryCodepage="1252" InstallScope="perMachine" />
+    <Package Id="*" Keywords="Installer" Description="A-SaaS ??????????" Manufacturer="Aegif"
+      InstallerVersion="100" Languages="1041" Compressed="yes" SummaryCodepage="932" InstallScope="perMachine" />
 
     <PropertyRef Id="NETFRAMEWORK40CLIENT" />
-    <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again. Download: http://www.microsoft.com/en-us/download/details.aspx?id=17113">
+    <Condition Message="??????????? .NET Framework 4.0 ??????????????????????????????????????? : http://www.microsoft.com/en-us/download/details.aspx?id=17113">
       <![CDATA[Installed OR NETFRAMEWORK40CLIENT]]>
     </Condition>
 
-    <Media Id="1" Cabinet="CmisSync.cab" EmbedCab="yes"/>
+    <Media Id="1" Cabinet="ASaaSDrive.cab" EmbedCab="yes"/>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLDIR" Name="CmisSync">
+        <Directory Id="INSTALLDIR" Name="A-SaaS Drive">
           <Directory Id="DIR_x86" Name="x86"/>
           <Directory Id="DIR_x64" Name="x64"/>
           <Directory Id="localeDirectoryCS" Name="cs"/>
@@ -32,7 +32,7 @@
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="CmisSyncProgramsFolder" Name="CmisSync"/>
+        <Directory Id="CmisSyncProgramsFolder" Name="A-SaaS Drive"/>
       </Directory>
       <Directory Id="DesktopFolder"/>
       <!--<Directory Id="AppDataFolder">
@@ -141,7 +141,7 @@
     <DirectoryRef Id="CmisSyncProgramsFolder">
       <Component Id="StartMenuShortcut" Guid="FCFFE059-4D1F-4E0C-AFE7-8F5B77390EE3">
         <Shortcut Id="ApplicationStartMenuShortcut"
-                  Name="CmisSync"
+                  Name="A-SaaS Drive"
                   Target="[INSTALLDIR]CmisSync.exe"
                   WorkingDirectory="INSTALLDIR"/>
         <RemoveFolder Id="CmisSyncProgramsFolder" On="uninstall"/>
@@ -152,7 +152,7 @@
     <DirectoryRef Id="DesktopFolder">
       <Component Id="DesktopShortcut" Guid="34192850-2445-4C0B-A0A2-2EEDC2BE03DF">
         <Shortcut Id="ApplicationDesktopShortcut"
-                  Name="CmisSync"
+                  Name="A-SaaS Drive"
                   Target="[INSTALLDIR]CmisSync.exe"
                   WorkingDirectory="INSTALLDIR"/>
         <RemoveFile Id="DesktopFolder" Name="CmisSync.lnk" On="uninstall"/>
@@ -195,7 +195,7 @@
       <!--<ComponentGroupRef Id="pluginsComponentGroup" />-->
     </Feature>
 
-    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="license_ja.rtf" />
     <WixVariable Id="WixUIBannerBmp" Value="WixUIBanner.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="WixUIDialog.bmp" />
     <UI>
@@ -222,6 +222,6 @@
     
     <MajorUpgrade
       Schedule="afterInstallInitialize"
-      DowngradeErrorMessage="A later version of CmisSync is already installed. Setup will now exit." />
+      DowngradeErrorMessage="A-SaaS ???????????????????????????????????????????" />
   </Product>
 </Wix>

@@ -6,7 +6,7 @@
     <ProductVersion>3.8</ProductVersion>
     <ProjectGuid>419109db-39ab-4a87-9224-3a79277eeda1</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>CmisSync</OutputName>
+    <OutputName>ASaaSDrive</OutputName>
     <OutputType>Bundle</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -70,11 +70,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CustomTheme.wxl" />
+    <EmbeddedResource Include="CustomTheme_ja.wxl" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CustomTheme.xml" />
     <Content Include="license.rtf" />
+    <Content Include="license_ja.rtf" />
     <Content Include="logo.png" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
@@ -86,11 +87,11 @@
       <DefineConstants>BuildVersion=%(AssemblyVersion.Version)</DefineConstants>
     </PropertyGroup>
   </Target>
-	<Target Name="AfterBuild">
+  <Target Name="AfterBuild">
     <GetAssemblyIdentity AssemblyFiles="..\..\..\CmisSync.Lib\bin\$(Configuration)\CmisSync.Lib.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
     <Copy SourceFiles=".\bin\$(Configuration)\$(OutputName).exe" DestinationFiles=".\bin\$(Configuration)\$(OutputName).%(AssemblyVersion.Version).exe" />
     <Delete Files=".\bin\$(Configuration)\$(OutputName).exe" />
-	</Target>
+  </Target>
 </Project>

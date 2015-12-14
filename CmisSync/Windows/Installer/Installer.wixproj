@@ -6,7 +6,7 @@
     <ProductVersion>3.8</ProductVersion>
     <ProjectGuid>380a1b60-7c30-41d9-838a-febda2fdfaad</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>CmisSync</OutputName>
+    <OutputName>ASaaSDrive</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -76,6 +76,7 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="license_ja.rtf" />
     <Content Include="license.rtf" />
     <Content Include="WixUIBanner.bmp" />
     <Content Include="WixUIDialog.bmp" />
