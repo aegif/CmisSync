@@ -371,7 +371,7 @@ Please check the protocol part of the given URL. Maybe your server is not capabl
     <value>A-SaaS Drive is Open Source software. You are free to use, modify, and redistribute it under the GNU General Public License version 3 or later.</value>
   </data>
   <data name="PleaseCheckForUpdates" xml:space="preserve">
-    <value>Please check for updates at A-SaaS Drive.com</value>
+    <value>Please check for updates at CmisSync.com</value>
   </data>
   <data name="ReportProblem" xml:space="preserve">
     <value>Report a problem</value>

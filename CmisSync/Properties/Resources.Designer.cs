@@ -599,7 +599,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Please check for updates at A-SaaS Drive.com に類似しているローカライズされた文字列を検索します。
+        ///   Please check for updates at CmisSync.com に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string PleaseCheckForUpdates {
             get {

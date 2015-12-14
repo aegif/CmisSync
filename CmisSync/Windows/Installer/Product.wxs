@@ -4,11 +4,11 @@
   <Product Name="A-SaaS Drive" Id="*" UpgradeCode="D0C6DB5C-D3DA-430C-B5EE-E44478C8668B"
     Language="1041" Codepage="932" Version="$(var.BuildVersion)" Manufacturer="Aegif">
 
-    <Package Id="*" Keywords="Installer" Description="A-SaaS ??????????" Manufacturer="Aegif"
+    <Package Id="*" Keywords="Installer" Description="A-SaaS Drive" Manufacturer="Aegif"
       InstallerVersion="100" Languages="1041" Compressed="yes" SummaryCodepage="932" InstallScope="perMachine" />
 
     <PropertyRef Id="NETFRAMEWORK40CLIENT" />
-    <Condition Message="??????????? .NET Framework 4.0 ??????????????????????????????????????? : http://www.microsoft.com/en-us/download/details.aspx?id=17113">
+    <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again. Download?http://www.microsoft.com/en-us/download/details.aspx?id=17113">
       <![CDATA[Installed OR NETFRAMEWORK40CLIENT]]>
     </Condition>
 
@@ -175,7 +175,7 @@
       </Component>
     </DirectoryRef>
 
-    <Feature Id="CmisSyncFeature" Title="CmisSync" Description="CmisSync" Level="1" AllowAdvertise="no">
+    <Feature Id="CmisSyncFeature" Title="A-SaaS Drive" Description="A-SaaS Drive" Level="1" AllowAdvertise="no">
       <ComponentRef Id="CmisSync.exe" />
       <ComponentRef Id="CmisSync.Console.exe" />
       <ComponentRef Id="Libraries" />
@@ -222,6 +222,6 @@
     
     <MajorUpgrade
       Schedule="afterInstallInitialize"
-      DowngradeErrorMessage="A-SaaS ???????????????????????????????????????????" />
+      DowngradeErrorMessage="A later version of CmisSync is already installed. Setup will now exit." />
   </Product>
 </Wix>

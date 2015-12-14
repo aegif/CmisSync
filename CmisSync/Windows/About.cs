@@ -132,12 +132,14 @@ namespace CmisSync {
                 Width        = 318
             };
 
+            /*
             Link website_link = new Link(Properties_Resources.ResourceManager.GetString(
                 "Website", CultureInfo.CurrentCulture), Controller.WebsiteLinkAddress);
             Link credits_link = new Link(Properties_Resources.ResourceManager.GetString(
                 "Credits", CultureInfo.CurrentCulture), Controller.CreditsLinkAddress);
             Link report_problem_link = new Link(Properties_Resources.ResourceManager.GetString(
                 "ReportProblem", CultureInfo.CurrentCulture), Controller.ReportProblemLinkAddress);
+            */
 
             Canvas canvas = new Canvas ();
 
@@ -157,6 +159,7 @@ namespace CmisSync {
             Canvas.SetLeft (credits, 294);
             Canvas.SetTop (credits, 142);
 
+            /*
             canvas.Children.Add (website_link);
             Canvas.SetLeft (website_link, 289);
             Canvas.SetTop (website_link, 222);
@@ -168,6 +171,7 @@ namespace CmisSync {
             canvas.Children.Add (report_problem_link);
             Canvas.SetLeft (report_problem_link, 289 + website_link.ActualWidth + credits_link.ActualWidth + 115);
             Canvas.SetTop (report_problem_link, 222);
+            */
 
             Content = canvas;
         }
