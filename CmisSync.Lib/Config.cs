@@ -155,7 +155,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(HomePath, "CmisSync");
+                return Path.Combine(HomePath, "ASaaSDrive");
             }
         }
 

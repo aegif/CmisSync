@@ -87,7 +87,7 @@ namespace CmisSync {
 
             // Taskbar
 			TaskbarItemInfo = new TaskbarItemInfo () {
-				Description = "CmisSync"
+				Description = "A-SaaS Drive"
 			};
 
             // Separation and background for the line of buttons.
