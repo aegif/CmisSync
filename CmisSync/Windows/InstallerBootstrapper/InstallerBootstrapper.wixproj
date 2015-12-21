@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>3.8</ProductVersion>
+    <ProductVersion>1.0</ProductVersion>
     <ProjectGuid>419109db-39ab-4a87-9224-3a79277eeda1</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>ASaaSDriveSetup</OutputName>
@@ -80,7 +80,7 @@
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <Target Name="BeforeBuild">
-    <GetAssemblyIdentity AssemblyFiles="..\..\..\CmisSync.Lib\bin\$(Configuration)\CmisSync.Lib.dll">
+    <GetAssemblyIdentity AssemblyFiles="..\..\Windows\bin\$(Configuration)\CmisSync.exe">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
     <PropertyGroup>
@@ -88,7 +88,7 @@
     </PropertyGroup>
   </Target>
   <Target Name="AfterBuild">
-    <GetAssemblyIdentity AssemblyFiles="..\..\..\CmisSync.Lib\bin\$(Configuration)\CmisSync.Lib.dll">
+    <GetAssemblyIdentity AssemblyFiles="..\..\Windows\bin\$(Configuration)\CmisSync.exe">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
     <Copy SourceFiles=".\bin\$(Configuration)\$(OutputName).exe" DestinationFiles=".\bin\$(Configuration)\$(OutputName).%(AssemblyVersion.Version).exe" />

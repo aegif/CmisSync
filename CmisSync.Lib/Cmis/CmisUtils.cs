@@ -97,7 +97,7 @@ namespace CmisSync.Lib.Cmis
                 "/p8cmis/resources/Service", // IBM FileNet
                 "/logicaldoc/service/cmis", // LogicalDOC
                 "/_vti_bin/cmis/rest?getRepositories", // Microsoft SharePoint
-                "/nemakiware/atom/bedroom", // NemakiWare  TODO: different port, typically 8080 for Web UI and 3000 for CMIS
+                "/nemakiware/core/atom", // NemakiWare  TODO: different port, typically 8080 for Web UI and 3000 for CMIS
                 "/nuxeo/atom/cmis", // Nuxeo
                 "/cmis/atom",
                 "/cmis/resources/", // EMC Documentum

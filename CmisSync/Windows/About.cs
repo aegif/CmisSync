@@ -122,12 +122,19 @@ namespace CmisSync {
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227))
             };
 
+            TextBlock cmisysncInfo = new TextBlock() {
+                FontSize = 11,
+                Foreground = new SolidColorBrush(Color.FromRgb(135, 178, 227)),
+                Text = Properties_Resources.ResourceManager.GetString( "PleaseCheckForUpdates", CultureInfo.CurrentCulture),
+                TextWrapping = TextWrapping.Wrap,
+                Width = 318
+            };
+
             TextBlock credits = new TextBlock () {
                 FontSize     = 11,
                 Foreground = new SolidColorBrush (Color.FromRgb (135, 178, 227)),
-                Text         = "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n" +
-                    "\n" +
-                    Properties_Resources.ResourceManager.GetString("OpenSource", CultureInfo.CurrentCulture),
+                Text         = "Copyright © 2010–" + DateTime.Now.Year.ToString() + " Aegif and others.\n"
+                   /*  + "\n"  + Properties_Resources.ResourceManager.GetString("OpenSource", CultureInfo.CurrentCulture) */,
                 TextWrapping = TextWrapping.Wrap,
                 Width        = 318
             };
@@ -151,9 +158,16 @@ namespace CmisSync {
             Canvas.SetLeft (version, 289);
             Canvas.SetTop (version, 92);
 
+            /*
             canvas.Children.Add (this.updates);
             Canvas.SetLeft (this.updates, 289);
             Canvas.SetTop (this.updates, 109);
+            */
+
+            canvas.Children.Add(cmisysncInfo);
+            Canvas.SetLeft(cmisysncInfo, 294);
+            Canvas.SetTop(cmisysncInfo, 34);
+
 
             canvas.Children.Add (credits);
             Canvas.SetLeft (credits, 294);

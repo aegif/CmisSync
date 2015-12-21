@@ -3,7 +3,7 @@
   <Bundle
     Name="A-SaaS Drive"
     Version="$(var.BuildVersion)"
-    Manufacturer="Aegif"
+    Manufacturer="Accounting SaaS Japan"
     IconSourceFile="$(var.CmisSync.ProjectDir)\Pixmaps\cmissync-app.ico"
     UpgradeCode="12F52B78-05B3-4A20-9BAE-2211A807A3E7">
 

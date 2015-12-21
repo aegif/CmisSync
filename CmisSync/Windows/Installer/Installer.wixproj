@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>3.8</ProductVersion>
+    <ProductVersion>1.0</ProductVersion>
     <ProjectGuid>380a1b60-7c30-41d9-838a-febda2fdfaad</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>ASaaSDriveSetup</OutputName>
@@ -83,7 +83,7 @@
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <Target Name="BeforeBuild">
-    <GetAssemblyIdentity AssemblyFiles="..\..\..\CmisSync.Lib\bin\$(Configuration)\CmisSync.Lib.dll">
+    <GetAssemblyIdentity AssemblyFiles="..\..\Windows\bin\$(Configuration)\CmisSync.exe">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
     <PropertyGroup>

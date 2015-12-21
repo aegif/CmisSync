@@ -357,6 +357,9 @@
     <value>A-SaaS ドライブはオープンソースソフトウェアです。 GPLv3 ライセンスの元で自由に利用・改変・再配布が出来ます。</value>
   </data>
   <data name="PleaseCheckForUpdates" xml:space="preserve">
-    <value>A-SaaS ドライブは CmisSync をベースに作られています。 CmisSync.com</value>
+    <value>A-SaaS ドライブはオープンソースの CMIS 同期クライアント CmisSync をベースに作られています。 CmisSync の最新情報は CmisSync.com で提供されています。</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderText" xml:space="preserve">
+    <value>同期しようとしたローカルフォルダは既に存在します。このまま実行するとファイルのコンフリクトが多く発生する可能性があります。本当によろしいですか？パス： "{0}"</value>
   </data>
 </root>

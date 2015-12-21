@@ -99,6 +99,7 @@
     </Compile>
     <Compile Include="CertPolicyWindow.cs" />
     <Compile Include="PollIntervalSlider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shortcut.cs" />
     <Compile Include="StatusIcon.cs">
       <SubType>Form</SubType>
