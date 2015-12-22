@@ -169,7 +169,7 @@
     <value>完了</value>
   </data>
   <data name="FolderAlreadyExist" xml:space="preserve">
-    <value>フォルダがA-SaaS ドライブルートフォルダに既に存在します</value>
+    <value>フォルダが A-SaaS ドライブルートフォルダに既に存在します</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>ヘルプ</value>
@@ -353,13 +353,70 @@
   <data name="Seconds" xml:space="preserve">
     <value>秒</value>
   </data>
+  <data name="Credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="ModifiedSame" xml:space="preserve">
+    <value>ユーザ {0} が変更したファイル「{1}」をあなたが同時に編集しました。</value>
+  </data>
   <data name="OpenSource" xml:space="preserve">
     <value>A-SaaS ドライブはオープンソースソフトウェアです。 GPLv3 ライセンスの元で自由に利用・改変・再配布が出来ます。</value>
   </data>
   <data name="PleaseCheckForUpdates" xml:space="preserve">
     <value>A-SaaS ドライブはオープンソースの CMIS 同期クライアント CmisSync をベースに作られています。 CmisSync の最新情報は CmisSync.com で提供されています。</value>
   </data>
+  <data name="ReportProblem" xml:space="preserve">
+    <value>問題を報告する</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Website</value>
+  </data>
+  <data name="YourVersion" xml:space="preserve">
+    <value>あなたのファイルは’Conflict Copy'という名前を付けて保存されています。手動でマージを行い、このファイルは削除してください。</value>
+  </data>
+  <data name="SyncAtStartup" xml:space="preserve">
+    <value>Windows 開始時に A-SaaS Drive を起動</value>
+  </data>
+  <data name="RemoveSyncQuestion" xml:space="preserve">
+    <value>このフォルダを同期対象から外してよろしいですか？</value>
+  </data>
+  <data name="RemoveSyncTitle" xml:space="preserve">
+    <value>フォルダを同期対象から除外</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>新しいバージョン ({0}) が利用可能です！</value>
+  </data>
+  <data name="RunningLatestVersion" xml:space="preserve">
+    <value>最新バージョンを使っています</value>
+  </data>
+  <data name="FolderAlreadyInUse" xml:space="preserve">
+    <value>フォルダ {0} はすでに {1} によって使用されています</value>
+  </data>
+  <data name="InvalidRepoName" xml:space="preserve">
+    <value>リポジトリ名 {0} には利用できない文字が使用されています。</value>
+  </data>
+  <data name="NameResolutionFailure" xml:space="preserve">
+    <value>指定したホスト名は存在しません。ホスト名およびネットワークの接続状態を確認してください。</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>変更の破棄</value>
+  </data>
+  <data name="EditTitle" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="LoadingStatusABORTED" xml:space="preserve">
+    <value>読込が中断されました...</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>変更を保存しました</value>
+  </data>
   <data name="ConfirmExistingLocalFolderText" xml:space="preserve">
     <value>同期しようとしたローカルフォルダは既に存在します。このまま実行するとファイルのコンフリクトが多く発生する可能性があります。本当によろしいですか？パス： "{0}"</value>
+  </data>
+  <data name="ConfirmExistingLocalFolderTitle" xml:space="preserve">
+    <value>同期フォルダの選択の確認</value>
   </data>
 </root>
