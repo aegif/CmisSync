@@ -26,6 +26,10 @@ namespace CmisSync
         /// </summary>
         private ContextMenuStrip traymenu = new ContextMenuStrip();
 
+        public void MenuRefresh() {
+            traymenu.Refresh();
+        }
+
         /// <summary>
         /// Windows object for the status icon.
         /// </summary>
@@ -115,7 +119,7 @@ namespace CmisSync
 
                     BeginInvoke((Action)delegate
                     {
-                        stateItem.Text = state_text;
+                        stateItem.Text = Utils.Ellipsis(state_text,32);
                         string iconText = Utils.Ellipsis(Properties_Resources.CmisSync + "\n" + state_text, 63);
                         if (!iconText.Equals(trayicon.Text)) // TODO Useful? http://stackoverflow.com/q/34083778
                         {
@@ -133,6 +137,7 @@ namespace CmisSync
                     BeginInvoke((Action)delegate
                     {
                         this.trayicon.Text = Utils.Ellipsis(Properties_Resources.CmisSync + "\n" + Controller.StateText, 63);
+                        this.CreateMenu();
                     });
                 }
             };
@@ -227,7 +232,7 @@ namespace CmisSync
 
             if (Controller.StateText.Length > 32)
             {
-                this.stateItem.ToolTipText = Utils.WordWrap(Controller.StateText, 63);
+                this.stateItem.ToolTipText = Utils.WordWrap(Controller.StateText, 32);
             }
 
             this.traymenu.Items.Add(stateItem);
@@ -345,6 +350,9 @@ namespace CmisSync
                 addFolderItem.Click += delegate
                 {
                     Controller.AddRemoteFolderClicked();
+                    CreateMenu();
+                    traymenu.Refresh();
+
                 };
                 this.traymenu.Items.Add(addFolderItem);
                 this.traymenu.Items.Add(new ToolStripSeparator());
