@@ -40,7 +40,7 @@ namespace CmisSync
         /// <summary>
         /// Constructor.
         /// </summary>
-        public PollIntervalSlider(TextBlock sliderLabel)
+        public PollIntervalSlider(TextBlock sliderLabel, int defaultValue = 7)
         {
             this.sliderLabel = sliderLabel;
 
@@ -66,20 +66,14 @@ namespace CmisSync
             this.Ticks = tickMarks;
 
             // Show current value in UI.
-            ShowCurrentValue();
+            this.PollInterval = defaultValue;
         }
+        protected override void OnValueChanged(double oldValue, double newValue) {
+            base.OnValueChanged(oldValue, newValue);
 
-        protected override void OnThumbDragStarted(DragStartedEventArgs e)
-        {
-            base.OnThumbDragStarted(e);
             this.ShowCurrentValue();
         }
 
-        protected override void OnThumbDragDelta(DragDeltaEventArgs e)
-        {
-            base.OnThumbDragDelta(e);
-            this.ShowCurrentValue();
-        }
 
         /// <summary></summary>
         /// <returns></returns>
