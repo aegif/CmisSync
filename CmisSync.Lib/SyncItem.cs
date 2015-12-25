@@ -71,7 +71,6 @@ namespace CmisSync.Lib
         virtual public bool ExistsLocal()
         {
             bool exists = File.Exists(LocalPath);
-            Logger.Debug("File.Exists(" + LocalPath + ") = " + exists);
             return exists;
         }
     }

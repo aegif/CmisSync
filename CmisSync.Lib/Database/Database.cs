@@ -145,7 +145,7 @@ namespace CmisSync.Lib.Database
             {
                 try
                 {
-                    Logger.Info(String.Format("Checking whether database {0} exists", databaseFileName));
+                    Logger.Info(String.Format("Checking whether database {0} exists", Path.GetFileName(databaseFileName) ));
                     bool createDatabase = !File.Exists(databaseFileName);
 
                     sqliteConnection = new SQLiteConnection("Data Source=" + databaseFileName + ";PRAGMA journal_mode=WAL");

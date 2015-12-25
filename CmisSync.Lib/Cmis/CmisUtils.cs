@@ -460,7 +460,7 @@ namespace CmisSync.Lib.Cmis
             session.Clear(); // Clear all caches.
             session.Binding.GetRepositoryService().GetRepositoryInfos(null);
             string token = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
-            Logger.Debug("Server token:" + token);
+            Logger.DebugFormat("Server:{0} token: {1}" ,session.RepositoryInfo.ProductName, token);
             return token ?? string.Empty;
         }
 
