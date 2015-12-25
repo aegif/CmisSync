@@ -32,7 +32,7 @@ namespace CmisSync.Lib
     public class Config
     {
 
-        public static readonly string DEFAULT_URL_ADRESS = "https://cloud.nemakiware.com/core/atom"
+        public static readonly string DEFAULT_URL_ADRESS = "https://cloud.nemakiware.com/core/atom";
 
         /// <summary>
         /// The current config schema version.
