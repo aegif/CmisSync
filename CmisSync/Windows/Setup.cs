@@ -511,7 +511,7 @@ namespace CmisSync
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 
                                 if (Controller.PreviousAddress == null || Controller.PreviousAddress.ToString() == String.Empty)
-                                    address_box.Text = "https://";
+                                    address_box.Text = Config.DEFAULT_URL_ADRESS;
                                 else
                                     address_box.Text = Controller.PreviousAddress.ToString();
                                 address_box.Focus();
@@ -797,7 +797,8 @@ namespace CmisSync
                                 {
                                     if (repository.Key == Controller.saved_repository)
                                     {
-                                        localfoldername += "\\" + repository.Value;
+                                        var remote_path = Controller.saved_remote_path.Replace('/',Path.DirectorySeparatorChar);
+                                        localfoldername += "\\" + repository.Value + remote_path;
                                         break;
                                     }
                                 }
@@ -1105,11 +1106,11 @@ namespace CmisSync
                                     Width = 100
                                 };
 
-                                PollIntervalSlider slider = new PollIntervalSlider(slider_value)
+                                PollIntervalSlider slider = new PollIntervalSlider(slider_value, Controller.saved_sync_interval)
                                 {
                                     Width = 400,
-                                    PollInterval = Controller.saved_sync_interval
                                 };
+                                
 
                                 TextBlock slider_min_label = new TextBlock()
                                 {
