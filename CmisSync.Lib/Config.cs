@@ -31,6 +31,9 @@ namespace CmisSync.Lib
     /// </summary>
     public class Config
     {
+
+        public static readonly string DEFAULT_URL_ADRESS = "https://cloud.nemakiware.com/core/atom"
+
         /// <summary>
         /// The current config schema version.
         /// </summary>
@@ -48,7 +51,7 @@ namespace CmisSync.Lib
         /// It is used for any newly created synchronized folder.
         /// In milliseconds.
         /// </summary>
-        public static readonly int DEFAULT_POLL_INTERVAL = 5 * 1000; // 5 seconds.
+        public static readonly int DEFAULT_POLL_INTERVAL = 180 * 1000; // 3 miniutes.
 
 
         /// <summary>
