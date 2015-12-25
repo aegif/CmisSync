@@ -203,7 +203,11 @@ namespace CmisSync
         /// <param name="path">Path to the log file</param>
         public void ShowLog(string path)
         {
-            Process.Start("notepad.exe", path);
+            var p = new Process();
+            p.StartInfo.FileName = path;
+            p.StartInfo.UseShellExecute = true;
+            p.Start();
+
         }
     }
 }
