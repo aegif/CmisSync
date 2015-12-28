@@ -219,33 +219,37 @@ namespace CmisSync.Lib
         /// </summary>
         public static bool IsDirectoryWorthSyncing(string localDirectory, RepoInfo repoInfo)
         {
-            if (!localDirectory.StartsWith(repoInfo.TargetDirectory))
+            // Normalize dir separator.
+            var localDirPath = Path.GetFullPath(localDirectory + Path.AltDirectorySeparatorChar);
+            var targetDirPath = Path.GetFullPath(repoInfo.TargetDirectory + Path.AltDirectorySeparatorChar);
+
+            if (!localDirPath.StartsWith(targetDirPath))
             {
-                Logger.WarnFormat("Local directory is outside repo target directory.  local={0}, repo={1}", localDirectory, repoInfo.TargetDirectory);
+                Logger.WarnFormat("Local directory is outside repo target directory.  local={0}, repo={1}", localDirPath, targetDirPath);
                 return false;
             }
 
             //Check for ignored path...
-            string path = localDirectory.Substring(repoInfo.TargetDirectory.Length).Replace("\\", "/");
+            string path = localDirPath.Substring(targetDirPath.Length).Replace("\\", "/");
             if (repoInfo.isPathIgnored(path))
             {
-                Logger.DebugFormat("Skipping {0}: hidden folder", localDirectory);
+                Logger.DebugFormat("Skipping {0}: hidden folder", localDirPath);
                 return false;
 
             }
 
             //Check system/hidden
-            DirectoryInfo directoryInfo = new DirectoryInfo(localDirectory);
+            DirectoryInfo directoryInfo = new DirectoryInfo(localDirPath);
             if (directoryInfo.Exists)
             {
                 if (directoryInfo.Attributes.HasFlag(FileAttributes.Hidden))
                 {
-                    Logger.DebugFormat("Skipping {0}: hidden folder", localDirectory);
+                    Logger.DebugFormat("Skipping {0}: hidden folder", localDirPath);
                     return false;
                 }
                 if (directoryInfo.Attributes.HasFlag(FileAttributes.System))
                 {
-                    Logger.DebugFormat("Skipping {0}: system folder", localDirectory);
+                    Logger.DebugFormat("Skipping {0}: system folder", localDirPath);
                     return false;
                 }
 

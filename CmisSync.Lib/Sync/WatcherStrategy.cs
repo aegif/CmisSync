@@ -29,7 +29,7 @@ namespace CmisSync.Lib.Sync
             /// <returns>Whether something has changed in the local folder</returns>
             private bool WatcherSync(string remoteFolder, string localFolder)
             {
-                Logger.Debug(remoteFolder + " : " + localFolder);
+                Logger.DebugFormat("Watcher sync started. Remote : {0} Local : {0} ", remoteFolder , localFolder);
                 bool locallyModified = false;
                 SleepWhileSuspended();
                 Queue<FileSystemEventArgs> changeQueue = repo.Watcher.GetChangeQueue();

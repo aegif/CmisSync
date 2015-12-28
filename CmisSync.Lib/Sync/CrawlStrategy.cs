@@ -91,15 +91,17 @@ namespace CmisSync.Lib.Sync
                 IList<string> remoteSubfolders = new List<string>();
 
                 // Crawl remote children.
-                // Logger.LogInfo("Sync", String.Format("Crawl remote folder {0}", this.remoteFolderPath));
+                Logger.DebugFormat("Crawl remote folder {0}", this.remoteFolderPath);
                 bool success = CrawlRemote(remoteFolder, remotePath, localFolder, remoteFiles, remoteSubfolders);
+                Logger.DebugFormat("Crawl remote folder includes {0} files", remoteFiles.Count);
+
 
                 // Crawl local files.
-                // Logger.LogInfo("Sync", String.Format("Crawl local files in the local folder {0}", localFolder));
+                Logger.DebugFormat("Crawl local files in the local folder {0}", localFolder);
                 CrawlLocalFiles(localFolder, remoteFolder, remoteFiles);
 
                 // Crawl local folders.
-                // Logger.LogInfo("Sync", String.Format("Crawl local folder {0}", localFolder));
+                Logger.DebugFormat("Crawl local folder {0}", localFolder);
                 CrawlLocalFolders(localFolder, remoteFolder, remoteSubfolders);
 
                 return success;
@@ -476,14 +478,19 @@ namespace CmisSync.Lib.Sync
                         item = SyncItemFactory.CreateFromLocalPath(filePath, repoInfo);
                     }
 
-                    // string fileName = Path.GetFileName(filePath);
+                    string localFileName = Path.GetFileName(filePath);
                     string fileName = item.RemoteFileName;
+                    var worthSyncing = Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoInfo);
+                    var existingRemote = remoteFiles.Contains(fileName);
 
-                    if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoInfo))
+                    Logger.DebugFormat("LocalCheck LocalFileName:{0}, RemoteNameOnLocalDB:{1}, WorthSyncing:{2}, ExistingRemote:{3}", localFileName, fileName,  worthSyncing, existingRemote);
+
+                    if (worthSyncing)
                     {
-                        if (!(remoteFiles.Contains(fileName) ||
-                            // Workaround for Documentum which sometimes put a ".zip" extension to document names.
-                            (CmisUtils.IsDocumentum(session) && remoteFiles.Contains(fileName + ".zip"))))
+                        if (!(existingRemote
+                           // Workaround for Documentum which sometimes put a ".zip" extension to document names.
+                           // || (CmisUtils.IsDocumentum(session) && remoteFiles.Contains(fileName + ".zip"))
+                            ))
                         {
                             // This local file is not on the CMIS server now, so
                             // check whether it used invalidFolderNameRegex to exist on server or not.
