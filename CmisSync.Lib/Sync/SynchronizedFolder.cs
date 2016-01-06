@@ -414,6 +414,8 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (PermissionDeniedException e)
                     {
+                        Logger.Error("PermissionDeniedException : The session might have been cut by the remote server, so try to reconnect.");
+
                         // The session might have been cut by the remote server, so try to reconnect.
                         Connect();
 
@@ -1084,7 +1086,11 @@ namespace CmisSync.Lib.Sync
 
                         Logger.Debug("Uploading: " + syncItem.LocalPath + " as "
                             + remoteFolder.Path + "/" + remoteFileName);
-                        remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                        try {
+                            remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
+                        } catch {
+                            throw;
+                        }
                         Logger.Debug("Uploaded: " + syncItem.LocalPath);
                         filehash = hashAlg.Hash;
                     }
