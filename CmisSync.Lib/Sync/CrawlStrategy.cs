@@ -247,7 +247,7 @@ namespace CmisSync.Lib.Sync
                                         // TODO Should we retry? Maybe at least once, as a manual recursion instead of a DeleteTree.
                                     }
                                 }
-                                catch (CmisPermissionDeniedException e)
+                                catch (CmisPermissionDeniedException)
                                 {
                                     // We don't have the permission to delete this folder. Warn and recreate it.
                                     Utils.NotifyUser("You don't have the necessary permissions to delete folder " + remoteSubFolder.Path

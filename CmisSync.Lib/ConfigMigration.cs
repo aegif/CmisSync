@@ -168,7 +168,7 @@ namespace CmisSync.Lib.Sync
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

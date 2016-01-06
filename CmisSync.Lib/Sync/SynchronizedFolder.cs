@@ -412,7 +412,7 @@ namespace CmisSync.Lib.Sync
                     {
                         remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
                     }
-                    catch (PermissionDeniedException e)
+                    catch (PermissionDeniedException)
                     {
                         Logger.Error("PermissionDeniedException : The session might have been cut by the remote server, so try to reconnect.");
 

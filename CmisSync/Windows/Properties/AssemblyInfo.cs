@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("A-Saas Drive Cliant Software")]
+[assembly: AssemblyTitle("A-Saas Drive Client Software")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Aegif crop.")]
+[assembly: AssemblyCompany("Aegif corp.")]
 [assembly: AssemblyProduct("A-Saas Drive")]
-[assembly: AssemblyCopyright("Aegif crop.")]
+[assembly: AssemblyCopyright("Aegif corp.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
