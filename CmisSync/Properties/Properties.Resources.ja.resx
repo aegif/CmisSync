@@ -378,7 +378,7 @@
     <value>あなたのファイルは’Conflict Copy'という名前を付けて保存されています。手動でマージを行い、このファイルは削除してください。</value>
   </data>
   <data name="SyncAtStartup" xml:space="preserve">
-    <value>Windows 開始時に A-SaaS Drive を起動</value>
+    <value>A-SaaS Drive 開始時に強制同期を行う </value>
   </data>
   <data name="RemoveSyncQuestion" xml:space="preserve">
     <value>このフォルダを同期対象から外してよろしいですか？</value>

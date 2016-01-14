@@ -32,6 +32,7 @@ namespace CmisSync.Lib
     public class Config
     {
 
+        public static readonly string SYNC_ROOTFOLDER_NAME = "ASaaSDrive";
         public static readonly string DEFAULT_URL_ADDRESS = "https://cloud.nemakiware.com/core/atom";
 
         /// <summary>
@@ -158,7 +159,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                return Path.Combine(HomePath, "ASaaSDrive");
+                return Path.Combine(HomePath, SYNC_ROOTFOLDER_NAME);
             }
         }
 

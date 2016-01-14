@@ -173,9 +173,14 @@
     </DirectoryRef> -->
 
     <DirectoryRef Id="StartupFolder">
-      <Component Id="StartupMenuItem" Guid="46C6E4A6-74C4-4D1B-AD7E-38F2F92144F6">
-        <RemoveFile Id="RemoveStartupItem" Name="CmisSync.lnk" On="uninstall"/>
-        <RegistryValue Root="HKCU" Key="Software\CmisSync" Name="StartupMenuItem" Type="integer" Value="1" KeyPath="yes"/>
+      <Component Id="ApplicationShortCutStartUp" Guid="46C6E4A6-74C4-4D1B-AD7E-38F2F92144F6">
+        <Shortcut Id="AppShortCutStartUp"
+          Name="A-SaaS Drive"
+          Target="[INSTALLDIR]CmisSync.exe"
+          WorkingDirectory="INSTALLDIR"/>
+        <RegistryKey Root="HKCU" Key="Software\CmisSync" Action="createAndRemoveOnUninstall">
+          <RegistryValue Name="ShortCutStartUp" Type="integer" Value="1" KeyPath="yes"  />
+        </RegistryKey>
       </Component>
     </DirectoryRef>
 
@@ -187,7 +192,7 @@
       <ComponentRef Id="COMP_x64" />
       <ComponentRef Id="StartMenuShortcut" />
       <ComponentRef Id="DesktopShortcut" />
-      <ComponentRef Id="StartupMenuItem" />
+      <ComponentRef Id="ApplicationShortCutStartUp" />
       <!--<ComponentRef Id="localeComponentCS" />
       <ComponentRef Id="localeComponentDE" />
       <ComponentRef Id="localeComponentES" />
