@@ -76,7 +76,7 @@ namespace CmisSync
         public override void AddToBookmarks()
         {
             string user_profile_path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string shortcut_path = Path.Combine(user_profile_path, "Links", "CmisSync.lnk");
+            string shortcut_path = Path.Combine(user_profile_path, "Links", Properties_Resources.CmisSync + ".lnk");
 
             if (File.Exists(shortcut_path))
                 File.Delete(shortcut_path);
