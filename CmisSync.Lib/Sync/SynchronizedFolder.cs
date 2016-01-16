@@ -663,7 +663,7 @@ namespace CmisSync.Lib.Sync
                 // List all children.
                 foreach (ICmisObject cmisObject in children)
                 {
-                    string remoteSubPath = remotePath + CmisUtils.CMIS_FILE_SEPARATOR + cmisObject.Name;
+                    //string remoteSubPath = remotePath + CmisUtils.CMIS_FILE_SEPARATOR + cmisObject.Name;
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
                         IFolder remoteSubFolder = (IFolder)cmisObject;
@@ -677,6 +677,7 @@ namespace CmisSync.Lib.Sync
 
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoInfo))
                         {
+                            string remoteSubPath = remoteSubFolder.Path;
                             DownloadDirectory(remoteSubFolder, remoteSubPath, localSubFolderItem.LocalPath);
                         }
                     }
@@ -684,6 +685,8 @@ namespace CmisSync.Lib.Sync
                     {
                         if (Utils.WorthSyncing(localFolder, cmisObject.Name, repoInfo))
                         {
+                            IDocument remoteDocument = (IDocument)cmisObject;
+                            string remoteSubPath = remoteDocument.Paths[0];
                             // It is a file, just download it.
                             DownloadFile((IDocument)cmisObject, remoteSubPath, localFolder);
                         }

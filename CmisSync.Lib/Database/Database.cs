@@ -92,9 +92,18 @@ namespace CmisSync.Lib.Database
         {
             this.databaseFileName = databaseFileName;
             this.localPathPrefix = localPathPrefix;
-            this.localPathPrefixSize = localPathPrefix.Length + 1;
+            this.localPathPrefixSize = localPathPrefix.Length;
+            if (!remotePathPrefix.Equals("/"))
+            {
+                this.localPathPrefixSize += 1;
+            }
+
             this.remotePathPrefix = remotePathPrefix;
-            this.remotePathPrefixSize = remotePathPrefix.Length + 1;
+            this.remotePathPrefixSize = remotePathPrefix.Length;
+            if (!remotePathPrefix.Equals("/"))
+            {
+                this.remotePathPrefixSize += 1;
+            }
         }
 
         /// <summary>
@@ -984,6 +993,10 @@ namespace CmisSync.Lib.Database
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 			parameters.Add("localPath", localRelativePath);
             string res = (string)ExecuteSQLFunction(command, parameters);
+            if(res == null)
+            {
+                Logger.Debug("GetCheckSum return null for path=" + path + ", localRelativePath=" + localRelativePath);
+            }
             return res;
         }
 
