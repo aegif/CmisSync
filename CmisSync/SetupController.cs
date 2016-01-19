@@ -459,9 +459,12 @@ namespace CmisSync
                 WindowIsOpen = false;
                 HideWindowEvent();
 
+                // ASaas Drive is forced to start up by installer
+                /*
                 // If requested, add CmisSync to the list of programs to be started up when the user logs into Windows.
                 if (this.create_startup_item)
                     new Thread(() => Program.Controller.CreateStartupItem()).Start();
+                */
             }
             else
             {

@@ -316,10 +316,11 @@ namespace CmisSync
 
                                             slide_image.Source = UIHelpers.GetImageSource("tutorial-slide-4");
 
-                                            CheckBox check_box = new CheckBox()
-                                            {
+                                            CheckBox check_box = new CheckBox() {
+                                                // ASaas Drive is forced to start up by installer
+                                                Visibility = Visibility.Hidden,
                                                 Content = Properties_Resources.Startup,
-                                                IsChecked = true
+                                                IsChecked = true,
                                             };
 
 

@@ -31,6 +31,9 @@ namespace CmisSync
     /// </summary>
     public class Controller : ControllerBase, UserNotificationListener
     {
+
+        public static string ShortCutName = Properties_Resources.CmisSync + ".lnk";
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -58,7 +61,7 @@ namespace CmisSync
         public override void CreateStartupItem()
         {
             string startup_folder_path = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-            string shortcut_path = Path.Combine(startup_folder_path, "CmisSync.lnk");
+            string shortcut_path = Path.Combine(startup_folder_path, ShortCutName);
 
             if (File.Exists(shortcut_path))
                 File.Delete(shortcut_path);
@@ -76,7 +79,7 @@ namespace CmisSync
         public override void AddToBookmarks()
         {
             string user_profile_path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string shortcut_path = Path.Combine(user_profile_path, "Links", Properties_Resources.CmisSync + ".lnk");
+            string shortcut_path = Path.Combine(user_profile_path, "Links", ShortCutName);
 
             if (File.Exists(shortcut_path))
                 File.Delete(shortcut_path);
