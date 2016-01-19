@@ -993,7 +993,7 @@ namespace CmisSync.Lib.Database
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 			parameters.Add("localPath", localRelativePath);
             string res = (string)ExecuteSQLFunction(command, parameters);
-            if(res == null)
+            if(string.IsNullOrEmpty(res))
             {
                 Logger.Debug("GetCheckSum return null for path=" + path + ", localRelativePath=" + localRelativePath);
             }
