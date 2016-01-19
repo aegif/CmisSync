@@ -230,7 +230,7 @@ namespace CmisSync.Lib
         /// <param name="repoInfo"></param>
         public RemotePathSyncItem(string remotePath, RepoInfo repoInfo)
         {
-            
+            this.localRoot = PathRepresentationConverter.RemoteToLocal(repoInfo.TargetDirectory);
             this.remoteRoot = PathRepresentationConverter.LocalToRemote(repoInfo.RemotePath);
 
             this.remotePath = remotePath;
@@ -239,27 +239,6 @@ namespace CmisSync.Lib
                 this.remotePath = remotePath.Substring(this.remoteRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
             this.localPath = PathRepresentationConverter.RemoteToLocal(this.remotePath);
-            //this.localRoot = PathRepresentationConverter.RemoteToLocal(repoInfo.TargetDirectory);
-            this.localRoot = repoInfo.TargetDirectory;
-
-
-            string test;
-            if (!String.IsNullOrEmpty(this.localPath)
-                   && this.localPath.StartsWith(Path.DirectorySeparatorChar.ToString())
-                   && this.localRoot.EndsWith(Path.DirectorySeparatorChar.ToString())
-                   )
-            {
-                test =　this.localRoot + localPath;
-            }
-            else
-            {
-                test = Path.GetFullPath(Path.Combine(this.localRoot, this.localPath));
-            }
-
-
-            string lp = this.LocalPath;
-
-
         }
 
         /// <summary></summary>
