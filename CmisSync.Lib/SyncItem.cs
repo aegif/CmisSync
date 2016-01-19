@@ -31,39 +31,57 @@ namespace CmisSync.Lib
         }
 
         /// <summary></summary>
-        abstract public string LocalRelativePath
+        public virtual string LocalRelativePath
         {
-            get;
+            get
+            {
+                return localPath;
+            }
         }
 
         /// <summary></summary>
-        abstract public string RemoteRelativePath
+        public virtual string RemoteRelativePath
         {
-            get;
+            get
+            {
+                return remotePath;
+            }
         }
 
         /// <summary></summary>
-        abstract public string LocalPath
+        public virtual string LocalPath
         {
-            get;
+            get
+            {
+                return Path.GetFullPath(Path.Combine(localRoot, localPath));
+            }
         }
 
         /// <summary></summary>
-        abstract public string RemotePath
+        public virtual string RemotePath
         {
-            get;
+            get
+            {
+                return Path.GetFullPath(Path.Combine(remoteRoot, remotePath));
+            }
         }
 
         /// <summary></summary>
-        abstract public string LocalFileName
+        public virtual string LocalFileName
         {
-            get;
+            get
+            {
+                return Path.GetFileName(localPath);
+            }
         }
 
         /// <summary></summary>
-        abstract public string RemoteFileName
+        public virtual string RemoteFileName
         {
-            get;
+            get
+            {
+                return Path.GetFileName(remotePath);
+            }
         }
 
         /// <summary></summary>
@@ -202,70 +220,6 @@ namespace CmisSync.Lib
             this.remotePath = remotePath;
         }
             
-        /// <summary></summary>
-        public override string LocalRelativePath
-        {
-            get
-            {
-                return localPath;
-            }
-        }
-
-        /// <summary></summary>
-        public override string RemoteRelativePath
-        {
-            get
-            {
-                return remotePath;
-            }
-        }
-
-        /// <summary></summary>
-        public override string LocalPath
-        {
-            get
-            {                
-                if(!String.IsNullOrEmpty(this.localPath) 
-                    && this.localPath.StartsWith(Path.DirectorySeparatorChar.ToString())
-                    && this.localRoot.EndsWith(Path.DirectorySeparatorChar.ToString())
-                    )
-                {
-                    return this.localRoot + localPath;
-                }
-                else
-                {
-                    return Path.GetFullPath(Path.Combine(this.localRoot, this.localPath));
-                }
-               
-            }
-        }
-
-        /// <summary></summary>
-        public override string RemotePath
-        {
-            get
-            {
-                return Path.Combine(this.remoteRoot, this.remotePath);
-            }
-        }
-
-        /// <summary></summary>
-        public override string LocalFileName
-        {
-            get
-            {
-                return Path.GetFileName(this.localPath);
-            }
-        }
-
-        /// <summary></summary>
-        public override string RemoteFileName
-        {
-            get
-            {
-                return Path.GetFileName(this.remotePath);
-            }
-        }
     }
 
     /// <summary></summary>
@@ -330,59 +284,17 @@ namespace CmisSync.Lib
             this.localPath = Path.Combine(PathRepresentationConverter.RemoteToLocal(remoteRootRelative), localRelativePath);
         }
 
-        /// <summary></summary>
-        public override string LocalRelativePath
-        {
-            get
-            {
-                return localPath;
-            }
-        }
 
-        /// <summary></summary>
-        public override string RemoteRelativePath
-        {
-            get
-            {
-                return remotePath;
-            }
-        }
-        
         /// <summary></summary>
         public override string LocalPath
         {
             get
             {
-                return Utils.PathCombine(localRoot, localPath);
+                return Path.GetFullPath(Utils.PathCombine(localRoot, localPath));
             }
         }
 
-        /// <summary></summary>
-        public override string RemotePath
-        {
-            get
-            {
-                return Path.Combine(remoteRoot, remotePath);
-            }
-        }
 
-        /// <summary></summary>
-        public override string LocalFileName
-        {
-            get
-            {
-                return Path.GetFileName(localPath);
-            }
-        }
-
-        /// <summary></summary>
-        public override string RemoteFileName
-        {
-            get
-            {
-                return Path.GetFileName(remotePath);
-            }
-        }
     }
 
     /// <summary>Path representation converter.</summary>
