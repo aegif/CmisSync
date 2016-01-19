@@ -109,13 +109,13 @@ namespace CmisSync.Lib.Sync
                 SleepWhileSuspended();
                 string oldDirectory = Path.GetDirectoryName(oldPathname);
                 string oldFilename = Path.GetFileName(oldPathname);
-                string oldLocalName = oldPathname.Substring(localFolder.Length + 1);
+                string oldLocalName = extractRelativePath(oldPathname, localFolder);//string oldLocalName = oldPathname.Substring(localFolder.Length + 1);
                 string oldRemoteName = Path.Combine(remoteFolder, oldLocalName).Replace('\\', '/'); // FIXME
                 string oldRemoteBaseName = Path.GetDirectoryName(oldRemoteName).Replace('\\', '/');
                 bool oldPathnameWorthSyncing = Utils.WorthSyncing(oldDirectory, oldFilename, repoInfo);
                 string newDirectory = Path.GetDirectoryName(newPathname);
                 string newFilename = Path.GetFileName(newPathname);
-                string newLocalName = newPathname.Substring(localFolder.Length + 1);
+                string newLocalName = extractRelativePath(newPathname, localFolder); //string newLocalName = newPathname.Substring(localFolder.Length + 1);
                 string newRemoteName = Path.Combine(remoteFolder, newLocalName).Replace('\\', '/');
                 string newRemoteBaseName = Path.GetDirectoryName(newRemoteName).Replace('\\', '/');
                 bool newPathnameWorthSyncing = Utils.WorthSyncing(newDirectory, newFilename, repoInfo);
@@ -229,7 +229,7 @@ namespace CmisSync.Lib.Sync
                 }
                 try
                 {
-                    string name = pathname.Substring(localFolder.Length + 1);
+                    string name = extractRelativePath(pathname, localFolder);
                     string remoteName = Path.Combine(remoteFolder, name).Replace('\\', '/');
                     IFolder remoteBase = null;
                     if (File.Exists(pathname) || Directory.Exists(pathname))
@@ -325,6 +325,13 @@ namespace CmisSync.Lib.Sync
                 Thread.Sleep(GRACE_TIME);
                 return false; // Perform a sync.
             }
+
+            private string extractRelativePath(string pathname, string localFolder)
+            {
+                string name = pathname.Replace(localFolder, String.Empty).TrimStart(Path.DirectorySeparatorChar);
+                return name;
+            }
+
         }
     }
 }
