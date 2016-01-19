@@ -827,7 +827,7 @@ namespace CmisSync.Lib.Sync
                 {
                     syncItem = SyncItemFactory.CreateFromRemotePath(remotePath, repoInfo);
                 }
-
+                string lp = syncItem.LocalPath;
                 Logger.Info("Downloading: " + syncItem.RemoteFileName);
 
                 // Skip if invalid file name. See https://github.com/aegif/CmisSync/issues/196
