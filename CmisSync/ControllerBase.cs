@@ -28,8 +28,6 @@ using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Events;
 using CmisSync.Auth;
 
-using System.Windows.Forms;
-
 #if __COCOA__
 // using Edit = CmisSync.EditWizardController;
 #endif
@@ -235,15 +233,13 @@ namespace CmisSync
                 ShowSetupWindow(PageType.Setup);
             }
 
-            Thread t = new Thread(() =>
+            new Thread(() =>
             {
                 CheckRepositories();
                 RepositoriesLoaded = true;
                 // Update GUI.
                 FolderListChanged();
-            });
-            t.SetApartmentState(ApartmentState.STA);
-            t.Start();
+            }).Start();
         }
 
         /// <summary>
@@ -387,7 +383,7 @@ namespace CmisSync
                         aRepo.Suspend();
                         Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                     }
-                }
+                        }
             }
         }
 
@@ -403,31 +399,36 @@ namespace CmisSync
                 foreach (RepoBase aRepo in this.repositories)
                 {
                     if (aRepo.Status == SyncStatus.Suspend)
-                    {
-                        aRepo.Resume();
-                        Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        {
+                            aRepo.Resume();
+                            Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
+                        }
                     }
                 }
             }
-        }
 
         /// <summary>
         /// Check the configured CmisSync synchronized folders.
+        /// Remove the ones whose folders have been deleted.
         /// </summary>
         private void CheckRepositories()
         {
             lock (this.repo_lock)
             {
-                Queue<Config.SyncConfig.Folder> missingFolders = new Queue<Config.SyncConfig.Folder>();
+                List<Config.SyncConfig.Folder> toBeDeleted = new List<Config.SyncConfig.Folder>();
+                // If folder has been deleted, remove it from configuration too.
                 foreach (Config.SyncConfig.Folder f in ConfigManager.CurrentConfig.Folders)
                 {
+                    string folder_name = f.DisplayName;
                     string folder_path = f.LocalPath;
 
                     if (!Directory.Exists(folder_path))
                     {
-                        // If folder has been deleted, ask the user what to do.
-                        Logger.Info("ControllerBase | Found missing folder '" + f.DisplayName + "'");
-                        missingFolders.Enqueue(f);
+                        RemoveRepository(f);
+                        toBeDeleted.Add(f);
+
+                        Logger.Info("ControllerBase | Removed folder '" + folder_name + "' from config");
+
                     }
                     else
                     {
@@ -435,83 +436,17 @@ namespace CmisSync
                     }
                 }
 
-                while (missingFolders.Count != 0)
+                foreach (Config.SyncConfig.Folder f in toBeDeleted)
                 {
-                    // Disabled because incompatible wit Mac OS X: handleMissingSyncFolder(missingFolders.Dequeue());
+                    ConfigManager.CurrentConfig.Folders.Remove(f);
                 }
-
-                ConfigManager.CurrentConfig.Save();
+                if (toBeDeleted.Count > 0)
+                    ConfigManager.CurrentConfig.Save();
             }
 
             // Update GUI.
             FolderListChanged();
         }
-
-        /*private void handleMissingSyncFolder(Config.SyncConfig.Folder f)
-        {
-            bool handled = false;
-
-            while (handled == false)
-            {
-                MissingFolderDialog dialog = new MissingFolderDialog(f);
-                dialog.ShowDialog();
-                if (dialog.action == MissingFolderDialog.Action.MOVE)
-                {
-                    String startPath = Directory.GetParent(f.LocalPath).FullName;
-                    FolderBrowserDialog fbd = new FolderBrowserDialog();
-                    fbd.SelectedPath = startPath;
-                    fbd.Description = "Select the folder you have moved or renamed";
-                    fbd.ShowNewFolderButton = false;
-                    DialogResult result = fbd.ShowDialog();
-
-                    if (result == DialogResult.OK && fbd.SelectedPath.Length > 0)
-                    {
-                        if (!Directory.Exists(fbd.SelectedPath))
-                        {
-                            throw new InvalidDataException();
-                        }
-                        Logger.Info("ControllerBase | Folder '" + f.DisplayName + "' ('" + f.LocalPath + "') moved to '" + fbd.SelectedPath + "'");
-                        f.LocalPath = fbd.SelectedPath;
-
-                        AddRepository(f.GetRepoInfo());
-                        handled = true;
-                    }
-                }
-                else if (dialog.action == MissingFolderDialog.Action.REMOVE)
-                {
-                    RemoveRepository(f);
-                    ConfigManager.CurrentConfig.Folders.Remove(f);
-
-                    Logger.Info("ControllerBase | Removed folder '" + f.DisplayName + "' from config");
-                    handled = true;
-                }
-                else if (dialog.action == MissingFolderDialog.Action.RECREATE)
-                {
-                    RepoInfo info = f.GetRepoInfo();
-                    RemoveRepository(f);
-                    ConfigManager.CurrentConfig.Folders.Remove(f);
-                    CreateRepository(info.Name,
-                        info.Address,
-                        info.User,
-                        info.Password.ToString(),
-                        info.RepoID,
-                        info.RemotePath,
-                        info.TargetDirectory,
-                        info.getIgnoredPaths().OfType<String>().ToList(),
-                        info.SyncAtStartup);
-                    Logger.Info("ControllerBase | Folder '" + f.DisplayName + "' recreated");
-                    handled = true;
-                }
-                else
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-            // handled == true
-            // now resume the synchronization (if ever was suspended)
-            // FIXME: the problem is that if the user suspended this repo it will get resumed anyway (ignoring the user setting)
-            Program.Controller.ResumeRepositorySynchronization(f.DisplayName);
-        }*/
 
         /// <summary>
         /// Fix the file attributes of a folder, recursively.
@@ -648,31 +583,6 @@ namespace CmisSync
         public void ActivityError(Tuple<string, Exception> error)
         {
             //FIXME: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
-            String reponame = error.Item1;
-            Exception exception = error.Item2;
-
-            if (exception is MissingSyncFolderException)
-            {
-                //Suspend sync... (should be resumed after the user has handled the error)
-                Program.Controller.SuspendRepositorySynchronization(reponame);
-                //FIXME: should update the suspended menu item, but i can't from here
-                //UpdateSuspendSyncFolderEvent(reponame);
-                
-                //handle in a new thread, becouse this is the syncronization one and can be killed if the user decide to remove the repo or resync it
-                /* Disabled because incompatible with Mac OS X: Thread t = new Thread(() =>
-                {
-                    handleMissingSyncFolder(ConfigManager.CurrentConfig.GetFolder(reponame));
-                });
-                t.SetApartmentState(ApartmentState.STA);
-                t.Start();*/
-
-                //dont resume here, the handler thread will if needed (or kill this thread)
-                //Program.Controller.ResumeRepositorySynchronization(reponame);
-
-                //handled, no need to do anything else
-                return;
-            }
-
             OnError(error);
         }
     }

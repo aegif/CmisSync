@@ -193,10 +193,6 @@ namespace CmisSync.Lib.Sync
                         {
                             repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
                         }
-                        catch (CmisMissingSyncFolderException e) 
-                        {
-                            repo.OnSyncError(new MissingSyncFolderException("Missing sync folder.", e));
-                        }
                         catch (Exception e)
                         {
                             repo.OnSyncError(new BaseException(e));
@@ -435,14 +431,12 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        // The user has deleted/moved/renamed the local root folder while CmisSync was running.
-                        if ( ! Directory.Exists(localFolder))
-                        {
-                            throw new CmisMissingSyncFolderException("Missing " + localFolder + ".");
-                        }
-
                         // Apply local changes noticed by the filesystem watcher.
-                        WatcherSync(remoteFolderPath, localFolder);
+                        bool locallyModified = WatcherSync(remoteFolderPath, localFolder);
+                        if (locallyModified)
+                        {
+                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
+                        }
 
                         if (ChangeLogCapability)
                         {
