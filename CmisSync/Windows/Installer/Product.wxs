@@ -54,6 +54,7 @@
         <File Id="DotCMIS.dll" Name="DotCMIS.dll" Source="$(var.CmisSync.TargetDir)\DotCMIS.dll" DiskId="1" />
         <File Id="log4net.dll" Name="log4net.dll" Source="$(var.CmisSync.TargetDir)\log4net.dll" DiskId="1" />
         <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.CmisSync.TargetDir)\Newtonsoft.Json.dll" DiskId="1" />
+        <File Id="RestSharp.dll" Name="RestSharp.dll" Source="$(var.CmisSync.TargetDir)\RestSharp.dll" DiskId="1" />
         <File Id="System.Data.SQLite.dll" Name="System.Data.SQLite.dll" Source="$(var.CmisSync.TargetDir)\System.Data.SQLite.dll" DiskId="1" />
         <File Id="cmissync_app.ico" Name="cmissync.ico" Source="$(var.CmisSync.ProjectDir)\Pixmaps\cmissync-app.ico" DiskId="1" />
       </Component>

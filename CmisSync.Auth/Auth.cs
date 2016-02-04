@@ -51,6 +51,9 @@ namespace CmisSync.Auth
             // Create session factory.
             SessionFactory factory = SessionFactory.NewInstance();
 
+            //linzhixing
+            Specific.SpecificAuth.setCmisParameters(parameters);
+
             // Create session.
             ISession session = factory.CreateSession(parameters);
             Logger.Info("VendorName: " + session.RepositoryInfo.VendorName);
