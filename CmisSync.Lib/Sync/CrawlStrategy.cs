@@ -149,16 +149,14 @@ namespace CmisSync.Lib.Sync
                         {
                             // It is a CMIS folder.
                             IFolder remoteSubFolder = (IFolder)cmisObject;
-                            //string remoteSubPath = remotePath + CmisUtils.CMIS_FILE_SEPARATOR + remoteSubFolder.Name;
-                            string remoteSubPath = remoteSubFolder.Path;
+                            string remoteSubPath = CmisUtils.getPath(remotePath, remoteSubFolder);
                             CrawlRemoteFolder(remoteSubFolder, remoteSubPath, localFolder, remoteFolders);
                         }
                         else if (cmisObject is DotCMIS.Client.Impl.Document)
                         {
                             // It is a CMIS document.
                             IDocument remoteDocument = (IDocument)cmisObject;
-                            //string remoteDocumentPath = remotePath + CmisUtils.CMIS_FILE_SEPARATOR + remoteDocument.Name;
-                            string remoteDocumentPath = remoteDocument.Paths[0];
+                            string remoteDocumentPath = CmisUtils.getPath(remotePath, remoteDocument);
                             CrawlRemoteDocument(remoteDocument, remoteDocumentPath, localFolder, remoteFiles);
                         }
                         else if (isLink(cmisObject))
@@ -321,9 +319,6 @@ namespace CmisSync.Lib.Sync
                     }
 
                     remoteFiles.Add(remoteDocumentFileName);
-
-                    var paths = remoteDocument.Paths;
-                    var pathsCount = paths.Count;
                     var syncItem = database.GetSyncItemFromRemotePath(remotePath);
                     if (null == syncItem)
                     {

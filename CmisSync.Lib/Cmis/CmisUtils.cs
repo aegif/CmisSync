@@ -499,5 +499,17 @@ namespace CmisSync.Lib.Cmis
         {
             return session.RepositoryInfo.ProductName.Contains("Documentum");
         }
+
+        public static string getPath(string remotePath, IFileableCmisObject remoteObject)
+        {
+            if(remotePath.EndsWith(CMIS_FILE_SEPARATOR.ToString()))
+            {
+                return remotePath + remoteObject.Name;
+            }
+            else
+            {
+                return remotePath + CmisUtils.CMIS_FILE_SEPARATOR + remoteObject.Name;
+            }
+        }
     }
 }
