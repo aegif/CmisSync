@@ -266,7 +266,7 @@ namespace CmisSync.Lib
         /// <param name="repoInfo"></param>
         public RemotePathSyncItem(string remotePath, RepoInfo repoInfo)
         {
-            this.localRoot = PathRepresentationConverter.RemoteToLocal(repoInfo.TargetDirectory);
+            this.localRoot = repoInfo.TargetDirectory;
             this.remoteRoot = PathRepresentationConverter.LocalToRemote(repoInfo.RemotePath);
 
             this.remotePath = remotePath;
