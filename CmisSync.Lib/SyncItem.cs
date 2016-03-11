@@ -3,6 +3,7 @@ using System.IO;
 using CmisSync.Lib.Cmis;
 using log4net;
 using DotCMIS.Client;
+using CmisSync.Lib.Database;
 
 
 namespace CmisSync.Lib
@@ -13,20 +14,50 @@ namespace CmisSync.Lib
         // Log.
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncItem));
 
-        /// <summary>local Repository root folder</summary>
+        // The examples below are for this item:
+        //
+        // Local: C:\Users\nico\CmisSync\A Project\adir\afile.txt
+        // Remote: /sites/aproject/adir/a<file
+        //
+        // Notice how:
+        // - Slashes and antislashes can differ
+        // - File names can differ
+        // - Remote and local have different sets of fobidden characters
+        //
+        // For that reason, never convert a local path to a remote path (or vice versa) without checking the database.
+
+        /// <summary>
+        /// Local root of the collection.
+        /// Example: C:\Users\nico\CmisSync\myproject
+        /// </summary>
         protected string localRoot;
 
-        /// <summary>remote Repository root folder</summary>
+        /// <summary>
+        /// Remote root of the collection.
+        /// Example: 
+        /// </summary>
         protected string remoteRoot;
 
-        /// <summary>local relative path</summary>
+        /// <summary>
+        /// Local path of the item, relative to the local root
+        /// Example: mydir\myfile.txt
+        /// </summary>
         protected string localPath;
 
-        /// <summary>remote relative path</summary>
-        protected string remotePath;
+        /// <summary>
+        /// Remote path of the item, relative to the remote root
+        /// Example: 
+        /// </summary>
+        public string remotePath;
+
+        /// <summary>
+        /// Reference to the CmisSync database.
+        /// It is useful to get the remote path that matches a local path, or vice versa
+        /// </summary>
+        protected Database.Database database;
 
         /// <summary></summary>
-        protected SyncItem()
+        protected SyncItem() // TODO remove, does not seem to be used
         {
         }
 
@@ -98,13 +129,24 @@ namespace CmisSync.Lib
             return new LocalPathSyncItem(Path.Combine(folder, fileName), repoInfo);
         }
 
-        /// <summary></summary>
-        /// <param name="path"></param>
-        /// <param name="repoInfo"></param>
-        /// <returns></returns>
-        public static SyncItem CreateFromRemotePath(string path, RepoInfo repoInfo)
+        /// <summary>
+        /// Only use for documents!
+        /// </summary>
+        public static SyncItem CreateFromRemoteDocument(string remoteDocumentPath, string localFilename, RepoInfo repoInfo)
         {
-            return new RemotePathSyncItem(path, repoInfo);
+            string localRoot = PathRepresentationConverter.RemoteToLocal(repoInfo.TargetDirectory); //FIXME
+            string remoteRoot = PathRepresentationConverter.LocalToRemote(repoInfo.RemotePath); // FIXME
+
+            string remoteFolderPath = remoteDocumentPath.Substring(0, remoteDocumentPath.LastIndexOf(CmisUtils.CMIS_FILE_SEPARATOR));
+            string remoteDocumentName = remoteDocumentPath.Substring(remoteDocumentPath.LastIndexOf(CmisUtils.CMIS_FILE_SEPARATOR));
+
+            RemotePathSyncItem item = new RemotePathSyncItem(remoteFolderPath, remoteDocumentName, localFilename, repoInfo);
+            return item;
+        }
+
+        public static SyncItem CreateFromRemoteFolder(string path, RepoInfo repoInfo)
+        {
+            return new RemotePathSyncItem(path, repoInfo); // FIXME create that definition when others fixed
         }
 
         /// <summary></summary>
@@ -112,10 +154,10 @@ namespace CmisSync.Lib
         /// <param name="fileName"></param>
         /// <param name="repoInfo"></param>
         /// <returns></returns>
-        public static SyncItem CreateFromRemotePath(string folder, string fileName, RepoInfo repoInfo)
+        /*public static SyncItem CreateFromRemotePath(string folder, string fileName, RepoInfo repoInfo)
         {
-            return new RemotePathSyncItem(Path.Combine(folder, fileName), repoInfo);
-        }
+            return new RemotePathSyncItem(Path.Combine(folder, fileName), document, repoInfo); // FIXME
+        }*/
 
         /// <summary></summary>
         /// <param name="localFolder"></param>
@@ -165,7 +207,6 @@ namespace CmisSync.Lib
             {
                 this.localPath = localPath.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
             }
-            this.remotePath = PathRepresentationConverter.LocalToRemote(this.localPath);
         }
 
         /// <summary></summary>
@@ -177,7 +218,7 @@ namespace CmisSync.Lib
             this.localRoot = repoInfo.TargetDirectory;
             this.remoteRoot = repoInfo.RemotePath;
 
-            this.localPath = Path.Combine(localFolder, PathRepresentationConverter.RemoteToLocal(remoteRelativePath));
+            this.localPath = Path.Combine(localFolder, PathRepresentationConverter.RemoteToLocal(remoteRelativePath)); // FIXME
             if (localPath.StartsWith(this.localRoot))
             {
                 this.localPath = localPath.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
@@ -187,7 +228,7 @@ namespace CmisSync.Lib
             {
                 localRootRelative = localFolder.Substring(localRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
-            this.remotePath = CmisUtils.PathCombine(PathRepresentationConverter.LocalToRemote(localRootRelative), remoteRelativePath);
+            this.remotePath = CmisUtils.PathCombine(PathRepresentationConverter.LocalToRemote(localRootRelative), remoteRelativePath); // FIXME
         }
 
         /// <summary></summary>
@@ -195,7 +236,7 @@ namespace CmisSync.Lib
         /// <param name="localPath"></param>
         /// <param name="remotePrefix"></param>
         /// <param name="remotePath"></param>
-        public LocalPathSyncItem(string localPrefix, string localPath, string remotePrefix, string remotePath)
+        public LocalPathSyncItem(string localPrefix, string localPath, string remotePrefix, string remotePath, Database.Database database)
         {
             this.localRoot = localPrefix;
             this.remoteRoot = remotePrefix;
@@ -217,7 +258,12 @@ namespace CmisSync.Lib
         {
             get
             {
-                return remotePath;
+                // Get the remote path from database, as it can be different from the name path
+                database.GetRemoteFilePath
+
+                // If not present in database, it means it is a new locally-created file, so PathRepresentationConverter.LocalToRemote is OK.
+                this.remotePath = PathRepresentationConverter.LocalToRemote(this.localPath);
+                //return remotePath;
             }
         }
 
@@ -261,20 +307,20 @@ namespace CmisSync.Lib
     /// <summary></summary>
     public class RemotePathSyncItem : SyncItem
     {
-        /// <summary></summary>
-        /// <param name="remotePath"></param>
-        /// <param name="repoInfo"></param>
-        public RemotePathSyncItem(string remotePath, RepoInfo repoInfo)
+        /// <summary>
+        /// Use only for folders, not for documents!
+        /// </summary>
+        public RemotePathSyncItem(string remoteFolderPath, RepoInfo repoInfo)
         {
             this.localRoot = PathRepresentationConverter.RemoteToLocal(repoInfo.TargetDirectory);
             this.remoteRoot = PathRepresentationConverter.LocalToRemote(repoInfo.RemotePath);
 
-            this.remotePath = remotePath;
+            this.remotePath = remoteFolderPath;
             if (remotePath.StartsWith(this.remoteRoot))
             {
                 this.remotePath = remotePath.Substring(this.remoteRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
-            this.localPath = PathRepresentationConverter.RemoteToLocal(this.remotePath);
+            this.localPath = PathRepresentationConverter.RemoteToLocal(this.remotePath); // does not work with contentStreamFilename
         }
 
         /// <summary></summary>
@@ -289,7 +335,7 @@ namespace CmisSync.Lib
             this.remotePath = Path.Combine(remoteFolder, PathRepresentationConverter.LocalToRemote(localRelativePath));
             if (this.remotePath.StartsWith(this.remoteRoot))
             {
-                this.remotePath = this.remotePath.Substring(this.localRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
+                this.remotePath = this.remotePath.Substring(this.remoteRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
             string remoteRootRelative = remoteFolder;
             if (remoteFolder.StartsWith(this.remoteRoot))
@@ -297,6 +343,19 @@ namespace CmisSync.Lib
                 remoteRootRelative = remoteFolder.Substring(localRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
             this.localPath = Path.Combine(PathRepresentationConverter.RemoteToLocal(remoteRootRelative), localRelativePath);
+        }
+
+        public RemotePathSyncItem(string remoteFolderPath, string remoteDocumentName, string localFilename, RepoInfo repoInfo)
+        {
+            this.localRoot = repoInfo.TargetDirectory;
+            this.remoteRoot = repoInfo.RemotePath;
+
+            this.remotePath = remoteFolderPath;
+            if (remotePath.StartsWith(this.remoteRoot))
+            {
+                this.remotePath = remotePath.Substring(this.remoteRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
+            }
+            this.localPath = localFilename;
         }
 
         /// <summary></summary>

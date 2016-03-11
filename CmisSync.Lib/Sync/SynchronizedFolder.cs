@@ -50,6 +50,13 @@ namespace CmisSync.Lib.Sync
             private bool BIDIRECTIONAL = true;
 
             /// <summary>
+            /// Whether to set local file names based on cmis:contentStreamName (true) or cmis:name (false)
+            /// true is typically a good choice on Documentum
+            /// false is typically a good choice on Alfresco
+            /// </summary>
+            private bool USE_CMIS_STREAM_NAME = true;
+
+            /// <summary>
             /// At which degree the repository supports Change Logs.
             /// See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
             /// The possible values are actually none, objectidsonly, properties, all
@@ -664,13 +671,14 @@ namespace CmisSync.Lib.Sync
                     string remoteSubPath = remotePath + CmisUtils.CMIS_FILE_SEPARATOR + cmisObject.Name;
                     if (cmisObject is DotCMIS.Client.Impl.Folder)
                     {
-                        IFolder remoteSubFolder = (IFolder)cmisObject;
-                        // string localSubFolder = Path.Combine(localFolder, PathRepresentationConverter.RemoteToLocal(cmisObject.Name));
+                        // Case of a folder: Download recursively.
 
+                        IFolder remoteSubFolder = (IFolder)cmisObject;
                         var localSubFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+
                         if (null == localSubFolderItem)
                         {
-                            localSubFolderItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoInfo);
+                            localSubFolderItem = SyncItemFactory.CreateFromRemoteFolder(remoteSubFolder.Path, repoInfo);
                         }
 
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoInfo))
@@ -680,10 +688,12 @@ namespace CmisSync.Lib.Sync
                     }
                     else if (cmisObject is DotCMIS.Client.Impl.Document)
                     {
-                        if (Utils.WorthSyncing(localFolder, cmisObject.Name, repoInfo))
+                        // Case of a document: Download it.
+
+                        Document document = (Document)cmisObject;
+                        if (Utils.WorthSyncing(localFolder, localFilename(document), repoInfo)) // FIXME
                         {
-                            // It is a file, just download it.
-                            DownloadFile((IDocument)cmisObject, remoteSubPath, localFolder);
+                            DownloadFile(document, remoteSubPath, localFolder);
                         }
                     }
                     else
@@ -726,7 +736,7 @@ namespace CmisSync.Lib.Sync
                 var syncFolderItem = database.GetFolderSyncItemFromRemotePath(remoteFolder.Path);
                 if (null == syncFolderItem)
                 {
-                    syncFolderItem = SyncItemFactory.CreateFromRemotePath(remoteFolder.Path, repoInfo);
+                    syncFolderItem = SyncItemFactory.CreateFromRemoteFolder(remoteFolder.Path, repoInfo);
                 }
                 database.AddFolder(syncFolderItem, remoteFolder.Id, remoteFolder.LastModificationDate);
                 Logger.Info("Added folder to database: " + localFolder);
@@ -820,7 +830,7 @@ namespace CmisSync.Lib.Sync
                 var syncItem = database.GetSyncItemFromRemotePath(remotePath);
                 if (null == syncItem)
                 {
-                    syncItem = SyncItemFactory.CreateFromRemotePath(remotePath, repoInfo);
+                    syncItem = SyncItemFactory.CreateFromRemoteDocument(remotePath, localFilename(remoteDocument), repoInfo);
                 }
 
                 Logger.Info("Downloading: " + syncItem.RemoteFileName);
@@ -1230,7 +1240,7 @@ namespace CmisSync.Lib.Sync
 
                             // Prepare content stream
                             ContentStream remoteStream = new ContentStream();
-                            remoteStream.FileName = remoteFile.ContentStreamFileName;
+                            remoteStream.FileName = localFilename(remoteFile);
                             remoteStream.Length = localfile.Length;
                             remoteStream.MimeType = remoteFile.GetContentStream().MimeType;
                             remoteStream.Stream = localfile;
@@ -1294,7 +1304,7 @@ namespace CmisSync.Lib.Sync
                     {
                         if (null != (document = obj as IDocument))
                         {
-                            if (document.Name == fileName)
+                            if (localFilename(document).Equals(fileName))
                             {
                                 found = true;
                                 break;
@@ -1523,6 +1533,14 @@ namespace CmisSync.Lib.Sync
                     ProcessRecoverableException(String.Format("Could not move folder: {0} -> {1}", oldPathname, newPathname), e);
                     return false;
                 }
+            }
+
+
+            private string localFilename(IDocument document)
+            {
+                return USE_CMIS_STREAM_NAME ?
+                    document.ContentStreamFileName
+                    : document.Name;
             }
 
 

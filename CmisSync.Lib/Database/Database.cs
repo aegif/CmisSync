@@ -770,22 +770,23 @@ namespace CmisSync.Lib.Database
 
         /// <summary>
         /// Checks whether the database contains a given item.
+        /// Local filename is often different from remote document name.
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        public bool ContainsFile(SyncItem item)
+        public bool ContainsLocalFile(string localRelativePath)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>();
-            if (item is RemotePathSyncItem)
-            {
-                parameters.Add("path", item.RemoteRelativePath);
-                return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE path=@path", parameters);
-            }
-            else
-            {
-                parameters.Add("localPath", item.LocalRelativePath);
-                return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE localPath=@localPath", parameters);
-            }
+            parameters.Add("localPath", localRelativePath);
+            return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE localPath=@localPath", parameters);
+        }
+
+        /// <summary>
+        /// Checks whether the database contains a given item.
+        /// </summary>
+        public bool ContainsRemoteFile(string remoteRelativePath)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("path", remoteRelativePath);
+            return null != ExecuteSQLFunction("SELECT serverSideModificationDate FROM files WHERE path=@path", parameters);
         }
 
         /// <summary>
