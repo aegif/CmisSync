@@ -190,7 +190,7 @@ namespace CmisSync.Lib
             return new LocalPathSyncItem(localPathPrefix, localPath, remotePathPrefix, remotePath);
         }
     }
-               
+    
     /// <summary></summary>
     public class LocalPathSyncItem : SyncItem
     {
@@ -213,7 +213,7 @@ namespace CmisSync.Lib
         /// <param name="localFolder"></param>
         /// <param name="remoteRelativePath"></param>
         /// <param name="repoInfo"></param>
-        public LocalPathSyncItem(string localFolder, string remoteRelativePath, RepoInfo repoInfo)
+        public LocalPathSyncItem(string localFolder, string remoteRelativePath, RepoInfo repoInfo, Database.Database database)
         {
             this.localRoot = repoInfo.TargetDirectory;
             this.remoteRoot = repoInfo.RemotePath;
@@ -236,7 +236,7 @@ namespace CmisSync.Lib
         /// <param name="localPath"></param>
         /// <param name="remotePrefix"></param>
         /// <param name="remotePath"></param>
-        public LocalPathSyncItem(string localPrefix, string localPath, string remotePrefix, string remotePath, Database.Database database)
+        public LocalPathSyncItem(string localPrefix, string localPath, string remotePrefix, string remotePath)
         {
             this.localRoot = localPrefix;
             this.remoteRoot = remotePrefix;
