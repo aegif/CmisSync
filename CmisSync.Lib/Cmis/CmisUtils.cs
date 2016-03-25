@@ -45,7 +45,7 @@ namespace CmisSync.Lib.Cmis
         // Log.
         private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisUtils));
 
-        /// <summary>Character that separates two folders in a CMIS path.</summary>
+        /// <summary>Character that separates two folders in a CMIS path (/).</summary>
         public static char CMIS_FILE_SEPARATOR = '/';
 
         /// <summary>
@@ -469,15 +469,27 @@ namespace CmisSync.Lib.Cmis
         /// Equivalent of .NET Path.Combine, but for CMIS paths.
         /// CMIS paths always use forward slashes.
         /// </summary>
-        public static string PathCombine(string path1, string path2)
+        public static string PathCombine(string cmisPath1, string cmisPath2)
         {
-            if (String.IsNullOrEmpty(path1))
-                return path2;
+            if (String.IsNullOrEmpty(cmisPath1))
+                return cmisPath2;
 
-            if (String.IsNullOrEmpty(path2))
-                return path1;
+            if (String.IsNullOrEmpty(cmisPath2))
+                return cmisPath1;
 
-            return path1 + CMIS_FILE_SEPARATOR + path2;
+            return cmisPath1 + CMIS_FILE_SEPARATOR + cmisPath2;
+        }
+
+
+        /// <summary>
+        /// Get the last part of a CMIS path
+        /// Example: "/the/path/< 9000/theleaf" returns "theleaf"
+        /// Why not use Path.GetFileName ? Because it chokes on characters that are not authorized on the local filesystem.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetLeafname(string cmisPath)
+        {
+            return cmisPath.Split('/').Last();
         }
 
 

@@ -556,17 +556,6 @@ namespace CmisSync.Lib
             File.Delete(filePath);
         }
 
-        /// <summary>
-        /// Get the last part of a CMIS path
-        /// Example: "/the/path/< 9000/theleaf" returns "theleaf"
-        /// Why not use Path.GetFileName ? Because it chokes on characters that are not authorized on the local filesystem.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetLeafOfCmisPath(string cmisPath)
-        {
-            return cmisPath.Split('/').Last();
-        }
-
         public static void ConfigureLogging()
         {
             FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));

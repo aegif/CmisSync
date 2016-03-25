@@ -224,8 +224,6 @@ namespace CmisSync.Lib.Database
             {
                 // Remove path prefix
                 path = path.Substring(localPathPrefixSize, path.Length - localPathPrefixSize);
-                // RemoveLocalPrefix all slashes to forward slash
-                //path = path.Replace('\\', '/');
             }
             return path;
         }
@@ -800,6 +798,41 @@ namespace CmisSync.Lib.Database
             return Denormalize((string)ExecuteSQLFunction("SELECT path FROM files WHERE id=@id", parameters));
         }
 
+
+        /// <summary>
+        /// Return the remote path of an item identified by its local path.
+        /// If no such item exist yet in database (ex: new local file), returns the remote path it should be written to.
+        /// </summary>
+        public string FileRemoteToLocal(string remotePath)
+        {
+            string normalizedRemotePath = RemoveLocalPrefix(remotePath);
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("remotePath", normalizedRemotePath);
+            string localPath = (string)ExecuteSQLFunction("SELECT path FROM files WHERE path=@remotePath", parameters);
+            if (string.IsNullOrEmpty(localPath))
+            {
+                return PathRepresentationConverter.RemoteToLocal(remotePath);
+            }
+            return localPath;
+        }
+
+        /// <summary>
+        /// Return the local path of an item identified by its remote path.
+        /// If no such item exist yet in database (ex: new remote file), returns the local path it should be written to.
+        /// </summary>
+        public string FileLocalToRemote(string localPath)
+        {
+            string normalizedLocalPath = RemoveLocalPrefix(localPath);
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("localPath", normalizedLocalPath);
+            string remotePath = (string)ExecuteSQLFunction("SELECT path FROM files WHERE localPath=@localPath", parameters);
+            if (string.IsNullOrEmpty(remotePath))
+            {
+                return PathRepresentationConverter.LocalToRemote(localPath);
+            }
+            return remotePath;
+        }
+
         /// <summary>
         /// Gets the syncitem from id.
         /// </summary>
@@ -813,7 +846,7 @@ namespace CmisSync.Lib.Database
             string remotePath = (string)result["path"];
             object localPathObj = result["localPath"];
             string localPath = (localPathObj is DBNull) ? remotePath : (string)localPathObj;
-            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, remotePath);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, remotePath, false);
         }
 
         /// <summary>
@@ -832,7 +865,7 @@ namespace CmisSync.Lib.Database
                 return null;
             }
 
-            return SyncItemFactory.CreateFromPaths(localPathPrefix, normalizedLocalPath, remotePathPrefix, path);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, normalizedLocalPath, remotePathPrefix, path, false);
         }
 
         /// <summary>
@@ -851,7 +884,7 @@ namespace CmisSync.Lib.Database
                 return null;
             }
 
-            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, normalizedRemotePath, false);
         }
 
         /// <summary>
@@ -870,7 +903,7 @@ namespace CmisSync.Lib.Database
                 return null;
             }
 
-            return SyncItemFactory.CreateFromPaths(localPathPrefix, normalizedLocalPath, remotePathPrefix, path);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, normalizedLocalPath, remotePathPrefix, path, true);
         }
 
         /// <summary>
@@ -889,7 +922,7 @@ namespace CmisSync.Lib.Database
                 return null;
             }
 
-            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, normalizedRemotePath);
+            return SyncItemFactory.CreateFromPaths(localPathPrefix, localPath, remotePathPrefix, normalizedRemotePath, true);
         }
 
         /// <summary>
