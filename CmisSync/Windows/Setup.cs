@@ -718,7 +718,7 @@ namespace CmisSync
                                             System.Windows.Controls.TreeViewItem subItem =
                                                 new System.Windows.Controls.TreeViewItem();
                                             subItem.Tag = new SelectionTreeItem(null, subfolder);
-                                            subItem.Header = CmisUtils.GetLeafOfCmisPath(subfolder);
+                                            subItem.Header = CmisUtils.GetLeafname(subfolder);
                                             item.Items.Add(subItem);
                                         }
                                         ((SelectionTreeItem)item.Tag).childrenLoaded = true;

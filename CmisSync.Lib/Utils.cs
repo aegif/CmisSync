@@ -548,7 +548,7 @@ namespace CmisSync.Lib
             File.Delete(filePath);
         }
 
-
+        // FIXME is it really used?
         public static void ConfigureLogging()
         {
             FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));
@@ -560,6 +560,15 @@ namespace CmisSync.Lib
             {
                 log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             }
+        }
+
+        /// <summary>
+        /// Like Path.Combine, but does not choke on special characters.
+        /// Special characters are a separate concern, use this method if it is not the current concern.
+        /// </summary>
+        public static string PathCombine(string localDirectory, string filename)
+        {
+            return localDirectory + Path.DirectorySeparatorChar + filename;
         }
     }
 }

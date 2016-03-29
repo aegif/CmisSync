@@ -130,9 +130,9 @@ namespace CmisSync.Lib.Sync
                 {
                     if (oldPathnameWorthSyncing && newPathnameWorthSyncing)
                     {
-                        if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(oldPathname, repoInfo)))
+                        if (database.ContainsLocalFile(oldPathname))
                         {
-                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(newPathname, repoInfo)))
+                            if (database.ContainsLocalFile(newPathname))
                             {
                                 //database already contains path so revert back to delete/update
                                 success &= WatcherSyncDelete(remoteFolder, localFolder, oldPathname);
@@ -250,7 +250,7 @@ namespace CmisSync.Lib.Sync
                     if (File.Exists(pathname))
                     {
                         bool success = false;
-                        if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(pathname, repoInfo)))
+                        if (database.ContainsLocalFile(pathname))
                         {
                             if (database.LocalFileHasChanged(pathname))
                             {

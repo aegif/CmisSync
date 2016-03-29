@@ -207,7 +207,7 @@ namespace CmisSync.Lib.Sync
                         var subFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                         if (null == subFolderItem)
                         {
-                            subFolderItem = SyncItemFactory.CreateFromRemotePath(remoteSubFolder.Path, repoInfo);
+                            subFolderItem = SyncItemFactory.CreateFromRemoteFolder(remoteSubFolder.Path, repoInfo, database);
                         }
 
                         // Check whether local folder exists.
@@ -292,20 +292,20 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
 
-                if (Utils.WorthSyncing(localFolder, remoteDocument.Name, repoInfo))
+                if (Utils.WorthSyncing(localFolder, localFilename(remoteDocument), repoInfo))
                 {
                     // We use the filename of the document's content stream.
                     // This can be different from the name of the document.
                     // For instance in FileNet it is not unusual to have a document where
                     // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
-                    string remoteDocumentFileName = remoteDocument.ContentStreamFileName;
+                    string remoteDocumentFileName = localFilename(remoteDocument);
                     //Logger.Debug("CrawlRemote doc: " + localFolder + CmisUtils.CMIS_FILE_SEPARATOR + remoteDocumentFileName);
 
                     // If this file does not have a filename, ignore it.
                     // It sometimes happen on IBM P8 CMIS server, not sure why.
                     if (remoteDocumentFileName == null)
                     {
-                        Logger.Warn("Skipping download of '" + remoteDocument.Name + "' with null content stream in " + localFolder);
+                        Logger.Warn("Skipping download of '" + localFilename(remoteDocument) + "' with null content stream in " + localFolder);
                         return;
                     }
 
@@ -316,10 +316,10 @@ namespace CmisSync.Lib.Sync
                     var syncItem = database.GetSyncItemFromRemotePath(remotePath);
                     if (null == syncItem)
                     {
-                        syncItem = SyncItemFactory.CreateFromRemotePath(remotePath, repoInfo);
+                        syncItem = SyncItemFactory.CreateFromRemoteDocument(remotePath, localFilename(remoteDocument), repoInfo, database);
                     }
 
-                    if (syncItem.ExistsLocal())
+                    if (syncItem.FileExistsLocal())
                     {
                         // Check modification date stored in database and download if remote modification date if different.
                         DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
@@ -382,7 +382,7 @@ namespace CmisSync.Lib.Sync
                     {
                         // The remote file exists locally.
 
-                        if (database.ContainsFile(syncItem))
+                        if (database.ContainsLocalFile(syncItem.LocalRelativePath))
                         {
                             // The file used to be present locally (as revealed by the database), but does not exist anymore locally.
                             // So, it must have been deleted locally by the user.
@@ -467,11 +467,11 @@ namespace CmisSync.Lib.Sync
                     if (null == item)
                     {
                         // The file has been recently created locally (not synced from server).
-                        item = SyncItemFactory.CreateFromLocalPath(filePath, repoInfo);
+                        item = SyncItemFactory.CreateFromLocalPath(filePath, false, repoInfo, database);
                     }
 
                     // string fileName = Path.GetFileName(filePath);
-                    string fileName = item.RemoteFileName;
+                    string fileName = item.RemoteLeafname;
 
                     if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoInfo))
                     {
@@ -481,7 +481,7 @@ namespace CmisSync.Lib.Sync
                         {
                             // This local file is not on the CMIS server now, so
                             // check whether it used to exist on server or not.
-                            if (database.ContainsFile(SyncItemFactory.CreateFromLocalPath(filePath, repoInfo)))
+                            if (database.ContainsLocalFile(filePath))
                             {
                                 if (database.LocalFileHasChanged(filePath))
                                 {
@@ -609,12 +609,12 @@ namespace CmisSync.Lib.Sync
                     var syncFolderItem = database.GetFolderSyncItemFromLocalPath(localSubFolder);
                     if (null == syncFolderItem)
                     {
-                        syncFolderItem = SyncItemFactory.CreateFromLocalPath(localSubFolder, repoInfo);
+                        syncFolderItem = SyncItemFactory.CreateFromLocalPath(localSubFolder, true, repoInfo, database);
                     }
 
                     if (Utils.WorthSyncing(Path.GetDirectoryName(localSubFolder), folderName, repoInfo))
                     {
-                        if (!remoteFolders.Contains(syncFolderItem.RemoteFileName))
+                        if (!remoteFolders.Contains(syncFolderItem.RemoteLeafname))
                         {
                             // This local folder is not on the CMIS server now, so
                             // check whether it used to exist on server or not.
