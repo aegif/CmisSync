@@ -333,7 +333,7 @@ namespace CmisSync.Lib
             string remoteRelativeFolder = lastSeparator >= 0 ?
                 remoteRelativePath.Substring(0, lastSeparator)
                 : String.Empty;
-            localRelativePath = database.RemoteToLocal(remoteRelativeFolder + localFilename, isFolder);
+            localRelativePath = database.RemoteToLocal(Utils.PathCombine(remoteRelativeFolder, localFilename), isFolder);
         }
 
 
