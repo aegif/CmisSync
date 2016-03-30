@@ -169,7 +169,7 @@ namespace CmisSync.Lib.Sync
                 // Check whether it is a document worth syncing.
                 if (remoteDocument != null)
                 {
-                    if (!Utils.IsFileWorthSyncing(localFilename(remoteDocument), repoInfo))
+                    if (!Utils.IsFileWorthSyncing(repoInfo.CmisProfile.localFilename(remoteDocument), repoInfo))
                     {
                         Logger.Info("Ignore change as it is about a document unworth syncing: " + changeIdForDebug);
                         return false;

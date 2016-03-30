@@ -147,9 +147,9 @@ namespace CmisSync.Lib
             string remoteRoot = repoInfo.RemotePath;
             string relativeRemoteDocumentPath = remoteDocumentPath.Substring(remoteRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
 
-            string remoteDocumentName = remoteDocument.Name;
+            string remoteDocumentName = repoInfo.CmisProfile.localFilename(remoteDocument);
 
-            RemotePathSyncItem item = new RemotePathSyncItem(relativeRemoteDocumentPath, remoteDocumentName, false, repoInfo, database);
+            RemotePathSyncItem item = new RemotePathSyncItem(relativeRemoteDocumentPath, remoteDocumentName, repoInfo, database);
             return item;
         }
 
@@ -163,11 +163,6 @@ namespace CmisSync.Lib
             return new LocalPathSyncItem(localFolder, remoteFileName, true, repoInfo, database);
         }
 
-
-        public static SyncItem CreateFromRemoteFolderAndLocalName(string remoteFolder, string LocalFileName, RepoInfo repoInfo, Database.Database database)
-        {
-            return new RemotePathSyncItem(remoteFolder, LocalFileName, true, repoInfo, database);
-        }
 
         /// <summary>
         /// Specify all local and remote paths.
@@ -316,9 +311,14 @@ namespace CmisSync.Lib
         }
 
 
-        public RemotePathSyncItem(string remoteRelativePath, string localRelativePath, bool isFolder, RepoInfo repoInfo, Database.Database database)
+        /// <summary>
+        /// Create from the path of a remote file, and the local filename to use.
+        /// </summary>
+        /// <param name="remoteRelativePath">Example: adir/a<file</param>
+        /// <param name="localFilename">Example: afile.txt</param>
+        public RemotePathSyncItem(string remoteRelativePath, string localFilename, RepoInfo repoInfo, Database.Database database)
         {
-            this.isFolder = isFolder;
+            this.isFolder = false;
             this.database = database;
             this.localRoot = repoInfo.TargetDirectory;
             this.remoteRoot = repoInfo.RemotePath;
@@ -328,6 +328,12 @@ namespace CmisSync.Lib
             {
                 this.remoteRelativePath = this.remoteRelativePath.Substring(localRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
+
+            int lastSeparator = remoteRelativePath.LastIndexOf(CmisUtils.CMIS_FILE_SEPARATOR);
+            string remoteRelativeFolder = lastSeparator >= 0 ?
+                remoteRelativePath.Substring(0, lastSeparator)
+                : String.Empty;
+            localRelativePath = database.RemoteToLocal(remoteRelativeFolder + localFilename, isFolder);
         }
 
 

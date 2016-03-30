@@ -292,20 +292,20 @@ namespace CmisSync.Lib.Sync
             {
                 SleepWhileSuspended();
 
-                if (Utils.WorthSyncing(localFolder, localFilename(remoteDocument), repoInfo))
+                if (Utils.WorthSyncing(localFolder, repoInfo.CmisProfile.localFilename(remoteDocument), repoInfo))
                 {
                     // We use the filename of the document's content stream.
                     // This can be different from the name of the document.
                     // For instance in FileNet it is not unusual to have a document where
                     // document.Name is "foo" and document.ContentStreamFileName is "foo.jpg".
-                    string remoteDocumentFileName = localFilename(remoteDocument);
+                    string remoteDocumentFileName = repoInfo.CmisProfile.localFilename(remoteDocument);
                     //Logger.Debug("CrawlRemote doc: " + localFolder + CmisUtils.CMIS_FILE_SEPARATOR + remoteDocumentFileName);
 
                     // If this file does not have a filename, ignore it.
                     // It sometimes happen on IBM P8 CMIS server, not sure why.
                     if (remoteDocumentFileName == null)
                     {
-                        Logger.Warn("Skipping download of '" + localFilename(remoteDocument) + "' with null content stream in " + localFolder);
+                        Logger.Warn("Skipping download of '" + repoInfo.CmisProfile.localFilename(remoteDocument) + "' with null content stream in " + localFolder);
                         return;
                     }
 
@@ -316,7 +316,7 @@ namespace CmisSync.Lib.Sync
                     var syncItem = database.GetSyncItemFromRemotePath(remotePath);
                     if (null == syncItem)
                     {
-                        syncItem = SyncItemFactory.CreateFromRemoteDocument(remotePath, localFilename(remoteDocument), repoInfo, database);
+                        syncItem = SyncItemFactory.CreateFromRemoteDocument(remotePath, repoInfo.CmisProfile.localFilename(remoteDocument), repoInfo, database);
                     }
 
                     if (syncItem.FileExistsLocal())

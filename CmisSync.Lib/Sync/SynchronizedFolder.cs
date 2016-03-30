@@ -47,14 +47,7 @@ namespace CmisSync.Lib.Sync
             /// Whether sync is bidirectional or only from server to client.
             /// TODO make it a CMIS folder - specific setting
             /// </summary>
-            private bool BIDIRECTIONAL = true;
-
-            /// <summary>
-            /// Whether to set local file names based on cmis:contentStreamName (true) or cmis:name (false)
-            /// true is typically a good choice on Documentum
-            /// false is typically a good choice on Alfresco
-            /// </summary>
-            private bool USE_CMIS_STREAM_NAME = true;
+            private bool BIDIRECTIONAL = true; // TODO move to CmisProfile
 
             /// <summary>
             /// At which degree the repository supports Change Logs.
@@ -62,24 +55,24 @@ namespace CmisSync.Lib.Sync
             /// The possible values are actually none, objectidsonly, properties, all
             /// But for now we only distinguish between none (false) and the rest (true)
             /// </summary>
-            private bool ChangeLogCapability;
+            private bool ChangeLogCapability; // TODO move to CmisProfile
 
             /// <summary>
             /// If the repository is able send a folder tree in one request, this is true,
             /// Otherwise the default behaviour is false
             /// </summary>
-            private bool IsGetFolderTreeSupported = false;
+            private bool IsGetFolderTreeSupported = false; // TODO move to CmisProfile
 
             /// <summary>
             /// If the repository allows to request all Descendants of a folder or file,
             /// this is set to true, otherwise the default behaviour is false
             /// </summary>
-            private bool IsGetDescendantsSupported = false;
+            private bool IsGetDescendantsSupported = false; // TODO move to CmisProfile
 
             /// <summary>
             /// Is true, if the repository is able to return property changes.
             /// </summary>
-            private bool IsPropertyChangesSupported = false;
+            private bool IsPropertyChangesSupported = false; // TODO move to CmisProfile
 
             /// <summary>
             /// Session to the CMIS repository.
@@ -691,7 +684,7 @@ namespace CmisSync.Lib.Sync
                         // Case of a document: Download it.
 
                         Document document = (Document)cmisObject;
-                        if (Utils.WorthSyncing(localFolder, localFilename(document), repoInfo)) // FIXME
+                        if (Utils.WorthSyncing(localFolder, repoInfo.CmisProfile.localFilename(document), repoInfo)) // FIXME
                         {
                             DownloadFile(document, remoteSubPath, localFolder);
                         }
@@ -833,7 +826,7 @@ namespace CmisSync.Lib.Sync
                     syncItem = SyncItemFactory.CreateFromRemoteDocument(remotePath, remoteDocument, repoInfo, database);
                 }
 
-                Logger.Info("Downloading: " + syncItem.RemoteLeafname);
+                Logger.Info("Downloading: " + syncItem.LocalLeafname);
 
                 // Skip if invalid file name. See https://github.com/aegif/CmisSync/issues/196
                 if (Utils.IsInvalidFileName(syncItem.LocalLeafname)) 
@@ -1240,7 +1233,7 @@ namespace CmisSync.Lib.Sync
 
                             // Prepare content stream
                             ContentStream remoteStream = new ContentStream();
-                            remoteStream.FileName = localFilename(remoteFile);
+                            remoteStream.FileName = repoInfo.CmisProfile.localFilename(remoteFile);
                             remoteStream.Length = localfile.Length;
                             remoteStream.MimeType = remoteFile.GetContentStream().MimeType;
                             remoteStream.Stream = localfile;
@@ -1304,7 +1297,7 @@ namespace CmisSync.Lib.Sync
                     {
                         if (null != (document = obj as IDocument))
                         {
-                            if (localFilename(document).Equals(fileName))
+                            if (repoInfo.CmisProfile.localFilename(document).Equals(fileName))
                             {
                                 found = true;
                                 break;
@@ -1537,14 +1530,6 @@ namespace CmisSync.Lib.Sync
                     ProcessRecoverableException(String.Format("Could not move folder: {0} -> {1}", oldPathname, newPathname), e);
                     return false;
                 }
-            }
-
-
-            private string localFilename(IDocument document)
-            {
-                return USE_CMIS_STREAM_NAME ?
-                    document.ContentStreamFileName
-                    : document.Name;
             }
 
 
