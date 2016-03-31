@@ -25,11 +25,13 @@ namespace CmisSync
 
             string path = remotePath;
 
+            // On the CMIS side, backward slash is not a special character, it can be part of a document's name.
+            path = path.Replace('\\', '￥');
+
             // CMIS slash to Windows backward slash.
             path = path.Replace('/', '\\'); // Convert CMIS file separator to Windows file separator.
 
             // Other characters.
-            //path = path.Replace('\\', '￥'); // On the CMIS side, backward slash is not a special character, it can be part of a document's name.
             //path = path.Replace('<', '＜'); // The < character is allowed on CMIS, but not on Windows, so thr trick is to use its two-bytes representation.
             //path = path.Replace('>', '＞');
             //path = path.Replace(':', '：');
@@ -38,7 +40,7 @@ namespace CmisSync
             //path = path.Replace('|', '｜');
 
             // Only for tests on ECMs that have the same character restrictions as Windows, such as Alfresco.
-            // path = path.Replace('&', '＆');
+            //path = path.Replace('&', '＆');
 
             return path;
         }
@@ -56,11 +58,13 @@ namespace CmisSync
 
             string path = localPath;
 
+            // Revert back from two-bytes representation. Backward slashes have no special meaning on the CMIS side.
+            path = path.Replace('￥', '\\');
+
             // Windows backward slashe to CMIS slash.
             path = path.Replace('\\', '/'); // Convert Windows file separator to CMIS file separator.
 
             // Other characters
-            //path = path.Replace('￥', '\\'); // Revert back from two-bytes representation. Backward slashes have no special meaning on the CMIS side.
             //path = path.Replace('＜', '<'); // Revert back from two-bytes representation.
             //path = path.Replace('＞', '>');
             //path = path.Replace('：', ':');
@@ -69,7 +73,7 @@ namespace CmisSync
             //path = path.Replace('｜', '|');
 
             // Only for tests on ECMs that have the same character restrictions as Windows, such as Alfresco.
-            // path = path.Replace('＆', '&');
+            //path = path.Replace('＆', '&');
 
             return path;
         }
