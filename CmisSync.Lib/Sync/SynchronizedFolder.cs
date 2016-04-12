@@ -684,7 +684,7 @@ namespace CmisSync.Lib.Sync
                         // Case of a document: Download it.
 
                         Document document = (Document)cmisObject;
-                        if (Utils.WorthSyncing(localFolder, repoInfo.CmisProfile.localFilename(document), repoInfo)) // FIXME
+                        if (Utils.WorthSyncing(localFolder, repoInfo.CmisProfile.localFilename(document), repoInfo))
                         {
                             DownloadFile(document, remoteSubPath, localFolder);
                         }

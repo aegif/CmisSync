@@ -48,7 +48,7 @@ namespace CmisSync.Lib
         /// Remote path of the item, relative to the remote root
         /// Example: adir/a<file
         /// </summary>
-        public string remoteRelativePath; // FIXME protected
+        protected string remoteRelativePath;
 
         /// <summary>
         /// Whether the item is a folder or a file.
@@ -155,14 +155,8 @@ namespace CmisSync.Lib
 
         public static SyncItem CreateFromRemoteFolder(string remoteFolderPath, RepoInfo repoInfo, Database.Database database)
         {
-            return new RemotePathSyncItem(remoteFolderPath, true, repoInfo, database); // FIXME create that definition when others fixed
+            return new RemotePathSyncItem(remoteFolderPath, true, repoInfo, database);
         }
-
-        public static SyncItem CreateFromLocalFolderAndRemoteName(string localFolder, string remoteFileName, RepoInfo repoInfo, Database.Database database)
-        {
-            return new LocalPathSyncItem(localFolder, remoteFileName, true, repoInfo, database);
-        }
-
 
         /// <summary>
         /// Specify all local and remote paths.
@@ -193,26 +187,6 @@ namespace CmisSync.Lib
             if (localPath.StartsWith(this.localRoot))
             {
                 this.localRelativePath = localPath.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
-            }
-        }
-
-
-        public LocalPathSyncItem(string localFolder, string remoteRelativePath, bool isFolder, RepoInfo repoInfo, Database.Database database)
-        {
-            this.isFolder = isFolder;
-            this.database = database;
-            this.localRoot = repoInfo.TargetDirectory;
-            this.remoteRoot = repoInfo.RemotePath;
-
-            this.localRelativePath = Path.Combine(localFolder, PathRepresentationConverter.RemoteToLocal(remoteRelativePath)); // FIXME
-            if (localRelativePath.StartsWith(this.localRoot))
-            {
-                this.localRelativePath = localRelativePath.Substring(localRoot.Length).TrimStart(Path.DirectorySeparatorChar);
-            }
-            string localRootRelative = localFolder; // FIXME not used?
-            if (localFolder.StartsWith(this.localRoot))
-            {
-                localRootRelative = localFolder.Substring(localRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
             }
         }
 

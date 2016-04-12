@@ -548,7 +548,7 @@ namespace CmisSync.Lib
             File.Delete(filePath);
         }
 
-        // FIXME is it really used?
+
         public static void ConfigureLogging()
         {
             FileInfo alternativeLog4NetConfigFile = new FileInfo(Path.Combine(Directory.GetParent(ConfigManager.CurrentConfigFile).FullName, "log4net.config"));
