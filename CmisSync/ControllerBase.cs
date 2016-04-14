@@ -352,7 +352,7 @@ namespace CmisSync
         {
             lock (this.repo_lock)
             {
-                //FIXME: why are we sospendig all repositories instead of the one passed?
+                //TODO: why are we suspending all repositories instead of the one passed?
                 foreach (RepoBase aRepo in this.repositories)
                 {
                     if (aRepo.Status != SyncStatus.Suspend)
@@ -375,7 +375,7 @@ namespace CmisSync
         {
             lock (this.repo_lock)
             {
-                //FIXME: why are we sospendig all repositories instead of the one passed?
+                //TODO: why are we suspending all repositories instead of the one passed?
                 foreach (RepoBase aRepo in this.repositories)
                 {
                     if (aRepo.Status != SyncStatus.Suspend)
@@ -395,7 +395,7 @@ namespace CmisSync
         {
             lock (this.repo_lock)
             {
-                //FIXME: why are we sospendig all repositories instead of the one passed?
+                //TODO: why are we suspending all repositories instead of the one passed?
                 foreach (RepoBase aRepo in this.repositories)
                 {
                     if (aRepo.Status == SyncStatus.Suspend)
@@ -582,7 +582,7 @@ namespace CmisSync
         /// </summary>
         public void ActivityError(Tuple<string, Exception> error)
         {
-            //FIXME: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
+            //TODO: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
             OnError(error);
         }
     }

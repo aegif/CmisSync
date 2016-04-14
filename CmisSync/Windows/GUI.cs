@@ -49,7 +49,7 @@ namespace CmisSync {
         /// </summary>
         public GUI ()
         {   
-			// FIXME: The second time windows are shown, the windows
+			// TODO: The second time windows are shown, the windows
 			// don't have the smooth ease in animation, but appear abruptly.
 			// The ease out animation always seems to work
             Setup      = new Setup ();

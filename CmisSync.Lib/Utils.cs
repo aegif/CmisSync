@@ -254,6 +254,7 @@ namespace CmisSync.Lib
             return true;
         }
 
+
         /// <summary>
         /// Check whether the file is worth syncing or not.
         /// This optionally excludes blank files or files too large.
@@ -301,6 +302,7 @@ namespace CmisSync.Lib
             return true;
         }
 
+
         /// <summary>
         /// Check whether the file is worth syncing or not.
         /// Files that are not worth syncing include temp files, locks, etc.
@@ -311,6 +313,7 @@ namespace CmisSync.Lib
                 IsDirectoryWorthSyncing(localDirectory, repoInfo) &&
                 IsFileWorthSyncing(PathCombine(localDirectory, filename), repoInfo);
         }
+
 
         /// <summary>
         /// Determines whether this instance is valid ISO-8859-1 specified input.
@@ -323,6 +326,7 @@ namespace CmisSync.Lib
             String result = Encoding.GetEncoding(28591).GetString(bytes);
             return String.Equals(input, result);
         }
+
 
         /// <summary>
         /// Check whether the file is worth syncing or not.
@@ -372,6 +376,7 @@ namespace CmisSync.Lib
             return ret;
         }
 
+
         /// <summary>
         /// Regular expression to check whether a file name is valid or not.
         /// In particular, CmisSync forbids characters that would not be allowed on Windows:
@@ -379,6 +384,7 @@ namespace CmisSync.Lib
         /// </summary>
         private static Regex invalidFileNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())+"\"?:/\\|<>*") + "]");
+
 
         /// <summary>
         /// Check whether a folder name is valid or not.
@@ -405,11 +411,13 @@ namespace CmisSync.Lib
             return localDirectory + Path.DirectorySeparatorChar + filename;
         }
 
+
         /// <summary>
         /// Regular expression to check whether a filename is valid or not.
         /// </summary>
         private static Regex invalidFolderNameRegex = new Regex(
             "[" + Regex.Escape(new string(Path.GetInvalidPathChars())+"\"?:/\\|<>*") + "]");
+
 
         /// <summary>
         /// Find an available conflict free filename for this file.
@@ -449,6 +457,7 @@ namespace CmisSync.Lib
             }
         }
 
+
         /// <summary>
         /// Format a file size nicely.
         /// Example: 1048576 becomes "1 MB"
@@ -466,6 +475,7 @@ namespace CmisSync.Lib
             else
                 return byteCount.ToString() + " bytes";
         }
+
 
         /// <summary>
         /// Formats the bandwidth in typical 10 based calculation
@@ -490,6 +500,7 @@ namespace CmisSync.Lib
                 return bitsPerSecond.ToString() + " Bit/s";
         }
 
+
         /// <summary>
         /// Format a file size nicely.
         /// Example: 1048576 becomes "1 MB"
@@ -498,6 +509,7 @@ namespace CmisSync.Lib
         {
             return FormatSize((double) byteCount);
         }
+
 
         /// <summary>
         /// Formats the bandwidth in typical 10 based calculation
@@ -513,6 +525,18 @@ namespace CmisSync.Lib
             return FormatBandwidth((double) bitsPerSecond);
         }
 
+
+        /// <summary>
+        /// Check whether an URL is valid or not.
+        /// </summary>
+        public static bool IsvalidURL(string url)
+        {
+            Uri uri;
+            return Uri.TryCreate(url, UriKind.Absolute, out uri)
+                && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+        }
+
+
         /// <summary>
         /// Whether a file or directory is a symbolic link.
         /// </summary>
@@ -526,6 +550,7 @@ namespace CmisSync.Lib
                 return IsSymlink(dirinfo);
             return false;
         }
+
 
         /// <summary>
         /// Determines whether this instance is a symlink the specified FileSystemInfo.
@@ -566,6 +591,7 @@ namespace CmisSync.Lib
         {
             return cmisPath.Split('/').Last();
         }
+
 
         public static void ConfigureLogging()
         {

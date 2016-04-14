@@ -259,7 +259,7 @@ namespace CmisSync
             // Error.
             Program.Controller.OnError += delegate(Tuple<string, Exception> error)
             {
-                //FIXME: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
+                //TODO: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
                 String reponame = error.Item1;
                 Exception exception = error.Item2;
 
@@ -282,7 +282,7 @@ namespace CmisSync
 
                 if (exception is PermissionDeniedException)
                 {
-                    //FIXME: why it get suspended? Instead i should ask the user if the password has changed and he want to enter a new one
+                    //TODO: why it get suspended? Instead i should ask the user if the password has changed and he want to enter a new one
                     //Suspend sync...
                     SuspendSyncClicked(reponame);
                 }

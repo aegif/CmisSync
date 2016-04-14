@@ -13,6 +13,7 @@ namespace CmisSync
     {
         private static char[] splitChars = new char[] { ' ', '-', '\t', '\\' };
 
+
         /// <summary>
         /// Open a folder in Windows Explorer.
         /// </summary>
@@ -25,6 +26,7 @@ namespace CmisSync
 
             process.Start();
         }
+
 
         /// <summary>
         /// Trim a string to length size with an ellipsis.
@@ -47,6 +49,7 @@ namespace CmisSync
                 return text;
             }
         }
+
 
         /// <summary>
         /// Word wrap a strign to width characters.
@@ -91,6 +94,7 @@ namespace CmisSync
 
             return strBuilder.ToString();
         }
+
 
         /// <summary>
         /// Convert a string into an array of string based on split chars.

@@ -316,7 +316,7 @@ namespace CmisSync
         /// <summary>
         /// Regex to check an HTTP/HTTPS URL.
         /// </summary>
-        private Regex UrlRegex = new Regex(@"^" + // FIXME use http://stackoverflow.com/questions/161738/what-is-the-best-regular-expression-to-check-if-a-string-is-a-valid-url
+        private Regex UrlRegex = new Regex(@"^" + // TODO use http://stackoverflow.com/questions/161738/what-is-the-best-regular-expression-to-check-if-a-string-is-a-valid-url
                     "(https?)://" +                                                 // protocol
                     "(([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+" +        // username
                     "(:([a-z\\d$_\\.\\+!\\*'\\(\\),;\\?&=-]|%[\\da-f]{2})+)?" +     // password
@@ -490,10 +490,12 @@ namespace CmisSync
 
 
             bool emptyAddress = string.IsNullOrEmpty(address);
-            bool regexMatch = this.UrlRegex.IsMatch(address);
+            bool validAddress = false;
+            
             // Check address validity.
-            if (!emptyAddress && regexMatch)
+            if (!emptyAddress && CmisSync.Lib.Utils.IsvalidURL(address))
             {
+                validAddress = true;
                 try
                 {
                     this.saved_address = new Uri(address);
@@ -501,18 +503,17 @@ namespace CmisSync
                 catch (Exception ex)
                 {
                     Logger.Debug("Error creating URI: " + ex.Message, ex);
-                    regexMatch = false;
                 }
             }
             // Enable button to next step.
-            UpdateAddProjectButtonEvent(!emptyAddress && regexMatch);
+            UpdateAddProjectButtonEvent(validAddress);
 
             // Return validity error, or empty string if valid.
             if (emptyAddress)
             {
                 return "EmptyURLNotAllowed";
             }
-            if (!regexMatch)
+            if (!validAddress)
             {
                 return "InvalidURL";
             }
