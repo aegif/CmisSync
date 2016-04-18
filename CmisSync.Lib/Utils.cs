@@ -10,6 +10,7 @@ using System.Security.Permissions;
 
 using System.Text.RegularExpressions;
 using System.Reflection;
+using CmisSync.Lib.Cmis;
 #if __MonoCS__ && !__COCOA__
 using Mono.Unix.Native;
 #endif
@@ -186,7 +187,7 @@ namespace CmisSync.Lib
             }
 
             // Check resulting file path length
-            string fullPath = PathCombine(localDirectory, filename);
+            string fullPath = CmisUtils.PathCombine(localDirectory, filename);
 
             #if __COCOA__ || __MonoCS__
             // TODO Check filename length for OS X
@@ -311,7 +312,7 @@ namespace CmisSync.Lib
         {
             return IsFilenameWorthSyncing(localDirectory, filename) &&
                 IsDirectoryWorthSyncing(localDirectory, repoInfo) &&
-                IsFileWorthSyncing(PathCombine(localDirectory, filename), repoInfo);
+                IsFileWorthSyncing(CmisUtils.PathCombine(localDirectory, filename), repoInfo);
         }
 
 
@@ -399,16 +400,6 @@ namespace CmisSync.Lib
             }
 
             return ret;
-        }
-
-
-        /// <summary>
-        /// Like Path.Combine, but does not choke on special characters.
-        /// Special characters are a separate concern, use this method if it is not the current concern.
-        /// </summary>
-        public static string PathCombine(string localDirectory, string filename)
-        {
-            return localDirectory + Path.DirectorySeparatorChar + filename;
         }
 
 
@@ -581,16 +572,6 @@ namespace CmisSync.Lib
             File.Delete(filePath);
         }
 
-        /// <summary>
-        /// Get the last part of a CMIS path
-        /// Example: "/the/path/< 9000/theleaf" returns "theleaf"
-        /// Why not use Path.GetFileName ? Because it chokes on characters that are not authorized on the local filesystem.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetLeafOfCmisPath(string cmisPath)
-        {
-            return cmisPath.Split('/').Last();
-        }
 
 
         public static void ConfigureLogging()
@@ -604,6 +585,15 @@ namespace CmisSync.Lib
             {
                 log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             }
+        }
+
+        /// <summary>
+        /// Like Path.Combine, but does not choke on special characters.
+        /// Special characters are a separate concern, use this method if it is not the current concern.
+        /// </summary>
+        public static string PathCombine(string localDirectory, string filename)
+        {
+            return localDirectory + Path.DirectorySeparatorChar + filename;
         }
     }
 }

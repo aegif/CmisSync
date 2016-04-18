@@ -125,6 +125,8 @@ namespace CmisSync.Lib
         /// <summary></summary>
         public long MaxDeletionRetries { get; set; }
 
+        public CmisProfile CmisProfile { get; set; }
+
         /// <summary>
         /// Simple constructor.
         /// </summary>
@@ -134,6 +136,7 @@ namespace CmisSync.Lib
             name = name.Replace("\\", "_");
             name = name.Replace("/", "_");
             CmisDatabase = Path.Combine(cmisDatabaseFolder, name + ".cmissync");
+            CmisProfile = new CmisProfile();
         }
 
         /// <summary>
@@ -160,6 +163,7 @@ namespace CmisSync.Lib
             MaxUploadRetries = 2;
             MaxDownloadRetries = 2;
             MaxDeletionRetries = 2;
+            CmisProfile = new CmisProfile();
         }
 
         /// <summary>
