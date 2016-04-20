@@ -118,7 +118,7 @@ namespace CmisSync.Lib.Sync
                 bool oldPathnameWorthSyncing = Utils.WorthSyncing(oldDirectory, oldFilename, repoInfo);
 
                 // New item.
-                bool isFolder = File.GetAttributes(newPathname).HasFlag(FileAttributes.Directory);
+                bool isFolder = Utils.IsFolder(newPathname);
                 string newDirectory = Path.GetDirectoryName(newPathname); // TODO do this only if isFolder is true, modify rest of the logic accordingly.
                 string newFilename = Path.GetFileName(newPathname);
                 string newLocalName = newPathname.Substring(localFolder.Length + 1);
@@ -239,7 +239,7 @@ namespace CmisSync.Lib.Sync
                 try
                 {
                     string localName = localPath.Substring(localFolder.Length + 1);
-                    bool isFolder = File.Exists(localPath);
+                    bool isFolder = Utils.IsFolder(localPath);
 
                     SyncItem item = SyncItemFactory.CreateFromLocalPath(localPath, isFolder, repoInfo, database);
                     
@@ -248,7 +248,7 @@ namespace CmisSync.Lib.Sync
                     IFolder remoteBase = null;
                     if (File.Exists(localPath) || Directory.Exists(localPath))
                     {
-                        string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/'); //FIXME
+                        string remoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(item.RemotePath);
                         remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
                         if (null == remoteBase)
                         {

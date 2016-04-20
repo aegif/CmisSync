@@ -529,6 +529,16 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Whether a path points to a local directory or not.
+        /// Must be an absolute local path.
+        /// </summary>
+        public static bool IsFolder(string path)
+        {
+            return File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+        }
+
+
+        /// <summary>
         /// Whether a file or directory is a symbolic link.
         /// </summary>
         public static bool IsSymlink(string path)
