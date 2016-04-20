@@ -501,7 +501,13 @@ namespace CmisSync.Lib.Cmis
         /// <returns></returns>
         public static string GetLeafOfCmisPath(string cmisPath)
         {
-            return cmisPath.Split('/').Last();
+            return cmisPath.Split(CMIS_FILE_SEPARATOR).Last();
+        }
+
+
+        public static string GetUpperFolderOfCmisPath(string cmisPath)
+        {
+            return cmisPath.Substring(0, cmisPath.LastIndexOf(CMIS_FILE_SEPARATOR));
         }
 
 

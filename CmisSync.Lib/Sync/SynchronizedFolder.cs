@@ -1134,7 +1134,7 @@ namespace CmisSync.Lib.Sync
                     {
                         Logger.Debug(String.Format("Creating remote folder {0} for local folder {1}", syncItem.RemoteLeafname, localFolder));
                         folder = remoteBaseFolder.CreateFolder(properties);
-                        Logger.Debug(String.Format("Created remote folder {0}({1}) for local folder {2}", syncItem.RemoteLeafname, folder.Id ,localFolder));
+                        Logger.Debug(String.Format("Created remote folder {0}({1}) for local folder {2}", syncItem.RemoteLeafname, folder.Id, localFolder));
                     }
                     catch (CmisNameConstraintViolationException)
                     {

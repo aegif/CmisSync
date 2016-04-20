@@ -861,10 +861,17 @@ namespace CmisSync.Lib.Database
             string normalizedLocalPath = RemoveLocalPrefix(localPath);
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             parameters.Add("localPath", normalizedLocalPath);
+
+            // Try to find it in files database.
             string path = (string)ExecuteSQLFunction("SELECT path FROM files WHERE localPath=@localPath", parameters);
             if (string.IsNullOrEmpty(path))
             {
-                return null;
+                // Try to find it in folders database.
+                path = (string)ExecuteSQLFunction("SELECT path FROM folders WHERE localPath=@localPath", parameters);
+                if (string.IsNullOrEmpty(path))
+                {
+                    return null;
+                }
             }
 
             return SyncItemFactory.CreateFromPaths(localPathPrefix, normalizedLocalPath, remotePathPrefix, path, false);

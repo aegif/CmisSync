@@ -153,6 +153,10 @@ namespace CmisSync.Lib
             return item;
         }
 
+        /// <summary>
+        /// Create sync item from the path of a remote folder.
+        /// </summary>
+        /// <param name="remoteFolderPath">Example: /sites/aproject/adir</param>
         public static SyncItem CreateFromRemoteFolder(string remoteFolderPath, RepoInfo repoInfo, Database.Database database)
         {
             return new RemotePathSyncItem(remoteFolderPath, true, repoInfo, database);
@@ -270,6 +274,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Use only for folders, not for documents!
         /// </summary>
+        /// <param name="remoteFolderPath">Example: /sites/aproject/adir</param>
         public RemotePathSyncItem(string remoteFolderPath, bool isFolder, RepoInfo repoInfo, Database.Database database)
         {
             this.isFolder = isFolder;

@@ -107,18 +107,27 @@ namespace CmisSync.Lib.Sync
             {
                 bool success = true;
                 SleepWhileSuspended();
+
+                // Old item.
                 string oldDirectory = Path.GetDirectoryName(oldPathname);
                 string oldFilename = Path.GetFileName(oldPathname);
                 string oldLocalName = oldPathname.Substring(localFolder.Length + 1);
-                string oldRemoteName = Path.Combine(remoteFolder, oldLocalName).Replace('\\', '/'); // FIXME
-                string oldRemoteBaseName = Path.GetDirectoryName(oldRemoteName).Replace('\\', '/');
+                SyncItem oldItem = database.GetSyncItemFromLocalPath(oldPathname);
+                string oldRemoteName = oldItem.RemotePath;
+                string oldRemoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(oldRemoteName);
                 bool oldPathnameWorthSyncing = Utils.WorthSyncing(oldDirectory, oldFilename, repoInfo);
-                string newDirectory = Path.GetDirectoryName(newPathname);
+
+                // New item.
+                bool isFolder = File.GetAttributes(newPathname).HasFlag(FileAttributes.Directory);
+                string newDirectory = Path.GetDirectoryName(newPathname); // TODO do this only if isFolder is true, modify rest of the logic accordingly.
                 string newFilename = Path.GetFileName(newPathname);
                 string newLocalName = newPathname.Substring(localFolder.Length + 1);
-                string newRemoteName = Path.Combine(remoteFolder, newLocalName).Replace('\\', '/');
-                string newRemoteBaseName = Path.GetDirectoryName(newRemoteName).Replace('\\', '/');
+                SyncItem newItem = SyncItemFactory.CreateFromLocalPath(newPathname, isFolder, repoInfo, database);
+                string newRemoteName = newItem.RemotePath;
+                string newRemoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(newRemoteName);
                 bool newPathnameWorthSyncing = Utils.WorthSyncing(newDirectory, newFilename, repoInfo);
+
+                // Operations.
                 bool rename = oldDirectory.Equals(newDirectory) && !oldFilename.Equals(newFilename);
                 bool move = !oldDirectory.Equals(newDirectory) && oldFilename.Equals(newFilename);
                 if ((rename && move) || (!rename && !move))
@@ -239,7 +248,7 @@ namespace CmisSync.Lib.Sync
                     IFolder remoteBase = null;
                     if (File.Exists(localPath) || Directory.Exists(localPath))
                     {
-                        string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/');
+                        string remoteBaseName = Path.GetDirectoryName(remoteName).Replace('\\', '/'); //FIXME
                         remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
                         if (null == remoteBase)
                         {
