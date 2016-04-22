@@ -218,6 +218,14 @@ namespace CmisSync.Lib.Sync
                         }
                         else
                         {
+                            // Maybe the whole synchronized folder has disappeared?
+                            // While rare for normal filesystems, that happens rather often with mounted folders (for instance encrypted folders)
+                            // In such a case, we should abort this synchronization rather than delete the remote subfolder.
+                            if (!Directory.Exists(repoInfo.TargetDirectory))
+                            {
+                                throw new Exception("Local folder has disappeared: " + repoInfo.TargetDirectory + " , aborting synchronization");
+                            }
+
                             // If there was previously a file with this name, delete it.
                             // TODO warn if local changes in the file.
                             if (File.Exists(subFolderItem.LocalPath))
@@ -380,7 +388,15 @@ namespace CmisSync.Lib.Sync
                     }
                     else
                     {
-                        // The remote file exists locally.
+                        // The remote file does not exist on the local filesystem.
+
+                        // Maybe the whole synchronized folder has disappeared?
+                        // While rare for normal filesystems, that happens rather often with mounted folders (for instance encrypted folders)
+                        // In such a case, we should abort this synchronization rather than delete the remote file.
+                        if ( ! Directory.Exists(repoInfo.TargetDirectory))
+                        {
+                            throw new Exception("Local folder has disappeared: " + repoInfo.TargetDirectory + " , aborting synchronization");
+                        }
 
                         if (database.ContainsLocalFile(syncItem.LocalRelativePath))
                         {
