@@ -1248,8 +1248,15 @@ namespace CmisSync.Lib.Sync
 
                             Logger.Debug("after SetContentStream");
 
+                            // Get updated file.
+                            var allFileVersions = remoteFile.GetAllVersions();
+                            // CMIS 1.1 specification for getAllVersions: "returns the list of all document objects in the speciﬁed version series, sorted by cmis:creationDate descending"
+                            // So the latest version is at index 0
+                            var updatedFile = allFileVersions[0];
+
                             // Update timestamp in database.
-                            database.SetFileServerSideModificationDate(syncItem, ((DateTime)remoteFile.LastModificationDate).ToUniversalTime());
+                            DateTime serverSideModificationDate = updatedFile.LastModificationDate.Value.ToUniversalTime();
+                            database.SetFileServerSideModificationDate(syncItem, serverSideModificationDate);
 
                             // Update checksum
                             database.RecalculateChecksum(syncItem);
