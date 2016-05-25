@@ -187,7 +187,7 @@ namespace CmisSync.Lib
             }
 
             // Check resulting file path length
-            string fullPath = CmisUtils.PathCombine(localDirectory, filename);
+            string fullPath = Path.Combine(localDirectory, filename);
 
             #if __COCOA__ || __MonoCS__
             // TODO Check filename length for OS X
@@ -312,7 +312,7 @@ namespace CmisSync.Lib
         {
             return IsFilenameWorthSyncing(localDirectory, filename) &&
                 IsDirectoryWorthSyncing(localDirectory, repoInfo) &&
-                IsFileWorthSyncing(CmisUtils.PathCombine(localDirectory, filename), repoInfo);
+                IsFileWorthSyncing(Path.Combine(localDirectory, filename), repoInfo);
         }
 
 
