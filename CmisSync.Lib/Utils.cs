@@ -274,24 +274,24 @@ namespace CmisSync.Lib
                 if (fileInfo.Attributes.HasFlag(FileAttributes.Hidden))
 
                 {
-                    Logger.DebugFormat("Skipping {0}: hidden file", filepath);
+                    Logger.InfoFormat("Skipping {0}: hidden file", filepath);
                     return false;
                 }
                 if (fileInfo.Attributes.HasFlag(FileAttributes.System))
                 {
-                    Logger.DebugFormat("Skipping {0}: system file", filepath);
+                    Logger.InfoFormat("Skipping {0}: system file", filepath);
                     return false;
                 }
 
                 //Check filesize
                 if (!allowBlankFiles && fileInfo.Length <= 0)
                 {
-                    Logger.DebugFormat("Skipping {0}: blank file", filepath);
+                    Logger.InfoFormat("Skipping {0}: blank file", filepath);
                     return false;
                 }
                 if (limitFilesize && fileInfo.Length > filesizeLimit)
                 {
-                    Logger.DebugFormat("Skipping {0}: file too large {1}MB", filepath, fileInfo.Length / (1024f * 1024f));
+                    Logger.InfoFormat("Skipping {0}: file too large {1}MB", filepath, fileInfo.Length / (1024f * 1024f));
                     return false;
                 }
 
