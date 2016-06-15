@@ -97,7 +97,7 @@ namespace CmisSync.Lib.Cmis
                 "/p8cmis/resources/Service", // IBM FileNet
                 "/logicaldoc/service/cmis", // LogicalDOC
                 "/_vti_bin/cmis/rest?getRepositories", // Microsoft SharePoint
-                "/nemakiware/atom/bedroom", // NemakiWare  TODO: different port, typically 8080 for Web UI and 3000 for CMIS
+                "/nemakiware/core/atom", // NemakiWare  TODO: different port, typically 8080 for Web UI and 3000 for CMIS
                 "/nuxeo/atom/cmis", // Nuxeo
                 "/cmis/atom",
                 "/cmis/resources/", // EMC Documentum
@@ -460,7 +460,7 @@ namespace CmisSync.Lib.Cmis
             session.Clear(); // Clear all caches.
             session.Binding.GetRepositoryService().GetRepositoryInfos(null);
             string token = session.Binding.GetRepositoryService().GetRepositoryInfo(session.RepositoryInfo.Id, null).LatestChangeLogToken;
-            Logger.Debug("Server token:" + token);
+            Logger.DebugFormat("Server:{0} token: {1}" ,session.RepositoryInfo.ProductName, token);
             return token ?? string.Empty;
         }
 
