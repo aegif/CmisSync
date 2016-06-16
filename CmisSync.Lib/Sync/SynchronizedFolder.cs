@@ -643,6 +643,9 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download all content from a CMIS folder.
             /// </summary>
+            /// <param name="remoteFolder">The new folder to download. Example: /sites/project/newfolder</param>
+            /// <param name="remotePath">The new folder to download. Example: /sites/project/newfolder</param>
+            /// <param name="localFolder">The new folder that will be filled by this operation. Warning: It must exist already! Example: C:\CmisSync\project\newfolder</param> TODO: Create the local folder in this method.
             private void RecursiveFolderCopy(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 SleepWhileSuspended();
@@ -1059,7 +1062,6 @@ namespace CmisSync.Lib.Sync
                 {
                     syncItem = SyncItemFactory.CreateFromLocalPath(filePath, false, repoInfo, database);
                 }
-                Logger.Info("Uploading: " + syncItem.LocalPath);
 
                 try
                 {
@@ -1085,10 +1087,9 @@ namespace CmisSync.Lib.Sync
                         contentStream.Length = file.Length;
                         contentStream.Stream = hashstream;
 
-                        Logger.Debug("Uploading: " + syncItem.LocalPath + " as "
-                            + remoteFolder.Path + "/" + remoteFileName);
+                        Logger.InfoFormat("Uploading: {0} as {1}/{2}",syncItem.LocalPath, remoteFolder.Path, remoteFileName);
                         remoteDocument = remoteFolder.CreateDocument(properties, contentStream, null);
-                        Logger.Debug("Uploaded: " + syncItem.LocalPath);
+                        Logger.InfoFormat("Uploaded: {0}", syncItem.LocalPath);
                         filehash = hashAlg.Hash;
                     }
 
@@ -1111,7 +1112,7 @@ namespace CmisSync.Lib.Sync
             /// Upload folder recursively.
             /// After execution, the hierarchy on server will be: .../remoteBaseFolder/localFolder/...
             /// </summary>
-            private bool UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder)
+            private bool UploadFolderRecursively(IFolder remoteBaseFolder, string localFolder) // TODO switch order of argument for consistency with methods above and below
             {
                 bool success = true;
                 SleepWhileSuspended();
@@ -1193,7 +1194,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    ProcessRecoverableException("Could not uploading folder: " + localFolder, e);
+                    ProcessRecoverableException("Could not upload folder: " + localFolder, e);
                     return false;
                 }
                 return success;
@@ -1203,24 +1204,24 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Upload new version of file.
             /// </summary>
-            private bool UpdateFile(string filePath, IDocument remoteFile)
+            private bool UpdateFile(string localFilePath, IDocument remoteFile)
             {
                 SleepWhileSuspended();
                 try
                 {
-                    var syncItem = database.GetSyncItemFromLocalPath(filePath);
+                    var syncItem = database.GetSyncItemFromLocalPath(localFilePath);
                     if (null == syncItem)
                     {
-                        syncItem = SyncItemFactory.CreateFromLocalPath(filePath, false, repoInfo, database);
+                        syncItem = SyncItemFactory.CreateFromLocalPath(localFilePath, false, repoInfo, database);
                     }
 
                     Logger.Info("Updating: " + syncItem.LocalPath);
-                    using (Stream localfile = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (Stream localfile = File.Open(localFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         // Ignore files with null or empty content stream.
                         if ((localfile == null) && (localfile.Length == 0))
                         {
-                            Logger.Info("Skipping update of file with null or empty content stream: " + filePath);
+                            Logger.Info("Skipping update of file with null or empty content stream: " + localFilePath);
                             return true;
                         }
 
@@ -1278,7 +1279,7 @@ namespace CmisSync.Lib.Sync
                 }
                 catch (Exception e)
                 {
-                    ProcessRecoverableException("Could not update file: " + filePath, e);
+                    ProcessRecoverableException("Could not update file: " + localFilePath, e);
                     return false;
                 }
             }

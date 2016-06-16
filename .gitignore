@@ -50,3 +50,4 @@ build/cmissync.spec
 DataSpaceSync.Console/dsscli
 TestResult.xml
 Extras/MonoMac.dll
+/CmisSync/Windows/packages/Newtonsoft.Json.6.0.2
