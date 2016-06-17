@@ -394,7 +394,7 @@ namespace CmisSync.Lib.Sync
                     {
                         Connect();
 
-                        firstSync = true;
+                        firstSync = repoInfo.SyncAtStartup;
                     }
                     else
                     {
@@ -425,18 +425,35 @@ namespace CmisSync.Lib.Sync
 
                     if (firstSync)
                     {
-                        Logger.Debug("First sync, invoke a full crawl sync");
-                        CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
-                        firstSync = false;
+                        Logger.Debug("First sync, apply local changes then invoke a full crawl sync");
+                        
+                        // Compare local files with local database and apply changes to the server.
+                        ApplyLocalChanges(localFolder);
+
+                        var success = false;
+                        if (ChangeLogCapability)
+                        {
+                            //Before full sync, get latest changelog
+                            var lastTokenOnServer = CmisUtils.GetChangeLogToken(session);
+                            success = CrawlSync(remoteFolder, remoteFolderPath, localFolder);
+                            if(success) database.SetChangeLogToken(lastTokenOnServer);
+                        }else
+                        {
+                            // Full sync.
+                            success = CrawlSync(remoteFolder, remoteFolderPath, localFolder);
+
+                        }
+
+                        //If crawl sync failed, retry.
+                        firstSync = !success;
                     }
                     else
                     {
                         // Apply local changes noticed by the filesystem watcher.
-                        bool locallyModified = WatcherSync(remoteFolderPath, localFolder);
-                        if (locallyModified)
-                        {
-                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
-                        }
+                        WatcherSync(remoteFolderPath, localFolder);
+
+                        // Compare locally, in case the watcher did not do its job correctly (that happens, Windows bug).
+                        ApplyLocalChanges(localFolder);
 
                         if (ChangeLogCapability)
                         {
@@ -1327,6 +1344,70 @@ namespace CmisSync.Lib.Sync
                 {
                     ProcessRecoverableException("Could not update file: " + filePath, e);
                     return false;
+                }
+            }
+
+
+            public void DeleteRemoteDocument(IDocument document, SyncItem syncItem)
+            {
+                string message0 = "CmisSync Warning: You have deleted file " + syncItem.LocalPath + "\nCmisSync will now delete it from the server. If you actually did not delete this file, please report a bug at CmisSync@aegif.jp";
+                Logger.Info(message0);
+                //Utils.NotifyUser(message0);
+
+                if (document.IsVersionSeriesCheckedOut != null
+                    && (bool)document.IsVersionSeriesCheckedOut)
+                {
+                    string message = String.Format("File {0} is checked out on the server by another user: {1}", syncItem.LocalPath, document.CheckinComment);
+                    Logger.Info(message);
+                    Utils.NotifyUser(message);
+                }
+                else
+                {
+                    // File has been recently removed locally, so remove it from server too.
+
+                    activityListener.ActivityStarted();
+                    Logger.Info("Removing locally deleted file on server: " + syncItem.RemotePath);
+                    document.DeleteAllVersions();
+                    // Remove it from database.
+                    database.RemoveFile(syncItem);
+                    activityListener.ActivityStopped();
+                }
+            }
+
+
+            /// <summary>
+            /// Delete the folder from the remote server.
+            /// </summary>
+            public void DeleteRemoteFolder(IFolder folder, SyncItem syncItem, string upperFolderPath)
+            {
+                try
+                {
+                    Logger.Debug("Removing remote folder tree: " + folder.Path);
+                    IList<string> failedIDs = folder.DeleteTree(true, null, true);
+                    if (failedIDs == null || failedIDs.Count != 0)
+                    {
+                        Logger.Error("Failed to completely delete remote folder " + folder.Path);
+                        // TODO Should we retry? Maybe at least once, as a manual recursion instead of a DeleteTree.
+                    }
+
+                    // Delete the folder from database.
+                    database.RemoveFolder(syncItem);
+                }
+                catch (CmisPermissionDeniedException e)
+                {
+
+                    // TODO: Add resource
+                    string message = String.Format("フォルダ {0} に対して削除やリネームする権限がないため、サーバからこのフォルダを復元します（フォルダに含まれるファイル数が多い場合、復元に時間がかかります）。", syncItem.LocalPath);
+                    Utils.NotifyUser(message);
+
+
+                    // We don't have the permission to delete this folder. Warn and recreate it.
+                    /*
+                    Utils.NotifyUser("You don't have the necessary permissions to delete folder " + folder.Path
+                        + "\nIf you feel you should be able to delete it, please contact your server administrator");
+                    */
+                    database.RemoveFolder(syncItem);
+                    DownloadDirectory(folder, syncItem.RemotePath, syncItem.LocalPath);
                 }
             }
 

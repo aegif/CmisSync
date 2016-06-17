@@ -397,8 +397,8 @@ namespace CmisSync.Lib
                 remote_timer.Stop();
                 local_timer.Stop();
             }
-            Watcher.EnableRaisingEvents = false; //Disable events while syncing...
-            Watcher.EnableEvent = false;
+            //Watcher.EnableRaisingEvents = false; //Disable events while syncing...
+            //Watcher.EnableEvent = false;
         }
 
 
