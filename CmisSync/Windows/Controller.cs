@@ -23,6 +23,7 @@ using Forms = System.Windows.Forms;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
+using System.Threading;
 
 namespace CmisSync
 {
@@ -185,7 +186,13 @@ namespace CmisSync
         /// </summary>
         public void NotifyUser(string message)
         {
-            System.Windows.Forms.MessageBox.Show(message, "CmisSync notification");
+            var thread = new Thread(
+                () =>
+                {
+                    System.Windows.Forms.MessageBox.Show(message, "CmisSync notification");
+                }
+            );
+            thread.Start();
         }
 
 
