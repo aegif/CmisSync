@@ -31,6 +31,9 @@ namespace CmisSync.Lib
     /// </summary>
     public class Config
     {
+
+        public static readonly string DEFAULT_URL_ADDRESS = "https://";
+
         /// <summary>
         /// The current config schema version.
         /// </summary>
