@@ -429,6 +429,7 @@ namespace CmisSync.Lib.Sync
                             // Thus, CmisSync must remove the file from the server too.
 
                             DeleteRemoteDocument(remoteDocument, syncItem);
+
                         }
                         else
                         {

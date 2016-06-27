@@ -1348,18 +1348,27 @@ namespace CmisSync.Lib.Sync
             }
 
 
-            public void DeleteRemoteDocument(IDocument document, SyncItem syncItem)
+            public void DeleteRemoteDocument(IDocument remoteDocument, SyncItem syncItem)
             {
-                string message0 = "CmisSync Warning: You have deleted file " + syncItem.LocalPath + "\nCmisSync will now delete it from the server. If you actually did not delete this file, please report a bug at CmisSync@aegif.jp";
+
+
+               string message0 = "CmisSync Warning: You have deleted file " + syncItem.LocalPath +
+                                "\nCmisSync will now delete it from the server. If you actually did not delete this file, please report a bug at CmisSync@aegif.jp";
                 Logger.Info(message0);
                 //Utils.NotifyUser(message0);
 
-                if (document.IsVersionSeriesCheckedOut != null
-                    && (bool)document.IsVersionSeriesCheckedOut)
+                if ((bool)remoteDocument.IsVersionSeriesCheckedOut
+                    && !remoteDocument.VersionSeriesCheckedOutBy.Equals(repoInfo.User))
                 {
-                    string message = String.Format("File {0} is checked out on the server by another user: {1}", syncItem.LocalPath, document.CheckinComment);
+                    string message = String.Format("Restoring file \"{0}\" because it is checked out on the server by another user: {1}",
+                        syncItem.LocalPath, remoteDocument.VersionSeriesCheckedOutBy);
                     Logger.Info(message);
                     Utils.NotifyUser(message);
+
+                    // Restore the deleted file
+                    activityListener.ActivityStarted();
+                    DownloadFile(remoteDocument, syncItem.RemotePath, Path.GetDirectoryName(syncItem.LocalPath));
+                    activityListener.ActivityStopped();
                 }
                 else
                 {
@@ -1367,7 +1376,7 @@ namespace CmisSync.Lib.Sync
 
                     activityListener.ActivityStarted();
                     Logger.Info("Removing locally deleted file on server: " + syncItem.RemotePath);
-                    document.DeleteAllVersions();
+                    remoteDocument.DeleteAllVersions();
                     // Remove it from database.
                     database.RemoveFile(syncItem);
                     activityListener.ActivityStopped();
