@@ -57,9 +57,9 @@ namespace CmisSync.Lib.Sync
                 if (ConfigManager.CurrentConfig.GetFolder(repoInfo.Name) != null)
                     features = ConfigManager.CurrentConfig.GetFolder(repoInfo.Name).SupportedFeatures;
                 int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
-                    (int)features.MaxNumberOfContentChanges : 100;
+                    (int)features.MaxNumberOfContentChanges : 50;
 
-                IChangeEvents changes;
+
 
                 // Get last change token that had been saved on client side.
                 string lastTokenOnClient = database.GetChangeLogToken();
@@ -69,7 +69,7 @@ namespace CmisSync.Lib.Sync
 
                 if (lastTokenOnClient == lastTokenOnServer)
                 {
-                    Logger.Debug("No changes to sync, tokens on server and client are equal: \"" + lastTokenOnClient + "\"");
+                    Logger.DebugFormat("No changes to sync, tokens on server and client are equal: \"{0}\"", lastTokenOnClient);
                     return;
                 }
 
@@ -83,29 +83,21 @@ namespace CmisSync.Lib.Sync
                 }
 
                 // ChangeLog tokens are different, so checking changes is needed.
+                var currentChangeToken = lastTokenOnClient;
+                IChangeEvents changes;
                 do
                 {
                     // Check which documents/folders have changed.
-                    changes = session.GetContentChanges(lastTokenOnClient, IsPropertyChangesSupported, maxNumItems);
+                    changes = session.GetContentChanges(currentChangeToken, IsPropertyChangesSupported, maxNumItems);
 
-                    // Apply changes.
-                    foreach (IChangeEvent change in changes.ChangeEventList)
-                    {
-                        // Check whether change is applicable.
-                        // For instance, we dont care about changes to non-synced folders.
-                        if (ChangeIsApplicable(change))
-                        {
-                            // Launch a CrawlSync (which means syncing everything indistinctively).
-                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, remotePath, localFolder);
+                    // First event was already processed previous.
+                    var changeEvents = changes.ChangeEventList.Where(p => p != changes.ChangeEventList.FirstOrDefault()).ToList();
 
-                            // A single CrawlSync takes care of all pending changes, so no need to analyze the rest of the changes.
-                            // It will also update the last client-side ChangeLog token, more accurately than we can do here.
-                            return;
-                        }
-                    }
+                    CrawlChangeLogSyncAndUpdateChangeLogToken(changeEvents, remoteFolder, remotePath, localFolder);
 
-                    // No applicable changes, update ChangeLog token.
-                    lastTokenOnClient = changes.LatestChangeLogToken; // But dont save to database as latest server token is actually a later token.
+                    currentChangeToken = changes.LatestChangeLogToken; 
+
+                    database.SetChangeLogToken(currentChangeToken);
                 }
                 // Repeat if there were two many changes to fit in a single response.
                 // Only reached if none of the changes in this iteration were non-applicable.
@@ -118,7 +110,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Check whether a change is relevant for the current synchronized folder.
             /// </summary>
-            private bool ChangeIsApplicable(IChangeEvent change)
+            /*private bool ChangeIsApplicable(IChangeEvent change)
             {
                 ICmisObject cmisObject = null;
                 IFolder remoteFolder = null;
@@ -150,6 +142,12 @@ namespace CmisSync.Lib.Sync
                         Logger.Info("A CMIS exception occured when querying the change. Syncing just in case: " + changeIdForDebug + " :", e);
                         return true;
                     }
+                
+                }
+                catch (CmisPermissionDeniedException e)
+                {
+                    Logger.Info("Permission denied object  : " + changeIdForDebug + " :", e);
+                    return false;
                 }
                 catch (Exception e)
                 {
@@ -203,6 +201,157 @@ namespace CmisSync.Lib.Sync
 
                 // No path was relevant, so ignore the change.
                 return false;
+            }*/
+            
+            
+            /// <summary>
+            /// Apply CMIS ChangeLog changes.
+            /// </summary>
+            private void CrawlChangeLogSyncAndUpdateChangeLogToken(IList<IChangeEvent> changeLogs, IFolder remoteFolder, string remotePath, string localFolder)
+            {
+                SleepWhileSuspended();
+
+                var sw = new System.Diagnostics.Stopwatch();
+                activityListener.ActivityStarted();
+                try
+                {
+                    sw.Start();
+                    Logger.InfoFormat("Change log sync start : {0} logs", changeLogs.Count());
+
+                    // TODO: Compact changelogs
+
+                    foreach (var change in changeLogs)
+                    {
+                        var id = change.ObjectId;
+                        try
+                        {
+                            Logger.InfoFormat("Change log : Type={0}, Name={1}, Id={2}", change.ChangeType, change.Properties["cmis:name"].First(), id);
+                        }
+                        catch
+                        {
+                            Logger.InfoFormat("Change log : Type={0}, Id={1} ", change.ChangeType, id);
+                        }
+
+                        try
+                        {
+                            var cmisObject = session.GetObject(id);
+                            CrawlCmisObject(cmisObject);
+                        }
+                        catch (CmisObjectNotFoundException ex)
+                        {
+
+                            if (change.ChangeType == ChangeType.Deleted)
+                            {
+
+                                var local = database.GetSyncItem(id);
+                                if (local != null)
+                                {
+                                    var destFolderPath = Path.GetDirectoryName(local.LocalPath);
+                                    var destFolderItem = SyncItemFactory.CreateFromLocalPath(destFolderPath, true, repoInfo, database);
+
+                                    try
+                                    {
+                                        var destCmisFolder = session.GetObjectByPath(destFolderItem.RemotePath) as IFolder;
+
+                                        if (local.IsFolder)
+                                        {
+                                            CrawlSync(destCmisFolder, destFolderItem.RemotePath, destFolderItem.LocalPath);
+                                        }
+                                        else
+                                        {
+                                            CheckLocalFile(local.LocalPath, destCmisFolder, new List<string>());
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        if (e is ArgumentNullException || e is CmisObjectNotFoundException)
+                                        {
+                                            // GetObjectByPath failure
+                                            Logger.InfoFormat("Remote parent object not found, ignore. {0}", destFolderItem.RemotePath);
+                                        }
+                                        else
+                                        {
+                                            throw;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Logger.InfoFormat("Remote deleted object not in local database, ignore. {0}", id);
+                                }
+                            }
+                            else
+                            {
+                                Logger.InfoFormat("Remote object not found but delete event, ignore. {0}", id);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Debug(ex);
+                        }
+                    }
+
+                    sw.Stop();
+                    Logger.InfoFormat("Change log sync end : {1} min / {0} logs", changeLogs.Count(), sw.Elapsed);
+                }
+                finally
+                {
+                    activityListener.ActivityStopped();
+                }
+            }
+
+
+            /// <summary>
+            /// Synchronize changes made to a particular CMIS object.
+            /// </summary>
+            private void CrawlCmisObject(ICmisObject cmisObject)
+            {
+                if (cmisObject is DotCMIS.Client.Impl.Folder)
+                {
+                    var remoteSubFolder = cmisObject as IFolder;
+
+
+                    // Look for the local equivalent.
+                    var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+                    while (true)
+                    {
+                        // If other local folders have the same id, they are obsolete and must be deteled.
+                        var foldersToDelete = database.GetAllFoldersWithCmisId(cmisObject.Id).Where(p => p.RemotePath != remoteSubFolder.Path);
+                        foreach (var folderToDelete in foldersToDelete)
+                        {
+                            RemoveFolderLocally(folderToDelete.LocalPath);
+                        };
+
+                        if (localFolderItem != null || remoteSubFolder.IsRootFolder) break;
+
+                        // Go up one level before performing the same thing.
+                        remoteSubFolder = remoteSubFolder.Parents[0]; //TODO: Fix Parents[0] for multi-parent repositories
+                        localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+                    };
+
+                    CrawlSync(remoteSubFolder, remoteSubFolder.Path, localFolderItem.LocalPath);
+                }
+                else if (cmisObject is DotCMIS.Client.Impl.Document)
+                {
+                    var remoteDocument = cmisObject as IDocument;
+
+                    // Apply the change on all paths via which it is applicable.
+                    foreach (IFolder remoteIFolder in remoteDocument.Parents)
+                    {
+                        if (PathIsApplicable(remoteIFolder.Path))
+                        {
+                            Logger.Debug("Document change is applicable:" + remoteIFolder);
+
+                            var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteIFolder.Path);
+                            var localFolder = localFolderItem.LocalPath;
+
+                            var remoteDocumentPath = CmisUtils.PathCombine(remoteIFolder.Path, repoInfo.CmisProfile.localFilename(remoteDocument));
+                            var documentItem = SyncItemFactory.CreateFromRemoteDocument(remoteDocumentPath, remoteDocument, repoInfo, database);
+
+                            CrawlRemoteDocument(remoteDocument, documentItem.RemotePath, localFolder, null);
+                        }
+                    }
+                }
             }
             
             

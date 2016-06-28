@@ -32,6 +32,8 @@ namespace CmisSync
     /// </summary>
     public class Controller : ControllerBase, UserNotificationListener
     {
+        public static string ShortcutName = Properties_Resources.CmisSync + ".lnk";
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -59,7 +61,7 @@ namespace CmisSync
         public override void CreateStartupItem()
         {
             string startup_folder_path = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-            string shortcut_path = Path.Combine(startup_folder_path, "CmisSync.lnk");
+            string shortcut_path = Path.Combine(startup_folder_path, ShortcutName);
 
             if (File.Exists(shortcut_path))
                 File.Delete(shortcut_path);
@@ -77,7 +79,7 @@ namespace CmisSync
         public override void AddToBookmarks()
         {
             string user_profile_path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string shortcut_path = Path.Combine(user_profile_path, "Links", "CmisSync.lnk");
+            string shortcut_path = Path.Combine(user_profile_path, "Links", ShortcutName);
 
             if (File.Exists(shortcut_path))
                 File.Delete(shortcut_path);
@@ -210,7 +212,10 @@ namespace CmisSync
         /// <param name="path">Path to the log file</param>
         public void ShowLog(string path)
         {
-            Process.Start("notepad.exe", path);
+            var p = new Process();
+            p.StartInfo.FileName = path;
+            p.StartInfo.UseShellExecute = true;
+            p.Start();
         }
     }
 }

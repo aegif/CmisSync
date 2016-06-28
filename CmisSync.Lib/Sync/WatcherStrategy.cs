@@ -46,6 +46,8 @@ namespace CmisSync.Lib.Sync
                 while (changeQueue.Count > 0)
                 {
                     activityListener.ActivityStarted();
+                    try
+                    {
                     FileSystemEventArgs earliestChange = changeQueue.Dequeue();
                     string pathname = earliestChange.FullPath;
                     if (!pathname.StartsWith(localFolder))
@@ -93,6 +95,11 @@ namespace CmisSync.Lib.Sync
                                 break;
                         }
                     }
+                    }
+                    catch(Exception ex)
+                    {
+                        locallyModified = true;
+                    }
                     activityListener.ActivityStopped();
                 }
                 return locallyModified;
@@ -108,11 +115,18 @@ namespace CmisSync.Lib.Sync
                 bool success = true;
                 SleepWhileSuspended();
 
+                try
+                {
                 // Old item.
                 string oldDirectory = Path.GetDirectoryName(oldPathname);
                 string oldFilename = Path.GetFileName(oldPathname);
                 string oldLocalName = oldPathname.Substring(localFolder.Length + 1);
                 SyncItem oldItem = database.GetSyncItemFromLocalPath(oldPathname);
+                    if (oldItem == null)
+                    {
+                        // The change is about a file which was not in database yet, we can't move it. Further action is needed.
+                        return false;
+                    }
                 string oldRemoteName = oldItem.RemotePath;
                 string oldRemoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(oldRemoteName);
                 bool oldPathnameWorthSyncing = Utils.WorthSyncing(oldDirectory, oldFilename, repoInfo);
@@ -135,8 +149,6 @@ namespace CmisSync.Lib.Sync
                     Logger.ErrorFormat("Not a valid rename/move: {0} -> {1}", oldPathname, newPathname);
                     return true; // It is not our problem that watcher data is not valid.
                 }
-                try
-                {
                     if (oldPathnameWorthSyncing && newPathnameWorthSyncing)
                     {
                         if (database.ContainsLocalFile(oldPathname))
@@ -212,10 +224,15 @@ namespace CmisSync.Lib.Sync
                         //Neither old or new path worth syncing
                     }
                 }
+                catch (FileNotFoundException e)
+                {
+                    success = false;
+                    Logger.Warn("Could process watcher sync move, file or folder not found: " + oldPathname + " -> " + newPathname, e);
+                }
                 catch (Exception e)
                 {
                     success = false;
-                    ProcessRecoverableException("Could process watcher sync move: " + oldPathname + " -> " + newPathname, e);
+                    ProcessRecoverableException("Could not process watcher sync move: " + oldPathname + " -> " + newPathname, e);
                 }
                 return success;
             }
@@ -238,16 +255,13 @@ namespace CmisSync.Lib.Sync
                 }
                 try
                 {
-                    string localName = localPath.Substring(localFolder.Length + 1);
-                    bool isFolder = Utils.IsFolder(localPath);
 
-                    SyncItem item = SyncItemFactory.CreateFromLocalPath(localPath, isFolder, repoInfo, database);
-                    
                     // Get the remote directory, needed by the update method.
-                    string remoteName = item.RemotePath;
                     IFolder remoteBase = null;
                     if (File.Exists(localPath) || Directory.Exists(localPath))
                     {
+                        bool isFolder = Utils.IsFolder(localPath);
+                        SyncItem item = SyncItemFactory.CreateFromLocalPath(localPath, isFolder, repoInfo, database);
                         string remoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(item.RemotePath);
                         remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
                         if (null == remoteBase)

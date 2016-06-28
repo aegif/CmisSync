@@ -67,6 +67,12 @@ namespace CmisSync
 
             Controller = new Controller();
 
+            // Custom configuration file specified from command line.
+            if (args.Length > 0)
+            {
+                ConfigManager.CurrentConfigFile = args[0];
+            }
+
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
             ServicePointManager.CertificatePolicy = new CertPolicyHandler();
@@ -101,7 +107,8 @@ namespace CmisSync
             }
 
             // Only allow one instance of CmisSync (on Windows)
-            if (!program_mutex.WaitOne(0, false))
+            if (args.Length == 0 &&     // Allow more than one instance if using a custom config file.
+                !program_mutex.WaitOne(0, false))
             {
                 Logger.Error("CmisSync is already running.");
                 Environment.Exit(-1);

@@ -7,6 +7,9 @@ using log4net;
 
 namespace CmisSync.Lib.Cmis
 {
+    /// <summary>
+    /// TODO merge with Config.Feature ?
+    /// </summary>
     public class CmisProfile
     {
         /// <summary>

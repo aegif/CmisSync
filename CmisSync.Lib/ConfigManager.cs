@@ -22,6 +22,11 @@ namespace CmisSync.Lib
         private static Object configlock = new Object();
 
         /// <summary>
+        /// Path to a custom configuration file, specified from command line.
+        /// </summary>
+        private static string customConfigFile;
+
+        /// <summary>
         /// The CmisSync configuration.
         /// Following the singleton design pattern.
         /// </summary>
@@ -54,7 +59,19 @@ namespace CmisSync.Lib
         {
             get
             {
+                if (customConfigFile != null)
+                {
+                    return customConfigFile;
+                }
+                else
+                {
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cmissync", "config.xml");
+                }
+            }
+
+            set
+            {
+                customConfigFile = value;
             }
         }
     }

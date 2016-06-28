@@ -511,7 +511,7 @@ namespace CmisSync
                                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
 
                                 if (Controller.PreviousAddress == null || Controller.PreviousAddress.ToString() == String.Empty)
-                                    address_box.Text = "https://";
+                                    address_box.Text = Config.DEFAULT_URL_ADDRESS;
                                 else
                                     address_box.Text = Controller.PreviousAddress.ToString();
                                 address_box.Focus();
