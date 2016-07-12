@@ -59,8 +59,6 @@ namespace CmisSync.Lib.Sync
                 int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync
                     (int)features.MaxNumberOfContentChanges : 50;
 
-
-
                 // Get last change token that had been saved on client side.
                 string lastTokenOnClient = database.GetChangeLogToken();
 
@@ -100,7 +98,6 @@ namespace CmisSync.Lib.Sync
                     database.SetChangeLogToken(currentChangeToken);
                 }
                 // Repeat if there were two many changes to fit in a single response.
-                // Only reached if none of the changes in this iteration were non-applicable.
                 while (changes.HasMoreItems ?? false);
 
                 database.SetChangeLogToken(lastTokenOnServer);
