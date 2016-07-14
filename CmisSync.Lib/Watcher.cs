@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using log4net;
 using System.Security.Permissions;
 using CmisSync.Lib.Cmis;
+using System.Threading;
 
 
 namespace CmisSync.Lib
@@ -43,154 +44,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// the file/folder pathname (relative to <c>Path</c>) list for changes
         /// </summary>
-        private List<FileSystemEventArgs> changeList = new List<FileSystemEventArgs>();
-
-        /// <summary>
-        /// supported change type
-        /// rename a file: <c>Deleted</c> for the old name, and <c>Created</c> for the new name
-        /// </summary>
-        /*public enum ChangeTypes
-        {
-            /// <summary>
-            /// no change for the file/folder
-            /// </summary>
-            None,
-
-            /// <summary>
-            /// a new file/folder is created
-            /// </summary>
-            Created,
-
-            /// <summary>
-            /// the content for the file is changed
-            /// </summary>
-            Changed,
-
-            /// <summary>
-            /// the file/folder is deleted
-            /// </summary>
-            Deleted
-        };*/
-
-        /// <summary>
-        /// key is the element in <c>changeList</c>
-        /// </summary>
-        //private Dictionary<string, ChangeTypes> changes = new Dictionary<string, ChangeTypes>();
-
-
-        /*/// <summary>
-        /// <returns>the file/folder pathname (relative to <c>Path</c>) list for changes</returns>
-        /// </summary>
-        public List<string> GetChangeList()
-        {
-            lock (changeLock)
-            {
-                return new List<string>(changeList);
-            }
-        }
-
-
-        /// <summary>
-        /// <returns><c>ChangeTypes</c> for <param name="name">the file/folder</param></returns>
-        /// </summary>
-        public ChangeTypes GetChangeType(string name)
-        {
-            lock (changeLock)
-            {
-                ChangeTypes type;
-                if (changes.TryGetValue(name, out type))
-                {
-                    return type;
-                }
-                else
-                {
-                    return ChangeTypes.None;
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// remove <param name="name">the file/folder</param> from changes
-        /// </summary>
-        public void RemoveChange(string name)
-        {
-            lock (changeLock)
-            {
-                if (changes.Remove(name))
-                {
-                    changeList.Remove(name);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// remove <param name="name">the file/folder</param> from changes for <param name="change"/>
-        /// </summary>
-        public void RemoveChange(string name, ChangeTypes change)
-        {
-            lock (changeLock)
-            {
-                ChangeTypes type;
-                if (changes.TryGetValue(name, out type))
-                {
-                    if (type == change)
-                    {
-                        changes.Remove(name);
-                        changeList.Remove(name);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Insert the file/folder for change parameter.
-        /// It should do nothing if the file/folder exists in changes.
-        /// </summary>
-        /// <param name="name">the file/folder</param>
-        /// <param name="change"></param>
-        public void InsertChange(string name, ChangeTypes change)
-        {
-            if (ChangeTypes.None == change)
-            {
-                return;
-            }
-
-            lock (changeLock)
-            {
-                if (!changes.ContainsKey(name))
-                {
-                    changeList.Add(name);
-                    changes[name] = change;
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// remove all from changes
-        /// </summary>
-        public void RemoveAll()
-        {
-            lock (changeLock)
-            {
-                changes.Clear();
-                changeList.Clear();
-            }
-        }
-
-
-        /// <summary>
-        /// Get the number of elements in the change queue.
-        /// </summary>
-        public int GetChangeCount()
-        {
-            lock (changeLock)
-            {
-                return changeList.Count;
-            }
-        }*/
+        private List<WatcherEvent> changeList = new List<WatcherEvent>();
 
 
         /// <summary>
@@ -223,22 +77,23 @@ namespace CmisSync.Lib
         /// <summary>
         /// Get the change queue.
         /// </summary>
-        public Queue<FileSystemEventArgs> GetChangeQueue()
+        public Queue<WatcherEvent> GetChangeQueue()
         {
             lock (changeLock)
             {
-                Queue<FileSystemEventArgs> changeQueue = new Queue<FileSystemEventArgs>();
+                Queue<WatcherEvent> changeQueue = new Queue<WatcherEvent>();
                 int changeListCount = changeList.Count;
                 for (int i = 0; i < changeListCount; i++)
                 {
-                    FileSystemEventArgs change = changeList[i];
+                    WatcherEvent watcherEvent = changeList[i];
+                    FileSystemEventArgs change = watcherEvent.GetFileSystemEventArgs();
                     string fileName = System.IO.Path.GetFileName(change.FullPath);
                     string dirName = System.IO.Path.GetDirectoryName(change.FullPath);
                     bool redundantChange = false;
                     if (change.ChangeType == WatcherChangeTypes.Deleted)
                     {
                         //Detect a file/folder move...
-                        FileSystemEventArgs nextChange = ((i + 1) < changeListCount) ? changeList[i + 1] : null;
+                        FileSystemEventArgs nextChange = ((i + 1) < changeListCount) ? changeList[i + 1].GetFileSystemEventArgs() : null;
                         if (nextChange != null)
                         {
                             string nextFileName = System.IO.Path.GetFileName(nextChange.FullPath);
@@ -258,11 +113,11 @@ namespace CmisSync.Lib
                         for (int j = i - 1; j >= 0; j--)
                         {
                             //Iterate backwards through the list of changes, find the most recent operation on this specific file
-                            if (change.FullPath.Equals(changeList[j].FullPath))
+                            if (change.FullPath.Equals(changeList[j].GetFileSystemEventArgs().FullPath))
                             {
                                 //If the most recent operation is a created or changed operation this operation is redundant
-                                if (changeList[j].ChangeType == WatcherChangeTypes.Created ||
-                                changeList[j].ChangeType == WatcherChangeTypes.Changed)
+                                if (changeList[j].GetFileSystemEventArgs().ChangeType == WatcherChangeTypes.Created ||
+                                    changeList[j].GetFileSystemEventArgs().ChangeType == WatcherChangeTypes.Changed)
                                 {
                                     redundantChange = true;
                                 }
@@ -276,7 +131,7 @@ namespace CmisSync.Lib
                     }
                     else
                     {
-                        changeQueue.Enqueue(change);
+                        changeQueue.Enqueue(watcherEvent);
                     }
                 }
                 return changeQueue;
@@ -303,7 +158,7 @@ namespace CmisSync.Lib
             lock (changeLock)
             {
                 Logger.DebugFormat("{0}: {1}", change.ChangeType, change.FullPath);
-                changeList.Add(change);
+                changeList.Add(new WatcherEvent(change));
             }
         }
         /// <summary>
@@ -315,9 +170,11 @@ namespace CmisSync.Lib
             {
                 if (Logger.IsDebugEnabled)
                 {
-                    foreach (FileSystemEventArgs change in changeList)
+                    foreach (WatcherEvent change in changeList)
                     {
-                        Logger.Debug("Clearing from change list: " + change.ChangeType + ": " + change.Name);
+                        Logger.Debug("Clearing from change list: " +
+                            change.GetFileSystemEventArgs().ChangeType + ": " +
+                            change.GetFileSystemEventArgs().Name);
                     }
                 }
                 changeList.Clear();
@@ -351,31 +208,6 @@ namespace CmisSync.Lib
             Logger.Error("Error occurred for FileSystemWatcher");
             EnableRaisingEvents = false;
         }
-
-
-        /*private void OnRenamed(object source, RenamedEventArgs e)
-        {
-            Logger.Debug("FS Object renaming detected: " + e.OldFullPath + " to " + e.FullPath);
-            string oldname = e.OldFullPath;
-            string newname = e.FullPath;
-            if (oldname.StartsWith(Path))
-            {
-                FileSystemEventArgs eventDelete = new FileSystemEventArgs(
-                    WatcherChangeTypes.Deleted,
-                    System.IO.Path.GetDirectoryName(oldname),
-                    System.IO.Path.GetFileName(oldname));
-                OnDeleted(source, eventDelete);
-            }
-            if (newname.StartsWith(Path))
-            {
-                FileSystemEventArgs eventCreate = new FileSystemEventArgs(
-                    WatcherChangeTypes.Created,
-                    System.IO.Path.GetDirectoryName(newname),
-                    System.IO.Path.GetFileName(newname));
-                OnCreated(source, eventCreate);
-            }
-            InvokeChangeEvent(e);
-        }*/
 
 
         /// <summary>
@@ -460,6 +292,107 @@ namespace CmisSync.Lib
                     return oldFullPath;
                 }
             }
+        }
+    }
+
+
+    /// <summary>
+    /// A grace time is accorded to deletion events before initiating any server-side deletion.
+    /// 
+    /// In many programs (like Microsoft Word), deletion is often just a save:
+    /// 1. Save data to temporary file ~wrdxxxx.tmp
+    /// 2. Delete Example.doc
+    /// 3. Rename ~wrdxxxx.tmp to Example.doc
+    /// See https://support.microsoft.com/en-us/kb/211632
+    /// So, upon deletion, wait a bit for any save operation to hopefully finalize, then sync.
+    /// This is not 100% foolproof, as saving can last for more than the grace time, but probably
+    /// the best we can do without mind-reading third-party programs.
+    /// </summary>
+    public class Grace
+    {
+        // Log.
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Grace));
+
+
+        /// <summary>
+        /// Approximate date of the event.
+        /// A few seconds of error is not a problem.
+        /// </summary>
+        private DateTime graceEnd;
+
+
+        /// <summary>
+        /// The grace time to wait for.
+        /// Expressed in seconds.
+        /// </summary>
+        public static int GRACE_TIME = 15;
+
+
+        /// <summary>
+        /// Create a new Grace starting from now.
+        /// </summary>
+        public Grace()
+        {
+            // GRACE_TIME seconds from now.
+            graceEnd = DateTime.Now.Add(new TimeSpan(0, 0, GRACE_TIME));
+        }
+
+
+        /// <summary>
+        /// Wait until the grace time has expired.
+        /// </summary>
+        public void WaitGraceTime()
+        {
+            while (DateTime.Now < graceEnd)
+            {
+                Logger.Debug("Waiting grace time");
+                Thread.Sleep(1000); // Wait a second.
+            }
+            Logger.Debug("Grace time reached");
+        }
+    }
+
+
+    /// <summary>
+    /// An event detected by the watcher.
+    /// </summary>
+    public class WatcherEvent
+    {
+        /// <summary>
+        /// Object describing the change.
+        /// </summary>
+        private FileSystemEventArgs args;
+
+
+        /// <summary>
+        /// Grace time associated to the change.
+        /// If the change is a deletion, we will wait until this time has passed before initiating any server-side deletion.
+        /// </summary>
+        private Grace grace;
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public WatcherEvent(FileSystemEventArgs args)
+        {
+            this.args = args;
+
+            // Start the grace time count.
+            // A few seconds might have passed already, but we don't care since grace time is around tenfold that.
+            grace = new Grace();
+        }
+
+
+        public FileSystemEventArgs GetFileSystemEventArgs()
+        {
+            return args;
+        }
+
+
+        public Grace GetGrace()
+        {
+            return grace;
         }
     }
 }
