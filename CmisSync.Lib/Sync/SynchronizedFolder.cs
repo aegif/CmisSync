@@ -1357,7 +1357,9 @@ namespace CmisSync.Lib.Sync
                 Logger.Info(message0);
                 //Utils.NotifyUser(message0);
 
-                if ((bool)remoteDocument.IsVersionSeriesCheckedOut
+                if (remoteDocument.IsVersionSeriesCheckedOut != null
+                    && (bool)remoteDocument.IsVersionSeriesCheckedOut
+                    && remoteDocument.VersionSeriesCheckedOutBy != null
                     && !remoteDocument.VersionSeriesCheckedOutBy.Equals(repoInfo.User))
                 {
                     string message = String.Format("Restoring file \"{0}\" because it is checked out on the server by another user: {1}",
