@@ -56,12 +56,6 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// Affect a new <c>SyncStatus</c> value.
-        /// </summary>
-        public Action<SyncStatus> SyncStatusChanged { get; set; }
-
-
-        /// <summary>
         /// Whether this folder's synchronization is running right now.
         /// </summary>
         public abstract bool isSyncing();
@@ -94,7 +88,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Current status of the synchronization (paused or not).
         /// </summary>
-        public SyncStatus Status { get; private set; }
+        public bool Enabled { get; private set; }
 
 
         /// <summary>
@@ -102,7 +96,7 @@ namespace CmisSync.Lib
         /// </summary>
         public void Suspend()
         {
-            Status = SyncStatus.Suspend;
+            Enabled = false;
             RepoInfo.IsSuspended = true;
 
             //Get configuration
@@ -117,7 +111,7 @@ namespace CmisSync.Lib
         /// </summary>
         public virtual void Resume()
         {
-            Status = SyncStatus.Idle;
+            Enabled = true;
             RepoInfo.IsSuspended = false;
 
             //Get configuration
@@ -192,7 +186,10 @@ namespace CmisSync.Lib
 
             this.activityListener = activityListener;
 
-            if (repoInfo.IsSuspended) Status = SyncStatus.Suspend;
+            if (repoInfo.IsSuspended)
+            {
+                Enabled = false;
+            }
 
             // Folder lock.
             // Disabled for now. Can be an interesting feature, but should be made opt-in, as
@@ -323,7 +320,10 @@ namespace CmisSync.Lib
 
             //Pause sync
             this.remote_timer.Stop();
-            if (Status == SyncStatus.Idle) Suspend();
+            if (Enabled)
+            {
+                Suspend();
+            }
 
             //Update password...
             if (!String.IsNullOrEmpty(password))
@@ -476,22 +476,5 @@ namespace CmisSync.Lib
 
             return size;
         }
-    }
-
-
-    /// <summary>
-    /// Current status of the synchronization.
-    /// </summary>
-    public enum SyncStatus
-    {
-        /// <summary>
-        /// Normal operation.
-        /// </summary>
-        Idle,
-
-        /// <summary>
-        /// Synchronization is suspended.
-        /// </summary>
-        Suspend
     }
 }

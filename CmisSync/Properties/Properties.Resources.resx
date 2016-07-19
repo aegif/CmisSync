@@ -260,11 +260,11 @@ the resulting XML on the cmissync forum.</value>
   <data name="LocalDirectoryExist" xml:space="preserve">
     <value>A local folder with the same name already exist, please use a different name to prevent sync conflicts.</value>
   </data>
-  <data name="PauseSync" xml:space="preserve">
-    <value>Pause sync</value>
+  <data name="DisableSync" xml:space="preserve">
+    <value>Disable sync</value>
   </data>
-  <data name="ResumeSync" xml:space="preserve">
-    <value>Resume sync</value>
+  <data name="EnableSync" xml:space="preserve">
+    <value>Enable sync</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">
     <value>Browse remote folder</value>

@@ -152,7 +152,7 @@ namespace CmisSync
                         {
                             if (aRepo.Name == reponame)
                             {
-                                setSyncItemState(pauseitem, syncitem, aRepo.Status);
+                                SetEnabledOrDisabled(pauseitem, syncitem, aRepo.Enabled);
                                 break;
                             }
                         }
@@ -178,18 +178,18 @@ namespace CmisSync
         }
 
 
-        private void setSyncItemState(ToolStripMenuItem pauseItem, ToolStripMenuItem syncItem, SyncStatus status)
+        private void SetEnabledOrDisabled(ToolStripMenuItem enableDisableItem, ToolStripMenuItem syncItem, bool enabled)
         {
-            switch (status)
+            switch (enabled)
             {
-                case SyncStatus.Idle:
-                    pauseItem.Text = CmisSync.Properties_Resources.PauseSync;
-                    pauseItem.Image = UIHelpers.GetBitmap("media_playback_pause");
+                case true:
+                    enableDisableItem.Text = CmisSync.Properties_Resources.DisableSync;
+                    enableDisableItem.Image = UIHelpers.GetBitmap("media_playback_pause");
                     syncItem.Enabled = true;
                     break;
-                case SyncStatus.Suspend:
-                    pauseItem.Text = CmisSync.Properties_Resources.ResumeSync;
-                    pauseItem.Image = UIHelpers.GetBitmap("media_playback_start");
+                case false:
+                    enableDisableItem.Text = CmisSync.Properties_Resources.EnableSync;
+                    enableDisableItem.Image = UIHelpers.GetBitmap("media_playback_start");
                     syncItem.Enabled = false;
                     break;
             }
@@ -299,12 +299,12 @@ namespace CmisSync
                     settingsItem.Click += SettingsDelegate(folderName);
 
 
-                    setSyncItemState(suspendFolderItem, manualSyncItem, SyncStatus.Idle);
+                    SetEnabledOrDisabled(suspendFolderItem, manualSyncItem, true);
                     foreach (RepoBase aRepo in Program.Controller.Repositories)
                     {
                         if (aRepo.Name.Equals(folderName))
                         {
-                            setSyncItemState(suspendFolderItem, manualSyncItem, aRepo.Status);
+                            SetEnabledOrDisabled(suspendFolderItem, manualSyncItem, aRepo.Enabled);
                             break;
                         }
                     }

@@ -260,10 +260,10 @@ the resulting XML to cmissync@aegif.jp</value>
   <data name="LocalDirectoryExist" xml:space="preserve">
     <value>A local folder with the same name already exist, please use a different name.</value>
   </data>
-  <data name="PauseSync" xml:space="preserve">
-    <value>Pause sync</value>
+  <data name="DisableSync" xml:space="preserve">
+    <value>Disable synchronization</value>
   </data>
-  <data name="ResumeSync" xml:space="preserve">
+  <data name="EnableSync" xml:space="preserve">
     <value>Nadaljevanje sinhronizacije</value>
   </data>
   <data name="BrowseRemoteFolder" xml:space="preserve">

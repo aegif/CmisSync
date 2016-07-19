@@ -196,11 +196,11 @@ namespace CmisSync.Lib.Sync
                         if (changed)
                         {
 
-                            // TODO: リソース化
-                            string message = String.Format("ローカルで削除されたフォルダ {0} の子要素がサーバ側で更新されていたため、フォルダ全体を復帰します。必要であれば再度削除を試みてください。", localPath);
+                            // TODO: Internationalization
+                            string message = String.Format("Restoring folder {0} because its sub-items have been modified on the server. You can delete it again.", localPath);
                             Utils.NotifyUser(message);
 
-                            // TODO: フォルダのコンフリクト処理
+                            // TODO: Handle folder conflict
                             // Delete local database entry.
                             database.RemoveFolder(SyncItemFactory.CreateFromLocalPath(deletedFolder, true, repoInfo, database));
 
@@ -239,7 +239,7 @@ namespace CmisSync.Lib.Sync
 
             private bool HasFolderChanged(IFolder deletedIFolder)
             {
-                // TODO 新規作成に対応できてない
+                // TODO Does not work if newly-created.
 
                 // ChangeLog 
                 string lastTokenOnClient = database.GetChangeLogToken();

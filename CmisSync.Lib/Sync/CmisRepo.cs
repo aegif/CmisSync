@@ -97,13 +97,13 @@ namespace CmisSync.Lib.Sync
         {
             if (this.synchronizedFolder != null)// Because it is sometimes called before the object's constructor has completed.
             {
-                if (this.Status == SyncStatus.Idle)
+                if (this.Enabled)
                 {
                     this.synchronizedFolder.SyncInBackground(syncFull);
                 }
                 else
                 {
-                    Logger.Info(String.Format("Repo {0} - Sync skipped. Status={1}", this.Name, this.Status));
+                    Logger.Info(String.Format("Repo {0} - Sync skipped. Status={1}", this.Name, this.Enabled));
                 }
             }
         }
@@ -126,13 +126,13 @@ namespace CmisSync.Lib.Sync
         {
             if (this.synchronizedFolder != null)
             {
-                if (this.Status == SyncStatus.Idle)
+                if (this.Enabled)
                 {
                     this.synchronizedFolder.SyncInNotBackground(syncFull);
                 }
                 else
                 {
-                    Logger.Info(String.Format("Repo {0} - Sync skipped.Status={1}", this.Name, this.Status));
+                    Logger.Info(String.Format("Repo {0} - Sync skipped.Status={1}", this.Name, this.Enabled));
                 }
             }
         }

@@ -226,6 +226,15 @@ namespace CmisSync {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disable sync.
+        /// </summary>
+        internal static string DisableSync {
+            get {
+                return ResourceManager.GetString("DisableSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Discard changes.
         /// </summary>
         internal static string DiscardChanges {
@@ -277,6 +286,15 @@ namespace CmisSync {
         internal static string EmptyURLNotAllowed {
             get {
                 return ResourceManager.GetString("EmptyURLNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable sync.
+        /// </summary>
+        internal static string EnableSync {
+            get {
+                return ResourceManager.GetString("EnableSync", resourceCulture);
             }
         }
         
@@ -581,15 +599,6 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Pause sync.
-        /// </summary>
-        internal static string PauseSync {
-            get {
-                return ResourceManager.GetString("PauseSync", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to CMIS server found, but permission denied. Please check username/password..
         /// </summary>
         internal static string PermissionDenied {
@@ -667,15 +676,6 @@ namespace CmisSync {
         internal static string ReportProblem {
             get {
                 return ResourceManager.GetString("ReportProblem", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Resume sync.
-        /// </summary>
-        internal static string ResumeSync {
-            get {
-                return ResourceManager.GetString("ResumeSync", resourceCulture);
             }
         }
         
@@ -945,7 +945,7 @@ namespace CmisSync {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can easily add a new CMIS folder at any time..
+        ///   Looks up a localized string similar to You can easily add a new folder to synchronize, at any time..
         /// </summary>
         internal static string YouCan {
             get {

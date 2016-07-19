@@ -295,7 +295,7 @@ namespace CmisSync
         {
             foreach (RepoBase aRepo in this.repositories)
             {
-                if (aRepo.Name == reponame && aRepo.Status == SyncStatus.Idle)
+                if (aRepo.Name == reponame && aRepo.Enabled)
                 {
 
                     aRepo.ManualSync();
@@ -356,7 +356,7 @@ namespace CmisSync
                 {
                     if(aRepo.Name.Equals(repoName))
                     {
-                    if (aRepo.Status != SyncStatus.Suspend)
+                    if ( ! aRepo.Enabled)
                     {
                         SuspendRepositorySynchronization(repoName);
                     }
@@ -382,14 +382,14 @@ namespace CmisSync
                 {
                     if (aRepo.Name.Equals(repoName))
                     {
-                    if (aRepo.Status != SyncStatus.Suspend)
-                    {
-                        aRepo.Suspend();
-                        Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
-                    }
+                        if ( ! aRepo.Enabled)
+                        {
+                            aRepo.Suspend();
+                            Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                         }
+                    }
+                }
             }
-        }
         }
 
 
@@ -405,7 +405,7 @@ namespace CmisSync
                 {
                     if (aRepo.Name.Equals(repoName))
                     {
-                    if (aRepo.Status == SyncStatus.Suspend)
+                    if ( ! aRepo.Enabled)
                         {
                             aRepo.Resume();
                             Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
