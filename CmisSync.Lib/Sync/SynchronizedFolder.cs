@@ -1655,7 +1655,7 @@ namespace CmisSync.Lib.Sync
                         if (syncWorker.CancellationPending)
                         {
                             //Sync was cancelled...
-                            repo.Resume();
+                            repo.Enable();
                             throw new OperationCanceledException("Suspended sync was cancelled by user.");
                         }
                     }

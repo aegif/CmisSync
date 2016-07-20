@@ -94,7 +94,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Stop syncing momentarily.
         /// </summary>
-        public void Suspend()
+        public void Disable()
         {
             Enabled = false;
             RepoInfo.IsSuspended = true;
@@ -109,7 +109,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Restart syncing.
         /// </summary>
-        public virtual void Resume()
+        public virtual void Enable()
         {
             Enabled = true;
             RepoInfo.IsSuspended = false;
@@ -186,10 +186,7 @@ namespace CmisSync.Lib
 
             this.activityListener = activityListener;
 
-            if (repoInfo.IsSuspended)
-            {
-                Enabled = false;
-            }
+            Enabled = ! repoInfo.IsSuspended;
 
             // Folder lock.
             // Disabled for now. Can be an interesting feature, but should be made opt-in, as
@@ -322,7 +319,7 @@ namespace CmisSync.Lib
             this.remote_timer.Stop();
             if (Enabled)
             {
-                Suspend();
+                Disable();
             }
 
             //Update password...
@@ -346,7 +343,7 @@ namespace CmisSync.Lib
             config.Save();
 
             //Always resume sync...
-            Resume();
+            Enable();
             this.remote_timer.Start();
         }
 

@@ -1766,10 +1766,10 @@ namespace TestLibrary
 
                 //  create and delete heavy folder in concurrent
                 Console.WriteLine(" Remote create and delete heavy folder");
-                cmis.Suspend();
+                cmis.Disable();
                 folder1 = CreateFolder(folder, name1);
                 CreateHeavyFolderRemote(folder1);
-                cmis.Resume();
+                cmis.Enable();
                 folder1.DeleteTree(true, null, true);
                 Assert.IsTrue(WaitUntilDone(delegate
                 {

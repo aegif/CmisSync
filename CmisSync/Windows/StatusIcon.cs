@@ -178,19 +178,19 @@ namespace CmisSync
         }
 
 
-        private void SetEnabledOrDisabled(ToolStripMenuItem enableDisableItem, ToolStripMenuItem syncItem, bool enabled)
+        private void SetEnabledOrDisabled(ToolStripMenuItem enableDisableItem, ToolStripMenuItem menuItem, bool enabled)
         {
             switch (enabled)
             {
                 case true:
                     enableDisableItem.Text = CmisSync.Properties_Resources.DisableSync;
                     enableDisableItem.Image = UIHelpers.GetBitmap("media_playback_pause");
-                    syncItem.Enabled = true;
+                    menuItem.Enabled = true;
                     break;
                 case false:
                     enableDisableItem.Text = CmisSync.Properties_Resources.EnableSync;
                     enableDisableItem.Image = UIHelpers.GetBitmap("media_playback_start");
-                    syncItem.Enabled = false;
+                    menuItem.Enabled = false;
                     break;
             }
         }

@@ -45,7 +45,7 @@ namespace CmisSync.Lib.Sync
         }
 
         /// <summary></summary>
-        public override void Resume()
+        public override void Enable()
         {
             if(this.synchronizedFolder != null)
             {
@@ -53,7 +53,7 @@ namespace CmisSync.Lib.Sync
                 this.synchronizedFolder.resetFailedOperationsCounter();
                 this.synchronizedFolder.ForceFullSyncAtNextSync();
             }
-            base.Resume();
+            base.Enable();
         }
 
 
