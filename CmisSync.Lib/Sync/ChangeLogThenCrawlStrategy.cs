@@ -307,7 +307,6 @@ namespace CmisSync.Lib.Sync
                 {
                     var remoteSubFolder = cmisObject as IFolder;
 
-
                     // Look for the local equivalent.
                     var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                     while (true)

@@ -149,9 +149,15 @@ namespace CmisSync.Lib.Sync
                 bool success = true;
                 SleepWhileSuspended();
 
+                // Remember seen names, and depending on the profile ignore the ones that have appeared already.
+                // For instance, if the CMIS server has a file called Hello and a folder called HELLO, then on Windows the paths would conflict.
+                // Store lowercase file and folder names inside.
+                HashSet<string> names = new HashSet<string>();
+
                 // Get all remote children.
                 // TODO: use paging
                 IOperationContext operationContext = session.CreateOperationContext();
+                this.repoInfo.CmisProfile.ConfigureOperationContext(operationContext);
                 operationContext.MaxItemsPerPage = Int32.MaxValue;
                 foreach (ICmisObject cmisObject in remoteFolder.GetChildren(operationContext))
                 {
@@ -162,14 +168,30 @@ namespace CmisSync.Lib.Sync
                             // It is a CMIS folder.
                             IFolder remoteSubFolder = (IFolder)cmisObject;
                             string remoteSubPath = CmisUtils.PathCombine(remotePath, remoteSubFolder.Name);
-                            CrawlRemoteFolder(remoteSubFolder, remoteSubPath, localFolder, remoteFolders);
+                            if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames && names.Contains(remoteSubFolder.Name.ToLowerInvariant()))
+                            {
+                                Logger.Warn("Ignoring " + remoteSubFolder.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                            }
+                            else
+                            {
+                                CrawlRemoteFolder(remoteSubFolder, remoteSubPath, localFolder, remoteFolders);
+                                names.Add(remoteSubFolder.Name.ToLowerInvariant());
+                            }
                         }
                         else if (cmisObject is DotCMIS.Client.Impl.Document)
                         {
                             // It is a CMIS document.
                             IDocument remoteDocument = (IDocument)cmisObject;
                             string remoteDocumentPath = CmisUtils.PathCombine(remotePath, remoteDocument.Name);
-                            CrawlRemoteDocument(remoteDocument, remoteDocumentPath, localFolder, remoteFiles);
+                            if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames && names.Contains(remoteDocument.Name.ToLowerInvariant()))
+                            {
+                                Logger.Warn("Ignoring " + remoteDocument.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                            }
+                            else
+                            {
+                                CrawlRemoteDocument(remoteDocument, remoteDocumentPath, localFolder, remoteFiles);
+                                names.Add(remoteDocument.Name.ToLowerInvariant());
+                            }
                         }
                         else if (isLink(cmisObject))
                         {
@@ -339,7 +361,7 @@ namespace CmisSync.Lib.Sync
 
                     if (remoteFiles != null)
                     {
-                    remoteFiles.Add(remoteDocumentFileName);
+                        remoteFiles.Add(remoteDocumentFileName);
                     }
 
                     var paths = remoteDocument.Paths;

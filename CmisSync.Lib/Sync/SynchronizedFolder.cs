@@ -953,21 +953,20 @@ namespace CmisSync.Lib.Sync
                         return false;
                     }
 
-
-                    // Update or conflict
+                    // Either it is an update; or a file with the same name has been created at the same time locally, resulting in a conflict.
                     if (File.Exists(filePath))
                     {
                         if (database.LocalFileHasChanged(filePath)) // Conflict. Server-side file and local file both modified.
                         {
                             Logger.Info(String.Format("Conflict with file: {0}", syncItem.RemoteLeafname));
+
                             // Rename local file with a conflict suffix.
                             string conflictFilename = Utils.CreateConflictFilename(filePath, repoInfo.User);
                             Logger.Debug(String.Format("Renaming conflicted local file {0} to {1}", filePath, conflictFilename));
                             File.Move(filePath, conflictFilename);
 
+                            // Remove the ".sync" suffix.
                             Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
-                            // Remove the ".sync" suffix.
-                            // Remove the ".sync" suffix.
                             File.Move(tmpFilePath, filePath);
                             SetLastModifiedDate(remoteDocument, filePath, metadata);
 
