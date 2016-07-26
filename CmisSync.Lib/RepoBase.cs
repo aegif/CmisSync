@@ -19,7 +19,6 @@ using log4net;
 using System;
 using System.IO;
 using Timers = System.Timers;
-using CmisSync.Lib.Events;
 using CmisSync.Auth;
 
 namespace CmisSync.Lib
@@ -215,21 +214,6 @@ namespace CmisSync.Lib
             };
             local_timer.AutoReset = false;
             local_timer.Interval = delay_interval;
-        }
-
-
-        private bool RepoInfoChanged(ISyncEvent e)
-        {
-            if (e is RepoConfigChangedEvent)
-            {
-                this.RepoInfo = (e as RepoConfigChangedEvent).RepoInfo;
-                return true;
-            }
-            else
-            {
-                // This should never ever happen!
-                return false;
-            }
         }
 
 

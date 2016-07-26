@@ -17,8 +17,6 @@
 using System;
 using System.IO;
 
-using CmisSync.Lib.Events;
-
 namespace CmisSync.Lib.Sync
 {
     /// <summary></summary>

@@ -25,7 +25,6 @@ using System.Threading;
 using System.Collections.ObjectModel;
 
 using CmisSync.Lib.Cmis;
-using CmisSync.Lib.Events;
 using CmisSync.Auth;
 
 #if __COCOA__
