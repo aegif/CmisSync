@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using DotCMIS.Client;
 using log4net;
+using DotCMIS.Client.Impl;
+using System.IO;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -24,9 +26,13 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public bool UseCmisStreamName { get; set; }
 
+        public bool IgnoreIfSameLowercaseNames { get; set; }
+
         public CmisProfile()
         {
             UseCmisStreamName = true;
+
+            IgnoreIfSameLowercaseNames = !IsFileSystemCaseSensitive();
         }
 
         /// <summary>
@@ -53,6 +59,51 @@ namespace CmisSync.Lib.Cmis
             {
                 return document.Name;
             }
+        }
+
+
+        /// <summary>
+        /// Prepare the given OperationContext for use with this CMIS profile.
+        /// </summary>
+        /// <param name="operationContext"></param>
+        public void ConfigureOperationContext(IOperationContext operationContext)
+        {
+            if (IgnoreIfSameLowercaseNames)
+            {
+                // Depending on the CMIS profile, order by stream name or document name.
+                if (UseCmisStreamName)
+                {
+                    operationContext.OrderBy = "cmis:contentStreamFileName";
+                }
+                else
+                {
+                    operationContext.OrderBy = "cmis:name";
+                }
+            }
+            else
+            {
+                // Do not specify an order criteria, as we don't need it,
+                // and it might have a performance impact on the CMIS server.
+            }
+        }
+
+
+        /// <summary>
+        /// Whether the operating system is case-sensitive.
+        /// For instance on Linux you can have two files/folders called "test" and "TEST", but on Windows that does not work.
+        /// CMIS allows for case-sensitive names.
+        /// This method does not extend to mounted filesystems, which might have different properties.
+        /// </summary>
+        /// <returns>true if case sensitive</returns>
+        private static bool IsFileSystemCaseSensitive()
+        {
+            // Actually try.
+            string file = Path.GetTempPath() + "test";
+            File.CreateText(file).Close();
+            bool result = File.Exists("TEST");
+            File.Delete(file);
+
+            return result;
         }
     }
 }

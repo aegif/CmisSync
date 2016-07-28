@@ -25,7 +25,6 @@ using System.Threading;
 using System.Collections.ObjectModel;
 
 using CmisSync.Lib.Cmis;
-using CmisSync.Lib.Events;
 using CmisSync.Auth;
 
 #if __COCOA__
@@ -345,10 +344,10 @@ namespace CmisSync
         }
 
         /// <summary>
-        /// Pause or un-pause synchronization for a particular folder.
+        /// Eanble or disable synchronization for a particular folder.
         /// </summary>
         /// <param name="repoName">the folder to pause/unpause</param>
-        public void SuspendOrResumeRepositorySynchronization(string repoName)
+        public void EnableOrDisableRepositorySynchronization(string repoName)
         {
             lock (this.repo_lock)
             {
@@ -356,25 +355,25 @@ namespace CmisSync
                 {
                     if(aRepo.Name.Equals(repoName))
                     {
-                    if ( ! aRepo.Enabled)
-                    {
-                        SuspendRepositorySynchronization(repoName);
-                    }
-                    else
-                    {
-                        ResumeRepositorySynchronization(repoName);
+                        if (aRepo.Enabled)
+                        {
+                            DisableRepositorySynchronization(repoName);
+                        }
+                        else
+                        {
+                            EnableRepositorySynchronization(repoName);
+                        }
                     }
                 }
             }
         }
-        }
 
 
         /// <summary>
-        /// Pause synchronization for a particular folder.
+        /// Disable synchronization for a particular folder.
         /// </summary>
-        /// <param name="repoName">the folder to pause</param>
-        public void SuspendRepositorySynchronization(string repoName)
+        /// <param name="repoName">the folder to disable sync for</param>
+        public void DisableRepositorySynchronization(string repoName)
         {
             lock (this.repo_lock)
             {
@@ -382,9 +381,9 @@ namespace CmisSync
                 {
                     if (aRepo.Name.Equals(repoName))
                     {
-                        if ( ! aRepo.Enabled)
+                        if (aRepo.Enabled)
                         {
-                            aRepo.Suspend();
+                            aRepo.Disable();
                             Logger.Debug("Requested to suspend sync of repo " + aRepo.Name);
                         }
                     }
@@ -394,10 +393,10 @@ namespace CmisSync
 
 
         /// <summary>
-        /// Un-pause synchronization for a particular folder.
+        /// Enable synchronization for a particular folder.
         /// </summary>
-        /// <param name="repoName">the folder to unpause</param>
-        public void ResumeRepositorySynchronization(string repoName)
+        /// <param name="repoName">the folder to enable sync for</param>
+        public void EnableRepositorySynchronization(string repoName)
         {
             lock (this.repo_lock)
             {
@@ -407,7 +406,7 @@ namespace CmisSync
                     {
                     if ( ! aRepo.Enabled)
                         {
-                            aRepo.Resume();
+                            aRepo.Enable();
                             Logger.Debug("Requested to resume sync of repo " + aRepo.Name);
                         }
                     }

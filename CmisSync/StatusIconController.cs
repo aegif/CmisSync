@@ -370,7 +370,7 @@ namespace CmisSync
         /// </summary>
         public void SuspendSyncClicked(string reponame)
         {
-            Program.Controller.SuspendOrResumeRepositorySynchronization(reponame);
+            Program.Controller.EnableOrDisableRepositorySynchronization(reponame);
             //TODO: the StatusIcon should listen the controlleo or the repository for Suspended changes instead of call UpdateSuspendSyncFolderEvent
             UpdateSuspendSyncFolderEvent(reponame);
         }
