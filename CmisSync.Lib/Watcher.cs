@@ -213,11 +213,12 @@ namespace CmisSync.Lib
         /// <summary>
         /// Whether this object has been disposed or not.
         /// </summary>
-        private bool disposed;
+        private bool disposed = false;
 
 
         /// <summary>
         /// Dispose of the watcher.
+        /// Called by RepoBase.Dispose via System.ComponentModel
         /// </summary>
         /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
@@ -226,10 +227,10 @@ namespace CmisSync.Lib
             {
                 if (disposing)
                 {
+                    base.Dispose(disposing);
                 }
                 disposed = true;
             }
-            base.Dispose(disposing);
         }
 
 
