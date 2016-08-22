@@ -40,14 +40,14 @@ namespace TestLibrary
         {
             File.Delete(DatabasePath);
         }
-        /*
-        [Test, Category("Database")]
+        
+        /*[Test, Category("Database")]
         public void TestSpecialCharacter()
         {
             string oldPath = Path.Combine(RootPath, "a'b'c");
             string newPath = Path.Combine(RootPath, "'a'b'c'");
 
-            using (Database database = new Database(DatabasePath))
+            using (Database database = new Database(DatabasePath), )
             {
                 CreateTestFile(oldPath, 10);
                 database.AddFile(oldPath, "1", DateTime.Now, null, FakeHash);

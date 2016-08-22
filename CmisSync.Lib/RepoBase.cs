@@ -250,7 +250,6 @@ namespace CmisSync.Lib
                     this.local_timer.Stop();
                     this.local_timer.Dispose();
                     this.Watcher.Dispose();
-                    // this.folderLock.Dispose(); Folder lock disabled.
                 }
                 this.disposed = true;
             }

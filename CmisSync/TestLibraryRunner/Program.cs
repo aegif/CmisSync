@@ -39,8 +39,12 @@ namespace TestLibraryRunner
                     File.ReadAllText(path));
             object[] server = servers.ElementAt(serverId);
 
-            new CmisSyncTests().Sync((string)server[0], (string)server[1],
+            CmisSyncTests tests = new CmisSyncTests();
+
+            tests.Init();
+            tests.Sync((string)server[0], (string)server[1],
                     (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
+            tests.TearDown();
         }
 
         static void testFuzzy()

@@ -91,12 +91,12 @@ namespace TestLibrary
         [TearDown]
         public void TearDown()
         {
-            foreach( string file in Directory.GetFiles(CMISSYNCDIR)) {
+            // System.Threading.Thread.Sleep(30 * 1000);
+            foreach(string file in Directory.GetFiles(CMISSYNCDIR)) {
                 if(file.EndsWith(".cmissync"))
                 {
                     File.Delete(file);
-                }
-                    
+                } 
             }
         }
 
@@ -435,6 +435,7 @@ namespace TestLibrary
                     // Clean.
                     Console.WriteLine("Clean all.");
                     Clean(localDirectory, synchronizedFolder);
+                    synchronizedFolder.Dispose();
                 }
             }
         }
