@@ -513,14 +513,12 @@ namespace CmisSync.Lib.Sync
                         item = SyncItemFactory.CreateFromLocalPath(filePath, false, repoInfo, database);
                     }
 
-                    string fileName = item.RemoteLeafname;
+                    string fileName = item.LocalLeafname;
 
                     if (Utils.WorthSyncing(Path.GetDirectoryName(filePath), fileName, repoInfo))
                     {
                         if (remoteFiles != null &&
-                                ! ( remoteFiles.Contains(fileName) ||
-                            // Workaround for Documentum which sometimes put a ".zip" extension to document names.
-                            (CmisUtils.IsDocumentum(session) && remoteFiles.Contains(fileName + ".zip"))))
+                                ! remoteFiles.Contains(fileName))
                         {
                             // This local file is not on the CMIS server now, so
                             // check whether it used to exist on server or not.

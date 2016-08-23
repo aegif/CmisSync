@@ -42,6 +42,9 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public string localFilename(IDocument document)
         {
+            // Can be useful for tests, making local filenames radically different, thus making bugs easier to catch.
+            // return document.Id;
+
             if (UseCmisStreamName)
             {
                 if (document.ContentStreamFileName != null)
