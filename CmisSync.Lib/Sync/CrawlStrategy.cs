@@ -493,7 +493,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Check a local file in a given directory (not recursive).
             /// </summary>
-            /// <param name="remoteFiles">Remove the file if it is not in this list of remote files. Ignored if null</param>
+            /// <param name="remoteFiles">Remove the file if it is not in this list of remote files (translated to local filenames). Ignored if null</param>
             private void CheckLocalFile(string filePath, IFolder remoteFolder, IList<string> remoteFiles)
             {
                 SleepWhileSuspended();
