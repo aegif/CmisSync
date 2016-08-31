@@ -345,9 +345,7 @@ namespace CmisSync.Lib.Sync
                     try
                     {
                         IDocument modifiedDocument = (IDocument)session.GetObjectByPath(modifiedItem.RemotePath);
-
-                        IList<string> remoteFiles = new List<string>(); // Needed by the crawl method.
-                        CrawlRemoteDocument(modifiedDocument, modifiedItem.RemotePath, modifiedItem.LocalPath, remoteFiles);
+                        UpdateFile(modifiedItem.LocalPath, modifiedDocument);
                     }
                     catch (Exception e)
                     {
