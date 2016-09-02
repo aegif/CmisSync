@@ -20,6 +20,11 @@ namespace CmisSync.Lib.Cmis
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(CmisProfile));
 
         /// <summary>
+        /// Whether the CMIS server supports ordering by contentStreamFileName or not.
+        /// </summary>
+        public bool contentStreamFileNameOrderable { get; set; }
+
+        /// <summary>
         /// Whether to set local file names based on cmis:contentStreamName (true) or cmis:name (false)
         /// true is typically a good choice on Documentum
         /// false is typically a good choice on Alfresco
@@ -30,6 +35,8 @@ namespace CmisSync.Lib.Cmis
 
         public CmisProfile()
         {
+            contentStreamFileNameOrderable = false; // FIXME get that info from repository
+
             UseCmisStreamName = true;
 
             IgnoreIfSameLowercaseNames = !IsFileSystemCaseSensitive();
@@ -74,7 +81,7 @@ namespace CmisSync.Lib.Cmis
             if (IgnoreIfSameLowercaseNames)
             {
                 // Depending on the CMIS profile, order by stream name or document name.
-                if (UseCmisStreamName)
+                if (UseCmisStreamName && contentStreamFileNameOrderable)
                 {
                     operationContext.OrderBy = "cmis:contentStreamFileName";
                 }
