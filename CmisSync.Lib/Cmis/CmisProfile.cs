@@ -78,6 +78,12 @@ namespace CmisSync.Lib.Cmis
         /// <param name="operationContext"></param>
         public void ConfigureOperationContext(IOperationContext operationContext)
         {
+            /*
+            Disabled because repository may generate error if the type is not Orderable for cmis:contentStreamFileName
+            Documentum generates such an error: https://github.com/aegif/CmisSync/issues/724
+            Alfresco also is not Orderable even though it does not generate an error:
+            http://stackoverflow.com/questions/39290294/check-whether-cmiscontentstreamfilename-is-orderable
+            
             if (IgnoreIfSameLowercaseNames)
             {
                 // Depending on the CMIS profile, order by stream name or document name.
@@ -95,6 +101,7 @@ namespace CmisSync.Lib.Cmis
                 // Do not specify an order criteria, as we don't need it,
                 // and it might have a performance impact on the CMIS server.
             }
+            */
         }
 
 
