@@ -1276,7 +1276,7 @@ namespace CmisSync.Lib.Sync
                             var updatedFile = allFileVersions[0];
 
                             // Update timestamp in database.
-                            DateTime serverSideModificationDate = updatedFile.LastModificationDate.Value.ToUniversalTime();
+                            DateTime serverSideModificationDate = updatedFile.RefreshTimestamp;
                             database.SetFileServerSideModificationDate(syncItem, serverSideModificationDate);
 
                             // Update checksum
