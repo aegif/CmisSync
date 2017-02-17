@@ -321,7 +321,6 @@ namespace CmisSync.Lib.Sync
                 filters.Add("cmis:path");
                 filters.Add("cmis:changeToken"); // Needed to send update commands, see https://github.com/aegif/CmisSync/issues/516
                 session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
-                session.DefaultContext.RenditionFilterString = "*";
             }
 
             /// <summary>
@@ -860,7 +859,6 @@ namespace CmisSync.Lib.Sync
                     return true;
                 }
 
-                Boolean success = false;
                 try
                 {
                     DotCMIS.Data.IContentStream contentStream = null;
@@ -898,6 +896,7 @@ namespace CmisSync.Lib.Sync
                     }
 
                     // Download file.
+                    Boolean success = false;
                     byte[] filehash = { };
                     try
                     {
@@ -1024,29 +1023,13 @@ namespace CmisSync.Lib.Sync
                     database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                     Logger.Info("Added file to database: " + filePath);
 
-                    if (!success)
-                    {
-                        return false;
-                    }
+                    return success;
                 }
                 catch (Exception e)
                 {
                     ProcessRecoverableException("Could not download file: " + syncItem.LocalPath, e);
                     return false;
                 }
-
-                // Download the document's renditions.
-                IList<IRenditionData> renditions = session.GetRenditions(repoInfo.RepoID, remoteDocument.Id, "*", 10, 0, new DotCMIS.Data.Extensions.ExtensionsData());
-                foreach (IRenditionData rendition in renditions)
-                {
-                    string title = rendition.Title;
-                    string fileExtension = rendition.MimeType.Substring(rendition.MimeType.IndexOf("/") + 1); // TODO modify CmisSync.Lib.Cmis.MimeType to perform reverse lookup, and use it.
-                    string path = syncItem.LocalPath + "_" + title + "." + fileExtension; // TODO sanitize title
-
-                    byte[] filehash = DownloadStream(remoteDocument.GetContentStream(rendition.StreamId), path);
-                    success &= filehash != null;
-                }
-                return success;
             }
 
 
