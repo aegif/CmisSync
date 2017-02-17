@@ -497,6 +497,24 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Format a file size nicely with the exact value.
+        /// Example: 1048576 becomes "1 MB"
+        /// </summary>
+        public static string FormatSizeExact(double byteCount)
+        {
+            if (byteCount >= 1099511627776)
+                return String.Format("{0:##.##} TB", (double)(byteCount / 1099511627776));
+            else if (byteCount >= 1073741824)
+                return String.Format("{0:##.##} GB", (double)(byteCount / 1073741824));
+            else if (byteCount >= 1048576)
+                return String.Format("{0:##.##} MB", (double)(byteCount / 1048576));
+            else if (byteCount >= 1024)
+                return String.Format("{0:##.##} KB", (double)(byteCount / 1024));
+            else
+                return byteCount.ToString() + " bytes";
+        }
+
+        /// <summary>
         /// Formats the bandwidth in typical 10 based calculation
         /// </summary>
         /// <returns>
@@ -529,6 +547,15 @@ namespace CmisSync.Lib
             return FormatSize((double) byteCount);
         }
 
+
+        /// <summary>
+        /// Format a file size nicely with the exact value.
+        /// Example: 1048576 becomes "1 MB"
+        /// </summary>
+        public static string FormatSizeExact(long byteCount)
+        {
+            return FormatSizeExact((double) byteCount);
+        }
 
         /// <summary>
         /// Formats the bandwidth in typical 10 based calculation

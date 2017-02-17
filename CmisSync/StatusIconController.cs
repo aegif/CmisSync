@@ -357,6 +357,14 @@ namespace CmisSync
             Program.Controller.ShowAboutWindow();
         }
 
+		/// <summary>
+		/// Show the SyncSize dialog.
+		/// </summary>
+		public void SyncSizeClicked()
+		{
+			Program.Controller.ShowSyncSizeWindow();
+		}
+
         /// <summary>
         /// Quit CmisSync.
         /// </summary>

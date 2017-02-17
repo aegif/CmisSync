@@ -27,6 +27,7 @@ namespace CmisSync {
         public StatusIcon StatusIcon;
         public Setup Setup;
         public About About;
+		public SyncSize SyncSize;
 
         public static string AssetsPath =
             (null != Environment.GetEnvironmentVariable("CMISSYNC_ASSETS_DIR"))
@@ -38,6 +39,7 @@ namespace CmisSync {
 
             Setup      = new Setup ();
             About      = new About ();
+			SyncSize = new SyncSize ();
             StatusIcon = new StatusIcon ();
 			CmisSync.Lib.Utils.SetUserNotificationListener (new UserNotificationListenerLinux (StatusIcon));
             Program.Controller.UIHasLoaded ();

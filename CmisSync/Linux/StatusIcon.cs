@@ -260,6 +260,14 @@ private ApplicationIndicator indicator;
             };
             this.menu.Add (about_item);
 
+			// Sync size Menu
+			MenuItem Syncsize_item = new MenuItem (
+				"Syncing size");
+			Syncsize_item.Activated += delegate {
+				Controller.SyncSizeClicked ();
+			};
+			this.menu.Add (Syncsize_item);
+
             this.quit_item = new MenuItem (
                     CmisSync.Properties_Resources.Exit) {
                 Sensitive = true

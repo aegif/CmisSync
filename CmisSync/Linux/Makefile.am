@@ -9,6 +9,7 @@ LIBS = $(REF_CMISSYNC) $(LOG4NET_LIBS) $(NOTIFY_SHARP_LIBS) $(LIB_CMISAUTH) $(DO
 
 SOURCES =  \
 	../AboutController.cs \
+	../SyncSizeController.cs \
 	../CertPolicyHandler.cs \
 	../ControllerBase.cs \
 	../EditController.cs \
@@ -16,6 +17,7 @@ SOURCES =  \
 	../SetupController.cs \
 	../StatusIconController.cs \
 	About.cs \
+	SyncSize.cs \
 	CertPolicyWindow.cs \
 	CmisTree/CmisTreeStore.cs \
 	CmisTree/LoadingStatusModel.cs \
