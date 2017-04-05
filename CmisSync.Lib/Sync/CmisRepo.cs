@@ -35,8 +35,8 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
-            : base(repoInfo, activityListener)
+        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher)
+            : base(repoInfo, activityListener, enableWatcher)
         {
             this.synchronizedFolder = new SynchronizedFolder(repoInfo, this, activityListener);
             Logger.Info(synchronizedFolder);

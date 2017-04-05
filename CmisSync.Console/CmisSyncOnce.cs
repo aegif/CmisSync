@@ -32,6 +32,7 @@ namespace CmisSync.Console
 		public static void Main (string[] args)
 		{
             Utils.ConfigureLogging();
+            PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
 
             CmisSyncOnce once = new CmisSyncOnce();
 
@@ -82,7 +83,7 @@ namespace CmisSync.Console
 
             foreach (RepoInfo repoInfo in repos)
             {
-                CmisRepo cmisRepo = new CmisRepo (repoInfo, controller);
+                CmisRepo cmisRepo = new CmisRepo (repoInfo, controller, false);
                 cmisRepo.SyncInNotBackground();
             }
 		}
