@@ -295,11 +295,9 @@ namespace CmisSync.Lib.Sync
                     {
                         IDocument deletedDocument = (IDocument)session.GetObjectByPath(deletedItem.RemotePath);
 
-                        // Needed by the normal crawl, but actually not used in our particular case here.
-                        IList<string> remoteFiles = new List<string>();
                         try
                         {
-                            CrawlRemoteDocument(deletedDocument, deletedItem.RemotePath, deletedItem.LocalPath, remoteFiles);
+                            CrawlRemoteDocument(deletedDocument, deletedItem.RemotePath, deletedItem.LocalPath, null);
                         }
                         catch (CmisPermissionDeniedException e)
                         {
@@ -345,7 +343,8 @@ namespace CmisSync.Lib.Sync
                     try
                     {
                         IDocument modifiedDocument = (IDocument)session.GetObjectByPath(modifiedItem.RemotePath);
-                        UpdateFile(modifiedItem.LocalPath, modifiedDocument);
+                        
+                        CrawlRemoteDocument(modifiedDocument, modifiedItem.RemotePath, modifiedItem.LocalPath, null);
                     }
                     catch (Exception e)
                     {

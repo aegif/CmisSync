@@ -380,6 +380,8 @@ namespace CmisSync.Lib.Sync
                         // Check modification date stored in database and download if remote modification date if different.
                         DateTime? serverSideModificationDate = ((DateTime)remoteDocument.LastModificationDate).ToUniversalTime();
                         DateTime? lastDatabaseUpdate = database.GetServerSideModificationDate(syncItem);
+                        //Logger.Debug("serverSideModificationDate:" + serverSideModificationDate
+                        //    + " lastDatabaseUpdate:" + lastDatabaseUpdate);
 
                         if (lastDatabaseUpdate == null)
                         {
