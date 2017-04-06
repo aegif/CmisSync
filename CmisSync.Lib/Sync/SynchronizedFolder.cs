@@ -454,7 +454,10 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         // Apply local changes noticed by the filesystem watcher.
-                        success = WatcherSync(remoteFolderPath, localFolder);
+                        if (repo.Watcher != null)
+                        {
+                            success = WatcherSync(remoteFolderPath, localFolder);
+                        }
 
                         // Compare locally, in case the watcher did not do its job correctly (that happens, Windows bug).
                         success &= ApplyLocalChanges(localFolder);
@@ -468,7 +471,10 @@ namespace CmisSync.Lib.Sync
                         {
                             //  Have to crawl remote.
                             Logger.Warn("Invoke a full crawl sync (the remote does not support ChangeLog)");
-                            repo.Watcher.Clear();
+                            if (repo.Watcher != null)
+                            {
+                                repo.Watcher.Clear();
+                            }
                             success &= CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
                         }
                     }
