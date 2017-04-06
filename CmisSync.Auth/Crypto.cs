@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
+using log4net;
 
 namespace CmisSync.Auth
 {
@@ -11,6 +12,9 @@ namespace CmisSync.Auth
     /// </summary>
     public static class Crypto
     {
+        // Log.
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Auth));
+
         /// <summary>
         /// Obfuscate a string.
         /// </summary>
@@ -71,8 +75,7 @@ namespace CmisSync.Auth
                 }
                 catch (CryptographicException e)
                 {
-                    Console.WriteLine("Data was not encrypted. An error occurred.");
-                    Console.WriteLine(e.ToString());
+                    Logger.Error("Data was not encrypted. An error occurred.", e);
                     return null;
                 }
             #endif
@@ -101,8 +104,7 @@ namespace CmisSync.Auth
                 {
                     if (e is CryptographicException || e is FormatException)
                     {
-                        Console.WriteLine("Your password is not obfuscated yet.");
-                        Console.WriteLine("Using unobfuscated value directly might be deprecated soon, so please delete your local directories and recreate them. Thank you for your understanding.");
+                        Logger.Info("Your password is not obfuscated.");
                         return value;
                     }
                     else
@@ -180,8 +182,7 @@ namespace CmisSync.Auth
             {
                 if (e is CryptographicException || e is FormatException || e is ArgumentException)
                 {
-                    Console.WriteLine("Your password is not obfuscated yet.");
-                    Console.WriteLine("Using unobfuscated value directly might be deprecated soon, so please delete your local directories and recreate them. Thank you for your understanding.");
+                    Console.WriteLine("Your password is not obfuscated.");
                     return value;
                 }
                 else
