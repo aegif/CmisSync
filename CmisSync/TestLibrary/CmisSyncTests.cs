@@ -91,8 +91,14 @@ namespace TestLibrary
         [TearDown]
         public void TearDown()
         {
+            // Clear remaining resources.
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             // System.Threading.Thread.Sleep(30 * 1000);
-            foreach(string file in Directory.GetFiles(CMISSYNCDIR)) {
+
+            // Remove SQLite databases.
+            foreach (string file in Directory.GetFiles(CMISSYNCDIR))
+            {
                 if(file.EndsWith(".cmissync"))
                 {
                     File.Delete(file);
@@ -745,7 +751,8 @@ namespace TestLibrary
                     synchronizedFolder.Sync();
                     // Create a list of file names
                     List<string> files = new List<string>();
-                    for(int i = 1 ; i <= 10; i++) {
+                    for(int i = 1 ; i <= 10; i++)
+                    {
                         string filename =  String.Format("file{0}.bin", i.ToString());
                         files.Add(filename);
                     }
@@ -764,13 +771,19 @@ namespace TestLibrary
                         Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
                             foreach(string filename in files)
                             {
-                                try{
+                                try
+                                {
                                     string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
                                     IDocument d = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
-                                    if(d == null || d.ContentStreamLength != length)
+                                    if (d == null || d.ContentStreamLength != length)
+                                    {
                                         return false;
-                                }catch(Exception)
-                                {return false;}
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    return false;
+                                }
                             }
                             return true;
                         }));
