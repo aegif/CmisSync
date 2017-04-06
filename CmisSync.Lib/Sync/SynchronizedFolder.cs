@@ -191,10 +191,12 @@ namespace CmisSync.Lib.Sync
                         }
                         catch (CmisPermissionDeniedException e)
                         {
+                            Logger.Error(e.Message);
                             repo.OnSyncError(new PermissionDeniedException("Authentication failed.", e));
                         }
                         catch (Exception e)
                         {
+                            Logger.Error(e.Message);
                             repo.OnSyncError(new BaseException(e));
                         }
                         finally
@@ -1185,11 +1187,10 @@ namespace CmisSync.Lib.Sync
                     }
                     catch (Exception e)
                     {
-                        ProcessRecoverableException(String.Format("Exception when create remote folder for local folder {0}: {1}", localFolder, e.Message), e);
+                        ProcessRecoverableException(String.Format("Exception when creating remote folder for local folder {0}: {1}", localFolder, e.Message), e);
                         return false;
                     }
-
-
+                    
                     // Create database entry for this folder
                     // TODO Add metadata
                     database.AddFolder(syncItem, folder.Id, folder.LastModificationDate);

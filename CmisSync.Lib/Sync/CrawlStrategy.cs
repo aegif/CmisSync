@@ -436,6 +436,36 @@ namespace CmisSync.Lib.Sync
                             }
                         }
                     }
+                    else if (Directory.Exists(syncItem.LocalPath))
+                    {
+                        // With the same name have been created: a document on the server, and a folder locally.
+                        // This is a conflict.
+                        // Rename the local and download the remote.
+
+                        Logger.Info("Conflict between remote document \"" + remoteDocumentFileName
+                            + "\" and local folder \"" + syncItem.LocalPath
+                            + "\", renaming local folder and downloading remote document");
+
+                        // Rename local folder.
+                        String newFolderPath = Utils.CreateConflictFoldername(syncItem.LocalPath, repoInfo.User);
+                        Directory.Move(syncItem.LocalPath, newFolderPath);
+
+                        // Download server document
+                        success &= DownloadFile(remoteDocument, remotePath, localFolder);
+                        repo.OnConflictResolved();
+
+                        // Notify the user.
+                        string lastModifiedBy = CmisUtils.GetProperty(remoteDocument, "cmis:lastModifiedBy");
+                        string message = String.Format(
+                            // Properties_Resources.ResourceManager.GetString("ModifiedSame", CultureInfo.CurrentCulture),
+                            "User {0} has created document \"{1}\" at the same time as you created a folder with the same name.",
+                            lastModifiedBy, syncItem.LocalPath)
+                            + "\n\n"
+                            // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
+                            + "Your folder has been saved as \"" + newFolderPath + "\", please rename it.";
+                        Logger.Info(message);
+                        Utils.NotifyUser(message);
+                    }
                     else
                     {
                         // The remote file does not exist on the local filesystem.
@@ -660,12 +690,12 @@ namespace CmisSync.Lib.Sync
 
                     if (Utils.WorthSyncing(Path.GetDirectoryName(localSubFolder), folderName, repoInfo))
                     {
-                    var syncFolderItem = database.GetFolderSyncItemFromLocalPath(localSubFolder);
-                    if (null == syncFolderItem)
-                    {
+                        var syncFolderItem = database.GetFolderSyncItemFromLocalPath(localSubFolder);
+                        if (null == syncFolderItem)
+                        {
                             // The local item is not in database. It has not been uploaded yet.
-                        syncFolderItem = SyncItemFactory.CreateFromLocalPath(localSubFolder, true, repoInfo, database);
-                    }
+                            syncFolderItem = SyncItemFactory.CreateFromLocalPath(localSubFolder, true, repoInfo, database);
+                        }
 
                         if (remoteFolders.Contains(syncFolderItem.RemoteLeafname))
                         {
@@ -677,7 +707,7 @@ namespace CmisSync.Lib.Sync
                                 // TODO
                             }
                             else
-                    {
+                            {
                                 // The folder just appeared both on the local and remote sides.
                                 // Rename local folder then download remote folder.
 
@@ -709,14 +739,13 @@ namespace CmisSync.Lib.Sync
                             }
                             else
                             {
-                                    // New local folder, upload recursively.
-                                    activityListener.ActivityStarted();
+                                // New local folder, upload recursively.
+                                activityListener.ActivityStarted();
                                 UploadFolderRecursively(remoteRoot, localSubFolder);
-                                    activityListener.ActivityStopped();
-                                }
+                                activityListener.ActivityStopped();
                             }
                         }
-
+                    }
                 }
                 catch (Exception e)
                 {
