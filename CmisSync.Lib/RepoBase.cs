@@ -251,7 +251,10 @@ namespace CmisSync.Lib
                     this.remote_timer.Dispose();
                     this.local_timer.Stop();
                     this.local_timer.Dispose();
-                    this.Watcher.Dispose();
+                    if (Watcher != null)
+                    {
+                        this.Watcher.Dispose();
+                    }
                 }
                 this.disposed = true;
             }
