@@ -717,7 +717,7 @@ namespace TestLibrary
         public void SyncUploads(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-                        // Prepare checkout directory.
+            // Prepare checkout directory.
             string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
             CleanDirectory(localDirectory);
             Console.WriteLine("Synced to clean state.");
