@@ -117,10 +117,10 @@ namespace CmisSync.Lib.Sync
 
         /// <summary>
         /// Synchonize.
-        /// The synchronization is performed in synchronous.
+        /// The synchronization is performed synchronously.
         /// </summary>
         /// <param name="syncFull"></param>
-        public void SyncInNotBackground(bool syncFull)
+        public void SyncNotInBackground(bool syncFull)
         {
             if (this.synchronizedFolder != null)
             {
@@ -136,11 +136,11 @@ namespace CmisSync.Lib.Sync
         }
 
         /// <summary>
-        /// The synchronization is performed in synchronous.
+        /// The synchronization is performed synchronously.
         /// </summary>
-        public void SyncInNotBackground()
+        public void SyncNotInBackground()
         {
-            SyncInNotBackground(true);
+            SyncNotInBackground(true);
         }
 
         /// <summary>

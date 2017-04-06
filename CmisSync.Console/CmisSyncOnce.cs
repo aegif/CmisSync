@@ -84,7 +84,7 @@ namespace CmisSync.Console
             foreach (RepoInfo repoInfo in repos)
             {
                 CmisRepo cmisRepo = new CmisRepo (repoInfo, controller, false);
-                cmisRepo.SyncInNotBackground();
+                cmisRepo.SyncNotInBackground();
             }
 		}
 	}
