@@ -58,7 +58,7 @@ namespace CmisSync.Console
             bool success = once.Sync();
 
             // Exit code 0 if synchronization was successful or not needed,
-            // 1 if synchronization or could not run for unforeseen reasons.
+            // 1 if synchronization failed, or could not run.
             return success ? 0 : 1;
 		}
 
