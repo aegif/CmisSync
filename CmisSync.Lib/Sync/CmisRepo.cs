@@ -120,17 +120,22 @@ namespace CmisSync.Lib.Sync
         /// The synchronization is performed synchronously.
         /// </summary>
         /// <param name="syncFull"></param>
-        public void SyncNotInBackground(bool syncFull)
+        public bool SyncNotInBackground(bool syncFull)
         {
-            if (this.synchronizedFolder != null)
+            if (synchronizedFolder == null)
             {
-                if (this.Enabled)
+                return false;
+            }
+            else
+            {
+                if (Enabled)
                 {
-                    this.synchronizedFolder.SyncInNotBackground(syncFull);
+                    return synchronizedFolder.SyncNotInBackground(syncFull);
                 }
                 else
                 {
                     Logger.Info(String.Format("Repo {0} - Sync skipped.Status={1}", this.Name, this.Enabled));
+                    return true;
                 }
             }
         }
@@ -138,9 +143,9 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// The synchronization is performed synchronously.
         /// </summary>
-        public void SyncNotInBackground()
+        public bool SyncNotInBackground()
         {
-            SyncNotInBackground(true);
+            return SyncNotInBackground(true);
         }
 
         /// <summary>

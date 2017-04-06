@@ -383,7 +383,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
             /// </summary>
-            public void Sync(bool syncFull)
+            public bool Sync(bool syncFull)
             {
                 lock (syncLock)
                 {
@@ -425,6 +425,7 @@ namespace CmisSync.Lib.Sync
                     }
 
                     string localFolder = repoInfo.TargetDirectory;
+                    var success = false;
 
                     if (firstSync)
                     {
@@ -433,7 +434,6 @@ namespace CmisSync.Lib.Sync
                         // Compare local files with local database and apply changes to the server.
                         ApplyLocalChanges(localFolder);
 
-                        var success = false;
                         if (ChangeLogCapability)
                         {
                             //Before full sync, get latest changelog
@@ -454,24 +454,25 @@ namespace CmisSync.Lib.Sync
                     else
                     {
                         // Apply local changes noticed by the filesystem watcher.
-                        WatcherSync(remoteFolderPath, localFolder);
+                        success = WatcherSync(remoteFolderPath, localFolder);
 
                         // Compare locally, in case the watcher did not do its job correctly (that happens, Windows bug).
-                        ApplyLocalChanges(localFolder);
+                        success &= ApplyLocalChanges(localFolder);
 
                         if (ChangeLogCapability)
                         {
                             Logger.Debug("Invoke a remote change log sync");
-                            ChangeLogThenCrawlSync(remoteFolder, remoteFolderPath, localFolder);
+                            success &= ChangeLogThenCrawlSync(remoteFolder, remoteFolderPath, localFolder);
                         }
                         else
                         {
                             //  Have to crawl remote.
                             Logger.Warn("Invoke a full crawl sync (the remote does not support ChangeLog)");
                             repo.Watcher.Clear();
-                            CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
+                            success &= CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
                         }
                     }
+                    return success;
                 }
             }
 
@@ -497,17 +498,18 @@ namespace CmisSync.Lib.Sync
             /// Sync on the current thread.
             /// </summary>
             /// <param name="syncFull"></param>
-            public void SyncInNotBackground(bool syncFull)
+            public bool SyncNotInBackground(bool syncFull)
             {
                 if (IsSyncing())
                 {
                     Logger.Debug("Sync already running in background: " + repoInfo.TargetDirectory);
-                    return;
+                    return false;
                 }
 
+                bool success = false;
                 try
                 {
-                    Sync(syncFull);
+                    success = Sync(syncFull);
                 }
                 catch (CmisPermissionDeniedException e)
                 {
@@ -521,6 +523,7 @@ namespace CmisSync.Lib.Sync
                 {
                     SyncComplete(syncFull);
                 }
+                return success;
             }
 
             /// <summary>
@@ -1351,9 +1354,9 @@ namespace CmisSync.Lib.Sync
             }
 
 
-            public void DeleteRemoteDocument(IDocument remoteDocument, SyncItem syncItem)
+            public bool DeleteRemoteDocument(IDocument remoteDocument, SyncItem syncItem)
             {
-
+                bool success = true;
 
                string message0 = "CmisSync Warning: You have deleted file " + syncItem.LocalPath +
                                 "\nCmisSync will now delete it from the server. If you actually did not delete this file, please report a bug at CmisSync@aegif.jp";
@@ -1372,7 +1375,7 @@ namespace CmisSync.Lib.Sync
 
                     // Restore the deleted file
                     activityListener.ActivityStarted();
-                    DownloadFile(remoteDocument, syncItem.RemotePath, Path.GetDirectoryName(syncItem.LocalPath));
+                    success &= DownloadFile(remoteDocument, syncItem.RemotePath, Path.GetDirectoryName(syncItem.LocalPath));
                     activityListener.ActivityStopped();
                 }
                 else
@@ -1381,11 +1384,12 @@ namespace CmisSync.Lib.Sync
 
                     activityListener.ActivityStarted();
                     Logger.Info("Removing locally deleted file on server: " + syncItem.RemotePath);
-                    remoteDocument.DeleteAllVersions();
+                    /*success &=*/ remoteDocument.DeleteAllVersions();
                     // Remove it from database.
                     database.RemoveFile(syncItem);
                     activityListener.ActivityStopped();
                 }
+                return success;
             }
 
 

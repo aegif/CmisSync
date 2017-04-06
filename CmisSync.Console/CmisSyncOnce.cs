@@ -29,7 +29,7 @@ namespace CmisSync.Console
         /// <summary>
         /// Main method, pass folder name as argument.
         /// </summary>
-		public static void Main (string[] args)
+		public static int Main (string[] args)
 		{
             Utils.ConfigureLogging();
             PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
@@ -55,7 +55,11 @@ namespace CmisSync.Console
             }
 
             // Synchronize all
-            once.Sync();
+            bool success = once.Sync();
+
+            // Exit code 0 if synchronization was successful or not needed,
+            // 1 if synchronization or could not run for unforeseen reasons.
+            return success ? 0 : 1;
 		}
 
         /// <summary>
@@ -77,15 +81,18 @@ namespace CmisSync.Console
         /// <summary>
         /// Synchronize folder.
         /// </summary>
-		private void Sync ()
+		private bool Sync ()
 		{
+            bool success = true;
             ConsoleController controller = new ConsoleController();
 
             foreach (RepoInfo repoInfo in repos)
             {
                 CmisRepo cmisRepo = new CmisRepo (repoInfo, controller, false);
-                cmisRepo.SyncNotInBackground();
+                success &= cmisRepo.SyncNotInBackground();
             }
+
+            return success;
 		}
 	}
 }

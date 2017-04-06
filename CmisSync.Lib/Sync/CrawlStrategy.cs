@@ -111,9 +111,10 @@ namespace CmisSync.Lib.Sync
             /// Perform a crawl sync (check all folders and file checksums).
             /// If successful, update the local ChangeLog token.
             /// </summary>
-            private void CrawlSyncAndUpdateChangeLogToken(IFolder remoteFolder, string remotePath, string localFolder)
+            private bool CrawlSyncAndUpdateChangeLogToken(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 var sw = new System.Diagnostics.Stopwatch();
+                bool success = false;
                 Logger.Info("Remote Full Crawl Started");
                 try
                 {
@@ -121,7 +122,7 @@ namespace CmisSync.Lib.Sync
                     string token = CmisUtils.GetChangeLogToken(session);
 
                     // Sync.
-                    bool success = CrawlSync(remoteFolder, remotePath, localFolder);
+                    success = CrawlSync(remoteFolder, remotePath, localFolder);
 
                     // Update ChangeLog token if sync has been successful.
                     if (success)
@@ -137,6 +138,7 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.InfoFormat("Remote Full Crawl Finished : {0} min", sw.Elapsed);
                 }
+                return success;
             }
 
 
@@ -338,9 +340,10 @@ namespace CmisSync.Lib.Sync
             /// Check remote document, syncing down if needed.
             /// Meanwhile, cache remoteFiles, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
             /// </summary>
-            private void CrawlRemoteDocument(IDocument remoteDocument, string remotePath, string localFolder, IList<string> remoteFiles)
+            private bool CrawlRemoteDocument(IDocument remoteDocument, string remotePath, string localFolder, IList<string> remoteFiles)
             {
                 SleepWhileSuspended();
+                bool success = true;
 
                 if (Utils.WorthSyncing(localFolder, repoInfo.CmisProfile.localFilename(remoteDocument), repoInfo))
                 {
@@ -356,7 +359,7 @@ namespace CmisSync.Lib.Sync
                     if (remoteDocumentFileName == null)
                     {
                         Logger.Warn("Skipping download of '" + repoInfo.CmisProfile.localFilename(remoteDocument) + "' with null content stream in " + localFolder);
-                        return;
+                        return true;
                     }
 
                     if (remoteFiles != null)
@@ -382,7 +385,7 @@ namespace CmisSync.Lib.Sync
                         {
                             Logger.Info("Downloading file absent from database: " + syncItem.LocalPath);
                             activityListener.ActivityStarted();
-                            DownloadFile(remoteDocument, remotePath, localFolder);
+                            success &= DownloadFile(remoteDocument, remotePath, localFolder);
                             activityListener.ActivityStopped();
                         }
                         else
@@ -405,7 +408,7 @@ namespace CmisSync.Lib.Sync
                                     File.Move(syncItem.LocalPath, newFilePath);
 
                                     // Download server version
-                                    DownloadFile(remoteDocument, remotePath, localFolder);
+                                    success &= DownloadFile(remoteDocument, remotePath, localFolder);
                                     Logger.Info("- Checksum of remote file: " + Database.Database.Checksum(syncItem.LocalPath));
                                     repo.OnConflictResolved();
 
@@ -424,7 +427,7 @@ namespace CmisSync.Lib.Sync
                                 else
                                 {
                                     Logger.Info("Downloading modified file: " + remoteDocumentFileName);
-                                    DownloadFile(remoteDocument, remotePath, localFolder);
+                                    success &= DownloadFile(remoteDocument, remotePath, localFolder);
                                 }
 
                                 activityListener.ActivityStopped();
@@ -449,7 +452,7 @@ namespace CmisSync.Lib.Sync
                             // So, it must have been deleted locally by the user.
                             // Thus, CmisSync must remove the file from the server too.
 
-                            DeleteRemoteDocument(remoteDocument, syncItem);
+                            success &= DeleteRemoteDocument(remoteDocument, syncItem);
 
                         }
                         else
@@ -458,11 +461,12 @@ namespace CmisSync.Lib.Sync
 
                             Logger.Info("New remote file: " + syncItem.RemotePath);
                             activityListener.ActivityStarted();
-                            DownloadFile(remoteDocument, remotePath, localFolder);
+                            success &= DownloadFile(remoteDocument, remotePath, localFolder);
                             activityListener.ActivityStopped();
                         }
                     }
                 }
+                return success;
             }
 
 
@@ -494,16 +498,17 @@ namespace CmisSync.Lib.Sync
             /// Check a local file in a given directory (not recursive).
             /// </summary>
             /// <param name="remoteFiles">Remove the file if it is not in this list of remote files (translated to local filenames). Ignored if null</param>
-            private void CheckLocalFile(string filePath, IFolder remoteFolder, IList<string> remoteFiles)
+            private bool CheckLocalFile(string filePath, IFolder remoteFolder, IList<string> remoteFiles)
             {
                 SleepWhileSuspended();
+                bool success = true;
 
                 try
                 {
                     if (Utils.IsSymlink(new FileInfo(filePath)))
                     {
                         Logger.Info("Skipping symbolic linked file: " + filePath);
-                        return;
+                        return true;
                     }
                     
                     var item = database.GetSyncItemFromLocalPath(filePath);
@@ -532,7 +537,7 @@ namespace CmisSync.Lib.Sync
                                         // Local file was updated, sync up.
                                         Logger.Info("Uploading locally edited remotely removed file from the repository: " + filePath);
                                         activityListener.ActivityStarted();
-                                        UploadFile(filePath, remoteFolder);
+                                        success &= UploadFile(filePath, remoteFolder);
                                         activityListener.ActivityStopped();
                                     }
                                     else
@@ -579,7 +584,7 @@ namespace CmisSync.Lib.Sync
                                     // New file, sync up.
                                     Logger.Info("Uploading file absent on repository: " + filePath);
                                     activityListener.ActivityStarted();
-                                    UploadFile(filePath, remoteFolder);
+                                    success &= UploadFile(filePath, remoteFolder);
                                     activityListener.ActivityStopped();
                                 }
                             }
@@ -594,7 +599,7 @@ namespace CmisSync.Lib.Sync
                                     // Upload new version of file content.
                                     Logger.Info("Uploading file update on repository: " + filePath);
                                     activityListener.ActivityStarted();
-                                    UpdateFile(filePath, remoteFolder);
+                                    success &= UpdateFile(filePath, remoteFolder);
                                     activityListener.ActivityStopped();
                                 }
                             }
@@ -604,7 +609,9 @@ namespace CmisSync.Lib.Sync
                 catch (Exception e)
                 {
                     ProcessRecoverableException("Could not crawl sync local file: " + filePath, e);
+                    success = false;
                 }
+                return success;
             }
 
 
