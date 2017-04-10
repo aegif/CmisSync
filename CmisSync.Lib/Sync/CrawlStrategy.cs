@@ -255,9 +255,9 @@ namespace CmisSync.Lib.Sync
                             try
                             {
                                 activityListener.ActivityStarted();
-                            // Recurse into folder.
-                            CrawlSync(remoteSubFolder, remotePath, subFolderItem.LocalPath);
-                        }
+                                // Recurse into folder.
+                                CrawlSync(remoteSubFolder, remotePath, subFolderItem.LocalPath);
+                            }
                             finally
                             {
                                 activityListener.ActivityStopped();
@@ -340,6 +340,7 @@ namespace CmisSync.Lib.Sync
             /// Check remote document, syncing down if needed.
             /// Meanwhile, cache remoteFiles, they are output parameters that are used in CrawlLocalFiles/CrawlLocalFolders
             /// </summary>
+            /// <param name="remoteFiles">output collection where the method will store any remote file. Specify null if not needed.</param>
             private bool CrawlRemoteDocument(IDocument remoteDocument, string remotePath, string localFolder, IList<string> remoteFiles)
             {
                 SleepWhileSuspended();
