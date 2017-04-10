@@ -17,7 +17,7 @@ using NUnit.Framework;
 /**
  * Unit Tests for CmisSync.
  * 
- * To use them, first create a JSON file containing the credentials/parameters to your CMIS server(s)
+ * To use them, first create a JSON file containing the credentials/parameters to a test folder on your CMIS server(s)
  * Put it in TestLibrary/test-servers.json and use this format:
 [
     [
@@ -39,6 +39,7 @@ using NUnit.Framework;
         "repo3"
     ]
 ]
+ * Warning: All previous content of these folders will be deleted by the tests.
  */
 namespace TestLibrary
 {
@@ -137,8 +138,15 @@ namespace TestLibrary
                     path = "../CmisSync/TestLibrary/test-servers-fuzzy.json";
                 }
 
-                return JsonConvert.DeserializeObject<List<object[]>>(
-                    File.ReadAllText(path));
+                try
+                {
+                    return JsonConvert.DeserializeObject<List<object[]>>(
+                       File.ReadAllText(path));
+                }
+                catch(Exception e)
+                {
+                    return Enumerable.Empty<object []>();
+                }
             }
         }
 
@@ -147,7 +155,6 @@ namespace TestLibrary
         /// <param name="synchronizedFolder"></param>
         private void Clean(string localDirectory, CmisRepo.SynchronizedFolder synchronizedFolder)
         {
-
             // Sync deletions to server.
             synchronizedFolder.Sync();
             CleanAll(localDirectory);
@@ -446,7 +453,7 @@ namespace TestLibrary
             }
         }
 
-        /*[Test, TestCaseSource("TestServers"), Category("Slow")]
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -469,13 +476,12 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false))
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
                     cmis,
                     activityListener))
-                using (Watcher watcher = new Watcher(localDirectory))
                 {
                     synchronizedFolder.resetFailedOperationsCounter();
                     synchronizedFolder.Sync();
@@ -484,9 +490,71 @@ namespace TestLibrary
                     // Create random small file.
                     string filename = LocalFilesystemActivityGenerator.GetNextFileName();
                     string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
-                    watcher.EnableRaisingEvents = true;
                     LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
-                    WatcherTest.WaitWatcher((int)repoInfo.PollInterval, watcher, 1);
+                    // Sync again.
+                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
+                    {
+                        try
+                        {
+                            IDocument d = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+                            if (d != null)
+                                return true;
+                        }
+                        catch (Exception)
+                        { return false; }
+                        return false;
+                    }));
+                    Console.WriteLine("Second sync done.");
+                    // Check that file is present server-side.
+                    IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+                    Assert.NotNull(doc);
+                    Assert.AreEqual(filename, doc.ContentStreamFileName);
+                    Assert.AreEqual(filename, doc.Name);
+
+                    // Clean.
+                    Console.WriteLine("Clean all.");
+                    Clean(localDirectory, synchronizedFolder);
+                }
+            }
+        }
+
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            CleanDirectory(localDirectory);
+            Console.WriteLine("Synced to clean state.");
+
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            RepoInfo repoInfo = new RepoInfo(
+                    canonical_name,
+                    CMISSYNCDIR,
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    new DateTime(1900, 01, 01),
+                    true);
+
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false))
+            {
+                using (CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
+                using (Watcher watcher = new Watcher(localDirectory))
+                {
+                    synchronizedFolder.resetFailedOperationsCounter();
+                    synchronizedFolder.Sync();
+                    Console.WriteLine("Synced to clean state.");
+
+                    // Create random big file.
+                    string filename = LocalFilesystemActivityGenerator.GetNextFileName();
+                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
+                    LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000); // 1 MB ... no that big to not load servers too much.
                     // Sync again.
                     Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder,delegate {
                         try{
@@ -511,71 +579,7 @@ namespace TestLibrary
             }
         }
 
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
-        [Ignore]
-        public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId)
-        {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
-
-            IActivityListener activityListener = new Mock<IActivityListener>().Object;
-            RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
-                    remoteFolderPath,
-                    url,
-                    user,
-                    password,
-                    repositoryId,
-                    5000,
-                    false,
-                    new DateTime(1900, 01, 01),
-                    true);
-
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder =
-                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
-                using (Watcher watcher = new Watcher(localDirectory))
-                {
-                    synchronizedFolder.resetFailedOperationsCounter();
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
-
-                    // Create random big file.
-                    string filename = LocalFilesystemActivityGenerator.GetNextFileName();
-                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
-                    watcher.EnableRaisingEvents = true;
-                    LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000); // 1 MB ... no that big to not load servers too much.
-                    WatcherTest.WaitWatcher((int)repoInfo.PollInterval, watcher, 1);
-                    // Sync again.
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder,delegate {
-                        try{
-                            IDocument d = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
-                            if(d!=null)
-                                return true;
-                        }catch(Exception)
-                        {return false;}
-                        return false;
-                    }));
-                    Console.WriteLine("Second sync done.");
-                    // Check that file is present server-side.
-                    IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
-                    Assert.NotNull(doc);
-                    Assert.AreEqual(filename, doc.ContentStreamFileName);
-                    Assert.AreEqual(filename, doc.Name);
-
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
-                }
-            }
-        }*/
-
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        /*[Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
         public void ResumeBigFile(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
@@ -710,10 +714,10 @@ namespace TestLibrary
                 Console.WriteLine("Clean all.");
                 Clean(localDirectory2, synchronizedFolder2);
             }
-        }
+        }*/
 
         // Goal: Make sure that CmisSync works for uploading modified files.
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        /*[Test, TestCaseSource("TestServers"), Category("Slow")]
         public void SyncUploads(string canonical_name, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
@@ -742,12 +746,10 @@ namespace TestLibrary
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
-                using (Watcher watcher = new Watcher(localDirectory))
                 {
                     // Clear local and remote folder
                     synchronizedFolder.Sync();
                     CleanAll(localDirectory);
-                    WatcherTest.WaitWatcher();
                     synchronizedFolder.Sync();
                     // Create a list of file names
                     List<string> files = new List<string>();
@@ -792,7 +794,7 @@ namespace TestLibrary
                     }
                 }
             }
-        }
+        }*/
 
         /// <summary>
         /// Creates or modifies binary file.
