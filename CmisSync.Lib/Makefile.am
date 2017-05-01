@@ -8,8 +8,8 @@ LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) $(WEBLIBS) $(MONO
 SOURCES =  \
 	ActivityListenerAggregator.cs \
 	Backend.cs \
-	ChunkedStream.cs \
 	Cmis/BaseException.cs \
+	Cmis/CmisProfile.cs \
 	Cmis/PermissionDeniedException.cs \
 	Cmis/CmisUtils.cs \
 	Cmis/ServerNotFoundException.cs \
@@ -21,18 +21,6 @@ SOURCES =  \
 	Database/DatabaseMigration.cs \
 	Database/DatabaseMigrationBase.cs \
 	Database/DatabaseMigrationToVersion3.cs \
-	Events/ActiveActivitiesManager.cs \
-	Events/ConfigChangedEvent.cs \
-	Events/DebugLoggingHandler.cs \
-	Events/FileConflictEvent.cs \
-	Events/FileTransmissionEvent.cs \
-	Events/FSDeletionHandler.cs \
-	Events/FSEvent.cs \
-	Events/GenericSyncEventHandler.cs \
-	Events/ISyncEvent.cs \
-	Events/SyncEventHandler.cs \
-	Events/SyncEventManager.cs \
-	Events/SyncEventQueue.cs \
 	IActivityListener.cs \
 	FolderLock.cs \
   ##	Properties/AssemblyInfo.cs \
@@ -42,6 +30,7 @@ SOURCES =  \
 	Sync/ChangeLogThenCrawlStrategy.cs \
 	Sync/CmisRepo.cs \
 	Sync/CrawlStrategy.cs \
+	Sync/LocalComparisonStrategy.cs \
 	Sync/SynchronizedFolder.cs \
 	Sync/WatcherStrategy.cs \
 	UserNotificationListener.cs \

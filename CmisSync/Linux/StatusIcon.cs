@@ -27,6 +27,9 @@ using System.Globalization;
 using CmisSync.Lib;
 namespace CmisSync {
 
+    /// <summary>
+    /// CmisSync icon in the status bar.
+    /// </summary>
     public class StatusIcon {
 		public void NotifyUser (string message)
 		{
@@ -48,7 +51,7 @@ namespace CmisSync {
         private MenuItem state_item;
         private bool IsHandleCreated = false;
 #if HAVE_APP_INDICATOR		
-private ApplicationIndicator indicator;
+        private ApplicationIndicator indicator;
 
 		
 #else
@@ -76,6 +79,7 @@ private ApplicationIndicator indicator;
             CreateMenu ();
 
 
+            // Icon.
             Controller.UpdateIconEvent += delegate (int icon_frame) {
                 Application.Invoke (delegate {
                         if (icon_frame > -1) {
@@ -107,6 +111,7 @@ private ApplicationIndicator indicator;
                 });
             };
 
+            // Menu.
             Controller.UpdateStatusItemEvent += delegate (string state_text) {
                 if(!IsHandleCreated) return;
                 Application.Invoke (delegate {
@@ -115,6 +120,7 @@ private ApplicationIndicator indicator;
                         });
             };
 
+            // Repo Submenu.
             Controller.UpdateMenuEvent += delegate (IconState state) {
                 Application.Invoke (delegate {
                         CreateMenu ();
@@ -161,6 +167,9 @@ private ApplicationIndicator indicator;
             }
         }
 
+        /// <summary>
+        /// Create the GUI elements of the menu.
+        /// </summary>
         public void CreateMenu ()
         {
             this.menu = new Menu ();
@@ -183,12 +192,14 @@ private ApplicationIndicator indicator;
                         RepoName = folder_name
                     };
 
+                    // Sub-item: open locally.
                     ImageMenuItem open_localfolder_item = new CmisSyncMenuItem(
                             CmisSync.Properties_Resources.OpenLocalFolder) {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
                     };
                     open_localfolder_item.Activated += OpenFolderDelegate(folder_name);
 /*
+                    // Sub-item: open remotely.
                     ImageMenuItem browse_remotefolder_item = new CmisSyncMenuItem(
                             CmisSync.Properties_Resources.BrowseRemoteFolder) {
                         Image = new Image (UIHelpers.GetIcon ("folder-cmissync", 16))
@@ -200,6 +211,7 @@ private ApplicationIndicator indicator;
                         CmisSync.Properties_Resources.EditTitle);
                     edit_folder_item.Activated += EditFolderDelegate(folder_name);
 
+                    // Sub-item: suspend sync.
                     ImageMenuItem suspend_folder_item = new CmisSyncMenuItem(
                             CmisSync.Properties_Resources.PauseSync) {
                         RepoName = folder_name
@@ -214,12 +226,14 @@ private ApplicationIndicator indicator;
                     }
                     suspend_folder_item.Activated += SuspendSyncFolderDelegate(folder_name);
 
+                    // Sub-item: remove folder from sync
                     ImageMenuItem remove_folder_from_sync_item = new CmisSyncMenuItem(
                             CmisSync.Properties_Resources.RemoveFolderFromSync) {
                         Image = new Image (UIHelpers.GetIcon ("document-deleted", 12))
                     };
                     remove_folder_from_sync_item.Activated += RemoveFolderFromSyncDelegate(folder_name);
 
+                    // Add the sub-items.
                     submenu.Add(open_localfolder_item);
                     //submenu.Add(browse_remotefolder_item);
                     submenu.Add(suspend_folder_item);
@@ -227,6 +241,7 @@ private ApplicationIndicator indicator;
                     submenu.Add(new SeparatorMenuItem());
                     submenu.Add(remove_folder_from_sync_item);
 
+                    // Add the main item.
                     this.menu.Add (subfolder_item);
                 }
 
@@ -295,6 +310,10 @@ private ApplicationIndicator indicator;
             };
         }
 
+
+        /// <summary>
+        /// Delegate for suspending sync.
+        /// </summary>
         private EventHandler SuspendSyncFolderDelegate(string reponame)
         {
             return delegate
