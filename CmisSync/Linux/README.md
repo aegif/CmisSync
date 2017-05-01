@@ -55,7 +55,7 @@ At the root of the CmisSync root folder, run the following commands:
 $ git submodule init
 $ git submodule update
 $ make -f Makefile.am
-$ ./configure --with-dotcmis=Extras/DotCMIS.dll
+$  ./configure --with-dotcmis=Extras/DotCMIS.dll --with-newtonsoft-json=Extras/Newtonsoft.Json.dll
 $ make
 ```
 
