@@ -126,7 +126,7 @@ namespace CmisSync.Lib.Sync
             {
                 if (this.Enabled)
                 {
-                    this.synchronizedFolder.SyncInNotBackground(syncFull);
+                    this.synchronizedFolder.SyncInForeground(syncFull);
                 }
                 else
                 {

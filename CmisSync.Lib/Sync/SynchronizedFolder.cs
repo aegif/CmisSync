@@ -498,11 +498,11 @@ namespace CmisSync.Lib.Sync
             /// Sync on the current thread.
             /// </summary>
             /// <param name="syncFull"></param>
-            public void SyncInNotBackground(bool syncFull)
+            public void SyncInForeground(bool syncFull)
             {
                 if (IsSyncing())
                 {
-                    Logger.Debug("Sync already running in background: " + repoInfo.TargetDirectory);
+                    Logger.Debug("SyncInForeground: Sync already running in background: " + repoInfo.TargetDirectory);
                     return;
                 }
 
@@ -531,11 +531,13 @@ namespace CmisSync.Lib.Sync
             {
                 if (IsSyncing())
                 {
-                    Logger.Debug("Sync already running in background: " + repoInfo.TargetDirectory);
+                    Logger.Debug("SyncInBackground: Sync already running in background: " + repoInfo.TargetDirectory);
                     return;
                 }
 
                 syncWorker.RunWorkerAsync(syncFull);
+
+                Logger.Debug("SyncInBackground: IsSyncing(): " + IsSyncing());
             }
 
             /// <summary>
