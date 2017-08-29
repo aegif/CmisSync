@@ -210,6 +210,13 @@ namespace CmisSync.Lib
             }
             #endif
 
+            // Check whether the file is a rendition
+            if (filename.Contains("_rendition_"))
+            {
+                Logger.Debug("Ignoring rendition " + filename);
+                return false;
+            }
+
             return true;
         }
 

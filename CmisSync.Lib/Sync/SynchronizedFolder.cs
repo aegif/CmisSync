@@ -15,6 +15,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using CmisSync.Lib.Database;
+using System.Linq;
 
 namespace CmisSync.Lib.Sync
 {
@@ -48,6 +49,9 @@ namespace CmisSync.Lib.Sync
             /// TODO make it a CMIS folder - specific setting
             /// </summary>
             private bool BIDIRECTIONAL = true; // TODO move to CmisProfile
+
+
+            public static String RENDITION_IDENTIFIER = "_rendition_";
 
             /// <summary>
             /// At which degree the repository supports Change Logs.
@@ -1041,9 +1045,14 @@ namespace CmisSync.Lib.Sync
                 IList<IRenditionData> renditions = session.GetRenditions(repoInfo.RepoID, remoteDocument.Id, "*", 10, 0, new DotCMIS.Data.Extensions.ExtensionsData());
                 foreach (IRenditionData rendition in renditions)
                 {
+                    Logger.Debug(rendition + " " + rendition.MimeType);
+                    string fileExtension = MimeType.GetExtension(rendition.MimeType);
+
                     string title = rendition.Title;
-                    string fileExtension = rendition.MimeType.Substring(rendition.MimeType.IndexOf("/") + 1); // TODO modify CmisSync.Lib.Cmis.MimeType to perform reverse lookup, and use it.
-                    string path = syncItem.LocalPath + "_" + title + "." + fileExtension; // TODO sanitize title
+                    var sanitizedTitle = new string(title.Select(
+                        character => Path.GetInvalidFileNameChars().Contains(character) ? '_' : character).ToArray());
+
+                    string path = syncItem.LocalPath + RENDITION_IDENTIFIER + title + "." + fileExtension;
 
                     byte[] filehash = DownloadStream(remoteDocument.GetContentStream(rendition.StreamId), path);
                     success &= filehash != null;
