@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using log4net;
 
 namespace CmisSync.Lib.Cmis
 {
@@ -13,20 +14,52 @@ namespace CmisSync.Lib.Cmis
     public static class MimeType
     {
         /// <summary>
+        /// Log.
+        /// </summary>
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MimeType));
+
+
+        /// <summary>
         /// Guess the MIME type of a file.
         /// </summary>
         /// <param name="fileName">Relative filename, for instance mydoc.odt</param>
         /// <returns>MIME type, for instance </returns>
         public static string GetMIMEType(string fileName)
         {
-            if (Path.GetExtension(fileName).Length > 1 && /* File with an extension */
-                MIMETypesDictionary.ContainsKey(Path.GetExtension(fileName).Remove(0, 1)))
+            // If no extension or no match, return generic MIME type.
+            string result = "application/octet-stream";
+            
+            string extensionWithDot = Path.GetExtension(fileName);
+            if (extensionWithDot.Length > 1)  /* File with an extension */
             {
-                return MIMETypesDictionary[Path.GetExtension(fileName).Remove(0, 1)];
+                string extension = Path.GetExtension(fileName).Remove(0, 1);
+                if (extension2mime.ContainsKey(extension))
+                {
+                    result = extension2mime[extension];
+                }
             }
 
-            // If no match, return generic MIME type.
-            return "application/octet-stream";
+            Logger.Debug("Filename to MIME: " + fileName + "->" + result);
+            return result;
+        }
+
+
+        public static string GetExtension(string mimeType)
+        {
+            string result = null;
+            if (mimeType != null && mimeType.Length > 0
+                && mime2extension.ContainsKey(mimeType))
+            {
+                result = mime2extension[mimeType];
+            }
+            else
+            {
+                // If no such MIME type, return default extension.
+                result = "???";
+            }
+
+            Logger.Debug("MIME to extension: " + mimeType + "->" + result);
+            return result;
         }
 
 
@@ -159,6 +192,7 @@ namespace CmisSync.Lib.Cmis
                 {"cmx", "image/x-cmx"},
                 {"cod", "application/vnd.rim.cod"},
                 {"com", "application/x-msdownload"},
+                {"txt", "text/plain"},
                 {"conf", "text/plain"},
                 {"cpio", "application/x-cpio"},
                 {"cpp", "text/x-c"},
@@ -226,6 +260,7 @@ namespace CmisSync.Lib.Cmis
                 {"dvb", "video/vnd.dvb.file"},
                 {"dvi", "application/x-dvi"},
                 {"dwf", "model/vnd.dwf"},
+                {"dwg", "application/dwg"},
                 {"dwg", "image/vnd.dwg"},
                 {"dxf", "image/vnd.dxf"},
                 {"dxp", "application/vnd.spotfire.dxp"},
@@ -633,16 +668,17 @@ namespace CmisSync.Lib.Cmis
                 {"png", "image/png"},
                 {"pnm", "image/x-portable-anymap"},
                 {"portpkg", "application/vnd.macports.portpkg"},
+                {"ppt", "application/vnd.ms-powerpoint"},
                 {"pot", "application/vnd.ms-powerpoint"},
                 {"potm", "application/vnd.ms-powerpoint.template.macroenabled.12"},
                 {"potx", "application/vnd.openxmlformats-officedocument.presentationml.template"},
+                {"ppa", "application/vnd.ms-powerpoint"},
                 {"ppam", "application/vnd.ms-powerpoint.addin.macroenabled.12"},
                 {"ppd", "application/vnd.cups-ppd"},
                 {"ppm", "image/x-portable-pixmap"},
                 {"pps", "application/vnd.ms-powerpoint"},
                 {"ppsm", "application/vnd.ms-powerpoint.slideshow.macroenabled.12"},
                 {"ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow"},
-                {"ppt", "application/vnd.ms-powerpoint"},
                 {"pptm", "application/vnd.ms-powerpoint.presentation.macroenabled.12"},
                 {"pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
                 {"pqa", "application/vnd.palm"},
@@ -844,7 +880,6 @@ namespace CmisSync.Lib.Cmis
                 {"twds", "application/vnd.simtech-mindmapper"},
                 {"txd", "application/vnd.genomatix.tuxedo"},
                 {"txf", "application/vnd.mobius.txf"},
-                {"txt", "text/plain"},
                 {"u32", "application/x-authorware-bin"},
                 {"udeb", "application/x-debian-package"},
                 {"ufd", "application/vnd.ufdl"},
@@ -971,12 +1006,12 @@ namespace CmisSync.Lib.Cmis
                 {"xhtml", "application/xhtml+xml"},
                 {"xhvml", "application/xv+xml"},
                 {"xif", "image/vnd.xiff"},
+                {"xls", "application/vnd.ms-excel"},
                 {"xla", "application/vnd.ms-excel"},
                 {"xlam", "application/vnd.ms-excel.addin.macroenabled.12"},
                 {"xlc", "application/vnd.ms-excel"},
                 {"xlf", "application/x-xliff+xml"},
                 {"xlm", "application/vnd.ms-excel"},
-                {"xls", "application/vnd.ms-excel"},
                 {"xlsb", "application/vnd.ms-excel.sheet.binary.macroenabled.12"},
                 {"xlsm", "application/vnd.ms-excel.sheet.macroenabled.12"},
                 {"xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
@@ -1017,6 +1052,7 @@ namespace CmisSync.Lib.Cmis
                 {"z8", "application/x-zmachine"},
                 {"zaz", "application/vnd.zzazz.deck+xml"},
                 {"zip", "application/zip"},
+                {"zip", "application/x-zip-compressed"},
                 {"zir", "application/vnd.zul"},
                 {"zirz", "application/vnd.zul"},
                 {"zmm", "application/vnd.handheld-entertainment+xml"}
@@ -1024,7 +1060,17 @@ namespace CmisSync.Lib.Cmis
 
             for (int x = 0; x < types.GetLength(0); ++x)
             {
-                MIMETypesDictionary[types[x, 0]] = types[x, 1];
+                string extension = types[x, 0];
+                string mime = types[x, 1];
+                //MIMETypesDictionary.Add(types[x, 0], types[x, 1]);
+                if (!mime2extension.ContainsKey(mime))
+                {
+                    mime2extension.Add(mime, extension);
+                }
+                if (!extension2mime.ContainsKey(extension))
+                {
+                    extension2mime.Add(extension, mime);
+                }
             }
         }
 
@@ -1033,7 +1079,10 @@ namespace CmisSync.Lib.Cmis
         /// Dictionary of the most common filename extensions and associated MIME types.
         /// List generated by https://github.com/nicolas-raoul/Filename_Extension_To_MIME_Type
         /// </summary>
-        private static readonly Dictionary<string, string> MIMETypesDictionary =
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        //private static readonly BiDictionary<string, string> MIMETypesDictionary =
+        //    new BiDictionary<string, string>();// StringComparer.OrdinalIgnoreCase);
+
+        private static readonly Dictionary<string, string> mime2extension = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, string> extension2mime = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     }
 }
