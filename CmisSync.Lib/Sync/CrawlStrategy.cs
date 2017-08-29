@@ -486,6 +486,19 @@ namespace CmisSync.Lib.Sync
 
                 foreach (string filePath in files)
                 {
+                    // Remove renditions whose document does not exist anymore.
+                    if (filePath.Contains(SynchronizedFolder.RENDITION_IDENTIFIER))
+                    {
+                        string document = filePath.Substring(0, filePath.IndexOf(SynchronizedFolder.RENDITION_IDENTIFIER));
+                        if (!files.Contains(document))
+                        {
+                            string renditionPath = Path.Combine(localFolder, filePath);
+                            Logger.Info("The document " + document + " does not exist anymore, so delete its rendition " + renditionPath + " too.");
+                            File.Delete(renditionPath);
+                            continue;
+                        }
+                    }
+
                     CheckLocalFile(filePath, remoteFolder, remoteFiles);
                 }
             }
