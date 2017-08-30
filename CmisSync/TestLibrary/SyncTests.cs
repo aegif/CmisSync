@@ -17,7 +17,7 @@ using NUnit.Framework;
 /**
  * Unit Tests for CmisSync.
  * 
- * To use them, first create a JSON file containing the credentials/parameters to your CMIS server(s)
+ * To use them, first create a JSON file containing the credentials/parameters to a test folder on your CMIS server(s)
  * Put it in TestLibrary/test-servers.json and use this format:
 [
     [
@@ -39,6 +39,7 @@ using NUnit.Framework;
         "repo3"
     ]
 ]
+ * Warning: All previous content of these folders will be deleted by the tests.
  */
 namespace TestLibrary
 {
@@ -51,56 +52,9 @@ namespace TestLibrary
     using CmisSync.Auth;
     using CmisSync.Lib.Database;
 
-    /// <summary></summary>
     [TestFixture]
-    public class CmisSyncTests
+    public class SyncTests : AbstractSyncTests
     {
-        private readonly string CMISSYNCDIR = ConfigManager.CurrentConfig.FoldersPath;
-        private readonly int HeavyNumber = 10;
-        private readonly int HeavyFileSize = 1024;
-
-        public CmisSyncTests()
-        {
-        }
-
-        class TrustAlways : ICertificatePolicy
-        {
-            public bool CheckValidationResult(ServicePoint sp, X509Certificate certificate, WebRequest request, int error)
-            {
-                // For testing, always accept any certificate
-                return true;
-            }
-        }
-
-        [TestFixtureSetUp]
-        public void ClassInit()
-        {
-#if __MonoCS__
-            Environment.SetEnvironmentVariable("MONO_MANAGED_WATCHER", "enabled");
-#endif
-            ServicePointManager.CertificatePolicy = new TrustAlways();
-        }
-
-        [SetUp]
-        public void Init()
-        {
-            // Redirect log to be easily seen when running test.
-            log4net.Config.BasicConfigurator.Configure(new TraceAppender());
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            // System.Threading.Thread.Sleep(30 * 1000);
-            foreach(string file in Directory.GetFiles(CMISSYNCDIR)) {
-                if(file.EndsWith(".cmissync"))
-                {
-                    File.Delete(file);
-                } 
-            }
-        }
-
-        /// <summary></summary>
         public static IEnumerable<object[]> TestServers
         {
             get
@@ -118,7 +72,6 @@ namespace TestLibrary
             }
         }
 
-        /// <summary></summary>
         public static IEnumerable<object[]> TestServersFuzzy
         {
             get
@@ -131,239 +84,21 @@ namespace TestLibrary
                     path = "../CmisSync/TestLibrary/test-servers-fuzzy.json";
                 }
 
-                return JsonConvert.DeserializeObject<List<object[]>>(
-                    File.ReadAllText(path));
-            }
-        }
-
-        /// <summary></summary>
-        /// <param name="localDirectory"></param>
-        /// <param name="synchronizedFolder"></param>
-        private void Clean(string localDirectory, CmisRepo.SynchronizedFolder synchronizedFolder)
-        {
-
-            // Sync deletions to server.
-            synchronizedFolder.Sync();
-            CleanAll(localDirectory);
-            synchronizedFolder.Sync();
-
-            // Remove checkout folder.
-            Directory.Delete(localDirectory);
-        }
-
-        private void DeleteDirectoryIfExists(string path)
-        {
-            if (Directory.Exists(path))
-            {
-                Directory.Delete(path, true);
-            }
-        }
-
-        private void CleanDirectory(string path)
-        {
-            // Delete recursively.
-            DeleteDirectoryIfExists(path);
-
-            // Delete database.
-            string database = path + ".cmissync";
-            if (File.Exists(database))
-            {
                 try
                 {
-                    File.Delete(database);
+                    return JsonConvert.DeserializeObject<List<object[]>>(
+                       File.ReadAllText(path));
                 }
-                catch (IOException ex)
+                catch (Exception e)
                 {
-                    Console.WriteLine("Exception on testing side, ignoring " + database + ":" + ex);
-                }
-            }
-
-            // Prepare empty directory.
-            Directory.CreateDirectory(path);
-        }
-
-        private void CleanAll(string path)
-        {
-            DirectoryInfo directory = new DirectoryInfo(path);
-
-            try
-            {
-                // Delete all local files/folders.
-                foreach (FileInfo file in directory.GetFiles())
-                {
-                    if (file.Name.EndsWith(".sync"))
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        file.Delete();
-                    }
-                    catch (IOException ex)
-                    {
-                        Console.WriteLine("Exception on testing side, ignoring " + file.FullName + ":" + ex);
-                    }
-                }
-                foreach (DirectoryInfo dir in directory.GetDirectories())
-                {
-                    CleanAll(dir.FullName);
-
-                    try
-                    {
-                        dir.Delete();
-                    }
-                    catch (IOException ex)
-                    {
-                        Console.WriteLine("Exception on testing side, ignoring " + dir.FullName + ":" + ex);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception on testing side, ignoring " + ex);
-            }
-        }
-
-        private ISession CreateSession(RepoInfo repoInfo)
-        {
-            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
-            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
-            cmisParameters[SessionParameter.AtomPubUrl] = repoInfo.Address.ToString();
-            cmisParameters[SessionParameter.User] = repoInfo.User;
-            cmisParameters[SessionParameter.Password] = repoInfo.Password.ToString();
-            cmisParameters[SessionParameter.RepositoryId] = repoInfo.RepoID;
-            cmisParameters[SessionParameter.ConnectTimeout] = "-1";
-
-            return SessionFactory.NewInstance().CreateSession(cmisParameters);
-        }
-
-        public IDocument CreateDocument(IFolder folder, string name, string content)
-        {
-            Dictionary<string, object> properties = new Dictionary<string, object>();
-            properties.Add(PropertyIds.Name, name);
-            properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
-
-            ContentStream contentStream = new ContentStream();
-            contentStream.FileName = name;
-            contentStream.MimeType = MimeType.GetMIMEType(name);
-            contentStream.Length = content.Length;
-            contentStream.Stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-
-            return folder.CreateDocument(properties, contentStream, null);
-        }
-
-        public IFolder CreateFolder(IFolder folder, string name)
-        {
-            Dictionary<string, object> properties = new Dictionary<string, object>();
-            properties.Add(PropertyIds.Name, name);
-            properties.Add(PropertyIds.ObjectTypeId, "cmis:folder");
-
-            return folder.CreateFolder(properties);
-        }
-
-        public IDocument CopyDocument(IFolder folder, IDocument source, string name)
-        {
-            Dictionary<string, object> properties = new Dictionary<string, object>();
-            properties.Add(PropertyIds.Name, name);
-            properties.Add(PropertyIds.ObjectTypeId, "cmis:document");
-
-            return folder.CreateDocumentFromSource(source, properties, null);
-        }
-
-        public IDocument RenameDocument(IDocument source, string name)
-        {
-            Dictionary<string, object> properties = new Dictionary<string, object>();
-            properties.Add(PropertyIds.Name, name);
-
-            return (IDocument)source.UpdateProperties(properties);
-        }
-
-        public IFolder RenameFolder(IFolder source, string name)
-        {
-            Dictionary<string, object> properties = new Dictionary<string, object>();
-            properties.Add(PropertyIds.Name, name);
-
-            return (IFolder)source.UpdateProperties(properties);
-        }
-
-        public void CreateHeavyFolder(string root)
-        {
-            for (int iFolder = 0; iFolder < HeavyNumber; ++iFolder)
-            {
-                string folder = Path.Combine(root, iFolder.ToString());
-                Directory.CreateDirectory(folder);
-                for (int iFile = 0; iFile < HeavyNumber; ++iFile)
-                {
-                    string file = Path.Combine(folder, iFile.ToString());
-                    using (Stream stream = File.OpenWrite(file))
-                    {
-                        byte[] content = new byte[HeavyFileSize];
-                        for (int i = 0; i < HeavyFileSize; ++i)
-                        {
-                            content[i] = (byte)('A'+iFile%10);
-                        }
-                        stream.Write(content, 0, content.Length);
-                    }
+                    return Enumerable.Empty<object[]>();
                 }
             }
         }
 
-        public bool CheckHeavyFolder(string root)
+        public SyncTests()
         {
-            for (int iFolder = 0; iFolder < HeavyNumber; ++iFolder)
-            {
-                string folder = Path.Combine(root, iFolder.ToString());
-                if (!Directory.Exists(folder))
-                {
-                    return false;
-                }
-                for (int iFile = 0; iFile < HeavyNumber; ++iFile)
-                {
-                    string file = Path.Combine(folder, iFile.ToString());
-                    FileInfo info = new FileInfo(file);
-                    if(!info.Exists || info.Length != HeavyFileSize)
-                    {
-                        return false;
-                    }
-                    try
-                    {
-                        using (Stream stream = File.OpenRead(file))
-                        {
-                            byte[] content = new byte[HeavyFileSize];
-                            stream.Read(content, 0, HeavyFileSize);
-                            for (int i = 0; i < HeavyFileSize; ++i)
-                            {
-                                if (content[i] != (byte)('A' + iFile % 10))
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
         }
-
-        public void CreateHeavyFolderRemote(IFolder root)
-        {
-            for (int iFolder = 0; iFolder < HeavyNumber; ++iFolder)
-            {
-                IFolder folder = CreateFolder(root, iFolder.ToString());
-                for (int iFile = 0; iFile < HeavyNumber; ++iFile)
-                {
-                    string content = new string((char)('A' + iFile % 10), HeavyFileSize);
-                    CreateDocument(folder, iFile.ToString(), content);
-                }
-            }
-        }
-
-        // /////////////////////////// TESTS ///////////////////////////
 
         [Test, Category("Fast")]
         public void Placebo()
@@ -372,7 +107,7 @@ namespace TestLibrary
         }
 
         [Test, Category("Fast")]
-        public void TestCrypto()
+        public void Obfuscation()
         {
             String[] test_pws = { "", "test", "Whatever", "Something to try" };
             foreach (String pass in test_pws)
@@ -383,7 +118,7 @@ namespace TestLibrary
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void GetRepositories(string canonical_name, string localPath, string remoteFolderPath,
+        public void ConnectToTestServers(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             ServerCredentials credentials = new ServerCredentials()
@@ -401,18 +136,15 @@ namespace TestLibrary
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void Sync(string canonical_name, string localPath, string remoteFolderPath,
+        public void EmptySync(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
 
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
+                    canonicalName,
+                    ConfigFolder(),
                     remoteFolderPath,
                     url,
                     user,
@@ -423,161 +155,104 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                    repoInfo,
-                    cmis, activityListener))
-                {
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
 
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
-                    synchronizedFolder.Dispose();
-                }
-            }
+            synchronizedFolder.Sync();
+        }
+
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void ClientSideSmallFileAddition(string canonicalName, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            RepoInfo repoInfo = new RepoInfo(
+                    canonicalName,
+                    ConfigFolder(),
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    new DateTime(1900, 01, 01),
+                    true);
+
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
+
+            // Create random small file.
+            string filename = LocalFilesystemActivityGenerator.GetNextFileName();
+            string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
+            LocalFilesystemActivityGenerator.CreateRandomFile(
+                Path.Combine(cmisSyncDirectory, canonicalName), 3);
+
+            // Sync.
+            synchronizedFolder.Sync();
+
+            // Check that file is present server-side.
+            IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+            Assert.NotNull(doc);
+            Assert.AreEqual(filename, doc.ContentStreamFileName);
+            Assert.AreEqual(filename, doc.Name);
+        }
+
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void ClientSideBigFileAddition(string canonicalName, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            RepoInfo repoInfo = new RepoInfo(
+                    canonicalName,
+                    ConfigFolder(),
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    new DateTime(1900, 01, 01),
+                    true);
+
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
+            synchronizedFolder.resetFailedOperationsCounter();
+            synchronizedFolder.Sync();
+            Console.WriteLine("Synced to clean state.");
+
+            // Create random big file.
+            string filename = LocalFilesystemActivityGenerator.GetNextFileName();
+            string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
+            LocalFilesystemActivityGenerator.CreateRandomFile(localPath, 1000); // 1 MB ... no that big to not load servers too much.
+
+            // Sync.
+            synchronizedFolder.Sync();
+
+            // Check that file is present server-side.
+            IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+            Assert.NotNull(doc);
+            Assert.AreEqual(filename, doc.ContentStreamFileName);
+            Assert.AreEqual(filename, doc.Name);
         }
 
         /*[Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void ClientSideSmallFileAddition(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId)
-        {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
-
-            IActivityListener activityListener = new Mock<IActivityListener>().Object;
-            RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
-                    remoteFolderPath,
-                    url,
-                    user,
-                    password,
-                    repositoryId,
-                    5000,
-                    false,
-                    new DateTime(1900, 01, 01),
-                    true);
-
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
-                    repoInfo,
-                    cmis,
-                    activityListener))
-                using (Watcher watcher = new Watcher(localDirectory))
-                {
-                    synchronizedFolder.resetFailedOperationsCounter();
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
-
-                    // Create random small file.
-                    string filename = LocalFilesystemActivityGenerator.GetNextFileName();
-                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
-                    watcher.EnableRaisingEvents = true;
-                    LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
-                    WatcherTest.WaitWatcher((int)repoInfo.PollInterval, watcher, 1);
-                    // Sync again.
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder,delegate {
-                        try{
-                            IDocument d = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
-                            if(d!=null)
-                                return true;
-                        }catch(Exception)
-                        {return false;}
-                        return false;
-                    }));
-                    Console.WriteLine("Second sync done.");
-                    // Check that file is present server-side.
-                    IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
-                    Assert.NotNull(doc);
-                    Assert.AreEqual(filename, doc.ContentStreamFileName);
-                    Assert.AreEqual(filename, doc.Name);
-
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
-                }
-            }
-        }
-
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
-        public void ClientSideBigFileAddition(string canonical_name, string localPath, string remoteFolderPath,
+        public void ResumeBigFile(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
-
-            IActivityListener activityListener = new Mock<IActivityListener>().Object;
-            RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
-                    remoteFolderPath,
-                    url,
-                    user,
-                    password,
-                    repositoryId,
-                    5000,
-                    false,
-                    new DateTime(1900, 01, 01),
-                    true);
-
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder =
-                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
-                using (Watcher watcher = new Watcher(localDirectory))
-                {
-                    synchronizedFolder.resetFailedOperationsCounter();
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
-
-                    // Create random big file.
-                    string filename = LocalFilesystemActivityGenerator.GetNextFileName();
-                    string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
-                    watcher.EnableRaisingEvents = true;
-                    LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 1000); // 1 MB ... no that big to not load servers too much.
-                    WatcherTest.WaitWatcher((int)repoInfo.PollInterval, watcher, 1);
-                    // Sync again.
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder,delegate {
-                        try{
-                            IDocument d = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
-                            if(d!=null)
-                                return true;
-                        }catch(Exception)
-                        {return false;}
-                        return false;
-                    }));
-                    Console.WriteLine("Second sync done.");
-                    // Check that file is present server-side.
-                    IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
-                    Assert.NotNull(doc);
-                    Assert.AreEqual(filename, doc.ContentStreamFileName);
-                    Assert.AreEqual(filename, doc.Name);
-
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
-                }
-            }
-        }*/
-
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
-        [Ignore]
-        public void ResumeBigFile(string canonical_name, string localPath, string remoteFolderPath,
-            string url, string user, string password, string repositoryId)
-        {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            string canonical_name2 = canonical_name + ".BigFile";
-            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonicalName);
+            string canonicalName2 = canonicalName + ".BigFile";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonicalName2);
             CleanDirectory(localDirectory);
             CleanDirectory(localDirectory2);
             Console.WriteLine("Synced to clean state.");
@@ -591,7 +266,7 @@ namespace TestLibrary
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
+                    canonicalName,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -604,7 +279,7 @@ namespace TestLibrary
                     true);
             repoInfo.ChunkSize = 1024 * 1024;
             RepoInfo repoInfo2 = new RepoInfo(
-                    canonical_name2,
+                    canonicalName2,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -617,7 +292,7 @@ namespace TestLibrary
                     true);
             repoInfo2.ChunkSize = 1024 * 1024;
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false))
             using (CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
             {
@@ -644,7 +319,7 @@ namespace TestLibrary
             Console.WriteLine(String.Format("Upload big file size: {0}MB", fileSizeInMB));
             for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 100; ++retry)
             {
-                using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+                using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false))
                 using (CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
                 {
@@ -670,7 +345,7 @@ namespace TestLibrary
             Console.WriteLine(String.Format("Download big file size: {0}MB", fileSizeInMB));
             for (int currentFileSizeInMB = 0, retry = 0; currentFileSizeInMB < fileSizeInMB && retry < 100; ++retry)
             {
-                using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+                using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener, false))
                 using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
                     new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
                 {
@@ -696,7 +371,7 @@ namespace TestLibrary
             string checksum2 = Database.Checksum(file2);
             Assert.IsTrue(checksum1 == checksum2);
 
-            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener, false))
             using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
                     new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
             {
@@ -704,15 +379,15 @@ namespace TestLibrary
                 Console.WriteLine("Clean all.");
                 Clean(localDirectory2, synchronizedFolder2);
             }
-        }
+        }*/
 
         // Goal: Make sure that CmisSync works for uploading modified files.
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void SyncUploads(string canonical_name, string localPath, string remoteFolderPath,
+        /*[Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void SyncUploads(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-                        // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
+            // Prepare checkout directory.
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonicalName);
             CleanDirectory(localDirectory);
             Console.WriteLine("Synced to clean state.");
 
@@ -720,7 +395,7 @@ namespace TestLibrary
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
+                    canonicalName,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -732,20 +407,19 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false))
             {
                 using (CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
-                using (Watcher watcher = new Watcher(localDirectory))
                 {
                     // Clear local and remote folder
                     synchronizedFolder.Sync();
                     CleanAll(localDirectory);
-                    WatcherTest.WaitWatcher();
                     synchronizedFolder.Sync();
                     // Create a list of file names
                     List<string> files = new List<string>();
-                    for(int i = 1 ; i <= 10; i++) {
+                    for(int i = 1 ; i <= 10; i++)
+                    {
                         string filename =  String.Format("file{0}.bin", i.ToString());
                         files.Add(filename);
                     }
@@ -764,13 +438,19 @@ namespace TestLibrary
                         Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
                             foreach(string filename in files)
                             {
-                                try{
+                                try
+                                {
                                     string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
                                     IDocument d = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
-                                    if(d == null || d.ContentStreamLength != length)
+                                    if (d == null || d.ContentStreamLength != length)
+                                    {
                                         return false;
-                                }catch(Exception)
-                                {return false;}
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    return false;
+                                }
                             }
                             return true;
                         }));
@@ -779,46 +459,21 @@ namespace TestLibrary
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Creates or modifies binary file.
-        /// </summary>
-        /// <returns>
-        /// Path of the created or modified binary file
-        /// </returns>
-        /// <param name='file'>
-        /// File path
-        /// </param>
-        /// <param name='length'>
-        /// Length (default is 1024)
-        /// </param>
-        private string createOrModifyBinaryFile(string file, int length = 1024)
-        {
-            using (Stream stream = File.Open(file, FileMode.Create))
-            {
-                byte[] content = new byte[length];
-                stream.Write(content, 0, content.Length);
-            }
-            return file;
-        }
+        }*/
 
         // Goal: Make sure that CmisSync works for remote changes.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void SyncRemote(string canonical_name, string localPath, string remoteFolderPath,
+        public void FileAndFolderOperations(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
 
             // Mock.
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
+                    canonicalName,
+                    ConfigFolder(),
                     remoteFolderPath,
                     url,
                     user,
@@ -829,168 +484,133 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder =
-                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
-                using (Watcher watcher = new Watcher(localDirectory))
-                {
-                    synchronizedFolder.Sync();
-                    CleanAll(localDirectory);
-                    WatcherTest.WaitWatcher();
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
 
-                    ISession session = CreateSession(repoInfo);
-                    IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+            ISession session = CreateSession(repoInfo);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
 
-                    string name1 = "SyncChangeLog.1";
-                    string path1 = Path.Combine(localDirectory, name1);
+            string name1 = "test.1";
+            string path1 = Path.Combine(localPath, name1);
 
-                    string name2 = "SyncChangeLog.2";
-                    string path2 = Path.Combine(localDirectory, name2);
+            string name2 = "test.2";
+            string path2 = Path.Combine(localPath, name2);
 
-                    //  create document
-                    Console.WriteLine(" Remote create file");
-                    Assert.IsFalse(File.Exists(path1));
-                    IDocument doc1 = CreateDocument(folder, name1, "SyncChangeLog");
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return File.Exists(path1);
-                    }));
-                    Assert.IsTrue(File.Exists(path1));
+            Console.WriteLine("Create remote document");
+            Assert.IsFalse(File.Exists(path1));
+            IDocument doc1 = CreateDocument(remoteFolder, name1, "test");
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate {
+                return File.Exists(path1);
+            }));
 
-                    //TODO: AtomPub does not support copy
-                    ////  copy document
-                    //Console.WriteLine(" Remote copy file");
-                    //Assert.IsFalse(File.Exists(path2));
-                    //IDocument doc2 = CopyDocument(folder, doc1, name2);
-                    //synchronizedFolder.Sync();
-                    //Assert.IsTrue(File.Exists(path2));
+            Console.WriteLine("Rename remote document");
+            IDocument doc2 = RenameDocument(doc1, name2);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate {
+                return !File.Exists(path1) && File.Exists(path2);
+            }));
+            
+            Console.WriteLine("Create remote folder");
+            IFolder remoteSubFolder = CreateFolder(remoteFolder, name1);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate {
+                return Directory.Exists(path1);
+            }));
 
-                    //  rename document
-                    Console.WriteLine(" Remote rename file");
-                    Assert.IsTrue(File.Exists(path1));
-                    Assert.IsFalse(File.Exists(path2));
-                    IDocument doc2 = RenameDocument(doc1, name2);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return !File.Exists(path1) && File.Exists(path2);
-                    }));
-                    Assert.IsFalse(File.Exists(path1));
-                    Assert.IsTrue(File.Exists(path2));
+            Console.WriteLine("Move remote document");
+            string filename = Path.Combine(path1, name2);
+            doc2.Move(remoteFolder, remoteSubFolder);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate {
+                return File.Exists(filename);
+            }));
 
-                    //  create folder
-                    Console.WriteLine(" Remote create folder");
-                    Assert.IsFalse(Directory.Exists(path1));
-                    IFolder folder1 = CreateFolder(folder, name1);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return Directory.Exists(path1);
-                    }));
-                    Assert.IsTrue(Directory.Exists(path1));
+            Console.WriteLine("Delete remote document");
+            doc2.DeleteAllVersions();
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate {
+                return !File.Exists(filename);
+            }));
 
-                    //  move document
-                    Console.WriteLine(" Remote move file");
-                    string filename = Path.Combine(path1, name2);
-                    Assert.IsFalse(File.Exists(filename));
-                    doc2.Move(folder, folder1);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return File.Exists(filename);
-                    }));
+            //  rename folder
+            Console.WriteLine(" Remote rename folder");
+            Assert.IsTrue(Directory.Exists(path1));
+            Assert.IsFalse(Directory.Exists(path2));
+            IFolder folder2 = RenameFolder(remoteSubFolder, name2);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
+                return !Directory.Exists(path1) && Directory.Exists(path2);
+            }));
+            Assert.IsFalse(Directory.Exists(path1));
+            Assert.IsTrue(Directory.Exists(path2));
 
-                    //  delete document
-                    Console.WriteLine(" Remote delete file");
-                    Assert.IsTrue(File.Exists(filename));
-                    doc2.DeleteAllVersions();
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return !File.Exists(filename);
-                    }));
-                    Assert.IsFalse(File.Exists(filename));
+            //  move folder
+            Console.WriteLine(" Remote move folder");
+            Assert.IsFalse(Directory.Exists(path1));
+            remoteSubFolder = CreateFolder(remoteFolder, name1);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
+                return Directory.Exists(path1) && !Directory.Exists(Path.Combine(path2, name1));
+            }));
+            Assert.IsTrue(Directory.Exists(path1));
+            Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1)));
+            remoteSubFolder.Move(remoteFolder, folder2);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
+                return !Directory.Exists(path1) && Directory.Exists(Path.Combine(path2, name1));
+            }));
+            Assert.IsFalse(Directory.Exists(path1));
+            Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1)));
 
-                    //  rename folder
-                    Console.WriteLine(" Remote rename folder");
-                    Assert.IsTrue(Directory.Exists(path1));
-                    Assert.IsFalse(Directory.Exists(path2));
-                    IFolder folder2 = RenameFolder(folder1, name2);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return !Directory.Exists(path1) && Directory.Exists(path2);
-                    }));
-                    Assert.IsFalse(Directory.Exists(path1));
-                    Assert.IsTrue(Directory.Exists(path2));
+            //  move folder with sub folder and sub file
+            Console.WriteLine(" Remote move folder with subfolder and subfile");
+            Assert.IsFalse(File.Exists(Path.Combine(path2, name1, name1)));
+            Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1, name2)));
+            CreateDocument(remoteSubFolder, name1, "test");
+            CreateFolder(remoteSubFolder, name2);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
+                return File.Exists(Path.Combine(path2, name1, name1)) && Directory.Exists(Path.Combine(path2, name1, name2));
+            }));
+            Assert.IsTrue(File.Exists(Path.Combine(path2, name1, name1)));
+            Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1, name2)));
+            remoteSubFolder.Move(folder2, remoteFolder);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
+                return File.Exists(Path.Combine(path1, name1)) && Directory.Exists(Path.Combine(path1, name2));
+            }));
+            Assert.IsTrue(File.Exists(Path.Combine(path1, name1)));
+            Assert.IsTrue(Directory.Exists(Path.Combine(path1, name2)));
 
-                    //  move folder
-                    Console.WriteLine(" Remote move folder");
-                    Assert.IsFalse(Directory.Exists(path1));
-                    folder1 = CreateFolder(folder, name1);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return Directory.Exists(path1) && !Directory.Exists(Path.Combine(path2, name1));
-                    }));
-                    Assert.IsTrue(Directory.Exists(path1));
-                    Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1)));
-                    folder1.Move(folder, folder2);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return !Directory.Exists(path1) && Directory.Exists(Path.Combine(path2, name1));
-                    }));
-                    Assert.IsFalse(Directory.Exists(path1));
-                    Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1)));
-
-                    //  move folder with sub folder and sub file
-                    Console.WriteLine(" Remote move folder with subfolder and subfile");
-                    Assert.IsFalse(File.Exists(Path.Combine(path2, name1, name1)));
-                    Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1, name2)));
-                    CreateDocument(folder1, name1, "SyncChangeLog");
-                    CreateFolder(folder1, name2);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return File.Exists(Path.Combine(path2, name1, name1)) && Directory.Exists(Path.Combine(path2, name1, name2));
-                    }));
-                    Assert.IsTrue(File.Exists(Path.Combine(path2, name1, name1)));
-                    Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1, name2)));
-                    folder1.Move(folder2, folder);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return File.Exists(Path.Combine(path1, name1)) && Directory.Exists(Path.Combine(path1, name2));
-                    }));
-                    Assert.IsTrue(File.Exists(Path.Combine(path1, name1)));
-                    Assert.IsTrue(Directory.Exists(Path.Combine(path1, name2)));
-
-                    //  delete folder tree
-                    Console.WriteLine(" Remote delete folder tree");
-                    Assert.IsTrue(Directory.Exists(path1));
-                    folder1.DeleteTree(true, null, true);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return !Directory.Exists(path1);
-                    }, 20));
-                    Assert.IsFalse(Directory.Exists(path1));
-                    Assert.IsTrue(Directory.Exists(path2));
-                    folder2.DeleteTree(true, null, true);
-                    WaitUntilSyncIsDone(synchronizedFolder, delegate {
-                        return !Directory.Exists(path2);
-                    });
-                    if(Directory.Exists(path2))
-                        synchronizedFolder.ForceFullSync();
-                    Assert.IsFalse(Directory.Exists(path2));
-
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
-                }
-            }
+            //  delete folder tree
+            Console.WriteLine(" Remote delete folder tree");
+            Assert.IsTrue(Directory.Exists(path1));
+            remoteSubFolder.DeleteTree(true, null, true);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
+                return !Directory.Exists(path1);
+            }, 20));
+            Assert.IsFalse(Directory.Exists(path1));
+            Assert.IsTrue(Directory.Exists(path2));
+            folder2.DeleteTree(true, null, true);
+            SyncAndWaitUntilCondition(synchronizedFolder, delegate {
+                return !Directory.Exists(path2);
+            });
+            if(Directory.Exists(path2))
+                synchronizedFolder.ForceFullSync();
+            Assert.IsFalse(Directory.Exists(path2));
         }
 
         // Goal: Make sure that CmisSync works for remote heavy folder changes.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
-        public void SyncRemoteHeavyFolder(string canonical_name, string localPath, string remoteFolderPath,
+        public void HeavyFileAndFolderOperations(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
 
             // Mock.
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
+                    canonicalName,
+                    ConfigFolder(),
                     remoteFolderPath,
                     url,
                     user,
@@ -1001,87 +621,72 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+            new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
+            ISession session = CreateSession(repoInfo);
+            IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+
+            string name1 = "test.1";
+            string path1 = Path.Combine(localPath, name1);
+
+            string name2 = "test.2";
+            string path2 = Path.Combine(localPath, name2);
+
+            //  create heavy folder
+            Console.WriteLine(" Remote create heavy folder");
+            Assert.IsFalse(Directory.Exists(path1));
+            IFolder folder1 = CreateFolder(folder, name1);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
             {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder =
-                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
-                using (Watcher watcher = new Watcher(localDirectory))
-                {
-                    synchronizedFolder.Sync();
-                    CleanAll(localDirectory);
-                    WatcherTest.WaitWatcher();
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
+                return Directory.Exists(path1);
+            }));
+            CreateHeavyFolderRemote(folder1);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return CheckHeavyFolder(path1);
+            }));
 
-                    ISession session = CreateSession(repoInfo);
-                    IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+            //  rename heavy folder
+            Console.WriteLine(" Remote rename heavy folder");
+            IFolder folder2 = RenameFolder(folder1, name2);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return CheckHeavyFolder(path2);
+            }));
 
-                    string name1 = "SyncChangeLog.1";
-                    string path1 = Path.Combine(localDirectory, name1);
+            //  move heavy folder
+            Console.WriteLine(" Remote move heavy folder");
+            folder1 = CreateFolder(folder, name1);
+            folder2.Move(folder, folder1);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return CheckHeavyFolder(Path.Combine(path1,name2));
+            }));
 
-                    string name2 = "SyncChangeLog.2";
-                    string path2 = Path.Combine(localDirectory, name2);
-
-                    //  create heavy folder
-                    Console.WriteLine(" Remote create heavy folder");
-                    Assert.IsFalse(Directory.Exists(path1));
-                    IFolder folder1 = CreateFolder(folder, name1);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
-                    {
-                        return Directory.Exists(path1);
-                    }));
-                    Assert.IsTrue(Directory.Exists(path1));
-                    CreateHeavyFolderRemote(folder1);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
-                    {
-                        return CheckHeavyFolder(path1);
-                    }));
-                    Assert.IsTrue(CheckHeavyFolder(path1));
-
-                    //  rename heavy folder
-                    Console.WriteLine(" Remote rename heavy folder");
-                    IFolder folder2 = RenameFolder(folder1, name2);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
-                    {
-                        return CheckHeavyFolder(path2);
-                    }));
-                    Assert.IsTrue(CheckHeavyFolder(path2));
-
-                    //  move heavy folder
-                    Console.WriteLine(" Remote move heavy folder");
-                    folder1 = CreateFolder(folder, name1);
-                    folder2.Move(folder, folder1);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
-                    {
-                        return CheckHeavyFolder(Path.Combine(path1,name2));
-                    }));
-                    Assert.IsTrue(CheckHeavyFolder(Path.Combine(path1, name2)));
-
-                    //  delete heavy folder
-                    Console.WriteLine(" Remote delete heavy folder");
-                    folder1.DeleteTree(true, null, true);
-                    Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
-                    {
-                        return !Directory.Exists(path1);
-                    }));
-                    Assert.IsFalse(Directory.Exists(path1));
-
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
-                }
-            }
+            //  delete heavy folder
+            Console.WriteLine(" Remote delete heavy folder");
+            folder1.DeleteTree(true, null, true);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return !Directory.Exists(path1);
+            }));
         }
         
         // Goal: Make sure that CmisSync works for equality.
         /*[Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void SyncRenamedFiles(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncRenamedFiles(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            string canonical_name2 = canonical_name + ".equality";
-            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonicalName);
+            string canonicalName2 = canonicalName + ".equality";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonicalName2);
             CleanDirectory(localDirectory);
             CleanDirectory(localDirectory2);
             Console.WriteLine("Synced to clean state.");
@@ -1090,7 +695,7 @@ namespace TestLibrary
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
+                    canonicalName,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -1102,7 +707,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
             RepoInfo repoInfo2 = new RepoInfo(
-                    canonical_name2,
+                    canonicalName2,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -1194,13 +799,13 @@ namespace TestLibrary
 
         // Goal: Make sure that CmisSync works for equality.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void SyncEquality(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncEquality(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            string canonical_name2 = canonical_name + ".equality";
-            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonicalName);
+            string canonicalName2 = canonicalName + ".equality";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonicalName2);
             CleanDirectory(localDirectory);
             CleanDirectory(localDirectory2);
             Console.WriteLine("Synced to clean state.");
@@ -1209,7 +814,7 @@ namespace TestLibrary
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
+                    canonicalName,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -1221,7 +826,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
             RepoInfo repoInfo2 = new RepoInfo(
-                    canonical_name2,
+                    canonicalName2,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -1472,13 +1077,13 @@ namespace TestLibrary
 
         // Goal: Make sure that CmisSync works for empty files without creating conflict files.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void SyncEmptyFileEquality(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncEmptyFileEquality(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            string canonical_name2 = canonical_name + ".equality";
-            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
+            string localDirectory = Path.Combine(CMISSYNCDIR, canonicalName);
+            string canonicalName2 = canonicalName + ".equality";
+            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonicalName2);
             CleanDirectory(localDirectory);
             CleanDirectory(localDirectory2);
             Console.WriteLine("Synced to clean state.");
@@ -1487,7 +1092,7 @@ namespace TestLibrary
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
+                    canonicalName,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -1499,7 +1104,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
             RepoInfo repoInfo2 = new RepoInfo(
-                    canonical_name2,
+                    canonicalName2,
                     CMISSYNCDIR,
                     remoteFolderPath,
                     url,
@@ -1551,25 +1156,25 @@ namespace TestLibrary
         }*/
 
         // Goal: Make sure that CmisSync works for heavy folder.
-        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        /*[Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
-        public void SyncEqualityHeavyFolder(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncEqualityHeavyFolder(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
             // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            string canonical_name2 = canonical_name + ".equality";
-            string localDirectory2 = Path.Combine(CMISSYNCDIR, canonical_name2);
-            CleanDirectory(localDirectory);
-            CleanDirectory(localDirectory2);
+            string localDirectory = Path.Combine(cmisSyncDirectory, canonicalName);
+            string canonicalName2 = canonicalName + ".equality";
+            string localDirectory2 = Path.Combine(cmisSyncDirectory, canonicalName2);
+            CleanLocalDirectory(localDirectory2);
             Console.WriteLine("Synced to clean state.");
 
             // Mock.
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
+                    canonicalName,
+                    cmisSyncDirectory,
                     remoteFolderPath,
                     url,
                     user,
@@ -1580,8 +1185,8 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
             RepoInfo repoInfo2 = new RepoInfo(
-                    canonical_name2,
-                    CMISSYNCDIR,
+                    canonicalName2,
+                    cmisSyncDirectory,
                     remoteFolderPath,
                     url,
                     user,
@@ -1591,10 +1196,10 @@ namespace TestLibrary
                     false,
                     DateTime.MinValue,
                     true);
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
+            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener,false))
             using (CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
-            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener))
+            using (CmisRepo cmis2 = new CmisRepo(repoInfo2, activityListener, false))
             using (CmisRepo.SynchronizedFolder synchronizedFolder2 =
                     new CmisRepo.SynchronizedFolder(repoInfo2, cmis2, activityListener))
             using (Watcher watcher = new Watcher(localDirectory))
@@ -1621,7 +1226,7 @@ namespace TestLibrary
                 Directory.CreateDirectory(oldfolder);
                 CreateHeavyFolder(oldfolder);
                 Assert.IsTrue(CheckHeavyFolder(oldfolder));
-                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
+                Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder2, delegate
                 {
                     synchronizedFolder.Sync();
                     return CheckHeavyFolder(oldfolder2);
@@ -1634,7 +1239,7 @@ namespace TestLibrary
                 string newfolder2 = Path.Combine(localDirectory2, newname);
                 Directory.Move(oldfolder, newfolder);
                 Assert.IsTrue(CheckHeavyFolder(newfolder));
-                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
+                Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder2, delegate
                 {
                     synchronizedFolder.Sync();
                     return CheckHeavyFolder(newfolder2);
@@ -1648,7 +1253,7 @@ namespace TestLibrary
                 newfolder = Path.Combine(oldfolder, newname);
                 newfolder2 = Path.Combine(oldfolder2, newname);
                 Assert.IsTrue(CheckHeavyFolder(newfolder));
-                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
+                Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder2, delegate
                 {
                     synchronizedFolder.Sync();
                     return CheckHeavyFolder(newfolder2);
@@ -1658,7 +1263,7 @@ namespace TestLibrary
                 //  test heavy folder delete
                 Console.WriteLine(" Local delete heavy folder");
                 Directory.Delete(newfolder, true);
-                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder2, delegate
+                Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder2, delegate
                 {
                     synchronizedFolder.Sync();
                     return !Directory.Exists(newfolder2);
@@ -1670,25 +1275,22 @@ namespace TestLibrary
                 Clean(localDirectory, synchronizedFolder);
                 Clean(localDirectory2, synchronizedFolder2);
             }
-        }
+        }*/
 
         // Goal: Make sure that CmisSync works for concurrent heavy folder.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
-        public void SyncConcurrentHeavyFolder(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncConcurrentHeavyFolder(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
 
             // Mock.
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
+                    canonicalName,
+                    ConfigFolder(),
                     remoteFolderPath,
                     url,
                     user,
@@ -1699,104 +1301,86 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            using (CmisRepo.SynchronizedFolder synchronizedFolder =
-                    new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener))
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                    new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
+            //  Invoke the backend synchronize for concurrent
+            cmisRepo.Initialize();
+
+            ISession session = CreateSession(repoInfo);
+            IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+
+            string name1 = "SyncConcurrent.1";
+            string path1 = Path.Combine(localPath, name1);
+            string name2 = "SyncConcurrent.2";
+            string path2 = Path.Combine(localPath, name2);
+
+            //  create heavy folder in concurrent
+            IFolder folder1 = CreateFolder(folder, name1);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
             {
-                synchronizedFolder.resetFailedOperationsCounter();
-                synchronizedFolder.Sync();
-                CleanAll(localDirectory);
-                WatcherTest.WaitWatcher();
-                synchronizedFolder.Sync();
-                Console.WriteLine("Synced to clean state.");
+                return Directory.Exists(path1);
+            }));
+            CreateHeavyFolderRemote(folder1);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return CheckHeavyFolder(path1);
+            }));
 
-                //  Invoke the backend synchronize for concurrent
-                cmis.Initialize();
+            //  rename heavy folder in concurrent 
+            Console.WriteLine(" Concurrent rename heavy folder");
+            IFolder folder2 = RenameFolder(folder1, name2);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return CheckHeavyFolder(path2);
+            }));
 
-                ISession session = CreateSession(repoInfo);
-                IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+            //  move heavy folder in concurrent
+            Console.WriteLine(" Concurrent move heavy folder");
+            folder1 = CreateFolder(folder, name1);
+            folder2.Move(folder, folder1);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return CheckHeavyFolder(Path.Combine(path1, name2));
+            }));
 
-                string name1 = "SyncConcurrent.1";
-                string path1 = Path.Combine(localDirectory, name1);
-                string name2 = "SyncConcurrent.2";
-                string path2 = Path.Combine(localDirectory, name2);
+            //  delete heavy folder in concurrent
+            Console.WriteLine(" Remote delete heavy folder");
+            folder1.DeleteTree(true, null, true);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return !Directory.Exists(path1);
+            }));
 
-                //  create heavy folder in concurrent
-                Console.WriteLine(" Concurrent create heavy folder");
-                Assert.IsFalse(Directory.Exists(path1));
-                IFolder folder1 = CreateFolder(folder, name1);
-                Assert.IsTrue(WaitUntilDone(delegate
-                {
-                    return Directory.Exists(path1);
-                }));
-                Assert.IsTrue(Directory.Exists(path1));
-                CreateHeavyFolderRemote(folder1);
-                Assert.IsTrue(WaitUntilSyncIsDone(synchronizedFolder, delegate
-                {
-                    return CheckHeavyFolder(path1);
-                }));
-                Assert.IsTrue(CheckHeavyFolder(path1));
-
-                //  rename heavy folder in concurrent 
-                Console.WriteLine(" Concurrent rename heavy folder");
-                IFolder folder2 = RenameFolder(folder1, name2);
-                Assert.IsTrue(WaitUntilDone(delegate
-                {
-                    return CheckHeavyFolder(path2);
-                }));
-                Assert.IsTrue(CheckHeavyFolder(path2));
-
-                //  move heavy folder in concurrent
-                Console.WriteLine(" Concurrent move heavy folder");
-                folder1 = CreateFolder(folder, name1);
-                folder2.Move(folder, folder1);
-                Assert.IsTrue(WaitUntilDone(delegate
-                {
-                    return CheckHeavyFolder(Path.Combine(path1, name2));
-                }));
-                Assert.IsTrue(CheckHeavyFolder(Path.Combine(path1, name2)));
-
-                //  delete heavy folder in concurrent
-                Console.WriteLine(" Remote delete heavy folder");
-                folder1.DeleteTree(true, null, true);
-                Assert.IsTrue(WaitUntilDone(delegate
-                {
-                    return !Directory.Exists(path1);
-                }));
-                Assert.IsFalse(Directory.Exists(path1));
-
-                //  create and delete heavy folder in concurrent
-                Console.WriteLine(" Remote create and delete heavy folder");
-                cmis.Disable();
-                folder1 = CreateFolder(folder, name1);
-                CreateHeavyFolderRemote(folder1);
-                cmis.Enable();
-                folder1.DeleteTree(true, null, true);
-                Assert.IsTrue(WaitUntilDone(delegate
-                {
-                    return !Directory.Exists(path1);
-                }));
-                Assert.IsFalse(Directory.Exists(path1));
-
-                // Clean.
-                Console.WriteLine("Clean all.");
-                Clean(localDirectory, synchronizedFolder);
-            }
+            //  create and delete heavy folder in concurrent
+            Console.WriteLine(" Remote create and delete heavy folder");
+            cmisRepo.Disable();
+            folder1 = CreateFolder(folder, name1);
+            CreateHeavyFolderRemote(folder1);
+            cmisRepo.Enable();
+            folder1.DeleteTree(true, null, true);
+            synchronizedFolder.Sync();
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return !Directory.Exists(path1);
+            }));
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void ClientSideDirectoryAndSmallFilesAddition(string canonical_name, string localPath, string remoteFolderPath,
+        public void ClientSideDirectoryAndSmallFilesAddition(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
 
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
+                    canonicalName,
+                    ConfigFolder(),
                     remoteFolderPath,
                     url,
                     user,
@@ -1807,44 +1391,29 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    cmis, activityListener))
-                {
-                    synchronizedFolder.resetFailedOperationsCounter();
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
+                    cmisRepo, activityListener);
 
-                    // Create directory and small files.
-                    LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
+            // Create directory and small files.
+            LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localPath);
 
-                    // Sync again.
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Second sync done.");
-
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
-                }
-            }
+            // Sync.
+            synchronizedFolder.Sync();
         }
 
         // Goal: Make sure that CmisSync does not crash when syncing while modifying locally.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void SyncWhileModifyingFiles(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncWhileModifyingFiles(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
 
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
+                    canonicalName,
+                    ConfigFolder(),
                     remoteFolderPath,
                     url,
                     user,
@@ -1855,74 +1424,60 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
-                    cmis, activityListener))
+                    cmisRepo, activityListener);
+
+            // Sync a few times in a different thread.
+            bool syncing = true;
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
                 {
-                    synchronizedFolder.resetFailedOperationsCounter();
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
-
-                    // Sync a few times in a different thread.
-                    bool syncing = true;
-                    BackgroundWorker bw = new BackgroundWorker();
-                    bw.DoWork += new DoWorkEventHandler(
-                        delegate(Object o, DoWorkEventArgs args)
-                        {
-                            for (int i = 0; i < 10; i++)
-                            {
-                                Console.WriteLine("Sync F" + i.ToString());
-                                synchronizedFolder.Sync();
-                            }
-                        }
-                    );
-                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                        delegate(object o, RunWorkerCompletedEventArgs args)
-                        {
-                            syncing = false;
-                        }
-                    );
-                    bw.RunWorkerAsync();
-
-                    // Keep creating/removing a file as long as sync is going on.
-                    int count = 10000;
-                    while (syncing)
+                    for (int i = 0; i < 10; i++)
                     {
-                        count--;
-                        if (count <= 0)
-                        {
-                            System.Threading.Thread.Sleep(1000);
-                        }
-                        //Console.WriteLine("Create/remove " + LocalFilesystemActivityGenerator.id);
-                        LocalFilesystemActivityGenerator.CreateRandomFile(localDirectory, 3);
-                        CleanAll(localDirectory);
+                        Console.WriteLine("Sync F" + i.ToString());
+                        synchronizedFolder.Sync();
                     }
-
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
                 }
+            );
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                delegate(object o, RunWorkerCompletedEventArgs args)
+                {
+                    syncing = false;
+                }
+            );
+            bw.RunWorkerAsync();
+
+            // Keep creating/removing a file as long as sync is going on.
+            int count = 10000;
+            while (syncing)
+            {
+                count--;
+                if (count <= 0)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+                //Console.WriteLine("Create/remove " + LocalFilesystemActivityGenerator.id);
+                LocalFilesystemActivityGenerator.CreateRandomFile(localPath, 3);
+                Directory.Delete(localPath);
             }
         }
 
         // Goal: Make sure that CmisSync does not crash when syncing while adding/removing files/folders locally.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void SyncWhileModifyingFolders(string canonical_name, string localPath, string remoteFolderPath,
+        public void SyncWhileModifyingFolders(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Prepare checkout directory.
-            string localDirectory = Path.Combine(CMISSYNCDIR, canonical_name);
-            CleanDirectory(localDirectory);
-            Console.WriteLine("Synced to clean state.");
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
 
             // Mock.
             IActivityListener activityListener = new Mock<IActivityListener>().Object;
             // Sync.
             RepoInfo repoInfo = new RepoInfo(
-                    canonical_name,
-                    CMISSYNCDIR,
+                    canonicalName,
+                    ConfigFolder(),
                     remoteFolderPath,
                     url,
                     user,
@@ -1933,63 +1488,55 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            using (CmisRepo cmis = new CmisRepo(repoInfo, activityListener))
-            {
-                using (CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
                     cmis,
-                    new Mock<IActivityListener>().Object))
+                    new Mock<IActivityListener>().Object);
+            synchronizedFolder.resetFailedOperationsCounter();
+            synchronizedFolder.Sync();
+            Console.WriteLine("Synced to clean state.");
+
+            // Sync a few times in a different thread.
+            bool syncing = true;
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += new DoWorkEventHandler(
+                delegate(Object o, DoWorkEventArgs args)
                 {
-                    synchronizedFolder.resetFailedOperationsCounter();
-                    synchronizedFolder.Sync();
-                    Console.WriteLine("Synced to clean state.");
-
-                    // Sync a few times in a different thread.
-                    bool syncing = true;
-                    BackgroundWorker bw = new BackgroundWorker();
-                    bw.DoWork += new DoWorkEventHandler(
-                        delegate(Object o, DoWorkEventArgs args)
-                        {
-                            for (int i = 0; i < 10; i++)
-                            {
-                                Console.WriteLine("Sync D" + i.ToString());
-                                synchronizedFolder.Sync();
-                            }
-                        }
-                    );
-                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                        delegate(object o, RunWorkerCompletedEventArgs args)
-                        {
-                            syncing = false;
-                        }
-                    );
-                    bw.RunWorkerAsync();
-
-                    // Keep creating/removing a file as long as sync is going on.
-                    int count = 1000;
-                    while (syncing)
+                    for (int i = 0; i < 10; i++)
                     {
-                        count--;
-                        if (count <= 0)
-                        {
-                            System.Threading.Thread.Sleep(1000);
-                        }
-                        //Console.WriteLine("Create/remove.");
-                        LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localDirectory);
-                        CleanAll(localDirectory);
+                        Console.WriteLine("Sync D" + i.ToString());
+                        synchronizedFolder.Sync();
                     }
-
-                    // Clean.
-                    Console.WriteLine("Clean all.");
-                    Clean(localDirectory, synchronizedFolder);
                 }
+            );
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                delegate(object o, RunWorkerCompletedEventArgs args)
+                {
+                    syncing = false;
+                }
+            );
+            bw.RunWorkerAsync();
+
+            // Keep creating/removing a file as long as sync is going on.
+            int count = 1000;
+            while (syncing)
+            {
+                count--;
+                if (count <= 0)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+                //Console.WriteLine("Create/remove.");
+                LocalFilesystemActivityGenerator.CreateDirectoriesAndFiles(localPath);
+                Directory.Delete(localPath);
             }
         }
 
         // Write a file and immediately check whether it has been created.
         // Should help to find out whether CMIS servers are synchronous or not.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void WriteThenRead(string canonical_name, string localPath, string remoteFolderPath,
+        public void WriteThenRead(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             string fileName = "test.txt";
@@ -2046,7 +1593,7 @@ namespace TestLibrary
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         [Ignore]
-        public void DotCmisToIBMConnections(string canonical_name, string localPath, string remoteFolderPath,
+        public void DotCmisToIBMConnections(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             var cmisParameters = new Dictionary<string, string>();
@@ -2092,75 +1639,6 @@ namespace TestLibrary
             };
             Tuple<CmisServer, Exception> server = CmisUtils.GetRepositoriesFuzzy(credentials);
             Assert.NotNull(server.Item1);
-        }
-
-        /// <summary>
-        /// Waits the until sync is done.
-        /// </summary>
-        /// <returns>
-        /// True, if checkStop has been true, otherwise false.
-        /// </returns>
-        /// <param name='synchronizedFolder'>
-        /// Synchronized folder, which should be used for sync and waiting.
-        /// </param>
-        /// <param name='checkStop'>
-        /// If returns <c>true</c> wait returns true, otherwise a retry will be executed until reaching maxTries.
-        /// </param>
-        /// <param name='maxTries'>
-        /// Number of retries, until false is returned, if checkStop could not be true.
-        /// </param>
-        /// <param name='pollInterval'>
-        /// Sleep interval duration in miliseconds between synchronization calls.
-        /// </param>
-        public static bool WaitUntilSyncIsDone(CmisRepo.SynchronizedFolder synchronizedFolder, Func<bool> checkStop, int maxTries = 4,  int pollInterval = 5000)
-        {
-            int i = 0;
-            while(i < maxTries)
-            {
-                try{
-                    synchronizedFolder.Sync();
-                }catch(DotCMIS.Exceptions.CmisRuntimeException e){
-                    Console.WriteLine("{0} Exception caught and swallowed, retry.", e);
-                    System.Threading.Thread.Sleep(pollInterval);
-                    continue;
-                }
-                if(checkStop())
-                    return true;
-                Console.WriteLine(String.Format("Retry Sync in {0}ms", pollInterval));
-                System.Threading.Thread.Sleep(pollInterval);
-                i++;
-            }
-            Console.WriteLine("Sync call was not successful");
-            return false;
-        }
-
-        /// <summary>
-        /// Waits until checkStop is true or waiting duration is reached.
-        /// </summary>
-        /// <returns>
-        /// True if checkStop is true, otherwise waits for pollInterval miliseconds and checks again until the wait threshold is reached.
-        /// </returns>
-        /// <param name='checkStop'>
-        /// Checks if the condition, which is waited for is <c>true</c>.
-        /// </param>
-        /// <param name='wait'>
-        /// Waiting threshold. If this is reached, <c>false</c> will be returned.
-        /// </param>
-        /// <param name='pollInterval'>
-        /// Sleep duration between two condition validations by calling checkStop.
-        /// </param>
-        public static bool WaitUntilDone(Func<bool> checkStop, int wait = 300000, int pollInterval = 1000)
-        {
-            while (wait > 0)
-            {
-                System.Threading.Thread.Sleep(pollInterval);
-                wait -= pollInterval;
-                if (checkStop())
-                    return true;
-                Console.WriteLine(String.Format("Retry Wait in {0}ms", pollInterval));
-            }
-            Console.WriteLine("Wait was not successful");
-            return false;
         }
     }
 }

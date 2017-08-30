@@ -384,7 +384,8 @@ namespace CmisSync.Lib
         {
             get
             {
-                return LocalRelativePath.Substring(LocalRelativePath.LastIndexOf(Path.DirectorySeparatorChar) + 1); // 1 for the DirectorySeparatorChar
+                int separatorIndex = LocalRelativePath.LastIndexOf(Path.DirectorySeparatorChar);
+                return LocalRelativePath.Substring(separatorIndex + 1); // +1 for the DirectorySeparatorChar
             }
         }
 

@@ -248,7 +248,7 @@ namespace CmisSync
         private void AddRepository(RepoInfo repositoryInfo)
         {
             RepoBase repo = null;
-            repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator);
+            repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator, true);
             this.repositories.Add(repo);
             repo.Initialize();
         }

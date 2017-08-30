@@ -23,6 +23,7 @@ namespace CmisSync.Lib.Database
     using SQLiteConnection = SqliteConnection;
     using SQLiteCommand = SqliteCommand;
     using SQLiteException = SqliteException;
+    using SQLiteDataReader = SqliteDataReader;
 #endif
 
     /// <summary>
@@ -547,7 +548,7 @@ namespace CmisSync.Lib.Database
             if (null != modifyDateObj)
             {
                 #if __MonoCS__
-                modifyDateObj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
+                modifyDateObj = DateTime.SpecifyKind((DateTime)modifyDateObj, DateTimeKind.Utc);
                 #else
                 modifyDateObj = ((DateTime)modifyDateObj).ToUniversalTime();
                 #endif

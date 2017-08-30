@@ -35,8 +35,8 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
-            : base(repoInfo, activityListener)
+        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher)
+            : base(repoInfo, activityListener, enableWatcher)
         {
             this.synchronizedFolder = new SynchronizedFolder(repoInfo, this, activityListener);
             Logger.Info(synchronizedFolder);
@@ -117,30 +117,35 @@ namespace CmisSync.Lib.Sync
 
         /// <summary>
         /// Synchonize.
-        /// The synchronization is performed in synchronous.
+        /// The synchronization is performed synchronously.
         /// </summary>
         /// <param name="syncFull"></param>
-        public void SyncInNotBackground(bool syncFull)
+        public bool SyncInForeground(bool syncFull)
         {
-            if (this.synchronizedFolder != null)
+            if (synchronizedFolder == null)
             {
-                if (this.Enabled)
+                return false;
+            }
+            else
+            {
+                if (Enabled)
                 {
-                    this.synchronizedFolder.SyncInForeground(syncFull);
+                    return synchronizedFolder.SyncInForeground(syncFull);
                 }
                 else
                 {
                     Logger.Info(String.Format("Repo {0} - Sync skipped.Status={1}", this.Name, this.Enabled));
+                    return true;
                 }
             }
         }
 
         /// <summary>
-        /// The synchronization is performed in synchronous.
+        /// The synchronization is performed synchronously.
         /// </summary>
-        public void SyncInNotBackground()
+        public bool SyncInForeground()
         {
-            SyncInNotBackground(true);
+            return SyncInForeground(true);
         }
 
         /// <summary>

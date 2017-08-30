@@ -176,7 +176,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Constructor.
         /// </summary>
-        public RepoBase(RepoInfo repoInfo, IActivityListener activityListener)
+        public RepoBase(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher)
         {
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
@@ -192,10 +192,12 @@ namespace CmisSync.Lib
             // most users would be surprised to see this file appear.
             // folderLock = new FolderLock(LocalPath);
 
-            Watcher = new Watcher(LocalPath);
-            Watcher.EnableRaisingEvents = true;
-
-
+            if (enableWatcher)
+            {
+                Watcher = new Watcher(LocalPath);
+                Watcher.EnableRaisingEvents = true;
+            }
+            
             // Main loop syncing every X seconds.
             remote_timer.Elapsed += delegate
             {
@@ -249,7 +251,10 @@ namespace CmisSync.Lib
                     this.remote_timer.Dispose();
                     this.local_timer.Stop();
                     this.local_timer.Dispose();
-                    this.Watcher.Dispose();
+                    if (Watcher != null)
+                    {
+                        this.Watcher.Dispose();
+                    }
                 }
                 this.disposed = true;
             }
@@ -397,14 +402,17 @@ namespace CmisSync.Lib
                 last_partial_sync = DateTime.Now;
             }
 
-            if (Watcher.GetChangeCount() > 0)
+            if (Watcher != null)
             {
-                //Watcher was stopped (due to error) so clear and restart sync
-                Watcher.Clear();
+                if (Watcher.GetChangeCount() > 0)
+                {
+                    //Watcher was stopped (due to error) so clear and restart sync
+                    Watcher.Clear();
+                }
+                Watcher.EnableRaisingEvents = true;
+                Watcher.EnableEvent = true;
             }
 
-            Watcher.EnableRaisingEvents = true;
-            Watcher.EnableEvent = true;
             Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
 
             // Save last sync
