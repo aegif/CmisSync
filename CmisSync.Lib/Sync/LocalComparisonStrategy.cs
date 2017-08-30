@@ -400,6 +400,12 @@ namespace CmisSync.Lib.Sync
                 bool success = true;
                 foreach (string addedFile in addedFiles)
                 {
+                    if ( ! Utils.WorthSyncing(addedFile))
+                    {
+                        Logger.Debug("Ignoring non-sync-worthy file " + addedFile);
+                        continue;
+                    }
+
                     string destinationFolderPath = Path.GetDirectoryName(addedFile);
                     SyncItem folderItem = SyncItemFactory.CreateFromLocalPath(destinationFolderPath, true, repoInfo, database);
                     SyncItem fileItem = SyncItemFactory.CreateFromLocalPath(addedFile, false, repoInfo, database);

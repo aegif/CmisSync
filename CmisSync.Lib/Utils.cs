@@ -364,6 +364,13 @@ namespace CmisSync.Lib
                 return false;
             }
 
+            // Check whether the file is a rendition
+            if (filename.Contains("_rendition_"))
+            {
+                Logger.Debug("Ignoring rendition " + filename);
+                return false;
+            }
+
             //Logger.Info("SynchronizedFolder | Worth syncing:" + filename);
             return true;
         }
