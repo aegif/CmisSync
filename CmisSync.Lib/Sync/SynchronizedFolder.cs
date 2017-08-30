@@ -327,6 +327,7 @@ namespace CmisSync.Lib.Sync
                 filters.Add("cmis:path");
                 filters.Add("cmis:changeToken"); // Needed to send update commands, see https://github.com/aegif/CmisSync/issues/516
                 session.DefaultContext = session.CreateOperationContext(filters, false, true, false, IncludeRelationshipsFlag.None, null, true, null, true, 100);
+                session.DefaultContext.RenditionFilterString = "*";
             }
 
             /// <summary>
@@ -876,6 +877,7 @@ namespace CmisSync.Lib.Sync
                     return true;
                 }
 
+                Boolean success = false;
                 try
                 {
                     DotCMIS.Data.IContentStream contentStream = null;
@@ -913,7 +915,6 @@ namespace CmisSync.Lib.Sync
                     }
 
                     // Download file.
-                    Boolean success = false;
                     byte[] filehash = { };
                     try
                     {
@@ -1040,7 +1041,10 @@ namespace CmisSync.Lib.Sync
                     database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                     Logger.Info("Added file to database: " + filePath);
 
-                    return success;
+                    if (!success)
+                    {
+                        return false;
+                    }
                 }
                 catch (Exception e)
                 {
