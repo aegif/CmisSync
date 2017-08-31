@@ -130,7 +130,7 @@ namespace CmisSync.Lib.Sync
             {
                 if (Enabled)
                 {
-                    return synchronizedFolder.SyncNotInBackground(syncFull);
+                    return synchronizedFolder.SyncInForeground(syncFull);
                 }
                 else
                 {

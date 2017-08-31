@@ -506,7 +506,7 @@ namespace CmisSync.Lib.Sync
             /// Sync on the current thread.
             /// </summary>
             /// <param name="syncFull"></param>
-            public bool SyncNotInBackground(bool syncFull)
+            public bool SyncInForeground(bool syncFull)
             {
                 if (IsSyncing())
                 {
