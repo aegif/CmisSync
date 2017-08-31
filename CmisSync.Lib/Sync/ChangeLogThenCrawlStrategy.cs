@@ -339,7 +339,7 @@ namespace CmisSync.Lib.Sync
                     {
                         if (PathIsApplicable(remoteIFolder.Path))
                         {
-                            Logger.Debug("Document change is applicable:" + remoteIFolder);
+                            Logger.Debug("Document change is applicable in folder " + remoteIFolder);
 
                             var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteIFolder.Path);
                             var localFolder = localFolderItem.LocalPath;
