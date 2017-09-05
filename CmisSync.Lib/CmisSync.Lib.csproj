@@ -70,6 +70,7 @@
     <Compile Include="Database\DatabaseMigration.cs" />
     <Compile Include="Sync\ChangeLogThenCrawlStrategy.cs" />
     <Compile Include="Sync\LocalComparisonStrategy.cs" />
+    <Compile Include="Sync\Renditions.cs" />
     <Compile Include="UserNotificationListener.cs" />
     <Compile Include="Cmis\BaseException.cs" />
     <Compile Include="Database\Database.cs" />

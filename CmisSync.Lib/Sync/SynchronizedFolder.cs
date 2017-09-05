@@ -443,7 +443,7 @@ namespace CmisSync.Lib.Sync
 
                         if (ChangeLogCapability)
                         {
-                            //Before full sync, get latest changelog
+                            // Before full sync, get latest changelog token
                             var lastTokenOnServer = CmisUtils.GetChangeLogToken(session);
                             success = CrawlSync(remoteFolder, remoteFolderPath, localFolder);
                             if(success) database.SetChangeLogToken(lastTokenOnServer);
@@ -452,10 +452,9 @@ namespace CmisSync.Lib.Sync
                         {
                             // Full sync.
                             success = CrawlSync(remoteFolder, remoteFolderPath, localFolder);
-
                         }
 
-                        //If crawl sync failed, retry.
+                        // If crawl sync failed, retry.
                         firstSync = !success;
                     }
                     else
@@ -485,6 +484,13 @@ namespace CmisSync.Lib.Sync
                             success &= CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder);
                         }
                     }
+
+                    // Update renditions.
+                    // This is done at the end (rather than while crawling) because:
+                    // - Renditions are asynchronously generated server-side, we don't know when they will be ready
+                    // - ChangeLog do not reveal whether new renditions are available.
+                    Renditions.Update(session, repoInfo, database, remoteFolder, remoteFolderPath, localFolder);
+
                     return success;
                 }
             }
@@ -1053,24 +1059,7 @@ namespace CmisSync.Lib.Sync
                 }
 
                 // Download the document's renditions.
-                IList<IRenditionData> renditions = session.GetRenditions(repoInfo.RepoID, remoteDocument.Id, "*", 10, 0, new DotCMIS.Data.Extensions.ExtensionsData());
-                foreach (IRenditionData rendition in renditions)
-                {
-                    Logger.Debug(rendition + " " + rendition.MimeType);
-                    string fileExtension = MimeType.GetExtension(rendition.MimeType);
-
-                    string title = rendition.Title;
-                    var sanitizedTitle = new string(title.Select(
-                        character => Path.GetInvalidFileNameChars().Contains(character) ? '_' : character).ToArray());
-
-                    string path = syncItem.LocalPath + RENDITION_IDENTIFIER + title + "." + fileExtension;
-
-                    byte[] filehash = DownloadStream(remoteDocument.GetContentStream(rendition.StreamId), path);
-                    if (null == filehash)
-                    {
-                        return false;
-                    }
-                }
+                success &= Renditions.Download(session, repoInfo, database, remoteDocument, syncItem);
 
                 return true;
             }
@@ -1092,10 +1081,10 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Download a file, without retrying.
             /// </summary>
-            private byte[] DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
+            public static byte[] DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
             {
                 byte[] hash = { };
-                using (Stream file = File.OpenWrite(filePath))
+                using (Stream file = File.Create(filePath))
                 using (SHA1 hashAlg = new SHA1Managed())
                 using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                 {
@@ -1682,7 +1671,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Sleep while suspended.
             /// </summary>
-            private void SleepWhileSuspended()
+            public void SleepWhileSuspended()
             {
                 if (syncWorker.CancellationPending)
                 {

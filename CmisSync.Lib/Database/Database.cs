@@ -1216,6 +1216,26 @@ namespace CmisSync.Lib.Database
             return result;
         }
 
+
+        /// <summary>
+        /// Get the CMIS identifier of a document.
+        /// </summary>
+        /// <param name="localPath">Full local path of a document, for instance C:\CmisSync\mysync\subfolder\doc1.txt</param>
+        public string GetDocumentId(string localPath)
+        {
+            string normalizedLocalPath = RemoveLocalPrefix(localPath);
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("localPath", normalizedLocalPath);
+            string id = (string)ExecuteSQLFunction("SELECT id FROM files WHERE localPath=@localPath", parameters);
+            if (string.IsNullOrEmpty(id))
+            {
+                return null;
+            }
+
+            return id;
+        }
+
+
         /// <summary>
         /// Helper method to execute an SQL command that does not return anything.
         /// </summary>

@@ -279,13 +279,13 @@ namespace CmisSync.Lib.Sync
                             {
                                 try
                                 {
-                                activityListener.ActivityStarted();
-                                Utils.DeleteEvenIfReadOnly(subFolderItem.LocalPath);
+                                    activityListener.ActivityStarted();
+                                    Utils.DeleteEvenIfReadOnly(subFolderItem.LocalPath);
                                 }
                                 finally
                                 {
-                                activityListener.ActivityStopped();
-                            }
+                                    activityListener.ActivityStopped();
+                                }
                             }
 
                             if (database.ContainsFolder(subFolderItem))
@@ -294,11 +294,11 @@ namespace CmisSync.Lib.Sync
                                 {
                                     activityListener.ActivityStarted();
 
-                                // If there was previously a folder with this name, it means that
-                                // the user has deleted it voluntarily, so delete it from server too.
+                                    // If there was previously a folder with this name, it means that
+                                    // the user has deleted it voluntarily, so delete it from server too.
 
                                     DeleteRemoteFolder(remoteSubFolder, subFolderItem, remotePath);
-                                    }
+                                }
                                 finally
                                 {
                                     activityListener.ActivityStopped();
@@ -308,26 +308,25 @@ namespace CmisSync.Lib.Sync
                             {
                                 try
                                 {
-                                // The folder has been recently created on server, so download it.
-                                activityListener.ActivityStarted();
-                                Directory.CreateDirectory(subFolderItem.LocalPath);
+                                    // The folder has been recently created on server, so download it.
+                                    activityListener.ActivityStarted();
+                                    Directory.CreateDirectory(subFolderItem.LocalPath);
 
-                                // Create database entry for this folder.
-                                // TODO - Yannick - Add metadata
-                                database.AddFolder(subFolderItem, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
-                                Logger.Info("Added folder to database: " + subFolderItem.LocalPath);
+                                    // Create database entry for this folder.
+                                    // TODO - Yannick - Add metadata
+                                    database.AddFolder(subFolderItem, remoteSubFolder.Id, remoteSubFolder.LastModificationDate);
+                                    Logger.Info("Added folder to database: " + subFolderItem.LocalPath);
 
-                                // Recursive copy of the whole folder.
-                                RecursiveFolderCopy(remoteSubFolder, remotePath, subFolderItem.LocalPath);
-
+                                    // Recursive copy of the whole folder.
+                                    RecursiveFolderCopy(remoteSubFolder, remotePath, subFolderItem.LocalPath);
                                 }
                                 finally
                                 {
-                                activityListener.ActivityStopped();
+                                    activityListener.ActivityStopped();
+                                }
                             }
                         }
                     }
-                }
                 }
                 catch (Exception e)
                 {
@@ -492,7 +491,7 @@ namespace CmisSync.Lib.Sync
                         {
                             // New remote file, download it.
 
-                            Logger.Info("New remote file: " + syncItem.RemotePath);
+                            Logger.Info("New remote file: " + remoteDocument.Name);
                             activityListener.ActivityStarted();
                             success &= DownloadFile(remoteDocument, remotePath, localFolder);
                             activityListener.ActivityStopped();
@@ -523,19 +522,6 @@ namespace CmisSync.Lib.Sync
 
                 foreach (string filePath in files)
                 {
-                    // Remove renditions whose document does not exist anymore.
-                    if (filePath.Contains(SynchronizedFolder.RENDITION_IDENTIFIER))
-                    {
-                        string document = filePath.Substring(0, filePath.IndexOf(SynchronizedFolder.RENDITION_IDENTIFIER));
-                        if (!files.Contains(document))
-                        {
-                            string renditionPath = Path.Combine(localFolder, filePath);
-                            Logger.Info("The document " + document + " does not exist anymore, so delete its rendition " + renditionPath + " too.");
-                            File.Delete(renditionPath);
-                            continue;
-                        }
-                    }
-
                     CheckLocalFile(filePath, remoteFolder, remoteFiles);
                 }
             }
