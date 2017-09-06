@@ -1063,7 +1063,7 @@ namespace CmisSync.Lib.Sync
             private byte[] DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
             {
                 byte[] hash = { };
-                using (Stream file = File.OpenWrite(filePath))
+                using (Stream file = File.Create(filePath))
                 using (SHA1 hashAlg = new SHA1Managed())
                 using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                 {

@@ -492,7 +492,7 @@ namespace CmisSync.Lib.Sync
                         {
                             // New remote file, download it.
 
-                            Logger.Info("New remote file: " + syncItem.RemotePath);
+                            Logger.Info("New remote file: " + remoteDocument.Name);
                             activityListener.ActivityStarted();
                             success &= DownloadFile(remoteDocument, remotePath, localFolder);
                             activityListener.ActivityStopped();
