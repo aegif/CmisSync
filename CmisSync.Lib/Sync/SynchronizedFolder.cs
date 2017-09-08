@@ -1430,7 +1430,7 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Debug("Removing remote folder tree: " + folder.Path);
                     IList<string> failedIDs = folder.DeleteTree(true, null, true);
-                    if (failedIDs == null || failedIDs.Count != 0)
+                    if (failedIDs != null && failedIDs.Count != 0)
                     {
                         Logger.Error("Failed to completely delete remote folder " + folder.Path);
                         // TODO Should we retry? Maybe at least once, as a manual recursion instead of a DeleteTree.
