@@ -342,9 +342,9 @@ namespace CmisSync.Lib.Sync
                     SyncItem modifiedItem = SyncItemFactory.CreateFromLocalPath(modifiedFile, true, repoInfo, database);
                     try
                     {
+                        Logger.Info("Uploading file update on repository: " + modifiedFile);
                         IDocument modifiedDocument = (IDocument)session.GetObjectByPath(modifiedItem.RemotePath);
-                        
-                        CrawlRemoteDocument(modifiedDocument, modifiedItem.RemotePath, modifiedItem.LocalPath, null);
+                        success &= UpdateFile(modifiedItem.LocalPath, modifiedDocument);
                     }
                     catch (Exception e)
                     {
