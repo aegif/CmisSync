@@ -106,6 +106,24 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// Ignore folders and documents with a name that contains a slash.
+        /// While it is very rare, Documentum is known to allow that and mistakenly present theses as CMIS object, violating the CMIS specification.
+        /// </summary>
+        public bool RemoteObjectWorthSyncing(string name)
+        {
+            if (name.Contains('/'))
+            {
+                Logger.Warn("Ignoring remote object " + name + " as it contains a slash. The CMIS specification forbids slashes in path elements (paragraph 2.1.5.3), please report the bug to your server vendor");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+
+        /// <summary>
         /// Whether the operating system is case-sensitive.
         /// For instance on Linux you can have two files/folders called "test" and "TEST", but on Windows that does not work.
         /// CMIS allows for case-sensitive names.
