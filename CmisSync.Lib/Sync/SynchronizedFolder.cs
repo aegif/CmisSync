@@ -693,6 +693,11 @@ namespace CmisSync.Lib.Sync
                     return;
                 }
 
+                // Remember seen names, and depending on the profile ignore the ones that have appeared already.
+                // For instance, if the CMIS server has a file called Hello and a folder called HELLO, then on Windows the paths would conflict.
+                // Store lowercase file and folder names inside.
+                HashSet<string> names = new HashSet<string>();
+
                 // List all children.
                 foreach (ICmisObject cmisObject in children)
                 {
@@ -709,9 +714,21 @@ namespace CmisSync.Lib.Sync
                             localSubFolderItem = SyncItemFactory.CreateFromRemoteFolder(remoteSubFolder.Path, repoInfo, database);
                         }
 
+                        // Ignore edgy folders.
+                        if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames && names.Contains(remoteSubFolder.Name.ToLowerInvariant()))
+                        {
+                            Logger.Warn("Ignoring " + remoteSubFolder.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                            continue;
+                        }
+                        if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteSubFolder))
+                        {
+                            continue;
+                        }
+
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoInfo))
                         {
                             DownloadDirectory(remoteSubFolder, remoteSubPath, localSubFolderItem.LocalPath);
+                            names.Add(remoteSubFolder.Name.ToLowerInvariant());
                         }
                     }
                     else if (cmisObject is DotCMIS.Client.Impl.Document)
@@ -719,9 +736,22 @@ namespace CmisSync.Lib.Sync
                         // Case of a document: Download it.
 
                         Document document = (Document)cmisObject;
+                        // Ignore edgy documents.
+
+                        if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames && names.Contains(document.Name.ToLowerInvariant()))
+                        {
+                            Logger.Warn("Ignoring " + document.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                            continue;
+                        }
+                        if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(document))
+                        {
+                            continue;
+                        }
+
                         if (Utils.WorthSyncing(localFolder, repoInfo.CmisProfile.localFilename(document), repoInfo))
                         {
                             DownloadFile(document, remoteSubPath, localFolder);
+                            names.Add(document.Name.ToLowerInvariant());
                         }
                     }
                     else

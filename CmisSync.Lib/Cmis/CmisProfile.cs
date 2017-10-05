@@ -109,11 +109,11 @@ namespace CmisSync.Lib.Cmis
         /// Ignore folders and documents with a name that contains a slash.
         /// While it is very rare, Documentum is known to allow that and mistakenly present theses as CMIS object, violating the CMIS specification.
         /// </summary>
-        public bool RemoteObjectWorthSyncing(string name)
+        public bool RemoteObjectWorthSyncing(ICmisObject cmisObject)
         {
-            if (name.Contains('/'))
+            if (cmisObject.Name.Contains('/'))
             {
-                Logger.Warn("Ignoring remote object " + name + " as it contains a slash. The CMIS specification forbids slashes in path elements (paragraph 2.1.5.3), please report the bug to your server vendor");
+                Logger.Warn("Ignoring remote object " + cmisObject.Name + " as it contains a slash. The CMIS specification forbids slashes in path elements (paragraph 2.1.5.3), please report the bug to your server vendor");
                 return false;
             }
             else

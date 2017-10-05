@@ -177,7 +177,7 @@ namespace CmisSync.Lib.Sync
                                 Logger.Warn("Ignoring " + remoteSubFolder.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
                                 continue;
                             }
-                            if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteSubFolder.Name))
+                            if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteSubFolder))
                             {
                                 continue;
                             }
@@ -197,7 +197,7 @@ namespace CmisSync.Lib.Sync
                                 Logger.Warn("Ignoring " + remoteDocument.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
                                 continue;
                             }
-                            if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteDocument.Name))
+                            if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteDocument))
                             {
                                 continue;
                             }

@@ -325,6 +325,11 @@ namespace CmisSync.Lib.Sync
                 {
                     var remoteSubFolder = cmisObject as IFolder;
 
+                    if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteSubFolder))
+                    {
+                        return true;
+                    }
+
                     // Look for the local equivalent.
                     var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                     while (true)
@@ -348,6 +353,11 @@ namespace CmisSync.Lib.Sync
                 else if (cmisObject is DotCMIS.Client.Impl.Document)
                 {
                     var remoteDocument = cmisObject as IDocument;
+
+                    if (!repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteDocument))
+                    {
+                        return true;
+                    }
 
                     // Apply the change on all paths via which it is applicable.
                     foreach (IFolder remoteIFolder in remoteDocument.Parents)
