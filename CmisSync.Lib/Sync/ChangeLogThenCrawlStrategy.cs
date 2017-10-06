@@ -269,7 +269,7 @@ namespace CmisSync.Lib.Sync
                                         }
                                         else
                                         {
-                                            success &= CheckLocalFile(local.LocalPath, destCmisFolder, new List<string>());
+                                            success &= CheckLocalFile(local.LocalPath, destCmisFolder, null);
                                         }
                                     }
                                     catch (Exception e)

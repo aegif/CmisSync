@@ -61,7 +61,7 @@ namespace CmisSync.Lib.Cmis
                 else
                 {
                     // This should probably never happen theoretically, but anyway that happens sometimes in Alfresco.
-                    Logger.Error("ContentStreamFileName null for " + document.Name + "(" + document.Paths[0] + ")");
+                    Logger.Warn("cmis:contentStreamFileName not set for \"" + document.Paths[0] + "\", using cmis:name \"" + document.Name + "\" as a file name instead");
                     return document.Name;
                 }
             }

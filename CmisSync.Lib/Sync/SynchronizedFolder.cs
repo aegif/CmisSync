@@ -181,9 +181,10 @@ namespace CmisSync.Lib.Sync
                     delegate(Object o, DoWorkEventArgs args)
                     {
                         bool syncFull = (bool)args.Argument;
+                        bool success = false;
                         try
                         {
-                            Sync(syncFull);
+                            success = Sync(syncFull);
                         }
                         catch (OperationCanceledException e)
                         {
@@ -201,7 +202,7 @@ namespace CmisSync.Lib.Sync
                         }
                         finally
                         {
-                            SyncComplete(syncFull);
+                            SyncComplete(syncFull, success);
                         }
                     }
                 );
@@ -487,13 +488,13 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Synchronize has completed.
             /// </summary>
-            public void SyncComplete(bool syncFull)
+            public void SyncComplete(bool syncFull, bool success)
             {
                 lock (syncLock)
                 {
                     try
                     {
-                        repo.OnSyncComplete(syncFull);
+                        repo.OnSyncComplete(syncFull, success);
                     }
                     finally
                     {
@@ -529,7 +530,7 @@ namespace CmisSync.Lib.Sync
                 }
                 finally
                 {
-                    SyncComplete(syncFull);
+                    SyncComplete(syncFull, success);
                 }
                 return success;
             }
@@ -939,42 +940,46 @@ namespace CmisSync.Lib.Sync
                     // Download file.
                     Boolean success = false;
                     byte[] filehash = { };
-                    try
-                    {
-                        contentStream = remoteDocument.GetContentStream();
 
-                        // If this file does not have a content stream, ignore it.
-                        // Even 0 bytes files have a contentStream.
-                        // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-                        if (contentStream == null)
+                    // If zero length, skip downloading the content, just go on with an empty file
+                    if (remoteDocument.ContentStreamLength == 0)
+                    {
+                        Logger.Info("Skipping download of file with content length zero: " + syncItem.RemoteLeafname);
+                        using (FileStream s = File.Create(tmpFilePath))
                         {
-                            Logger.Warn("Skipping download of file with null content stream: " + syncItem.RemoteLeafname);
-                            return true;
+                            s.Close();
+                            success = true;
                         }
-                        // Skip downloading the content, just go on with an empty file
-                        if (remoteDocument.ContentStreamLength == 0)
+                    }
+                    else
+                    {
+                        try
                         {
-                            Logger.Info("Skipping download of file with content length zero: " + syncItem.RemoteLeafname);
-                            using (FileStream s = File.Create(tmpFilePath))
+                            contentStream = remoteDocument.GetContentStream();
+
+                            // If this file does not have a content stream, ignore it.
+                            // Even 0 bytes files have a contentStream.
+                            // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                            if (contentStream == null)
                             {
-                                s.Close();
+                                Logger.Warn("Skipping download of file with null content stream: " + syncItem.RemoteLeafname);
+                                return true;
                             }
+                            else
+                            {
+                                filehash = DownloadStream(contentStream, tmpFilePath);
+                                contentStream.Stream.Close();
+                            }
+                            success = true;
                         }
-                        else
+                        catch (CmisBaseException e)
                         {
-                            filehash = DownloadStream(contentStream, tmpFilePath);
-                            contentStream.Stream.Close();
+                            ProcessRecoverableException("Download failed: " + syncItem.RemoteLeafname, e);
+                            if (contentStream != null) contentStream.Stream.Close();
+                            success = false;
+                            File.Delete(tmpFilePath);
                         }
-                        success = true;
                     }
-                    catch (CmisBaseException e)
-                    {
-                        ProcessRecoverableException("Download failed: " + syncItem.RemoteLeafname, e);
-                        if (contentStream != null) contentStream.Stream.Close();
-                        success = false;
-                        File.Delete(tmpFilePath);
-                    }
-
                     if ( ! success)
                     {
                         return false;

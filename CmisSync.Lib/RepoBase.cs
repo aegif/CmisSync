@@ -390,7 +390,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Called when sync completes.
         /// </summary>
-        public void OnSyncComplete(bool syncFull)
+        public void OnSyncComplete(bool syncFull, bool success)
         {
             if (syncFull)
             {
@@ -413,7 +413,7 @@ namespace CmisSync.Lib
                 Watcher.EnableEvent = true;
             }
 
-            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath + " , success=" + success);
 
             // Save last sync
             RepoInfo.LastSuccessedSync = DateTime.Now;
