@@ -13,10 +13,10 @@ namespace CmisSync.Auth
     /// This class allows one to connect to a CMIS repository.
     /// It can return a list of repositories, or directly a CMIS session if the repository is known.
     /// </summary>
-    public class Auth
+    public class Authentication
     {
         // Log.
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(Auth));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Authentication));
 
         /// <summary>
         /// Connect to a CMIS server and get the list of repositories.

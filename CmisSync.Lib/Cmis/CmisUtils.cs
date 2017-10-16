@@ -165,7 +165,7 @@ namespace CmisSync.Lib.Cmis
             IList<IRepository> repositories;
             try
             {
-                repositories = Auth.Auth.GetCmisRepositories(credentials.Address, credentials.UserName, credentials.Password.ToString());
+                repositories = Auth.Authentication.GetCmisRepositories(credentials.Address, credentials.UserName, credentials.Password.ToString());
             }
             catch (CmisPermissionDeniedException e)
             {
@@ -216,7 +216,7 @@ namespace CmisSync.Lib.Cmis
             List<string> result = new List<string>();
 
             // Connect to the CMIS repository.
-            ISession session = Auth.Auth.GetCmisSession(url, user, password, repositoryId);
+            ISession session = Auth.Authentication.GetCmisSession(url, user, password, repositoryId);
 
             // Get the folder.
             IFolder folder;
@@ -306,7 +306,7 @@ namespace CmisSync.Lib.Cmis
         static public FolderTree GetSubfolderTree(CmisRepoCredentials credentials, string path, int depth)
         {
             // Connect to the CMIS repository.
-            ISession session = Auth.Auth.GetCmisSession(credentials.Address.ToString(), credentials.UserName, credentials.Password.ToString(), credentials.RepoId);
+            ISession session = Auth.Authentication.GetCmisSession(credentials.Address.ToString(), credentials.UserName, credentials.Password.ToString(), credentials.RepoId);
 
             // Get the folder.
             IFolder folder;
@@ -404,7 +404,7 @@ namespace CmisSync.Lib.Cmis
                 try
                 {
                     // Connect to the CMIS repository.
-                    ISession session = Auth.Auth.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
+                    ISession session = Auth.Authentication.GetCmisSession(repo.Address.ToString(), repo.User, repo.Password.ToString(), repo.RepoID);
 
                     if (session.RepositoryInfo.ThinClientUri == null
                         || String.IsNullOrEmpty(session.RepositoryInfo.ThinClientUri.ToString()))

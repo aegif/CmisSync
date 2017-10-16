@@ -49,7 +49,7 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public string localFilename(IDocument document)
         {
-            // Can be useful for tests, making local filenames radically different, thus making bugs easier to catch.
+            // Can be useful for tests, making local filenames radically different, thus making bugs easier to catch:
             // return document.Id;
 
             if (UseCmisStreamName)
@@ -69,6 +69,16 @@ namespace CmisSync.Lib.Cmis
             {
                 return document.Name;
             }
+        }
+
+
+        /// <summary>
+        /// Name used as part of the remote path in the local CmisSync database.
+        /// This must be unique on the remote folder.
+        /// </summary>
+        public string remoteFilename(IDocument document)
+        {
+            return (string)document.GetPropertyValue("cmis:name");
         }
 
 

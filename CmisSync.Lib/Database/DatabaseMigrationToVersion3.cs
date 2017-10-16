@@ -119,7 +119,7 @@ namespace CmisSync.Lib.Database
                 "\nIt can take up to HOURS if you have many files, thank you for your patience." +
                 "\nA notification will pop up when it is done.");
 
-            var session = Auth.Auth.GetCmisSession(
+            var session = Auth.Authentication.GetCmisSession(
                               ((Uri)syncFolder.RemoteUrl).ToString(),
                               syncFolder.UserName,
                               Crypto.Deobfuscate(syncFolder.ObfuscatedPassword),

@@ -9,6 +9,7 @@ using System.Globalization;
 using DotCMIS.Client.Impl;
 using CmisSync.Lib.Cmis;
 using DotCMIS.Enums;
+using System.Text;
 
 namespace CmisSync.Lib.Sync
 {
@@ -159,9 +160,29 @@ namespace CmisSync.Lib.Sync
                 // Get all remote children.
                 // TODO: use paging
                 IOperationContext operationContext = session.CreateOperationContext();
+                operationContext.FilterString = "*";
+                operationContext.IncludeAllowableActions = true;
+                operationContext.IncludePolicies = true;
+                operationContext.IncludeRelationships = IncludeRelationshipsFlag.Both;
+                operationContext.IncludeAcls = true;
+                // renditionFilter=* not available in DotCMIS
                 this.repoInfo.CmisProfile.ConfigureOperationContext(operationContext);
                 operationContext.MaxItemsPerPage = Int32.MaxValue;
-                foreach (ICmisObject cmisObject in remoteFolder.GetChildren(operationContext))
+
+                // Get children.
+                IItemEnumerable<ICmisObject> childrenEnumeration = remoteFolder.GetChildren(operationContext);
+
+                // Log.
+                /*IList<ICmisObject> children = childrenEnumeration.ToList(); // Because we need to enumerate twice (log+crawl).
+                StringBuilder logBuilder = new StringBuilder();
+                foreach (ICmisObject cmisObject in children)
+                {
+                    logBuilder.Append(cmisObject.Name + " (" + cmisObject.GetType().Name + ") ");
+                }
+                Logger.Debug("Content of " + remotePath + ": " + logBuilder);*/
+
+                // Crawl.
+                foreach (ICmisObject cmisObject in childrenEnumeration /*children*/)
                 {
                     try
                     {
@@ -192,9 +213,10 @@ namespace CmisSync.Lib.Sync
                             string remoteDocumentPath = CmisUtils.PathCombine(remotePath, remoteDocument.Name);
 
                             // Ignore edgy documents.
-                            if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames && names.Contains(remoteDocument.Name.ToLowerInvariant()))
+                            if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames &&
+                                names.Contains(repoInfo.CmisProfile.localFilename(remoteDocument).ToLowerInvariant()))
                             {
-                                Logger.Warn("Ignoring " + remoteDocument.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                                Logger.Warn("Ignoring " + repoInfo.CmisProfile.localFilename(remoteDocument) + "because other file or folder has the same name when ignoring lowercase/uppercase");
                                 continue;
                             }
                             if (!repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteDocument))
@@ -249,15 +271,17 @@ namespace CmisSync.Lib.Sync
 
                 try
                 {
-                    if (Utils.WorthSyncing(localFolder, remoteSubFolder.Name, repoInfo))
+                    // Get the sub-folder's would-be local name.
+                    var subFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
+                    if (null == subFolderItem)
+                    {
+                        subFolderItem = SyncItemFactory.CreateFromRemoteFolder(remoteSubFolder.Path, repoInfo, database);
+                    }
+
+                    if (Utils.WorthSyncing(localFolder, subFolderItem.LocalLeafname, repoInfo))
                     {
                         Logger.Info("CrawlRemote localFolder:\"" + localFolder + "\" remoteSubFolder.Path:\"" + remoteSubFolder.Path + "\" remoteSubFolder.Name:\"" + remoteSubFolder.Name + "\"");
                         remoteFolders.Add(remoteSubFolder.Name);
-                        var subFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
-                        if (null == subFolderItem)
-                        {
-                            subFolderItem = SyncItemFactory.CreateFromRemoteFolder(remoteSubFolder.Path, repoInfo, database);
-                        }
 
                         // Check whether local folder exists.
                         if (Directory.Exists(subFolderItem.LocalPath))
@@ -566,7 +590,7 @@ namespace CmisSync.Lib.Sync
                     if (Utils.WorthSyncing(Path.GetDirectoryName(localFilePath), fileName, repoInfo))
                     {
                         if (localFilenameTranslationOfExistingRemoteDocuments != null &&
-                                !localFilenameTranslationOfExistingRemoteDocuments.Contains(fileName))
+                                ! localFilenameTranslationOfExistingRemoteDocuments.Contains(fileName))
                         {
                             // This local file is not on the CMIS server now, so
                             // check whether it used to exist on server or not.

@@ -272,7 +272,7 @@ namespace CmisSync.Lib.Sync
             public void Connect()
             {
                 // Create session.
-                session = Auth.Auth.GetCmisSession(repoInfo.Address.ToString(), repoInfo.User, repoInfo.Password.ToString(), repoInfo.RepoID);
+                session = Auth.Authentication.GetCmisSession(repoInfo.Address.ToString(), repoInfo.User, repoInfo.Password.ToString(), repoInfo.RepoID);
                 Logger.Debug("Created CMIS session: " + session.ToString());
                 
                 // Detect repository capabilities.
@@ -511,7 +511,7 @@ namespace CmisSync.Lib.Sync
             {
                 if (IsSyncing())
                 {
-                    Logger.Debug("Sync already running in background: " + repoInfo.TargetDirectory);
+                    Logger.Debug("SyncInForeground: Sync already running in background: " + repoInfo.TargetDirectory);
                     return false;
                 }
 
@@ -542,11 +542,13 @@ namespace CmisSync.Lib.Sync
             {
                 if (IsSyncing())
                 {
-                    Logger.Debug("Sync already running in background: " + repoInfo.TargetDirectory);
+                    Logger.Debug("SyncInBackground: Sync already running in background: " + repoInfo.TargetDirectory);
                     return;
                 }
 
                 syncWorker.RunWorkerAsync(syncFull);
+
+                Logger.Debug("SyncInBackground: IsSyncing(): " + IsSyncing());
             }
 
             /// <summary>
@@ -884,6 +886,7 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             private bool DownloadFile(IDocument remoteDocument, string remotePath, string localFolder)
             {
+                //Logger.Debug("DownloadFile " + remoteDocument + " remotePath:" + remotePath + " localFolder:" + localFolder);
                 SleepWhileSuspended();
 
                 var syncItem = database.GetSyncItemFromRemotePath(remotePath);
@@ -901,6 +904,7 @@ namespace CmisSync.Lib.Sync
                     return true;
                 }
 
+                Boolean success = false;
                 try
                 {
                     DotCMIS.Data.IContentStream contentStream = null;
@@ -938,7 +942,6 @@ namespace CmisSync.Lib.Sync
                     }
 
                     // Download file.
-                    Boolean success = false;
                     byte[] filehash = { };
 
                     // If zero length, skip downloading the content, just go on with an empty file
@@ -1069,13 +1072,17 @@ namespace CmisSync.Lib.Sync
                     database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                     Logger.Info("Added file to database: " + filePath);
 
-                    return success;
+                    if (!success)
+                    {
+                        return false;
+                    }
                 }
                 catch (Exception e)
                 {
                     ProcessRecoverableException("Could not download file: " + syncItem.LocalPath, e);
                     return false;
                 }
+                return true;
             }
 
 
@@ -1370,7 +1377,7 @@ namespace CmisSync.Lib.Sync
                     {
                         if (null != (document = obj as IDocument))
                         {
-                            if (repoInfo.CmisProfile.localFilename(document).Equals(fileName))
+                            if (repoInfo.CmisProfile.remoteFilename(document).Equals(fileName))
                             {
                                 found = true;
                                 break;

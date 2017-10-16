@@ -22,6 +22,11 @@ namespace CmisSync.Console
 	class CmisSyncOnce
 	{
         /// <summary>
+        /// Logging.
+        /// </summary>
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisSyncOnce));
+
+        /// <summary>
         /// Configured synchronized folder on which the synchronization must be performed.
         /// </summary>
 		private List<RepoInfo> repos = new List<RepoInfo>();
@@ -32,6 +37,11 @@ namespace CmisSync.Console
 		public static int Main (string[] args)
 		{
             Utils.ConfigureLogging();
+            Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);
+
+            // Uncomment this line to disable SSL checking (for self-signed certificates)
+            // ServicePointManager.CertificatePolicy = new YesCertPolicyHandler();
+
             PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
 
             CmisSyncOnce once = new CmisSyncOnce();
@@ -89,7 +99,7 @@ namespace CmisSync.Console
             foreach (RepoInfo repoInfo in repos)
             {
                 CmisRepo cmisRepo = new CmisRepo (repoInfo, controller, false);
-                success &= cmisRepo.SyncNotInBackground();
+                success &= cmisRepo.SyncInForeground();
             }
 
             return success;

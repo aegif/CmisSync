@@ -120,7 +120,7 @@ namespace CmisSync.Lib.Sync
         /// The synchronization is performed synchronously.
         /// </summary>
         /// <param name="syncFull"></param>
-        public bool SyncNotInBackground(bool syncFull)
+        public bool SyncInForeground(bool syncFull)
         {
             if (synchronizedFolder == null)
             {
@@ -143,9 +143,9 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// The synchronization is performed synchronously.
         /// </summary>
-        public bool SyncNotInBackground()
+        public bool SyncInForeground()
         {
-            return SyncNotInBackground(true);
+            return SyncInForeground(true);
         }
 
         /// <summary>

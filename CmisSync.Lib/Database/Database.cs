@@ -911,6 +911,7 @@ namespace CmisSync.Lib.Database
         /// <param name="remotePath">Remote path.</param>
         public SyncItem GetSyncItemFromRemotePath(string remotePath)
         {
+            //Logger.Debug("GetSyncItemFromRemotePath " + remotePath);
             if (remotePath.Equals(remotePathPrefix))
             {
                 return SyncItemFactory.CreateFromPaths(localPathPrefix, localPathPrefix, remotePathPrefix, remotePathPrefix, false);
