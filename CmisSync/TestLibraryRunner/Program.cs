@@ -8,12 +8,14 @@ using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 
+using log4net;
+using log4net.Config;
+
 using CmisSync.Lib;
 using CmisSync.Lib.Sync;
 using CmisSync.Lib.Cmis;
 
-using log4net;
-using log4net.Config;
+using TestLibrary;
 
 // Useful to debug unit tests.
 namespace TestLibraryRunner
@@ -25,7 +27,6 @@ namespace TestLibraryRunner
             // For testing, always accept any certificate
             return true;
         }
-
     }
 
     class Program
@@ -39,10 +40,10 @@ namespace TestLibraryRunner
                     File.ReadAllText(path));
             object[] server = servers.ElementAt(serverId);
 
-            CmisSyncTests tests = new CmisSyncTests();
+            SyncTests tests = new SyncTests();
 
             tests.Init();
-            tests.Sync((string)server[0], (string)server[1],
+            tests.EmptySync((string)server[0], (string)server[1],
                     (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
             tests.TearDown();
         }
@@ -52,7 +53,7 @@ namespace TestLibraryRunner
             IEnumerable<object[]> servers = JsonConvert.DeserializeObject<List<object[]>>(
                     File.ReadAllText("../../../TestLibrary/test-servers-fuzzy.json"));
             object[] server = servers.ElementAt(serverId);
-            new CmisSyncTests().GetRepositoriesFuzzy((string)server[0], (string)server[1], (string)server[2]);
+            new SyncTests().GetRepositoriesFuzzy((string)server[0], (string)server[1], (string)server[2]);
         }
 
         static void Main(string[] args)

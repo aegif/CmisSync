@@ -1,5 +1,6 @@
 ﻿using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Sync;
 using DotCMIS;
 using DotCMIS.Client;
 using DotCMIS.Client.Impl;
@@ -15,7 +16,6 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using static CmisSync.Lib.Sync.CmisRepo;
 
 namespace TestLibrary
 {
@@ -377,7 +377,7 @@ namespace TestLibrary
         /// <param name='pollInterval'>
         /// Sleep interval duration in miliseconds between synchronization calls.
         /// </param>
-        public static bool SyncAndWaitUntilCondition(SynchronizedFolder synchronizedFolder, Func<bool> checkStop, int maxTries = 4, int pollInterval = 5000)
+        public static bool SyncAndWaitUntilCondition(CmisRepo.SynchronizedFolder synchronizedFolder, Func<bool> checkStop, int maxTries = 4, int pollInterval = 5000)
         {
             int i = 0;
             while (i < maxTries)
