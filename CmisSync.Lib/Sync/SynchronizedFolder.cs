@@ -202,7 +202,7 @@ namespace CmisSync.Lib.Sync
                         }
                         finally
                         {
-                            SyncComplete(syncFull, success);
+                            OnSyncComplete(syncFull, success);
                         }
                     }
                 );
@@ -353,39 +353,17 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
             /// </summary>
-            public void Sync()
+            /// <returns>success or not</returns>
+            public bool Sync()
             {
-                Sync(true);
-            }
-
-
-            /// <summary>
-            /// Track whether a full sync is done
-            /// </summary>
-            private bool syncFull = false;
-
-            /// <summary>
-            /// Forces the full sync independent of FS events or Remote events.
-            /// </summary>
-            public void ForceFullSync()
-            {
-                ForceFullSyncAtNextSync();
-                Sync();
-            }
-
-            /// <summary>
-            /// Forces the full sync at next sync.
-            /// This can be used to ensure a full sync if fs or remote events where lost.
-            /// </summary>
-            public void ForceFullSyncAtNextSync()
-            {
-                syncFull = false;
+                return Sync(true);
             }
 
 
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
             /// </summary>
+            /// <returns>success or not</returns>
             public bool Sync(bool syncFull)
             {
                 lock (syncLock)
@@ -486,9 +464,9 @@ namespace CmisSync.Lib.Sync
             }
 
             /// <summary>
-            /// Synchronize has completed.
+            /// Synchronization has completed.
             /// </summary>
-            public void SyncComplete(bool syncFull, bool success)
+            public void OnSyncComplete(bool syncFull, bool success)
             {
                 lock (syncLock)
                 {
@@ -507,6 +485,7 @@ namespace CmisSync.Lib.Sync
             /// Sync on the current thread.
             /// </summary>
             /// <param name="syncFull"></param>
+            /// <returns>success or not</returns>
             public bool SyncInForeground(bool syncFull)
             {
                 if (IsSyncing())
@@ -530,7 +509,7 @@ namespace CmisSync.Lib.Sync
                 }
                 finally
                 {
-                    SyncComplete(syncFull, success);
+                    OnSyncComplete(syncFull, success);
                 }
                 return success;
             }
@@ -681,7 +660,8 @@ namespace CmisSync.Lib.Sync
             /// <param name="remoteFolder">The new folder to download. Example: /sites/project/newfolder</param>
             /// <param name="remotePath">The new folder to download. Example: /sites/project/newfolder</param>
             /// <param name="localFolder">The new folder that will be filled by this operation. Warning: It must exist already! Example: C:\CmisSync\project\newfolder</param> TODO: Create the local folder in this method.
-            private void RecursiveFolderCopy(IFolder remoteFolder, string remotePath, string localFolder)
+            /// <returns>success or not</returns>
+            private bool RecursiveFolderCopy(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 SleepWhileSuspended();
 
@@ -693,7 +673,7 @@ namespace CmisSync.Lib.Sync
                 catch (CmisBaseException e)
                 {
                     ProcessRecoverableException("Could not get children objects: " + remoteFolder.Path, e);
-                    return;
+                    return false;
                 }
 
                 // Remember seen names, and depending on the profile ignore the ones that have appeared already.
@@ -701,7 +681,8 @@ namespace CmisSync.Lib.Sync
                 // Store lowercase file and folder names inside.
                 HashSet<string> names = new HashSet<string>();
 
-                // List all children.
+                // Download all children.
+                bool success = true;
                 foreach (ICmisObject cmisObject in children)
                 {
                     string remoteSubPath = remotePath + CmisUtils.CMIS_FILE_SEPARATOR + cmisObject.Name;
@@ -730,7 +711,7 @@ namespace CmisSync.Lib.Sync
 
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoInfo))
                         {
-                            DownloadDirectory(remoteSubFolder, remoteSubPath, localSubFolderItem.LocalPath);
+                            success &= DownloadDirectory(remoteSubFolder, remoteSubPath, localSubFolderItem.LocalPath);
                             names.Add(remoteSubFolder.Name.ToLowerInvariant());
                         }
                     }
@@ -753,7 +734,7 @@ namespace CmisSync.Lib.Sync
 
                         if (Utils.WorthSyncing(localFolder, repoInfo.CmisProfile.localFilename(document), repoInfo))
                         {
-                            DownloadFile(document, remoteSubPath, localFolder);
+                            success &= DownloadFile(document, remoteSubPath, localFolder);
                             names.Add(document.Name.ToLowerInvariant());
                         }
                     }
@@ -763,6 +744,7 @@ namespace CmisSync.Lib.Sync
                             + " for object " + remoteFolder + "/" + cmisObject.Name);
                     }
                 }
+                return success;
             }
 
 
@@ -803,16 +785,17 @@ namespace CmisSync.Lib.Sync
                 Logger.Info("Added folder to database: " + localFolder);
 
                 // Recurse into folder.
-                RecursiveFolderCopy(remoteFolder, remotePath, localFolder);
+                bool success = RecursiveFolderCopy(remoteFolder, remotePath, localFolder);
 
-                return true;
+                return success;
             }
 
 
             /// <summary>
             /// Set the last modification date of a local file to whatever a remote document's last modfication date is.
             /// </summary>
-            private void SetLastModifiedDate(IDocument remoteDocument, string filepath, Dictionary<string, string[]> metadata)
+            /// <returns>true if successful</returns>
+            private bool SetLastModifiedDate(IDocument remoteDocument, string filepath, Dictionary<string, string[]> metadata)
             {
                 try
                 {
@@ -833,7 +816,9 @@ namespace CmisSync.Lib.Sync
                 catch (Exception e)
                 {
                     Logger.Debug(String.Format("Failed to set last modified date for the local file: {0}", filepath), e);
+                    return false;
                 }
+                return true;
             }
 
 
@@ -884,6 +869,7 @@ namespace CmisSync.Lib.Sync
             /// Create CmisSync database entry for this file
             /// 
             /// </summary>
+            /// <returns>success or not</returns>
             private bool DownloadFile(IDocument remoteDocument, string remotePath, string localFolder)
             {
                 //Logger.Debug("DownloadFile " + remoteDocument + " remotePath:" + remotePath + " localFolder:" + localFolder);
@@ -1021,7 +1007,7 @@ namespace CmisSync.Lib.Sync
                             // Remove the ".sync" suffix.
                             Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
                             File.Move(tmpFilePath, filePath);
-                            SetLastModifiedDate(remoteDocument, filePath, metadata);
+                            success &= SetLastModifiedDate(remoteDocument, filePath, metadata);
 
                             // Warn user about conflict.
                             string lastModifiedBy = CmisUtils.GetProperty(remoteDocument, "cmis:lastModifiedBy");
@@ -1040,7 +1026,7 @@ namespace CmisSync.Lib.Sync
                             Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
                             // Remove the ".sync" suffix.
                             File.Move(tmpFilePath, filePath);
-                            SetLastModifiedDate(remoteDocument, filePath, metadata);
+                            success &= SetLastModifiedDate(remoteDocument, filePath, metadata);
                         }
                     }
                     else // New file
@@ -1048,7 +1034,7 @@ namespace CmisSync.Lib.Sync
                         Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
                         // Remove the ".sync" suffix.
                         File.Move(tmpFilePath, filePath);
-                        SetLastModifiedDate(remoteDocument, filePath, metadata);
+                        success &= SetLastModifiedDate(remoteDocument, filePath, metadata);
                     }
 
                     if (null != remoteDocument.CreationDate)

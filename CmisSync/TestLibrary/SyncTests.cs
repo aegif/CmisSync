@@ -159,7 +159,8 @@ namespace TestLibrary
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
 
-            synchronizedFolder.Sync();
+            bool success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
@@ -193,7 +194,8 @@ namespace TestLibrary
                 Path.Combine(cmisSyncDirectory, canonicalName), 3);
 
             // Sync.
-            synchronizedFolder.Sync();
+            bool success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
 
             // Check that file is present server-side.
             IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
@@ -235,7 +237,8 @@ namespace TestLibrary
             LocalFilesystemActivityGenerator.CreateRandomFile(localPath, 1000); // 1 MB ... no that big to not load servers too much.
 
             // Sync.
-            synchronizedFolder.Sync();
+            bool success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
 
             // Check that file is present server-side.
             IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
@@ -500,37 +503,47 @@ namespace TestLibrary
             Console.WriteLine("Create remote document");
             Assert.IsFalse(File.Exists(path1));
             IDocument doc1 = CreateDocument(remoteFolder, name1, "test");
-            synchronizedFolder.Sync();
-            Assert.IsTrue(WaitUntilCondition(delegate {
+            bool success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
                 return File.Exists(path1);
             }));
 
             Console.WriteLine("Rename remote document");
             IDocument doc2 = RenameDocument(doc1, name2);
-            synchronizedFolder.Sync();
-            Assert.IsTrue(WaitUntilCondition(delegate {
+            success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
                 return !File.Exists(path1) && File.Exists(path2);
             }));
             
             Console.WriteLine("Create remote folder");
             IFolder remoteSubFolder = CreateFolder(remoteFolder, name1);
-            synchronizedFolder.Sync();
-            Assert.IsTrue(WaitUntilCondition(delegate {
+            success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
                 return Directory.Exists(path1);
             }));
 
             Console.WriteLine("Move remote document");
             string filename = Path.Combine(path1, name2);
             doc2.Move(remoteFolder, remoteSubFolder);
-            synchronizedFolder.Sync();
-            Assert.IsTrue(WaitUntilCondition(delegate {
+            success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
                 return File.Exists(filename);
             }));
 
             Console.WriteLine("Delete remote document");
             doc2.DeleteAllVersions();
-            synchronizedFolder.Sync();
-            Assert.IsTrue(WaitUntilCondition(delegate {
+            success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
                 return !File.Exists(filename);
             }));
 
@@ -592,8 +605,10 @@ namespace TestLibrary
             SyncAndWaitUntilCondition(synchronizedFolder, delegate {
                 return !Directory.Exists(path2);
             });
-            if(Directory.Exists(path2))
-                synchronizedFolder.ForceFullSync();
+            if (Directory.Exists(path2))
+            {
+                success = synchronizedFolder.Sync();
+            }
             Assert.IsFalse(Directory.Exists(path2));
         }
 
