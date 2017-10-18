@@ -183,15 +183,15 @@ namespace CmisSync.Lib.Sync
                                 if (rename)
                                 {
                                     //rename file...
-                                    IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName);
+                                    IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName, true);
                                     success &= RenameFile(oldDirectory, newFilename, remoteDocument);
                                 }
                                 else //move
                                 {
                                     //move file...
-                                    IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName);
-                                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName);
-                                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName);
+                                    IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName, true);
+                                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName, true);
+                                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName, true);
                                     success &= MoveFile(oldDirectory, newDirectory, oldRemoteFolder, newRemoteFolder, remoteDocument);
                                 }
                             }
@@ -209,15 +209,15 @@ namespace CmisSync.Lib.Sync
                                 if (rename)
                                 {
                                     //rename folder...
-                                    IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName);
+                                    IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName, true);
                                     success &= RenameFolder(oldDirectory, newFilename, remoteFolderObject);
                                 }
                                 else //move
                                 {
                                     //move folder...
-                                    IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName);
-                                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName);
-                                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName);
+                                    IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName, true);
+                                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName, true);
+                                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName, true);
                                     success &= MoveFolder(oldDirectory, newDirectory, oldRemoteFolder, newRemoteFolder, remoteFolderObject);
                                 }
                             }
@@ -282,7 +282,7 @@ namespace CmisSync.Lib.Sync
                         bool isFolder = Utils.IsFolder(localPath);
                         SyncItem item = SyncItemFactory.CreateFromLocalPath(localPath, isFolder, repoInfo, database);
                         string remoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(item.RemotePath);
-                        remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
+                        remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName, true);
                         if (null == remoteBase)
                         {
                             Logger.WarnFormat("The remote base folder {0} for local {1} does not exist, ignore for the update action", remoteBaseName, localPath);

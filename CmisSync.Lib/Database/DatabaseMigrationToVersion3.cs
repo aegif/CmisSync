@@ -155,7 +155,7 @@ namespace CmisSync.Lib.Database
                             string id = null;
                             try
                             {
-                                id = session.GetObjectByPath(remotePath).Id;
+                                id = session.GetObjectByPath(remotePath, true).Id;
                             }
                             catch (DotCMIS.Exceptions.CmisObjectNotFoundException e)
                             {
@@ -188,7 +188,7 @@ namespace CmisSync.Lib.Database
                             string id = null;
                             try
                             {
-                                id = session.GetObjectByPath(remotePath).Id;
+                                id = session.GetObjectByPath(remotePath, true).Id;
                             }
                             catch (DotCMIS.Exceptions.CmisObjectNotFoundException e)
                             {

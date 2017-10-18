@@ -746,7 +746,7 @@ namespace CmisSync.Lib.Sync
                                 // The folder just appeared both on the local and remote sides.
                                 // Rename local folder then download remote folder.
 
-                                IFolder remoteFolder = (IFolder)session.GetObjectByPath(syncFolderItem.RemotePath);
+                                IFolder remoteFolder = (IFolder)session.GetObjectByPath(syncFolderItem.RemotePath, true);
 
                                 var path = syncFolderItem.LocalPath;
                                 var newPath = Utils.CreateConflictFoldername(path, repoInfo.User);

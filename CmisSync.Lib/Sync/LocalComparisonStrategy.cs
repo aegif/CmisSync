@@ -183,7 +183,7 @@ namespace CmisSync.Lib.Sync
                     SyncItem deletedItem = SyncItemFactory.CreateFromLocalPath(deletedFolder, true, repoInfo, database);
                     try
                     {
-                        var deletedIFolder = session.GetObjectByPath(deletedItem.RemotePath) as IFolder;
+                        var deletedIFolder = session.GetObjectByPath(deletedItem.RemotePath, true) as IFolder;
 
                         // Check whether the remote folder has changes we haven't gotten yet (conflict)
                         var changed = HasFolderChanged(deletedIFolder);
@@ -293,7 +293,7 @@ namespace CmisSync.Lib.Sync
                     SyncItem deletedItem = SyncItemFactory.CreateFromLocalPath(deletedFile, false, repoInfo, database);
                     try
                     {
-                        IDocument deletedDocument = (IDocument)session.GetObjectByPath(deletedItem.RemotePath);
+                        IDocument deletedDocument = (IDocument)session.GetObjectByPath(deletedItem.RemotePath, true);
 
                         try
                         {
@@ -343,7 +343,7 @@ namespace CmisSync.Lib.Sync
                     try
                     {
                         Logger.Info("Uploading file update on repository: " + modifiedFile);
-                        IDocument modifiedDocument = (IDocument)session.GetObjectByPath(modifiedItem.RemotePath);
+                        IDocument modifiedDocument = (IDocument)session.GetObjectByPath(modifiedItem.RemotePath, true);
                         success &= UpdateFile(modifiedItem.LocalPath, modifiedDocument);
                     }
                     catch (Exception e)
@@ -369,7 +369,7 @@ namespace CmisSync.Lib.Sync
                     SyncItem addedFolderItem = SyncItemFactory.CreateFromLocalPath(addedFolder, true, repoInfo, database);
                     try
                     {
-                        IFolder destinationFolder = (IFolder)session.GetObjectByPath(destinationFolderItem.RemotePath);
+                        IFolder destinationFolder = (IFolder)session.GetObjectByPath(destinationFolderItem.RemotePath, true);
 
                         IList<string> remoteFolders = new List<string>();
 
@@ -410,7 +410,7 @@ namespace CmisSync.Lib.Sync
                     SyncItem fileItem = SyncItemFactory.CreateFromLocalPath(addedFile, false, repoInfo, database);
                     try
                     {
-                        IFolder destinationFolder = (IFolder)session.GetObjectByPath(folderItem.RemotePath);
+                        IFolder destinationFolder = (IFolder)session.GetObjectByPath(folderItem.RemotePath, true);
 
                         // Fill documents list, needed by the crawl method.
                         IList<string> remoteFiles = new List<string>();

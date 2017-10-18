@@ -198,7 +198,7 @@ namespace TestLibrary
             Assert.IsTrue(success);
 
             // Check that file is present server-side.
-            IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+            IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath, true);
             Assert.NotNull(doc);
             Assert.AreEqual(filename, doc.ContentStreamFileName);
             Assert.AreEqual(filename, doc.Name);
@@ -227,7 +227,6 @@ namespace TestLibrary
             CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
-            synchronizedFolder.resetFailedOperationsCounter();
             synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
 
@@ -241,7 +240,7 @@ namespace TestLibrary
             Assert.IsTrue(success);
 
             // Check that file is present server-side.
-            IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath);
+            IDocument doc = (IDocument)CreateSession(repoInfo).GetObjectByPath(remoteFilePath, true);
             Assert.NotNull(doc);
             Assert.AreEqual(filename, doc.ContentStreamFileName);
             Assert.AreEqual(filename, doc.Name);
@@ -492,7 +491,7 @@ namespace TestLibrary
                 new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
 
             ISession session = CreateSession(repoInfo);
-            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
 
             string name1 = "test.1";
             string path1 = Path.Combine(localPath, name1);
@@ -640,7 +639,7 @@ namespace TestLibrary
             CmisRepo.SynchronizedFolder synchronizedFolder =
             new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
             ISession session = CreateSession(repoInfo);
-            IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+            IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
 
             string name1 = "test.1";
             string path1 = Path.Combine(localPath, name1);
@@ -1323,7 +1322,7 @@ namespace TestLibrary
             cmisRepo.Initialize();
 
             ISession session = CreateSession(repoInfo);
-            IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+            IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
 
             string name1 = "SyncConcurrent.1";
             string path1 = Path.Combine(localPath, name1);
@@ -1508,7 +1507,6 @@ namespace TestLibrary
                     repoInfo,
                     cmis,
                     new Mock<IActivityListener>().Object);
-            synchronizedFolder.resetFailedOperationsCounter();
             synchronizedFolder.Sync();
             Console.WriteLine("Synced to clean state.");
 
@@ -1566,7 +1564,7 @@ namespace TestLibrary
             ISession session = factory.CreateSession(cmisParameters);
 
             // IFolder root = session.GetRootFolder();
-            IFolder root = (IFolder)session.GetObjectByPath(remoteFolderPath);
+            IFolder root = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
 
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, fileName);
@@ -1602,7 +1600,7 @@ namespace TestLibrary
             Assert.True(found);
 
             // Clean.
-            IDocument doc = (IDocument)session.GetObjectByPath((remoteFolderPath + "/" + fileName).Replace("//", "/"));
+            IDocument doc = (IDocument)session.GetObjectByPath((remoteFolderPath + "/" + fileName).Replace("//", "/"), true);
             doc.DeleteAllVersions();
         }
 

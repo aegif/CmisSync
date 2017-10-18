@@ -101,7 +101,7 @@ namespace TestLibrary
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
             cmisParameters[SessionParameter.ConnectTimeout] = "-1";
             ISession session = SessionFactory.NewInstance().CreateSession(cmisParameters);
-            Folder folder = (Folder)session.GetObjectByPath(remoteFolderPath);
+            Folder folder = (Folder)session.GetObjectByPath(remoteFolderPath, true);
             foreach (ICmisObject cmisObject in folder.GetChildren())
             {
                 if (cmisObject is Folder)

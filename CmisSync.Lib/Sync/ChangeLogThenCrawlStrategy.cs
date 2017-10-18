@@ -233,7 +233,8 @@ namespace CmisSync.Lib.Sync
 
                         try
                         {
-                            var cmisObject = session.GetObject(id);
+                            // Get the object with that identifier. Note that it might not exist anymore, so errors are expected, no need to log their details.
+                            var cmisObject = session.GetObject(id, false);
                             if (change.ChangeType == ChangeType.Updated)
                             {
                                 // Updates are tricky, as they can be move/rename operations in which we don't get complete information about
@@ -261,7 +262,7 @@ namespace CmisSync.Lib.Sync
 
                                     try
                                     {
-                                        var destCmisFolder = session.GetObjectByPath(destFolderItem.RemotePath) as IFolder;
+                                        var destCmisFolder = session.GetObjectByPath(destFolderItem.RemotePath, true) as IFolder;
 
                                         if (local.IsFolder)
                                         {

@@ -222,7 +222,7 @@ namespace CmisSync.Lib.Cmis
             IFolder folder;
             try
             {
-                folder = (IFolder)session.GetObjectByPath(path);
+                folder = (IFolder)session.GetObjectByPath(path, true);
             }
             catch (Exception ex)
             {
@@ -312,7 +312,7 @@ namespace CmisSync.Lib.Cmis
             IFolder folder;
             try
             {
-                folder = (IFolder)session.GetObjectByPath(path);
+                folder = (IFolder)session.GetObjectByPath(path, true);
             }
             catch (Exception ex)
             {
@@ -551,7 +551,8 @@ namespace CmisSync.Lib.Cmis
         {
             try
             {
-                ICmisObject cmisObject = session.GetObjectByPath(path);
+                // Try querying for this object. The object not existing is a common case, so do not log potential error.
+                ICmisObject cmisObject = session.GetObjectByPath(path, false);
 
                 if (cmisObject == null)
                 {
