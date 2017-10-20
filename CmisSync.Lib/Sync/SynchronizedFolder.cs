@@ -142,7 +142,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Event to notify that the sync has completed.
             /// </summary>
-            private AutoResetEvent autoResetEvent = new AutoResetEvent(true);
+            private AutoResetEvent autoResetEvent = new AutoResetEvent(true); // TODO needed?
 
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
@@ -180,11 +180,10 @@ namespace CmisSync.Lib.Sync
                 syncWorker.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
-                        bool syncFull = (bool)args.Argument;
                         bool success = false;
                         try
                         {
-                            success = Sync(syncFull);
+                            success = Sync();
                         }
                         catch (OperationCanceledException e)
                         {
@@ -202,7 +201,7 @@ namespace CmisSync.Lib.Sync
                         }
                         finally
                         {
-                            OnSyncComplete(syncFull, success);
+                            OnSyncComplete(success);
                         }
                     }
                 );
@@ -258,13 +257,6 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
-            /// <summary>
-            /// Resets all the failed upload to zero.
-            /// </summary>
-            public void resetFailedOperationsCounter()
-            {
-                database.DeleteAllFailedOperations();
-            }
 
             /// <summary>
             /// Connect to the CMIS repository.
@@ -350,26 +342,17 @@ namespace CmisSync.Lib.Sync
                 return this.enabled;
             }
 
+
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
             /// </summary>
             /// <returns>success or not</returns>
             public bool Sync()
             {
-                return Sync(true);
-            }
-
-
-            /// <summary>
-            /// Synchronize between CMIS folder and local folder.
-            /// </summary>
-            /// <returns>success or not</returns>
-            public bool Sync(bool syncFull)
-            {
                 lock (syncLock)
                 {
                     autoResetEvent.Reset();
-                    repo.OnSyncStart(syncFull);
+                    repo.OnSyncStart();
 
                     SleepWhileSuspended();
 
@@ -394,7 +377,7 @@ namespace CmisSync.Lib.Sync
                     IFolder remoteFolder = null;
                     try
                     {
-                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
                     }
                     catch (PermissionDeniedException e)
                     {
@@ -402,7 +385,7 @@ namespace CmisSync.Lib.Sync
                         Connect();
 
                         // Retry the same operation.
-                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
                     }
 
                     string localFolder = repoInfo.TargetDirectory;
@@ -466,13 +449,13 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Synchronization has completed.
             /// </summary>
-            public void OnSyncComplete(bool syncFull, bool success)
+            public void OnSyncComplete(bool success)
             {
                 lock (syncLock)
                 {
                     try
                     {
-                        repo.OnSyncComplete(syncFull, success);
+                        repo.OnSyncComplete(success);
                     }
                     finally
                     {
@@ -484,9 +467,8 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Sync on the current thread.
             /// </summary>
-            /// <param name="syncFull"></param>
             /// <returns>success or not</returns>
-            public bool SyncInForeground(bool syncFull)
+            public bool SyncInForeground()
             {
                 if (IsSyncing())
                 {
@@ -497,7 +479,7 @@ namespace CmisSync.Lib.Sync
                 bool success = false;
                 try
                 {
-                    success = Sync(syncFull);
+                    success = Sync();
                 }
                 catch (CmisPermissionDeniedException e)
                 {
@@ -509,7 +491,7 @@ namespace CmisSync.Lib.Sync
                 }
                 finally
                 {
-                    OnSyncComplete(syncFull, success);
+                    OnSyncComplete(success);
                 }
                 return success;
             }
@@ -517,7 +499,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Sync in the background.
             /// </summary>
-            public void SyncInBackground(bool syncFull)
+            public void SyncInBackground()
             {
                 if (IsSyncing())
                 {
@@ -525,7 +507,7 @@ namespace CmisSync.Lib.Sync
                     return;
                 }
 
-                syncWorker.RunWorkerAsync(syncFull);
+                syncWorker.RunWorkerAsync();
 
                 Logger.Debug("SyncInBackground: IsSyncing(): " + IsSyncing());
             }
