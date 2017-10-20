@@ -394,7 +394,7 @@ namespace CmisSync.Lib.Sync
                     IFolder remoteFolder = null;
                     try
                     {
-                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
                     }
                     catch (PermissionDeniedException e)
                     {
@@ -402,7 +402,7 @@ namespace CmisSync.Lib.Sync
                         Connect();
 
                         // Retry the same operation.
-                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
                     }
 
                     string localFolder = repoInfo.TargetDirectory;
