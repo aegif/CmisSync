@@ -71,7 +71,7 @@ namespace CmisSync.Lib.Sync
                     return true;
                 }
 
-                bool success = false;
+                bool success = true;
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just sync everything from remote.

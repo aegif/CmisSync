@@ -389,7 +389,7 @@ namespace CmisSync.Lib.Sync
                     }
 
                     string localFolder = repoInfo.TargetDirectory;
-                    var success = false;
+                    var success = true;
 
                     if (firstSync)
                     {
