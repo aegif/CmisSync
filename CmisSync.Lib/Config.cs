@@ -342,7 +342,7 @@ namespace CmisSync.Lib
         /// </summary>
         public string GetLogFilePath()
         {
-            return Path.Combine(ConfigPath, "debug_log.txt");
+            return Path.Combine(ConfigPath, "CmisSync_log.txt");
         }
 
         private string GetLogLevel()
