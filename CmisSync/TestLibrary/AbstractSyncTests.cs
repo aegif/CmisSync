@@ -124,7 +124,7 @@ namespace TestLibrary
             return Path.GetDirectoryName(ConfigManager.CurrentConfigFile);
         }
 
-        protected void DeleteDirectoryIfExists(string path)
+        protected void DeleteLocalDirectoryIfExists(string path)
         {
             if (Directory.Exists(path))
             {
@@ -211,7 +211,7 @@ namespace TestLibrary
             return SessionFactory.NewInstance().CreateSession(cmisParameters);
         }
 
-        protected IDocument CreateDocument(IFolder folder, string name, string content)
+        protected IDocument CreateRemoteDocument(IFolder folder, string name, string content)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -226,7 +226,7 @@ namespace TestLibrary
             return folder.CreateDocument(properties, contentStream, null);
         }
 
-        protected IFolder CreateFolder(IFolder folder, string name)
+        protected IFolder CreateRemoteFolder(IFolder folder, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -235,7 +235,7 @@ namespace TestLibrary
             return folder.CreateFolder(properties);
         }
 
-        protected IDocument CopyDocument(IFolder folder, IDocument source, string name)
+        protected IDocument CopyRemoteDocument(IFolder folder, IDocument source, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -244,7 +244,7 @@ namespace TestLibrary
             return folder.CreateDocumentFromSource(source, properties, null);
         }
 
-        protected IDocument RenameDocument(IDocument source, string name)
+        protected IDocument RenameRemoteDocument(IDocument source, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -252,7 +252,7 @@ namespace TestLibrary
             return (IDocument)source.UpdateProperties(properties);
         }
 
-        protected IFolder RenameFolder(IFolder source, string name)
+        protected IFolder RenameRemoteFolder(IFolder source, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -260,7 +260,7 @@ namespace TestLibrary
             return (IFolder)source.UpdateProperties(properties);
         }
 
-        protected void CreateHeavyFolder(string root)
+        protected void CreateHeavyLocalFolder(string root)
         {
             for (int iFolder = 0; iFolder < HEAVY_FACTOR; ++iFolder)
             {
@@ -282,7 +282,7 @@ namespace TestLibrary
             }
         }
 
-        protected bool CheckHeavyFolder(string root)
+        protected bool CheckHeavyLocalFolder(string root)
         {
             for (int iFolder = 0; iFolder < HEAVY_FACTOR; ++iFolder)
             {
@@ -323,15 +323,15 @@ namespace TestLibrary
             return true;
         }
 
-        protected void CreateHeavyFolderRemote(IFolder root)
+        protected void CreateHeavyRemoteFolder(IFolder root)
         {
             for (int iFolder = 0; iFolder < HEAVY_FACTOR; ++iFolder)
             {
-                IFolder folder = CreateFolder(root, iFolder.ToString());
+                IFolder folder = CreateRemoteFolder(root, iFolder.ToString());
                 for (int iFile = 0; iFile < HEAVY_FACTOR; ++iFile)
                 {
                     string content = new string((char)('A' + iFile % 10), HEAVY_FILE_SIZE);
-                    CreateDocument(folder, iFile.ToString(), content);
+                    CreateRemoteDocument(folder, iFile.ToString(), content);
                 }
             }
         }
@@ -349,7 +349,7 @@ namespace TestLibrary
         /// <param name='length'>
         /// Length (default is 1024)
         /// </param>
-        private string createOrModifyBinaryFile(string file, int length = 1024)
+        private string createOrModifyLocalBinaryFile(string file, int length = 1024)
         {
             using (Stream stream = File.Open(file, FileMode.Create))
             {

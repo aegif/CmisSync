@@ -501,7 +501,7 @@ namespace TestLibrary
 
             Console.WriteLine("Create remote document");
             Assert.IsFalse(File.Exists(path1));
-            IDocument doc1 = CreateDocument(remoteFolder, name1, "test");
+            IDocument doc1 = CreateRemoteDocument(remoteFolder, name1, "test");
             bool success = synchronizedFolder.Sync();
             Assert.IsTrue(success);
             Assert.IsTrue(WaitUntilCondition(delegate
@@ -510,7 +510,7 @@ namespace TestLibrary
             }));
 
             Console.WriteLine("Rename remote document");
-            IDocument doc2 = RenameDocument(doc1, name2);
+            IDocument doc2 = RenameRemoteDocument(doc1, name2);
             success = synchronizedFolder.Sync();
             Assert.IsTrue(success);
             Assert.IsTrue(WaitUntilCondition(delegate
@@ -519,7 +519,7 @@ namespace TestLibrary
             }));
             
             Console.WriteLine("Create remote folder");
-            IFolder remoteSubFolder = CreateFolder(remoteFolder, name1);
+            IFolder remoteSubFolder = CreateRemoteFolder(remoteFolder, name1);
             success = synchronizedFolder.Sync();
             Assert.IsTrue(success);
             Assert.IsTrue(WaitUntilCondition(delegate
@@ -550,7 +550,7 @@ namespace TestLibrary
             Console.WriteLine(" Remote rename folder");
             Assert.IsTrue(Directory.Exists(path1));
             Assert.IsFalse(Directory.Exists(path2));
-            IFolder folder2 = RenameFolder(remoteSubFolder, name2);
+            IFolder folder2 = RenameRemoteFolder(remoteSubFolder, name2);
             Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
                 return !Directory.Exists(path1) && Directory.Exists(path2);
             }));
@@ -560,7 +560,7 @@ namespace TestLibrary
             //  move folder
             Console.WriteLine(" Remote move folder");
             Assert.IsFalse(Directory.Exists(path1));
-            remoteSubFolder = CreateFolder(remoteFolder, name1);
+            remoteSubFolder = CreateRemoteFolder(remoteFolder, name1);
             Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
                 return Directory.Exists(path1) && !Directory.Exists(Path.Combine(path2, name1));
             }));
@@ -577,8 +577,8 @@ namespace TestLibrary
             Console.WriteLine(" Remote move folder with subfolder and subfile");
             Assert.IsFalse(File.Exists(Path.Combine(path2, name1, name1)));
             Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1, name2)));
-            CreateDocument(remoteSubFolder, name1, "test");
-            CreateFolder(remoteSubFolder, name2);
+            CreateRemoteDocument(remoteSubFolder, name1, "test");
+            CreateRemoteFolder(remoteSubFolder, name2);
             Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate {
                 return File.Exists(Path.Combine(path2, name1, name1)) && Directory.Exists(Path.Combine(path2, name1, name2));
             }));
@@ -650,36 +650,36 @@ namespace TestLibrary
             //  create heavy folder
             Console.WriteLine(" Remote create heavy folder");
             Assert.IsFalse(Directory.Exists(path1));
-            IFolder folder1 = CreateFolder(folder, name1);
+            IFolder folder1 = CreateRemoteFolder(folder, name1);
             synchronizedFolder.Sync();
             Assert.IsTrue(WaitUntilCondition(delegate
             {
                 return Directory.Exists(path1);
             }));
-            CreateHeavyFolderRemote(folder1);
+            CreateHeavyRemoteFolder(folder1);
             synchronizedFolder.Sync();
             Assert.IsTrue(WaitUntilCondition(delegate
             {
-                return CheckHeavyFolder(path1);
+                return CheckHeavyLocalFolder(path1);
             }));
 
             //  rename heavy folder
             Console.WriteLine(" Remote rename heavy folder");
-            IFolder folder2 = RenameFolder(folder1, name2);
+            IFolder folder2 = RenameRemoteFolder(folder1, name2);
             synchronizedFolder.Sync();
             Assert.IsTrue(WaitUntilCondition(delegate
             {
-                return CheckHeavyFolder(path2);
+                return CheckHeavyLocalFolder(path2);
             }));
 
             //  move heavy folder
             Console.WriteLine(" Remote move heavy folder");
-            folder1 = CreateFolder(folder, name1);
+            folder1 = CreateRemoteFolder(folder, name1);
             folder2.Move(folder, folder1);
             synchronizedFolder.Sync();
             Assert.IsTrue(WaitUntilCondition(delegate
             {
-                return CheckHeavyFolder(Path.Combine(path1,name2));
+                return CheckHeavyLocalFolder(Path.Combine(path1,name2));
             }));
 
             //  delete heavy folder
@@ -1330,36 +1330,36 @@ namespace TestLibrary
             string path2 = Path.Combine(localPath, name2);
 
             //  create heavy folder in concurrent
-            IFolder folder1 = CreateFolder(folder, name1);
+            IFolder folder1 = CreateRemoteFolder(folder, name1);
             synchronizedFolder.Sync();
             Assert.IsTrue(WaitUntilCondition(delegate
             {
                 return Directory.Exists(path1);
             }));
-            CreateHeavyFolderRemote(folder1);
+            CreateHeavyRemoteFolder(folder1);
             synchronizedFolder.Sync();
             Assert.IsTrue(WaitUntilCondition(delegate
             {
-                return CheckHeavyFolder(path1);
+                return CheckHeavyLocalFolder(path1);
             }));
 
             //  rename heavy folder in concurrent 
             Console.WriteLine(" Concurrent rename heavy folder");
-            IFolder folder2 = RenameFolder(folder1, name2);
+            IFolder folder2 = RenameRemoteFolder(folder1, name2);
             synchronizedFolder.Sync();
             Assert.IsTrue(WaitUntilCondition(delegate
             {
-                return CheckHeavyFolder(path2);
+                return CheckHeavyLocalFolder(path2);
             }));
 
             //  move heavy folder in concurrent
             Console.WriteLine(" Concurrent move heavy folder");
-            folder1 = CreateFolder(folder, name1);
+            folder1 = CreateRemoteFolder(folder, name1);
             folder2.Move(folder, folder1);
             synchronizedFolder.Sync();
             Assert.IsTrue(WaitUntilCondition(delegate
             {
-                return CheckHeavyFolder(Path.Combine(path1, name2));
+                return CheckHeavyLocalFolder(Path.Combine(path1, name2));
             }));
 
             //  delete heavy folder in concurrent
@@ -1374,8 +1374,8 @@ namespace TestLibrary
             //  create and delete heavy folder in concurrent
             Console.WriteLine(" Remote create and delete heavy folder");
             cmisRepo.Disable();
-            folder1 = CreateFolder(folder, name1);
-            CreateHeavyFolderRemote(folder1);
+            folder1 = CreateRemoteFolder(folder, name1);
+            CreateHeavyRemoteFolder(folder1);
             cmisRepo.Enable();
             folder1.DeleteTree(true, null, true);
             synchronizedFolder.Sync();
