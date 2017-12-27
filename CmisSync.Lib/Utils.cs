@@ -50,7 +50,11 @@ namespace CmisSync.Lib
         /// </summary>
         public static void NotifyUser(string message)
         {
-            userNotificationListener.NotifyUser(message);
+            Logger.Info(message);
+            if (userNotificationListener != null)
+            {
+                userNotificationListener.NotifyUser(message);
+            }
         }
 
 
