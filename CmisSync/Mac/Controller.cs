@@ -28,7 +28,7 @@ using MonoMac.ObjCRuntime;
 using Mono.Unix.Native;
 
 using CmisSync.Lib;
-using CmisSync.Lib.Events;
+// using CmisSync.Lib.Events;
 using CmisSync.Lib.Cmis;
 
 using log4net;

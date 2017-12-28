@@ -27,7 +27,7 @@ using MonoMac.ObjCRuntime;
 using log4net;
 
 using CmisSync.Lib;
-using CmisSync.Lib.Events;
+// using CmisSync.Lib.Events;
 
 namespace CmisSync {
 
@@ -60,6 +60,15 @@ namespace CmisSync {
         private NSImage update_image;
 
         private Dictionary<String, NSMenuItem> FolderItems;
+
+        public enum SyncStatus
+        {
+            Idle,
+            Paused,
+            SyncUp,
+            SyncDown,
+            Error
+        }
 
         public StatusIcon () : base ()
         {
@@ -396,7 +405,7 @@ namespace CmisSync {
     }
 
     //TODO This isn't working well, please create a native COCOA like solution 
-    public class TransmissionMenuItem : NSMenuItem {
+    /* public class TransmissionMenuItem : NSMenuItem {
         public TransmissionMenuItem(FileTransmissionEvent transmission) {
 
             Title = System.IO.Path.GetFileName(transmission.Path);
@@ -418,7 +427,7 @@ namespace CmisSync {
                 }
             };
         }
-    }
+    } */
 
 
 }
