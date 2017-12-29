@@ -11,6 +11,7 @@
     <AssemblyName>CmisSync.Lib</AssemblyName>
     <ReleaseVersion>
     </ReleaseVersion>
+    <UseMSBuildEngine>false</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
