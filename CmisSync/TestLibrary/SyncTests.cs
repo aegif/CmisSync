@@ -463,9 +463,58 @@ namespace TestLibrary
             }
         }*/
 
-        // Goal: Make sure that CmisSync works for remote changes.
+        /**
+         * Goal: Make sure that CmisSync works for remote file creation.
+         */
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void FileAndFolderOperations(string canonicalName, string localPath, string remoteFolderPath,
+        public void CreateRemoteDocument(string canonicalName, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonicalName,
+                    ConfigFolder(),
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
+
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
+
+            ISession session = CreateSession(repoInfo);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
+
+            string name1 = "test.1";
+            string path1 = Path.Combine(localPath, name1);
+
+            Console.WriteLine("Create remote document");
+            Assert.IsFalse(File.Exists(path1));
+            IDocument doc1 = CreateRemoteDocument(remoteFolder, name1, "test");
+            bool success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return File.Exists(path1);
+            }));
+        }
+
+        /**
+         * Some servers (like Alfresco) do not show renames in the CMIS ChangeLog.
+         * So this test is expected to fail for these.
+         */
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void RenameRemoteDocument(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
@@ -517,35 +566,264 @@ namespace TestLibrary
             {
                 return !File.Exists(path1) && File.Exists(path2);
             }));
-            
+        }
+
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void CreateRemoteFolder(string canonicalName, string localPath, string remoteFolderPath,
+    string url, string user, string password, string repositoryId)
+        {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonicalName,
+                    ConfigFolder(),
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
+
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
+
+            ISession session = CreateSession(repoInfo);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
+
+            string name1 = "test.1";
+            string path1 = Path.Combine(localPath, name1);
+
             Console.WriteLine("Create remote folder");
             IFolder remoteSubFolder = CreateRemoteFolder(remoteFolder, name1);
-            success = synchronizedFolder.Sync();
+            bool success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return Directory.Exists(path1);
+            }));
+        }
+
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void RenameRemoteFolder(string canonicalName, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonicalName,
+                    ConfigFolder(),
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
+
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
+
+            ISession session = CreateSession(repoInfo);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
+
+            string name1 = "test.1";
+            string path1 = Path.Combine(localPath, name1);
+
+            string name2 = "test.2";
+            string path2 = Path.Combine(localPath, name2);
+
+            Console.WriteLine("Create remote folder");
+            IFolder remoteSubFolder = CreateRemoteFolder(remoteFolder, name1);
+            bool success = synchronizedFolder.Sync();
             Assert.IsTrue(success);
             Assert.IsTrue(WaitUntilCondition(delegate
             {
                 return Directory.Exists(path1);
             }));
 
-            Console.WriteLine("Move remote document");
-            string filename = Path.Combine(path1, name2);
-            doc2.Move(remoteFolder, remoteSubFolder);
-            success = synchronizedFolder.Sync();
+            //  rename folder
+            Console.WriteLine(" Remote rename folder");
+            Assert.IsTrue(Directory.Exists(path1));
+            Assert.IsFalse(Directory.Exists(path2));
+            IFolder folder2 = RenameRemoteFolder(remoteSubFolder, name2);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate
+            {
+                return !Directory.Exists(path1) && Directory.Exists(path2);
+            }));
+            Assert.IsFalse(Directory.Exists(path1));
+            Assert.IsTrue(Directory.Exists(path2));
+        }
+
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void DeleteRemoteDocument(string canonicalName, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonicalName,
+                    ConfigFolder(),
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
+
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
+
+            ISession session = CreateSession(repoInfo);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
+
+            string name1 = "test.1";
+            string path1 = Path.Combine(localPath, name1);
+
+            Console.WriteLine("Create remote document");
+            Assert.IsFalse(File.Exists(path1));
+            IDocument doc1 = CreateRemoteDocument(remoteFolder, name1, "test");
+            bool success = synchronizedFolder.Sync();
             Assert.IsTrue(success);
             Assert.IsTrue(WaitUntilCondition(delegate
             {
-                return File.Exists(filename);
+                return File.Exists(path1);
             }));
 
             Console.WriteLine("Delete remote document");
-            doc2.DeleteAllVersions();
+            doc1.DeleteAllVersions();
             success = synchronizedFolder.Sync();
             Assert.IsTrue(success);
             Assert.IsTrue(WaitUntilCondition(delegate
             {
-                return !File.Exists(filename);
+                return !File.Exists(path1);
+            }));
+        }
+
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void MoveRemoteFolder(string canonicalName, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonicalName,
+                    ConfigFolder(),
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
+
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
+
+            ISession session = CreateSession(repoInfo);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
+
+            string name1 = "test.1";
+            string path1 = Path.Combine(localPath, name1);
+
+            string name2 = "test.2";
+            string path2 = Path.Combine(localPath, name2);
+
+            //  move folder
+            Console.WriteLine(" Remote move folder");
+            Assert.IsFalse(Directory.Exists(path1));
+            IFolder folder1 = CreateRemoteFolder(remoteFolder, name1);
+            IFolder folder2 = CreateRemoteFolder(remoteFolder, name2);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate
+            {
+                return Directory.Exists(path1) && Directory.Exists(path2);
+            }));
+            Assert.IsTrue(Directory.Exists(path1));
+            Assert.IsFalse(Directory.Exists(Path.Combine(path2, name1)));
+            folder1.Move(remoteFolder, folder2);
+            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate
+            {
+                return !Directory.Exists(path1) && Directory.Exists(Path.Combine(path2, name1));
+            }));
+            Assert.IsFalse(Directory.Exists(path1));
+            Assert.IsTrue(Directory.Exists(Path.Combine(path2, name1)));
+        }
+
+        /*[Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void reste(string canonicalName, string localPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+
+            // Mock.
+            IActivityListener activityListener = new Mock<IActivityListener>().Object;
+            // Sync.
+            RepoInfo repoInfo = new RepoInfo(
+                    canonicalName,
+                    ConfigFolder(),
+                    remoteFolderPath,
+                    url,
+                    user,
+                    password,
+                    repositoryId,
+                    5000,
+                    false,
+                    DateTime.MinValue,
+                    true);
+
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo.SynchronizedFolder synchronizedFolder =
+                new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
+
+            ISession session = CreateSession(repoInfo);
+            IFolder remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
+
+            string name1 = "test.1";
+            string path1 = Path.Combine(localPath, name1);
+
+            Console.WriteLine("Create remote document");
+            Assert.IsFalse(File.Exists(path1));
+            IDocument doc1 = CreateRemoteDocument(remoteFolder, name1, "test");
+            bool success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return File.Exists(path1);
             }));
 
+            Console.WriteLine("Delete remote document");
+            doc1.DeleteAllVersions();
+            success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
+            {
+                return !File.Exists(path1);
+            }));
             //  rename folder
             Console.WriteLine(" Remote rename folder");
             Assert.IsTrue(Directory.Exists(path1));
@@ -609,11 +887,11 @@ namespace TestLibrary
                 success = synchronizedFolder.Sync();
             }
             Assert.IsFalse(Directory.Exists(path2));
-        }
+        }*/
 
         // Goal: Make sure that CmisSync works for remote heavy folder changes.
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        [Ignore]
+        //[Ignore]
         public void HeavyFileAndFolderOperations(string canonicalName, string localPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
