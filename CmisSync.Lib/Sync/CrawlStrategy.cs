@@ -589,8 +589,8 @@ namespace CmisSync.Lib.Sync
 
                     if (Utils.WorthSyncing(Path.GetDirectoryName(localFilePath), fileName, repoInfo))
                     {
-                        if (localFilenameTranslationOfExistingRemoteDocuments != null &&
-                                ! localFilenameTranslationOfExistingRemoteDocuments.Contains(fileName))
+                        if (localFilenameTranslationOfExistingRemoteDocuments == null ||
+                            ! localFilenameTranslationOfExistingRemoteDocuments.Contains(fileName))
                         {
                             // This local file is not on the CMIS server now, so
                             // check whether it used to exist on server or not.
