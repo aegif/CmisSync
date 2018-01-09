@@ -94,8 +94,8 @@ namespace CmisSync.Lib.Sync
 
                     success &= CrawlChangeLogSyncAndUpdateChangeLogToken(changeEvents, remoteFolder, remotePath, localFolder);
 
-                    currentChangeToken = changes.LatestChangeLogToken; 
-
+                    // Save the token of the last of the changes we just consumed.
+                    currentChangeToken = changes.LatestChangeLogToken;
                     database.SetChangeLogToken(currentChangeToken);
                 }
                 // Repeat if there were two many changes to fit in a single response.
