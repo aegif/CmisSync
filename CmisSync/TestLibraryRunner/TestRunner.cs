@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TestLibrary;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
@@ -17,7 +16,9 @@ using CmisSync.Lib.Cmis;
 
 using TestLibrary;
 
-// Useful to debug unit tests.
+/**
+ * Useful to debug a given unit test.
+ */
 namespace TestLibraryRunner
 {
     class TrustAlways : ICertificatePolicy
@@ -29,9 +30,12 @@ namespace TestLibraryRunner
         }
     }
 
-    class Program
+    /**
+     * Run a particular unit test.
+     */
+    class TestRunner
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(TestRunner));
         static int serverId = 0; // Which server in the JSON file (first=0)
 
         static void test(string path)
@@ -43,7 +47,8 @@ namespace TestLibraryRunner
             SyncTests tests = new SyncTests();
 
             tests.Init();
-            tests.EmptySync((string)server[0], (string)server[1],
+            // Enter the unit test method to debug below.
+            tests.DeleteRemoteDocument((string)server[0], (string)server[1],
                     (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
             tests.TearDown();
         }
@@ -86,9 +91,12 @@ namespace TestLibraryRunner
                 log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             }
 
-            //new CmisSyncTests().TestCrypto();
             test(path == null ? "../../../TestLibrary/test-servers.json" : path);
             //testFuzzy();
+            //new CmisSyncTests().TestCrypto();
+
+            Console.WriteLine("Press enter to close...");
+            Console.ReadLine();
         }
     }
 }
