@@ -14,14 +14,19 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+using log4net;
 using System;
 using System.IO;
+using CmisSync.Lib.Sync.CmisRepoFolder;
 
 namespace CmisSync.Lib.Sync
 {
     /// <summary></summary>
     public partial class CmisRepo : RepoBase
     {
+        // Log.
+        private static readonly ILog Logger = LogManager.GetLogger (typeof (CmisRepo));
+
         /// <summary>
         /// Remote folder to synchronize.
         /// </summary>
