@@ -599,32 +599,21 @@ namespace CmisSync.Lib.Sync
                                 if (database.LocalFileHasChanged(localFilePath))
                                 {
                                     // If file has changed locally, move to 'your_version' and warn about conflict
-                                    if (BIDIRECTIONAL)
-                                    {
-                                        // Local file was updated, sync up.
-                                        Logger.Info("Uploading locally edited remotely removed file from the repository: " + localFilePath);
-                                        activityListener.ActivityStarted();
-                                        success &= UploadFile(localFilePath, remoteFolder);
-                                        activityListener.ActivityStopped();
-                                    }
-                                    else
-                                    {
-                                        Logger.Info("Conflict with file: " + localFilePath + ", backing up locally modified version.");
-                                        activityListener.ActivityStarted();
-                                        // Rename locally modified file.
-                                        String newFilePath = Utils.CreateConflictFilename(localFilePath, repoInfo.User);
+                                    Logger.Info("Conflict with file: " + localFilePath + ", backing up locally modified version.");
+                                    activityListener.ActivityStarted();
+                                    // Rename locally modified file.
+                                    String newFilePath = Utils.CreateConflictFilename(localFilePath, repoInfo.User);
 
-                                        // The file might be ReadOnly, so make it writable first, otherwise the move will fail.
-                                        File.SetAttributes(localFilePath, FileAttributes.Normal); // TODO use Utils.DeleteEvenIfReadOnly
+                                    // The file might be ReadOnly, so make it writable first, otherwise the move will fail.
+                                    File.SetAttributes(localFilePath, FileAttributes.Normal); // TODO use Utils.DeleteEvenIfReadOnly
 
-                                        File.Move(localFilePath, newFilePath);
+                                    File.Move(localFilePath, newFilePath);
 
-                                        // Delete file from database.
-                                        database.RemoveFile(item);
+                                    // Delete file from database.
+                                    database.RemoveFile(item);
 
-                                        repo.OnConflictResolved();
-                                        activityListener.ActivityStopped();
-                                    }
+                                    repo.OnConflictResolved();
+                                    activityListener.ActivityStopped();
                                 }
                                 else
                                 {
@@ -632,11 +621,8 @@ namespace CmisSync.Lib.Sync
                                     Logger.Info("Removing remotely deleted file: " + localFilePath);
                                     activityListener.ActivityStarted();
 
-                                    // The file might be ReadOnly, so make it writable first, otherwise removal will fail.
-                                    File.SetAttributes(localFilePath, FileAttributes.Normal); // TODO use Utils.DeleteEvenIfReadOnly
-
                                     // Delete from the local filesystem.
-                                    File.Delete(localFilePath);
+                                    Utils.DeleteEvenIfReadOnly(localFilePath);
 
                                     // Delete file from database.
                                     database.RemoveFile(item);
@@ -646,14 +632,11 @@ namespace CmisSync.Lib.Sync
                             }
                             else
                             {
-                                if (BIDIRECTIONAL)
-                                {
-                                    // New file, sync up.
-                                    Logger.Info("Uploading file absent on repository: " + localFilePath);
-                                    activityListener.ActivityStarted();
-                                    success &= UploadFile(localFilePath, remoteFolder);
-                                    activityListener.ActivityStopped();
-                                }
+                                // New file, sync up.
+                                Logger.Info("Uploading file absent on repository: " + localFilePath);
+                                activityListener.ActivityStarted();
+                                success &= UploadFile(localFilePath, remoteFolder);
+                                activityListener.ActivityStopped();
                             }
                         }
                         else
@@ -661,14 +644,11 @@ namespace CmisSync.Lib.Sync
                             // The file exists both on server and locally.
                             if (database.LocalFileHasChanged(localFilePath))
                             {
-                                if (BIDIRECTIONAL)
-                                {
-                                    // Upload new version of file content.
-                                    Logger.Info("Uploading file update on repository: " + localFilePath);
-                                    activityListener.ActivityStarted();
-                                    success &= UpdateFile(localFilePath, remoteFolder);
-                                    activityListener.ActivityStopped();
-                                }
+                                // Upload new version of file content.
+                                Logger.Info("Uploading file update on repository: " + localFilePath);
+                                activityListener.ActivityStarted();
+                                success &= UpdateFile(localFilePath, remoteFolder);
+                                activityListener.ActivityStopped();
                             }
                         }
                     }
