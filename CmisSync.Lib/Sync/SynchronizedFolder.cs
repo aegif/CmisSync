@@ -44,12 +44,6 @@ namespace CmisSync.Lib.Sync
             private Object syncLock = new Object();
 
             /// <summary>
-            /// Whether sync is bidirectional or only from server to client.
-            /// TODO make it a CMIS folder - specific setting
-            /// </summary>
-            private bool BIDIRECTIONAL = true; // TODO move to CmisProfile
-
-            /// <summary>
             /// At which degree the repository supports Change Logs.
             /// See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
             /// The possible values are actually none, objectidsonly, properties, all
