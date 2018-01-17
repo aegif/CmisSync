@@ -46,7 +46,7 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// Remote path of the item, relative to the remote root
-        /// Example: adir/a<file
+        /// Example: adir/a&lt;file
         /// </summary>
         protected string remoteRelativePath;
 

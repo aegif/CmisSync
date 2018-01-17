@@ -186,7 +186,15 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                     {
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)cmisObject;
+
                         string remoteSubPath = CmisUtils.PathCombine(remotePath, remoteSubFolder.Name);
+                        // TODO: debug
+                        System.Console.WriteLine ("Found a remote sub folder: \n" +
+                                                  "  sub folder path: {0}\n" +
+                                                  "  remote path: {1}\n" +
+                                                  "  remote subfolder name: {2}\n" +
+                                                  "  remote subfolder path: {3}",
+                                                  remoteSubPath, remotePath, remoteSubFolder.Name, remoteSubFolder.Path);
 
                         // Ignore edgy folders.
                         if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames && names.Contains(remoteSubFolder.Name.ToLowerInvariant()))
@@ -206,6 +214,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                     {
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)cmisObject;
+
                         string remoteDocumentPath = CmisUtils.PathCombine(remotePath, remoteDocument.Name);
 
                         // Ignore edgy documents.
@@ -219,6 +228,14 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                         {
                             continue;
                         }
+
+                        // TODO: debug
+                        System.Console.WriteLine ("Crawl Remote Document: \n" +
+                                                  "  remotePath: {0}\n" +
+                                                  "  remoteDocumentName: {1}\n" +
+                                                  "  remoteDocumentPath: {2}\n" +
+                                                  "  localFolder: {3}",
+                                                  remotePath, remoteDocument.Name, remoteDocumentPath, localFolder);
 
                         CrawlRemoteDocument(remoteDocument, remoteDocumentPath, localFolder, localFilenameTranslationOfExistingRemoteDocuments);
                         names.Add(remoteDocument.Name.ToLowerInvariant());

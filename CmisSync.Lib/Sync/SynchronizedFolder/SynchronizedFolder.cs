@@ -402,6 +402,15 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                     }
                     else
                     {
+                        // TODO debug
+                        System.Console.WriteLine ("Crawl Sync start: \n" +
+                                                  "  remoteFolder: {0}\n" +
+                                                  "  remoteFolderPath: {1}\n" +
+                                                  "  localFolder: {2}\n" +
+                                                  "  repoInfoRemotePath: {3}\n" +
+                                                  "  repoInfoTargetPath: {4}",
+                                                  remoteFolder.Path, remoteFolderPath, localFolder, repoInfo.RemotePath, repoInfo.TargetDirectory);
+
                         // Full sync.
                         success = CrawlSync(remoteFolder, remoteFolderPath, localFolder);
 

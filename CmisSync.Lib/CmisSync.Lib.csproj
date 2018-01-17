@@ -44,11 +44,12 @@
     <DefineConstants>TRACE;DEBUG;__COCOA__;</DefineConstants>
     <DocumentationFile>bin\Debug\CmisSync.Lib.XML</DocumentationFile>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>anycpu</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -102,6 +103,11 @@
     <Compile Include="Sync\SynchronizedFolder\WatcherStrategy.cs" />
     <Compile Include="Sync\SynchronizedFolder\SynchronizedFolder.cs" />
     <Compile Include="Sync\SynchronizedFolder\LocalComparisonStrategy.cs" />
+    <Compile Include="Sync\SynchronizeMachine\SyncState.cs" />
+    <Compile Include="Sync\SyncTriplet\SyncTriplet.cs" />
+    <Compile Include="Sync\SyncTriplet\TripletItem\StorageItem.cs" />
+    <Compile Include="Sync\SyncTriplet\TripletItem\DBStorageItem.cs" />
+    <Compile Include="Sync\SyncTriplet\SyncTripletFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
@@ -122,6 +128,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Sync\SynchronizedFolder\" />
+    <Folder Include="Sync\SynchronizeMachine\" />
+    <Folder Include="Sync\SyncTriplet\" />
+    <Folder Include="Sync\SyncTriplet\TripletItem\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
