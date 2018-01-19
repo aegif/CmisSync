@@ -150,6 +150,7 @@ namespace CmisSync.Lib
             }
         }
 
+        
         /// <summary>
         /// insert <param name="change"/> in changes.
         /// </summary>
@@ -161,6 +162,8 @@ namespace CmisSync.Lib
                 changeList.Add(new WatcherEvent(change));
             }
         }
+
+
         /// <summary>
         /// remove all from changes
         /// </summary>

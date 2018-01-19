@@ -2,20 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TestLibrary;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 
+using log4net;
+using log4net.Config;
+
 using CmisSync.Lib;
 using CmisSync.Lib.Sync;
 using CmisSync.Lib.Cmis;
 
-using log4net;
-using log4net.Config;
+using TestLibrary;
 
-// Useful to debug unit tests.
+/**
+ * Useful to debug a given unit test.
+ */
 namespace TestLibraryRunner
 {
     class TrustAlways : ICertificatePolicy
@@ -25,12 +28,14 @@ namespace TestLibraryRunner
             // For testing, always accept any certificate
             return true;
         }
-
     }
 
-    class Program
+    /**
+     * Run a particular unit test.
+     */
+    class TestRunner
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(TestRunner));
         static int serverId = 0; // Which server in the JSON file (first=0)
 
         static void test(string path)
@@ -39,10 +44,11 @@ namespace TestLibraryRunner
                     File.ReadAllText(path));
             object[] server = servers.ElementAt(serverId);
 
-            CmisSyncTests tests = new CmisSyncTests();
+            SyncTests tests = new SyncTests();
 
             tests.Init();
-            tests.Sync((string)server[0], (string)server[1],
+            // Enter the unit test method to debug below.
+            tests.DeleteRemoteDocument((string)server[0], (string)server[1],
                     (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
             tests.TearDown();
         }
@@ -52,7 +58,7 @@ namespace TestLibraryRunner
             IEnumerable<object[]> servers = JsonConvert.DeserializeObject<List<object[]>>(
                     File.ReadAllText("../../../TestLibrary/test-servers-fuzzy.json"));
             object[] server = servers.ElementAt(serverId);
-            new CmisSyncTests().GetRepositoriesFuzzy((string)server[0], (string)server[1], (string)server[2]);
+            new SyncTests().GetRepositoriesFuzzy((string)server[0], (string)server[1], (string)server[2]);
         }
 
         static void Main(string[] args)
@@ -85,9 +91,12 @@ namespace TestLibraryRunner
                 log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             }
 
-            //new CmisSyncTests().TestCrypto();
             test(path == null ? "../../../TestLibrary/test-servers.json" : path);
             //testFuzzy();
+            //new CmisSyncTests().TestCrypto();
+
+            Console.WriteLine("Press enter to close...");
+            Console.ReadLine();
         }
     }
 }

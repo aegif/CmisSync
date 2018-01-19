@@ -49,7 +49,7 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public string localFilename(IDocument document)
         {
-            // Can be useful for tests, making local filenames radically different, thus making bugs easier to catch.
+            // Can be useful for tests, making local filenames radically different, thus making bugs easier to catch:
             // return document.Id;
 
             if (UseCmisStreamName)
@@ -61,7 +61,7 @@ namespace CmisSync.Lib.Cmis
                 else
                 {
                     // This should probably never happen theoretically, but anyway that happens sometimes in Alfresco.
-                    Logger.Error("ContentStreamFileName null for " + document.Name + "(" + document.Paths[0] + ")");
+                    Logger.Warn("cmis:contentStreamFileName not set for \"" + document.Paths[0] + "\", using cmis:name \"" + document.Name + "\" as a file name instead");
                     return document.Name;
                 }
             }
@@ -69,6 +69,16 @@ namespace CmisSync.Lib.Cmis
             {
                 return document.Name;
             }
+        }
+
+
+        /// <summary>
+        /// Name used as part of the remote path in the local CmisSync database.
+        /// This must be unique on the remote folder.
+        /// </summary>
+        public string remoteFilename(IDocument document)
+        {
+            return (string)document.GetPropertyValue("cmis:name");
         }
 
 
@@ -102,6 +112,24 @@ namespace CmisSync.Lib.Cmis
                 // and it might have a performance impact on the CMIS server.
             }
             */
+        }
+
+
+        /// <summary>
+        /// Ignore folders and documents with a name that contains a slash.
+        /// While it is very rare, Documentum is known to allow that and mistakenly present theses as CMIS object, violating the CMIS specification.
+        /// </summary>
+        public bool RemoteObjectWorthSyncing(ICmisObject cmisObject)
+        {
+            if (cmisObject.Name.Contains('/'))
+            {
+                Logger.Warn("Ignoring remote object " + cmisObject.Name + " as it contains a slash. The CMIS specification forbids slashes in path elements (paragraph 2.1.5.3), please report the bug to your server vendor");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
 

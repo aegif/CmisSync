@@ -1,5 +1,6 @@
 ﻿using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Sync;
 using DotCMIS;
 using DotCMIS.Client;
 using DotCMIS.Client.Impl;
@@ -15,7 +16,6 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using static CmisSync.Lib.Sync.CmisRepo;
 
 namespace TestLibrary
 {
@@ -101,7 +101,7 @@ namespace TestLibrary
             cmisParameters[SessionParameter.RepositoryId] = repositoryId;
             cmisParameters[SessionParameter.ConnectTimeout] = "-1";
             ISession session = SessionFactory.NewInstance().CreateSession(cmisParameters);
-            Folder folder = (Folder)session.GetObjectByPath(remoteFolderPath);
+            Folder folder = (Folder)session.GetObjectByPath(remoteFolderPath, true);
             foreach (ICmisObject cmisObject in folder.GetChildren())
             {
                 if (cmisObject is Folder)
@@ -124,7 +124,7 @@ namespace TestLibrary
             return Path.GetDirectoryName(ConfigManager.CurrentConfigFile);
         }
 
-        protected void DeleteDirectoryIfExists(string path)
+        protected void DeleteLocalDirectoryIfExists(string path)
         {
             if (Directory.Exists(path))
             {
@@ -211,7 +211,7 @@ namespace TestLibrary
             return SessionFactory.NewInstance().CreateSession(cmisParameters);
         }
 
-        protected IDocument CreateDocument(IFolder folder, string name, string content)
+        protected IDocument CreateRemoteDocument(IFolder folder, string name, string content)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -226,7 +226,7 @@ namespace TestLibrary
             return folder.CreateDocument(properties, contentStream, null);
         }
 
-        protected IFolder CreateFolder(IFolder folder, string name)
+        protected IFolder CreateRemoteFolder(IFolder folder, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -235,7 +235,7 @@ namespace TestLibrary
             return folder.CreateFolder(properties);
         }
 
-        protected IDocument CopyDocument(IFolder folder, IDocument source, string name)
+        protected IDocument CopyRemoteDocument(IFolder folder, IDocument source, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -244,7 +244,7 @@ namespace TestLibrary
             return folder.CreateDocumentFromSource(source, properties, null);
         }
 
-        protected IDocument RenameDocument(IDocument source, string name)
+        protected IDocument RenameRemoteDocument(IDocument source, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -252,7 +252,7 @@ namespace TestLibrary
             return (IDocument)source.UpdateProperties(properties);
         }
 
-        protected IFolder RenameFolder(IFolder source, string name)
+        protected IFolder RenameRemoteFolder(IFolder source, string name)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
             properties.Add(PropertyIds.Name, name);
@@ -260,7 +260,7 @@ namespace TestLibrary
             return (IFolder)source.UpdateProperties(properties);
         }
 
-        protected void CreateHeavyFolder(string root)
+        protected void CreateHeavyLocalFolder(string root)
         {
             for (int iFolder = 0; iFolder < HEAVY_FACTOR; ++iFolder)
             {
@@ -282,7 +282,7 @@ namespace TestLibrary
             }
         }
 
-        protected bool CheckHeavyFolder(string root)
+        protected bool CheckHeavyLocalFolder(string root)
         {
             for (int iFolder = 0; iFolder < HEAVY_FACTOR; ++iFolder)
             {
@@ -323,15 +323,15 @@ namespace TestLibrary
             return true;
         }
 
-        protected void CreateHeavyFolderRemote(IFolder root)
+        protected void CreateHeavyRemoteFolder(IFolder root)
         {
             for (int iFolder = 0; iFolder < HEAVY_FACTOR; ++iFolder)
             {
-                IFolder folder = CreateFolder(root, iFolder.ToString());
+                IFolder folder = CreateRemoteFolder(root, iFolder.ToString());
                 for (int iFile = 0; iFile < HEAVY_FACTOR; ++iFile)
                 {
                     string content = new string((char)('A' + iFile % 10), HEAVY_FILE_SIZE);
-                    CreateDocument(folder, iFile.ToString(), content);
+                    CreateRemoteDocument(folder, iFile.ToString(), content);
                 }
             }
         }
@@ -349,7 +349,7 @@ namespace TestLibrary
         /// <param name='length'>
         /// Length (default is 1024)
         /// </param>
-        private string createOrModifyBinaryFile(string file, int length = 1024)
+        private string createOrModifyLocalBinaryFile(string file, int length = 1024)
         {
             using (Stream stream = File.Open(file, FileMode.Create))
             {
@@ -377,7 +377,7 @@ namespace TestLibrary
         /// <param name='pollInterval'>
         /// Sleep interval duration in miliseconds between synchronization calls.
         /// </param>
-        public static bool SyncAndWaitUntilCondition(SynchronizedFolder synchronizedFolder, Func<bool> checkStop, int maxTries = 4, int pollInterval = 5000)
+        public static bool SyncAndWaitUntilCondition(CmisRepo.SynchronizedFolder synchronizedFolder, Func<bool> checkStop, int maxTries = 4, int pollInterval = 5000)
         {
             int i = 0;
             while (i < maxTries)

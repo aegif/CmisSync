@@ -26,11 +26,11 @@ namespace CmisSync.Lib.Sync
             /// </summary>
             /// <param name="remoteFolder">Remote folder.</param>
             /// <param name="localFolder">Local folder.</param>
-            /// <returns>Whether something has changed in the local folder</returns>
+            /// <returns>Whether any local change has now been synchronized, so that no further action is needed</returns>
             private bool WatcherSync(string remoteFolder, string localFolder)
             {
                 Logger.Debug(remoteFolder + " : " + localFolder);
-                bool locallyModified = false;
+                bool success = true;
                 SleepWhileSuspended();
                 Queue<WatcherEvent> changeQueue = repo.Watcher.GetChangeQueue();
                 repo.Watcher.Clear();
@@ -81,8 +81,7 @@ namespace CmisSync.Lib.Sync
                         CmisSync.Lib.Watcher.MovedEventArgs change =
                             (CmisSync.Lib.Watcher.MovedEventArgs)earliestChange.GetFileSystemEventArgs();
                         Logger.DebugFormat("Processing 'Moved': {0} -> {1}.", change.OldFullPath, pathname);
-                        bool done = WatchSyncMove(remoteFolder, localFolder, change.OldFullPath, pathname, earliestChange.GetGrace());
-                        locallyModified |= !done;
+                        success &= WatchSyncMove(remoteFolder, localFolder, change.OldFullPath, pathname, earliestChange.GetGrace());
                     }
                     else if (earliestChange.GetFileSystemEventArgs() is RenamedEventArgs)
                     {
@@ -90,8 +89,7 @@ namespace CmisSync.Lib.Sync
                         RenamedEventArgs change =
                             (RenamedEventArgs)earliestChange.GetFileSystemEventArgs();
                         Logger.DebugFormat("Processing 'Renamed': {0} -> {1}.", change.OldFullPath, pathname);
-                        bool done = WatchSyncMove(remoteFolder, localFolder, change.OldFullPath, pathname, earliestChange.GetGrace());
-                        locallyModified |= !done;
+                        success &= WatchSyncMove(remoteFolder, localFolder, change.OldFullPath, pathname, earliestChange.GetGrace());
                     }
                     else
                     {
@@ -101,12 +99,10 @@ namespace CmisSync.Lib.Sync
                         {
                             case WatcherChangeTypes.Created:
                             case WatcherChangeTypes.Changed:
-                                bool done = WatcherSyncUpdate(remoteFolder, localFolder, pathname);
-                                locallyModified |= !done;
+                                success &= WatcherSyncUpdate(remoteFolder, localFolder, pathname);
                                 break;
                             case WatcherChangeTypes.Deleted:
-                                done = WatcherSyncDelete(remoteFolder, localFolder, pathname, earliestChange.GetGrace());
-                                locallyModified |= !done;
+                                success &= WatcherSyncDelete(remoteFolder, localFolder, pathname, earliestChange.GetGrace());
                                 break;
                             default:
                                 Logger.ErrorFormat("Ignoring change with unhandled type -> '{0}': {1}.",
@@ -117,11 +113,11 @@ namespace CmisSync.Lib.Sync
                     }
                     catch(Exception ex)
                     {
-                        locallyModified = true;
+                        success = false;
                     }
                     activityListener.ActivityStopped();
                 }
-                return locallyModified;
+                return success;
             }
 
 
@@ -183,15 +179,15 @@ namespace CmisSync.Lib.Sync
                                 if (rename)
                                 {
                                     //rename file...
-                                    IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName);
+                                    IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName, true);
                                     success &= RenameFile(oldDirectory, newFilename, remoteDocument);
                                 }
                                 else //move
                                 {
                                     //move file...
-                                    IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName);
-                                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName);
-                                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName);
+                                    IDocument remoteDocument = (IDocument)session.GetObjectByPath(oldRemoteName, true);
+                                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName, true);
+                                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName, true);
                                     success &= MoveFile(oldDirectory, newDirectory, oldRemoteFolder, newRemoteFolder, remoteDocument);
                                 }
                             }
@@ -209,15 +205,15 @@ namespace CmisSync.Lib.Sync
                                 if (rename)
                                 {
                                     //rename folder...
-                                    IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName);
+                                    IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName, true);
                                     success &= RenameFolder(oldDirectory, newFilename, remoteFolderObject);
                                 }
                                 else //move
                                 {
                                     //move folder...
-                                    IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName);
-                                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName);
-                                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName);
+                                    IFolder remoteFolderObject = (IFolder)session.GetObjectByPath(oldRemoteName, true);
+                                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath(oldRemoteBaseName, true);
+                                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath(newRemoteBaseName, true);
                                     success &= MoveFolder(oldDirectory, newDirectory, oldRemoteFolder, newRemoteFolder, remoteFolderObject);
                                 }
                             }
@@ -282,7 +278,7 @@ namespace CmisSync.Lib.Sync
                         bool isFolder = Utils.IsFolder(localPath);
                         SyncItem item = SyncItemFactory.CreateFromLocalPath(localPath, isFolder, repoInfo, database);
                         string remoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(item.RemotePath);
-                        remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName);
+                        remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName, true);
                         if (null == remoteBase)
                         {
                             Logger.WarnFormat("The remote base folder {0} for local {1} does not exist, ignore for the update action", remoteBaseName, localPath);

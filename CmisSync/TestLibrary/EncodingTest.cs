@@ -50,7 +50,6 @@ namespace TestLibrary
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName(">"), ">");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("*"), "*");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("|"), "|");
-            Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("–€"), "Non Valid ISO 8859-1 Character accepted");
         }
 
         [Test, Category("Fast")]

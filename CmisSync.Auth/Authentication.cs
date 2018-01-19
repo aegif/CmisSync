@@ -13,10 +13,10 @@ namespace CmisSync.Auth
     /// This class allows one to connect to a CMIS repository.
     /// It can return a list of repositories, or directly a CMIS session if the repository is known.
     /// </summary>
-    public class Auth
+    public class Authentication
     {
         // Log.
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(Auth));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Authentication));
 
         /// <summary>
         /// Connect to a CMIS server and get the list of repositories.
@@ -75,9 +75,9 @@ namespace CmisSync.Auth
             // If too long, users will not be warned early enough about network problems.
 
             // Connect Timeout: Time to connect to the server, the first time. Does not depend on file size.
-            parameters[SessionParameter.ConnectTimeout] = "-1"; // Infinite, as a trial to solve https://github.com/aegif/CmisSync/issues/418
+            parameters[SessionParameter.ConnectTimeout] = "3600000"; // One hour, see https://github.com/aegif/CmisSync/issues/418
             // Read Timeout: Time to download a document. Depends on document size and network speed.
-            parameters[SessionParameter.ReadTimeout] = "-1"; // Infinite, as a trial to solve https://github.com/aegif/CmisSync/issues/418
+            parameters[SessionParameter.ReadTimeout] = "21600000"; // Six hours, see https://github.com/aegif/CmisSync/issues/418
             // Write Timeout: Time to upload a document. Depends on document size and network speed.
             //parameters[SessionParameter.WriteTimeout] = "1200000"; // Twenty minutes // Apparently DotCMIS uses the same setting for both read and write, see https://github.com/aegif/chemistry-dotcmis/blob/trunk/DotCMIS/binding/http.cs#L155
             return parameters;

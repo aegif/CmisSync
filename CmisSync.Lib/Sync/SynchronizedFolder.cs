@@ -44,12 +44,6 @@ namespace CmisSync.Lib.Sync
             private Object syncLock = new Object();
 
             /// <summary>
-            /// Whether sync is bidirectional or only from server to client.
-            /// TODO make it a CMIS folder - specific setting
-            /// </summary>
-            private bool BIDIRECTIONAL = true; // TODO move to CmisProfile
-
-            /// <summary>
             /// At which degree the repository supports Change Logs.
             /// See http://docs.oasis-open.org/cmis/CMIS/v1.0/os/cmis-spec-v1.0.html#_Toc243905424
             /// The possible values are actually none, objectidsonly, properties, all
@@ -142,7 +136,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Event to notify that the sync has completed.
             /// </summary>
-            private AutoResetEvent autoResetEvent = new AutoResetEvent(true);
+            private AutoResetEvent autoResetEvent = new AutoResetEvent(true); // TODO needed?
 
             /// <summary>
             ///  Constructor for Repo (at every launch of CmisSync)
@@ -180,10 +174,10 @@ namespace CmisSync.Lib.Sync
                 syncWorker.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
-                        bool syncFull = (bool)args.Argument;
+                        bool success = false;
                         try
                         {
-                            Sync(syncFull);
+                            success = Sync();
                         }
                         catch (OperationCanceledException e)
                         {
@@ -201,7 +195,7 @@ namespace CmisSync.Lib.Sync
                         }
                         finally
                         {
-                            SyncComplete(syncFull);
+                            OnSyncComplete(success);
                         }
                     }
                 );
@@ -257,13 +251,6 @@ namespace CmisSync.Lib.Sync
                 }
             }
 
-            /// <summary>
-            /// Resets all the failed upload to zero.
-            /// </summary>
-            public void resetFailedOperationsCounter()
-            {
-                database.DeleteAllFailedOperations();
-            }
 
             /// <summary>
             /// Connect to the CMIS repository.
@@ -271,7 +258,7 @@ namespace CmisSync.Lib.Sync
             public void Connect()
             {
                 // Create session.
-                session = Auth.Auth.GetCmisSession(repoInfo.Address.ToString(), repoInfo.User, repoInfo.Password.ToString(), repoInfo.RepoID);
+                session = Auth.Authentication.GetCmisSession(repoInfo.Address.ToString(), repoInfo.User, repoInfo.Password.ToString(), repoInfo.RepoID);
                 Logger.Debug("Created CMIS session: " + session.ToString());
                 
                 // Detect repository capabilities.
@@ -349,48 +336,17 @@ namespace CmisSync.Lib.Sync
                 return this.enabled;
             }
 
-            /// <summary>
-            /// Synchronize between CMIS folder and local folder.
-            /// </summary>
-            public void Sync()
-            {
-                Sync(true);
-            }
-
-
-            /// <summary>
-            /// Track whether a full sync is done
-            /// </summary>
-            private bool syncFull = false;
-
-            /// <summary>
-            /// Forces the full sync independent of FS events or Remote events.
-            /// </summary>
-            public void ForceFullSync()
-            {
-                ForceFullSyncAtNextSync();
-                Sync();
-            }
-
-            /// <summary>
-            /// Forces the full sync at next sync.
-            /// This can be used to ensure a full sync if fs or remote events where lost.
-            /// </summary>
-            public void ForceFullSyncAtNextSync()
-            {
-                syncFull = false;
-            }
-
 
             /// <summary>
             /// Synchronize between CMIS folder and local folder.
             /// </summary>
-            public bool Sync(bool syncFull)
+            /// <returns>success or not</returns>
+            public bool Sync()
             {
                 lock (syncLock)
                 {
                     autoResetEvent.Reset();
-                    repo.OnSyncStart(syncFull);
+                    repo.OnSyncStart();
 
                     SleepWhileSuspended();
 
@@ -415,7 +371,7 @@ namespace CmisSync.Lib.Sync
                     IFolder remoteFolder = null;
                     try
                     {
-                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
                     }
                     catch (PermissionDeniedException e)
                     {
@@ -423,11 +379,11 @@ namespace CmisSync.Lib.Sync
                         Connect();
 
                         // Retry the same operation.
-                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath);
+                        remoteFolder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
                     }
 
                     string localFolder = repoInfo.TargetDirectory;
-                    var success = false;
+                    var success = true;
 
                     if (firstSync)
                     {
@@ -485,15 +441,15 @@ namespace CmisSync.Lib.Sync
             }
 
             /// <summary>
-            /// Synchronize has completed.
+            /// Synchronization has completed.
             /// </summary>
-            public void SyncComplete(bool syncFull)
+            public void OnSyncComplete(bool success)
             {
                 lock (syncLock)
                 {
                     try
                     {
-                        repo.OnSyncComplete(syncFull);
+                        repo.OnSyncComplete(success);
                     }
                     finally
                     {
@@ -505,19 +461,19 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Sync on the current thread.
             /// </summary>
-            /// <param name="syncFull"></param>
-            public bool SyncNotInBackground(bool syncFull)
+            /// <returns>success or not</returns>
+            public bool SyncInForeground()
             {
                 if (IsSyncing())
                 {
-                    Logger.Debug("Sync already running in background: " + repoInfo.TargetDirectory);
+                    Logger.Debug("SyncInForeground: Sync already running in background: " + repoInfo.TargetDirectory);
                     return false;
                 }
 
                 bool success = false;
                 try
                 {
-                    success = Sync(syncFull);
+                    success = Sync();
                 }
                 catch (CmisPermissionDeniedException e)
                 {
@@ -529,7 +485,7 @@ namespace CmisSync.Lib.Sync
                 }
                 finally
                 {
-                    SyncComplete(syncFull);
+                    OnSyncComplete(success);
                 }
                 return success;
             }
@@ -537,15 +493,17 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Sync in the background.
             /// </summary>
-            public void SyncInBackground(bool syncFull)
+            public void SyncInBackground()
             {
                 if (IsSyncing())
                 {
-                    Logger.Debug("Sync already running in background: " + repoInfo.TargetDirectory);
+                    Logger.Debug("SyncInBackground: Sync already running in background: " + repoInfo.TargetDirectory);
                     return;
                 }
 
-                syncWorker.RunWorkerAsync(syncFull);
+                syncWorker.RunWorkerAsync();
+
+                Logger.Debug("SyncInBackground: IsSyncing(): " + IsSyncing());
             }
 
             /// <summary>
@@ -678,7 +636,8 @@ namespace CmisSync.Lib.Sync
             /// <param name="remoteFolder">The new folder to download. Example: /sites/project/newfolder</param>
             /// <param name="remotePath">The new folder to download. Example: /sites/project/newfolder</param>
             /// <param name="localFolder">The new folder that will be filled by this operation. Warning: It must exist already! Example: C:\CmisSync\project\newfolder</param> TODO: Create the local folder in this method.
-            private void RecursiveFolderCopy(IFolder remoteFolder, string remotePath, string localFolder)
+            /// <returns>success or not</returns>
+            private bool RecursiveFolderCopy(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 SleepWhileSuspended();
 
@@ -690,10 +649,16 @@ namespace CmisSync.Lib.Sync
                 catch (CmisBaseException e)
                 {
                     ProcessRecoverableException("Could not get children objects: " + remoteFolder.Path, e);
-                    return;
+                    return false;
                 }
 
-                // List all children.
+                // Remember seen names, and depending on the profile ignore the ones that have appeared already.
+                // For instance, if the CMIS server has a file called Hello and a folder called HELLO, then on Windows the paths would conflict.
+                // Store lowercase file and folder names inside.
+                HashSet<string> names = new HashSet<string>();
+
+                // Download all children.
+                bool success = true;
                 foreach (ICmisObject cmisObject in children)
                 {
                     string remoteSubPath = remotePath + CmisUtils.CMIS_FILE_SEPARATOR + cmisObject.Name;
@@ -709,9 +674,21 @@ namespace CmisSync.Lib.Sync
                             localSubFolderItem = SyncItemFactory.CreateFromRemoteFolder(remoteSubFolder.Path, repoInfo, database);
                         }
 
+                        // Ignore edgy folders.
+                        if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames && names.Contains(remoteSubFolder.Name.ToLowerInvariant()))
+                        {
+                            Logger.Warn("Ignoring " + remoteSubFolder.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                            continue;
+                        }
+                        if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteSubFolder))
+                        {
+                            continue;
+                        }
+
                         if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoInfo))
                         {
-                            DownloadDirectory(remoteSubFolder, remoteSubPath, localSubFolderItem.LocalPath);
+                            success &= DownloadDirectory(remoteSubFolder, remoteSubPath, localSubFolderItem.LocalPath);
+                            names.Add(remoteSubFolder.Name.ToLowerInvariant());
                         }
                     }
                     else if (cmisObject is DotCMIS.Client.Impl.Document)
@@ -719,9 +696,22 @@ namespace CmisSync.Lib.Sync
                         // Case of a document: Download it.
 
                         Document document = (Document)cmisObject;
+                        // Ignore edgy documents.
+
+                        if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames && names.Contains(document.Name.ToLowerInvariant()))
+                        {
+                            Logger.Warn("Ignoring " + document.Name + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                            continue;
+                        }
+                        if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(document))
+                        {
+                            continue;
+                        }
+
                         if (Utils.WorthSyncing(localFolder, repoInfo.CmisProfile.localFilename(document), repoInfo))
                         {
-                            DownloadFile(document, remoteSubPath, localFolder);
+                            success &= DownloadFile(document, remoteSubPath, localFolder);
+                            names.Add(document.Name.ToLowerInvariant());
                         }
                     }
                     else
@@ -730,6 +720,7 @@ namespace CmisSync.Lib.Sync
                             + " for object " + remoteFolder + "/" + cmisObject.Name);
                     }
                 }
+                return success;
             }
 
 
@@ -770,16 +761,17 @@ namespace CmisSync.Lib.Sync
                 Logger.Info("Added folder to database: " + localFolder);
 
                 // Recurse into folder.
-                RecursiveFolderCopy(remoteFolder, remotePath, localFolder);
+                bool success = RecursiveFolderCopy(remoteFolder, remotePath, localFolder);
 
-                return true;
+                return success;
             }
 
 
             /// <summary>
             /// Set the last modification date of a local file to whatever a remote document's last modfication date is.
             /// </summary>
-            private void SetLastModifiedDate(IDocument remoteDocument, string filepath, Dictionary<string, string[]> metadata)
+            /// <returns>true if successful</returns>
+            private bool SetLastModifiedDate(IDocument remoteDocument, string filepath, Dictionary<string, string[]> metadata)
             {
                 try
                 {
@@ -800,7 +792,9 @@ namespace CmisSync.Lib.Sync
                 catch (Exception e)
                 {
                     Logger.Debug(String.Format("Failed to set last modified date for the local file: {0}", filepath), e);
+                    return false;
                 }
+                return true;
             }
 
 
@@ -851,8 +845,10 @@ namespace CmisSync.Lib.Sync
             /// Create CmisSync database entry for this file
             /// 
             /// </summary>
+            /// <returns>success or not</returns>
             private bool DownloadFile(IDocument remoteDocument, string remotePath, string localFolder)
             {
+                //Logger.Debug("DownloadFile " + remoteDocument + " remotePath:" + remotePath + " localFolder:" + localFolder);
                 SleepWhileSuspended();
 
                 var syncItem = database.GetSyncItemFromRemotePath(remotePath);
@@ -870,6 +866,7 @@ namespace CmisSync.Lib.Sync
                     return true;
                 }
 
+                Boolean success = false;
                 try
                 {
                     DotCMIS.Data.IContentStream contentStream = null;
@@ -907,44 +904,47 @@ namespace CmisSync.Lib.Sync
                     }
 
                     // Download file.
-                    Boolean success = false;
                     byte[] filehash = { };
-                    try
-                    {
-                        contentStream = remoteDocument.GetContentStream();
 
-                        // If this file does not have a content stream, ignore it.
-                        // Even 0 bytes files have a contentStream.
-                        // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
-                        if (contentStream == null)
+                    // If zero length, skip downloading the content, just go on with an empty file
+                    if (remoteDocument.ContentStreamLength == 0)
+                    {
+                        Logger.Info("Skipping download of file with content length zero: " + syncItem.RemoteLeafname);
+                        using (FileStream s = File.Create(tmpFilePath))
                         {
-                            Logger.Warn("Skipping download of file with null content stream: " + syncItem.RemoteLeafname);
-                            return true;
+                            s.Close();
+                            success = true;
                         }
-                        // Skip downloading the content, just go on with an empty file
-                        if (remoteDocument.ContentStreamLength == 0)
+                    }
+                    else
+                    {
+                        try
                         {
-                            Logger.Info("Skipping download of file with content length zero: " + syncItem.RemoteLeafname);
-                            using (FileStream s = File.Create(tmpFilePath))
+                            contentStream = remoteDocument.GetContentStream();
+
+                            // If this file does not have a content stream, ignore it.
+                            // Even 0 bytes files have a contentStream.
+                            // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
+                            if (contentStream == null)
                             {
-                                s.Close();
+                                Logger.Warn("Skipping download of file with null content stream: " + syncItem.RemoteLeafname);
+                                return true;
                             }
+                            else
+                            {
+                                filehash = DownloadStream(contentStream, tmpFilePath);
+                                contentStream.Stream.Close();
+                            }
+                            success = true;
                         }
-                        else
+                        catch (CmisBaseException e)
                         {
-                            filehash = DownloadStream(contentStream, tmpFilePath);
-                            contentStream.Stream.Close();
+                            ProcessRecoverableException("Download failed: " + syncItem.RemoteLeafname, e);
+                            if (contentStream != null) contentStream.Stream.Close();
+                            success = false;
+                            File.Delete(tmpFilePath);
                         }
-                        success = true;
                     }
-                    catch (CmisBaseException e)
-                    {
-                        ProcessRecoverableException("Download failed: " + syncItem.RemoteLeafname, e);
-                        if (contentStream != null) contentStream.Stream.Close();
-                        success = false;
-                        File.Delete(tmpFilePath);
-                    }
-
                     if ( ! success)
                     {
                         return false;
@@ -983,7 +983,7 @@ namespace CmisSync.Lib.Sync
                             // Remove the ".sync" suffix.
                             Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
                             File.Move(tmpFilePath, filePath);
-                            SetLastModifiedDate(remoteDocument, filePath, metadata);
+                            success &= SetLastModifiedDate(remoteDocument, filePath, metadata);
 
                             // Warn user about conflict.
                             string lastModifiedBy = CmisUtils.GetProperty(remoteDocument, "cmis:lastModifiedBy");
@@ -1002,7 +1002,7 @@ namespace CmisSync.Lib.Sync
                             Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
                             // Remove the ".sync" suffix.
                             File.Move(tmpFilePath, filePath);
-                            SetLastModifiedDate(remoteDocument, filePath, metadata);
+                            success &= SetLastModifiedDate(remoteDocument, filePath, metadata);
                         }
                     }
                     else // New file
@@ -1010,7 +1010,7 @@ namespace CmisSync.Lib.Sync
                         Logger.Debug(String.Format("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
                         // Remove the ".sync" suffix.
                         File.Move(tmpFilePath, filePath);
-                        SetLastModifiedDate(remoteDocument, filePath, metadata);
+                        success &= SetLastModifiedDate(remoteDocument, filePath, metadata);
                     }
 
                     if (null != remoteDocument.CreationDate)
@@ -1034,13 +1034,17 @@ namespace CmisSync.Lib.Sync
                     database.AddFile(syncItem, remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                     Logger.Info("Added file to database: " + filePath);
 
-                    return success;
+                    if (!success)
+                    {
+                        return false;
+                    }
                 }
                 catch (Exception e)
                 {
                     ProcessRecoverableException("Could not download file: " + syncItem.LocalPath, e);
                     return false;
                 }
+                return true;
             }
 
 
@@ -1063,7 +1067,7 @@ namespace CmisSync.Lib.Sync
             private byte[] DownloadStream(DotCMIS.Data.IContentStream contentStream, string filePath)
             {
                 byte[] hash = { };
-                using (Stream file = File.OpenWrite(filePath))
+                using (Stream file = File.Create(filePath))
                 using (SHA1 hashAlg = new SHA1Managed())
                 using (CryptoStream hashstream = new CryptoStream(file, hashAlg, CryptoStreamMode.Write))
                 {
@@ -1335,7 +1339,7 @@ namespace CmisSync.Lib.Sync
                     {
                         if (null != (document = obj as IDocument))
                         {
-                            if (repoInfo.CmisProfile.localFilename(document).Equals(fileName))
+                            if (repoInfo.CmisProfile.remoteFilename(document).Equals(fileName))
                             {
                                 found = true;
                                 break;
@@ -1409,7 +1413,7 @@ namespace CmisSync.Lib.Sync
                 {
                     Logger.Debug("Removing remote folder tree: " + folder.Path);
                     IList<string> failedIDs = folder.DeleteTree(true, null, true);
-                    if (failedIDs == null || failedIDs.Count != 0)
+                    if (failedIDs != null && failedIDs.Count != 0)
                     {
                         Logger.Error("Failed to completely delete remote folder " + folder.Path);
                         // TODO Should we retry? Maybe at least once, as a manual recursion instead of a DeleteTree.

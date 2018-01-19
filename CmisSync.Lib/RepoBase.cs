@@ -43,12 +43,6 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// Perform a synchronization if one is not running already.
-        /// </summary>
-        public abstract void SyncInBackground(bool syncFull);
-
-
-        /// <summary>
         /// Local disk size taken by the repository.
         /// </summary>
         public abstract double Size { get; }
@@ -212,7 +206,7 @@ namespace CmisSync.Lib
             local_timer.Elapsed += delegate
             {
                 // Run partial sync.
-                SyncInBackground(false);
+                SyncInBackground();
             };
             local_timer.AutoReset = false;
             local_timer.Interval = delay_interval;
@@ -374,33 +368,18 @@ namespace CmisSync.Lib
         /// <summary>
         /// Called when sync starts.
         /// </summary>
-        public void OnSyncStart(bool syncFull)
+        public void OnSyncStart()
         {
-            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Started: " + LocalPath);
-            if (syncFull)
-            {
-                remote_timer.Stop();
-                local_timer.Stop();
-            }
-            //Watcher.EnableRaisingEvents = false; //Disable events while syncing...
-            //Watcher.EnableEvent = false;
+            Logger.Info(" Sync Started: " + LocalPath);
         }
 
 
         /// <summary>
         /// Called when sync completes.
         /// </summary>
-        public void OnSyncComplete(bool syncFull)
+        public void OnSyncComplete(bool success)
         {
-            if (syncFull)
-            {
-                remote_timer.Start();
-                last_sync = DateTime.Now;
-            }
-            else
-            {
-                last_partial_sync = DateTime.Now;
-            }
+            remote_timer.Start();
 
             if (Watcher != null)
             {
@@ -413,7 +392,7 @@ namespace CmisSync.Lib
                 Watcher.EnableEvent = true;
             }
 
-            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+            Logger.Info("Sync Complete: " + LocalPath + " , success=" + success);
 
             // Save last sync
             RepoInfo.LastSuccessedSync = DateTime.Now;

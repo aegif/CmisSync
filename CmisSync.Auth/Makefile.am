@@ -6,7 +6,7 @@ ASSEMBLY_INFO_SOURCE = Properties/AssemblyInfo.cs
 LIBS = $(LOG4NET_LIBS) $(DATALIBS) $(JSON_LIBS) $(DOTCMISLIBS) $(WEBLIBS) $(MONOPOSIX)
 
 SOURCES =  \
-	Auth.cs \
+	Authentication.cs \
 	Credentials.cs \
 	Crypto.cs \
 	Password.cs

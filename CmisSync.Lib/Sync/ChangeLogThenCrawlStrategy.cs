@@ -71,7 +71,7 @@ namespace CmisSync.Lib.Sync
                     return true;
                 }
 
-                bool success = false;
+                bool success = true;
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just sync everything from remote.
@@ -94,8 +94,8 @@ namespace CmisSync.Lib.Sync
 
                     success &= CrawlChangeLogSyncAndUpdateChangeLogToken(changeEvents, remoteFolder, remotePath, localFolder);
 
-                    currentChangeToken = changes.LatestChangeLogToken; 
-
+                    // Save the token of the last of the changes we just consumed.
+                    currentChangeToken = changes.LatestChangeLogToken;
                     database.SetChangeLogToken(currentChangeToken);
                 }
                 // Repeat if there were two many changes to fit in a single response.
@@ -233,14 +233,27 @@ namespace CmisSync.Lib.Sync
 
                         try
                         {
-                            var cmisObject = session.GetObject(id);
-                            success &= CrawlCmisObject(cmisObject);
+                            // Get the object with that identifier. Note that it might not exist anymore, so errors are expected, no need to log their details.
+                            var cmisObject = session.GetObject(id, false);
+                            if (change.ChangeType == ChangeType.Updated)
+                            {
+                                // Updates are tricky, as they can be move/rename operations in which we don't get complete information about
+                                // both the source and destination.
+                                // So, just sync everything.
+
+                                success &= CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder); ;
+                                break; // We synced everything, so no need to process the rest of the changes.
+                            }
+                            else
+                            {
+                                // The change only applies to the object itself, so only crawl that object.
+                                success &= CrawlCmisObject(cmisObject);
+                            }
                         }
                         catch (CmisObjectNotFoundException ex)
                         {
                             if (change.ChangeType == ChangeType.Deleted)
                             {
-
                                 var local = database.GetSyncItem(id);
                                 if (local != null)
                                 {
@@ -249,7 +262,7 @@ namespace CmisSync.Lib.Sync
 
                                     try
                                     {
-                                        var destCmisFolder = session.GetObjectByPath(destFolderItem.RemotePath) as IFolder;
+                                        var destCmisFolder = session.GetObjectByPath(destFolderItem.RemotePath, true) as IFolder;
 
                                         if (local.IsFolder)
                                         {
@@ -257,7 +270,7 @@ namespace CmisSync.Lib.Sync
                                         }
                                         else
                                         {
-                                            success &= CheckLocalFile(local.LocalPath, destCmisFolder, new List<string>());
+                                            success &= CheckLocalFile(local.LocalPath, destCmisFolder, null);
                                         }
                                     }
                                     catch (Exception e)
@@ -269,7 +282,10 @@ namespace CmisSync.Lib.Sync
                                         }
                                         else
                                         {
-                                            throw;
+                                            // Something really bad and unexpected happened.
+                                            // Give up the ChangeLog strategy, and just crawl everything, this is better than failing.
+                                            success &= CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder); ;
+                                            break; // We synced everything, so no need to process the rest of the changes.
                                         }
                                     }
                                 }
@@ -310,6 +326,11 @@ namespace CmisSync.Lib.Sync
                 {
                     var remoteSubFolder = cmisObject as IFolder;
 
+                    if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteSubFolder))
+                    {
+                        return true;
+                    }
+
                     // Look for the local equivalent.
                     var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                     while (true)
@@ -334,12 +355,17 @@ namespace CmisSync.Lib.Sync
                 {
                     var remoteDocument = cmisObject as IDocument;
 
+                    if (!repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteDocument))
+                    {
+                        return true;
+                    }
+
                     // Apply the change on all paths via which it is applicable.
                     foreach (IFolder remoteIFolder in remoteDocument.Parents)
                     {
                         if (PathIsApplicable(remoteIFolder.Path))
                         {
-                            Logger.Debug("Document change is applicable:" + remoteIFolder);
+                            Logger.Debug("Document " + repoInfo.CmisProfile.localFilename(remoteDocument) + " changed in applicable folder " + remoteIFolder);
 
                             var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteIFolder.Path);
                             var localFolder = localFolderItem.LocalPath;

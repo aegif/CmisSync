@@ -13,7 +13,7 @@ namespace CmisSync.Auth
     public static class Crypto
     {
         // Log.
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(Auth));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Authentication));
 
         /// <summary>
         /// Obfuscate a string.
