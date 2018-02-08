@@ -402,56 +402,5 @@ namespace CmisSync.Lib
             }
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// <summary>
-    /// Converter between local path representation to remote path representation.
-    /// Example:
-    ///  - Remote: aproject/adir/a<file
-    ///  - Local: A Project\adir\afile.txt
-    /// </summary>
-    public interface IPathRepresentationConverter
-    {
-        string LocalToRemote(string localPath);
-
-        string RemoteToLocal(string remotePath);
-    }
-
-    /// <summary>
-    /// Identity converter.
-    /// </summary>
-    public class DefaultPathRepresentationConverter : IPathRepresentationConverter
-    {
-        public string LocalToRemote(string localPath)
-        {
-            return localPath;
-        }
-
-        public string RemoteToLocal(string remotePath)
-        {
-            return remotePath;
-        }
-    }
-
-    /// <summary>Path representation converter.</summary>
-    public static class PathRepresentationConverter
-    {
-        private static IPathRepresentationConverter PathConverter = new DefaultPathRepresentationConverter();
-
-        static public void SetConverter(IPathRepresentationConverter converter)
-        {
-            PathConverter = converter;
-        }
-
-        static public string LocalToRemote(string localPath)
-        {
-            return PathConverter.LocalToRemote(localPath);
-        }
-
-        static public string RemoteToLocal(string remotePath)
-        {
-            return PathConverter.RemoteToLocal(remotePath);
-        }
-    }
 }
 

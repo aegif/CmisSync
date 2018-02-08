@@ -11,6 +11,8 @@ using System.Security.Permissions;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Config;
+
 #if __MonoCS__ && !__COCOA__
 using Mono.Unix.Native;
 #endif
@@ -29,33 +31,7 @@ namespace CmisSync.Lib
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Utils));
 
 
-        /// <summary>
-        /// Component which will receive notifications intended for the end-user.
-        /// A GUI program might raise a pop-up, a CLI program might print a line.
-        /// </summary>
-        private static UserNotificationListener userNotificationListener;
 
-
-        /// <summary>
-        /// Register the component which will receive notifications intended for the end-user.
-        /// </summary>
-        public static void SetUserNotificationListener(UserNotificationListener listener)
-        {
-            userNotificationListener = listener;
-        }
-
-
-        /// <summary>
-        /// Send a message to the end user.
-        /// </summary>
-        public static void NotifyUser(string message)
-        {
-            Logger.Info(message);
-            if (userNotificationListener != null)
-            {
-                userNotificationListener.NotifyUser(message);
-            }
-        }
 
 
         /// <summary>

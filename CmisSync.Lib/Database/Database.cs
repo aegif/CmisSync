@@ -14,6 +14,8 @@ using System.Security.Cryptography;
 using Newtonsoft.Json;
 using log4net;
 
+using CmisSync.Lib.Utilities.PathConverter;
+
 
 namespace CmisSync.Lib.Database
 {
@@ -832,7 +834,26 @@ namespace CmisSync.Lib.Database
             string localPath = (string)ExecuteSQLFunction("SELECT localPath FROM " + table + " WHERE path=@remotePath", parameters);
             if (string.IsNullOrEmpty(localPath))
             {
-                return PathRepresentationConverter.RemoteToLocal(remotePath);
+                return PathRepresentationConverterUtil.RemoteToLocal(remotePath);
+            }
+            return localPath;
+        }
+
+        /// <summary>
+        /// Remote to local nullable.
+        /// </summary>
+        /// <returns>The remote to local.</returns>
+        /// <param name="remotePath">Remote path.</param>
+        /// <param name="isFolder">If set to <c>true</c> is folder.</param>
+        public string NullableRemoteToLocal (string remotePath, bool isFolder)
+        {
+            string normalizedRemotePath = RemoveLocalPrefix (remotePath);
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("remotePath", normalizedRemotePath);
+            string table = isFolder ? "folders" : "files";
+            string localPath = (string)ExecuteSQLFunction ("SELECT localPath FROM " + table + " WHERE path=@remotePath", parameters);
+            if (string.IsNullOrEmpty (localPath)) {
+                return null;
             }
             return localPath;
         }
@@ -850,7 +871,26 @@ namespace CmisSync.Lib.Database
             string remotePath = (string)ExecuteSQLFunction("SELECT path FROM " + table + " WHERE localPath=@localPath", parameters);
             if (string.IsNullOrEmpty(remotePath))
             {
-                return PathRepresentationConverter.LocalToRemote(localPath);
+                return PathRepresentationConverterUtil.LocalToRemote(localPath);
+            }
+            return remotePath;
+        }
+
+        /// <summary>
+        /// Locals to remote nullable.
+        /// </summary>
+        /// <returns>The to remote.</returns>
+        /// <param name="localPath">Local path.</param>
+        /// <param name="isFolder">If set to <c>true</c> is folder.</param>
+        public string NullableLocalToRemote (string localPath, bool isFolder)
+        {
+            string normalizedLocalPath = RemoveLocalPrefix (localPath);
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("localPath", normalizedLocalPath);
+            string table = isFolder ? "folders" : "files";
+            string remotePath = (string)ExecuteSQLFunction ("SELECT path FROM " + table + " WHERE localPath=@localPath", parameters);
+            if (string.IsNullOrEmpty (remotePath)) {
+                return null;
             }
             return remotePath;
         }
@@ -1134,7 +1174,7 @@ namespace CmisSync.Lib.Database
             object result = GetGeneralTableValue(RemotePathPrefixKey);
             if (result == null)
             {
-                var syncFolder = ConfigManager.CurrentConfig.Folders.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
+                var syncFolder = Config.ConfigManager.CurrentConfig.Folders.Find((f) => f.GetRepoInfo().CmisDatabase == this.databaseFileName);
                 string oldprefix = syncFolder.RemotePath;
                 SetRemotePathPrefix(oldprefix);
                 return oldprefix;

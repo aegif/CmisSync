@@ -18,8 +18,9 @@ using log4net;
 using System;
 using System.IO;
 using CmisSync.Lib.Sync.CmisRepoFolder;
+using CmisSync.Lib.ActivityListener;
 
-namespace CmisSync.Lib.Sync
+namespace CmisSync.Lib.Sync.SyncRepo
 {
     /// <summary></summary>
     public partial class CmisRepo : RepoBase

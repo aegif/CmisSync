@@ -8,8 +8,9 @@ using log4net;
 using System.Text.RegularExpressions;
 using CmisSync.Lib.Cmis;
 using CmisSync.Auth;
+using CmisSync.Lib.Config;
 
-namespace CmisSync.Lib.Sync
+namespace CmisSync.Lib.Config
 {
     /// <summary>
     /// Migrate config.xml from past versions.
@@ -34,13 +35,13 @@ namespace CmisSync.Lib.Sync
             int configSchemaVersion = ConfigManager.CurrentConfig.ConfigSchemaVersion;
 
             // Skip migration if up-to-date.
-            if (configSchemaVersion == null || configSchemaVersion >= Config.SchemaVersion)
+            if (configSchemaVersion == null || configSchemaVersion >= CmisSyncConfig.SchemaVersion)
             {
                 return;
             }
 
             // Migrate with various step according to the version.
-            Logger.DebugFormat("Current config schema must be updated from {0} to {0}", configSchemaVersion, Config.SchemaVersion);
+            Logger.DebugFormat("Current config schema must be updated from {0} to {0}", configSchemaVersion, CmisSyncConfig.SchemaVersion);
             switch (configSchemaVersion)
             {
                 case 0:
@@ -54,7 +55,7 @@ namespace CmisSync.Lib.Sync
                     ReplaceOldAlfrescoURLs();
 
                     // Update version number.
-                    ConfigManager.CurrentConfig.ConfigSchemaVersion = Config.SchemaVersion;
+                    ConfigManager.CurrentConfig.ConfigSchemaVersion = CmisSyncConfig.SchemaVersion;
                     ConfigManager.CurrentConfig.Save();
                     break;
                 default:
@@ -132,7 +133,7 @@ namespace CmisSync.Lib.Sync
             bool modified = false;
 
             // Loop through all repositories.
-            foreach (CmisSync.Lib.Config.SyncConfig.Folder folder in ConfigManager.CurrentConfig.Folders)
+            foreach (CmisSyncConfig.SyncConfig.Folder folder in ConfigManager.CurrentConfig.Folders)
             {
                 string oldUrl = folder.RemoteUrl.ToString();
 
@@ -143,7 +144,7 @@ namespace CmisSync.Lib.Sync
 
                     if (IsAlfresco42OrLater(folder, newUrl))
                     {
-                        folder.RemoteUrl = new CmisSync.Lib.Config.XmlUri(new Uri(newUrl));
+                        folder.RemoteUrl = new CmisSync.Lib.Config.CmisSyncConfig.XmlUri(new Uri(newUrl));
                         modified = true;
                     }
                 }
@@ -155,7 +156,7 @@ namespace CmisSync.Lib.Sync
             }
         }
 
-        private static bool IsAlfresco42OrLater(CmisSync.Lib.Config.SyncConfig.Folder folder, string newUrl)
+        private static bool IsAlfresco42OrLater(CmisSync.Lib.Config.CmisSyncConfig.SyncConfig.Folder folder, string newUrl)
         {
             try
             {

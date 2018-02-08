@@ -4,7 +4,9 @@ using System.Threading;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync;
+using CmisSync.Lib.Sync.SyncRepo;
 using log4net;
 using System.Net;
 
@@ -42,7 +44,7 @@ namespace CmisSync.Console
             // Uncomment this line to disable SSL checking (for self-signed certificates)
             // ServicePointManager.CertificatePolicy = new YesCertPolicyHandler();
 
-            PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
+            //PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
 
             CmisSyncOnce once = new CmisSyncOnce();
 
@@ -56,8 +58,8 @@ namespace CmisSync.Console
             }
             else
             {
-                Config config = ConfigManager.CurrentConfig;
-                foreach (CmisSync.Lib.Config.SyncConfig.Folder folder in config.Folders)
+                CmisSyncConfig config = ConfigManager.CurrentConfig;
+                foreach (CmisSync.Lib.Config.CmisSyncConfig.SyncConfig.Folder folder in config.Folders)
                 {
                     RepoInfo repoInfo = folder.GetRepoInfo();
                     once.repos.Add(repoInfo);
@@ -77,8 +79,8 @@ namespace CmisSync.Console
         /// </summary>
         private void AddSynchronizedFolder(string folderName)
 		{
-			Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder folder = config.GetFolder(folderName);
+			CmisSyncConfig config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.CmisSyncConfig.SyncConfig.Folder folder = config.GetFolder(folderName);
             if (folder == null)
             {
                 System.Console.WriteLine("No folder found with this name: " + folderName);

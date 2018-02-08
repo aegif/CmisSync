@@ -1,10 +1,12 @@
 using System;
 using CmisSync.Lib;
+using CmisSync.Lib.ActivityListener;
+using CmisSync.Lib.Utilities.UserNotificationListener;
 
 namespace CmisSync.Console
 {
     // Console UI does not actually need a controller, so we use this empty controller instead.
-	public class ConsoleController : IActivityListener, UserNotificationListener
+	public class ConsoleController : IActivityListener, IUserNotificationListener
 	{
         /// <summary>
         /// Constructor
@@ -12,7 +14,7 @@ namespace CmisSync.Console
 		public ConsoleController ()
 		{
             // 
-            CmisSync.Lib.Utils.SetUserNotificationListener(this);
+            UserNotificationListenerUtil.SetUserNotificationListener(this);
 		}
 
         /// <summary>

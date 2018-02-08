@@ -10,6 +10,9 @@ using System.Data.SQLite;
 
 using log4net;
 using CmisSync.Auth;
+using CmisSync.Lib.Config;
+using CmisSync.Lib.Utilities.PathConverter;
+using CmisSync.Lib.Utilities.UserNotificationListener;
 
 namespace CmisSync.Lib.Database
 {
@@ -38,7 +41,7 @@ namespace CmisSync.Lib.Database
         /// <param name="syncFolder">File path.</param>
         /// <param name="connection">Connection.</param>
         /// <param name="currentVersion">Current database schema version.</param>
-        public void Migrate(Config.SyncConfig.Folder syncFolder, SQLiteConnection connection, int currentVersion)
+        public void Migrate(Config.CmisSyncConfig.SyncConfig.Folder syncFolder, SQLiteConnection connection, int currentVersion)
         {
             // Add columns and other database schema manipulation.
             MigrateSchema(syncFolder, connection);
@@ -55,7 +58,7 @@ namespace CmisSync.Lib.Database
         /// </summary>
         /// <param name="syncFolder">Folder name.</param>
         /// <param name="connection"></param>
-        public static void MigrateSchema(Config.SyncConfig.Folder syncFolder, SQLiteConnection connection)
+        public static void MigrateSchema(Config.CmisSyncConfig.SyncConfig.Folder syncFolder, SQLiteConnection connection)
         {
             // Add columns
             var filesTableColumns = GetColumnNames(connection, "files");
@@ -112,9 +115,9 @@ namespace CmisSync.Lib.Database
         /// <summary>
         /// Fill the data which is missing due to new columns in the database.
         /// </summary>
-        public static void FillMissingData(Config.SyncConfig.Folder syncFolder, SQLiteConnection connection)
+        public static void FillMissingData(Config.CmisSyncConfig.SyncConfig.Folder syncFolder, SQLiteConnection connection)
         {
-            Utils.NotifyUser("CmisSync needs to upgrade its own local data for folder \"" + syncFolder.RepositoryId +
+            UserNotificationListenerUtil.NotifyUser("CmisSync needs to upgrade its own local data for folder \"" + syncFolder.RepositoryId +
                 "\".\nPlease stay on the network during that time, sorry for the inconvenience." +
                 "\nIt can take up to HOURS if you have many files, thank you for your patience." +
                 "\nA notification will pop up when it is done.");
@@ -150,7 +153,7 @@ namespace CmisSync.Lib.Database
                             string remotePath = remoteRootFolder + "/" + remoteRelativePath;
 
                             // Example: テスト・テスト/テスト用ファイル.pptx
-                            string localPath = PathRepresentationConverter.RemoteToLocal(legacyPath.Substring(localRootFolder.Length + 1));
+                            string localPath = PathRepresentationConverterUtil.RemoteToLocal(legacyPath.Substring(localRootFolder.Length + 1));
 
                             string id = null;
                             try
@@ -184,7 +187,7 @@ namespace CmisSync.Lib.Database
                             string legacyPath = reader["path"].ToString();
                             string remoteRelativePath = legacyPath.Substring(localRootFolder.Length + 1);
                             string remotePath = remoteRootFolder + "/" + remoteRelativePath;
-                            string localPath = PathRepresentationConverter.RemoteToLocal(legacyPath.Substring(localRootFolder.Length + 1));
+                            string localPath = PathRepresentationConverterUtil.RemoteToLocal(legacyPath.Substring(localRootFolder.Length + 1));
                             string id = null;
                             try
                             {
@@ -226,11 +229,11 @@ namespace CmisSync.Lib.Database
             catch (Exception e)
             {
                 Logger.Info("Failed to migrate \"" + syncFolder.RepositoryId + "\".", e);
-                Utils.NotifyUser("Failure while migrating folder \"" + syncFolder.RepositoryId + "\".");
+                UserNotificationListenerUtil.NotifyUser("Failure while migrating folder \"" + syncFolder.RepositoryId + "\".");
                 throw;
             }
 
-            Utils.NotifyUser("CmisSync has finished upgrading its own local data for folder \"" + syncFolder.RepositoryId + "\".");
+            UserNotificationListenerUtil.NotifyUser("CmisSync has finished upgrading its own local data for folder \"" + syncFolder.RepositoryId + "\".");
         }
     }
 }

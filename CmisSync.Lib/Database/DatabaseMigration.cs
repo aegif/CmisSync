@@ -16,6 +16,7 @@ using log4net;
 using CmisSync.Auth;
 using DotCMIS.Client;
 using CmisSync.Lib.Database;
+using CmisSync.Lib.Config;
 
 namespace CmisSync.Lib.Database
 {

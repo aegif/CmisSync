@@ -20,8 +20,10 @@ using System;
 using System.IO;
 using Timers = System.Timers;
 using CmisSync.Auth;
+using CmisSync.Lib.ActivityListener;
+using CmisSync.Lib.Config;
 
-namespace CmisSync.Lib
+namespace CmisSync.Lib.Sync.SyncRepo
 {
 
     /// <summary>
@@ -93,8 +95,8 @@ namespace CmisSync.Lib
             RepoInfo.IsSuspended = true;
 
             //Get configuration
-            Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
+            Config.CmisSyncConfig config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.CmisSyncConfig.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
             syncConfig.IsSuspended = true;
             config.Save();
         }
@@ -108,8 +110,8 @@ namespace CmisSync.Lib
             RepoInfo.IsSuspended = false;
 
             //Get configuration
-            Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
+            Config.CmisSyncConfig config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.CmisSyncConfig.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
             syncConfig.IsSuspended = false;
             config.Save();
         }
@@ -294,8 +296,8 @@ namespace CmisSync.Lib
         public virtual void UpdateSettings(string password, int pollInterval, bool syncAtStartup)
         {
             //Get configuration
-            Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
+            Config.CmisSyncConfig config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.CmisSyncConfig.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
 
             //Pause sync
             this.remote_timer.Stop();

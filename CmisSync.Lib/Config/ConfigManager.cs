@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace CmisSync.Lib
+namespace CmisSync.Lib.Config
 {
     /// <summary>
     /// A static class that allows easy access to the configuration of CmisSync.
@@ -14,7 +14,7 @@ namespace CmisSync.Lib
         /// The CmisSync configuration.
         /// Following the singleton design pattern.
         /// </summary>
-        private static Config config;
+        private static CmisSyncConfig config;
 
         /// <summary>
         /// Lock to provide threadsafe singleton creation
@@ -30,7 +30,7 @@ namespace CmisSync.Lib
         /// The CmisSync configuration.
         /// Following the singleton design pattern.
         /// </summary>
-        public static Config CurrentConfig
+        public static CmisSyncConfig CurrentConfig
         {
             get
             {
@@ -42,7 +42,7 @@ namespace CmisSync.Lib
                         // If no configuration file exists, it will create a default one.
                         if (config == null)
                         {
-                            config = new Config(CurrentConfigFile);
+                            config = new CmisSyncConfig(CurrentConfigFile);
                         }
                     }
                 }

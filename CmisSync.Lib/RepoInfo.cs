@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using CmisSync.Lib.Cmis;
 using CmisSync.Auth;
+using CmisSync.Lib.Config;
 
 namespace CmisSync.Lib
 {

@@ -15,6 +15,11 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using CmisSync.Lib.Database;
+using CmisSync.Lib.ActivityListener;
+using CmisSync.Lib.Config;
+using CmisSync.Lib.Sync.SyncRepo;
+using CmisSync.Lib.Utilities.PathConverter;
+using CmisSync.Lib.Utilities.UserNotificationListener;
 
 namespace CmisSync.Lib.Sync.CmisRepoFolder
 {
@@ -270,10 +275,10 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
             
             //repoInfo.CmisProfile.contentStreamFileNameOrderable = session.RepositoryInfo.Capabilities. TODO
 
-            Config.SyncConfig.Folder folder = ConfigManager.CurrentConfig.GetFolder(this.repoInfo.Name);
+            Config.CmisSyncConfig.SyncConfig.Folder folder = ConfigManager.CurrentConfig.GetFolder(this.repoInfo.Name);
             if (folder != null)
             {
-                Config.Feature features = folder.SupportedFeatures;
+                Config.CmisSyncConfig.Feature features = folder.SupportedFeatures;
                 if (features != null)
                 {
                     if (IsGetDescendantsSupported && features.GetDescendantsSupport == false)
@@ -404,7 +409,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                     {
                         // TODO debug
                         System.Console.WriteLine ("Crawl Sync start: \n" +
-                                                  "  remoteFolder: {0}\n" +
+                                                  "  remoteFolder's path property: {0}\n" +
                                                   "  remoteFolderPath: {1}\n" +
                                                   "  localFolder: {2}\n" +
                                                   "  repoInfoRemotePath: {3}\n" +
@@ -695,7 +700,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                         continue;
                     }
 
-                    if (Utils.WorthSyncing(localFolder, PathRepresentationConverter.RemoteToLocal(remoteSubFolder.Name), repoInfo))
+                    if (Utils.WorthSyncing(localFolder, PathRepresentationConverterUtil.RemoteToLocal(remoteSubFolder.Name), repoInfo))
                     {
                         success &= DownloadDirectory(remoteSubFolder, remoteSubPath, localSubFolderItem.LocalPath);
                         names.Add(remoteSubFolder.Name.ToLowerInvariant());
@@ -1002,7 +1007,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                             + "\n\n"
                             + "Your version has been renamed '" + conflictFilename + "', please merge your important changes from it and then delete it.";
                         Logger.Info(message);
-                        Utils.NotifyUser(message);
+                        UserNotificationListenerUtil.NotifyUser(message);
                     }
                     else // Server side file was modified, but local file was not modified. Just need to update the file.
                     {
@@ -1316,7 +1321,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
 
                         // throw new IOException("File is Check Out on the server");
                         Logger.Info(message);
-                        Utils.NotifyUser(message);
+                        UserNotificationListenerUtil.NotifyUser(message);
                         return false;
                     }
                 }
@@ -1392,7 +1397,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                 string message = String.Format("Restoring file \"{0}\" because it is checked out on the server by another user: {1}",
                     syncItem.LocalPath, remoteDocument.VersionSeriesCheckedOutBy);
                 Logger.Info(message);
-                Utils.NotifyUser(message);
+                UserNotificationListenerUtil.NotifyUser(message);
 
                 // Restore the deleted file
                 activityListener.ActivityStarted();
@@ -1437,7 +1442,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
 
                 // TODO: Add resource
                 string message = String.Format("フォルダ {0} に対して削除やリネームする権限がないため、サーバからこのフォルダを復元します（フォルダに含まれるファイル数が多い場合、復元に時間がかかります）。", syncItem.LocalPath);
-                Utils.NotifyUser(message);
+                UserNotificationListenerUtil.NotifyUser(message);
 
 
                 // We don't have the permission to delete this folder. Warn and recreate it.

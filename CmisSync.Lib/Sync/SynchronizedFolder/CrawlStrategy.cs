@@ -12,6 +12,8 @@ using DotCMIS.Enums;
 using System.Text;
 using CmisSync.Lib.Sync;
 
+using CmisSync.Lib.Utilities.UserNotificationListener;
+
 namespace CmisSync.Lib.Sync.CmisRepoFolder
 {
     /// <summary>
@@ -472,7 +474,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                                     // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
                                     + "Your version has been saved as \"" + newFilePath + "\", please merge your important changes from it and then delete it.";
                                 Logger.Info(message);
-                                Utils.NotifyUser(message);
+                                UserNotificationListenerUtil.NotifyUser(message);
                             }
                             else
                             {
@@ -512,7 +514,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                         // + Properties_Resources.ResourceManager.GetString("YourVersion", CultureInfo.CurrentCulture);
                         + "Your folder has been saved as \"" + newFolderPath + "\", please rename it.";
                     Logger.Info(message);
-                    Utils.NotifyUser(message);
+                    UserNotificationListenerUtil.NotifyUser(message);
                 }
                 else
                 {

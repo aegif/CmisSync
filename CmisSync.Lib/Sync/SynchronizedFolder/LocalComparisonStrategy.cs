@@ -6,7 +6,10 @@ using DotCMIS.Client;
 using System.IO;
 using CmisSync.Lib.Database;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Config;
 using DotCMIS.Exceptions;
+
+using CmisSync.Lib.Utilities.UserNotificationListener;
 
 namespace CmisSync.Lib.Sync.CmisRepoFolder
 {
@@ -196,7 +199,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
 
                         // TODO: Internationalization
                         string message = String.Format("Restoring folder {0} because its sub-items have been modified on the server. You can delete it again.", localPath);
-                        Utils.NotifyUser(message);
+                        UserNotificationListenerUtil.NotifyUser(message);
 
                         // TODO: Handle folder conflict
                         // Delete local database entry.
@@ -246,7 +249,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
             if (lastTokenOnClient == lastTokenOnServer || lastTokenOnClient == null) return false;
 
             // TODO: Extract static code, because same code was writtern in SynchronizedFolder
-            Config.Feature features = null;
+            Config.CmisSyncConfig.Feature features = null;
             if (ConfigManager.CurrentConfig.GetFolder(repoInfo.Name) != null)
                 features = ConfigManager.CurrentConfig.GetFolder(repoInfo.Name).SupportedFeatures;
             int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync

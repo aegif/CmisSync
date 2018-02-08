@@ -17,6 +17,7 @@ using System.Net;
 using CmisSync.Lib;
 using DotCMIS.Data;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Config;
 
 namespace CmisSync.Lib.Sync.CmisRepoFolder
 {
@@ -51,7 +52,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
             }
 
             // Calculate queryable number of changes.
-            Config.Feature features = null;
+            Config.CmisSyncConfig.Feature features = null;
             if (ConfigManager.CurrentConfig.GetFolder(repoInfo.Name) != null)
                 features = ConfigManager.CurrentConfig.GetFolder(repoInfo.Name).SupportedFeatures;
             int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  // TODO if there are more items, either loop or force CrawlSync

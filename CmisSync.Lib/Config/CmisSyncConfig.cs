@@ -23,13 +23,16 @@ using System.Xml;
 using log4net;
 using CmisSync.Auth;
 
-namespace CmisSync.Lib
+namespace CmisSync.Lib.Config
 {
     /// <summary>
     /// Configuration of a CmisSync synchronized folder.
     /// It can be found in the XML configuration file.
+    /// ??? wait
+    /// Shouldn't it be the top level configuration of the 
+    /// CmisSync instance ?
     /// </summary>
-    public class Config
+    public class CmisSyncConfig
     {
 
         public static readonly string DEFAULT_URL_ADDRESS = "https://";
@@ -57,7 +60,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Log.
         /// </summary>
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof(Config));
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(CmisSyncConfig));
 
 
         /// <summary>
@@ -166,7 +169,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Constructor.
         /// </summary>
-        public Config(string fullPath)
+        public CmisSyncConfig(string fullPath)
         {
             FullPath = fullPath;
             ConfigPath = Path.GetDirectoryName(FullPath);
@@ -259,7 +262,7 @@ namespace CmisSync.Lib
             // Define the default XML configuration file.
             configXml = new SyncConfig()
             {
-                ConfigSchemaVersion = Config.SchemaVersion,
+                ConfigSchemaVersion = CmisSyncConfig.SchemaVersion,
                 Notifications = true,
                 SingleRepository = false, // Multiple repository for CmisSync, but some CmisSync-derived products have different defaults.
                 FrozenConfiguration = false,
@@ -627,7 +630,7 @@ namespace CmisSync.Lib
                     repoInfo.MaxUploadRetries = uploadRetries;
                     repoInfo.MaxDownloadRetries = downloadRetries;
                     repoInfo.MaxDeletionRetries = deletionRetries;
-                    if (PollInterval < 1) PollInterval = Config.DEFAULT_POLL_INTERVAL;
+                    if (PollInterval < 1) PollInterval = CmisSyncConfig.DEFAULT_POLL_INTERVAL;
                     repoInfo.PollInterval = PollInterval;
                     repoInfo.IsSuspended = IsSuspended;
                     repoInfo.SyncAtStartup = SyncAtStartup;

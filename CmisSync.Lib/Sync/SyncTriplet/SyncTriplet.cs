@@ -5,18 +5,6 @@ using CmisSync.Lib.Sync.SyncTriplet.TripletItem;
 
 namespace CmisSync.Lib.Sync.SyncTriplet
 {
-    // The examples below are for this item:
-    //
-    // Local: C:\Users\nico\CmisSync\A Project\adir\afile.txt
-    // Remote: /sites/aproject/adir/a<file
-    //
-    // Notice how:
-    // - Slashes and antislashes can differ
-    // - File names can differ
-    // - Remote and local have different sets of fobidden characters
-    //
-    // For that reason, never convert a local path to a remote path (or vice versa) without checking the database.
-
     /// <summary>
     /// Sync triplet.
     /// </summary>
@@ -26,7 +14,9 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         /// Initializes a new instance of the <see cref="T:CmisSync.Lib.Sync.SyncTriplet.SyncTriplet"/> class.
         /// </summary>
         public SyncTriplet() {
-            Logger.Debug("A new sync triplet is created");
+            // TODO: debug
+            Logger.Debug("A new sync triplet is initialized.");
+
             IsFolder = false;
             LocalStorage = null;
             RemoteStorage = null;
@@ -57,5 +47,29 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         /// The DBS torage of sync triplet.
         /// </summary>
         public DBStorageItem DBStorage { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether LocalStorageItem exist.
+        /// </summary>
+        /// <value><c>true</c> if local exist; otherwise, <c>false</c>.</value>
+        public Boolean LocalExist { get {
+                return (null == LocalStorage) ? false : LocalStorage.Exist;
+            }}
+
+        /// <summary>
+        /// Gets a value indicating whether RemoteStorageItem exist.
+        /// </summary>
+        /// <value><c>true</c> if remote exist; otherwise, <c>false</c>.</value>
+        public Boolean RemoteExist { get {
+                return (null == RemoteStorage) ? false : RemoteStorage.Exist;
+            }}
+
+        /// <summary>
+        /// Gets a value indicating whether DBStorageItem exist.
+        /// </summary>
+        /// <value><c>true</c> if DBE xist; otherwise, <c>false</c>.</value>
+        public Boolean DBExist { get {
+                return (null == DBStorage) ? false : DBStorage.Exist;
+            }}
    }
 }
