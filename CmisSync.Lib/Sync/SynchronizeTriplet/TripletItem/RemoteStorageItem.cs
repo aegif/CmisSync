@@ -1,7 +1,7 @@
 ﻿using System;
 using CmisSync.Lib.Cmis;
 
-namespace CmisSync.Lib.Sync.SyncTriplet.TripletItem
+namespace CmisSync.Lib.Sync.SynchronizeTriplet.TripletItem
 {
 
     public class RemoteStorageItem : BaseStorageItem

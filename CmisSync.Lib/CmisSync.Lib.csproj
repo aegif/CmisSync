@@ -87,7 +87,6 @@
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SyncItem.cs" />
     <Compile Include="Database\DatabaseMigrationToVersion3.cs" />
     <Compile Include="Sync\SynchronizedFolder\ChangeLogThenCrawlStrategy.cs" />
     <Compile Include="Sync\SynchronizedFolder\CrawlStrategy.cs" />
@@ -95,10 +94,10 @@
     <Compile Include="Sync\SynchronizedFolder\SynchronizedFolder.cs" />
     <Compile Include="Sync\SynchronizedFolder\LocalComparisonStrategy.cs" />
     <Compile Include="Sync\SynchronizeMachine\SyncState.cs" />
-    <Compile Include="Sync\SyncTriplet\SyncTriplet.cs" />
-    <Compile Include="Sync\SyncTriplet\TripletItem\BaseStorageItem.cs" />
-    <Compile Include="Sync\SyncTriplet\TripletItem\DBStorageItem.cs" />
-    <Compile Include="Sync\SyncTriplet\SyncTripletFactory.cs" />
+    <Compile Include="Sync\SynchronizeTriplet\SyncTriplet.cs" />
+    <Compile Include="Sync\SynchronizeTriplet\TripletItem\BaseStorageItem.cs" />
+    <Compile Include="Sync\SynchronizeTriplet\TripletItem\DBStorageItem.cs" />
+    <Compile Include="Sync\SynchronizeTriplet\SyncTripletFactory.cs" />
     <Compile Include="Utilities\PathConverter\IPathRepresentationConverter.cs" />
     <Compile Include="Utilities\PathConverter\DefaultPathRepresentationConverter.cs" />
     <Compile Include="Utilities\PathConverter\PathRepresentationConverterUtil.cs" />
@@ -106,8 +105,8 @@
     <Compile Include="Utilities\UserNotificationListener\IUserNotificationListener.cs" />
     <Compile Include="Utilities\UserNotificationListener\UserNotificationListenerUtil.cs" />
     <Compile Include="Utilities\FileUtilities\CheckSumUtil.cs" />
-    <Compile Include="Sync\SyncTriplet\TripletItem\LocalStorageItem.cs" />
-    <Compile Include="Sync\SyncTriplet\TripletItem\RemoteStorageItem.cs" />
+    <Compile Include="Sync\SynchronizeTriplet\TripletItem\LocalStorageItem.cs" />
+    <Compile Include="Sync\SynchronizeTriplet\TripletItem\RemoteStorageItem.cs" />
     <Compile Include="Sync\SyncRepo\RepoBase.cs" />
     <Compile Include="Sync\SyncRepo\CmisRepo.cs" />
     <Compile Include="ActivityListener\ActivityListenerAggregator.cs" />
@@ -117,6 +116,13 @@
     <Compile Include="Config\CmisSyncConfig.cs" />
     <Compile Include="Config\ConfigManager.cs" />
     <Compile Include="Config\ConfigMigration.cs" />
+    <Compile Include="Sync\SynchronizeItem\SyncItem.cs" />
+    <Compile Include="Sync\SynchronizeItem\SyncItemFactory.cs" />
+    <Compile Include="Sync\SynchronizeItem\LocalPathSyncItem.cs" />
+    <Compile Include="Sync\SynchronizeItem\RemotePathSyncItem.cs" />
+    <Compile Include="Sync\SynchronizeMachine\CmisRepoProcessor.cs" />
+    <Compile Include="Sync\SynchronizeMachine\SFTripletProcessor.cs" />
+    <Compile Include="Sync\SynchronizeMachine\SyncTripletProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
@@ -138,8 +144,8 @@
   <ItemGroup>
     <Folder Include="Sync\SynchronizedFolder\" />
     <Folder Include="Sync\SynchronizeMachine\" />
-    <Folder Include="Sync\SyncTriplet\" />
-    <Folder Include="Sync\SyncTriplet\TripletItem\" />
+    <Folder Include="Sync\SynchronizeTriplet\" />
+    <Folder Include="Sync\SynchronizeTriplet\TripletItem\" />
     <Folder Include="Utilities\" />
     <Folder Include="Utilities\PathConverter\" />
     <Folder Include="Utilities\UserNotificationListener\" />
@@ -148,6 +154,7 @@
     <Folder Include="ActivityListener\" />
     <Folder Include="Sync\SyncUnit\" />
     <Folder Include="Config\" />
+    <Folder Include="Sync\SynchronizeItem\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CmisSync.Lib.Sync.SyncTriplet.TripletItem
+namespace CmisSync.Lib.Sync.SynchronizeTriplet.TripletItem
 {
     /// <summary>
     /// Storage item.

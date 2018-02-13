@@ -10,6 +10,7 @@ using CmisSync.Lib.Config;
 using DotCMIS.Exceptions;
 
 using CmisSync.Lib.Utilities.UserNotificationListener;
+using CmisSync.Lib.Sync.SynchronizeItem;
 
 namespace CmisSync.Lib.Sync.CmisRepoFolder
 {

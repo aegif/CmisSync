@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using CmisSync.Lib.Sync.SynchronizeItem;
 
 namespace CmisSync.Lib.Utilities.FileUtilities
 {

@@ -2,7 +2,7 @@
 using CmisSync.Lib.Database;
 using log4net;
 
-namespace CmisSync.Lib.Sync.SyncTriplet.TripletItem
+namespace CmisSync.Lib.Sync.SynchronizeTriplet.TripletItem
 {
     /// <summary>
     /// DBI tem.

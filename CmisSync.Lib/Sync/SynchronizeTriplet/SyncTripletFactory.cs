@@ -1,10 +1,11 @@
 ﻿using System;
-using CmisSync.Lib.Sync.SyncTriplet.TripletItem;
+using CmisSync.Lib.Sync.SynchronizeTriplet.TripletItem;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Sync.SyncRepo;
 using DotCMIS.Client;
 using log4net;
 
-namespace CmisSync.Lib.Sync.SyncTriplet
+namespace CmisSync.Lib.Sync.SynchronizeTriplet
 {
     // The examples below are for this item:
     //

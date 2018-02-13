@@ -2,7 +2,7 @@
 using System.IO;
 using CmisSync.Lib.Utilities.FileUtilities;
 
-namespace CmisSync.Lib.Sync.SyncTriplet.TripletItem
+namespace CmisSync.Lib.Sync.SynchronizeTriplet.TripletItem
 {
     public class LocalStorageItem : BaseStorageItem
     {

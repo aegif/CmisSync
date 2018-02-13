@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using log4net;
 
 using CmisSync.Lib.Utilities.PathConverter;
+using CmisSync.Lib.Sync.SynchronizeItem;
 
 
 namespace CmisSync.Lib.Database

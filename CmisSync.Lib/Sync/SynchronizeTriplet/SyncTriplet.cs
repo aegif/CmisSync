@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using log4net;
-using CmisSync.Lib.Sync.SyncTriplet.TripletItem;
+using CmisSync.Lib.Sync.SynchronizeTriplet.TripletItem;
 
-namespace CmisSync.Lib.Sync.SyncTriplet
+namespace CmisSync.Lib.Sync.SynchronizeTriplet
 {
     /// <summary>
     /// Sync triplet.
@@ -26,7 +26,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         /// <summary>
         /// The logger.
         /// </summary>
-        private static readonly ILog Logger = LogManager.GetLogger (typeof (SyncItem));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncTriplet));
 
         /// <summary>
         /// Whether the item is a folder or a file.

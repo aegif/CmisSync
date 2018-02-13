@@ -18,6 +18,7 @@ using CmisSync.Lib;
 using DotCMIS.Data;
 using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Config;
+using CmisSync.Lib.Sync.SynchronizeItem;
 
 namespace CmisSync.Lib.Sync.CmisRepoFolder
 {

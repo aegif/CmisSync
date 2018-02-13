@@ -11,6 +11,7 @@ using DotCMIS.Client;
 using CmisSync.Lib.Cmis;
 using System.Threading;
 
+using CmisSync.Lib.Sync.SynchronizeItem;
 
 namespace CmisSync.Lib.Sync.CmisRepoFolder
 {
