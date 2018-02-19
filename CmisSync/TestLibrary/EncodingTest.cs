@@ -50,12 +50,12 @@ namespace TestLibrary
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName(">"), ">");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("*"), "*");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("|"), "|");
-            Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFileName("–€"), "Non Valid ISO 8859-1 Character accepted");
         }
 
         [Test, Category("Fast")]
         public void ValidFolderNameTest()
         {
+            // Valid folder names
             Assert.IsFalse(CmisSync.Lib.Utils.IsInvalidFolderName("abcdefghijklmnopqrstuvwxyz"));
             Assert.IsFalse(CmisSync.Lib.Utils.IsInvalidFolderName("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
             Assert.IsFalse(CmisSync.Lib.Utils.IsInvalidFolderName("1234567890"));
@@ -67,6 +67,8 @@ namespace TestLibrary
             Assert.IsFalse(CmisSync.Lib.Utils.IsInvalidFolderName("¡¢£¤¥¨©ª«¬®¯°µ¶·¸º»¼¼¾¿"));
             Assert.IsFalse(CmisSync.Lib.Utils.IsInvalidFolderName("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ"));
             Assert.IsFalse(CmisSync.Lib.Utils.IsInvalidFolderName("Þàáâãäåæçèéê"));
+            
+            // Invalid folder names
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFolderName("?"), "?");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFolderName(":"), ":");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFolderName("/"), "/");
@@ -76,7 +78,6 @@ namespace TestLibrary
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFolderName(">"), ">");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFolderName("*"), "*");
             Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFolderName("|"), "|");
-            Assert.IsTrue(CmisSync.Lib.Utils.IsInvalidFolderName("–€"), "Non Valid ISO 8859-1 Character accepted");
         }
     }
 }

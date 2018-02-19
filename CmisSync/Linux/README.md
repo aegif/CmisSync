@@ -49,15 +49,19 @@ If it says `Mono [...] version 2.x.y` the you must first install a newer version
 
 ### 3) Build
 
-At the root of the CmisSync root folder, run the following commands:
+At the root of the DotCMIS submodule, build DotCMIS, and copy the resulting DLL to `Extras/DotCMIS.dll`.
+
+Then, at the root of the CmisSync root folder, run the following commands:
 
 ```bash
 $ git submodule init
 $ git submodule update
 $ make -f Makefile.am
-$ ./configure --with-dotcmis=Extras/DotCMIS.dll
+$  ./configure --with-dotcmis=Extras/DotCMIS.dll --with-newtonsoft-json=Extras/Newtonsoft.Json.dll
 $ make
 ```
+
+The platform-independent library CmisSync.Lib evolves very fast, and we unfortunately lack the budget to maintain the Linux version at every change. So you might need to add/remove a few .cs files from the Makefiles. Rarely you might even need to modify some library calls within the source code. We warmly welcome pull requests, thanks a lot!
 
 ### 4) Install
 

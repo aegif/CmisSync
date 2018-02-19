@@ -23,6 +23,7 @@ namespace CmisSync.Lib.Database
     using SQLiteConnection = SqliteConnection;
     using SQLiteCommand = SqliteCommand;
     using SQLiteException = SqliteException;
+    using SQLiteDataReader = SqliteDataReader;
 #endif
 
     /// <summary>
@@ -547,7 +548,7 @@ namespace CmisSync.Lib.Database
             if (null != modifyDateObj)
             {
                 #if __MonoCS__
-                modifyDateObj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
+                modifyDateObj = DateTime.SpecifyKind((DateTime)modifyDateObj, DateTimeKind.Utc);
                 #else
                 modifyDateObj = ((DateTime)modifyDateObj).ToUniversalTime();
                 #endif
@@ -910,6 +911,7 @@ namespace CmisSync.Lib.Database
         /// <param name="remotePath">Remote path.</param>
         public SyncItem GetSyncItemFromRemotePath(string remotePath)
         {
+            //Logger.Debug("GetSyncItemFromRemotePath " + remotePath);
             if (remotePath.Equals(remotePathPrefix))
             {
                 return SyncItemFactory.CreateFromPaths(localPathPrefix, localPathPrefix, remotePathPrefix, remotePathPrefix, false);

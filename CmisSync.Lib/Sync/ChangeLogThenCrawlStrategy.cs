@@ -32,7 +32,7 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Synchronize using the ChangeLog feature of CMIS to trigger CrawlStrategy.
             /// </summary>
-            private void ChangeLogThenCrawlSync(IFolder remoteFolder, string remotePath, string localFolder)
+            private bool ChangeLogThenCrawlSync(IFolder remoteFolder, string remotePath, string localFolder)
             {
                 // Once in a while, run a crawl sync, to make up for any server-side ChangeLog bug.
                 // The frequency of this is calculated based on the poll interval, so that:
@@ -43,9 +43,9 @@ namespace CmisSync.Lib.Sync
                 if (changeLogIterationCounter > 263907 / (pollInterval/1000 + 117))
                 {
                     Logger.Debug("It has been a while since the last crawl sync, so launching a crawl sync now.");
-                    CrawlSyncAndUpdateChangeLogToken(remoteFolder, remotePath, localFolder);
+                    bool crawlSuccess = CrawlSyncAndUpdateChangeLogToken(remoteFolder, remotePath, localFolder);
                     changeLogIterationCounter = 0;
-                    return;
+                    return crawlSuccess;
                 }
                 else
                 {
@@ -68,13 +68,14 @@ namespace CmisSync.Lib.Sync
                 if (lastTokenOnClient == lastTokenOnServer)
                 {
                     Logger.DebugFormat("No changes to sync, tokens on server and client are equal: \"{0}\"", lastTokenOnClient);
-                    return;
+                    return true;
                 }
 
+                bool success = true;
                 if (lastTokenOnClient == null)
                 {
                     // Token is null, which means no sync has ever happened yet, so just sync everything from remote.
-                    CrawlRemote(remoteFolder, remotePath, repoInfo.TargetDirectory, new List<string>(), new List<string>());
+                    success &= CrawlRemote(remoteFolder, remotePath, repoInfo.TargetDirectory, new List<string>(), new List<string>());
                     
                     Logger.Info("Synced from remote, updating ChangeLog token: " + lastTokenOnServer);
                     database.SetChangeLogToken(lastTokenOnServer);
@@ -91,16 +92,17 @@ namespace CmisSync.Lib.Sync
                     // First event was already processed previous.
                     var changeEvents = changes.ChangeEventList.Where(p => p != changes.ChangeEventList.FirstOrDefault()).ToList();
 
-                    CrawlChangeLogSyncAndUpdateChangeLogToken(changeEvents, remoteFolder, remotePath, localFolder);
+                    success &= CrawlChangeLogSyncAndUpdateChangeLogToken(changeEvents, remoteFolder, remotePath, localFolder);
 
-                    currentChangeToken = changes.LatestChangeLogToken; 
-
+                    // Save the token of the last of the changes we just consumed.
+                    currentChangeToken = changes.LatestChangeLogToken;
                     database.SetChangeLogToken(currentChangeToken);
                 }
                 // Repeat if there were two many changes to fit in a single response.
                 while (changes.HasMoreItems ?? false);
 
                 database.SetChangeLogToken(lastTokenOnServer);
+                return success;
             }
 
 
@@ -204,10 +206,10 @@ namespace CmisSync.Lib.Sync
             /// <summary>
             /// Apply CMIS ChangeLog changes.
             /// </summary>
-            private void CrawlChangeLogSyncAndUpdateChangeLogToken(IList<IChangeEvent> changeLogs, IFolder remoteFolder, string remotePath, string localFolder)
+            private bool CrawlChangeLogSyncAndUpdateChangeLogToken(IList<IChangeEvent> changeLogs, IFolder remoteFolder, string remotePath, string localFolder)
             {
                 SleepWhileSuspended();
-
+                bool success = true;
                 var sw = new System.Diagnostics.Stopwatch();
                 activityListener.ActivityStarted();
                 try
@@ -231,15 +233,27 @@ namespace CmisSync.Lib.Sync
 
                         try
                         {
-                            var cmisObject = session.GetObject(id);
-                            CrawlCmisObject(cmisObject);
+                            // Get the object with that identifier. Note that it might not exist anymore, so errors are expected, no need to log their details.
+                            var cmisObject = session.GetObject(id, false);
+                            if (change.ChangeType == ChangeType.Updated)
+                            {
+                                // Updates are tricky, as they can be move/rename operations in which we don't get complete information about
+                                // both the source and destination.
+                                // So, just sync everything.
+
+                                success &= CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder); ;
+                                break; // We synced everything, so no need to process the rest of the changes.
+                            }
+                            else
+                            {
+                                // The change only applies to the object itself, so only crawl that object.
+                                success &= CrawlCmisObject(cmisObject);
+                            }
                         }
                         catch (CmisObjectNotFoundException ex)
                         {
-
                             if (change.ChangeType == ChangeType.Deleted)
                             {
-
                                 var local = database.GetSyncItem(id);
                                 if (local != null)
                                 {
@@ -248,15 +262,15 @@ namespace CmisSync.Lib.Sync
 
                                     try
                                     {
-                                        var destCmisFolder = session.GetObjectByPath(destFolderItem.RemotePath) as IFolder;
+                                        var destCmisFolder = session.GetObjectByPath(destFolderItem.RemotePath, true) as IFolder;
 
                                         if (local.IsFolder)
                                         {
-                                            CrawlSync(destCmisFolder, destFolderItem.RemotePath, destFolderItem.LocalPath);
+                                            success &= CrawlSync(destCmisFolder, destFolderItem.RemotePath, destFolderItem.LocalPath);
                                         }
                                         else
                                         {
-                                            CheckLocalFile(local.LocalPath, destCmisFolder, new List<string>());
+                                            success &= CheckLocalFile(local.LocalPath, destCmisFolder, null);
                                         }
                                     }
                                     catch (Exception e)
@@ -268,7 +282,10 @@ namespace CmisSync.Lib.Sync
                                         }
                                         else
                                         {
-                                            throw;
+                                            // Something really bad and unexpected happened.
+                                            // Give up the ChangeLog strategy, and just crawl everything, this is better than failing.
+                                            success &= CrawlSyncAndUpdateChangeLogToken(remoteFolder, remoteFolderPath, localFolder); ;
+                                            break; // We synced everything, so no need to process the rest of the changes.
                                         }
                                     }
                                 }
@@ -295,17 +312,24 @@ namespace CmisSync.Lib.Sync
                 {
                     activityListener.ActivityStopped();
                 }
+                return success;
             }
 
 
             /// <summary>
             /// Synchronize changes made to a particular CMIS object.
             /// </summary>
-            private void CrawlCmisObject(ICmisObject cmisObject)
+            private bool CrawlCmisObject(ICmisObject cmisObject)
             {
+                bool success = true;
                 if (cmisObject is DotCMIS.Client.Impl.Folder)
                 {
                     var remoteSubFolder = cmisObject as IFolder;
+
+                    if ( ! repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteSubFolder))
+                    {
+                        return true;
+                    }
 
                     // Look for the local equivalent.
                     var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
@@ -315,7 +339,7 @@ namespace CmisSync.Lib.Sync
                         var foldersToDelete = database.GetAllFoldersWithCmisId(cmisObject.Id).Where(p => p.RemotePath != remoteSubFolder.Path);
                         foreach (var folderToDelete in foldersToDelete)
                         {
-                            RemoveFolderLocally(folderToDelete.LocalPath);
+                            success &= RemoveFolderLocally(folderToDelete.LocalPath);
                         };
 
                         if (localFolderItem != null || remoteSubFolder.IsRootFolder) break;
@@ -325,18 +349,23 @@ namespace CmisSync.Lib.Sync
                         localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteSubFolder.Path);
                     };
 
-                    CrawlSync(remoteSubFolder, remoteSubFolder.Path, localFolderItem.LocalPath);
+                    success &= CrawlSync(remoteSubFolder, remoteSubFolder.Path, localFolderItem.LocalPath);
                 }
                 else if (cmisObject is DotCMIS.Client.Impl.Document)
                 {
                     var remoteDocument = cmisObject as IDocument;
+
+                    if (!repoInfo.CmisProfile.RemoteObjectWorthSyncing(remoteDocument))
+                    {
+                        return true;
+                    }
 
                     // Apply the change on all paths via which it is applicable.
                     foreach (IFolder remoteIFolder in remoteDocument.Parents)
                     {
                         if (PathIsApplicable(remoteIFolder.Path))
                         {
-                            Logger.Debug("Document change is applicable:" + remoteIFolder);
+                            Logger.Debug("Document " + repoInfo.CmisProfile.localFilename(remoteDocument) + " changed in applicable folder " + remoteIFolder);
 
                             var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteIFolder.Path);
                             var localFolder = localFolderItem.LocalPath;
@@ -344,10 +373,11 @@ namespace CmisSync.Lib.Sync
                             var remoteDocumentPath = CmisUtils.PathCombine(remoteIFolder.Path, repoInfo.CmisProfile.localFilename(remoteDocument));
                             var documentItem = SyncItemFactory.CreateFromRemoteDocument(remoteDocumentPath, remoteDocument, repoInfo, database);
 
-                            CrawlRemoteDocument(remoteDocument, documentItem.RemotePath, localFolder, null);
+                            success &= CrawlRemoteDocument(remoteDocument, documentItem.RemotePath, localFolder, null);
                         }
                     }
                 }
+                return success;
             }
             
             

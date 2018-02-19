@@ -26,7 +26,7 @@ using CmisSync.Auth;
 namespace CmisSync.Lib
 {
     /// <summary>
-    /// Configuration of a CmisSync synchronized folder.
+    /// CmisSync configuration (common configuration and configuration of each synchronized folder).
     /// It can be found in the XML configuration file.
     /// </summary>
     public class Config
@@ -342,7 +342,7 @@ namespace CmisSync.Lib
         /// </summary>
         public string GetLogFilePath()
         {
-            return Path.Combine(ConfigPath, "debug_log.txt");
+            return Path.Combine(ConfigPath, "CmisSync_log.txt");
         }
 
         private string GetLogLevel()

@@ -49,6 +49,9 @@
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Extras\Newtonsoft.Json.dll</HintPath>
@@ -102,6 +105,7 @@
     <Compile Include="ActivityListenerAggregator.cs" />
     <Compile Include="SyncItem.cs" />
     <Compile Include="Database\DatabaseMigrationToVersion3.cs" />
+    <Compile Include="WindowsPathRepresentationConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
@@ -116,6 +120,9 @@
       <Project>{529EF90F-A34C-4426-A4F9-65113AC23841}</Project>
       <Name>DotCMIS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.manifest" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

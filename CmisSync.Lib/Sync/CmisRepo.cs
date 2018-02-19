@@ -35,23 +35,11 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener)
-            : base(repoInfo, activityListener)
+        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher)
+            : base(repoInfo, activityListener, enableWatcher)
         {
             this.synchronizedFolder = new SynchronizedFolder(repoInfo, this, activityListener);
             Logger.Info(synchronizedFolder);
-        }
-
-        /// <summary></summary>
-        public override void Enable()
-        {
-            if(this.synchronizedFolder != null)
-            {
-                Logger.Debug("Reset all failed upload counter");
-                this.synchronizedFolder.resetFailedOperationsCounter();
-                this.synchronizedFolder.ForceFullSyncAtNextSync();
-            }
-            base.Enable();
         }
 
 
@@ -91,13 +79,13 @@ namespace CmisSync.Lib.Sync
         /// Synchronize.
         /// The synchronization is performed in the background, so that the UI stays usable.
         /// </summary>
-        public override void SyncInBackground(bool syncFull)
+        public override void SyncInBackground()
         {
             if (this.synchronizedFolder != null)// Because it is sometimes called before the object's constructor has completed.
             {
                 if (this.Enabled)
                 {
-                    this.synchronizedFolder.SyncInBackground(syncFull);
+                    this.synchronizedFolder.SyncInBackground();
                 }
                 else
                 {
@@ -107,41 +95,30 @@ namespace CmisSync.Lib.Sync
         }
 
         /// <summary>
-        /// Synchronize.
-        /// The synchronization is performed in the background, so that the UI stays usable.
-        /// </summary>
-        public override void SyncInBackground()
-        {
-            SyncInBackground(true);
-        }
-
-        /// <summary>
         /// Synchonize.
-        /// The synchronization is performed in synchronous.
+        /// The synchronization is performed synchronously.
         /// </summary>
         /// <param name="syncFull"></param>
-        public void SyncInNotBackground(bool syncFull)
+        public bool SyncInForeground()
         {
-            if (this.synchronizedFolder != null)
+            if (synchronizedFolder == null)
             {
-                if (this.Enabled)
+                return false;
+            }
+            else
+            {
+                if (Enabled)
                 {
-                    this.synchronizedFolder.SyncInNotBackground(syncFull);
+                    return synchronizedFolder.SyncInForeground();
                 }
                 else
                 {
                     Logger.Info(String.Format("Repo {0} - Sync skipped.Status={1}", this.Name, this.Enabled));
+                    return true;
                 }
             }
         }
 
-        /// <summary>
-        /// The synchronization is performed in synchronous.
-        /// </summary>
-        public void SyncInNotBackground()
-        {
-            SyncInNotBackground(true);
-        }
 
         /// <summary>
         /// Update repository settings.

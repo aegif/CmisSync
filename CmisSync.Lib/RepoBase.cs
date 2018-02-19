@@ -43,12 +43,6 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// Perform a synchronization if one is not running already.
-        /// </summary>
-        public abstract void SyncInBackground(bool syncFull);
-
-
-        /// <summary>
         /// Local disk size taken by the repository.
         /// </summary>
         public abstract double Size { get; }
@@ -176,7 +170,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// Constructor.
         /// </summary>
-        public RepoBase(RepoInfo repoInfo, IActivityListener activityListener)
+        public RepoBase(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher)
         {
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
@@ -192,10 +186,12 @@ namespace CmisSync.Lib
             // most users would be surprised to see this file appear.
             // folderLock = new FolderLock(LocalPath);
 
-            Watcher = new Watcher(LocalPath);
-            Watcher.EnableRaisingEvents = true;
-
-
+            if (enableWatcher)
+            {
+                Watcher = new Watcher(LocalPath);
+                Watcher.EnableRaisingEvents = true;
+            }
+            
             // Main loop syncing every X seconds.
             remote_timer.Elapsed += delegate
             {
@@ -210,7 +206,7 @@ namespace CmisSync.Lib
             local_timer.Elapsed += delegate
             {
                 // Run partial sync.
-                SyncInBackground(false);
+                SyncInBackground();
             };
             local_timer.AutoReset = false;
             local_timer.Interval = delay_interval;
@@ -249,8 +245,10 @@ namespace CmisSync.Lib
                     this.remote_timer.Dispose();
                     this.local_timer.Stop();
                     this.local_timer.Dispose();
-                    this.Watcher.Dispose();
-                    // this.folderLock.Dispose(); Folder lock disabled.
+                    if (Watcher != null)
+                    {
+                        this.Watcher.Dispose();
+                    }
                 }
                 this.disposed = true;
             }
@@ -370,43 +368,31 @@ namespace CmisSync.Lib
         /// <summary>
         /// Called when sync starts.
         /// </summary>
-        public void OnSyncStart(bool syncFull)
+        public void OnSyncStart()
         {
-            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Started: " + LocalPath);
-            if (syncFull)
-            {
-                remote_timer.Stop();
-                local_timer.Stop();
-            }
-            //Watcher.EnableRaisingEvents = false; //Disable events while syncing...
-            //Watcher.EnableEvent = false;
+            Logger.Info(" Sync Started: " + LocalPath);
         }
 
 
         /// <summary>
         /// Called when sync completes.
         /// </summary>
-        public void OnSyncComplete(bool syncFull)
+        public void OnSyncComplete(bool success)
         {
-            if (syncFull)
+            remote_timer.Start();
+
+            if (Watcher != null)
             {
-                remote_timer.Start();
-                last_sync = DateTime.Now;
-            }
-            else
-            {
-                last_partial_sync = DateTime.Now;
+                if (Watcher.GetChangeCount() > 0)
+                {
+                    //Watcher was stopped (due to error) so clear and restart sync
+                    Watcher.Clear();
+                }
+                Watcher.EnableRaisingEvents = true;
+                Watcher.EnableEvent = true;
             }
 
-            if (Watcher.GetChangeCount() > 0)
-            {
-                //Watcher was stopped (due to error) so clear and restart sync
-                Watcher.Clear();
-            }
-
-            Watcher.EnableRaisingEvents = true;
-            Watcher.EnableEvent = true;
-            Logger.Info((syncFull ? "Full" : "Partial") + " Sync Complete: " + LocalPath);
+            Logger.Info("Sync Complete: " + LocalPath + " , success=" + success);
 
             // Save last sync
             RepoInfo.LastSuccessedSync = DateTime.Now;

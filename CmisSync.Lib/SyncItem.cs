@@ -122,6 +122,9 @@ namespace CmisSync.Lib
     /// </summary>
     public static class SyncItemFactory
     {
+        // Log.
+        static readonly ILog Logger = LogManager.GetLogger(typeof(SyncItemFactory));
+
         public static SyncItem CreateFromLocalPath(string path, bool isFolder, RepoInfo repoInfo, Database.Database database)
         {
             return new LocalPathSyncItem(path, isFolder, repoInfo, database);
@@ -150,6 +153,7 @@ namespace CmisSync.Lib
         /// </summary>
         public static SyncItem CreateFromRemoteDocument(string remoteDocumentPath, IDocument remoteDocument, RepoInfo repoInfo, Database.Database database)
         {
+            //Logger.Debug("CreateFromRemoteDocument remoteDocumentPath:" + remoteDocumentPath + " remoteDocument:" + remoteDocument + " repoInfo:" + repoInfo + " database:" + database);
             string remoteFolderPath = remoteDocumentPath.Substring(0, remoteDocumentPath.LastIndexOf(CmisUtils.CMIS_FILE_SEPARATOR));
             string remoteRoot = repoInfo.RemotePath;
             string relativeRemoteDocumentPath = remoteDocumentPath.Substring(remoteRoot.Length).TrimStart(CmisUtils.CMIS_FILE_SEPARATOR);
@@ -384,7 +388,8 @@ namespace CmisSync.Lib
         {
             get
             {
-                return LocalRelativePath.Substring(LocalRelativePath.LastIndexOf(Path.DirectorySeparatorChar) + 1); // 1 for the DirectorySeparatorChar
+                int separatorIndex = LocalRelativePath.LastIndexOf(Path.DirectorySeparatorChar);
+                return LocalRelativePath.Substring(separatorIndex + 1); // +1 for the DirectorySeparatorChar
             }
         }
 

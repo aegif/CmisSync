@@ -20,6 +20,11 @@ namespace CmisSync.Lib.Cmis
         protected static readonly ILog Logger = LogManager.GetLogger(typeof(CmisProfile));
 
         /// <summary>
+        /// Whether the CMIS server supports ordering by contentStreamFileName or not.
+        /// </summary>
+        public bool contentStreamFileNameOrderable { get; set; }
+
+        /// <summary>
         /// Whether to set local file names based on cmis:contentStreamName (true) or cmis:name (false)
         /// true is typically a good choice on Documentum
         /// false is typically a good choice on Alfresco
@@ -30,6 +35,8 @@ namespace CmisSync.Lib.Cmis
 
         public CmisProfile()
         {
+            contentStreamFileNameOrderable = false; // FIXME get that info from repository
+
             UseCmisStreamName = true;
 
             IgnoreIfSameLowercaseNames = !IsFileSystemCaseSensitive();
@@ -42,6 +49,9 @@ namespace CmisSync.Lib.Cmis
         /// </summary>
         public string localFilename(IDocument document)
         {
+            // Can be useful for tests, making local filenames radically different, thus making bugs easier to catch:
+            // return document.Id;
+
             if (UseCmisStreamName)
             {
                 if (document.ContentStreamFileName != null)
@@ -51,7 +61,7 @@ namespace CmisSync.Lib.Cmis
                 else
                 {
                     // This should probably never happen theoretically, but anyway that happens sometimes in Alfresco.
-                    Logger.Error("ContentStreamFileName null for " + document.Name + "(" + document.Paths[0] + ")");
+                    Logger.Warn("cmis:contentStreamFileName not set for \"" + document.Paths[0] + "\", using cmis:name \"" + document.Name + "\" as a file name instead");
                     return document.Name;
                 }
             }
@@ -63,15 +73,31 @@ namespace CmisSync.Lib.Cmis
 
 
         /// <summary>
+        /// Name used as part of the remote path in the local CmisSync database.
+        /// This must be unique on the remote folder.
+        /// </summary>
+        public string remoteFilename(IDocument document)
+        {
+            return (string)document.GetPropertyValue("cmis:name");
+        }
+
+
+        /// <summary>
         /// Prepare the given OperationContext for use with this CMIS profile.
         /// </summary>
         /// <param name="operationContext"></param>
         public void ConfigureOperationContext(IOperationContext operationContext)
         {
+            /*
+            Disabled because repository may generate error if the type is not Orderable for cmis:contentStreamFileName
+            Documentum generates such an error: https://github.com/aegif/CmisSync/issues/724
+            Alfresco also is not Orderable even though it does not generate an error:
+            http://stackoverflow.com/questions/39290294/check-whether-cmiscontentstreamfilename-is-orderable
+            
             if (IgnoreIfSameLowercaseNames)
             {
                 // Depending on the CMIS profile, order by stream name or document name.
-                if (UseCmisStreamName)
+                if (UseCmisStreamName && contentStreamFileNameOrderable)
                 {
                     operationContext.OrderBy = "cmis:contentStreamFileName";
                 }
@@ -84,6 +110,25 @@ namespace CmisSync.Lib.Cmis
             {
                 // Do not specify an order criteria, as we don't need it,
                 // and it might have a performance impact on the CMIS server.
+            }
+            */
+        }
+
+
+        /// <summary>
+        /// Ignore folders and documents with a name that contains a slash.
+        /// While it is very rare, Documentum is known to allow that and mistakenly present theses as CMIS object, violating the CMIS specification.
+        /// </summary>
+        public bool RemoteObjectWorthSyncing(ICmisObject cmisObject)
+        {
+            if (cmisObject.Name.Contains('/'))
+            {
+                Logger.Warn("Ignoring remote object " + cmisObject.Name + " as it contains a slash. The CMIS specification forbids slashes in path elements (paragraph 2.1.5.3), please report the bug to your server vendor");
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 
