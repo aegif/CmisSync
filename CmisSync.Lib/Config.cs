@@ -26,7 +26,7 @@ using CmisSync.Auth;
 namespace CmisSync.Lib
 {
     /// <summary>
-    /// Configuration of a CmisSync synchronized folder.
+    /// CmisSync configuration (common configuration and configuration of each synchronized folder).
     /// It can be found in the XML configuration file.
     /// </summary>
     public class Config
