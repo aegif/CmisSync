@@ -89,8 +89,8 @@ namespace CmisSync.Lib.Sync
                     // Check which documents/folders have changed.
                     changes = session.GetContentChanges(currentChangeToken, IsPropertyChangesSupported, maxNumItems);
 
-                    // First event was already processed previous.
-                    var changeEvents = changes.ChangeEventList.Where(p => p != changes.ChangeEventList.FirstOrDefault()).ToList();
+                    // First event was already processed previous. <- not true for single rename
+                    var changeEvents = changes.ChangeEventList./*Where(p => p != changes.ChangeEventList.FirstOrDefault()).*/ToList();
 
                     success &= CrawlChangeLogSyncAndUpdateChangeLogToken(changeEvents, remoteFolder, remotePath, localFolder);
 
