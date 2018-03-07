@@ -170,7 +170,7 @@ namespace CmisSync.Lib
         {
             FullPath = fullPath;
             ConfigPath = Path.GetDirectoryName(FullPath);
-            Console.WriteLine("FullPath:" + FullPath);
+            Console.WriteLine("CmisSync configuration file: " + FullPath);
 
             // Create configuration folder if it does not exist yet.
             if (!Directory.Exists(ConfigPath))

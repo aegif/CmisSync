@@ -32,7 +32,7 @@ namespace CmisSync.Console
 		}
 
         /// <summary>
-        /// Activity error occured.
+        /// Activity error occurred.
         /// </summary>
         public void ActivityError(Tuple<string, Exception> error)
         {
