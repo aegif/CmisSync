@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Utilities.FileUtilities;
 using DotCMIS;
 
 namespace CmisSync.Lib.Sync.SynchronizeItem
@@ -51,7 +52,7 @@ namespace CmisSync.Lib.Sync.SynchronizeItem
             string remoteRelativeFolder = lastSeparator >= 0 ?
                 remoteRelativePath.Substring (0, lastSeparator)
                 : String.Empty;
-            string remoteRelativePathWithCorrectLeafname = CmisUtils.PathCombine (remoteRelativeFolder, localFilename);
+            string remoteRelativePathWithCorrectLeafname = CmisFileUtil.PathCombine (remoteRelativeFolder, localFilename);
             localRelativePath = database.RemoteToLocal (remoteRelativePathWithCorrectLeafname, isFolder);
         }
 
@@ -97,7 +98,7 @@ namespace CmisSync.Lib.Sync.SynchronizeItem
 
         public override string RemotePath {
             get {
-                return CmisUtils.PathCombine (remoteRoot, RemoteRelativePath);
+                return CmisFileUtil.PathCombine (remoteRoot, RemoteRelativePath);
             }
         }
 
@@ -112,7 +113,7 @@ namespace CmisSync.Lib.Sync.SynchronizeItem
 
         public override string RemoteLeafname {
             get {
-                return CmisUtils.GetLeafname (RemoteRelativePath);
+                return CmisFileUtil.GetLeafname (RemoteRelativePath);
             }
         }
     }

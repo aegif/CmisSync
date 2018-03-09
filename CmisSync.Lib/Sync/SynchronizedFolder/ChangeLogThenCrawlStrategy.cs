@@ -17,6 +17,7 @@ using System.Net;
 using CmisSync.Lib;
 using DotCMIS.Data;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Utilities.FileUtilities;
 using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync.SynchronizeItem;
 
@@ -370,7 +371,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                         var localFolderItem = database.GetFolderSyncItemFromRemotePath(remoteIFolder.Path);
                         var localFolder = localFolderItem.LocalPath;
 
-                        var remoteDocumentPath = CmisUtils.PathCombine(remoteIFolder.Path, repoInfo.CmisProfile.localFilename(remoteDocument));
+                        var remoteDocumentPath = CmisFileUtil.PathCombine(remoteIFolder.Path, repoInfo.CmisProfile.localFilename(remoteDocument));
                         var documentItem = SyncItemFactory.CreateFromRemoteDocument(remoteDocumentPath, remoteDocument, repoInfo, database);
 
                         success &= CrawlRemoteDocument(remoteDocument, documentItem.RemotePath, localFolder, null);

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using DotCMIS.Client.Impl;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Utilities.FileUtilities;
 using DotCMIS.Enums;
 using System.Text;
 using CmisSync.Lib.Sync;
@@ -171,6 +172,15 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
             // Get children.
             IItemEnumerable<ICmisObject> childrenEnumeration = remoteFolder.GetChildren(operationContext);
 
+            // TODO: debug
+            System.Console.WriteLine ("Got children from {0} ", remotePath);
+            foreach (ICmisObject cmisObject in childrenEnumeration) {
+                System.Console.WriteLine ("cmis object in children enumeration: \n" +
+                                          "  name: {0} \n" + 
+                                          "  type: {1}", cmisObject.Name, cmisObject.GetType ().ToString ()); 
+            }
+
+            childrenEnumeration = remoteFolder.GetChildren (operationContext);
             // Log.
             /*IList<ICmisObject> children = childrenEnumeration.ToList(); // Because we need to enumerate twice (log+crawl).
             StringBuilder logBuilder = new StringBuilder();
@@ -190,7 +200,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                         // It is a CMIS folder.
                         IFolder remoteSubFolder = (IFolder)cmisObject;
 
-                        string remoteSubPath = CmisUtils.PathCombine(remotePath, remoteSubFolder.Name);
+                        string remoteSubPath = CmisFileUtil.PathCombine(remotePath, remoteSubFolder.Name);
                         // TODO: debug
                         System.Console.WriteLine ("Found a remote sub folder: \n" +
                                                   "  sub folder path: {0}\n" +
@@ -218,7 +228,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                         // It is a CMIS document.
                         IDocument remoteDocument = (IDocument)cmisObject;
 
-                        string remoteDocumentPath = CmisUtils.PathCombine(remotePath, remoteDocument.Name);
+                        string remoteDocumentPath = CmisFileUtil.PathCombine(remotePath, remoteDocument.Name);
 
                         // Ignore edgy documents.
                         if (repoInfo.CmisProfile.IgnoreIfSameLowercaseNames &&

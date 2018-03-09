@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Utilities.FileUtilities;
 
 namespace CmisSync.Lib.Sync.SynchronizeItem
 {
@@ -61,7 +62,7 @@ namespace CmisSync.Lib.Sync.SynchronizeItem
 
         public override string RemotePath {
             get {
-                return CmisUtils.PathCombine (remoteRoot, RemoteRelativePath);
+                return CmisFileUtil.PathCombine (remoteRoot, RemoteRelativePath);
             }
         }
 
@@ -75,7 +76,7 @@ namespace CmisSync.Lib.Sync.SynchronizeItem
 
         public override string RemoteLeafname {
             get {
-                return CmisUtils.GetLeafname (RemoteRelativePath);
+                return CmisFileUtil.GetLeafname (RemoteRelativePath);
             }
         }
     }

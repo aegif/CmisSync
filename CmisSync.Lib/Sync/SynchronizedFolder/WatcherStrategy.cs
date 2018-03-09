@@ -9,6 +9,7 @@ using System.Data.Common;
 using DotCMIS;
 using DotCMIS.Client;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Utilities.FileUtilities;
 using System.Threading;
 
 using CmisSync.Lib.Sync.SynchronizeItem;
@@ -142,7 +143,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                     return false;
                 }
             string oldRemoteName = oldItem.RemotePath;
-            string oldRemoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(oldRemoteName);
+            string oldRemoteBaseName = CmisFileUtil.GetUpperFolderOfCmisPath(oldRemoteName);
             bool oldPathnameWorthSyncing = Utils.WorthSyncing(oldDirectory, oldFilename, repoInfo);
 
             // New item.
@@ -152,7 +153,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
             string newLocalName = newPathname.Substring(localFolder.Length + 1);
             SyncItem newItem = SyncItemFactory.CreateFromLocalPath(newPathname, isFolder, repoInfo, database);
             string newRemoteName = newItem.RemotePath;
-            string newRemoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(newRemoteName);
+                string newRemoteBaseName = CmisFileUtil.GetUpperFolderOfCmisPath(newRemoteName);
             bool newPathnameWorthSyncing = Utils.WorthSyncing(newDirectory, newFilename, repoInfo);
 
             // Operations.
@@ -276,7 +277,7 @@ namespace CmisSync.Lib.Sync.CmisRepoFolder
                 {
                     bool isFolder = Utils.IsFolder(localPath);
                     SyncItem item = SyncItemFactory.CreateFromLocalPath(localPath, isFolder, repoInfo, database);
-                    string remoteBaseName = CmisUtils.GetUpperFolderOfCmisPath(item.RemotePath);
+                    string remoteBaseName = CmisFileUtil.GetUpperFolderOfCmisPath(item.RemotePath);
                     remoteBase = (IFolder)session.GetObjectByPath(remoteBaseName, true);
                     if (null == remoteBase)
                     {

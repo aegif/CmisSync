@@ -16,6 +16,7 @@ using log4net;
 
 using CmisSync.Lib.Utilities.PathConverter;
 using CmisSync.Lib.Sync.SynchronizeItem;
+using CmisSync.Lib.Sync.SyncTriplet;
 
 
 namespace CmisSync.Lib.Database
@@ -431,6 +432,43 @@ namespace CmisSync.Lib.Database
             Logger.Debug("Completed database file addition for file: " + item.LocalPath);
         }
 
+        public void AddFile (string localRelativePath, string remoteRelativePath, string checksum, string objectId, DateTime? serverSideModificationDate,
+                             Dictionary<string, string []> metadata, byte [] filehash)
+        {
+
+            Logger.Debug ("Starting database file addition for file: " + localRelativePath);
+
+            /*
+            string checksum = null;
+            try {
+                checksum = triplet.LocalStorage.CheckSum;
+            } catch (IOException e) {
+                Logger.Warn ("IOException while calculating checksum of " + localRelativePath
+                    + " , The file was removed while reading. Just skip it, as it does not need to be added anymore. ", e);
+                return;
+            }*/
+
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
+            // See http://www.sqlite.org/datatype3.html
+            if (null != serverSideModificationDate) {
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime ();
+            }
+
+
+            // Insert into database.
+            string command =
+                @"INSERT OR REPLACE INTO files (path, localPath, id, serverSideModificationDate, metadata, checksum)
+                    VALUES (@path, @localPath, @id, @serverSideModificationDate, @metadata, @checksum)";
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("path", remoteRelativePath);
+            parameters.Add ("localPath", localRelativePath);
+            parameters.Add ("id", objectId);
+            parameters.Add ("serverSideModificationDate", serverSideModificationDate);
+            parameters.Add ("metadata", Json (metadata));
+            parameters.Add ("checksum", checksum);
+            ExecuteSQLAction (command, parameters);
+            Logger.Debug ("Completed database file addition for file: " + localRelativePath);
+        }
 
         /// <summary>
         /// Add a folder to the database.
@@ -456,6 +494,25 @@ namespace CmisSync.Lib.Database
         }
             
 
+        public void AddFolder (string remoteRelativePath, string localRelativePath, string objectId, DateTime? serverSideModificationDate)
+        {
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones
+            // See http://www.sqlite.org/datatype3.html
+            if (null != serverSideModificationDate) {
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime ();
+            }
+
+            string command =
+                @"INSERT OR REPLACE INTO folders (path, localPath, id, serverSideModificationDate)
+                    VALUES (@path, @localPath, @id, @serverSideModificationDate)";
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("path", remoteRelativePath);
+            parameters.Add ("localPath", localRelativePath);
+            parameters.Add ("id", objectId);
+            parameters.Add ("serverSideModificationDate", serverSideModificationDate);
+            ExecuteSQLAction (command, parameters);
+        }
+
         /// <summary>
         /// Remove a file from the database.
         /// </summary>
@@ -468,6 +525,21 @@ namespace CmisSync.Lib.Database
             parameters = new Dictionary<string, object>();
             parameters.Add("path", item.RemoteRelativePath);
             ExecuteSQLAction("DELETE FROM downloads WHERE path=@path", parameters);
+        }
+
+        /*
+         * when to remove file, local or remote might not exist
+         * use DBStorage 
+         */
+        public void RemoveFile (SyncTriplet triplet)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("path", triplet.DBStorage.DBRemotePath);
+            ExecuteSQLAction ("DELETE FROM files WHERE path=@path", parameters);
+
+            parameters = new Dictionary<string, object> ();
+            parameters.Add ("path", triplet.DBStorage.DBRemotePath);
+            ExecuteSQLAction ("DELETE FROM downloads WHERE path=@path", parameters);
         }
 
 
@@ -492,7 +564,24 @@ namespace CmisSync.Lib.Database
             ExecuteSQLAction("DELETE FROM files WHERE path LIKE @path", parameters);
         }
         
-        
+        public void RemoveFolder(SyncTriplet triplet)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            // Remove folder itself
+            parameters.Add("path", triplet.DBStorage.DBRemotePath);
+            ExecuteSQLAction("DELETE FROM folders WHERE path=@path", parameters);
+
+            // Remove all folders under this folder
+            parameters.Clear();
+            parameters.Add("path", triplet.DBStorage.DBRemotePath + "/%");
+            ExecuteSQLAction("DELETE FROM folders WHERE path LIKE @path", parameters);
+
+            // Remove all files under this folder
+            parameters.Clear();
+            parameters.Add("path", triplet.DBStorage.DBRemotePath + "/%");
+            ExecuteSQLAction("DELETE FROM files WHERE path LIKE @path", parameters);
+        }
+         
         /// <summary>
         /// Move a file.
         /// </summary>
@@ -559,6 +648,28 @@ namespace CmisSync.Lib.Database
             return (DateTime?)modifyDateObj;
         }
             
+        public DateTime? GetServerSideModificationDate (string remoteRelativePath, bool isFolder)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("path", remoteRelativePath);
+            object modifyDateObj = null;
+
+            if (isFolder) {
+                modifyDateObj = ExecuteSQLFunction ("SELECT serverSideModificationDate FROM folders WHERE path=@path", parameters);
+            } else {
+                modifyDateObj = ExecuteSQLFunction ("SELECT serverSideModificationDate FROM files WHERE path=@path", parameters);
+            }
+
+            if (null != modifyDateObj) {
+#if __MonoCS__
+                modifyDateObj = DateTime.SpecifyKind((DateTime)modifyDateObj, DateTimeKind.Utc);
+#else
+                modifyDateObj = ((DateTime)modifyDateObj).ToUniversalTime ();
+#endif
+            }
+            return (DateTime?)modifyDateObj;
+        }
+
 
         /// <summary>
         /// Set the last modification date of a file.
@@ -584,6 +695,24 @@ namespace CmisSync.Lib.Database
             ExecuteSQLAction(command, parameters);
         }
 
+        public void SetFileServerSideModificationDate (SyncTriplet triplet, DateTime? serverSideModificationDate)
+        {
+            // Make sure that the modification date is always UTC, because sqlite has no concept of Time-Zones.
+            // See http://www.sqlite.org/datatype3.html
+            if (null != serverSideModificationDate) {
+                serverSideModificationDate = ((DateTime)serverSideModificationDate).ToUniversalTime ();
+            }
+
+            string command = @"UPDATE files
+                    SET serverSideModificationDate=@serverSideModificationDate
+                    WHERE path=@path";
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("serverSideModificationDate", serverSideModificationDate);
+            parameters.Add ("path", triplet.RemoteStorage.RelativePath);
+            ExecuteSQLAction (command, parameters);
+        }
+
+
 
         /// <summary>
         /// Get the date at which the file was last download.
@@ -606,6 +735,21 @@ namespace CmisSync.Lib.Database
             return (DateTime?)obj;
         }
 
+        public DateTime? GetDownloadServerSideModificationDate (string remoteRelativePath)
+        {
+
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("path", remoteRelativePath);
+            object obj = ExecuteSQLFunction ("SELECT serverSideModificationDate FROM downloads WHERE path=@path", parameters);
+            if (null != obj) {
+                #if __MonoCS__
+                obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
+                #else
+                obj = ((DateTime)obj).ToUniversalTime ();
+                #endif
+            }
+            return (DateTime?)obj;
+        }
 
         /// <summary>
         /// Set the last download date of a file.
@@ -787,6 +931,17 @@ namespace CmisSync.Lib.Database
             parameters.Add("checksum", checksum);
             parameters.Add("localPath", localPath);
             ExecuteSQLAction(command, parameters);
+        }
+
+        public void SetChecksum (SyncTriplet triplet)
+        {
+            string command = @"UPDATE files
+                    SET checksum=@checksum
+                    WHERE localPath=@localPath";
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("checksum", triplet.LocalStorage.CheckSum);
+            parameters.Add ("localPath", triplet.LocalStorage.RelativePath);
+            ExecuteSQLAction (command, parameters);
         }
 
         /// <summary>
@@ -1244,6 +1399,18 @@ namespace CmisSync.Lib.Database
             return folders;
         }
 
+        public List<string[]> GetLocalFolders2 ()
+        {
+            var folders = new List<string[]> ();
+            SQLiteCommand command = new SQLiteCommand ("SELECT localPath, path FROM folders;", GetSQLiteConnection ());
+            SQLiteDataReader reader = command.ExecuteReader ();
+            while (reader.Read ()) {
+                string [] folder = new string [] { (string)reader ["localPath"], (string)reader ["path"] };
+                folders.Add (folder);
+            }
+            return folders;
+        }
+
 
         public List<ChecksummedFile> GetChecksummedFiles()
         {
@@ -1254,6 +1421,18 @@ namespace CmisSync.Lib.Database
             {
                 ChecksummedFile file = new ChecksummedFile((string)reader["localPath"], (string)reader["checksum"]);
                 result.Add(file);
+            }
+            return result;
+        }
+
+        public List<string[]> GetLocalFiles2()
+        {
+            List<string[]> result = new List<string[]> ();
+            SQLiteCommand command = new SQLiteCommand ("SELECT localPath, path FROM files;", GetSQLiteConnection ());
+            SQLiteDataReader reader = command.ExecuteReader ();
+            while (reader.Read ()) {
+                string [] file = new string [] { (string)reader ["localPath"], (string)reader ["path"] };
+                result.Add (file);
             }
             return result;
         }

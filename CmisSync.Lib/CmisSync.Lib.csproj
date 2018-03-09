@@ -93,11 +93,10 @@
     <Compile Include="Sync\SynchronizedFolder\WatcherStrategy.cs" />
     <Compile Include="Sync\SynchronizedFolder\SynchronizedFolder.cs" />
     <Compile Include="Sync\SynchronizedFolder\LocalComparisonStrategy.cs" />
-    <Compile Include="Sync\SynchronizeMachine\SyncState.cs" />
-    <Compile Include="Sync\SynchronizeTriplet\SyncTriplet.cs" />
-    <Compile Include="Sync\SynchronizeTriplet\TripletItem\BaseStorageItem.cs" />
-    <Compile Include="Sync\SynchronizeTriplet\TripletItem\DBStorageItem.cs" />
-    <Compile Include="Sync\SynchronizeTriplet\SyncTripletFactory.cs" />
+    <Compile Include="Sync\SyncTriplet\SyncTriplet.cs" />
+    <Compile Include="Sync\SyncTriplet\TripletItem\BaseStorageItem.cs" />
+    <Compile Include="Sync\SyncTriplet\TripletItem\DBStorageItem.cs" />
+    <Compile Include="Sync\SyncTriplet\SyncTripletFactory.cs" />
     <Compile Include="Utilities\PathConverter\IPathRepresentationConverter.cs" />
     <Compile Include="Utilities\PathConverter\DefaultPathRepresentationConverter.cs" />
     <Compile Include="Utilities\PathConverter\PathRepresentationConverterUtil.cs" />
@@ -105,14 +104,12 @@
     <Compile Include="Utilities\UserNotificationListener\IUserNotificationListener.cs" />
     <Compile Include="Utilities\UserNotificationListener\UserNotificationListenerUtil.cs" />
     <Compile Include="Utilities\FileUtilities\CheckSumUtil.cs" />
-    <Compile Include="Sync\SynchronizeTriplet\TripletItem\LocalStorageItem.cs" />
-    <Compile Include="Sync\SynchronizeTriplet\TripletItem\RemoteStorageItem.cs" />
+    <Compile Include="Sync\SyncTriplet\TripletItem\LocalStorageItem.cs" />
+    <Compile Include="Sync\SyncTriplet\TripletItem\RemoteStorageItem.cs" />
     <Compile Include="Sync\SyncRepo\RepoBase.cs" />
     <Compile Include="Sync\SyncRepo\CmisRepo.cs" />
     <Compile Include="ActivityListener\ActivityListenerAggregator.cs" />
     <Compile Include="ActivityListener\IActivityListener.cs" />
-    <Compile Include="Sync\SyncUnit\CmisSyncUnit.cs" />
-    <Compile Include="Sync\SyncUnit\BaseSyncUnit.cs" />
     <Compile Include="Config\CmisSyncConfig.cs" />
     <Compile Include="Config\ConfigManager.cs" />
     <Compile Include="Config\ConfigMigration.cs" />
@@ -120,9 +117,21 @@
     <Compile Include="Sync\SynchronizeItem\SyncItemFactory.cs" />
     <Compile Include="Sync\SynchronizeItem\LocalPathSyncItem.cs" />
     <Compile Include="Sync\SynchronizeItem\RemotePathSyncItem.cs" />
-    <Compile Include="Sync\SynchronizeMachine\CmisRepoProcessor.cs" />
-    <Compile Include="Sync\SynchronizeMachine\SFTripletProcessor.cs" />
-    <Compile Include="Sync\SynchronizeMachine\SyncTripletProcessor.cs" />
+    <Compile Include="Cmis\CmisProfileRefactor.cs" />
+    <Compile Include="Sync\SynchronizedFolder\Operations.cs" />
+    <Compile Include="Sync\CmisSyncFolder\CmisSyncFolder.cs" />
+    <Compile Include="Utilities\FileUtilities\CmisFileUtil.cs" />
+    <Compile Include="Cmis\CmisProperties.cs" />
+    <Compile Include="Sync\SyncWorker\SyncWorker.cs" />
+    <Compile Include="Sync\SyncWorker\SemiSyncTripletManager.cs" />
+    <Compile Include="Sync\SyncWorker\SyncTripletAssembler.cs" />
+    <Compile Include="Sync\SyncWorker\SyncTripletProcessor.cs" />
+    <Compile Include="Sync\SyncWorker\Crawler\LocalCrawlWorker.cs" />
+    <Compile Include="Sync\SyncWorker\Crawler\RemoteCrawlWorker.cs" />
+    <Compile Include="Sync\SyncWorker\ProcessWorker\ProcessWorker.cs" />
+    <Compile Include="Sync\SyncWorker\Internal\SingleItemPartitioner.cs" />
+    <Compile Include="Sync\SyncWorker\ProcessWorker\Internal\OperationUtils.cs" />
+    <Compile Include="Sync\SyncWorker\ProcessWorker\Internal\WorkerOperations.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
@@ -143,18 +152,22 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Sync\SynchronizedFolder\" />
-    <Folder Include="Sync\SynchronizeMachine\" />
-    <Folder Include="Sync\SynchronizeTriplet\" />
-    <Folder Include="Sync\SynchronizeTriplet\TripletItem\" />
+    <Folder Include="Sync\SyncTriplet\" />
+    <Folder Include="Sync\SyncTriplet\TripletItem\" />
     <Folder Include="Utilities\" />
     <Folder Include="Utilities\PathConverter\" />
     <Folder Include="Utilities\UserNotificationListener\" />
     <Folder Include="Utilities\FileUtilities\" />
     <Folder Include="Sync\SyncRepo\" />
     <Folder Include="ActivityListener\" />
-    <Folder Include="Sync\SyncUnit\" />
     <Folder Include="Config\" />
     <Folder Include="Sync\SynchronizeItem\" />
+    <Folder Include="Sync\CmisSyncFolder\" />
+    <Folder Include="Sync\SyncWorker\" />
+    <Folder Include="Sync\SyncWorker\Crawler\" />
+    <Folder Include="Sync\SyncWorker\ProcessWorker\" />
+    <Folder Include="Sync\SyncWorker\Internal\" />
+    <Folder Include="Sync\SyncWorker\ProcessWorker\Internal\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

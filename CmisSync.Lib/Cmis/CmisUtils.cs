@@ -465,54 +465,6 @@ namespace CmisSync.Lib.Cmis
         }
 
 
-        /// <summary>
-        /// Equivalent of .NET Path.Combine, but for CMIS paths.
-        /// CMIS paths always use forward slashes.
-        /// </summary>
-        public static string PathCombine(string cmisPath1, string cmisPath2)
-        {
-            if (String.IsNullOrEmpty(cmisPath1))
-                return cmisPath2;
-
-            if (String.IsNullOrEmpty(cmisPath2))
-                return cmisPath1;
-
-            // If the first path ends with a separator, just concatenate.
-            if (cmisPath1.EndsWith(CMIS_FILE_SEPARATOR.ToString()))
-                return cmisPath1 + cmisPath2;
-
-            return cmisPath1 + CMIS_FILE_SEPARATOR + cmisPath2;
-        }
-
-
-        /// <summary>
-        /// Get the last part of a CMIS path
-        /// Example: "/the/path/< 9000/theleaf" returns "theleaf"
-        /// Why not use Path.GetFileName ? Because it chokes on characters that are not authorized on the local filesystem.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetLeafname(string cmisPath)
-        {
-            return cmisPath.Split('/').Last();
-        }
-
-
-        /// <summary>
-        /// Get the last part of a CMIS path
-        /// Example: "/the/path/< 9000/theleaf" returns "theleaf"
-        /// Why not use Path.GetFileName ? Because it chokes on characters that are not authorized on the local filesystem.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetLeafOfCmisPath(string cmisPath)
-        {
-            return cmisPath.Split(CMIS_FILE_SEPARATOR).Last();
-        }
-
-
-        public static string GetUpperFolderOfCmisPath(string cmisPath)
-        {
-            return cmisPath.Substring(0, cmisPath.LastIndexOf(CMIS_FILE_SEPARATOR));
-        }
 
 
         /// <summary>
@@ -527,7 +479,6 @@ namespace CmisSync.Lib.Cmis
                 new DirectoryInfo(localPath).Attributes = FileAttributes.ReadOnly;
             }
         }
-
 
         public static bool IsDocumentum(ISession session)
         {
