@@ -56,6 +56,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                     Directory.SetLastWriteTime (localFolder, (DateTime)remoteFolder.LastModificationDate);
                 }
             } catch (Exception e) {
+                Console.WriteLine ("  %% download folder failed, " + e.Message);
                 return false;
             }
 
@@ -411,7 +412,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                     cmisSyncFolder.Database.RemoveFile (triplet);
                 }
             } catch (Exception e) {
-                
+                Console.WriteLine ("  %% delete remote file failed, " + e.Message);    
             }
             return success;
         }
@@ -445,6 +446,8 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                     + "\nIf you feel you should be able to delete it, please contact your server administrator");
                 */
                 cmisSyncFolder.Database.RemoveFolder (triplet);
+            } catch(Exception e) {
+                Console.WriteLine ("  %% delete remote folder failed, " + e.Message);
             }
         }
 
@@ -490,15 +493,19 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
         public static bool SolveConflict(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
             Console.WriteLine ("  %% Renaming: {0}", triplet.LocalStorage.RelativePath);
 
-            string filePath = OperationUtils.GetLocalFullPath (triplet, cmisSyncFolder);
-            // Rename local file with a conflict suffix.
+            try {
+                string filePath = OperationUtils.GetLocalFullPath (triplet, cmisSyncFolder);
+                // Rename local file with a conflict suffix.
 
-            if (triplet.IsFolder) {
-                string conflictFoldername = Utils.CreateConflictFoldername (filePath, cmisSyncFolder.CmisProfile.User);
-                Directory.Move (filePath, conflictFoldername);
-            } else {
-                string conflictFilename = Utils.CreateConflictFilename (filePath, cmisSyncFolder.CmisProfile.User);
-                File.Move (filePath, conflictFilename);
+                if (triplet.IsFolder) {
+                    string conflictFoldername = Utils.CreateConflictFoldername (filePath, cmisSyncFolder.CmisProfile.User);
+                    Directory.Move (filePath, conflictFoldername);
+                } else {
+                    string conflictFilename = Utils.CreateConflictFilename (filePath, cmisSyncFolder.CmisProfile.User);
+                    File.Move (filePath, conflictFilename);
+                }
+            } catch (Exception e) {
+                Console.WriteLine ("  %% rename file: " + triplet.LocalStorage.RelativePath + " failed. " + e.Message);
             }
    
             return true;

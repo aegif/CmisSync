@@ -23,7 +23,8 @@ namespace CmisSync.Lib.Sync.SyncWorker
          *     if set max upper bound in FullSyncTriplet
          * ,its TryAdd will not be blocked but directly return false.
          * 
-         * Buzy wait with sleep? 
+         * Buzy wait with sleep?
+         * 
          */
         public BlockingCollection<SyncTriplet.SyncTriplet> FullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet>();
 
