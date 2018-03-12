@@ -112,13 +112,19 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker
         }
 
         public static void SolveConflictAndSync(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
-            Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file\n" +
-                               "     {2}\n",
-                               System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name, triplet.Information);
+            // If LS=ne , DB=e, RS=ne: 
+            // both removed, clear DB record only
+            if (!triplet.LocalExist && !triplet.RemoteExist) {
+                WorkerOperations.RemoteDbRecord (triplet, cmisSyncFolder);
+            } else {
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file\n" +
+                                   "     {2}\n",
+                                   System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name, triplet.Information);
 
-            WorkerOperations.SolveConflict (triplet, session, cmisSyncFolder);
+                WorkerOperations.SolveConflict (triplet, session, cmisSyncFolder);
 
-            SyncRemoteToLocal (triplet, session, cmisSyncFolder);
+                SyncRemoteToLocal (triplet, session, cmisSyncFolder);
+            }
         }
     }
 }

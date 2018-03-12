@@ -491,9 +491,9 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
         }
 
         public static bool SolveConflict(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
-            Console.WriteLine ("  %% Renaming: {0}", triplet.LocalStorage.RelativePath);
-
             try {
+
+                Console.WriteLine ("  %% Renaming: {0}", triplet.LocalStorage.RelativePath);
                 string filePath = OperationUtils.GetLocalFullPath (triplet, cmisSyncFolder);
                 // Rename local file with a conflict suffix.
 
@@ -511,5 +511,13 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
             return true;
         }
 
+        public static bool RemoteDbRecord(SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
+            if (triplet.IsFolder) {
+                cmisSyncFolder.Database.RemoveFolder (triplet);
+            } else {
+                cmisSyncFolder.Database.RemoveFile (triplet);
+            }
+            return true;
+        }
     }
 }
