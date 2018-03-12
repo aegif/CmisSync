@@ -41,6 +41,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
             } else if (triplet.LocalEqDB && !triplet.RemoteEqDB) {
                 SyncRemoteToLocal (triplet, session, cmisSyncFolder);
+                Console.WriteLine (triplet.Information);
             } else if (!triplet.LocalEqDB && triplet.RemoteEqDB) {
                 SyncLocalToRemote (triplet, session, cmisSyncFolder);
             } else {

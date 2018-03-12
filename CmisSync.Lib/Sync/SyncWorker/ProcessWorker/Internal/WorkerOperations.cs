@@ -351,7 +351,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                         var updatedFile = allFileVersions [0];
 
                         // Update timestamp in database.
-                        DateTime serverSideModificationDate = updatedFile.RefreshTimestamp;
+                        DateTime serverSideModificationDate = (DateTime)updatedFile.LastModificationDate;//updatedFile.RefreshTimestamp;
                         cmisSyncFolder.Database.SetFileServerSideModificationDate (triplet, serverSideModificationDate);
 
                         // Update checksum
