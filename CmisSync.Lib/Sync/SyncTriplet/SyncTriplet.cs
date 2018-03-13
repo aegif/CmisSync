@@ -15,6 +15,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         /// </summary>
         public SyncTriplet(bool isFolder) {
             IsFolder = isFolder;
+            Delayed = true;
             LocalStorage = null;
             RemoteStorage = null;
             DBStorage = null;
@@ -24,6 +25,22 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         /// The logger.
         /// </summary>
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SyncTriplet));
+
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="T:CmisSync.Lib.Sync.SyncTriplet.SyncTriplet"/> is delayed.
+        /// 
+        /// Delayed is a propert to solve folder deletion problem in concurrent environment:
+        ///    if /a/b/c.txt and /a/b/ are processed concurrently, 
+        ///    it can not be guaranteed /a/b/ is processed after /a/b/c.txt
+        /// This is important especially when remote folder is removed while one file in local folder is modified.
+        /// 
+        /// Btw, this property is only useful when sb. want to delete a folder. When the processor find this property is true,
+        /// it will not process this triplet but move it to delayed Queue. When one processor task has completed, it will start
+        /// delayed queue processing. Beaware that delayed queue should be ordered in lexicographical order.
+        /// </summary>
+        /// <value><c>true</c> if delayed; otherwise, <c>false</c>.</value>
+        public bool Delayed { get; set;  }
 
         /// <summary>
         /// Gets or sets the name.

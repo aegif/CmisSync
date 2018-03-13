@@ -59,8 +59,11 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
             cmisSyncFolder.RemoteRootFolder = remoteRootFolder;
 
+            // semisynctriplet manager holds a concurrent semi triplet queue
             this.semiSyncTripletManager = new SemiSyncTripletManager (cmisSyncFolder);
+            // processor holds a concurrent triplet process queue
             this.syncTripletProcessor = new SyncTripletProcessor (cmisSyncFolder, session);
+            // assembler read semi triplet from semi queue, assemble it with remote info, and push assembled triplet to process queue
             this.syncTripletAssembler = new SyncTripletAssembler (cmisSyncFolder, session, syncTripletProcessor.FullSyncTriplets, semiSyncTripletManager.semiSyncTriplets);
 
         }

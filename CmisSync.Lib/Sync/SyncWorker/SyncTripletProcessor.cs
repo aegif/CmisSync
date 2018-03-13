@@ -1,5 +1,7 @@
 ﻿using log4net;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
@@ -28,6 +30,8 @@ namespace CmisSync.Lib.Sync.SyncWorker
          */
         public BlockingCollection<SyncTriplet.SyncTriplet> FullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet>();
 
+        private ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolerDeletions = new ConcurrentQueue<SyncTriplet.SyncTriplet> ();
+
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder = null;
 
         public SyncTripletProcessor (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session)
@@ -40,10 +44,59 @@ namespace CmisSync.Lib.Sync.SyncWorker
             ParallelOptions options = new ParallelOptions ();
             options.MaxDegreeOfParallelism = MaxParallelism;
 
+            // Process non-folder-deletion operations
             Parallel.ForEach (Internal.SingleItemPartitioner.Create (FullSyncTriplets.GetConsumingEnumerable ()), options, 
-                              (triplet) => ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder)
+                              (triplet) => ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, delayedFolerDeletions)
                              );
+
+
+            Console.WriteLine (" - Processing folder deletions");
+            // Process folder-deletion operations 
+            // One-by-One non-parallel approach yet
+            List<SyncTriplet.SyncTriplet> folderDeletionList = delayedFolerDeletions.ToList();
+
+            // Lexicographical order
+            // Therefore if there are files remained in the repository, eg. local removed but remote modified, vise versa
+            // the corresponding folder will be remained. 
+            folderDeletionList.Sort (new FolderLexicoGraphicalComparer ());
+            foreach(SyncTriplet.SyncTriplet triplet in  folderDeletionList) {
+                // unset delayed
+                triplet.Delayed = false;
+                ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, null);
+            }
         }
+
+        private class FolderLexicoGraphicalComparer : IComparer<SyncTriplet.SyncTriplet> {
+
+            public int Compare (SyncTriplet.SyncTriplet a, SyncTriplet.SyncTriplet b)
+            {
+                return 0 - Helper (a, b);
+            }
+
+            private int Helper(SyncTriplet.SyncTriplet a, SyncTriplet.SyncTriplet b) {
+                // C# will split "/" by '/' to an array with 2 elements: "", '/', ""
+                // will split "/a/b/c/" by '/' to an array with 5 elements: "", "a", "b", "c", ""
+                // so "" does nothing to the algoritm
+                String [] m = a.Name.Split ('/');
+                String [] n = b.Name.Split ('/');
+                int l = Math.Min (m.Length, n.Length);
+                int i= 0;
+                while (i <= l) {
+                    if (string.Compare (m [i], n [i]) < 0) return -1;
+                    if (string.Compare (m [i], n [i]) > 0) return 1;
+                    i++;
+                }
+                if (m.Length > n.Length) return 1;
+                if (m.Length < n.Length) return -1;
+                return 0;
+            } 
+        }
+
+        /*
+        public void StartDelayedFolderDeletion () {
+           // Process folder-deletion operations 
+        }
+        */
 
         ~SyncTripletProcessor ()
         {

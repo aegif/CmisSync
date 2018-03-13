@@ -1,19 +1,13 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncWorker/Crawler/LocalCrawlWorker.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/WorkerOperations.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/ProcessWorker.cs" Line="89" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/WorkerOperations.cs" Line="503" Column="24" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/SyncTriplet.cs" Line="103" Column="17" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/OperationUtils.cs" Line="33" Column="46" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/TripletItem/LocalStorageItem.cs" Line="41" Column="61" />
-      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/Operations.cs" Line="870" Column="79" />
-      <File FileName="../../CmisSync.Lib/Utilities/FileUtilities/CmisFileUtil.cs" Line="11" Column="11" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="78" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletProcessor.cs" Line="27" Column="11" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletAssembler.cs" Line="83" Column="70" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SemiSyncTripletManager.cs" Line="36" Column="13" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/Crawler/LocalCrawlWorker.cs" Line="1" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/WorkerOperations.cs" Line="204" Column="13" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletProcessor.cs" Line="60" Column="57" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="81" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/ProcessWorker.cs" Line="121" Column="61" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SemiSyncTripletManager.cs" Line="43" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletAssembler.cs" Line="98" Column="28" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -34,12 +28,12 @@
                   <Node name="TripletItem" expanded="True" />
                 </Node>
                 <Node name="SyncWorker" expanded="True">
-                  <Node name="Crawler" expanded="True">
-                    <Node name="LocalCrawlWorker.cs" selected="True" />
-                  </Node>
+                  <Node name="Crawler" expanded="True" />
                   <Node name="Internal" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
-                    <Node name="Internal" expanded="True" />
+                    <Node name="Internal" expanded="True">
+                      <Node name="WorkerOperations.cs" selected="True" />
+                    </Node>
                   </Node>
                 </Node>
               </Node>

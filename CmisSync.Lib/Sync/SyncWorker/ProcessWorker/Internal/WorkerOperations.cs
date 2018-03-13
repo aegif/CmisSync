@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections;
@@ -209,10 +210,32 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
             properties.Add (PropertyIds.LastModificationDate, Directory.GetLastWriteTime (triplet.LocalStorage.FullPath));
 
             try {
-                IFolder remoteBaseFolder = (IFolder)session.GetObjectByPath (cmisSyncFolder.RemotePath, false);
-                Logger.Debug (String.Format ("Creating remote folder {0} for local folder {1}", remoteLeaf, triplet.LocalStorage.RelativePath));
+                /*
+                 * IFolder remoteBaseFolder = (IFolder)session.GetObjectByPath (cmisSyncFolder.RemotePath, false);
+                 * Logger.Debug (String.Format ("Creating remote folder {0} for local folder {1}", remoteLeaf, triplet.LocalStorage.RelativePath));
+                 * IFolder folder = remoteBaseFolder.CreateFolder (properties);
+                 */
 
-                IFolder folder = remoteBaseFolder.CreateFolder (properties);
+                String remoteParentPath = CmisFileUtil.GetUpperFolderOfCmisPath (remoteFullPath);
+                IFolder remoteParentFolder;
+
+                // Block until get
+                while (true) {
+                    try {
+                        remoteParentFolder = (IFolder)session.GetObjectByPath (remoteParentPath, false);
+                        break;
+                    } catch (Exception e) {
+                        Console.WriteLine ("  %% Blocked while creating folder:\n" +
+                                           "       {0} \n" +
+                                           "     during creating \n" +
+                                           "       {1} \n" +
+                                           "     failed.", remoteParentPath, triplet.Name);
+                        Thread.Sleep (100);//return false;
+                    }
+                }
+
+                IFolder folder = remoteParentFolder.CreateFolder (properties);
+                Logger.Debug (String.Format ("Creating remote folder {0} for local folder {1}", remoteLeaf, triplet.LocalStorage.RelativePath));
                 Logger.Debug (String.Format ("Created remote folder {0}({1}) for local folder {2}", remoteLeaf, folder.Id, triplet.LocalStorage.RelativePath));
                 cmisSyncFolder.Database.AddFolder (remoteRelativePath, triplet.LocalStorage.RelativePath, folder.Id, folder.LastModificationDate);
             } catch (CmisNameConstraintViolationException) {
@@ -245,7 +268,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                     remoteFolder = (IFolder)session.GetObjectByPath (remoteFolderFullPath, false);
                     break;
                 } catch (Exception e) {
-                    Console.WriteLine ("  %% Get folder:\n" +
+                    Console.WriteLine ("  %% Blocked while creating folder:\n" +
                                       "       {0} \n" +
                                       "     during uploading \n" +
                                       "       {1} \n" +
@@ -412,7 +435,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                     cmisSyncFolder.Database.RemoveFile (triplet);
                 }
             } catch (Exception e) {
-                Console.WriteLine ("  %% delete remote file failed, " + e.Message);    
+                Console.WriteLine ("  %% delete remote file failed, " + e.Message);
             }
             return success;
         }
@@ -425,6 +448,15 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
         {
             try {
                 IFolder folder = (IFolder)session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
+
+                // Companion with triplet.Delay property:
+                // All files and subfolders should be removed before
+                // it.
+                if (folder.GetChildren().TotalNumItems > 0) {
+                    Console.WriteLine ("   %% unable to delete non-empty folder: " + folder.Path + "\n" +
+                                       "      check if there is modified file in it");
+                    return;
+                }
 
                 Logger.Debug ("Removing remote folder tree: " + triplet.RemoteStorage.RelativePath);
 
@@ -476,6 +508,13 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
             string localFullPath = triplet.LocalStorage.FullPath;
             // Folder has been deleted on server, delete it locally too.
             try {
+
+                if (Directory.EnumerateFileSystemEntries (localFullPath).Any ()) {
+                    Console.WriteLine ("  %%  Can not remove non-empty local folder " + triplet.Name + "\n" +
+                                       "      check if there is remaied modified file.");
+                    return true;
+                }
+
                 Logger.Info ("Removing remotely deleted folder: " + localFullPath);
                 Directory.Delete (localFullPath, true);
             } catch (Exception e) {
@@ -491,6 +530,10 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
         }
 
         public static bool SolveConflict(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
+
+            // case: LS=ne, RS=e, but LS!=DB, RS!=DB, conflict but download only
+            if (!triplet.LocalExist) return true;
+
             try {
 
                 Console.WriteLine ("  %% Renaming: {0}", triplet.LocalStorage.RelativePath);
@@ -505,7 +548,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                     File.Move (filePath, conflictFilename);
                 }
             } catch (Exception e) {
-                Console.WriteLine ("  %% rename file: " + triplet.LocalStorage.RelativePath + " failed. " + e.Message);
+                Console.WriteLine ("  %% rename file: " + triplet.Name + " failed. " + e.Message);
             }
    
             return true;
