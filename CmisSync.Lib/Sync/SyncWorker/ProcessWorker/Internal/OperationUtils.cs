@@ -31,13 +31,12 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
         private static readonly ILog Logger = LogManager.GetLogger (typeof (OperationUtils));
 
         public static string GetLocalFullPath(SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
-            string remoteRelativePath = triplet.RemoteStorage.RelativePath;
             return triplet.LocalExist? 
                           triplet.LocalStorage.FullPath:
                           Utils.PathCombine (
                           cmisSyncFolder.LocalPath,
                               String.Join (Path.DirectorySeparatorChar.ToString (),
-                                           remoteRelativePath.Split (CmisUtils.CMIS_FILE_SEPARATOR)));
+                                           triplet.RemoteStorage.RelativePath.Split (CmisUtils.CMIS_FILE_SEPARATOR)));
 
         }
 
@@ -47,13 +46,12 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
 
         public static string GetRemoteFullPath (SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
-            string localRelativePath = triplet.LocalStorage.RelativePath;
             return triplet.RemoteExist ? 
                           triplet.RemoteStorage.FullPath :
                           CmisFileUtil.PathCombine(
                               cmisSyncFolder.RemotePath,
                               String.Join (CmisUtils.CMIS_FILE_SEPARATOR.ToString(), 
-                                           localRelativePath.Split (Path.DirectorySeparatorChar)));
+                                           triplet.LocalStorage.RelativePath.Split (Path.DirectorySeparatorChar)));
 
         }
 
