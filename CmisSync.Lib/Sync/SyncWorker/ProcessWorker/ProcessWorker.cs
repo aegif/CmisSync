@@ -129,7 +129,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker
             // If LS=ne , DB=e, RS=ne: 
             // both removed, clear DB record only
             if (!triplet.LocalExist && !triplet.RemoteExist) {
-                WorkerOperations.RemoteDbRecord (triplet, cmisSyncFolder);
+                WorkerOperations.RemoveDbRecord (triplet, cmisSyncFolder);
             } else {
                 Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file\n",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);

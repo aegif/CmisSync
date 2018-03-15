@@ -1,14 +1,14 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/OperationUtils.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletProcessor.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/WorkerOperations.cs" Line="540" Column="66" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletProcessor.cs" Line="17" Column="45" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="81" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/ProcessWorker.cs" Line="121" Column="61" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SemiSyncTripletManager.cs" Line="43" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletAssembler.cs" Line="98" Column="28" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/OperationUtils.cs" Line="37" Column="45" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/Crawler/LocalCrawlWorker.cs" Line="73" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/ChangeLogThenCrawlStrategy.cs" Line="53" Column="44" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="83" Column="13" />
+      <File FileName="../../CmisSync.Lib/Cmis/CmisUtils.cs" Line="1" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/WorkerOperations.cs" Line="447" Column="28" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/ProcessWorker.cs" Line="42" Column="37" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletProcessor.cs" Line="48" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -16,13 +16,16 @@
           <Node name="CmisSync" expanded="True">
             <Node name="CmisSync.ConsoleUnderDev" expanded="True" />
             <Node name="CmisSync.Lib" expanded="True">
+              <Node name="ActivityListener" expanded="True" />
+              <Node name="Cmis" expanded="True" />
               <Node name="Sync" expanded="True">
+                <Node name="SynchronizedFolder" expanded="True" />
                 <Node name="SyncWorker" expanded="True">
+                  <Node name="Crawler" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
-                    <Node name="Internal" expanded="True">
-                      <Node name="OperationUtils.cs" selected="True" />
-                    </Node>
+                    <Node name="Internal" expanded="True" />
                   </Node>
+                  <Node name="SyncTripletProcessor.cs" selected="True" />
                 </Node>
               </Node>
             </Node>

@@ -451,10 +451,13 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
 
                 // Companion with triplet.Delay property:
                 // All files and subfolders should be removed before
-                // it.
+                // it. 
                 if (folder.GetChildren().TotalNumItems > 0) {
                     Console.WriteLine ("   %% unable to delete non-empty folder: " + folder.Path + "\n" +
                                        "      check if there is modified file in it");
+                    // Delete the folder from database.
+                    cmisSyncFolder.Database.RemoveFolder (triplet);
+
                     return;
                 }
 
@@ -509,9 +512,12 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
             // Folder has been deleted on server, delete it locally too.
             try {
 
+                // If is not empty, there must be conflict files
+                // However, db record must be removed
                 if (Directory.EnumerateFileSystemEntries (localFullPath).Any ()) {
                     Console.WriteLine ("  %%  Can not remove non-empty local folder " + triplet.Name + "\n" +
                                        "      check if there is remaied modified file.");
+                    cmisSyncFolder.Database.RemoveFolder (triplet);
                     return true;
                 }
 
@@ -554,7 +560,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
             return true;
         }
 
-        public static bool RemoteDbRecord(SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
+        public static bool RemoveDbRecord(SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
             if (triplet.IsFolder) {
                 cmisSyncFolder.Database.RemoveFolder (triplet);
             } else {

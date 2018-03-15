@@ -39,6 +39,8 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
         private SyncTripletProcessor syncTripletProcessor;
 
+        private bool isWorking = false;
+
         public SyncWorker (CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             this.cmisSyncFolder = cmisSyncFolder;
@@ -71,15 +73,20 @@ namespace CmisSync.Lib.Sync.SyncWorker
         public void Start () 
         {
             System.Console.WriteLine ("Start task: ");
+
+            isWorking = true;
+
             Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start ());
             Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start ());
             Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.Start ());
+
             semiManagerTask.Wait ();
 
             tripletAssemblerTask.Wait ();
 
             tripletProcessTask.Wait ();
 
+            isWorking = false;
             System.Console.WriteLine ("Triplet Processor completed");
         }
 
