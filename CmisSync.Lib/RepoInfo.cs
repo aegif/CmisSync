@@ -94,7 +94,7 @@ namespace CmisSync.Lib
         /// <summary>
         /// All folders, which should be ignored on synchronization.
         /// </summary>
-        private List<string> ignoredPaths = new List<string>();
+        public List<string> IgnoredPaths = new List<string>();
 
 
         /// <summary>
@@ -175,8 +175,8 @@ namespace CmisSync.Lib
         /// <param name="path"></param>
         public void addIgnorePath(string path)
         {
-            if(!this.ignoredPaths.Contains(path) && !String.IsNullOrEmpty(path))
-                this.ignoredPaths.Add(path);
+            if(!this.IgnoredPaths.Contains(path) && !String.IsNullOrEmpty(path))
+                this.IgnoredPaths.Add(path);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace CmisSync.Lib
         /// <returns>all ignored folders</returns>
         public string[] getIgnoredPaths()
         {
-            return ignoredPaths.ToArray();
+            return IgnoredPaths.ToArray();
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace CmisSync.Lib
         {
             if(Utils.IsInvalidFolderName(path.Replace("/", "").Replace("\"","")))
                 return true;
-            return !String.IsNullOrEmpty(ignoredPaths.Find(delegate(string ignore)
+            return !String.IsNullOrEmpty(IgnoredPaths.Find(delegate(string ignore)
             {
                 if (String.IsNullOrEmpty(ignore)) {
                     return false;

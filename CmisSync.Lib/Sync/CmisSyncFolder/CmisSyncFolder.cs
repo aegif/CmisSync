@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Database;
@@ -30,6 +31,8 @@ namespace CmisSync.Lib.Sync.CmisSyncFolder
 
         public double PollInterval;
 
+        public List<string> IgnoredPaths;
+
         public long MaxDownloadRetries;
 
         public long MaxUploadRetries;
@@ -45,6 +48,8 @@ namespace CmisSync.Lib.Sync.CmisSyncFolder
             PollInterval = repoInfo.PollInterval;
             CmisProfile = new CmisProfileRefactor (repoInfo);
             Database = new Database.Database (repoInfo.CmisDatabase, LocalPath, RemotePath);
+
+            IgnoredPaths = repoInfo.IgnoredPaths;
             MaxDownloadRetries = repoInfo.MaxDownloadRetries;
             MaxUploadRetries = repoInfo.MaxUploadRetries;
             MaxDeletionRetries = repoInfo.MaxDeletionRetries;

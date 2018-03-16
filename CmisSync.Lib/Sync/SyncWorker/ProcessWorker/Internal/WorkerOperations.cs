@@ -456,7 +456,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                     Console.WriteLine ("   %% unable to delete non-empty folder: " + folder.Path + "\n" +
                                        "      check if there is modified file in it");
                     // Delete the folder from database.
-                    cmisSyncFolder.Database.RemoveFolder (triplet);
+                    RemoveDbRecord (triplet, cmisSyncFolder);
 
                     return;
                 }
@@ -517,7 +517,9 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                 if (Directory.EnumerateFileSystemEntries (localFullPath).Any ()) {
                     Console.WriteLine ("  %%  Can not remove non-empty local folder " + triplet.Name + "\n" +
                                        "      check if there is remaied modified file.");
-                    cmisSyncFolder.Database.RemoveFolder (triplet);
+                    
+                    RemoveDbRecord (triplet, cmisSyncFolder);
+
                     return true;
                 }
 

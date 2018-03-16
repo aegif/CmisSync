@@ -8,6 +8,7 @@ using log4net;
 
 using CmisSync.Lib.Sync;
 using CmisSync.Lib.Sync.SyncTriplet;
+using CmisSync.Lib.Utilities.FileUtilities;
 using CmisSync.Lib.Cmis;
 
 namespace CmisSync.Lib.Sync.SyncWorker.Crawler
@@ -58,8 +59,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.Crawler
             // filePath and folderPath are all full pathes.
             foreach( String filePath in Directory.GetFiles (folder)) {
 
-                // ignore .sync file
-                if (filePath.Contains (".sync")) continue;
+                if (!SyncFileUtil.IsFileWorthSyncing (filePath, cmisSyncFolder)) continue;
 
                 SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalDocument (
                     filePath, this.cmisSyncFolder
@@ -73,7 +73,8 @@ namespace CmisSync.Lib.Sync.SyncWorker.Crawler
 
             foreach (String folderPath in Directory.GetDirectories (folder)) {
 
-                if (folderPath.Contains ("-conflict-version")) continue;
+                //if (folderPath.Contains ("-conflict-version")) continue;
+                if (!SyncFileUtil.IsDirectoryWorthSyncing (folderPath, cmisSyncFolder)) continue;
                 
                 SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (
                     folderPath, this.cmisSyncFolder

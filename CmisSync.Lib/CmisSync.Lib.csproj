@@ -132,6 +132,7 @@
     <Compile Include="Sync\SyncWorker\Internal\SingleItemPartitioner.cs" />
     <Compile Include="Sync\SyncWorker\ProcessWorker\Internal\OperationUtils.cs" />
     <Compile Include="Sync\SyncWorker\ProcessWorker\Internal\WorkerOperations.cs" />
+    <Compile Include="Utilities\FileUtilities\SyncFileUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
