@@ -455,6 +455,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                 if (folder.GetChildren().TotalNumItems > 0) {
                     Console.WriteLine ("   %% unable to delete non-empty folder: " + folder.Path + "\n" +
                                        "      check if there is modified file in it");
+
                     // Delete the folder from database.
                     RemoveDbRecord (triplet, cmisSyncFolder);
 
