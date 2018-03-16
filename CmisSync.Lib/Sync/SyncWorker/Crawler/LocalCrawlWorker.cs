@@ -59,7 +59,10 @@ namespace CmisSync.Lib.Sync.SyncWorker.Crawler
             // filePath and folderPath are all full pathes.
             foreach( String filePath in Directory.GetFiles (folder)) {
 
-                if (!SyncFileUtil.IsFileWorthSyncing (filePath, cmisSyncFolder)) continue;
+                if (!SyncFileUtil.WorthSyncing (filePath, cmisSyncFolder)) {
+                    Console.WriteLine (" - {0} is ignored: ", filePath);
+                    continue;
+                }
 
                 SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalDocument (
                     filePath, this.cmisSyncFolder
@@ -74,7 +77,11 @@ namespace CmisSync.Lib.Sync.SyncWorker.Crawler
             foreach (String folderPath in Directory.GetDirectories (folder)) {
 
                 //if (folderPath.Contains ("-conflict-version")) continue;
-                if (!SyncFileUtil.IsDirectoryWorthSyncing (folderPath, cmisSyncFolder)) continue;
+                if (!SyncFileUtil.WorthSyncing (folderPath, cmisSyncFolder)) {
+                    Console.WriteLine (" - {0} is ignored: ", folderPath);
+                    continue;
+                }
+
                 
                 SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (
                     folderPath, this.cmisSyncFolder
@@ -96,6 +103,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.Crawler
             {
                 if (!Directory.Exists(Utils.PathCombine(cmisSyncFolder.LocalPath, folder[0])))
                 {
+                    Console.WriteLine (" - {0} is deleted: ", folder[0]);
                     semiSyncTriplets.Add(
                         SyncTripletFactory.CreateSFGFromDBFolder (folder [0], folder [1], cmisSyncFolder));
                 }
@@ -106,6 +114,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.Crawler
             {
                 if (!File.Exists(Utils.PathCombine(cmisSyncFolder.LocalPath, file[0])))
                 {
+                    Console.WriteLine (" - {0} is deleted: ", file [0]);
                     semiSyncTriplets.Add (
                         SyncTripletFactory.CreateSFGFromDBFile(file [0], file [1], cmisSyncFolder));
                 }

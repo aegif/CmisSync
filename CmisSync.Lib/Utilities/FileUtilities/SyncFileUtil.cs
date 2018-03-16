@@ -52,18 +52,6 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             ")"
         );
 
-        public static bool IsPathIgnored (string path, CmisSyncFolder cmisSyncFolder)
-        {
-            if (IsInvalidFolderName (path.Replace ("/", "").Replace ("\"", "")))
-                return true;
-            return !String.IsNullOrEmpty (cmisSyncFolder.IgnoredPaths.Find (delegate (string ignore) {
-                if (String.IsNullOrEmpty (ignore)) {
-                    return false;
-                }
-                return path.StartsWith (ignore);
-            }));
-        }
-
         /// <summary>
         /// Extensions of files that must be excluded from synchronization.
         /// </summary>
@@ -77,17 +65,31 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             "cmissync", // CmisSync database
         };
 
+
+        public static bool IsPathIgnored (string path, CmisSyncFolder cmisSyncFolder)
+        {
+            if (IsInvalidFolderName (path.Replace ("/", "").Replace ("\"", "")))
+                return true;
+            return !String.IsNullOrEmpty (cmisSyncFolder.IgnoredPaths.Find (delegate (string ignore) {
+                if (String.IsNullOrEmpty (ignore)) {
+                    return false;
+                }
+                return path.StartsWith (ignore);
+            }));
+        }
+
+
         /// <summary>
         /// Check whether the filename is worth syncing or not.
         /// Files that are not worth syncing include temp files, locks, etc.
         /// </summary>
-        private static bool IsFilenameWorthSyncing (string localDirectory, string filename)
+        private static bool IsFilenameWorthSyncing (string filePath)
         {
-            if (null == filename) {
+            if (null == filePath) {
                 return false;
             }
 
-            filename = filename.ToLower ();
+            String filename = filePath.Split (Path.DirectorySeparatorChar).Last ().ToLower();
 
             if (ignoredFilenames.Contains (filename) ||
                 ignoredFilenamesRegex.IsMatch (filename)) {
@@ -106,7 +108,7 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             }
 
             // Check resulting file path length
-            string fullPath = Path.Combine (localDirectory, filename);
+            string fullPath = filePath; //Path.Combine (localDirectory, filename);
 
 #if __COCOA__ || __MonoCS__
             // TODO Check filename length for OS X
@@ -131,6 +133,52 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             return true;
         }
 
+        /// <summary>
+        /// Check whether the file is worth syncing or not.
+        /// This optionally excludes blank files or files too large.
+        /// </summary>
+        public static bool IsFileWorthSyncing (string filepath, CmisSyncFolder cmisSyncFolder)
+        {
+            if (!IsFilenameWorthSyncing (filepath)) return false;
+
+            bool allowBlankFiles = true; //TODO: add a preference repoInfo.allowBlankFiles
+            bool limitFilesize = false; //TODO: add preference for filesize limiting
+            long filesizeLimit = 256 * 1024 * 1024; //TODO: add a preference for filesize limit
+            
+            FileInfo fileInfo = new FileInfo (filepath);
+            
+            //Check permissions
+            if (fileInfo.Attributes.HasFlag (FileAttributes.Hidden)) {
+                Logger.InfoFormat ("Skipping {0}: hidden file", filepath);
+                return false;
+            }
+            if (fileInfo.Attributes.HasFlag (FileAttributes.System)) {
+                Logger.InfoFormat ("Skipping {0}: system file", filepath);
+                return false;
+            }
+            
+            //Check filesize
+            if (!allowBlankFiles && fileInfo.Length <= 0) {
+                Logger.InfoFormat ("Skipping {0}: blank file", filepath);
+                return false;
+            }
+            if (limitFilesize && fileInfo.Length > filesizeLimit) {
+                Logger.InfoFormat ("Skipping {0}: file too large {1}MB", filepath, fileInfo.Length / (1024f * 1024f));
+                return false;
+            }
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// In refactor demo, fodler might be -conflict-version
+        /// </summary>
+        /// <returns><c>true</c>, if directory name worth syncing was ised, <c>false</c> otherwise.</returns>
+        /// <param name="localDirectory">Local directory.</param>
+        private static bool IsDirectoryNameWorthSyncing ( string localDirectory ) {
+            return !localDirectory.Contains ("-conflict-version");
+        }
 
         /// <summary>
         /// Check whether the directory is worth syncing or not.
@@ -138,6 +186,8 @@ namespace CmisSync.Lib.Utilities.FileUtilities
         /// </summary>
         public static bool IsDirectoryWorthSyncing (string localDirectory, CmisSyncFolder cmisSyncFolder)
         {
+            if (!IsDirectoryNameWorthSyncing (localDirectory)) return false;
+
             if (!localDirectory.StartsWith (cmisSyncFolder.LocalPath)) {
                 Logger.WarnFormat ("Local directory is outside repo target directory.  local={0}, repo={1}", localDirectory, cmisSyncFolder.LocalPath);
                 return false;
@@ -168,58 +218,15 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             return true;
         }
 
-
-        /// <summary>
-        /// Check whether the file is worth syncing or not.
-        /// This optionally excludes blank files or files too large.
-        /// </summary>
-        public static bool IsFileWorthSyncing (string filepath, CmisSyncFolder cmisSyncFolder)
+        public static bool WorthSyncing (string filepath, CmisSyncFolder cmisSyncFolder)
         {
             if (File.Exists (filepath)) {
-                bool allowBlankFiles = true; //TODO: add a preference repoInfo.allowBlankFiles
-                bool limitFilesize = false; //TODO: add preference for filesize limiting
-                long filesizeLimit = 256 * 1024 * 1024; //TODO: add a preference for filesize limit
-
-                FileInfo fileInfo = new FileInfo (filepath);
-
-                //Check permissions
-                if (fileInfo.Attributes.HasFlag (FileAttributes.Hidden)) {
-                    Logger.InfoFormat ("Skipping {0}: hidden file", filepath);
-                    return false;
-                }
-                if (fileInfo.Attributes.HasFlag (FileAttributes.System)) {
-                    Logger.InfoFormat ("Skipping {0}: system file", filepath);
-                    return false;
-                }
-
-                //Check filesize
-                if (!allowBlankFiles && fileInfo.Length <= 0) {
-                    Logger.InfoFormat ("Skipping {0}: blank file", filepath);
-                    return false;
-                }
-                if (limitFilesize && fileInfo.Length > filesizeLimit) {
-                    Logger.InfoFormat ("Skipping {0}: file too large {1}MB", filepath, fileInfo.Length / (1024f * 1024f));
-                    return false;
-                }
-
+                return IsFileWorthSyncing (filepath, cmisSyncFolder);
             } else if (Directory.Exists (filepath)) {
                 return IsDirectoryWorthSyncing (filepath, cmisSyncFolder);
             }
-            return true;
+            return false;
         }
-
-
-        /// <summary>
-        /// Check whether the file is worth syncing or not.
-        /// Files that are not worth syncing include temp files, locks, etc.
-        /// </summary>
-        public static Boolean WorthSyncing (string localDirectory, string filename, CmisSyncFolder cmisSyncFolder)
-        {
-            return IsFilenameWorthSyncing (localDirectory, filename) &&
-                IsDirectoryWorthSyncing (localDirectory, cmisSyncFolder) &&
-                IsFileWorthSyncing (Path.Combine (localDirectory, filename), cmisSyncFolder);
-        }
-
 
         /// <summary>
         /// Determines whether this instance is valid ISO-8859-1 specified input.

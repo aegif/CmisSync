@@ -134,7 +134,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker
                 Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file\n",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
-                WorkerOperations.SolveConflict (triplet, session, cmisSyncFolder);
+                WorkerOperations.SolveConflict (triplet, cmisSyncFolder);
 
                 SyncRemoteToLocal (triplet, session, cmisSyncFolder, delayedFolderDeletions);
             }

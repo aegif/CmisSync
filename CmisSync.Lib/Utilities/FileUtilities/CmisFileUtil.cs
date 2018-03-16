@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Linq;
-using System.Text;
 using DotCMIS.Client;
 using log4net;
 using DotCMIS.Client.Impl;
@@ -148,7 +148,6 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             }
             */
         }
-
 
     }
 }

@@ -81,7 +81,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
             Console.WriteLine("  %% Downloading: " + remoteRelativePath);
 
             // Skip if invalid file name. See https://github.com/aegif/CmisSync/issues/196
-            if (Utils.IsInvalidFileName (CmisFileUtil.GetLeafname(remoteRelativePath))) {
+            if (SyncFileUtil.IsInvalidFileName (CmisFileUtil.GetLeafname(remoteRelativePath))) {
                 Logger.Info ("Skipping download of file with illegal filename: " + remoteRelativePath);
                 return true;
             }
@@ -517,7 +517,15 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
                 if (Directory.EnumerateFileSystemEntries (localFullPath).Any ()) {
                     Console.WriteLine ("  %%  Can not remove non-empty local folder " + triplet.Name + "\n" +
                                        "      check if there is remaied modified file.");
-                    
+
+
+                    // If is not empty, this folder must include conflicts.
+                    try {
+                        SolveConflict (triplet, cmisSyncFolder);
+                    } catch (Exception e) {
+                        
+                    }
+
                     RemoveDbRecord (triplet, cmisSyncFolder);
 
                     return true;
@@ -537,7 +545,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
             return true;
         }
 
-        public static bool SolveConflict(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
+        public static bool SolveConflict(SyncTriplet.SyncTriplet triplet,  CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
 
             // case: LS=ne, RS=e, but LS!=DB, RS!=DB, conflict but download only
             if (!triplet.LocalExist) return true;
