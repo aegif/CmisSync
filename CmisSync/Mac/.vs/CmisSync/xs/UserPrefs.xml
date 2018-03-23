@@ -1,18 +1,14 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Utils.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SynchronizedFolder/ChangeLogThenCrawlStrategy.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/Crawler/LocalCrawlWorker.cs" Line="117" Column="67" />
-      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/ChangeLogThenCrawlStrategy.cs" Line="53" Column="44" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="83" Column="13" />
-      <File FileName="../../CmisSync.Lib/Cmis/CmisUtils.cs" Line="27" Column="22" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/WorkerOperations.cs" Line="578" Column="79" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/ProcessWorker.cs" Line="137" Column="47" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletProcessor.cs" Line="24" Column="19" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletAssembler.cs" Line="1" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SemiSyncTripletManager.cs" Line="27" Column="33" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/Crawler/RemoteCrawlWorker.cs" Line="1" Column="1" />
-      <File FileName="../../CmisSync.Lib/Utils.cs" Line="432" Column="30" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletProcessor.cs" Line="8" Column="11" />
+      <File FileName="../../CmisSync.ConsoleUnderDev/CmisSyncOnceUnderDev.cs" Line="72" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/WorkerOperations.cs" Line="183" Column="48" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SemiSyncTripletManager.cs" Line="45" Column="40" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/Crawler/ChangeLogProcessor.cs" Line="86" Column="79" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="114" Column="53" />
+      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/ChangeLogThenCrawlStrategy.cs" Line="221" Column="43" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -23,10 +19,13 @@
               <Node name="ActivityListener" expanded="True" />
               <Node name="Cmis" expanded="True" />
               <Node name="Config" expanded="True" />
+              <Node name="Database" expanded="True" />
               <Node name="Properties" expanded="True" />
               <Node name="Sync" expanded="True">
                 <Node name="CmisSyncFolder" expanded="True" />
-                <Node name="SynchronizedFolder" expanded="True" />
+                <Node name="SynchronizedFolder" expanded="True">
+                  <Node name="ChangeLogThenCrawlStrategy.cs" selected="True" />
+                </Node>
                 <Node name="SyncWorker" expanded="True">
                   <Node name="Crawler" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
@@ -37,7 +36,12 @@
               <Node name="Utilities" expanded="True">
                 <Node name="FileUtilities" expanded="True" />
               </Node>
-              <Node name="Utils.cs" selected="True" />
+            </Node>
+            <Node name="DotCMIS" expanded="True">
+              <Node name="binding" expanded="True">
+                <Node name="atompub" expanded="True" />
+              </Node>
+              <Node name="client" expanded="True" />
             </Node>
           </Node>
         </State>

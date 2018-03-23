@@ -70,19 +70,5 @@ namespace CmisSync.ConsoleUnderDev
             return success;
         }
 
-        private void TestFolder( String rootfolder ) {
-
-            foreach (String file in Directory.GetFiles(rootfolder))
-            {
-                System.Console.WriteLine("  {0}", file);
-            }
-
-            foreach (String folder in Directory.GetDirectories(rootfolder))
-            {
-                System.Console.WriteLine("  {0}", folder);
-                TestFolder(folder);
-            }
-
-        }
     }
 }
