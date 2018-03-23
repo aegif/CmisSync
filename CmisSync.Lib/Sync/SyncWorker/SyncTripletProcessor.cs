@@ -46,11 +46,19 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
             // Process non-folder-deletion operations
             Parallel.ForEach (Internal.SingleItemPartitioner.Create (FullSyncTriplets.GetConsumingEnumerable ()), options, 
-                              (triplet) => ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, delayedFolerDeletions)
-                             );
+                              (triplet) => {
+
+                                  // ============== new approaches ===============
+                                  // must use a crawler counter to record the remote / local size to decide when to process folder deletions
+                                  // ProcessWorker.ProcessWorker.SyncAction action = ProcessWorker.ProcessWorker.Reduce (triplet, cmisSyncFolder);
+                                  // ProcessWorker.ProcessWorker.Process (triplet, action, session, cmisSyncFolder);
+
+                                  ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, delayedFolerDeletions);
+                              });
 
 
             Console.WriteLine (" - Processing folder deletions");
+
             // Process folder-deletion operations 
             // One-by-One non-parallel approach yet
             List<SyncTriplet.SyncTriplet> folderDeletionList = delayedFolerDeletions.ToList();
@@ -59,12 +67,75 @@ namespace CmisSync.Lib.Sync.SyncWorker
             // Therefore if there are files remained in the repository, eg. local removed but remote modified, vise versa
             // the corresponding folder will be remained. 
             folderDeletionList.Sort (new FolderLexicoGraphicalComparer ());
+
+            /*
             foreach(SyncTriplet.SyncTriplet triplet in  folderDeletionList) {
                 // unset delayed
                 triplet.Delayed = false;
                 ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, null);
             }
+            */
+            DoParallelFolderDeletions (folderDeletionList);
         }
+
+        private void DoParallelFolderDeletions(List<SyncTriplet.SyncTriplet> folders) {
+
+            Console.WriteLine (" - Do parallel folder deletions: ");
+
+            while (folders.Count > 0) {
+
+                Task parallelDeletionTask = Task.Factory.StartNew (() => ParallelFolderDeletionTask() );
+
+                if (!FullSyncTriplets.TryAdd (folders.First ())) {
+                    Console.WriteLine ("  - failed add : " + folders.First ().Name);
+                } else {
+                    Console.WriteLine ("  - start parallel delete: " + folders.First ().Name);
+                }
+
+                string lastFolderName = folders.First ().Name;
+
+                folders.RemoveAt (0);
+                int i = 0; 
+                while (i < folders.Count) {
+                    if (lastFolderName.StartsWith(folders[i].Name)) {
+                        // This folder can not be processed concurrently with 
+                        // the last folder name, increase index
+                        i++;
+                    } else {
+                        // This foler can be processed, remove from list and push 
+                        // to fullsynctriplet
+                        lastFolderName = folders [i].Name;
+
+                        if (!FullSyncTriplets.TryAdd (folders [i])) {
+                            Console.WriteLine ("  - failed add : " + folders [i].Name);
+                        } else {
+                            Console.WriteLine ("  - start parallel delete: " + folders [i].Name);
+                        }
+
+                        folders.RemoveAt (i);
+                    }
+                }
+
+                FullSyncTriplets.CompleteAdding ();
+
+                parallelDeletionTask.Wait ();
+
+                Console.WriteLine ("  - one loop of parallel folder deletions completed. start next loop");
+            }
+        }
+
+        private void ParallelFolderDeletionTask() {
+
+            ParallelOptions options = new ParallelOptions ();
+            options.MaxDegreeOfParallelism = MaxParallelism;
+
+            // Process parallel folder deletion
+            Parallel.ForEach (Internal.SingleItemPartitioner.Create (FullSyncTriplets.GetConsumingEnumerable ()), options,
+                              (triplet) => ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, null)
+                             );
+
+        }
+
 
         private class FolderLexicoGraphicalComparer : IComparer<SyncTriplet.SyncTriplet> {
 

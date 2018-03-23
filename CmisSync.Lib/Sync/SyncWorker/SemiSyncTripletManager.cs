@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿#pragma warning disable 0414
+using log4net;
 
 using System;
 using System.IO;
@@ -7,6 +8,8 @@ using System.Collections.Concurrent;
 
 using CmisSync.Lib.Sync.SyncTriplet;
 using CmisSync.Lib.Sync.SyncWorker.Crawler;
+
+using DotCMIS.Client;
 
 namespace CmisSync.Lib.Sync.SyncWorker
 {
@@ -24,16 +27,29 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder;
 
+        private ISession session;
+
         private LocalCrawlWorker localCrawlWorker;
 
-        public SemiSyncTripletManager (CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        private ChangeLogProcessor changeLogProcessor;
+
+        public SemiSyncTripletManager (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session)
         {
+            this.session = session;
             this.cmisSyncFolder = cmisSyncFolder;
             this.localCrawlWorker = new LocalCrawlWorker (cmisSyncFolder, semiSyncTriplets);
+            this.changeLogProcessor = new ChangeLogProcessor (cmisSyncFolder, session, semiSyncTriplets);
+        }
+
+        public void StartTest() {
+            changeLogProcessor.Start ();
         }
 
         public void Start() {
             localCrawlWorker.Start ();
+            // complete adding will stop blockcollection foreach loop in 
+            // synctriplet assembler
+            semiSyncTriplets.CompleteAdding ();
         }
 
         ~SemiSyncTripletManager ()
@@ -61,3 +77,4 @@ namespace CmisSync.Lib.Sync.SyncWorker
         }
     }
 }
+#pragma warning restore 0414

@@ -39,7 +39,11 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
         private SyncTripletProcessor syncTripletProcessor;
 
+        private object syncingLock = new object();
+
         private bool isWorking = false;
+
+        private bool isFirstSyncing = true;
 
         public SyncWorker (CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
@@ -62,7 +66,7 @@ namespace CmisSync.Lib.Sync.SyncWorker
             cmisSyncFolder.RemoteRootFolder = remoteRootFolder;
 
             // semisynctriplet manager holds a concurrent semi triplet queue
-            this.semiSyncTripletManager = new SemiSyncTripletManager (cmisSyncFolder);
+            this.semiSyncTripletManager = new SemiSyncTripletManager (cmisSyncFolder, session);
             // processor holds a concurrent triplet process queue
             this.syncTripletProcessor = new SyncTripletProcessor (cmisSyncFolder, session);
             // assembler read semi triplet from semi queue, assemble it with remote info, and push assembled triplet to process queue
@@ -72,22 +76,43 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
         public void Start () 
         {
-            System.Console.WriteLine ("Start task: ");
+            /*
+             * Later, full sync/ change log sync/ watcher sync 's selector
+             * would be written here.
+             */
+            lock (syncingLock) {
 
-            isWorking = true;
+                System.Console.WriteLine ("Start task: ");
 
-            Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start ());
-            Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start ());
-            Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.Start ());
+                isWorking = true;
 
-            semiManagerTask.Wait ();
+                /*
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start ());
+                Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start ());
+                Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.Start ());
 
-            tripletAssemblerTask.Wait ();
+                semiManagerTask.Wait ();
 
-            tripletProcessTask.Wait ();
+                tripletAssemblerTask.Wait ();
 
-            isWorking = false;
-            System.Console.WriteLine ("Triplet Processor completed");
+                tripletProcessTask.Wait ();
+
+                isWorking = false;
+
+                if (cmisSyncFolder.CmisProfile.CmisProperties.ChangeLogCapability) {
+                    try {
+                        String token = CmisUtils.GetChangeLogToken (session);
+                        System.Console.WriteLine ("Get server's changelot token {0}", token);
+                        cmisSyncFolder.Database.SetChangeLogToken (token);
+                    } catch (Exception e) {
+                        System.Console.WriteLine ("Get server's changelot token error: {0}", e.Message);
+                    }
+                }
+
+                System.Console.WriteLine ("Triplet Processor completed");
+                */
+                semiSyncTripletManager.StartTest ();
+            }
         }
 
         private void Connect ()

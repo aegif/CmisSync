@@ -49,9 +49,6 @@ namespace CmisSync.Lib.Sync.SyncWorker.Crawler
                 semiSyncTriplets.Add (semi);
             }
 
-            // complete adding will stop blockcollection foreach loop in 
-            // synctriplet assembler
-            semiSyncTriplets.CompleteAdding ();
         }
 
         private void CrawlFolder(String folder) {

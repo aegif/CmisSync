@@ -42,7 +42,7 @@ namespace CmisSync.Lib.Sync.SyncWorker.ProcessWorker.Internal
          * Download directory actually only create the folder name.
          * Contained files are enqueued
          */
-        public static bool DownloadFolder(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static bool CreateLocalFolder(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string localFolder = OperationUtils.GetLocalFullPath (triplet, cmisSyncFolder);
             IFolder remoteFolder = (IFolder) session.GetObjectByPath (Utils.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), false);

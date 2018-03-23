@@ -1075,6 +1075,35 @@ namespace CmisSync.Lib.Database
         }
 
         /// <summary>
+        /// Gets the path from id
+        /// string[0] = local
+        /// string[1] = remote
+        /// </summary>
+        /// <returns>The path by identifier.</returns>
+        /// <param name="id">Identifier.</param>
+        public string[] GetPathById(string id) 
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("id", id);
+            var result = ExecuteOneRecordSQL ("SELECT path, localPath FROM files WHERE id=@id", parameters);
+            if (result.Count () > 0) {
+                string [] res = new string [2];
+                res [1] = (string)result ["path"];
+                object localPathObj = result ["localPath"];
+                res [0] = (localPathObj is DBNull) ? null : (string)localPathObj;
+                return res;
+            } else {
+                var results = ExecuteMultiRecordSQL ("SELECT path , localPath FROM folders WHERE id=@id ORDER BY serverSideModificationDate DESC", parameters);
+
+                return results.Select (p => {
+                    var localPath = p ["localPath"] as string;
+                    var remotePath = p ["path"] as string;
+                    return new string [2] { localPath, remotePath };
+                }).ToList ().FirstOrDefault ();
+            }
+        }
+
+        /// <summary>
         /// Gets the syncitem from local path.
         /// </summary>
         /// <returns>syncitem. If the item is not included in the database, return null.</returns>
