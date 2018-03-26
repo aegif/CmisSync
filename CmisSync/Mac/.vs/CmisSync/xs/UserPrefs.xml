@@ -1,14 +1,14 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SynchronizedFolder/ChangeLogThenCrawlStrategy.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncTripletProcessor.cs" Line="8" Column="11" />
-      <File FileName="../../CmisSync.ConsoleUnderDev/CmisSyncOnceUnderDev.cs" Line="72" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/ProcessWorker/Internal/WorkerOperations.cs" Line="183" Column="48" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SemiSyncTripletManager.cs" Line="45" Column="40" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/Crawler/ChangeLogProcessor.cs" Line="86" Column="79" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="114" Column="53" />
-      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/ChangeLogThenCrawlStrategy.cs" Line="221" Column="43" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" Line="158" Column="9" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="39" Column="43" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="70" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="54" Column="37" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="51" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="47" Column="91" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs" Line="66" Column="68" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -23,15 +23,22 @@
               <Node name="Properties" expanded="True" />
               <Node name="Sync" expanded="True">
                 <Node name="CmisSyncFolder" expanded="True" />
-                <Node name="SynchronizedFolder" expanded="True">
-                  <Node name="ChangeLogThenCrawlStrategy.cs" selected="True" />
-                </Node>
-                <Node name="SyncWorker" expanded="True">
+                <Node name="SynchronizedFolder" expanded="True" />
+                <Node name="SynchronizeItem" expanded="True" />
+                <Node name="SyncMachine" expanded="True">
                   <Node name="Crawler" expanded="True" />
+                  <Node name="Exceptions" expanded="True" />
+                  <Node name="Internal" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
-                    <Node name="Internal" expanded="True" />
+                    <Node name="Internal" expanded="True">
+                      <Node name="WorkerOperations.cs" selected="True" />
+                    </Node>
                   </Node>
                 </Node>
+                <Node name="SyncTriplet" expanded="True">
+                  <Node name="TripletItem" expanded="True" />
+                </Node>
+                <Node name="SyncWorker" expanded="True" />
               </Node>
               <Node name="Utilities" expanded="True">
                 <Node name="FileUtilities" expanded="True" />
@@ -40,6 +47,7 @@
             <Node name="DotCMIS" expanded="True">
               <Node name="binding" expanded="True">
                 <Node name="atompub" expanded="True" />
+                <Node name="browser" expanded="True" />
               </Node>
               <Node name="client" expanded="True" />
             </Node>
@@ -58,7 +66,9 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Mac Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/minwu-aegif/CmisSyncSourceCodes/CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" line="48" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.ItemProperties.CmisSync.Console PreferredExecutionTarget="MonoDevelop.Default" />

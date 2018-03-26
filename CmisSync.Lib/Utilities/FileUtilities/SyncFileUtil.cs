@@ -15,6 +15,8 @@ using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync;
 using CmisSync.Lib.Sync.CmisSyncFolder;
 
+using DotCMIS.Client;
+
 #if __MonoCS__ && !__COCOA__
 using Mono.Unix.Native;
 #endif
@@ -164,6 +166,12 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             }
             if (limitFilesize && fileInfo.Length > filesizeLimit) {
                 Logger.InfoFormat ("Skipping {0}: file too large {1}MB", filepath, fileInfo.Length / (1024f * 1024f));
+                return false;
+            }
+
+            //Ignore Symbol Link
+            if (Utils.IsSymlink(fileInfo)) {
+                Logger.InfoFormat ("Skipping {0}: symbolic link", filepath);
                 return false;
             }
 
@@ -317,5 +325,48 @@ namespace CmisSync.Lib.Utilities.FileUtilities
         /// </summary>
         private static Regex invalidFolderNameRegex = new Regex (
             "[" + Regex.Escape (new string (Path.GetInvalidPathChars ()) + "\"?:/\\|<>*") + "]");
+
+
+
+        /// <summary>
+        /// Gets the applicable path.
+        /// </summary>
+        /// <returns>The applicable path.</returns>
+        /// <param name="remoteDoc">Remote document.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static string GetApplicablePath(IDocument remoteDoc, CmisSyncFolder cmisSyncFolder) {
+            foreach (IFolder folder in remoteDoc.Parents) {
+                if (PathIsApplicable(folder.Path, cmisSyncFolder)) {
+                    return folder.Path;
+                } 
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Paths the is applicable.
+        /// </summary>
+        /// <returns><c>true</c>, if is applicable was pathed, <c>false</c> otherwise.</returns>
+        /// <param name="remotePath">Remote path.</param>
+        private static bool PathIsApplicable(string remotePath, CmisSyncFolder cmisSyncFolder)
+        {
+            // Ignore the change if not in a synchronized folder.
+            if ( ! remotePath.StartsWith(cmisSyncFolder.RemotePath))
+            {
+                Logger.Info("Ignore change as it is not in the synchronized folder's path: " + remotePath);
+                return false;
+            }
+
+            // Ignore if configured to be ignored.
+            if (IsPathIgnored(remotePath, cmisSyncFolder))
+            {
+                Logger.Info("Ignore change as it is in a path configured to be ignored: " + remotePath);
+                return false;
+            }
+
+            // In other case, the change is probably applicable.
+            return true;
+        }
+ 
     }
 }

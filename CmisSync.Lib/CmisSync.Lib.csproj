@@ -122,18 +122,20 @@
     <Compile Include="Sync\CmisSyncFolder\CmisSyncFolder.cs" />
     <Compile Include="Utilities\FileUtilities\CmisFileUtil.cs" />
     <Compile Include="Cmis\CmisProperties.cs" />
-    <Compile Include="Sync\SyncWorker\SyncWorker.cs" />
-    <Compile Include="Sync\SyncWorker\SemiSyncTripletManager.cs" />
-    <Compile Include="Sync\SyncWorker\SyncTripletAssembler.cs" />
-    <Compile Include="Sync\SyncWorker\SyncTripletProcessor.cs" />
-    <Compile Include="Sync\SyncWorker\Crawler\LocalCrawlWorker.cs" />
-    <Compile Include="Sync\SyncWorker\Crawler\RemoteCrawlWorker.cs" />
-    <Compile Include="Sync\SyncWorker\ProcessWorker\ProcessWorker.cs" />
-    <Compile Include="Sync\SyncWorker\Internal\SingleItemPartitioner.cs" />
-    <Compile Include="Sync\SyncWorker\ProcessWorker\Internal\OperationUtils.cs" />
-    <Compile Include="Sync\SyncWorker\ProcessWorker\Internal\WorkerOperations.cs" />
+    <Compile Include="Sync\SyncMachine\SyncMachine.cs" />
+    <Compile Include="Sync\SyncMachine\SemiSyncTripletManager.cs" />
+    <Compile Include="Sync\SyncMachine\SyncTripletAssembler.cs" />
+    <Compile Include="Sync\SyncMachine\SyncTripletProcessor.cs" />
+    <Compile Include="Sync\SyncMachine\Crawler\LocalCrawlWorker.cs" />
+    <Compile Include="Sync\SyncMachine\Crawler\RemoteCrawlWorker.cs" />
+    <Compile Include="Sync\SyncMachine\ProcessWorker\ProcessWorker.cs" />
+    <Compile Include="Sync\SyncMachine\Internal\SingleItemPartitioner.cs" />
+    <Compile Include="Sync\SyncMachine\ProcessWorker\Internal\OperationUtils.cs" />
+    <Compile Include="Sync\SyncMachine\ProcessWorker\Internal\WorkerOperations.cs" />
     <Compile Include="Utilities\FileUtilities\SyncFileUtil.cs" />
-    <Compile Include="Sync\SyncWorker\Crawler\ChangeLogProcessor.cs" />
+    <Compile Include="Sync\SyncMachine\Crawler\ChangeLogProcessor.cs" />
+    <Compile Include="Sync\SyncWorker\SyncWorker.cs" />
+    <Compile Include="Sync\SyncMachine\Exceptions\ChangeLogProcessorBreakException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
@@ -165,11 +167,13 @@
     <Folder Include="Config\" />
     <Folder Include="Sync\SynchronizeItem\" />
     <Folder Include="Sync\CmisSyncFolder\" />
+    <Folder Include="Sync\SyncMachine\" />
+    <Folder Include="Sync\SyncMachine\Crawler\" />
+    <Folder Include="Sync\SyncMachine\ProcessWorker\" />
+    <Folder Include="Sync\SyncMachine\Internal\" />
+    <Folder Include="Sync\SyncMachine\ProcessWorker\Internal\" />
     <Folder Include="Sync\SyncWorker\" />
-    <Folder Include="Sync\SyncWorker\Crawler\" />
-    <Folder Include="Sync\SyncWorker\ProcessWorker\" />
-    <Folder Include="Sync\SyncWorker\Internal\" />
-    <Folder Include="Sync\SyncWorker\ProcessWorker\Internal\" />
+    <Folder Include="Sync\SyncMachine\Exceptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

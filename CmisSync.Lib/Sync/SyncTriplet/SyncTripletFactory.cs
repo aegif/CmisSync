@@ -58,6 +58,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             return res;
         }
 
+        // Create Full Synctriplet, useful when remote has high prioirty, eg: changelog
         public static SyncTriplet CreateFromRemoteDocument(
             IFolder remoteFolder,
             IDocument remoteDocument,
@@ -92,6 +93,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         }
 
 
+        // Create Full Synctriplet, useful when remote has high prioirty, eg: changelog
         public static SyncTriplet CreateFromRemoteFolder(
             IFolder remoteFolder,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
