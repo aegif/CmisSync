@@ -32,7 +32,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null;
 
-        private Dictionary<string, List<ChangeType?>> changeBuffer = null;
+        //private Dictionary<string, List<ChangeType?>> changeBuffer = null;
+        private Dictionary<string, List<IChangeEvent>> changeBuffer = null;
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder;
 
@@ -50,7 +51,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
             Console.WriteLine (" Start Changelog process :");
 
-            changeBuffer =  new Dictionary<string, List<ChangeType?>> ();
+            //changeBuffer =  new Dictionary<string, List<ChangeType?>> ();
+            changeBuffer =  new Dictionary<string, List<IChangeEvent>> ();
 
             Config.CmisSyncConfig.Feature features = null;
             if (ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name) != null)
@@ -92,10 +94,24 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                  *  when UPDATE is detected and call the full crawler
                  */
                 foreach (IChangeEvent changeEvent in changeEvents) {
-                    if (changeBuffer.ContainsKey (changeEvent.ObjectId))
-                        changeBuffer [changeEvent.ObjectId].Add (changeEvent.ChangeType);
-                    else
-                        changeBuffer [changeEvent.ObjectId] = new List<ChangeType?> { changeEvent.ChangeType };
+                    if (changeBuffer.ContainsKey (changeEvent.ObjectId)) {
+                        //changeBuffer [changeEvent.ObjectId].Add (changeEvent.ChangeType);
+                        try {
+                            long deltaTime = ((DateTime)changeEvent.ChangeTime).ToFileTime () - ((DateTime)changeBuffer [changeEvent.ObjectId].Last ().ChangeTime).ToFileTime ();
+                            // FileTime's unit is 100nano second.
+                            // 5000000 = 0.5s = 500ms 
+                            // If an Update is following a Create in 500ms, ignore it. Create the object;
+                            if (deltaTime > 5000000) {
+                                changeBuffer [changeEvent.ObjectId].Add (changeEvent);
+                            }
+                        } catch (Exception e) {
+                            //ChangeTime is null
+                            changeBuffer [changeEvent.ObjectId].Add (changeEvent);
+                        }
+                    } else {
+                        //changeBuffer [changeEvent.ObjectId] = new List<ChangeType?> { changeEvent.ChangeType };
+                        changeBuffer [changeEvent.ObjectId] = new List<IChangeEvent> { changeEvent };
+                    }
                 }
 
                 currentChangeToken = changes.LatestChangeLogToken;
@@ -114,7 +130,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             // processs change logs
             foreach (string objId in changeBuffer.Keys) {
                 
-                ChangeType? action = changeBuffer [objId].Last ();
+                //ChangeType? action = changeBuffer [objId].Last ();
+                ChangeType? action = changeBuffer [objId].Last ().ChangeType;
 
                 /*for some old version of alfresco, ObjectId of changeEvent would be /RemotePath/ + Id, remove it*/
                 string remoteId = objId.Split (CmisUtils.CMIS_FILE_SEPARATOR).Last ();

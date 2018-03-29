@@ -80,7 +80,9 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             SyncTriplet res = new SyncTriplet (IsDocument);
 
             String remoteRoot = cmisSyncFolder.RemotePath;
-            String remoteFull = SyncFileUtil.GetApplicablePath (remoteDocument, cmisSyncFolder);
+            String remoteFull = CmisFileUtil.PathCombine(
+                SyncFileUtil.GetApplicablePath (remoteDocument, cmisSyncFolder), 
+                CmisFileUtil.GetLocalFileName(remoteDocument, cmisSyncFolder.CmisProfile));
             String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
             res.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument.LastModificationDate);
 
@@ -102,7 +104,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         {
             SyncTriplet res = CreateSFGFromRemoteDocument (remoteFolder, remoteDocument, cmisSyncFolder);
             // Create local storage 
-            res.LocalStorage = (null == res.DBStorage) ? null : new LocalStorageItem(cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
+            res.LocalStorage = (null == res.DBStorage.DBLocalPath) ? null : new LocalStorageItem(cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
 
             return res;
         }
@@ -113,7 +115,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         {
             SyncTriplet res = CreateSFGFromRemoteDocument (remoteDocumnt, cmisSyncFolder);
             // Create local storage 
-            res.LocalStorage = (null == res.DBStorage) ? null : new LocalStorageItem (cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
+            res.LocalStorage = (null == res.DBStorage.DBLocalPath) ? null : new LocalStorageItem (cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
 
             return res;
         }
@@ -148,7 +150,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
  
             SyncTriplet res = CreateSFGFromRemoteFolder (remoteFolder, cmisSyncFolder);
 
-            res.LocalStorage = (null == res.DBStorage) ? null : new LocalStorageItem (cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
+            res.LocalStorage = (null == res.DBStorage.DBLocalPath) ? null : new LocalStorageItem (cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
 
             return res;
         }

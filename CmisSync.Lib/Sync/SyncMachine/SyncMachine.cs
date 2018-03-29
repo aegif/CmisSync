@@ -89,7 +89,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 changes = session.GetContentChanges (currentChangeToken, cmisSyncFolder.CmisProfile.CmisProperties.IsPropertyChangesSupported, maxNumItems);
                 var changeEvents = changes.ChangeEventList./*Where (p => p != changes.ChangeEventList.FirstOrDefault ()).*/ToList ();
                 foreach (IChangeEvent changeEvent in changeEvents) {
-                    Console.WriteLine (" Get change : {0}, {1}", changeEvent.ObjectId, changeEvent.ChangeType);
+                    Console.WriteLine (" Get change : {0}, {1} at [{2}]({3})", changeEvent.ObjectId, changeEvent.ChangeType, changeEvent.ChangeTime.ToString(), ((DateTime)changeEvent.ChangeTime).ToFileTime());
                 }
                 currentChangeToken = changes.LatestChangeLogToken;
                 if (changes.HasMoreItems == true && (currentChangeToken == null || currentChangeToken.Length == 0)) {
