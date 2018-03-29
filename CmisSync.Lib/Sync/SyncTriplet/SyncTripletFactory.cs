@@ -34,7 +34,14 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         private const bool IsFolder = true;
         private const bool IsDocument = false;
 
-
+        /// <summary>
+        /// Creates the SFGF rom remote document. Given remote folder where the document is.
+        /// Therefore it is not necessary to check the document's folder.
+        /// </summary>
+        /// <returns>The SFGF rom remote document.</returns>
+        /// <param name="remoteFolder">Remote folder.</param>
+        /// <param name="remoteDocument">Remote document.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
         public static SyncTriplet CreateSFGFromRemoteDocument (
             IFolder remoteFolder,
             IDocument remoteDocument,
@@ -58,6 +65,35 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             return res;
         }
 
+        /// <summary>
+        /// Creates the SFGF rom remote document, given document only.
+        /// Folder path should be checked among all possible paths to select the one
+        /// start with CmisSyncFolder.RemotePath by SyncFileUtil.GetApplicablePath
+        /// </summary>
+        /// <returns>The SFGF rom remote document.</returns>
+        /// <param name="remoteDocument">Remote document.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static SyncTriplet CreateSFGFromRemoteDocument(
+            IDocument remoteDocument,
+            CmisSyncFolder.CmisSyncFolder cmisSyncFolder) 
+        {
+            SyncTriplet res = new SyncTriplet (IsDocument);
+
+            String remoteRoot = cmisSyncFolder.RemotePath;
+            String remoteFull = SyncFileUtil.GetApplicablePath (remoteDocument, cmisSyncFolder);
+            String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
+            res.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument.LastModificationDate);
+
+            // Check database
+            res.DBStorage = new DBStorageItem (cmisSyncFolder.Database, res.RemoteStorage.RelativePath, IsDocument, RemoteToLocal);
+
+            // Create local storage 
+            res.LocalStorage = null;
+
+            res.Name = remoteRelative;
+            return res;
+        }
+
         // Create Full Synctriplet, useful when remote has high prioirty, eg: changelog
         public static SyncTriplet CreateFromRemoteDocument(
             IFolder remoteFolder,
@@ -67,6 +103,17 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             SyncTriplet res = CreateSFGFromRemoteDocument (remoteFolder, remoteDocument, cmisSyncFolder);
             // Create local storage 
             res.LocalStorage = (null == res.DBStorage) ? null : new LocalStorageItem(cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
+
+            return res;
+        }
+
+        public static SyncTriplet CreateFromRemoteDocument(
+            IDocument remoteDocumnt,
+            CmisSyncFolder.CmisSyncFolder cmisSyncFolder) 
+        {
+            SyncTriplet res = CreateSFGFromRemoteDocument (remoteDocumnt, cmisSyncFolder);
+            // Create local storage 
+            res.LocalStorage = (null == res.DBStorage) ? null : new LocalStorageItem (cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
 
             return res;
         }

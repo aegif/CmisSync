@@ -28,7 +28,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
          * Buzy wait with sleep?
          * 
          */
-        public BlockingCollection<SyncTriplet.SyncTriplet> FullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet>();
+        private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null; //new BlockingCollection<SyncTriplet.SyncTriplet>();
 
         private ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolerDeletions = new ConcurrentQueue<SyncTriplet.SyncTriplet> ();
 
@@ -40,7 +40,12 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.session = session;
         }
 
-        public void Start() {
+        public void Start (
+            BlockingCollection<SyncTriplet.SyncTriplet> full 
+        ) {
+
+            fullSyncTriplets = full;
+
             delayedFolerDeletions = new ConcurrentQueue<SyncTriplet.SyncTriplet> ();
 
             ParallelOptions options = new ParallelOptions ();
@@ -48,7 +53,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
 
             // Process non-folder-deletion operations
-            Parallel.ForEach (Internal.SingleItemPartitioner.Create (FullSyncTriplets.GetConsumingEnumerable ()), options, 
+            Parallel.ForEach (Internal.SingleItemPartitioner.Create (fullSyncTriplets.GetConsumingEnumerable ()), options, 
                               (triplet) => {
 
                                   // ============== new approaches ===============
@@ -65,6 +70,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
             // Process folder-deletion operations 
             // One-by-One non-parallel approach yet
             List<SyncTriplet.SyncTriplet> folderDeletionList = delayedFolerDeletions.ToList();
+
+            ConcurrentDictionary<string, SyncTriplet.SyncTriplet> mmm = new ConcurrentDictionary<string, SyncTriplet.SyncTriplet> ();
 
             // Lexicographical order
             // Therefore if there are files remained in the repository, eg. local removed but remote modified, vise versa
@@ -87,15 +94,20 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
             while (folders.Count > 0) {
 
+                // everytime initialize a new full sync triplets;
+                fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
                 Task parallelDeletionTask = Task.Factory.StartNew (() => ParallelFolderDeletionTask() );
 
-                if (!FullSyncTriplets.TryAdd (folders.First ())) {
-                    Console.WriteLine ("  - failed add : " + folders.First ().Name);
+                // reset Delayed property.
+                folders[0].Delayed = false;
+
+                if (!fullSyncTriplets.TryAdd (folders[0])) {
+                    Console.WriteLine ("  - failed add : " + folders[0].Name);
                 } else {
-                    Console.WriteLine ("  - start parallel delete: " + folders.First ().Name);
+                    Console.WriteLine ("  - start parallel delete: " + folders[0].Name);
                 }
 
-                string lastFolderName = folders.First ().Name;
+                string lastFolderName = folders[0].Name;
 
                 folders.RemoveAt (0);
                 int i = 0; 
@@ -109,7 +121,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
                         // to fullsynctriplet
                         lastFolderName = folders [i].Name;
 
-                        if (!FullSyncTriplets.TryAdd (folders [i])) {
+                        // Set delayed to false
+                        folders [i].Delayed = false;
+
+                        if (!fullSyncTriplets.TryAdd (folders [i])) {
                             Console.WriteLine ("  - failed add : " + folders [i].Name);
                         } else {
                             Console.WriteLine ("  - start parallel delete: " + folders [i].Name);
@@ -119,7 +134,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                     }
                 }
 
-                FullSyncTriplets.CompleteAdding ();
+                fullSyncTriplets.CompleteAdding ();
 
                 parallelDeletionTask.Wait ();
 
@@ -133,7 +148,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             options.MaxDegreeOfParallelism = MaxParallelism;
 
             // Process parallel folder deletion
-            Parallel.ForEach (Internal.SingleItemPartitioner.Create (FullSyncTriplets.GetConsumingEnumerable ()), options,
+            Parallel.ForEach (Internal.SingleItemPartitioner.Create (fullSyncTriplets.GetConsumingEnumerable ()), options,
                               (triplet) => ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, null)
                              );
 
@@ -190,7 +205,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             lock (disposeLock) {
                 if (!this.disposed) {
                     if (disposing) {
-                        FullSyncTriplets.Dispose();
+                        //FullSyncTriplets.Dispose();
                     }
                     this.disposed = true;
                 }

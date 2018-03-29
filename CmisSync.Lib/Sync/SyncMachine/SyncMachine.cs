@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Linq;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -32,6 +33,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         private ISession session;
 
+        private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null; //new BlockingCollection<SyncTriplet.SyncTriplet> ();
+
+        private BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null; //new BlockingCollection<SyncTriplet.SyncTriplet> ();
+
         private SemiSyncTripletManager semiSyncTripletManager;
 
         private SyncTripletAssembler syncTripletAssembler;
@@ -52,8 +57,46 @@ namespace CmisSync.Lib.Sync.SyncMachine
             // processor holds a concurrent triplet process queue
             this.syncTripletProcessor = new SyncTripletProcessor (cmisSyncFolder, session);
             // assembler read semi triplet from semi queue, assemble it with remote info, and push assembled triplet to process queue
-            this.syncTripletAssembler = new SyncTripletAssembler (cmisSyncFolder, session, syncTripletProcessor.FullSyncTriplets, semiSyncTripletManager.semiSyncTriplets);
+            this.syncTripletAssembler = new SyncTripletAssembler (cmisSyncFolder, session);
 
+        }
+
+        public void DoChangeLogTest() {
+            Config.CmisSyncConfig.Feature features = null;
+            if (ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name) != null)
+                features = ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name).SupportedFeatures;
+
+            int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  
+                (int)features.MaxNumberOfContentChanges : 50;
+
+            string lastTokenOnClient = cmisSyncFolder.Database.GetChangeLogToken ();
+            string lastTokenOnServer = CmisUtils.GetChangeLogToken (session);
+
+            if (lastTokenOnClient == lastTokenOnServer) {
+                Console.WriteLine ("  Synchronized ");
+                return;
+            }
+            if (lastTokenOnClient == null) {
+                Console.WriteLine ("  Should do full sync! Local token is null");
+                return;
+            }
+
+            var currentChangeToken = lastTokenOnClient;
+            IChangeEvents changes;
+            do {
+                Console.WriteLine (" Get changes for current token: {0}", currentChangeToken);
+
+                changes = session.GetContentChanges (currentChangeToken, cmisSyncFolder.CmisProfile.CmisProperties.IsPropertyChangesSupported, maxNumItems);
+                var changeEvents = changes.ChangeEventList./*Where (p => p != changes.ChangeEventList.FirstOrDefault ()).*/ToList ();
+                foreach (IChangeEvent changeEvent in changeEvents) {
+                    Console.WriteLine (" Get change : {0}, {1}", changeEvent.ObjectId, changeEvent.ChangeType);
+                }
+                currentChangeToken = changes.LatestChangeLogToken;
+                if (changes.HasMoreItems == true && (currentChangeToken == null || currentChangeToken.Length == 0)) {
+                    break;
+                }
+
+            } while (changes.HasMoreItems ?? false);
         }
 
 
@@ -63,16 +106,23 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
             lock (syncingLock) {
 
-                System.Console.WriteLine ("Start task: ");
+                System.Console.WriteLine ("Crawl Sync Task Start: ");
 
                 IsWorking = true;
 
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start ());
-                Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start ());
-                Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalCrawler ());
+                fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+                semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets));
+                Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start (semiSyncTriplets));
+                Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalCrawler (semiSyncTriplets, fullSyncTriplets));
 
                 semiManagerTask.Wait ();
+                semiSyncTriplets.CompleteAdding ();
+
                 tripletAssemblerTask.Wait ();
+                fullSyncTriplets.CompleteAdding ();
+
                 tripletProcessTask.Wait ();
 
 
@@ -91,6 +141,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 IsWorking = false;
             }
 
+            Console.WriteLine ("Crawl Sync Task Completed.");
             return succeed;
         }
 
@@ -99,19 +150,49 @@ namespace CmisSync.Lib.Sync.SyncMachine
             bool succeed = true;
 
             lock (syncingLock) {
-                IsWorking = true;
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start ());
-                try {
-                    Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog ());
 
+                System.Console.WriteLine ("Changelog Sync Task Start: ");
+
+                IsWorking = true;
+
+                fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets));
+                try {
+
+                    Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog (fullSyncTriplets));
                     tripletAssemblerTask.Wait ();
-                } catch (ChangeLogProcessorBreakException ex) {
-                    succeed = false; 
+
+                } catch (AggregateException ae) {
+                    foreach (var e in ae.InnerExceptions) {
+                        if (e is ChangeLogProcessorBrokenException) {
+                            Console.WriteLine ("Changelog Sync Task broke: {0}", e.Message);
+                            succeed = false;
+                        } else {
+                            succeed = false;
+                            throw;
+                        }
+                    }
                 }
+
+                fullSyncTriplets.CompleteAdding ();
+
                 tripletProcessTask.Wait ();
+
+                if (succeed) {
+                    try {
+                        String token = CmisUtils.GetChangeLogToken (session);
+                        Console.WriteLine ("Get server's changelog token {0}", token);
+                        cmisSyncFolder.Database.SetChangeLogToken (token);
+                    } catch (Exception e) {
+                        Console.WriteLine ("Get server's changelog token error: {0}", e.Message);
+                    }
+                }
+                
                 IsWorking = false;
             }
 
+            Console.WriteLine ("Changelog Sync Task Completed.");
             return succeed;
         }
 

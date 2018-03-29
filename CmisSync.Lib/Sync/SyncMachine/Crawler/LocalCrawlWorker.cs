@@ -54,10 +54,24 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 outputQueue.Add (semi);
             }
 
+            waitingSemi.Clear ();
         }
 
         public void StartFrom(String path) {
+
             CrawlFolder (path);
+
+            foreach (SyncTriplet.SyncTriplet semi in waitingSemi) {
+                outputQueue.Add (semi);
+            }
+
+            // the folder is not root, push it to process queue after all containing items are pushed.
+            SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (
+                path, this.cmisSyncFolder
+            );
+            outputQueue.Add (triplet);
+
+            waitingSemi.Clear ();
         }
 
         private void CrawlFolder(String folder) {

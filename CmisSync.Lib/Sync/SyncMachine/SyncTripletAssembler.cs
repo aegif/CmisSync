@@ -8,6 +8,7 @@ using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Sync;
 using CmisSync.Lib.Sync.SyncTriplet;
 using CmisSync.Lib.Sync.SyncMachine.Crawler;
+using CmisSync.Lib.Sync.SyncMachine.Exceptions;
 using CmisSync.Lib.Utilities.FileUtilities;
 
 using DotCMIS.Client;
@@ -37,24 +38,40 @@ namespace CmisSync.Lib.Sync.SyncMachine
         private Dictionary<String, bool> processedTriplets = new Dictionary<string, bool> ();
 
         public SyncTripletAssembler (CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
-                                     ISession session,
-                                     BlockingCollection<SyncTriplet.SyncTriplet> syncTriplets,
-                                     BlockingCollection<SyncTriplet.SyncTriplet> semiTriplets 
+                                     ISession session//,
+                                     //BlockingCollection<SyncTriplet.SyncTriplet> syncTriplets,
+                                     //BlockingCollection<SyncTriplet.SyncTriplet> semiTriplets 
                                     )
         {
             this.cmisSyncFolder = cmisSyncFolder;
             this.session = session;
+            /*
             this.fullSyncTriplets = syncTriplets;
             this.semiSyncTriplets = semiTriplets;
             this.remoteCrawlWorker = new RemoteCrawlWorker (cmisSyncFolder, session, remoteBuffer);
             this.changeLogProcessor = new ChangeLogProcessor (cmisSyncFolder, session, fullSyncTriplets);
+            */
         }
 
-        public void StartForChangeLog() {
+        public void StartForChangeLog(
+            BlockingCollection<SyncTriplet.SyncTriplet> full 
+        ) {
+            this.fullSyncTriplets = full;
+            this.changeLogProcessor = new ChangeLogProcessor (cmisSyncFolder, session, fullSyncTriplets);
+
             changeLogProcessor.Start ();
+
         }
 
-        public void StartForLocalCrawler() {
+        public void StartForLocalCrawler(
+            BlockingCollection<SyncTriplet.SyncTriplet> semi,
+            BlockingCollection<SyncTriplet.SyncTriplet> full 
+        ) {
+
+            this.semiSyncTriplets = semi;
+            this.fullSyncTriplets = full;
+
+            this.remoteCrawlWorker = new RemoteCrawlWorker (cmisSyncFolder, session, remoteBuffer);
 
             // Start remote crawler for assemble 
             Task remoteCrawlTask = Task.Factory.StartNew (() => remoteCrawlWorker.Start () );
@@ -132,10 +149,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
             // Clear the remote buffer after all objects are pushed to 
             // full synctriplet queue for the next syncing.
             remoteBuffer.Clear ();
-
-            // Info full sync triplets that adding process is completed.
-            fullSyncTriplets.CompleteAdding ();
-
         }
 
         ~SyncTripletAssembler ()

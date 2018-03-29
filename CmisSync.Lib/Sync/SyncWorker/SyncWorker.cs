@@ -12,6 +12,7 @@ using CmisSync.Lib.ActivityListener;
 using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync;
 using CmisSync.Lib.Sync.SyncMachine;
+using CmisSync.Lib.Sync.SyncMachine.Exceptions;
 using CmisSync.Lib.Cmis;
 
 using DotCMIS;
@@ -36,7 +37,7 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
         private IFolder remoteRootFolder;
 
-        private bool isFirstSyncing = true;
+        private bool isFirstSyncing = false;
 
         public SyncWorker (CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
@@ -69,11 +70,14 @@ namespace CmisSync.Lib.Sync.SyncWorker
         }
 
         public void DoSync() {
+
+            //syncMachine.DoChangeLogTest (); return;
+
             if (isFirstSyncing)
                 syncMachine.DoCrawlSync ();
             else {
-                bool succeed = syncMachine.DoChangeLogSync ();
-                if (!succeed) {
+                if (!syncMachine.DoChangeLogSync ()) {
+                    Console.WriteLine ("Change Log Processor return broken: {0}, do full craw sync");
                     syncMachine.DoCrawlSync ();
                 }
             }

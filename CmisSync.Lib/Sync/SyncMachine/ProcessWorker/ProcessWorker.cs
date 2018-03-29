@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections;
@@ -206,9 +207,26 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                 // Remote deleted, remove local.
                 if (triplet.IsFolder) {
                     // sub folder might be already removed due to parent folder has been removed
-                    if (triplet.LocalExist && !triplet.Delayed) WorkerOperations.DeleteLocalFolder (triplet, cmisSyncFolder);
-                    // use delayed property. if delayed, do not process it but move to delayed queue.
-                    if (triplet.LocalExist && triplet.Delayed) delayedFolderDeletions.Enqueue(triplet);
+                    if (triplet.LocalExist) {
+                        /* it is not clear whether this operation is thread safe
+                        if (Directory.EnumerateFileSystemEntries(triplet.LocalStorage.FullPath).Count() == 0) {
+                            WorkerOperations.DeleteLocalFolder (triplet, cmisSyncFolder); 
+                        }  else  {
+                            delayedFolderDeletions.Enqueue (triplet); 
+                        }
+                        */
+                        if (!triplet.Delayed) WorkerOperations.DeleteLocalFolder (triplet, cmisSyncFolder);
+                        else {
+                            /*bool contains = false;
+                            foreach (SyncTriplet.SyncTriplet trip in delayedFolderDeletions) {
+                                if (trip.Name == triplet.Name) {
+                                    contains = true;
+                                    break;
+                                }
+                            }
+                            if (!contains)*/ delayedFolderDeletions.Enqueue (triplet);
+                        }
+                    } 
                 } else {
                     WorkerOperations.DeleteLocalFile (triplet, cmisSyncFolder);
                 }

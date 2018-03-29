@@ -23,7 +23,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         //private static readonly ILog Logger = LogManager.GetLogger (typeof (SemiSyncTripletManager));
 
-        public BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+        public BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null; // = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder;
 
@@ -35,14 +35,15 @@ namespace CmisSync.Lib.Sync.SyncMachine
         {
             this.session = session;
             this.cmisSyncFolder = cmisSyncFolder;
-            this.localCrawlWorker = new LocalCrawlWorker (cmisSyncFolder, semiSyncTriplets);
         }
 
-        public void Start() {
+        public void Start(BlockingCollection<SyncTriplet.SyncTriplet> semi) {
+
+            this.semiSyncTriplets = semi;
+
+            this.localCrawlWorker = new LocalCrawlWorker (cmisSyncFolder, semiSyncTriplets);
+
             localCrawlWorker.Start ();
-            // complete adding will stop blockcollection foreach loop in 
-            // synctriplet assembler
-            semiSyncTriplets.CompleteAdding ();
         }
 
         ~SemiSyncTripletManager ()
@@ -62,8 +63,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
         {
             lock (disposeLock) {
                 if (!this.disposed) {
-                    if (disposing)
-                        this.semiSyncTriplets.Dispose ();
+                    if (disposing) {}
+                        //this.semiSyncTriplets.Dispose ();
                     this.disposed = true;
                 }
             }

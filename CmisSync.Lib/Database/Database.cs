@@ -1078,6 +1078,7 @@ namespace CmisSync.Lib.Database
         /// Gets the path from id
         /// string[0] = local
         /// string[1] = remote
+        /// string[2] = 'Folder' / 'Document'
         /// </summary>
         /// <returns>The path by identifier.</returns>
         /// <param name="id">Identifier.</param>
@@ -1087,10 +1088,11 @@ namespace CmisSync.Lib.Database
             parameters.Add ("id", id);
             var result = ExecuteOneRecordSQL ("SELECT path, localPath FROM files WHERE id=@id", parameters);
             if (result.Count () > 0) {
-                string [] res = new string [2];
+                string [] res = new string [3];
                 res [1] = (string)result ["path"];
                 object localPathObj = result ["localPath"];
                 res [0] = (localPathObj is DBNull) ? null : (string)localPathObj;
+                res [2] = "Document";
                 return res;
             } else {
                 var results = ExecuteMultiRecordSQL ("SELECT path , localPath FROM folders WHERE id=@id ORDER BY serverSideModificationDate DESC", parameters);
@@ -1098,7 +1100,7 @@ namespace CmisSync.Lib.Database
                 return results.Select (p => {
                     var localPath = p ["localPath"] as string;
                     var remotePath = p ["path"] as string;
-                    return new string [2] { localPath, remotePath };
+                    return new string [3] { localPath, remotePath, "Folder" };
                 }).ToList ().FirstOrDefault ();
             }
         }

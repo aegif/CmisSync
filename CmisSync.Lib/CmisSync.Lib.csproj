@@ -135,7 +135,7 @@
     <Compile Include="Utilities\FileUtilities\SyncFileUtil.cs" />
     <Compile Include="Sync\SyncMachine\Crawler\ChangeLogProcessor.cs" />
     <Compile Include="Sync\SyncWorker\SyncWorker.cs" />
-    <Compile Include="Sync\SyncMachine\Exceptions\ChangeLogProcessorBreakException.cs" />
+    <Compile Include="Sync\SyncMachine\Exceptions\ChangeLogProcessorBrokenException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">

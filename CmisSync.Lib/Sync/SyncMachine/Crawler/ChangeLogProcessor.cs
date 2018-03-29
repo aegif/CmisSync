@@ -1,17 +1,21 @@
 ﻿#pragma warning disable 0414, 0219
 using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 using CmisSync.Lib.Config;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Sync.SyncTriplet;
+using CmisSync.Lib.Sync.SyncMachine.Crawler;
 using CmisSync.Lib.Sync.SyncMachine.Exceptions;
 
 using log4net;
 using DotCMIS;
 using DotCMIS.Client;
 using DotCMIS.Enums;
+using DotCMIS.Exceptions;
 
 namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 {
@@ -73,16 +77,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             IChangeEvents changes;
             do {
                 Console.WriteLine (" Get changes for current token: {0}", currentChangeToken);
+
                 // Check which documents/folders have changed.
                 changes = session.GetContentChanges (currentChangeToken, cmisSyncFolder.CmisProfile.CmisProperties.IsPropertyChangesSupported, maxNumItems);
 
                 /*
-                 * Changelogtoken's first item is the change caused by lastest
-                 * recorded change-log-token in our database. Since getContentChanges
-                 * will get changes from CurrentChangeToken, it must be duplicated.
-                 * Therefore one should remove it.
-                 * 
-                 * Due to latest report in master branch: single rename will not duplicate.
+                 * Due to latest report in the master branch: single rename will not duplicate.
                  */
                 var changeEvents = changes.ChangeEventList./*Where (p => p != changes.ChangeEventList.FirstOrDefault ()).*/ToList ();
 
@@ -113,7 +113,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
             // processs change logs
             foreach (string objId in changeBuffer.Keys) {
+                
                 ChangeType? action = changeBuffer [objId].Last ();
+
+                /*for some old version of alfresco, ObjectId of changeEvent would be /RemotePath/ + Id, remove it*/
                 string remoteId = objId.Split (CmisUtils.CMIS_FILE_SEPARATOR).Last ();
                 try {
                     Console.WriteLine ("  Getting remote object, last type: {0}, id = {1}", action, objId);
@@ -124,16 +127,25 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     // thus it should be buffered for parallel process
                     if (action == ChangeType.Updated) {
                         // do full sync
+                        throw new ChangeLogProcessorBrokenException (String.Format(" UPDATE detected, id = {0}, name = {1}", obj.Id, obj.Name));
                     }
 
+                    SyncTriplet.SyncTriplet triplet = null;
                     if (obj is IFolder) {
-                        IFolder remoteFolder = (IFolder)obj;
-                        Console.WriteLine ("  -- {0} is Folder, id = {1}", ((IFolder)obj).Path, ((IFolder)obj).Id);
+                        triplet = SyncTripletFactory.CreateFromRemoteFolder ((IFolder)obj, cmisSyncFolder);
+                        Console.WriteLine ("  -- {0} is Folder, id = {1}, action = {2}", ((IFolder)obj).Path, ((IFolder)obj).Id, action);
+
                     } else if (obj is IDocument) {
+                        triplet = SyncTripletFactory.CreateFromRemoteDocument ((IDocument)obj, cmisSyncFolder);
                         Console.WriteLine ("  -- {0} is Document, id = {1}", ((IDocument)obj).Name, ((IDocument)obj).Id);
                     }
 
-                } catch (Exception e) {
+                    if (!fullSyncTriplets.TryAdd (triplet)) {
+                        Console.WriteLine ("Add folder triplet to full synctriplet queue failed: " + obj.Name);
+                        Logger.Error ("Add folder triplet to full synctriplet queue failed: " + obj.Name);
+                    }
+
+                } catch (CmisObjectNotFoundException ex) { /* should be CmisObjectNotFoundExcepiton, not Exception, otherwise previous ChangeLogProcessorBroken will be caught */
 
                     // If it is deletion, execute sync
                     // due to all non-deletion not-found remote object will
@@ -144,8 +156,32 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                         string localpath = dbpath == null ? null : dbpath [0];
 
                         if (localpath != null) {
-                            Console.WriteLine ("  --  {1} event: {0}", action, localpath);
-                            
+                            string localFullPath = Path.Combine (cmisSyncFolder.LocalPath, localpath);
+                            Console.WriteLine ("  --  {1} event: {0}", action, localFullPath);
+                            if (dbpath[2].Equals("Folder")) {
+                                Console.WriteLine ("  -- Delete folder work: {0}", localFullPath);
+
+                                /*
+                                 * If changelog will give out all change event in the removed folder,
+                                 * it is not necessary to traverse the local dictionary.
+                                 * It is also not necessary to check duplication in delayedFolderDeletion 
+                                 * concurrent queue in TripletProcessor.
+                                if (!FolderDeleteEventHandler (localFullPath, cmisSyncFolder)) {
+                                    throw new ChangeLogProcessorBrokenException ("Folder Deletion Failed.");
+                                }*/
+
+                                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (localFullPath, cmisSyncFolder);
+                                if (!fullSyncTriplets.TryAdd (triplet)) {
+                                    Console.WriteLine ("Add folder deletion triplet to full synctriplet queue failed! {0}", localFullPath);
+                                }
+                            } else {
+                                Console.WriteLine ("  -- Delete file work: {0}", localFullPath);
+
+                                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalDocument (localFullPath, cmisSyncFolder);
+                                if (!fullSyncTriplets.TryAdd(triplet)) {
+                                    Console.WriteLine ("Add file deletion triplet to full synctriplet queue failed! {0}", localFullPath);
+                                }
+                            }
 
                         } else {
                             Console.WriteLine ("  -- {0} not found in DB, ignore", objId);
@@ -157,7 +193,16 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             }
         }
 
-        private bool FolderDeleteEvent(IFolder remoteFolder, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
+        private bool FolderDeleteEventHandler(string localFullPath, CmisSyncFolder.CmisSyncFolder syncFolder) {
+
+            LocalCrawlWorker folderDeletionWorker = new LocalCrawlWorker (syncFolder, fullSyncTriplets);
+
+            try {
+                folderDeletionWorker.StartFrom (localFullPath);
+            } catch (Exception ex) {
+                Console.WriteLine ("Folder deletion failed: {0}: {1}", localFullPath, ex.Message);
+                return false;
+            }
 
             return true; 
         }

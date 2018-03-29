@@ -47,7 +47,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
             string localFolder = OperationUtils.GetLocalFullPath (triplet, cmisSyncFolder);
 
             try {
-                IFolder remoteFolder = (IFolder)session.GetObjectByPath (Utils.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), false);
+                // Must be CmisFileUtil.PathCombine
+                IFolder remoteFolder = (IFolder)session.GetObjectByPath (CmisFileUtil.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), false);
 
                 Directory.CreateDirectory (localFolder);
 
@@ -68,12 +69,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 Console.WriteLine ("  %% download folder failed, {0} : {1}",  
                                    Utils.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), e.Message);
 
-                try {
-                    IFolder test = (IFolder)session.GetObjectByPath (" /Sites/cmis-sync-test/documentLibrary/test-folder-2/t-f-new", false);
-                } catch (Exception ex) {
-                    Console.WriteLine
-                           (" Fail again!");
-                }
                 return false;
             }
 
@@ -171,7 +166,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 }
 
                 Logger.Debug (String.Format ("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
+
                 // Remove the ".sync" suffix.
+                if (File.Exists(filePath)) {
+                    Utils.DeleteEvenIfReadOnly (filePath);    
+                }
                 File.Move (tmpFilePath, filePath);
                 success &= OperationUtils.SetLastModifiedDate (remoteDocument, filePath, metadata);
 
@@ -532,7 +531,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                         containsConflict = true;
                         break;
                     }
-
                 }
 
                 if (containsConflict) {
@@ -553,25 +551,19 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
 
                         }
                     }
+                } else {
+                    Logger.Info ("Removing remotely deleted folder: " + localFullPath);
+                    Directory.Delete (localFullPath, true);
                 }
-                
 
                 RemoveDbRecord (triplet, cmisSyncFolder);
 
                 return true;
 
-                Logger.Info ("Removing remotely deleted folder: " + localFullPath);
-                Directory.Delete (localFullPath, true);
             } catch (Exception e) {
+                Console.WriteLine ("  %% Delete local folder: {0} failed: {1}", triplet.Name, e.Message);
                 return false;
             }
-
-            // Delete folder from database.
-            if (!Directory.Exists (localFullPath)) {
-                cmisSyncFolder.Database.RemoveFolder (triplet);
-            }
-
-            return true;
         }
 
         public static bool SolveConflict(SyncTriplet.SyncTriplet triplet,  CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
