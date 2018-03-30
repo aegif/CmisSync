@@ -69,6 +69,10 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
         }
 
+        public void Disconnect () {
+            session = null;
+        }
+
         public void DoSync() {
 
             //syncMachine.DoChangeLogTest (); return;

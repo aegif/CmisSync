@@ -54,7 +54,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.cmisSyncFolder = cmisSyncFolder;
             this.session = session;
 
-
             // semisynctriplet manager holds a concurrent semi triplet queue
             this.semiSyncTripletManager = new SemiSyncTripletManager (cmisSyncFolder, session);
             // processor holds a concurrent triplet process queue
@@ -62,6 +61,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             // assembler read semi triplet from semi queue, assemble it with remote info, and push assembled triplet to process queue
             this.syncTripletAssembler = new SyncTripletAssembler (cmisSyncFolder, session);
 
+            // TODO: watcher for test
         }
 
         public bool DoCrawlSync ()

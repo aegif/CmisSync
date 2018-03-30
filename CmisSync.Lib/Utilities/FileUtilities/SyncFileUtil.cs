@@ -367,6 +367,24 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             // In other case, the change is probably applicable.
             return true;
         }
- 
+
+
+        /// <summary>
+        /// Is the remote object worth syncing.
+        /// </summary>
+        /// <returns><c>true</c>, if remote object worth syncing was ised, <c>false</c> otherwise.</returns>
+        /// <param name="obj">Object.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static bool IsRemoteObjectInCmisSyncPath (ICmisObject obj, CmisSyncFolder cmisSyncFolder)
+        {
+            if (obj is IFolder) {
+                if (((IFolder)obj).Path.StartsWith (cmisSyncFolder.RemotePath)) return true;
+            } else if (obj is IDocument) {
+                string path = SyncFileUtil.GetApplicablePath ((IDocument)obj, cmisSyncFolder);
+                if (path != null && path.StartsWith (cmisSyncFolder.RemotePath)) return true;
+            }
+            return false; 
+        }
+
     }
 }

@@ -10,6 +10,7 @@ using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Sync.SyncTriplet;
 using CmisSync.Lib.Sync.SyncMachine.Crawler;
 using CmisSync.Lib.Sync.SyncMachine.Exceptions;
+using CmisSync.Lib.Utilities.FileUtilities;
 
 using log4net;
 using DotCMIS;
@@ -140,6 +141,15 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                     ICmisObject obj = session.GetObject ( remoteId, false);
 
+                    /*
+                     * for some cmis eg: old alfresco, get changelog token for one repository will
+                     * return all changelog tokens. Check if they are worth syncing here.
+                     *   - SyncFileUtil: their path starts with CmisSyncFolder.RemotePath
+                     *   - CmisFileUtil: their name contain no slashes
+                     */
+                    if (!SyncFileUtil.IsRemoteObjectInCmisSyncPath (obj, cmisSyncFolder) ||
+                        !CmisFileUtil.RemoteObjectWorthSyncing (obj)) continue;
+
                     // if this line is called, there must be a remote object, therefore the changetype must be created, updated (or security)
                     // thus it should be buffered for parallel process
                     if (action == ChangeType.Updated) {
@@ -149,6 +159,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                     SyncTriplet.SyncTriplet triplet = null;
                     if (obj is IFolder) {
+
                         triplet = SyncTripletFactory.CreateFromRemoteFolder ((IFolder)obj, cmisSyncFolder);
                         Console.WriteLine ("  -- {0} is Folder, id = {1}, action = {2}", ((IFolder)obj).Path, ((IFolder)obj).Id, action);
 

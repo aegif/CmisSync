@@ -1,12 +1,17 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Utilities/FileUtilities/CmisFileUtil.cs">
     <Files>
       <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/WatcherStrategy.cs" Line="36" Column="25" />
       <File FileName="../../CmisSync.Lib/Sync/SyncRepo/RepoBase.cs" Line="208" Column="43" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="184" Column="58" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="126" Column="106" />
       <File FileName="../../CmisSync.Lib/Sync/CmisSyncFolder/CmisSyncFolder.cs" Line="63" Column="30" />
       <File FileName="../../CmisSync.ConsoleUnderDev/CmisSyncOnceUnderDev.cs" Line="69" Column="13" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="83" Column="49" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="62" Column="37" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" Line="150" Column="63" />
+      <File FileName="../../CmisSync.Lib/Utilities/FileUtilities/SyncFileUtil.cs" Line="373" Column="15" />
+      <File FileName="../../CmisSync.Lib/Utilities/FileUtilities/CmisFileUtil.cs" Line="55" Column="28" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -24,7 +29,6 @@
                   <Node name="ProcessWorker" expanded="True">
                     <Node name="Internal" expanded="True" />
                   </Node>
-                  <Node name="SyncMachine.cs" selected="True" />
                 </Node>
                 <Node name="SyncRepo" expanded="True" />
                 <Node name="SyncTriplet" expanded="True">
@@ -33,7 +37,9 @@
                 <Node name="SyncWorker" expanded="True" />
               </Node>
               <Node name="Utilities" expanded="True">
-                <Node name="FileUtilities" expanded="True" />
+                <Node name="FileUtilities" expanded="True">
+                  <Node name="CmisFileUtil.cs" selected="True" />
+                </Node>
               </Node>
             </Node>
           </Node>
