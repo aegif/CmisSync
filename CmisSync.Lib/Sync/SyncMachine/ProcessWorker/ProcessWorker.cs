@@ -177,28 +177,29 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
 
 // ======================================== old approaches ==================================================================
-        public static void Process(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, 
+        public static bool Process(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, 
                                    ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolderDeletions ) {
 
-            Reducer (triplet, session, cmisSyncFolder, delayedFolderDeletions);
+            return Reducer (triplet, session, cmisSyncFolder, delayedFolderDeletions);
         }
 
-        public static void Reducer(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, 
+        public static bool Reducer(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, 
                                    ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolderDeletions){
 
             if (triplet.LocalEqDB && triplet.RemoteEqDB) {
                 Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1} is syncrhonized!\n",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
+                return true;
             } else if (triplet.LocalEqDB && !triplet.RemoteEqDB) {
-                SyncRemoteToLocal (triplet, session, cmisSyncFolder, delayedFolderDeletions);
+                return SyncRemoteToLocal (triplet, session, cmisSyncFolder, delayedFolderDeletions);
             } else if (!triplet.LocalEqDB && triplet.RemoteEqDB) {
-                SyncLocalToRemote (triplet, session, cmisSyncFolder, delayedFolderDeletions);
+                return SyncLocalToRemote (triplet, session, cmisSyncFolder, delayedFolderDeletions);
             } else {
-                SolveConflictAndSync (triplet, session, cmisSyncFolder, delayedFolderDeletions);
+                return SolveConflictAndSync (triplet, session, cmisSyncFolder, delayedFolderDeletions);
             }
         }
 
-        public static void SyncRemoteToLocal(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
+        public static bool SyncRemoteToLocal(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
                                              ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolderDeletions) {
             if (!triplet.RemoteExist) {
                 Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: remote removed! delete local!\n",
@@ -215,7 +216,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                             delayedFolderDeletions.Enqueue (triplet); 
                         }
                         */
-                        if (!triplet.Delayed) WorkerOperations.DeleteLocalFolder (triplet, cmisSyncFolder);
+                        if (!triplet.Delayed) return WorkerOperations.DeleteLocalFolder (triplet, cmisSyncFolder);
                         else {
                             /*bool contains = false;
                             foreach (SyncTriplet.SyncTriplet trip in delayedFolderDeletions) {
@@ -225,10 +226,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                                 }
                             }
                             if (!contains)*/ delayedFolderDeletions.Enqueue (triplet);
+                            return true;
                         }
                     } 
                 } else {
-                    WorkerOperations.DeleteLocalFile (triplet, cmisSyncFolder);
+                    return WorkerOperations.DeleteLocalFile (triplet, cmisSyncFolder);
                 }
 
 
@@ -238,14 +240,15 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
                 // Remote new, download
                 if (triplet.IsFolder) {
-                    if (!triplet.LocalExist) WorkerOperations.CreateLocalFolder (triplet, session, cmisSyncFolder);
+                    if (!triplet.LocalExist) return WorkerOperations.CreateLocalFolder (triplet, session, cmisSyncFolder);
                 } else {
-                    WorkerOperations.DownloadFile (triplet, session, cmisSyncFolder);
+                    return WorkerOperations.DownloadFile (triplet, session, cmisSyncFolder);
                 }
             }
+            return true;
         }
 
-        public static void SyncLocalToRemote(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
+        public static bool SyncLocalToRemote(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
                                              ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolderDeletions) {
 
             if (cmisSyncFolder.BIDIRECTIONAL) {
@@ -255,12 +258,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
                     // Local Exist, upload to remote
                     if (triplet.IsFolder) {
-                        if (!triplet.RemoteExist) WorkerOperations.CreateRemoteFolder (triplet, session, cmisSyncFolder);
+                        if (!triplet.RemoteExist) return WorkerOperations.CreateRemoteFolder (triplet, session, cmisSyncFolder);
                     } else {
                         if (triplet.RemoteExist) {
-                            WorkerOperations.UpdateRemoteFile (triplet, session, cmisSyncFolder);
+                            return WorkerOperations.UpdateRemoteFile (triplet, session, cmisSyncFolder);
                         } else {
-                            WorkerOperations.UploadFile (triplet, session, cmisSyncFolder);
+                            return WorkerOperations.UploadFile (triplet, session, cmisSyncFolder);
                         }
                     }
 
@@ -274,34 +277,37 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                         // add delayed property 
                         if (triplet.Delayed) {
                             delayedFolderDeletions.Enqueue(triplet);
+                            return true;
                         } else {
-                            WorkerOperations.DeleteRemoteFolder (triplet, session, cmisSyncFolder);
+                            return WorkerOperations.DeleteRemoteFolder (triplet, session, cmisSyncFolder);
                         }
                     } else {
-                        WorkerOperations.DeleteRemoteFile (triplet, session, cmisSyncFolder);
+                        return WorkerOperations.DeleteRemoteFile (triplet, session, cmisSyncFolder);
                     }
                 }
                     
             }  else {
                 Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: not BIDIRECTIONAL, do not upload local to remote\n",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
+                return true;
             }
+            return true;
         }
 
-        public static void SolveConflictAndSync(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
+        public static bool SolveConflictAndSync(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
                                                 ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolderDeletions) {
 
             // If LS=ne , DB=e, RS=ne: 
             // both removed, clear DB record only
             if (!triplet.LocalExist && !triplet.RemoteExist) {
-                WorkerOperations.RemoveDbRecord (triplet, cmisSyncFolder);
+                return WorkerOperations.RemoveDbRecord (triplet, cmisSyncFolder);
             } else {
                 Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file\n",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 WorkerOperations.SolveConflict (triplet, cmisSyncFolder);
 
-                SyncRemoteToLocal (triplet, session, cmisSyncFolder, delayedFolderDeletions);
+                return SyncRemoteToLocal (triplet, session, cmisSyncFolder, delayedFolderDeletions);
             }
         }
     }

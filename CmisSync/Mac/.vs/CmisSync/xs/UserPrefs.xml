@@ -1,33 +1,34 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncTriplet/SyncTripletFactory.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" Line="155" Column="78" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="92" Column="208" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="1" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="75" Column="13" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="84" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs" Line="1" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="56" Column="21" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SemiSyncTripletManager.cs" Line="1" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/SyncTripletFactory.cs" Line="83" Column="36" />
+      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/WatcherStrategy.cs" Line="36" Column="25" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncRepo/RepoBase.cs" Line="208" Column="43" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="184" Column="58" />
+      <File FileName="../../CmisSync.Lib/Sync/CmisSyncFolder/CmisSyncFolder.cs" Line="63" Column="30" />
+      <File FileName="../../CmisSync.ConsoleUnderDev/CmisSyncOnceUnderDev.cs" Line="69" Column="13" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CmisSync" expanded="True">
+            <Node name="CmisSync.ConsoleUnderDev" expanded="True" />
             <Node name="CmisSync.Lib" expanded="True">
+              <Node name="Cmis" expanded="True" />
+              <Node name="Config" expanded="True" />
               <Node name="Sync" expanded="True">
                 <Node name="CmisSyncFolder" expanded="True" />
+                <Node name="SynchronizedFolder" expanded="True" />
                 <Node name="SyncMachine" expanded="True">
                   <Node name="Crawler" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
                     <Node name="Internal" expanded="True" />
                   </Node>
+                  <Node name="SyncMachine.cs" selected="True" />
                 </Node>
+                <Node name="SyncRepo" expanded="True" />
                 <Node name="SyncTriplet" expanded="True">
                   <Node name="TripletItem" expanded="True" />
-                  <Node name="SyncTripletFactory.cs" selected="True" />
                 </Node>
                 <Node name="SyncWorker" expanded="True" />
               </Node>
@@ -50,9 +51,7 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Mac Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/minwu-aegif/CmisSyncSourceCodes/CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" line="155" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.ItemProperties.CmisSync.Console PreferredExecutionTarget="MonoDevelop.Default" />

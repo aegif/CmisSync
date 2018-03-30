@@ -43,6 +43,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         private SyncTripletProcessor syncTripletProcessor;
 
+        private Watcher watcher = null;
+
         private object syncingLock = new object();
 
         public bool IsWorking = false;
@@ -52,6 +54,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.cmisSyncFolder = cmisSyncFolder;
             this.session = session;
 
+
             // semisynctriplet manager holds a concurrent semi triplet queue
             this.semiSyncTripletManager = new SemiSyncTripletManager (cmisSyncFolder, session);
             // processor holds a concurrent triplet process queue
@@ -60,45 +63,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.syncTripletAssembler = new SyncTripletAssembler (cmisSyncFolder, session);
 
         }
-
-        public void DoChangeLogTest() {
-            Config.CmisSyncConfig.Feature features = null;
-            if (ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name) != null)
-                features = ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name).SupportedFeatures;
-
-            int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?  
-                (int)features.MaxNumberOfContentChanges : 50;
-
-            string lastTokenOnClient = cmisSyncFolder.Database.GetChangeLogToken ();
-            string lastTokenOnServer = CmisUtils.GetChangeLogToken (session);
-
-            if (lastTokenOnClient == lastTokenOnServer) {
-                Console.WriteLine ("  Synchronized ");
-                return;
-            }
-            if (lastTokenOnClient == null) {
-                Console.WriteLine ("  Should do full sync! Local token is null");
-                return;
-            }
-
-            var currentChangeToken = lastTokenOnClient;
-            IChangeEvents changes;
-            do {
-                Console.WriteLine (" Get changes for current token: {0}", currentChangeToken);
-
-                changes = session.GetContentChanges (currentChangeToken, cmisSyncFolder.CmisProfile.CmisProperties.IsPropertyChangesSupported, maxNumItems);
-                var changeEvents = changes.ChangeEventList./*Where (p => p != changes.ChangeEventList.FirstOrDefault ()).*/ToList ();
-                foreach (IChangeEvent changeEvent in changeEvents) {
-                    Console.WriteLine (" Get change : {0}, {1} at [{2}]({3})", changeEvent.ObjectId, changeEvent.ChangeType, changeEvent.ChangeTime.ToString(), ((DateTime)changeEvent.ChangeTime).ToFileTime());
-                }
-                currentChangeToken = changes.LatestChangeLogToken;
-                if (changes.HasMoreItems == true && (currentChangeToken == null || currentChangeToken.Length == 0)) {
-                    break;
-                }
-
-            } while (changes.HasMoreItems ?? false);
-        }
-
 
         public bool DoCrawlSync ()
         {
@@ -124,7 +88,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 fullSyncTriplets.CompleteAdding ();
 
                 tripletProcessTask.Wait ();
-
 
                 if (cmisSyncFolder.CmisProfile.CmisProperties.ChangeLogCapability) {
                     try {
@@ -214,6 +177,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
             lock (disposeLock) {
                 if (!this.disposed) {
                     if (disposing) {
+                        this.fullSyncTriplets.Dispose ();
+                        this.semiSyncTriplets.Dispose ();
                         this.semiSyncTripletManager.Dispose ();
                         this.syncTripletAssembler.Dispose ();
                         this.syncTripletProcessor.Dispose ();
@@ -221,6 +186,45 @@ namespace CmisSync.Lib.Sync.SyncMachine
                     this.disposed = true;
                 }
             }
+        }
+
+        public void DoChangeLogTest ()
+        {
+            Config.CmisSyncConfig.Feature features = null;
+            if (ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name) != null)
+                features = ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name).SupportedFeatures;
+
+            int maxNumItems = (features != null && features.MaxNumberOfContentChanges != null) ?
+                (int)features.MaxNumberOfContentChanges : 50;
+
+            string lastTokenOnClient = cmisSyncFolder.Database.GetChangeLogToken ();
+            string lastTokenOnServer = CmisUtils.GetChangeLogToken (session);
+
+            if (lastTokenOnClient == lastTokenOnServer) {
+                Console.WriteLine ("  Synchronized ");
+                return;
+            }
+            if (lastTokenOnClient == null) {
+                Console.WriteLine ("  Should do full sync! Local token is null");
+                return;
+            }
+
+            var currentChangeToken = lastTokenOnClient;
+            IChangeEvents changes;
+            do {
+                Console.WriteLine (" Get changes for current token: {0}", currentChangeToken);
+
+                changes = session.GetContentChanges (currentChangeToken, cmisSyncFolder.CmisProfile.CmisProperties.IsPropertyChangesSupported, maxNumItems);
+                var changeEvents = changes.ChangeEventList./*Where (p => p != changes.ChangeEventList.FirstOrDefault ()).*/ToList ();
+                foreach (IChangeEvent changeEvent in changeEvents) {
+                    Console.WriteLine (" Get change : {0}, {1} at [{2}]({3})", changeEvent.ObjectId, changeEvent.ChangeType, changeEvent.ChangeTime.ToString (), ((DateTime)changeEvent.ChangeTime).ToFileTime ());
+                }
+                currentChangeToken = changes.LatestChangeLogToken;
+                if (changes.HasMoreItems == true && (currentChangeToken == null || currentChangeToken.Length == 0)) {
+                    break;
+                }
+
+            } while (changes.HasMoreItems ?? false);
         }
     }
 }

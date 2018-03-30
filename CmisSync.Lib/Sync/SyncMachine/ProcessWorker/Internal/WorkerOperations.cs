@@ -453,7 +453,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
         /// <summary>
         /// Delete the folder from the remote server.
         /// </summary>
-        public static void DeleteRemoteFolder (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static bool DeleteRemoteFolder (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             try {
                 IFolder folder = (IFolder)session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
@@ -468,7 +468,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     // Delete the folder from database.
                     RemoveDbRecord (triplet, cmisSyncFolder);
 
-                    return;
+                    return true;
                 }
 
                 Logger.Debug ("Removing remote folder tree: " + triplet.RemoteStorage.RelativePath);
@@ -493,7 +493,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 cmisSyncFolder.Database.RemoveFolder (triplet);
             } catch(Exception e) {
                 Console.WriteLine ("  %% delete remote folder failed, " + e.Message);
+                return false;
             }
+
+            return true;
         }
 
 
