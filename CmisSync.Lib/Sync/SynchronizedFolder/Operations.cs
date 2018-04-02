@@ -19,7 +19,7 @@ using CmisSync.Lib.ActivityListener;
 using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync.SyncRepo;
 using CmisSync.Lib.Utilities.PathConverter;
-using CmisSync.Lib.Utilities.UserNotificationListener;
+using CmisSync.Lib.UserNotificationListener;
 using CmisSync.Lib.Sync.SynchronizeItem;
 
 

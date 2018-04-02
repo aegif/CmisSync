@@ -12,7 +12,7 @@ using log4net;
 using CmisSync.Auth;
 using CmisSync.Lib.Config;
 using CmisSync.Lib.Utilities.PathConverter;
-using CmisSync.Lib.Utilities.UserNotificationListener;
+using CmisSync.Lib.UserNotificationListener;
 
 namespace CmisSync.Lib.Database
 {

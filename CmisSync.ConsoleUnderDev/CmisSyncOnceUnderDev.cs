@@ -65,6 +65,7 @@ namespace CmisSync.ConsoleUnderDev
                 SyncWorker syncWorker = new SyncWorker(cmisSyncFolder);
                 syncWorker.Initialize();
                 syncWorker.DoSync();
+                syncWorker.Disconnect();
             }
 
             return success;

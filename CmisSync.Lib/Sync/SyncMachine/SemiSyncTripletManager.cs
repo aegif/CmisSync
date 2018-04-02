@@ -23,7 +23,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         //private static readonly ILog Logger = LogManager.GetLogger (typeof (SemiSyncTripletManager));
 
-        public BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null; // = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+        private BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null; 
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder;
 

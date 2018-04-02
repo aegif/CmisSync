@@ -70,12 +70,16 @@ namespace CmisSync.Lib.Sync.SyncWorker
         }
 
         public void Disconnect () {
-            session = null;
+            session.Clear ();
         }
 
         public void DoSync() {
 
+            //syncMachine.DoWatcherTest ();
+
             //syncMachine.DoChangeLogTest (); return;
+
+            isFirstSyncing = true;
 
             if (isFirstSyncing)
                 syncMachine.DoCrawlSync ();

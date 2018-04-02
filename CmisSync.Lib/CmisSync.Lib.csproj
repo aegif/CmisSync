@@ -101,8 +101,6 @@
     <Compile Include="Utilities\PathConverter\DefaultPathRepresentationConverter.cs" />
     <Compile Include="Utilities\PathConverter\PathRepresentationConverterUtil.cs" />
     <Compile Include="Utilities\PathConverter\WindowsPathRepresentationConverter.cs" />
-    <Compile Include="Utilities\UserNotificationListener\IUserNotificationListener.cs" />
-    <Compile Include="Utilities\UserNotificationListener\UserNotificationListenerUtil.cs" />
     <Compile Include="Utilities\FileUtilities\CheckSumUtil.cs" />
     <Compile Include="Sync\SyncTriplet\TripletItem\LocalStorageItem.cs" />
     <Compile Include="Sync\SyncTriplet\TripletItem\RemoteStorageItem.cs" />
@@ -136,6 +134,9 @@
     <Compile Include="Sync\SyncMachine\Crawler\ChangeLogProcessor.cs" />
     <Compile Include="Sync\SyncWorker\SyncWorker.cs" />
     <Compile Include="Sync\SyncMachine\Exceptions\ChangeLogProcessorBrokenException.cs" />
+    <Compile Include="UserNotificationListener\IUserNotificationListener.cs" />
+    <Compile Include="UserNotificationListener\UserNotificationListenerUtil.cs" />
+    <Compile Include="Sync\SyncMachine\Crawler\LocalWatcherProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">
@@ -160,7 +161,6 @@
     <Folder Include="Sync\SyncTriplet\TripletItem\" />
     <Folder Include="Utilities\" />
     <Folder Include="Utilities\PathConverter\" />
-    <Folder Include="Utilities\UserNotificationListener\" />
     <Folder Include="Utilities\FileUtilities\" />
     <Folder Include="Sync\SyncRepo\" />
     <Folder Include="ActivityListener\" />
@@ -174,6 +174,7 @@
     <Folder Include="Sync\SyncMachine\ProcessWorker\Internal\" />
     <Folder Include="Sync\SyncWorker\" />
     <Folder Include="Sync\SyncMachine\Exceptions\" />
+    <Folder Include="UserNotificationListener\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -1,46 +1,35 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Utilities/FileUtilities/CmisFileUtil.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/WatcherStrategy.cs" Line="36" Column="25" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncRepo/RepoBase.cs" Line="208" Column="43" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="126" Column="106" />
-      <File FileName="../../CmisSync.Lib/Sync/CmisSyncFolder/CmisSyncFolder.cs" Line="63" Column="30" />
-      <File FileName="../../CmisSync.ConsoleUnderDev/CmisSyncOnceUnderDev.cs" Line="69" Column="13" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="83" Column="49" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="62" Column="37" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" Line="150" Column="63" />
-      <File FileName="../../CmisSync.Lib/Utilities/FileUtilities/SyncFileUtil.cs" Line="373" Column="15" />
-      <File FileName="../../CmisSync.Lib/Utilities/FileUtilities/CmisFileUtil.cs" Line="55" Column="28" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="235" Column="13" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncRepo/RepoBase.cs" Line="268" Column="39" />
+      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/SynchronizedFolder.cs" Line="433" Column="46" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="85" Column="40" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs" Line="44" Column="51" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="147" Column="17" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="182" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SemiSyncTripletManager.cs" Line="26" Column="17" />
+      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/CrawlStrategy.cs" Line="241" Column="25" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CmisSync" expanded="True">
+            <Node name="CmisSync.Console" expanded="True" />
             <Node name="CmisSync.ConsoleUnderDev" expanded="True" />
             <Node name="CmisSync.Lib" expanded="True">
-              <Node name="Cmis" expanded="True" />
-              <Node name="Config" expanded="True" />
+              <Node name="Database" expanded="True" />
               <Node name="Sync" expanded="True">
-                <Node name="CmisSyncFolder" expanded="True" />
                 <Node name="SynchronizedFolder" expanded="True" />
                 <Node name="SyncMachine" expanded="True">
                   <Node name="Crawler" expanded="True" />
-                  <Node name="ProcessWorker" expanded="True">
-                    <Node name="Internal" expanded="True" />
-                  </Node>
-                </Node>
-                <Node name="SyncRepo" expanded="True" />
-                <Node name="SyncTriplet" expanded="True">
-                  <Node name="TripletItem" expanded="True" />
+                  <Node name="SyncMachine.cs" selected="True" />
                 </Node>
                 <Node name="SyncWorker" expanded="True" />
               </Node>
-              <Node name="Utilities" expanded="True">
-                <Node name="FileUtilities" expanded="True">
-                  <Node name="CmisFileUtil.cs" selected="True" />
-                </Node>
-              </Node>
+              <Node name="UserNotificationListener" expanded="True" />
+              <Node name="Utilities" expanded="True" />
             </Node>
           </Node>
         </State>

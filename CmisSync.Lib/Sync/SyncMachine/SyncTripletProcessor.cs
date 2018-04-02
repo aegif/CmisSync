@@ -28,7 +28,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
          * Buzy wait with sleep?
          * 
          */
-        private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null; //new BlockingCollection<SyncTriplet.SyncTriplet>();
+        private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null; 
 
         private ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolerDeletions = new ConcurrentQueue<SyncTriplet.SyncTriplet> ();
 
@@ -71,14 +71,13 @@ namespace CmisSync.Lib.Sync.SyncMachine
             // One-by-One non-parallel approach yet
             List<SyncTriplet.SyncTriplet> folderDeletionList = delayedFolerDeletions.ToList();
 
-            ConcurrentDictionary<string, SyncTriplet.SyncTriplet> mmm = new ConcurrentDictionary<string, SyncTriplet.SyncTriplet> ();
-
             // Lexicographical order
             // Therefore if there are files remained in the repository, eg. local removed but remote modified, vise versa
             // the corresponding folder will be remained. 
             folderDeletionList.Sort (new FolderLexicoGraphicalComparer ());
 
             /*
+             * use parallel deletion instead
             foreach(SyncTriplet.SyncTriplet triplet in  folderDeletionList) {
                 // unset delayed
                 triplet.Delayed = false;
@@ -181,11 +180,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
             } 
         }
 
-        /*
-        public void StartDelayedFolderDeletion () {
-           // Process folder-deletion operations 
-        }
-        */
 
         ~SyncTripletProcessor ()
         {

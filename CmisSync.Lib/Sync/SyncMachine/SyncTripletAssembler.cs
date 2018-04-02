@@ -35,22 +35,12 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         private ConcurrentDictionary<string, SyncTriplet.SyncTriplet> remoteBuffer = new ConcurrentDictionary<String, SyncTriplet.SyncTriplet> ();
 
-        private Dictionary<String, bool> processedTriplets = new Dictionary<string, bool> ();
-
         public SyncTripletAssembler (CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
-                                     ISession session//,
-                                     //BlockingCollection<SyncTriplet.SyncTriplet> syncTriplets,
-                                     //BlockingCollection<SyncTriplet.SyncTriplet> semiTriplets 
+                                     ISession session
                                     )
         {
             this.cmisSyncFolder = cmisSyncFolder;
             this.session = session;
-            /*
-            this.fullSyncTriplets = syncTriplets;
-            this.semiSyncTriplets = semiTriplets;
-            this.remoteCrawlWorker = new RemoteCrawlWorker (cmisSyncFolder, session, remoteBuffer);
-            this.changeLogProcessor = new ChangeLogProcessor (cmisSyncFolder, session, fullSyncTriplets);
-            */
         }
 
         public void StartForChangeLog(
@@ -68,6 +58,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
             BlockingCollection<SyncTriplet.SyncTriplet> full 
         ) {
 
+            // Foreach operation on BlockingCollectio is sequentially executed
+            // so a common HashSet rather than ConcurrentDictionary should be enough.
+            HashSet<string> processedTriplets = new HashSet<string> ();
+
             this.semiSyncTriplets = semi;
             this.fullSyncTriplets = full;
 
@@ -81,12 +75,17 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
                 SyncTriplet.SyncTriplet remoteTriplet = null;
 
-                // if ignore samelowername, use lowerinvariant to lookup in already-crawled-remote-triplet dictionary
+                // If ignore samelowername, use lowerinvariant to lookup in already-crawled-remote-triplet dictionary.
+                // One note: IgnoreIfSameLowercaseName is applied only on remote server. it seems that if local fs is 
+                // case sensitive while remote is not, remote will regard two distinct files in local as duplicated files
+                // and rename one of them while upload.
                 string _key = cmisSyncFolder.CmisProfile.CmisProperties.IgnoreIfSameLowercaseNames ? semiTriplet.Name.ToLowerInvariant () : semiTriplet.Name;
 
                 // if remote info is already crawled
                 if (remoteBuffer.TryGetValue (_key, out remoteTriplet)) {
+
                     SyncTripletFactory.AssembleRemoteIntoLocal (remoteTriplet, semiTriplet);
+
                 } else {
 
                     // if remote is not crawled yet, lookup db for remote path and query CMIS server
@@ -117,7 +116,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                     Console.WriteLine (" - assembled triplet: {0} is not appended to full sync triplet list.", semiTriplet.Name);
                 } 
  
-                processedTriplets.Add (_key, true);
+                processedTriplets.Add (_key);
             }
 
             remoteCrawlTask.Wait ();
@@ -126,8 +125,9 @@ namespace CmisSync.Lib.Sync.SyncMachine
             // are already processed in the previous process.
             Console.WriteLine (" - Adding remained remote triplets");
             foreach (string key in remoteBuffer.Keys) {
-                if (processedTriplets.ContainsKey (key)) {
-                    // Console.WriteLine (" - key: {0}'s assigned remote-semitriplet is already pushed to processor, ignore", key);
+                if (processedTriplets.Contains (key)) {
+                    //Console.WriteLine (" - key: {0}'s assigned remote-semitriplet is already pushed to processor, ignore. Check whether the server is case insensitive.", key);
+                    continue;
                 } else {
                     Console.WriteLine (" - key: {0}'s assigned remote-semitriplet is not processed yet, push to full sync trip", key);
 

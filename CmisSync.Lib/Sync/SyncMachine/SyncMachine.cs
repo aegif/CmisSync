@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections;
@@ -60,8 +61,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.syncTripletProcessor = new SyncTripletProcessor (cmisSyncFolder, session);
             // assembler read semi triplet from semi queue, assemble it with remote info, and push assembled triplet to process queue
             this.syncTripletAssembler = new SyncTripletAssembler (cmisSyncFolder, session);
-
-            // TODO: watcher for test
         }
 
         public bool DoCrawlSync ()
@@ -225,6 +224,29 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 }
 
             } while (changes.HasMoreItems ?? false);
+        }
+
+        public void DoWatcherTest() {
+
+            // TODO: watcher for test
+            watcher = new Watcher (cmisSyncFolder.LocalPath);
+            watcher.EnableRaisingEvents = true;
+
+            watcher.Changed += (sender, e) => {
+                Console.WriteLine ("%% Filesystem changed: \n" +
+                                   "   Name: {0}\n" +
+                                   "   Path: {1}\n" +
+                                   "   Type: {2}", e.Name, e.FullPath, e.ChangeType);
+                Logger.Info (String.Format("FS wathcer: [0}: {1}, [{2}], len: {3}", e.Name, e.FullPath, e.ChangeType, ((Watcher)sender).GetChangeCount()));
+            };
+
+            while (true) {
+                Thread.Sleep (100);
+                /*Thread.Sleep (15000);
+                Console.WriteLine ("## watcher count: {0}", watcher.GetChangeCount ()); */
+            }
+
+            return;
         }
     }
 }

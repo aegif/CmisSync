@@ -13,7 +13,7 @@ using DotCMIS.Enums;
 using System.Text;
 using CmisSync.Lib.Sync;
 
-using CmisSync.Lib.Utilities.UserNotificationListener;
+using CmisSync.Lib.UserNotificationListener;
 using CmisSync.Lib.Sync.SynchronizeItem;
 
 namespace CmisSync.Lib.Sync.CmisRepoFolder

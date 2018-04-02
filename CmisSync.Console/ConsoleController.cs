@@ -1,7 +1,7 @@
 using System;
 using CmisSync.Lib;
 using CmisSync.Lib.ActivityListener;
-using CmisSync.Lib.Utilities.UserNotificationListener;
+using CmisSync.Lib.UserNotificationListener;
 
 namespace CmisSync.Console
 {
