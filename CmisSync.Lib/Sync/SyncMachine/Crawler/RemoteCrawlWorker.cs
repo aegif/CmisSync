@@ -4,13 +4,12 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Collections.Specialized;
 
 using log4net;
 using CmisSync.Auth;
-using CmisSync.Lib.ActivityListener;
 using CmisSync.Lib.Config;
-using CmisSync.Lib.Sync;
+using CmisSync.Lib.Sync.SyncMachine.Internal;
 using CmisSync.Lib.Sync.SyncTriplet;
 using CmisSync.Lib.Utilities.FileUtilities;
 using CmisSync.Lib.Cmis;
@@ -54,7 +53,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private static readonly ILog Logger = LogManager.GetLogger (typeof (RemoteCrawlWorker));
 
-        private ConcurrentDictionary<string, SyncTriplet.SyncTriplet> remoteBuffer = null;
+        private OrderedDictionary orderedRemoteBuffer;
+
+        private object orbLock;
 
         private ISession session;
 
@@ -62,13 +63,23 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private CmisProperties cmisProperties = null;
 
-        public RemoteCrawlWorker (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session,
-                                  ConcurrentDictionary<string, SyncTriplet.SyncTriplet> remoteBuffer)
+        private FoldersDependencies foldersDeps = null;
+
+        // locker is the common lock shared with Assembler
+        public RemoteCrawlWorker (
+            CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
+            ISession session,
+            OrderedDictionary ordBuffer,
+            object locker,
+            FoldersDependencies fdps
+        )
         {
             this.cmisSyncFolder = cmisSyncFolder;
             this.cmisProperties = cmisSyncFolder.CmisProfile.CmisProperties;
             this.session = session;
-            this.remoteBuffer = remoteBuffer;
+            this.orderedRemoteBuffer = ordBuffer;
+            this.orbLock = locker;
+            this.foldersDeps = fdps;
         }
 
         public void Start() {
@@ -89,30 +100,49 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         }
 
+        // The order of appending triplet is important when consider deletion conflict
+        // therefore orderedRemoteBuffer is an OrderedDictionary
         public void CrawlRemoteFolder(IFolder remoteFolder, IOperationContext context) {
+
+            string folderName = remoteFolder.Path.Equals(cmisSyncFolder.RemotePath) ? 
+                                            CmisUtils.CMIS_FILE_SEPARATOR.ToString() : SyncTripletFactory.CreateFromRemoteFolder (remoteFolder, cmisSyncFolder).Name;
+
 
             IItemEnumerable<ICmisObject> children = remoteFolder.GetChildren (context); 
             foreach (ICmisObject cmisObject in children) {
+
                 try {
+                    // process sub folders
                     if (cmisObject is DotCMIS.Client.Impl.Folder) {
                         IFolder subFolder = (IFolder)cmisObject;
                         SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromRemoteFolder (subFolder, this.cmisSyncFolder);
 
-                        if (this.cmisProperties.IgnoreIfSameLowercaseNames && remoteBuffer.ContainsKey (triplet.Name.ToLowerInvariant ())) {
-                            Logger.Warn ("Ignoring " + triplet.RemoteStorage.RelativePath + "because other file or folder has the same name when ignoring lowercase/uppercase");
-                            continue;
-                        }
-                        if (!CmisFileUtil.RemoteObjectWorthSyncing (subFolder)) {
-                            continue;
-                        }
+                        lock (orbLock) {
+                            if (this.cmisProperties.IgnoreIfSameLowercaseNames && orderedRemoteBuffer.Contains(triplet.Name.ToLowerInvariant ())) {
+                                Logger.Warn ("Ignoring " + triplet.RemoteStorage.RelativePath + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                                continue;
+                            }
+                            if (!CmisFileUtil.RemoteObjectWorthSyncing (subFolder)) {
+                                continue;
+                            }
 
-                        // Console.WriteLine (" % get remote sub - folder: {0}", triplet.RemoteStorage.RelativePath);
-
-                        if (!remoteBuffer.TryAdd (cmisProperties.IgnoreIfSameLowercaseNames ? triplet.Name.ToLowerInvariant () : triplet.Name, triplet)) {
-                            Logger.Error ("Adding " + triplet.Name + " to remote buffer failed!");
+                            if (!triplet.DBExist) {
+                                // Console.WriteLine (" % get remote sub - folder: {0}", triplet.RemoteStorage.RelativePath);
+                                orderedRemoteBuffer.Add (cmisProperties.IgnoreIfSameLowercaseNames ? triplet.Name.ToLowerInvariant () : triplet.Name, triplet);
+                            }
                         }
 
                         CrawlRemoteFolder (subFolder, context);
+
+                        // the same with local crawler, if triplet is not create, always add folder triplet after its contents
+                        if (triplet.DBExist) {
+                            lock (orbLock) {
+                                orderedRemoteBuffer.Add (cmisProperties.IgnoreIfSameLowercaseNames ? triplet.Name.ToLowerInvariant () : triplet.Name, triplet);
+                            }
+                        }
+
+                        foldersDeps.AddFolderDependence (folderName, triplet.Name);
+
 
                     } else {
                         if (cmisObject is DotCMIS.Client.Impl.Document) {
@@ -120,20 +150,22 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                             SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromRemoteDocument (remoteFolder, document, this.cmisSyncFolder);
 
-                            if (this.cmisProperties.IgnoreIfSameLowercaseNames && remoteBuffer.ContainsKey (triplet.Name.ToLowerInvariant ())) {
-                                Logger.Warn ("Ignoring " + triplet.RemoteStorage.RelativePath + "because other file or folder has the same name when ignoring lowercase/uppercase");
-                                continue;
-                            }
-                            if (!CmisFileUtil.RemoteObjectWorthSyncing (document)) {
-                                continue;
+                            lock (orbLock) {
+                                if (this.cmisProperties.IgnoreIfSameLowercaseNames && orderedRemoteBuffer.Contains (triplet.Name.ToLowerInvariant ())) {
+                                    Logger.Warn ("Ignoring " + triplet.RemoteStorage.RelativePath + "because other file or folder has the same name when ignoring lowercase/uppercase");
+                                    continue;
+                                }
+                                if (!CmisFileUtil.RemoteObjectWorthSyncing (document)) {
+                                    continue;
+                                }
+
+                                // Console.WriteLine (" % get remote file: {0}", triplet.RemoteStorage.RelativePath);
+                                orderedRemoteBuffer.Add (cmisProperties.IgnoreIfSameLowercaseNames ? triplet.Name.ToLowerInvariant () : triplet.Name, triplet);
                             }
 
-                            // Console.WriteLine (" % get remote file: {0}", triplet.RemoteStorage.RelativePath);
-
-                            if (!remoteBuffer.TryAdd (cmisProperties.IgnoreIfSameLowercaseNames ? triplet.Name.ToLowerInvariant () : triplet.Name, triplet)) {
-                                Logger.Error ("Adding " + triplet.Name + " to remote buffer failed!");
-                            }
+                            foldersDeps.AddFolderDependence (folderName, triplet.Name);
                         }
+
                         else if (isLink(cmisObject)) {
                             Logger.Debug("Ignoring file '" + remoteFolder + "/" + cmisObject.Name + "' of type '" +
                                 cmisObject.ObjectType.Description + "'. Links are not currently handled.");
@@ -146,7 +178,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     
                 }
             }
-
         } 
 
         private bool isLink (ICmisObject cmisObject)

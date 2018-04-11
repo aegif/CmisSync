@@ -42,9 +42,14 @@ namespace CmisSync.Lib.Sync.CmisSyncFolder
         public CmisSyncFolder (RepoInfo repoInfo)
         {
             Name = repoInfo.Name;
+
             RemotePath = repoInfo.RemotePath;
+            // Cmis path should not keep the last '/' but user's imput might
+            if (RemotePath [RemotePath.Length - 1] == CmisUtils.CMIS_FILE_SEPARATOR) RemotePath = RemotePath.Remove (RemotePath.Length - 1);
+
             LocalPath = repoInfo.TargetDirectory;
             BIDIRECTIONAL = true;
+
             PollInterval = repoInfo.PollInterval;
             CmisProfile = new CmisProfileRefactor (repoInfo);
             Database = new Database.Database (repoInfo.CmisDatabase, LocalPath, RemotePath);

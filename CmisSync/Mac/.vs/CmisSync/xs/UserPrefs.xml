@@ -1,16 +1,11 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/CmisSyncFolder/CmisSyncFolder.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="235" Column="13" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncRepo/RepoBase.cs" Line="268" Column="39" />
-      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/SynchronizedFolder.cs" Line="433" Column="46" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="85" Column="40" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs" Line="44" Column="51" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="147" Column="17" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="182" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SemiSyncTripletManager.cs" Line="26" Column="17" />
-      <File FileName="../../CmisSync.Lib/Sync/SynchronizedFolder/CrawlStrategy.cs" Line="241" Column="25" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/RemoteCrawlWorker.cs" Line="114" Column="21" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SemiSyncTripletManager.cs" Line="28" Column="46" />
+      <File FileName="../../CmisSync.Lib/Sync/CmisSyncFolder/CmisSyncFolder.cs" Line="48" Column="98" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalWatcherProcessor.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -21,15 +16,29 @@
             <Node name="CmisSync.Lib" expanded="True">
               <Node name="Database" expanded="True" />
               <Node name="Sync" expanded="True">
-                <Node name="SynchronizedFolder" expanded="True" />
+                <Node name="CmisSyncFolder" expanded="True">
+                  <Node name="CmisSyncFolder.cs" selected="True" />
+                </Node>
                 <Node name="SyncMachine" expanded="True">
                   <Node name="Crawler" expanded="True" />
-                  <Node name="SyncMachine.cs" selected="True" />
+                  <Node name="Exceptions" expanded="True" />
+                  <Node name="Internal" expanded="True" />
+                  <Node name="ProcessWorker" expanded="True">
+                    <Node name="Internal" expanded="True" />
+                  </Node>
+                </Node>
+                <Node name="SyncTriplet" expanded="True">
+                  <Node name="TripletItem" expanded="True" />
                 </Node>
                 <Node name="SyncWorker" expanded="True" />
               </Node>
               <Node name="UserNotificationListener" expanded="True" />
               <Node name="Utilities" expanded="True" />
+            </Node>
+            <Node name="DotCMIS" expanded="True">
+              <Node name="binding" expanded="True">
+                <Node name="atompub" expanded="True" />
+              </Node>
             </Node>
           </Node>
         </State>

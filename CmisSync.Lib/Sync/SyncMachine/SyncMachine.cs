@@ -13,6 +13,7 @@ using CmisSync.Auth;
 using CmisSync.Lib.ActivityListener;
 using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync;
+using CmisSync.Lib.Sync.SyncMachine.Internal;
 using CmisSync.Lib.Sync.SyncMachine.Exceptions;
 using CmisSync.Lib.Cmis;
 
@@ -34,9 +35,11 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         private ISession session;
 
-        private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null; //new BlockingCollection<SyncTriplet.SyncTriplet> ();
+        private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null; 
 
-        private BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null; //new BlockingCollection<SyncTriplet.SyncTriplet> ();
+        private BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null;
+
+        private FoldersDependencies foldersDependencies = null;
 
         private SemiSyncTripletManager semiSyncTripletManager;
 
@@ -73,12 +76,13 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
                 IsWorking = true;
 
+                foldersDependencies = new FoldersDependencies ();
                 fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
                 semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets));
-                Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start (semiSyncTriplets));
-                Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalCrawler (semiSyncTriplets, fullSyncTriplets));
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, foldersDependencies));
+                Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start (semiSyncTriplets, foldersDependencies));
+                Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalCrawler (semiSyncTriplets, fullSyncTriplets, foldersDependencies));
 
                 semiManagerTask.Wait ();
                 semiSyncTriplets.CompleteAdding ();
@@ -104,6 +108,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
             }
 
             Console.WriteLine ("Crawl Sync Task Completed.");
+
+            //TODO: debug
+            foldersDependencies.OutputFoldersDependences ();
+
             return succeed;
         }
 
@@ -117,9 +125,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
                 IsWorking = true;
 
+                foldersDependencies = new FoldersDependencies ();
                 fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets));
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, foldersDependencies));
                 try {
 
                     Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog (fullSyncTriplets));

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -73,8 +75,27 @@ namespace CmisSync.Lib.Sync.SyncWorker
             session.Clear ();
         }
 
+        private void test1() {
+            //List<int> m = new List<int> (); for (int k = 0; k < 30; k++) { m.Add (k); }
+            List<int> m = new List<int> () { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+            Dictionary<int, HashSet<int>> d = new Dictionary<int, HashSet<int>> ();
+            Object locker = new object ();
+
+            ParallelOptions opt = new ParallelOptions (); opt.MaxDegreeOfParallelism = 10;
+            Parallel.ForEach (m, opt, (i) => {
+                lock (locker) {
+                    if (d.ContainsKey (0)) d [0].Add (i); else d [0] = new HashSet<int> { i };
+                }
+            });
+            Console.WriteLine ("Final Count: " + d [0].Count.ToString ());
+            foreach (int i in d [0]) {
+                Console.WriteLine (i);
+            }
+        }
+
         public void DoSync() {
 
+            // test1 (); return;
             //syncMachine.DoWatcherTest ();
 
             //syncMachine.DoChangeLogTest (); return;

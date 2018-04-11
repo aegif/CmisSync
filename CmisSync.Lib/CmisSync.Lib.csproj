@@ -11,7 +11,7 @@
     <AssemblyName>CmisSync.Lib</AssemblyName>
     <ReleaseVersion>
     </ReleaseVersion>
-    <UseMSBuildEngine>false</UseMSBuildEngine>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -137,6 +137,8 @@
     <Compile Include="UserNotificationListener\IUserNotificationListener.cs" />
     <Compile Include="UserNotificationListener\UserNotificationListenerUtil.cs" />
     <Compile Include="Sync\SyncMachine\Crawler\LocalWatcherProcessor.cs" />
+    <Compile Include="Sync\SyncMachine\Internal\ReverseLexicoGraphicalComparer.cs" />
+    <Compile Include="Sync\SyncMachine\Internal\FoldersDependencies.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">

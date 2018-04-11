@@ -484,7 +484,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 cmisSyncFolder.Database.RemoveFolder (triplet);
             } catch (CmisPermissionDeniedException e) {
 
-
+                // TODO
                 // We don't have the permission to delete this folder. Warn and recreate it.
                 /*
                 Utils.NotifyUser("You don't have the necessary permissions to delete folder " + folder.Path
@@ -519,12 +519,51 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
         /// <summary>
         /// Remove folder from local filesystem and database.
         /// </summary>
+        public static bool DeleteLocalFolder (SyncTriplet.SyncTriplet triplet, bool containsConflict, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        {
+            string localFullPath = triplet.LocalStorage.FullPath;
+            // Folder has been deleted on server, delete it locally too.
+            try {
+                if (containsConflict) {
+
+                    // TODO: When a folder is not empty, it might contains many non-worthy files other than conflicts.
+                    // Check it. Be aware that if it contains another folder, there should be conflicts due to
+                    // inverse-lexicographical order.
+
+                    Console.WriteLine ("  %%  Can not remove non-empty local folder " + triplet.Name + "\n" +
+                                       "      check if there is remaied modified file.");
+
+
+                    // If is not empty, this folder must include conflicts.
+                    try {
+                        SolveConflict (triplet, cmisSyncFolder);
+                    } catch (Exception e) {
+                    }
+                } else {
+                    Logger.Info ("Removing remotely deleted folder: " + localFullPath);
+                    Directory.Delete (localFullPath, true);
+                }
+
+                RemoveDbRecord (triplet, cmisSyncFolder);
+
+                // if contains conflict, should be set to false
+                return containsConflict ? false : true;
+
+            } catch (Exception e) {
+                Console.WriteLine ("  %% Delete local folder: {0} failed: {1}", triplet.Name, e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Remove folder from local filesystem and database.
+        /// </summary>
         public static bool DeleteLocalFolder (SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string localFullPath = triplet.LocalStorage.FullPath;
             // Folder has been deleted on server, delete it locally too.
             try {
-                
+
                 // If is not empty, there must be conflict files
                 // However, db record must be removed
                 bool containsConflict = false;
@@ -541,11 +580,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     // TODO: When a folder is not empty, it might contains many non-worthy files other than conflicts.
                     // Check it. Be aware that if it contains another folder, there should be conflicts due to
                     // inverse-lexicographical order.
-
                     Console.WriteLine ("  %%  Can not remove non-empty local folder " + triplet.Name + "\n" +
                                        "      check if there is remaied modified file.");
-
-
                     // If is not empty, this folder must include conflicts.
                     if (containsConflict) {
                         try {
@@ -560,8 +596,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 }
 
                 RemoveDbRecord (triplet, cmisSyncFolder);
-
-                return true;
+                // if contains conflict, should be set to false
+                return containsConflict ? false : true;
 
             } catch (Exception e) {
                 Console.WriteLine ("  %% Delete local folder: {0} failed: {1}", triplet.Name, e.Message);

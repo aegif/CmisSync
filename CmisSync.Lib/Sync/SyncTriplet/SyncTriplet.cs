@@ -49,6 +49,12 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         public string Name { get; set; }
 
         /// <summary>
+        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:CmisSync.Lib.Sync.SyncTriplet.SyncTriplet"/>.
+        /// </summary>
+        /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:CmisSync.Lib.Sync.SyncTriplet.SyncTriplet"/>.</returns>
+        public override string ToString () { return Name; }
+
+        /// <summary>
         /// Whether the item is a folder or a file.
         /// </summary>
         public bool IsFolder { get; set; }

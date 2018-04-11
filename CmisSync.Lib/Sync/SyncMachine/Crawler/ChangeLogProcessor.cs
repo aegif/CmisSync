@@ -29,11 +29,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
     {
         private static readonly ILog Logger = LogManager.GetLogger (typeof (ChangeLogProcessor));
 
-        // private BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null;
-
         private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null;
 
-        //private Dictionary<string, List<ChangeType?>> changeBuffer = null;
         private Dictionary<string, List<IChangeEvent>> changeBuffer = null;
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder;
@@ -221,6 +218,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             }
         }
 
+        /*
         private bool FolderDeleteEventHandler(string localFullPath, CmisSyncFolder.CmisSyncFolder syncFolder) {
 
             LocalCrawlWorker folderDeletionWorker = new LocalCrawlWorker (syncFolder, fullSyncTriplets);
@@ -234,6 +232,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
             return true; 
         }
+        */
     }
 }
 #pragma warning restore 0414, 0219

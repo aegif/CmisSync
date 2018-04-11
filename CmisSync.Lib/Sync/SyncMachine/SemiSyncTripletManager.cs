@@ -4,10 +4,12 @@ using log4net;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 using CmisSync.Lib.Sync.SyncTriplet;
 using CmisSync.Lib.Sync.SyncMachine.Crawler;
+using CmisSync.Lib.Sync.SyncMachine.Internal;
 
 using DotCMIS.Client;
 
@@ -23,8 +25,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         //private static readonly ILog Logger = LogManager.GetLogger (typeof (SemiSyncTripletManager));
 
-        private BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null; 
-
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder;
 
         private ISession session;
@@ -37,11 +37,12 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.cmisSyncFolder = cmisSyncFolder;
         }
 
-        public void Start(BlockingCollection<SyncTriplet.SyncTriplet> semi) {
+        public void Start(
+            BlockingCollection<SyncTriplet.SyncTriplet> semi,
+            FoldersDependencies fdps)
+        {
 
-            this.semiSyncTriplets = semi;
-
-            this.localCrawlWorker = new LocalCrawlWorker (cmisSyncFolder, semiSyncTriplets);
+            this.localCrawlWorker = new LocalCrawlWorker (cmisSyncFolder, semi, fdps);
 
             localCrawlWorker.Start ();
         }

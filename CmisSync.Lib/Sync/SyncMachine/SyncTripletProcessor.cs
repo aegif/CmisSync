@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 
 using CmisSync.Lib.Sync;
 using CmisSync.Lib.Sync.SyncMachine.ProcessWorker;
+using CmisSync.Lib.Sync.SyncMachine.Internal;
 
 using DotCMIS.Client;
 
@@ -34,6 +35,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder = null;
 
+        private FoldersDependencies foldersDeps = null;
+
         public SyncTripletProcessor (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session)
         {
             this.cmisSyncFolder = cmisSyncFolder;
@@ -41,10 +44,13 @@ namespace CmisSync.Lib.Sync.SyncMachine
         }
 
         public void Start (
-            BlockingCollection<SyncTriplet.SyncTriplet> full 
+            BlockingCollection<SyncTriplet.SyncTriplet> full,
+            FoldersDependencies fdps
         ) {
 
             fullSyncTriplets = full;
+
+            foldersDeps = fdps;
 
             delayedFolerDeletions = new ConcurrentQueue<SyncTriplet.SyncTriplet> ();
 
@@ -53,40 +59,38 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
 
             // Process non-folder-deletion operations
-            Parallel.ForEach (Internal.SingleItemPartitioner.Create (fullSyncTriplets.GetConsumingEnumerable ()), options, 
+            Parallel.ForEach (Internal.SingleItemPartitioner.Create (fullSyncTriplets.GetConsumingEnumerable ()), options,
                               (triplet) => {
+                                  // ============== new approaches ==============
+                                  // Use folders dependencies class to record all folders' dependencies 
+                                  // one folder should be processed only after all its dependencies are processed.
+                                  // hint:
+                                  // because all folder deletions are enqueued after its conttents, 
+                                  // we can use spin() or sleep() to wait for that, just as create remote folder
+                                  bool succeed = ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, foldersDeps);
+                                  foldersDeps.RemoveFolderDependence (triplet.Name, succeed);
 
-                                  // ============== new approaches ===============
-                                  // must use a crawler counter to record the remote / local size to decide when to process folder deletions
-                                  // ProcessWorker.ProcessWorker.SyncAction action = ProcessWorker.ProcessWorker.Reduce (triplet, cmisSyncFolder);
-                                  // ProcessWorker.ProcessWorker.Process (triplet, action, session, cmisSyncFolder);
-
-                                  ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, delayedFolerDeletions);
                               });
 
-
-            Console.WriteLine (" - Processing folder deletions");
+            //Console.WriteLine (" - Processing folder deletions");
 
             // Process folder-deletion operations 
             // One-by-One non-parallel approach yet
-            List<SyncTriplet.SyncTriplet> folderDeletionList = delayedFolerDeletions.ToList();
+
+            //List<SyncTriplet.SyncTriplet> folderDeletionList = delayedFolerDeletions.ToList();
 
             // Lexicographical order
             // Therefore if there are files remained in the repository, eg. local removed but remote modified, vise versa
             // the corresponding folder will be remained. 
-            folderDeletionList.Sort (new FolderLexicoGraphicalComparer ());
 
-            /*
-             * use parallel deletion instead
-            foreach(SyncTriplet.SyncTriplet triplet in  folderDeletionList) {
-                // unset delayed
-                triplet.Delayed = false;
-                ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, null);
-            }
-            */
-            DoParallelFolderDeletions (folderDeletionList);
+            //folderDeletionList.Sort (new ReverseLexicoGraphicalComparer<SyncTriplet.SyncTriplet> ());
+            //DoParallelFolderDeletions (folderDeletionList);
+
+            // reset delayed folder deletion buffer
+
+            //delayedFolerDeletions = null;
         }
-
+       
         private void DoParallelFolderDeletions(List<SyncTriplet.SyncTriplet> folders) {
 
             Console.WriteLine (" - Do parallel folder deletions: ");
@@ -148,38 +152,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
             // Process parallel folder deletion
             Parallel.ForEach (Internal.SingleItemPartitioner.Create (fullSyncTriplets.GetConsumingEnumerable ()), options,
-                              (triplet) => ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, null)
+                              (triplet) => ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, new ConcurrentQueue<SyncTriplet.SyncTriplet>() )
                              );
 
         }
-
-
-        private class FolderLexicoGraphicalComparer : IComparer<SyncTriplet.SyncTriplet> {
-
-            public int Compare (SyncTriplet.SyncTriplet a, SyncTriplet.SyncTriplet b)
-            {
-                return 0 - Helper (a, b);
-            }
-
-            private int Helper(SyncTriplet.SyncTriplet a, SyncTriplet.SyncTriplet b) {
-                // C# will split "/" by '/' to an array with 2 elements: "", '/', ""
-                // will split "/a/b/c/" by '/' to an array with 5 elements: "", "a", "b", "c", ""
-                // so "" does nothing to the algoritm
-                String [] m = a.Name.Split ('/');
-                String [] n = b.Name.Split ('/');
-                int l = Math.Min (m.Length, n.Length);
-                int i= 0;
-                while (i <= l) {
-                    if (string.Compare (m [i], n [i]) < 0) return -1;
-                    if (string.Compare (m [i], n [i]) > 0) return 1;
-                    i++;
-                }
-                if (m.Length > n.Length) return 1;
-                if (m.Length < n.Length) return -1;
-                return 0;
-            } 
-        }
-
 
         ~SyncTripletProcessor ()
         {

@@ -147,7 +147,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             IFolder remoteFolder,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
- 
+
             SyncTriplet res = CreateSFGFromRemoteFolder (remoteFolder, cmisSyncFolder);
 
             res.LocalStorage = (null == res.DBStorage.DBLocalPath) ? null : new LocalStorageItem (cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
