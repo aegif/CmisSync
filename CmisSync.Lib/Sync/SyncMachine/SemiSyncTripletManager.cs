@@ -39,7 +39,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         public void Start(
             BlockingCollection<SyncTriplet.SyncTriplet> semi,
-            FoldersDependencies fdps)
+            ItemsDependencies fdps)
         {
 
             this.localCrawlWorker = new LocalCrawlWorker (cmisSyncFolder, semi, fdps);

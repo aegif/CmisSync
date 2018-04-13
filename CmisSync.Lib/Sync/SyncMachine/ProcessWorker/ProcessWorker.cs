@@ -32,9 +32,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
     {
 
 
-        // =================== FoldersDependencies Approach ================
+        // =================== ItemsDependencies Approach ================
         public static bool Process (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
-                                    FoldersDependencies fdps)
+                                    ItemsDependencies fdps)
 
         {
 
@@ -42,14 +42,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         }
 
         public static bool Reducer (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
-                                    FoldersDependencies fdps)
+                                    ItemsDependencies fdps)
         {
 
-            Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: Processed!\n",
-                               System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
-
             if (triplet.LocalEqDB && triplet.RemoteEqDB) {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1} is syncrhonized!\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1} is syncrhonized!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                 return true;
             } else if (triplet.LocalEqDB && !triplet.RemoteEqDB) {
@@ -62,10 +59,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         }
 
         public static bool SyncRemoteToLocal (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
-                                              FoldersDependencies fdps)
+                                              ItemsDependencies fdps)
         {
             if (!triplet.RemoteExist) {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: remote removed! delete local!\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: remote removed! delete local!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 // Remote deleted, remove local.
@@ -73,15 +70,16 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                     // sub folder might be already removed due to parent folder has been removed
                     if (triplet.LocalExist) {
 
-                        Console.WriteLine (" # [ WorkerThread: {0} ] wait spin for {1}\n",
+                        // Spin wait until folder's dependencies are all resolved
+                        // - local operation is fast therefore spin wait is ok.
+                        Console.WriteLine (" # [ WorkerThread: {0} ] spin wait for {1}'s dependencies are all resolved.",
                                            System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
-                        // TODO : add fdps resolve
                         var sw = new SpinWait ();
-                        while (fdps.GetFolderDependenceCount(triplet.Name) != 0) {
+                        while (fdps.GetItemDependenceCount(triplet.Name) != 0) {
                             sw.SpinOnce ();
                         }
 
-                        Console.WriteLine (" # [ WorkerThread: {0} ] delete local {1} after wait spin\n",
+                        Console.WriteLine (" # [ WorkerThread: {0} ] delete local {1} after spin wait",
                                            System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                         return WorkerOperations.DeleteLocalFolder (triplet, fdps.IsClear(triplet.Name), cmisSyncFolder);
                     }
@@ -91,7 +89,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
 
             } else {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: download remote to local\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: download remote to local",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 // Remote new, download
@@ -105,27 +103,39 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         }
 
         public static bool SyncLocalToRemote (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
-                                              FoldersDependencies fdps)
+                                              ItemsDependencies fdps)
         {
 
             if (cmisSyncFolder.BIDIRECTIONAL) {
                 if (triplet.LocalExist) {
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote\n",
+                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote",
                                     System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
-                    // Local Exist, upload to remote
-                    if (triplet.IsFolder) {
-                        if (!triplet.RemoteExist) return WorkerOperations.CreateRemoteFolder (triplet, session, cmisSyncFolder);
-                    } else {
-                        if (triplet.RemoteExist) {
-                            return WorkerOperations.UpdateRemoteFile (triplet, session, cmisSyncFolder);
-                        } else {
-                            return WorkerOperations.UploadFile (triplet, session, cmisSyncFolder);
+                    // remote not exist, create or upload to remote
+                    if (!triplet.RemoteExist) {
+                        // Sleep wait until folder's dependencies are all resolved
+                        // - remote operation is slow so use sleep wait
+                        Console.WriteLine (" # [ WorkerThread: {0} ] sleep wait for {1}'s depdencies are all resolved.",
+                                           System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
+                        while (fdps.GetItemDependenceCount (triplet.Name) != 0) {
+                            Thread.Sleep (100);
                         }
+                        Console.WriteLine (" # [ WorkerThread: {0} ] create {1} after sleep wait",
+                                           System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
+
+                        if (triplet.IsFolder)
+                            return WorkerOperations.CreateRemoteFolder (triplet, session, cmisSyncFolder);
+                        else 
+                            return WorkerOperations.UploadFile (triplet, session, cmisSyncFolder);
+
+                    // remote exist, update    
+                    } else {
+                        if (triplet.IsFolder) { }// do nothing 
+                        else return WorkerOperations.UpdateRemoteFile (triplet, session, cmisSyncFolder);
                     }
 
                 } else {
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: local deleted! remove remote file\n",
+                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: local deleted! remove remote file",
                                     System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                     // Local removed, delete remote
@@ -141,7 +151,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                 }
 
             } else {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: not BIDIRECTIONAL, do not upload local to remote\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: not BIDIRECTIONAL, do not upload local to remote",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                 return true;
             }
@@ -149,7 +159,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         }
 
         public static bool SolveConflictAndSync (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
-                                                 FoldersDependencies fdps)
+                                                 ItemsDependencies fdps)
         {
 
             // If LS=ne , DB=e, RS=ne: 
@@ -157,12 +167,16 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
             if (!triplet.LocalExist && !triplet.RemoteExist) {
                 return WorkerOperations.RemoveDbRecord (triplet, cmisSyncFolder);
             } else {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 WorkerOperations.SolveConflict (triplet, cmisSyncFolder);
 
-                return SyncRemoteToLocal (triplet, session, cmisSyncFolder, fdps);
+                SyncRemoteToLocal (triplet, session, cmisSyncFolder, fdps);
+
+                // Conflict would always return false
+                // TODO: add WorkerStatus to indicate what indeed happened
+                return false;
             }
         }
 
@@ -176,11 +190,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         public static bool Reducer(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, 
                                    ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolderDeletions){
 
-            Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: Processed!\n",
+            Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: Processed!",
                                System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
             if (triplet.LocalEqDB && triplet.RemoteEqDB) {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1} is syncrhonized!\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1} is syncrhonized!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                 return true;
             } else if (triplet.LocalEqDB && !triplet.RemoteEqDB) {
@@ -195,7 +209,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         public static bool SyncRemoteToLocal(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
                                              ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolderDeletions) {
             if (!triplet.RemoteExist) {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: remote removed! delete local!\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: remote removed! delete local!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 // Remote deleted, remove local.
@@ -228,7 +242,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
 
             } else {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: download remote to local\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: download remote to local",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 // Remote new, download
@@ -246,7 +260,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
             if (cmisSyncFolder.BIDIRECTIONAL) {
                 if (triplet.LocalExist) {
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote\n",
+                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote",
                                     System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                     // Local Exist, upload to remote
@@ -261,7 +275,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                     }
 
                 } else {
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: local deleted! remove remote file\n",
+                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: local deleted! remove remote file",
                                     System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                     // Local removed, delete remote
@@ -280,7 +294,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                 }
                     
             }  else {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: not BIDIRECTIONAL, do not upload local to remote\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: not BIDIRECTIONAL, do not upload local to remote",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                 return true;
             }
@@ -295,7 +309,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
             if (!triplet.LocalExist && !triplet.RemoteExist) {
                 return WorkerOperations.RemoveDbRecord (triplet, cmisSyncFolder);
             } else {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 WorkerOperations.SolveConflict (triplet, cmisSyncFolder);
@@ -313,7 +327,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         {
 
             if (triplet.LocalEqDB && triplet.RemoteEqDB) {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1} is syncrhonized!\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1} is syncrhonized!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                 return SyncAction.Sync;
             } else if (triplet.LocalEqDB && !triplet.RemoteEqDB) {
@@ -326,7 +340,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
             } else {
 
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: Conflict!\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: Conflict!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 return SyncAction.Conflict;
@@ -338,13 +352,13 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         public static SyncAction SyncRemoteToLocalReducer (SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             if (!triplet.RemoteExist) {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: remote removed! delete local!\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: remote removed! delete local!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 return SyncAction.DeleteLocal;
 
             } else {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: download remote to local\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: download remote to local",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 return SyncAction.Download;
@@ -356,13 +370,13 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
             if (cmisSyncFolder.BIDIRECTIONAL) {
                 if (triplet.LocalExist) {
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote\n",
+                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote",
                                     System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                     return SyncAction.Upload;
 
                 } else {
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: local deleted! remove remote file\n",
+                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: local deleted! remove remote file",
                                     System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                     return SyncAction.DeleteRemote;
@@ -370,7 +384,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                 }
 
             } else {
-                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: not BIDIRECTIONAL, do not upload local to remote\n",
+                Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: not BIDIRECTIONAL, do not upload local to remote",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 return SyncAction.Sync;
@@ -428,12 +442,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                 // both removed, clear DB record only
                 if (!triplet.LocalExist && !triplet.RemoteExist) {
 
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! only db record remained \n",
+                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! only db record remained ",
                                        System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                     WorkerOperations.RemoveDbRecord (triplet, cmisSyncFolder);
 
                 } else {
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file\n",
+                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file",
                                        System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                     WorkerOperations.SolveConflict (triplet, cmisSyncFolder);

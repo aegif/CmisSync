@@ -125,7 +125,10 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             get {
                 return ( !DBExist && !RemoteExist) ||
                     (DBExist && RemoteExist && (RemoteStorage.RelativePath == DBStorage.DBRemotePath) && (
-                        IsFolder ? true : (RemoteStorage.LastModified.ToString() == DBStorage.ServerSideModificationDate.ToString())
+                        IsFolder ? true : (
+                            // DB's last modification date is universal
+                            ((DateTime)RemoteStorage.LastModified).ToUniversalTime().ToString() == 
+                            DBStorage.ServerSideModificationDate.ToString())
                     )
                     );
             }

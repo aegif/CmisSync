@@ -62,7 +62,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
          *   one sub for remote crawler
          * Else for one file /xxxx/yyyy/zzz, it is first added to fdps by local crawler
          * and is soon pushed to full processor queue and been processed therefore the 
-         * fdp is delleted from fdps.  then there comes slow remote crawler add to fdps once again. 
+         * fdp is deleted from fdps.  then the slow remote crawler will add it to fdps again. 
          * 
          * It is not desired because we use empty fdps to judge if a folder should be deleted
          * 
@@ -72,7 +72,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
         public void StartForLocalCrawler (
             BlockingCollection<SyncTriplet.SyncTriplet> semi,
             BlockingCollection<SyncTriplet.SyncTriplet> full,
-            FoldersDependencies fdps
+            ItemsDependencies fdps
         ) {
 
             // Foreach operation on BlockingCollectio is sequentially executed
@@ -82,7 +82,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.semiSyncTriplets = semi;
             this.fullSyncTriplets = full;
 
-            FoldersDependencies r_fdps = new FoldersDependencies ();
+            ItemsDependencies r_fdps = new ItemsDependencies ();
 
             //this.remoteCrawlWorker = new RemoteCrawlWorker (cmisSyncFolder, session, remoteBuffer);
             RemoteCrawlWorker orderedRemoteCrawlWorker = new RemoteCrawlWorker (cmisSyncFolder, session, orderedRemoteBuffer, orbLock, r_fdps);
@@ -163,8 +163,9 @@ namespace CmisSync.Lib.Sync.SyncMachine
                         continue;
                     }
 
+                    // merge remote fdps for remote only folder (deletion) to processor's fdps
                     if (remoteTriplet.IsFolder) {
-                        foreach (string dep in r_fdps.GetFolderDependences (remoteTriplet.Name)) fdps.AddFolderDependence (remoteTriplet.Name, dep);
+                        foreach (string dep in r_fdps.GetItemDependences (remoteTriplet.Name)) fdps.AddItemDependence (remoteTriplet.Name, dep);
                     }
 
                     if (!fullSyncTriplets.TryAdd (remoteTriplet)) {

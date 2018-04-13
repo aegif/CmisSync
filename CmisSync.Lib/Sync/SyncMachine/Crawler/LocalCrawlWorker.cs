@@ -22,11 +22,24 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
      *     2.2. queue = fullSyncTriplet, it is for change log deletion sync. Triplets are directly sent to fullSyncTriplet with
      *          null remote storage ( = deleted remotely ).
      *  3. LocalCrawler 
-     *     3.1. Always add the folder triplet to the semi-production queue BEFORE their contents' triplets if it is newly created.
+     *     3.1. Always add the folder triplet to the semi-production queue BEFORE their contents' triplets if it is freshly created.
      *     3.2. BEAWARE WorkerOperion.UploadFile depends on this logic: if cmissync wants to upload a file but the folder is 
-     *          not fould, it must be being created.
+     *          not fould, it must be being created. 
      *     3.3. On the other hand, the folder triplets are pushed to the semi-production queue AFTER their content's triplets 
-     *          if it is not newly creted.
+     *          if it is not newly created.
+     *     3.4. (3.2) and (3.3) ensure we can use spin/sleep policy when doing creations/delections to wait the object dependencies
+     *          to be satisfied.
+     *  4. Object dependencies policy
+     *     4.1. If obj == new && parent == new : dep(obj) add parent. means creation of obj depends on creation of its parent
+     *     4.2. If obj == new && parnet != new : dep(parent add obj. means creation of obj does not dependes on its parents, 
+     *          but possible deletion of parent depends on obj.
+     *     4.3. If obj != new && parent != new : dep(parent) add obj. means possible deletion of parent depends on obj.
+     *     4.4. Conclusion: if parent == new , add parent to dep(obj), else add obj to dep(parent).
+     *     4.5. With this dependences construction, when creating a new object on the remote server, just check if its all deps 
+     *          are properly satisfied. If its all satisified but we can not find its parent folder, its parent folder must be
+     *          an 'Existed-but-Removed-Remotely' folder ( refer to 4.2, dep(obj) is empty because we didn't add its parent to it ).
+     *          Thus we can not upload it and we info its parent as false == there is confliction if you sync delete it.
+     *     4.6. This policy works only locally yet.
      */
     public class LocalCrawlWorker : IDisposable
     {
@@ -35,7 +48,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private BlockingCollection<SyncTriplet.SyncTriplet> outputQueue = null;
 
-        private FoldersDependencies foldersDeps = null;
+        private ItemsDependencies itemsDeps = null;
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder;
 
@@ -44,11 +57,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
         public LocalCrawlWorker ( 
                                  CmisSyncFolder.CmisSyncFolder cmisSyncFolder, 
                                  BlockingCollection<SyncTriplet.SyncTriplet> queue,
-                                 FoldersDependencies foldersDeps)
+                                 ItemsDependencies itemsDeps)
         {
             this.outputQueue = queue;
             this.cmisSyncFolder = cmisSyncFolder;
-            this.foldersDeps = foldersDeps;
+            this.itemsDeps = itemsDeps;
         }
 
         public void Start() {
@@ -56,18 +69,18 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             waitingSemi = new List<SyncTriplet.SyncTriplet> ();
             
             Console.WriteLine (" Start local file crawling from {0}", cmisSyncFolder.LocalPath);
-            CrawlFolder (cmisSyncFolder.LocalPath);
-            Console.WriteLine (" Finish local file crawling");
 
-            Console.WriteLine (" Start DB tranversing");
+            CrawlFolder (cmisSyncFolder.LocalPath);
+
             // deletes are always non-eq, priority.
             CrawlLocalDeleteds ();
-            Console.WriteLine (" Finish DB tranversing");
 
             // local non-eq first, append local-eq later
             foreach (SyncTriplet.SyncTriplet semi in waitingSemi) {
                 outputQueue.Add (semi);
             }
+
+            Console.WriteLine (" Local crawling completed.");
 
             waitingSemi.Clear ();
         }
@@ -77,25 +90,27 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             waitingSemi = new List<SyncTriplet.SyncTriplet> ();
 
             Console.WriteLine (" Start local file crawling from {0}", path);
-            CrawlFolder (path);
-            Console.WriteLine (" Finish local file crawling");
 
+            CrawlFolder (path);
             foreach (SyncTriplet.SyncTriplet semi in waitingSemi) {
                 outputQueue.Add (semi);
             }
-
             // the folder is not root, push it to process queue after all containing items are pushed.
             SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (
                 path, this.cmisSyncFolder
             );
             outputQueue.Add (triplet);
 
+            Console.WriteLine (" Finish local file crawling from {0}", path);
             waitingSemi.Clear ();
+
         }
 
         private void CrawlFolder(String folder) {
 
-            string folderName = SyncTripletFactory.CreateFromLocalFolder (folder, cmisSyncFolder).Name;
+            SyncTriplet.SyncTriplet dummyTriplet = SyncTripletFactory.CreateFromLocalFolder (folder, cmisSyncFolder);
+            string parentName = dummyTriplet.Name;
+            bool parentDBExist = folder.Equals(cmisSyncFolder.LocalPath) ? true : dummyTriplet.DBExist;
 
             // filePath and folderPath are all full pathes.
             foreach( String filePath in Directory.GetFiles (folder)) {
@@ -110,7 +125,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 );
 
                 // folder deps should be added before put to queue
-                foldersDeps.AddFolderDependence (folderName, triplet);
+                if (parentDBExist) itemsDeps.AddItemDependence (parentName, triplet);
+                else itemsDeps.AddItemDependence (triplet.Name, parentName);
 
                 if (triplet.LocalEqDB)
                     waitingSemi.Add (triplet);
@@ -131,7 +147,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 );
 
 
-                foldersDeps.AddFolderDependence (folderName, triplet);
+                if (parentDBExist) itemsDeps.AddItemDependence (parentName, triplet);
+                else itemsDeps.AddItemDependence (triplet.Name, parentName);
 
                 // LocalCrawler always add the folder triplet to the semi - production queue BEFORE their contents' triplets if it is newly created.
                 // On the other hand, the folder triplets are pushed to the semi-production queue AFTER their content's triplets 
@@ -166,11 +183,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromDBFile(file [0], file [1], cmisSyncFolder);
 
                     // get files's parent's name
-                    string folderName = triplet.Name.Remove (triplet.Name.LastIndexOf ('/') + 1);
+                    string parentFolderName = triplet.Name.Remove (triplet.Name.LastIndexOf ('/') + 1);
 
-                    if (folderName.Length > 0) {
+                    if (parentFolderName.Length > 0) {
 
-                        foldersDeps.AddFolderDependence (folderName, triplet);
+                        itemsDeps.AddItemDependence (parentFolderName, triplet);
                    }
 
                     outputQueue.Add (triplet);
@@ -194,7 +211,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     if (parentFolderName.Length > 0) {
 
                         // if not do so, the hashset is not thread-safety
-                        foldersDeps.AddFolderDependence (parentFolderName, triplet);
+                        itemsDeps.AddItemDependence (parentFolderName, triplet);
 
                     }
 

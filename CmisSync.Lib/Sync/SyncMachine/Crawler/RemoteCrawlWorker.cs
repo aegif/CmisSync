@@ -63,7 +63,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private CmisProperties cmisProperties = null;
 
-        private FoldersDependencies foldersDeps = null;
+        private ItemsDependencies itemsDeps = null;
 
         // locker is the common lock shared with Assembler
         public RemoteCrawlWorker (
@@ -71,7 +71,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             ISession session,
             OrderedDictionary ordBuffer,
             object locker,
-            FoldersDependencies fdps
+            ItemsDependencies fdps
         )
         {
             this.cmisSyncFolder = cmisSyncFolder;
@@ -79,7 +79,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             this.session = session;
             this.orderedRemoteBuffer = ordBuffer;
             this.orbLock = locker;
-            this.foldersDeps = fdps;
+            this.itemsDeps = fdps;
         }
 
         public void Start() {
@@ -141,7 +141,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                             }
                         }
 
-                        foldersDeps.AddFolderDependence (folderName, triplet.Name);
+                        itemsDeps.AddItemDependence (folderName, triplet.Name);
 
 
                     } else {
@@ -163,7 +163,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                                 orderedRemoteBuffer.Add (cmisProperties.IgnoreIfSameLowercaseNames ? triplet.Name.ToLowerInvariant () : triplet.Name, triplet);
                             }
 
-                            foldersDeps.AddFolderDependence (folderName, triplet.Name);
+                            itemsDeps.AddItemDependence (folderName, triplet.Name);
                         }
 
                         else if (isLink(cmisObject)) {

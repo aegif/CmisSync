@@ -138,7 +138,7 @@
     <Compile Include="UserNotificationListener\UserNotificationListenerUtil.cs" />
     <Compile Include="Sync\SyncMachine\Crawler\LocalWatcherProcessor.cs" />
     <Compile Include="Sync\SyncMachine\Internal\ReverseLexicoGraphicalComparer.cs" />
-    <Compile Include="Sync\SyncMachine\Internal\FoldersDependencies.cs" />
+    <Compile Include="Sync\SyncMachine\Internal\ItemsDependencies.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">

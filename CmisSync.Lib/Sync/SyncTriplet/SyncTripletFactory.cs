@@ -53,7 +53,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             String remoteRoot = cmisSyncFolder.RemotePath;
             String remoteFull = CmisFileUtil.PathCombine (remoteFolder.Path, CmisFileUtil.GetLocalFileName (remoteDocument, cmisSyncFolder.CmisProfile));
             String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
-            res.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument.LastModificationDate);
+            res.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument);
 
             // Check database
             res.DBStorage = new DBStorageItem (cmisSyncFolder.Database, res.RemoteStorage.RelativePath, IsDocument, RemoteToLocal);
@@ -84,7 +84,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
                 SyncFileUtil.GetApplicablePath (remoteDocument, cmisSyncFolder), 
                 CmisFileUtil.GetLocalFileName(remoteDocument, cmisSyncFolder.CmisProfile));
             String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
-            res.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument.LastModificationDate);
+            res.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument);
 
             // Check database
             res.DBStorage = new DBStorageItem (cmisSyncFolder.Database, res.RemoteStorage.RelativePath, IsDocument, RemoteToLocal);
@@ -131,7 +131,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             String remoteRoot = cmisSyncFolder.RemotePath;
             String remoteFull = remoteFolder.Path;
             String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
-            res.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteFolder.LastModificationDate);
+            res.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteFolder);
 
             res.DBStorage = new DBStorageItem (cmisSyncFolder.Database, res.RemoteStorage.RelativePath, IsFolder, RemoteToLocal);
 
@@ -244,7 +244,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             String remoteRoot = cmisSyncFolder.RemotePath;
             String remoteFull = fullPath;
             String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
-            localSemi.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument.LastModificationDate);
+            localSemi.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument);
 
         }
 
@@ -253,7 +253,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             String remoteRoot = cmisSyncFolder.RemotePath;
             String remoteFull = remoteFolder.Path;
             String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
-            localSemi.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteFolder.LastModificationDate);
+            localSemi.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteFolder);
 
         }
 

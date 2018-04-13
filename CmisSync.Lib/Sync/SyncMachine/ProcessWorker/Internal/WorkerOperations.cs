@@ -48,7 +48,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
 
             try {
                 // Must be CmisFileUtil.PathCombine
-                IFolder remoteFolder = (IFolder)session.GetObjectByPath (CmisFileUtil.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), false);
+                //IFolder remoteFolder = (IFolder)session.GetObjectByPath (CmisFileUtil.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), false);
+                IFolder remoteFolder = (IFolder)triplet.RemoteStorage.CmisObject;
 
                 Directory.CreateDirectory (localFolder);
 
@@ -117,7 +118,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 Console.WriteLine (" %%% download remote :" + triplet.RemoteStorage.FullPath);
                 byte [] filehash = { };
                 DotCMIS.Data.IContentStream contentStream = null;
-                IDocument remoteDocument = (IDocument) session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
+                //IDocument remoteDocument = (IDocument) session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
+                IDocument remoteDocument = (IDocument)triplet.RemoteStorage.CmisObject;
 
                 // If zero length, skip downloading the content, just go on with an empty file
                 if (remoteDocument.ContentStreamLength == 0) {
@@ -219,34 +221,22 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
             properties.Add (PropertyIds.LastModificationDate, Directory.GetLastWriteTime (triplet.LocalStorage.FullPath));
 
             try {
-                /*
-                 * IFolder remoteBaseFolder = (IFolder)session.GetObjectByPath (cmisSyncFolder.RemotePath, false);
-                 * Logger.Debug (String.Format ("Creating remote folder {0} for local folder {1}", remoteLeaf, triplet.LocalStorage.RelativePath));
-                 * IFolder folder = remoteBaseFolder.CreateFolder (properties);
-                 */
 
                 String remoteParentPath = CmisFileUtil.GetUpperFolderOfCmisPath (remoteFullPath);
                 IFolder remoteParentFolder;
 
-                // Block until get
-                while (true) {
-                    try {
-                        remoteParentFolder = (IFolder)session.GetObjectByPath (remoteParentPath, false);
-                        break;
-                    } catch (Exception e) {
-                        Console.WriteLine ("  %% Blocked while creating folder:\n" +
-                                           "       {0} \n" +
-                                           "     during creating \n" +
-                                           "       {1} \n" +
-                                           "     failed.", remoteParentPath, triplet.Name);
-                        Thread.Sleep (100);//return false;
-                    }
+                try {
+                    remoteParentFolder = (IFolder)session.GetObjectByPath (remoteParentPath, false);
+                } catch (Exception e) {
+                    Console.WriteLine ("  %% Can not get {1}'s parent folder {0}, abort creating", remoteParentPath, triplet.Name);
+                    return false;
                 }
 
                 IFolder folder = remoteParentFolder.CreateFolder (properties);
                 Logger.Debug (String.Format ("Creating remote folder {0} for local folder {1}", remoteLeaf, triplet.LocalStorage.RelativePath));
                 Logger.Debug (String.Format ("Created remote folder {0}({1}) for local folder {2}", remoteLeaf, folder.Id, triplet.LocalStorage.RelativePath));
                 cmisSyncFolder.Database.AddFolder (remoteRelativePath, triplet.LocalStorage.RelativePath, folder.Id, folder.LastModificationDate);
+
             } catch (CmisNameConstraintViolationException) {
                 Logger.Warn ("Remote file conflict with local folder " + remoteLeaf);
                 return false;
@@ -270,21 +260,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
 
             string localFullPath = triplet.LocalStorage.FullPath;
 
-            IFolder remoteFolder = null;
             string remoteFolderFullPath = CmisFileUtil.GetUpperFolderOfCmisPath (remoteFullPath);
-            while (true) {
-                try {
-                    remoteFolder = (IFolder)session.GetObjectByPath (remoteFolderFullPath, false);
-                    break;
-                } catch (Exception e) {
-                    Console.WriteLine ("  %% Blocked while creating folder:\n" +
-                                      "       {0} \n" +
-                                      "     during uploading \n" +
-                                      "       {1} \n" +
-                                      "     failed.", remoteFolderFullPath, remoteRelativePath);
-                    Thread.Sleep (100);//return false;
-                }
-            }
+            IFolder remoteFolder = null;
+
+            try {
+                remoteFolder = (IFolder)session.GetObjectByPath (remoteFolderFullPath, false);
+            } catch (Exception e) { return false; }
 
             if (null == remoteFolder) return false;
 
@@ -326,7 +307,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
                 return true;
             } catch (Exception e) {
-                Console.WriteLine ("  %% upload error, " + e.Message);
+                Console.WriteLine ("  %% Upload error, " + e.Message);
                 return false;
             }
         }
@@ -352,7 +333,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                         return true;
                     }
 
-                    IDocument remoteFile = (IDocument)session.GetObjectByPath (remoteFullPath, false);
+                    //IDocument remoteFile = (IDocument)session.GetObjectByPath (remoteFullPath, false);
+                    IDocument remoteFile = (IDocument)triplet.RemoteStorage.CmisObject;
 
                     // Check is write permission is allow
                     // Check if the file is Check out or not
@@ -415,7 +397,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
 
             try {
 
-                IDocument remoteDocument = (IDocument)session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
+                // IDocument remoteDocument = (IDocument)session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
+                IDocument remoteDocument = (IDocument)triplet.RemoteStorage.CmisObject;
 
                 if (remoteDocument.IsVersionSeriesCheckedOut != null
                     && (bool)remoteDocument.IsVersionSeriesCheckedOut
@@ -456,7 +439,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
         public static bool DeleteRemoteFolder (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             try {
-                IFolder folder = (IFolder)session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
+                //IFolder folder = (IFolder)session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
+                IFolder folder = (IFolder)triplet.RemoteStorage.CmisObject;
 
                 // Companion with triplet.Delay property:
                 // All files and subfolders should be removed before
@@ -519,10 +503,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
         /// <summary>
         /// Remove folder from local filesystem and database.
         /// </summary>
-        public static bool DeleteLocalFolder (SyncTriplet.SyncTriplet triplet, bool containsConflict, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static bool DeleteLocalFolder (SyncTriplet.SyncTriplet triplet, bool isClean, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string localFullPath = triplet.LocalStorage.FullPath;
             // Folder has been deleted on server, delete it locally too.
+            bool containsConflict = !isClean;
+
             try {
                 if (containsConflict) {
 

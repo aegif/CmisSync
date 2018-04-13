@@ -39,7 +39,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         private BlockingCollection<SyncTriplet.SyncTriplet> semiSyncTriplets = null;
 
-        private FoldersDependencies foldersDependencies = null;
+        private ItemsDependencies itemsDependencies = null;
 
         private SemiSyncTripletManager semiSyncTripletManager;
 
@@ -76,13 +76,13 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
                 IsWorking = true;
 
-                foldersDependencies = new FoldersDependencies ();
+                itemsDependencies = new ItemsDependencies ();
                 fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
                 semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, foldersDependencies));
-                Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start (semiSyncTriplets, foldersDependencies));
-                Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalCrawler (semiSyncTriplets, fullSyncTriplets, foldersDependencies));
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies));
+                Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start (semiSyncTriplets, itemsDependencies));
+                Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalCrawler (semiSyncTriplets, fullSyncTriplets, itemsDependencies));
 
                 semiManagerTask.Wait ();
                 semiSyncTriplets.CompleteAdding ();
@@ -110,7 +110,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             Console.WriteLine ("Crawl Sync Task Completed.");
 
             //TODO: debug
-            foldersDependencies.OutputFoldersDependences ();
+            itemsDependencies.OutputItemsDependences ();
 
             return succeed;
         }
@@ -125,10 +125,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
                 IsWorking = true;
 
-                foldersDependencies = new FoldersDependencies ();
+                itemsDependencies = new ItemsDependencies ();
                 fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, foldersDependencies));
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies));
                 try {
 
                     Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog (fullSyncTriplets));

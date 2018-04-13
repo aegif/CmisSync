@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
@@ -31,11 +32,9 @@ namespace CmisSync.Lib.Sync.SyncMachine
          */
         private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null; 
 
-        private ConcurrentQueue<SyncTriplet.SyncTriplet> delayedFolerDeletions = new ConcurrentQueue<SyncTriplet.SyncTriplet> ();
-
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder = null;
 
-        private FoldersDependencies foldersDeps = null;
+        private ItemsDependencies itemsDeps = null;
 
         public SyncTripletProcessor (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session)
         {
@@ -45,14 +44,12 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         public void Start (
             BlockingCollection<SyncTriplet.SyncTriplet> full,
-            FoldersDependencies fdps
+            ItemsDependencies fdps
         ) {
 
             fullSyncTriplets = full;
 
-            foldersDeps = fdps;
-
-            delayedFolerDeletions = new ConcurrentQueue<SyncTriplet.SyncTriplet> ();
+            itemsDeps = fdps;
 
             ParallelOptions options = new ParallelOptions ();
             options.MaxDegreeOfParallelism = MaxParallelism;
@@ -67,94 +64,11 @@ namespace CmisSync.Lib.Sync.SyncMachine
                                   // hint:
                                   // because all folder deletions are enqueued after its conttents, 
                                   // we can use spin() or sleep() to wait for that, just as create remote folder
-                                  bool succeed = ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, foldersDeps);
-                                  foldersDeps.RemoveFolderDependence (triplet.Name, succeed);
-
+                                  bool succeed = ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, itemsDeps);
+                                  Console.WriteLine (" P [ WorkerThread: {0} ] processing triplet [ {1} ]'s result: succeed={2}",
+                                                     Thread.CurrentThread.ManagedThreadId, triplet.Name, succeed);
+                                  itemsDeps.RemoveItemDependence (triplet.Name, succeed);
                               });
-
-            //Console.WriteLine (" - Processing folder deletions");
-
-            // Process folder-deletion operations 
-            // One-by-One non-parallel approach yet
-
-            //List<SyncTriplet.SyncTriplet> folderDeletionList = delayedFolerDeletions.ToList();
-
-            // Lexicographical order
-            // Therefore if there are files remained in the repository, eg. local removed but remote modified, vise versa
-            // the corresponding folder will be remained. 
-
-            //folderDeletionList.Sort (new ReverseLexicoGraphicalComparer<SyncTriplet.SyncTriplet> ());
-            //DoParallelFolderDeletions (folderDeletionList);
-
-            // reset delayed folder deletion buffer
-
-            //delayedFolerDeletions = null;
-        }
-       
-        private void DoParallelFolderDeletions(List<SyncTriplet.SyncTriplet> folders) {
-
-            Console.WriteLine (" - Do parallel folder deletions: ");
-
-            while (folders.Count > 0) {
-
-                // everytime initialize a new full sync triplets;
-                fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
-                Task parallelDeletionTask = Task.Factory.StartNew (() => ParallelFolderDeletionTask() );
-
-                // reset Delayed property.
-                folders[0].Delayed = false;
-
-                if (!fullSyncTriplets.TryAdd (folders[0])) {
-                    Console.WriteLine ("  - failed add : " + folders[0].Name);
-                } else {
-                    Console.WriteLine ("  - start parallel delete: " + folders[0].Name);
-                }
-
-                string lastFolderName = folders[0].Name;
-
-                folders.RemoveAt (0);
-                int i = 0; 
-                while (i < folders.Count) {
-                    if (lastFolderName.StartsWith(folders[i].Name)) {
-                        // This folder can not be processed concurrently with 
-                        // the last folder name, increase index
-                        i++;
-                    } else {
-                        // This foler can be processed, remove from list and push 
-                        // to fullsynctriplet
-                        lastFolderName = folders [i].Name;
-
-                        // Set delayed to false
-                        folders [i].Delayed = false;
-
-                        if (!fullSyncTriplets.TryAdd (folders [i])) {
-                            Console.WriteLine ("  - failed add : " + folders [i].Name);
-                        } else {
-                            Console.WriteLine ("  - start parallel delete: " + folders [i].Name);
-                        }
-
-                        folders.RemoveAt (i);
-                    }
-                }
-
-                fullSyncTriplets.CompleteAdding ();
-
-                parallelDeletionTask.Wait ();
-
-                Console.WriteLine ("  - one loop of parallel folder deletions completed. start next loop");
-            }
-        }
-
-        private void ParallelFolderDeletionTask() {
-
-            ParallelOptions options = new ParallelOptions ();
-            options.MaxDegreeOfParallelism = MaxParallelism;
-
-            // Process parallel folder deletion
-            Parallel.ForEach (Internal.SingleItemPartitioner.Create (fullSyncTriplets.GetConsumingEnumerable ()), options,
-                              (triplet) => ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, new ConcurrentQueue<SyncTriplet.SyncTriplet>() )
-                             );
-
         }
 
         ~SyncTripletProcessor ()
