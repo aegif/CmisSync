@@ -36,6 +36,7 @@ namespace CmisSync.Console
         /// </summary>
 		public static int Main (string[] args)
 		{
+            System.Console.WriteLine("Started CmisSyncOnce");
             Utils.ConfigureLogging();
             Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);
 
@@ -66,6 +67,9 @@ namespace CmisSync.Console
 
             // Synchronize all
             bool success = once.Sync();
+
+            //System.Console.WriteLine("Press enter to close...");
+            //System.Console.ReadLine();
 
             // Exit code 0 if synchronization was successful or not needed,
             // 1 if synchronization failed, or could not run.

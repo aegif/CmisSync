@@ -145,6 +145,7 @@ namespace CmisSync.Lib
         [Obsolete("Use other contructor outside of testings")]
         public RepoInfo(string name, string cmisDatabaseFolder, string remotePath, string address, string user, string password, string repoID, double pollInterval, Boolean isSuspended, DateTime lastSuccessedSync, bool syncAtStartup)
         {
+            // TODO call simple constructor above instead of duplicated code.
             Name = name;
             name = name.Replace("\\", "_");
             name = name.Replace("/", "_");

@@ -557,6 +557,8 @@ namespace TestLibrary
             {
                 return File.Exists(path1);
             }));
+            Console.WriteLine("Document: " + doc1.Id);
+            Console.WriteLine("Folder: " + remoteFolder.Id);
 
             Console.WriteLine("Rename remote document");
             IDocument doc2 = RenameRemoteDocument(doc1, name2);
@@ -653,18 +655,19 @@ namespace TestLibrary
             {
                 return Directory.Exists(path1);
             }));
-
-            //  rename folder
-            Console.WriteLine(" Remote rename folder");
-            Assert.IsTrue(Directory.Exists(path1));
             Assert.IsFalse(Directory.Exists(path2));
+            Console.WriteLine("Base folder: " + remoteFolder.Id);
+            Console.WriteLine("Sub-folder: " + remoteSubFolder.Id);
+
+            //  rename the sub-folder
+            Console.WriteLine("Rename remote sub-folder");
             IFolder folder2 = RenameRemoteFolder(remoteSubFolder, name2);
-            Assert.IsTrue(SyncAndWaitUntilCondition(synchronizedFolder, delegate
+            success = synchronizedFolder.Sync();
+            Assert.IsTrue(success);
+            Assert.IsTrue(WaitUntilCondition(delegate
             {
                 return !Directory.Exists(path1) && Directory.Exists(path2);
             }));
-            Assert.IsFalse(Directory.Exists(path1));
-            Assert.IsTrue(Directory.Exists(path2));
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]

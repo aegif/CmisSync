@@ -48,7 +48,7 @@ namespace TestLibraryRunner
 
             tests.Init();
             // Enter the unit test method to debug below.
-            tests.DeleteRemoteDocument((string)server[0], (string)server[1],
+            tests.RenameRemoteFolder((string)server[0], (string)server[1],
                     (string)server[2], (string)server[3], (string)server[4], (string)server[5], (string)server[6]);
             tests.TearDown();
         }
@@ -61,8 +61,16 @@ namespace TestLibraryRunner
             new SyncTests().GetRepositoriesFuzzy((string)server[0], (string)server[1], (string)server[2]);
         }
 
+        static void testExternal()
+        {
+            new ExternalTests().StartStopConsole();
+        }
+
         static void Main(string[] args)
         {
+            testExternal();
+            return;
+
             ServicePointManager.CertificatePolicy = new TrustAlways();
             bool firstRun = ! File.Exists(ConfigManager.CurrentConfigFile);
 
@@ -91,7 +99,7 @@ namespace TestLibraryRunner
                 log4net.Config.XmlConfigurator.Configure(ConfigManager.CurrentConfig.GetLog4NetConfig());
             }
 
-            test(path == null ? "../../../TestLibrary/test-servers.json" : path);
+            //test(path == null ? "../../../TestLibrary/test-servers.json" : path);
             //testFuzzy();
             //new CmisSyncTests().TestCrypto();
 
