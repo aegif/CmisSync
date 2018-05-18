@@ -65,7 +65,7 @@ namespace CmisSync.Lib
                 }
                 else
                 {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cmissync", "config.xml");
+                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cmissync", "config.xml");
                 }
             }
 

@@ -342,7 +342,9 @@ namespace CmisSync.Lib
         /// </summary>
         public string GetLogFilePath()
         {
-            return Path.Combine(ConfigPath, "CmisSync_log.txt");
+            XmlNode appender = configXml.Log4Net.SelectSingleNode("appender");
+            XmlNode file = appender.SelectSingleNode("file");
+            return file.Attributes["value"].Value;
         }
 
         private string GetLogLevel()
