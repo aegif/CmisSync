@@ -347,6 +347,18 @@ namespace CmisSync.Lib
             return file.Attributes["value"].Value;
         }
 
+
+        /// <summary>
+        /// Create the path to the future log file.
+        /// If there is already a log configuration, then please use GetLogFilePath instead.
+        /// </summary>
+        public string CreateLogFilePath()
+        {
+            // Create the log file at the same place as the .cmissync databases.
+            return Path.Combine(ConfigManager.DefaultConfigPath(), "debug_log.txt");
+        }
+
+
         private string GetLogLevel()
         {
 #if (DEBUG)
@@ -385,7 +397,7 @@ namespace CmisSync.Lib
             using (TextReader textReader = new StringReader(@"
   <log4net>
     <appender name=""CmisSyncFileAppender"" type=""log4net.Appender.RollingFileAppender"">
-      <file value=""" + GetLogFilePath() + @""" />
+      <file value=""" + CreateLogFilePath() + @""" />
       <appendToFile value=""true"" />
       <rollingStyle value=""Size"" />
       <maxSizeRollBackups value=""5"" />

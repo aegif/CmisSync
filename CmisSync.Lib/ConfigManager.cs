@@ -53,6 +53,17 @@ namespace CmisSync.Lib
 
 
         /// <summary>
+        /// Default path to use when creating "configuration" files such as config.xml, databases, and logs.
+        /// Please note that some CmisSync customized versions store their "configuration" in a different path,
+        /// so only use this method when no configuration exist, and never to retrieve the path of existing configuration.
+        /// </summary>
+        public static string DefaultConfigPath()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cmissync");
+        }
+
+        
+        /// <summary>
         /// Get the filesystem path to the XML configuration file.
         /// </summary>
         public static string CurrentConfigFile
@@ -65,7 +76,7 @@ namespace CmisSync.Lib
                 }
                 else
                 {
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cmissync", "config.xml");
+                    return Path.Combine(DefaultConfigPath(), "config.xml");
                 }
             }
 
