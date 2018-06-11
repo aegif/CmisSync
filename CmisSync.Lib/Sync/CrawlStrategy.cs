@@ -167,7 +167,7 @@ namespace CmisSync.Lib.Sync
                 operationContext.IncludeAcls = true;
                 // renditionFilter=* not available in DotCMIS
                 this.repoInfo.CmisProfile.ConfigureOperationContext(operationContext);
-                operationContext.MaxItemsPerPage = Int32.MaxValue;
+                operationContext.MaxItemsPerPage = Int32.MaxValue - 1; // -1 because it is the lowest value that works on SAP Cloud Platform Document Service, see https://github.com/aegif/CmisSync/issues/762
 
                 // Get children.
                 IItemEnumerable<ICmisObject> childrenEnumeration = remoteFolder.GetChildren(operationContext);
