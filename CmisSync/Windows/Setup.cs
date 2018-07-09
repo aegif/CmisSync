@@ -146,7 +146,7 @@ namespace CmisSync
                                 {
                                     Dispatcher.BeginInvoke((Action)delegate
                                     {
-                                        Program.UI.StatusIcon.Dispose();
+                                        Program.gui.StatusIcon.Dispose();
                                         Controller.SetupPageCancelled();
                                     });
                                 };

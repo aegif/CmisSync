@@ -37,7 +37,7 @@ namespace CmisSync
         /// <summary>
         /// User interface for CmisSync.
         /// </summary>
-        public static GUI UI;
+        public static GUI gui;
 
         /// <summary>
         /// MVC controller.
@@ -123,8 +123,8 @@ namespace CmisSync
             {
                 Controller.Initialize(firstRun);
 
-                UI = new GUI();
-                UI.Run();
+                gui = new GUI();
+                gui.Run();
             }
             catch (Exception e)
             {

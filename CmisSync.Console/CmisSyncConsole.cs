@@ -19,17 +19,28 @@ namespace CmisSync.Console
     /// Utility that performs a single synchronization.
     /// Useful for scripts, cron or command-line usage.
     /// </summary>
-	class CmisSyncOnce
+	class CmisSyncConsole
 	{
         /// <summary>
         /// Logging.
         /// </summary>
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisSyncOnce));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(CmisSyncConsole));
 
         /// <summary>
         /// Configured synchronized folder on which the synchronization must be performed.
         /// </summary>
-		private List<RepoInfo> repos = new List<RepoInfo>();
+		private List<CmisRepo> repos = new List<CmisRepo>();
+
+        /// <summary>
+        /// Whether the tool should continuously synchronize forever (like the desktop CmisSync, using a poll interval/etc),
+        /// or just synchronize once and exit.
+        /// </summary>
+        private bool continuous;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static ConsoleController controller = new ConsoleController();
 
         /// <summary>
         /// Main method, pass folder name as argument.
@@ -45,28 +56,43 @@ namespace CmisSync.Console
 
             PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
 
-            CmisSyncOnce once = new CmisSyncOnce();
+            bool continuous = false;
+
+            CmisSyncConsole instance = null;
 
             // Load the specified synchronized folders, or all if none is specified.
             if (args.Length > 0)
             {
-                for (int i = 0; i < args.Length; i++)
+                int i = 0;
+
+                if ("-c".Equals(args[0]))
                 {
-                    once.AddSynchronizedFolder(args[i]);
+                    continuous = true;
+                    i++;
+                }
+
+                instance = new CmisSyncConsole(continuous);
+
+                for (; i < args.Length; i++)
+                {
+                    instance.AddSynchronizedFolder(args[i]);
                 }
             }
             else
             {
+                // No specific folders given, so load all folders.
+
                 Config config = ConfigManager.CurrentConfig;
                 foreach (CmisSync.Lib.Config.SyncConfig.Folder folder in config.Folders)
                 {
                     RepoInfo repoInfo = folder.GetRepoInfo();
-                    once.repos.Add(repoInfo);
+                    CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, false);
+                    instance.repos.Add(cmisRepo);
                 }
             }
 
             // Synchronize all
-            bool success = once.Sync();
+            bool success = instance.Run();
 
             //System.Console.WriteLine("Press enter to close...");
             //System.Console.ReadLine();
@@ -89,24 +115,41 @@ namespace CmisSync.Console
                 return;
             }
 			RepoInfo repoInfo = folder.GetRepoInfo();
-            repos.Add(repoInfo);
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, false);
+            repos.Add(cmisRepo);
 		}
+
+        public CmisSyncConsole(bool continuous)
+        {
+            this.continuous = continuous;
+        }
 
         /// <summary>
         /// Synchronize folder.
         /// </summary>
-		private bool Sync ()
+		private bool Run ()
 		{
             bool success = true;
-            ConsoleController controller = new ConsoleController();
 
-            foreach (RepoInfo repoInfo in repos)
+            if (continuous)
             {
-                CmisRepo cmisRepo = new CmisRepo (repoInfo, controller, false);
-                success &= cmisRepo.SyncInForeground();
-            }
+                // TODO
+                foreach (CmisRepo cmisRepo in repos)
+                {
+                    //success &= cmisRepo.;
+                }
 
-            return success;
-		}
+                return true;
+            }
+            else
+            {
+                foreach (CmisRepo cmisRepo in repos)
+                {
+                    success &= cmisRepo.SyncInForeground();
+                }
+
+                return success;
+            }
+        }
 	}
 }

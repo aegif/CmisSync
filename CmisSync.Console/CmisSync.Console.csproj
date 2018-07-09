@@ -93,7 +93,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CmisSyncOnce.cs" />
+    <Compile Include="CmisSyncConsole.cs" />
     <Compile Include="ConsoleController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="YesCertPolicyHandler.cs" />

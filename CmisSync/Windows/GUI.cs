@@ -65,9 +65,9 @@ namespace CmisSync {
         public void Run ()
         {
             try {
-            Application.Run (StatusIcon = new StatusIcon ());
+                Application.Run (StatusIcon = new StatusIcon ());
             } finally {
-            StatusIcon.Dispose ();
+                StatusIcon.Dispose ();
             }
         }
     }

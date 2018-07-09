@@ -321,14 +321,14 @@ namespace CmisSync
         public void SettingsClicked(string reponame)
         {
             CmisSync.Lib.Config.SyncConfig.Folder repository = ConfigManager.CurrentConfig.GetFolder(reponame);
-            Program.UI.Setup.Controller.saved_repository = reponame;
+            Program.gui.Setup.Controller.saved_repository = reponame;
             if (repository != null)
             {
-                Program.UI.Setup.Controller.saved_user = repository.UserName;
-                Program.UI.Setup.Controller.saved_remote_path = repository.RemotePath;
-                Program.UI.Setup.Controller.saved_address = repository.RemoteUrl;
-                Program.UI.Setup.Controller.saved_sync_interval = (int)repository.PollInterval;
-                Program.UI.Setup.Controller.saved_syncatstartup = repository.SyncAtStartup;
+                Program.gui.Setup.Controller.saved_user = repository.UserName;
+                Program.gui.Setup.Controller.saved_remote_path = repository.RemotePath;
+                Program.gui.Setup.Controller.saved_address = repository.RemoteUrl;
+                Program.gui.Setup.Controller.saved_sync_interval = (int)repository.PollInterval;
+                Program.gui.Setup.Controller.saved_syncatstartup = repository.SyncAtStartup;
             }
             Program.Controller.ShowSetupWindow(PageType.Settings);
         }

@@ -171,8 +171,8 @@ namespace TestLibrary
         [Test, Category("Fast")]
         public void StartStopConsole()
         {
-            // TODO Change this to your CmisSync
-            Process process = Process.Start(@"C:\Users\win7pro32bit\Documents\GitHub\CmisSync\CmisSync.Console\bin\Debug\CmisSync.Console.exe");
+            // TODO Change this to your installed CmisSync
+            Process process = Process.Start(@"C:\Users\nico\src\CmisSync\CmisSync.Console\bin\Debug\CmisSync.Console.exe");
             if (null == process)
                 Assert.Fail("Could not start process, maybe an existing process has been reused?");
 

@@ -202,7 +202,7 @@ namespace CmisSync.Lib
             Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
             remote_timer.Interval = repoInfo.PollInterval;
 
-            //Partial sync interval..
+            // Partial sync interval.
             local_timer.Elapsed += delegate
             {
                 // Run partial sync.
