@@ -23,7 +23,7 @@ Open CmisSync/MacConsole/installer/CmisSyncConsole.pkg
 ### Usage
 
 ```
-$ smissync_once <sync folder name>
+$ cmissync_once <sync folder name>
 ```
 
 ### Uninstall
