@@ -85,36 +85,6 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// Stop syncing momentarily.
-        /// </summary>
-        public void Disable()
-        {
-            Enabled = false;
-            RepoInfo.IsSuspended = true;
-
-            //Get configuration
-            Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
-            syncConfig.IsSuspended = true;
-            config.Save();
-        }
-
-        /// <summary>
-        /// Restart syncing.
-        /// </summary>
-        public virtual void Enable()
-        {
-            Enabled = true;
-            RepoInfo.IsSuspended = false;
-
-            //Get configuration
-            Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
-            syncConfig.IsSuspended = false;
-            config.Save();
-        }
-
-        /// <summary>
         /// Return the synchronized folder's information.
         /// </summary>
         protected RepoInfo RepoInfo { get; set; }
@@ -327,6 +297,38 @@ namespace CmisSync.Lib
             //Always resume sync...
             Enable();
             this.remote_timer.Start();
+        }
+
+
+        /// <summary>
+        /// Stop syncing momentarily.
+        /// </summary>
+        public void Disable()
+        {
+            Enabled = false;
+            RepoInfo.IsSuspended = true;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
+            syncConfig.IsSuspended = true;
+            config.Save();
+        }
+
+
+        /// <summary>
+        /// Restart syncing.
+        /// </summary>
+        public virtual void Enable()
+        {
+            Enabled = true;
+            RepoInfo.IsSuspended = false;
+
+            //Get configuration
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
+            syncConfig.IsSuspended = false;
+            config.Save();
         }
 
 

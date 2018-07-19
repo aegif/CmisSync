@@ -115,7 +115,7 @@ namespace CmisSync
             }
 
             // Increase the number of concurrent requests to each server,
-            // as an unsatisfying workaround until this DotCMIS bug 632 is solved.
+            // as an unsatisfying workaround until DotCMIS bug 632 is solved.
             // See https://github.com/aegif/CmisSync/issues/140
             ServicePointManager.DefaultConnectionLimit = 1000;
 
