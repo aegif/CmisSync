@@ -101,35 +101,28 @@ namespace CmisSync.Lib
         /// </summary>
         public Watcher Watcher { get; private set; }
 
+
         /// <summary>
         /// Timer for watching the local and remote filesystems.
+        /// It perfoms synchronization at regular intervals.
         /// </summary>
-        private Timers.Timer remote_timer = new Timers.Timer();
+        private Timers.Timer periodicSynchronizationTimer = new Timers.Timer();
+
 
         /// <summary>
         /// Timer to delay syncing after local change is made.
+        /// Often several local changes are made in a short interval,
+        /// for instance MS Word sometimes deletes a file then rewrites it,
+        /// so better wait a bit rather than start syncing immediately.
         /// </summary>
-        private Timers.Timer local_timer = new Timers.Timer();
+        private Timers.Timer watcherDelayTimer = new Timers.Timer();
+
 
         /// <summary>
-        /// Timer for syncing after local change is made.
+        /// Time to wait after a local change is made.
         /// </summary>
-        private readonly double delay_interval = 15 * 1000; //15 seconds.
+        private readonly double delayAfterLocalChange = 15 * 1000; // 15 seconds.
 
-        /// <summary>
-        /// When the last full sync completed.
-        /// </summary>
-        private DateTime last_sync;
-
-        /// <summary>
-        /// When the last partial sync completed.
-        /// </summary>
-        private DateTime last_partial_sync;
-
-        /// <summary>
-        /// Folder lock.
-        /// </summary>
-        private FolderLock folderLock;
 
         /// <summary>
         /// Track whether <c>Dispose</c> has been called.
@@ -163,23 +156,23 @@ namespace CmisSync.Lib
             }
             
             // Main loop syncing every X seconds.
-            remote_timer.Elapsed += delegate
+            periodicSynchronizationTimer.Elapsed += delegate
             {
                 // Synchronize.
                 SyncInBackground();
             };
-            remote_timer.AutoReset = true;
+            periodicSynchronizationTimer.AutoReset = true;
             Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
-            remote_timer.Interval = repoInfo.PollInterval;
+            periodicSynchronizationTimer.Interval = repoInfo.PollInterval;
 
             // Partial sync interval.
-            local_timer.Elapsed += delegate
+            watcherDelayTimer.Elapsed += delegate
             {
                 // Run partial sync.
                 SyncInBackground();
             };
-            local_timer.AutoReset = false;
-            local_timer.Interval = delay_interval;
+            watcherDelayTimer.AutoReset = false;
+            watcherDelayTimer.Interval = delayAfterLocalChange;
         }
 
 
@@ -211,10 +204,10 @@ namespace CmisSync.Lib
             {
                 if (disposing)
                 {
-                    this.remote_timer.Stop();
-                    this.remote_timer.Dispose();
-                    this.local_timer.Stop();
-                    this.local_timer.Dispose();
+                    this.periodicSynchronizationTimer.Stop();
+                    this.periodicSynchronizationTimer.Dispose();
+                    this.watcherDelayTimer.Stop();
+                    this.watcherDelayTimer.Dispose();
                     if (Watcher != null)
                     {
                         this.Watcher.Dispose();
@@ -268,7 +261,7 @@ namespace CmisSync.Lib
             CmisSync.Lib.Config.SyncConfig.Folder syncConfig = config.GetFolder(this.Name);
 
             //Pause sync
-            this.remote_timer.Stop();
+            this.periodicSynchronizationTimer.Stop();
             if (Enabled)
             {
                 Disable();
@@ -287,7 +280,7 @@ namespace CmisSync.Lib
 
             //Update poll interval
             this.RepoInfo.PollInterval = pollInterval;
-            this.remote_timer.Interval = pollInterval;
+            this.periodicSynchronizationTimer.Interval = pollInterval;
             syncConfig.PollInterval = pollInterval;
             Logger.Debug("Updated \"" + this.Name + "\" poll interval: " + pollInterval);
 
@@ -296,7 +289,7 @@ namespace CmisSync.Lib
 
             //Always resume sync...
             Enable();
-            this.remote_timer.Start();
+            this.periodicSynchronizationTimer.Start();
         }
 
 
@@ -353,8 +346,8 @@ namespace CmisSync.Lib
         /// </summary>
         public void OnFileActivity(object sender, FileSystemEventArgs args)
         {
-            local_timer.Stop();
-            local_timer.Start(); //Restart the local timer...
+            watcherDelayTimer.Stop();
+            watcherDelayTimer.Start(); //Restart the local timer...
         }
 
 
@@ -381,7 +374,7 @@ namespace CmisSync.Lib
         /// </summary>
         public void OnSyncComplete(bool success)
         {
-            remote_timer.Start();
+            periodicSynchronizationTimer.Start();
 
             if (Watcher != null)
             {
