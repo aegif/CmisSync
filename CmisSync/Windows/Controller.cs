@@ -217,5 +217,58 @@ namespace CmisSync
             p.StartInfo.UseShellExecute = true;
             p.Start();
         }
+        
+        /// <summary>
+        /// Show setup window event.
+        /// </summary>
+        public event ShowSetupWindowEventHandler ShowSetupWindowEvent = delegate { };
+
+        /// <summary>
+        /// Show setup window event.
+        /// </summary>
+        public delegate void ShowSetupWindowEventHandler(PageType page_type);
+
+        /// <summary>
+        /// Show about window event.
+        /// </summary>
+        public event Action ShowAboutWindowEvent = delegate { };
+
+
+        /// <summary>
+        /// Once the GUI has loaded, show setup window if it is the first run, or check the repositories.
+        /// </summary>
+        public void UIHasLoaded()
+        {
+            if (firstRun)
+            {
+                ShowSetupWindow(PageType.Setup);
+            }
+
+            new Thread(() =>
+            {
+                CheckRepositories();
+                RepositoriesLoaded = true;
+                // Update GUI.
+                CallFolderListChanged();
+            }).Start();
+        }
+
+        /// <summary>
+        /// Show first-time wizard.
+        /// </summary>
+        public void ShowSetupWindow(PageType page_type)
+        {
+            ShowSetupWindowEvent(page_type);
+        }
+
+        /// <summary>
+        /// Show info about CmisSync
+        /// </summary>
+        public void ShowAboutWindow()
+        {
+            ShowAboutWindowEvent();
+        }
+
+
     }
 }

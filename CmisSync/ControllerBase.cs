@@ -46,7 +46,7 @@ namespace CmisSync
         /// <summary>
         /// Whether it is the first time that CmisSync is being run.
         /// </summary>
-        private bool firstRun;
+        protected bool firstRun;
 
         /// <summary>
         /// All the info about the CmisSync synchronized folder being created.
@@ -56,7 +56,7 @@ namespace CmisSync
         /// <summary>
         /// Whether the repositories have finished loading.
         /// </summary>
-        public bool RepositoriesLoaded { get; private set; }
+        public bool RepositoriesLoaded { get; protected set; }
 
         /// <summary>
         /// List of the CmisSync synchronized folders.
@@ -67,21 +67,6 @@ namespace CmisSync
         /// Path where the CmisSync synchronized folders are by default.
         /// </summary>
         public string FoldersPath { get; private set; }
-
-        /// <summary>
-        /// Show setup window event.
-        /// </summary>
-        public event ShowSetupWindowEventHandler ShowSetupWindowEvent = delegate { };
-
-        /// <summary>
-        /// Show setup window event.
-        /// </summary>
-        public delegate void ShowSetupWindowEventHandler(PageType page_type);
-
-        /// <summary>
-        /// Show about window event.
-        /// </summary>
-        public event Action ShowAboutWindowEvent = delegate { };
 
         /// <summary>
         /// Folder list changed.
@@ -220,25 +205,6 @@ namespace CmisSync
             }
 
             folderLock = new FolderLock(FoldersPath);
-        }
-
-        /// <summary>
-        /// Once the GUI has loaded, show setup window if it is the first run, or check the repositories.
-        /// </summary>
-        public void UIHasLoaded()
-        {
-            if (firstRun)
-            {
-                ShowSetupWindow(PageType.Setup);
-            }
-
-            new Thread(() =>
-            {
-                CheckRepositories();
-                RepositoriesLoaded = true;
-                // Update GUI.
-                FolderListChanged();
-            }).Start();
         }
 
         /// <summary>
@@ -419,7 +385,7 @@ namespace CmisSync
         /// Check the configured CmisSync synchronized folders.
         /// Remove the ones whose folders have been deleted.
         /// </summary>
-        private void CheckRepositories()
+        protected void CheckRepositories()
         {
             lock (this.repo_lock)
             {
@@ -532,22 +498,6 @@ namespace CmisSync
         }
 
         /// <summary>
-        /// Show first-time wizard.
-        /// </summary>
-        public void ShowSetupWindow(PageType page_type)
-        {
-            ShowSetupWindowEvent(page_type);
-        }
-
-        /// <summary>
-        /// Show info about CmisSync
-        /// </summary>
-        public void ShowAboutWindow()
-        {
-            ShowAboutWindowEvent();
-        }
-
-        /// <summary>
         /// Show an alert to the user.
         /// </summary>
         public void ShowAlert(string title, string message)
@@ -592,6 +542,11 @@ namespace CmisSync
         {
             //TODO: why a Tuple? We should get delegate(ErrorEvent event) or delegate(string repoName, Exception error)
             OnError(error);
+        }
+
+        protected void CallFolderListChanged()
+        {
+            FolderListChanged();
         }
     }
 }
