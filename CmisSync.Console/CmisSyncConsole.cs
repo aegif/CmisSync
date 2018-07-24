@@ -32,15 +32,65 @@ namespace CmisSync.Console
 		private List<CmisRepo> repos = new List<CmisRepo>();
 
         /// <summary>
-        /// Whether the tool should continuously synchronize forever (like the desktop CmisSync, using a poll interval/etc),
+        /// Whether the tool should synchronize again and again forever (like the desktop CmisSync, using a poll interval/etc),
         /// or just synchronize once and exit.
         /// </summary>
-        private bool continuous;
+        private bool perpetual;
 
         /// <summary>
-        /// 
+        /// Controller for the console UI.
         /// </summary>
         private static ConsoleController controller = new ConsoleController();
+
+        public CmisSyncConsole(bool perpetual)
+        {
+            this.perpetual = perpetual;
+        }
+
+        /// <summary>
+        /// Load folder configuration.
+        /// </summary>
+        private void AddSynchronizedFolder(string folderName)
+        {
+            Config config = ConfigManager.CurrentConfig;
+            CmisSync.Lib.Config.SyncConfig.Folder folder = config.GetFolder(folderName);
+            if (folder == null)
+            {
+                System.Console.WriteLine("No folder found with this name: " + folderName);
+                return;
+            }
+            RepoInfo repoInfo = folder.GetRepoInfo();
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, false, perpetual);
+            repos.Add(cmisRepo);
+        }
+
+        /// <summary>
+        /// Synchronize folder.
+        /// </summary>
+		private bool Run()
+        {
+            bool success = true;
+
+            if (perpetual)
+            {
+                // No need to do anything, as the periodicSynchronizationTimer objects in RepoBase have been configured to run synchronizations at regular intervals.
+
+                // Wait until our processus gets terminated. All work is done in other threads.
+                Thread.Sleep(Timeout.Infinite);
+
+                // This line will never be reached, but needed for compilation.
+                return true;
+            }
+            else
+            {
+                foreach (CmisRepo cmisRepo in repos)
+                {
+                    success &= cmisRepo.SyncInForeground();
+                }
+
+                return success;
+            }
+        }
 
         /// <summary>
         /// Main method, pass folder name as argument.
@@ -56,22 +106,28 @@ namespace CmisSync.Console
 
             PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
 
-            bool continuous = false;
+            bool perpetual = false;
 
             CmisSyncConsole instance = null;
 
+            // -p means perpetual.
+            if (args.Length > 0 && "-p".Equals(args[0]))
+            {
+                perpetual = true;
+            }
+
+            instance = new CmisSyncConsole(perpetual);
+
             // Load the specified synchronized folders, or all if none is specified.
-            if (args.Length > 0)
+            if (args.Length > 1 || (!perpetual && args.Length > 0 ))
             {
                 int i = 0;
 
-                if ("-c".Equals(args[0]))
+                // Skip the -p argument if present.
+                if ("-p".Equals(args[0]))
                 {
-                    continuous = true;
                     i++;
                 }
-
-                instance = new CmisSyncConsole(continuous);
 
                 for (; i < args.Length; i++)
                 {
@@ -86,7 +142,7 @@ namespace CmisSync.Console
                 foreach (CmisSync.Lib.Config.SyncConfig.Folder folder in config.Folders)
                 {
                     RepoInfo repoInfo = folder.GetRepoInfo();
-                    CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, false);
+                    CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, false, perpetual);
                     instance.repos.Add(cmisRepo);
                 }
             }
@@ -94,62 +150,12 @@ namespace CmisSync.Console
             // Synchronize all
             bool success = instance.Run();
 
-            //System.Console.WriteLine("Press enter to close...");
-            //System.Console.ReadLine();
+            System.Console.WriteLine("Press enter to close...");
+            System.Console.ReadLine();
 
             // Exit code 0 if synchronization was successful or not needed,
             // 1 if synchronization failed, or could not run.
             return success ? 0 : 1;
 		}
-
-        /// <summary>
-        /// Load folder configuration.
-        /// </summary>
-        private void AddSynchronizedFolder(string folderName)
-		{
-			Config config = ConfigManager.CurrentConfig;
-            CmisSync.Lib.Config.SyncConfig.Folder folder = config.GetFolder(folderName);
-            if (folder == null)
-            {
-                System.Console.WriteLine("No folder found with this name: " + folderName);
-                return;
-            }
-			RepoInfo repoInfo = folder.GetRepoInfo();
-            CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, false);
-            repos.Add(cmisRepo);
-		}
-
-        public CmisSyncConsole(bool continuous)
-        {
-            this.continuous = continuous;
-        }
-
-        /// <summary>
-        /// Synchronize folder.
-        /// </summary>
-		private bool Run ()
-		{
-            bool success = true;
-
-            if (continuous)
-            {
-                // TODO
-                foreach (CmisRepo cmisRepo in repos)
-                {
-                    //success &= cmisRepo.;
-                }
-
-                return true;
-            }
-            else
-            {
-                foreach (CmisRepo cmisRepo in repos)
-                {
-                    success &= cmisRepo.SyncInForeground();
-                }
-
-                return success;
-            }
-        }
 	}
 }

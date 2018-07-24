@@ -132,8 +132,9 @@ namespace CmisSync.Lib
 
         /// <summary>
         /// Constructor.
+        /// <param name="perpetual">Whether to perpetually sync again and again at regular intervals. False means syncing just once then stopping.</param>
         /// </summary>
-        public RepoBase(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher)
+        public RepoBase(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher, bool perpetual)
         {
             RepoInfo = repoInfo;
             LocalPath = repoInfo.TargetDirectory;
@@ -154,25 +155,29 @@ namespace CmisSync.Lib
                 Watcher = new Watcher(LocalPath);
                 Watcher.EnableRaisingEvents = true;
             }
-            
-            // Main loop syncing every X seconds.
-            periodicSynchronizationTimer.Elapsed += delegate
-            {
-                // Synchronize.
-                SyncInBackground();
-            };
-            periodicSynchronizationTimer.AutoReset = true;
-            Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
-            periodicSynchronizationTimer.Interval = repoInfo.PollInterval;
 
-            // Partial sync interval.
-            watcherDelayTimer.Elapsed += delegate
+            if (perpetual)
             {
-                // Run partial sync.
-                SyncInBackground();
-            };
-            watcherDelayTimer.AutoReset = false;
-            watcherDelayTimer.Interval = delayAfterLocalChange;
+                // Main loop syncing every X seconds.
+                periodicSynchronizationTimer.Elapsed += delegate
+                {
+                    // Synchronize.
+                    SyncInBackground();
+                };
+                periodicSynchronizationTimer.AutoReset = true;
+                Logger.Info("Repo " + repoInfo.Name + " - Set poll interval to " + repoInfo.PollInterval + "ms");
+                periodicSynchronizationTimer.Interval = repoInfo.PollInterval;
+                periodicSynchronizationTimer.Enabled = true;
+
+                // Partial sync interval.
+                watcherDelayTimer.Elapsed += delegate
+                {
+                    // Run partial sync.
+                    SyncInBackground();
+                };
+                watcherDelayTimer.AutoReset = false;
+                watcherDelayTimer.Interval = delayAfterLocalChange;
+            }
         }
 
 

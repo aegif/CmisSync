@@ -208,13 +208,14 @@ namespace CmisSync
         }
 
         /// <summary>
-        /// Initialize (in the GUI and syncing mechanism) an existing CmisSync synchronized folder.
+        /// Initialize (in the UI and syncing mechanism) an existing CmisSync synchronized folder.
         /// </summary>
         /// <param name="repositoryInfo">Synchronized folder path</param>
-        private void AddRepository(RepoInfo repositoryInfo)
+        /// <param name="perpetual">Whether to perpetually sync again and again at regular intervals. False means syncing just once then stopping.</param>
+        private void AddRepository(RepoInfo repositoryInfo, bool perpetual)
         {
             RepoBase repo = null;
-            repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator, true);
+            repo = new CmisSync.Lib.Sync.CmisRepo(repositoryInfo, activityListenerAggregator, true, perpetual);
             this.repositories.Add(repo);
             repo.Initialize();
         }
@@ -385,7 +386,7 @@ namespace CmisSync
         /// Check the configured CmisSync synchronized folders.
         /// Remove the ones whose folders have been deleted.
         /// </summary>
-        protected void CheckRepositories()
+        protected void CheckRepositories(bool perpetual)
         {
             lock (this.repo_lock)
             {
@@ -406,7 +407,7 @@ namespace CmisSync
                     }
                     else
                     {
-                        AddRepository(f.GetRepoInfo());
+                        AddRepository(f.GetRepoInfo(), perpetual);
                     }
                 }
 
@@ -492,8 +493,8 @@ namespace CmisSync
             // Add folder to XML config file.
             ConfigManager.CurrentConfig.AddFolder(repoInfo);
 
-            // Initialize in the GUI.
-            AddRepository(repoInfo);
+            // Initialize in the UI.
+            AddRepository(repoInfo, true);
             FolderListChanged();
         }
 

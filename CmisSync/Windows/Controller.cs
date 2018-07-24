@@ -246,7 +246,7 @@ namespace CmisSync
 
             new Thread(() =>
             {
-                CheckRepositories();
+                CheckRepositories(true);
                 RepositoriesLoaded = true;
                 // Update GUI.
                 CallFolderListChanged();
@@ -268,7 +268,5 @@ namespace CmisSync
         {
             ShowAboutWindowEvent();
         }
-
-
     }
 }

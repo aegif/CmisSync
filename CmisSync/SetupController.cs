@@ -635,8 +635,7 @@ namespace CmisSync
                 }
             }
             SyncingReponame = repoName;
-
-
+            
             // Add the remote folder to the configuration and start syncing.
             try
             {

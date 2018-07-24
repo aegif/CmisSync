@@ -35,8 +35,9 @@ namespace CmisSync.Lib.Sync
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher)
-            : base(repoInfo, activityListener, enableWatcher)
+        /// <param name="perpetual">Whether to perpetually sync again and again at regular intervals. False means syncing just once then stopping.</param>
+        public CmisRepo(RepoInfo repoInfo, IActivityListener activityListener, bool enableWatcher, bool perpetual)
+            : base(repoInfo, activityListener, enableWatcher, perpetual)
         {
             this.synchronizedFolder = new SynchronizedFolder(repoInfo, this, activityListener);
             Logger.Info(synchronizedFolder);

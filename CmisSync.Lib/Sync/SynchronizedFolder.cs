@@ -1680,6 +1680,11 @@ namespace CmisSync.Lib.Sync
                     enabled = false;
                 }
             }
+            
+            public override string ToString()
+            {
+                return repoInfo.Name;
+            }
         }
     }
 }

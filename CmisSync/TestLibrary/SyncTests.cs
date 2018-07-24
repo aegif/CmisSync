@@ -155,7 +155,7 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
 
@@ -183,7 +183,7 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
 
@@ -224,7 +224,7 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
             synchronizedFolder.Sync();
@@ -488,7 +488,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
 
@@ -535,7 +535,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
 
@@ -592,7 +592,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
 
@@ -634,7 +634,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
 
@@ -692,7 +692,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
 
@@ -744,7 +744,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                 new CmisRepo.SynchronizedFolder(repoInfo, cmis, activityListener);
 
@@ -916,7 +916,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
             new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
             ISession session = CreateSession(repoInfo);
@@ -1596,7 +1596,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
             //  Invoke the backend synchronize for concurrent
@@ -1686,7 +1686,7 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
                     cmisRepo, activityListener);
@@ -1719,7 +1719,7 @@ namespace TestLibrary
                     new DateTime(1900, 01, 01),
                     true);
 
-            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
                     cmisRepo, activityListener);
@@ -1783,7 +1783,7 @@ namespace TestLibrary
                     DateTime.MinValue,
                     true);
 
-            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false);
+            CmisRepo cmis = new CmisRepo(repoInfo, activityListener, false, false);
             CmisRepo.SynchronizedFolder synchronizedFolder = new CmisRepo.SynchronizedFolder(
                     repoInfo,
                     cmis,
