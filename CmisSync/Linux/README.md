@@ -43,8 +43,6 @@ $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
 
 Run the following command: `mono --version`
 
-If the output says something like `Mono [...] version 3.x.y` then proceed to the next paragraph.
-
 If it says `Mono [...] version 2.x.y` the you must first install a newer version of Mono.
 
 ### 3) Build
