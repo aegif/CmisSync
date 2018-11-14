@@ -8,7 +8,14 @@ According to your Linux distributions, run one of the following commands to inst
 $ sudo apt-get install libappindicator0.1-cil-dev gtk-sharp2 mono-runtime mono-devel \
   monodevelop libndesk-dbus1.0-cil-dev nant libnotify-cil-dev libgtk2.0-cil-dev mono-mcs \
   mono-gmcs libwebkit-cil-dev intltool libtool libndesk-dbus-glib1.0-cil-dev \
-  liblog4net-cil-dev libnewtonsoft-json-cil-dev gvfs
+  liblog4net-cil-dev libnewtonsoft-json-cil-dev gvfs libmono-cil-dev mono-dmcs
+```
+
+Then make 4.5 fill the role of 4.0:
+```
+cd /usr/lib/mono
+sudo rmdir 4.0
+sudo ln -s 4.5 4.0
 ```
 
 #### Debian
@@ -42,8 +49,6 @@ $ sudo zypper install gtk-sharp2 mono-core mono-devel monodevelop \
 ### 2) Make sure you have a recent Mono
 
 Run the following command: `mono --version`
-
-If the output says something like `Mono [...] version 3.x.y` then proceed to the next paragraph.
 
 If it says `Mono [...] version 2.x.y` the you must first install a newer version of Mono.
 
