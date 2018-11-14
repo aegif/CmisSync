@@ -355,7 +355,7 @@ namespace CmisSync.Lib
         public string CreateLogFilePath()
         {
             // Create the log file at the same place as the .cmissync databases.
-            return Path.Combine(ConfigManager.DefaultConfigPath(), "debug_log.txt");
+            return Path.Combine(ConfigManager.DefaultConfigPath(), "CmisSync_log.txt");
         }
 
 

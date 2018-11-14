@@ -83,7 +83,7 @@ namespace CmisSync
 
             CmisSync.Lib.Utils.ConfigureLogging();
 
-            Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);
+            Logger.Info("Starting CmisSync version: " + CmisSync.Lib.Backend.Version);
 
             if (args.Length != 0 && !args[0].Equals("start") &&
                 Backend.Platform != PlatformID.MacOSX &&
