@@ -190,30 +190,6 @@ namespace CmisSync.Lib
                 }
             }
 
-            // Check resulting file path length
-            string fullPath = Path.Combine(localDirectory, filename);
-
-            #if __COCOA__ || __MonoCS__
-            // TODO Check filename length for OS X
-            // * Max "FileName" length: 255 charactors.
-            // * FileName encoding is UTF-16 (Modified NFD).
-
-            #else
-            // Get Path.MaxPath
-            // It is not a public field so reflection is necessary.
-
-			FieldInfo maxPathField = typeof(Path).GetField("MaxPath",
-                BindingFlags.Static |
-                BindingFlags.GetField |
-                BindingFlags.NonPublic);
-
-            if (fullPath.Length > (int)maxPathField.GetValue(null))
-            {
-                Logger.WarnFormat("Skipping {0}: path too long", fullPath);
-                return false;
-            }
-            #endif
-
             return true;
         }
 
