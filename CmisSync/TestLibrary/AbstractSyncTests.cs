@@ -211,6 +211,19 @@ namespace TestLibrary
             return SessionFactory.NewInstance().CreateSession(cmisParameters);
         }
 
+        protected ISession CreateSession(string url, string user, string password, string repositoryId)
+        {
+            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = url;
+            cmisParameters[SessionParameter.User] = user;
+            cmisParameters[SessionParameter.Password] = password;
+            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+            cmisParameters[SessionParameter.ConnectTimeout] = "-1";
+
+            return SessionFactory.NewInstance().CreateSession(cmisParameters);
+        }
+
         protected IDocument CreateRemoteDocument(IFolder folder, string name, string content)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();

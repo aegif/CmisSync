@@ -56,18 +56,22 @@ namespace TestLibrary
     using System.Threading;
 
     [TestFixture]
-    public class ExternalTests
+    public class ExternalTests : AbstractSyncTests
     {
         public static IEnumerable<object[]> TestServers
         {
             get
             {
                 string path = "../../test-servers.json";
-                bool exists = File.Exists(path);
 
-                if (!exists)
+                if (!File.Exists(path))
                 {
                     path = "../CmisSync/TestLibrary/test-servers.json";
+                }
+
+                if (!File.Exists(path))
+                {
+                    throw new Exception("You must create a test-servers.json file before running tests, see documentation in header of SyncTests.cs");
                 }
 
                 return JsonConvert.DeserializeObject<List<object[]>>(
@@ -138,7 +142,7 @@ namespace TestLibrary
         public void StartStopUI()
         {
             // TODO Change this to your CmisSync
-            Process process = Process.Start(@"C:\Users\win7pro32bit\Documents\GitHub\CmisSync\CmisSync\Windows\bin\Debug\CmisSync.exe");
+            Process process = Process.Start(@"C:\Users\nico\src\CmisSync\CmisSync\Windows\bin\Debug\CmisSync.exe");
             if (null == process)
                 Assert.Fail("Could not start process, maybe an existing process has been reused?");
             
@@ -168,11 +172,35 @@ namespace TestLibrary
         }
 
 
+        // TODO Change this to your CmisSync, either debug or installed version.
+        private string CONSOLE_EXE = @"C:\Users\nico\src\CmisSync\CmisSync.Console\bin\Debug\CmisSync.Console.exe";
+
+
         [Test, Category("Fast")]
-        public void StartStopConsole()
+        public void StartStopConsolePerpetual()
         {
             // TODO Change this to your installed CmisSync
-            Process process = Process.Start(@"C:\Users\nico\src\CmisSync\CmisSync.Console\bin\Debug\CmisSync.Console.exe");
+            Process process = Process.Start(CONSOLE_EXE, "-p");
+            if (null == process)
+                Assert.Fail("Could not start process, maybe an existing process has been reused?");
+
+            process.OutputDataReceived += (s, e) => Console.WriteLine(e.Data);
+            process.ErrorDataReceived += (s, e) => Console.WriteLine(e.Data);
+
+            // The process should continue running perpetually.
+            Thread.Sleep(10 * 1000); // Wait for 10 seconds.
+            Assert.IsFalse(process.HasExited);
+
+            // Exit the process to avoid any possible interference with subsequent tests.
+            process.Kill();
+        }
+
+
+        [Test, Category("Fast")]
+        public void StartStopConsoleNonPerpetual()
+        {
+            // TODO Change this to your installed CmisSync
+            Process process = Process.Start(CONSOLE_EXE);
             if (null == process)
                 Assert.Fail("Could not start process, maybe an existing process has been reused?");
 
@@ -183,5 +211,67 @@ namespace TestLibrary
             process.WaitForExit();
             Console.Write("Exiting StartStopConsole");
         }
+
+
+        [Test, TestCaseSource("TestServers"), Category("Slow")]
+        public void Real(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+            string url, string user, string password, string repositoryId)
+        {
+            // Create temporary folder for configuration and data files.
+            string tempFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            string configurationFolder = Path.Combine(tempFolder, "configuration");
+            Directory.CreateDirectory(tempFolder);
+            Directory.CreateDirectory(configurationFolder);
+
+            // Create XML config file.
+            string customConfigPath = Path.Combine(configurationFolder, "config.xml");
+            string logPath = Path.Combine(configurationFolder, "debug_log.txt");
+            string localDataPath = Path.Combine(tempFolder, "data");
+            string customConfig = File.ReadAllText(@"../../config.xml");
+            // Replace variables in template
+            customConfig.Replace("{LOG}", logPath);
+            customConfig.Replace("{LOCAL_FOLDER}", localDataPath);
+            customConfig.Replace("{REMOTE_FOLDER}", remoteFolderPath);
+            customConfig.Replace("{URL}", url);
+            customConfig.Replace("{USER}", user);
+            customConfig.Replace("{PASSWORD}", password);
+            customConfig.Replace("{REPOSITORY}", repositoryId);
+
+            File.WriteAllText(customConfigPath, customConfig);
+
+            Process process = Process.Start(CONSOLE_EXE, "-p -c " + customConfigPath);
+            if (null == process)
+                Assert.Fail("Could not start process, maybe an existing process has been reused?");
+
+            process.OutputDataReceived += (s, e) => Console.WriteLine(e.Data);
+            process.ErrorDataReceived += (s, e) => Console.WriteLine(e.Data);
+
+            //Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
+            // TODO clean the remote folder and delete/create local folder
+
+            // Create random small file.
+            string filename = LocalFilesystemActivityGenerator.GetNextFileName();
+            string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
+            LocalFilesystemActivityGenerator.CreateRandomFile(localDataPath, 3);
+
+            Thread.Sleep(10 * 1000); // Wait for 10 seconds so that sync gets a chance to sync things.
+
+            // Check that file is present server-side.
+            IDocument doc = (IDocument)CreateSession(url, user, password, repositoryId).GetObjectByPath(remoteFilePath, true);
+            Assert.NotNull(doc);
+            Assert.AreEqual(filename, doc.ContentStreamFileName);
+            Assert.AreEqual(filename, doc.Name);
+
+            // Exit the process to avoid any possible interference with subsequent tests.
+            process.Kill();
+        }
+
+        public string CreateTemporaryDirectory()
+        {
+            string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDirectory);
+            return tempDirectory;
+        }
+
     }
 }
