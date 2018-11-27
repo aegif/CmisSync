@@ -116,6 +116,8 @@ namespace CmisSync.Console
                 perpetual = true;
             }
 
+            // Get optional config file from command line argument -c
+
             instance = new CmisSyncConsole(perpetual);
 
             // Load the specified synchronized folders, or all if none is specified.
