@@ -1,3 +1,4 @@
 [submodule "Extras/OpenDataSpaceDotCMIS"]
 	path = Extras/OpenDataSpaceDotCMIS
 	url = https://github.com/aegif/chemistry-dotcmis.git
+	trunk = trunk
