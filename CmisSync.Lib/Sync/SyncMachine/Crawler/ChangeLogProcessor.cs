@@ -25,6 +25,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
     // Change Log should consider 
     // change event does not happend in current remote path
     // eg : alfresco has only one changelog list.
+
+    // TODO: 2
+    // Dependencies.
+    // If delete, the changelog it self is reversed lexicographial order
+    // add dependencies one by one as dep[parent] <- obj?
+
     public class ChangeLogProcessor
     {
         private static readonly ILog Logger = LogManager.GetLogger (typeof (ChangeLogProcessor));

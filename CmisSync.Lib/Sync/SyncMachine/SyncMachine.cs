@@ -15,6 +15,7 @@ using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync;
 using CmisSync.Lib.Sync.SyncMachine.Internal;
 using CmisSync.Lib.Sync.SyncMachine.Exceptions;
+using CmisSync.Lib.Utilities.FileUtilities;
 using CmisSync.Lib.Cmis;
 
 using DotCMIS;
@@ -241,11 +242,17 @@ namespace CmisSync.Lib.Sync.SyncMachine
             watcher = new Watcher (cmisSyncFolder.LocalPath);
             watcher.EnableRaisingEvents = true;
 
-            watcher.Changed += (sender, e) => {
+            watcher.ChangeEvent += (sender, e) => {
+                WatcherEvent we = watcher.GetChangeQueue ().Last ();
+                //watcher.Changed += (sender, e) => {
+                //if (!e.FullPath.StartsWith (cmisSyncFolder.LocalPath) || e.FullPath.Equals (cmisSyncFolder.LocalPath)) return;
+                //if (!SyncFileUtil.WorthSyncing (e.FullPath, cmisSyncFolder)) return;
+
                 Console.WriteLine ("%% Filesystem changed: \n" +
                                    "   Name: {0}\n" +
                                    "   Path: {1}\n" +
-                                   "   Type: {2}", e.Name, e.FullPath, e.ChangeType);
+                                   "   Type: {2}\n" +
+                                   "   Object: {3}", e.Name, e.FullPath, e.ChangeType, e.GetType().ToString());
                 Logger.Info (String.Format("FS wathcer: [0}: {1}, [{2}], len: {3}", e.Name, e.FullPath, e.ChangeType, ((Watcher)sender).GetChangeCount()));
             };
 
