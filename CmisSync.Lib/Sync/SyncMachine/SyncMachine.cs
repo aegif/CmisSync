@@ -42,6 +42,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         private ItemsDependencies itemsDependencies = null;
 
+        private ProcessorCompleteAddingChecker processorCompleteAddingChecker = null;
+
         private SemiSyncTripletManager semiSyncTripletManager;
 
         private SyncTripletAssembler syncTripletAssembler;
@@ -78,18 +80,22 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 IsWorking = true;
 
                 itemsDependencies = new ItemsDependencies ();
+                processorCompleteAddingChecker = new ProcessorCompleteAddingChecker ( itemsDependencies );
+
                 fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
                 semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies));
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
                 Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start (semiSyncTriplets, itemsDependencies));
                 Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalCrawler (semiSyncTriplets, fullSyncTriplets, itemsDependencies));
 
                 semiManagerTask.Wait ();
                 semiSyncTriplets.CompleteAdding ();
 
+                // wait until assembler and processor completed
                 tripletAssemblerTask.Wait ();
-                fullSyncTriplets.CompleteAdding ();
+                // all semi-triplets assembled and pushed to process queue
+                processorCompleteAddingChecker.assemblerCompleted = true;
 
                 tripletProcessTask.Wait ();
 
@@ -119,6 +125,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
         public bool DoChangeLogSync() {
 
             bool succeed = true;
+            processorCompleteAddingChecker = new ProcessorCompleteAddingChecker ( itemsDependencies );
 
             lock (syncingLock) {
 
@@ -129,7 +136,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 itemsDependencies = new ItemsDependencies ();
                 fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies));
+                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
                 try {
 
                     Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog (fullSyncTriplets));
@@ -146,8 +153,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
                         }
                     }
                 }
-
-                fullSyncTriplets.CompleteAdding ();
 
                 tripletProcessTask.Wait ();
 
@@ -186,7 +191,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             lock (disposeLock) {
                 if (!this.disposed) {
                     if (disposing) {
-                        this.fullSyncTriplets.Dispose ();
+                        // this.fullSyncTriplets.Dispose ();
                         this.semiSyncTriplets.Dispose ();
                         this.semiSyncTripletManager.Dispose ();
                         this.syncTripletAssembler.Dispose ();

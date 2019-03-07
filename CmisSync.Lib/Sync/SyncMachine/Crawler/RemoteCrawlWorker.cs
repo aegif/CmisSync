@@ -55,7 +55,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private OrderedDictionary orderedRemoteBuffer;
 
-        private object orbLock;
+        private object lockObj;
 
         private ISession session;
 
@@ -71,15 +71,15 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             ISession session,
             OrderedDictionary ordBuffer,
             object locker,
-            ItemsDependencies fdps
+            ItemsDependencies idps
         )
         {
             this.cmisSyncFolder = cmisSyncFolder;
             this.cmisProperties = cmisSyncFolder.CmisProfile.CmisProperties;
             this.session = session;
             this.orderedRemoteBuffer = ordBuffer;
-            this.orbLock = locker;
-            this.itemsDeps = fdps;
+            this.lockObj = locker;
+            this.itemsDeps = idps;
         }
 
         public void Start() {
@@ -117,7 +117,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                         IFolder subFolder = (IFolder)cmisObject;
                         SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromRemoteFolder (subFolder, this.cmisSyncFolder);
 
-                        lock (orbLock) {
+                        lock (lockObj) {
                             if (this.cmisProperties.IgnoreIfSameLowercaseNames && orderedRemoteBuffer.Contains(triplet.Name.ToLowerInvariant ())) {
                                 Logger.Warn ("Ignoring " + triplet.RemoteStorage.RelativePath + "because other file or folder has the same name when ignoring lowercase/uppercase");
                                 continue;
@@ -134,15 +134,17 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                         CrawlRemoteFolder (subFolder, context);
 
-                        // the same with local crawler, if triplet is not create, always add folder triplet after its contents
+                        // the same with local crawler, if triplet is not freshly created, always add folder triplet after its contents
                         if (triplet.DBExist) {
-                            lock (orbLock) {
+                            lock (lockObj) {
                                 orderedRemoteBuffer.Add (cmisProperties.IgnoreIfSameLowercaseNames ? triplet.Name.ToLowerInvariant () : triplet.Name, triplet);
                             }
+
+                            // if triplet is not DBExist, it will result in 2 possible operstions:
+                            //  - create locally, while Directory.CreateDirectory is thread safe, we can igore dependence resolving.
+                            //  - conflict, download to local, there must be a local directory with the same name, no necessary for dependence resolving.
+                            itemsDeps.AddItemDependence (folderName, triplet.Name);
                         }
-
-                        itemsDeps.AddItemDependence (folderName, triplet.Name);
-
 
                     } else {
                         if (cmisObject is DotCMIS.Client.Impl.Document) {
@@ -150,7 +152,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                             SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromRemoteDocument (remoteFolder, document, this.cmisSyncFolder);
 
-                            lock (orbLock) {
+                            lock (lockObj) {
                                 if (this.cmisProperties.IgnoreIfSameLowercaseNames && orderedRemoteBuffer.Contains (triplet.Name.ToLowerInvariant ())) {
                                     Logger.Warn ("Ignoring " + triplet.RemoteStorage.RelativePath + "because other file or folder has the same name when ignoring lowercase/uppercase");
                                     continue;
@@ -163,7 +165,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                                 orderedRemoteBuffer.Add (cmisProperties.IgnoreIfSameLowercaseNames ? triplet.Name.ToLowerInvariant () : triplet.Name, triplet);
                             }
 
-                            itemsDeps.AddItemDependence (folderName, triplet.Name);
+                            if (triplet.DBExist) {
+                                // if triplet is not DBExist, it will result in 2 possible operstions:
+                                //  - download to local, while Directory.CreateDirectory is thread safe, we can igore dependence resolving.
+                                //  - conflict, download to local, there must be a local directory with the same name, no necessary for dependence resolving.
+                                itemsDeps.AddItemDependence (folderName, triplet.Name);
+                            }
                         }
 
                         else if (isLink(cmisObject)) {

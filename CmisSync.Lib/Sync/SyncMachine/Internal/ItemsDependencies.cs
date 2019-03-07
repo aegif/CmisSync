@@ -16,7 +16,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
 
         // itemName -- <dep1, dep2, ... depN>
         private Dictionary<string, HashSet<string>> itemsDeps = null;
-        private Dictionary<string, bool> conflictOrFailed = null;
+        private HashSet<string> conflictOrFailed = null;
 
         // depName -- <item1, item2, ..., itemN>
         // reverse lookup table
@@ -27,14 +27,21 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
         public ItemsDependencies ()
         {
             itemsDeps = new Dictionary<string, HashSet<string>> ();
-            conflictOrFailed = new Dictionary<string, bool> ();
+            conflictOrFailed = new HashSet<string> ();
             _LUT = new Dictionary<string, HashSet<string>> ();
         }
 
-        public bool IsClear(string item) {
+        public bool isAllResolved ()
+        {
+            lock (locker) {
+                return itemsDeps.Count == 0;
+            }
+        }
+
+        public bool IsResolved(string item) {
             lock(locker) {
                 if (!itemsDeps.ContainsKey (item)) return true;
-                return itemsDeps [item].Count == 0 && conflictOrFailed [item] == false;
+                return itemsDeps [item].Count == 0;
             }
         }
 
@@ -71,7 +78,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
                 // add dep to item's dependencies
                 if (itemsDeps.ContainsKey (item)) itemsDeps [item].Add (depName);
                 else itemsDeps [item] = new HashSet<string> { depName };
-                conflictOrFailed [item] = false;
 
                 // add item to LUT table given deps
                 if (_LUT.ContainsKey (depName)) _LUT [depName].Add (item);
@@ -90,7 +96,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
 
 
         /// <summary>
-        /// Removes the item dependence, give depName only
+        /// Removes the item dependence, give depName only.
+        /// If succeed flag is set to false, the depended item's sync
+        /// has failed. One should set all it relating item to ConflictOrFailed.
         /// </summary>
         /// <param name="depName">Dep name.</param>
         public void RemoveItemDependence(string depName, bool succeed) {
@@ -98,15 +106,36 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
                 if (!_LUT.ContainsKey (depName)) return;
                 foreach (string item in _LUT [depName]) {
                     if (!itemsDeps.ContainsKey (item)) continue;
-                    if (!itemsDeps [item].Remove (depName)) {
+                    if (itemsDeps [item].Remove (depName)) {
+                        if (itemsDeps[item].Count == 0) {
+                            itemsDeps.Remove (item);
+                        }
+                    } else {
                         Console.WriteLine ("  Remove item {0}'s dependency: {1} failed", item, depName);
                     }
                     if (!succeed) {
                         Console.WriteLine ("  Find conflicts in {0}'s dependencies: {1}", item, depName);
-                        this.conflictOrFailed [item] = true;
+                        conflictOrFailed.Add (item);
                     }
                 }
             } 
+        }
+
+        /// <summary>
+        /// Check if there is any failure in the processed dependencies. 
+        /// If yes, the processor should directly ignore it and remove it
+        /// in the ItemDependencies dictionary and mark itself as failure.
+        /// </summary>
+        /// <returns><c>true</c>, if failed dependence exists, <c>false</c> otherwise.</returns>
+        /// <param name="item">Item.</param>
+        public bool HasFailedDependence(String item) { 
+            lock (locker) {
+                if (!itemsDeps.ContainsKey (item)) return false;
+                foreach (string s in itemsDeps [item]) {
+                    if (conflictOrFailed.Contains (s)) return false;
+                }
+                return true;
+            }
         }
 
         /// <summary>

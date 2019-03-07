@@ -139,6 +139,7 @@
     <Compile Include="Sync\SyncMachine\Crawler\LocalWatcherProcessor.cs" />
     <Compile Include="Sync\SyncMachine\Internal\ReverseLexicoGraphicalComparer.cs" />
     <Compile Include="Sync\SyncMachine\Internal\ItemsDependencies.cs" />
+    <Compile Include="Sync\SyncMachine\Internal\ProcessorCompleteAddingChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CmisSync.Auth\CmisSync.Auth.csproj">

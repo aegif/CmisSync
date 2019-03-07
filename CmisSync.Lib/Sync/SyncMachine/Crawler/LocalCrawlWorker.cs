@@ -27,8 +27,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
      *          not fould, it must be being created. 
      *     3.3. On the other hand, the folder triplets are pushed to the semi-production queue AFTER their content's triplets 
      *          if it is not newly created.
-     *     3.4. (3.2) and (3.3) ensure we can use spin/sleep policy when doing creations/delections to wait the object dependencies
+     *     *(3.4). (3.2) and (3.3) ensure we can use spin/sleep policy when doing creations/delections to wait the object dependencies
      *          to be satisfied.
+     *     Deprecated: as throw-back-to-synctriplet queue is implemented and spin wait policy is removed, 
+     *                 semi-triplet processing order matters nothing now. But we keep this order because it will 
+     *                 mininize dependence resolving waiting.    
      *  4. Object dependencies policy
      *     4.1. If obj == new && parent == new : dep(obj) add parent. means creation of obj depends on creation of its parent
      *     4.2. If obj == new && parnet != new : dep(parent add obj. means creation of obj does not dependes on its parents, 
@@ -39,7 +42,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
      *          are properly satisfied. If its all satisified but we can not find its parent folder, its parent folder must be
      *          an 'Existed-but-Removed-Remotely' folder ( refer to 4.2, dep(obj) is empty because we didn't add its parent to it ).
      *          Thus we can not upload it and we info its parent as false == there is confliction if you sync delete it.
-     *     4.6. This policy works only locally yet.
      */
     public class LocalCrawlWorker : IDisposable
     {

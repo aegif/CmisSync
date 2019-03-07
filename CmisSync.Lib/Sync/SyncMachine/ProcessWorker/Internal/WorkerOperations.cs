@@ -99,7 +99,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 string filePath = OperationUtils.GetLocalFullPath (triplet, cmisSyncFolder);
                 string tmpFilePath = filePath + ".sync";
 
-                // Create if path not found 
+                // Create if path not found.
+                // Directory.CreateDirectory is state safe so just catch excepiton
                 Directory.CreateDirectory (Path.GetDirectoryName (tmpFilePath));
 
                 if (cmisSyncFolder.Database.GetOperationRetryCounter (filePath, Database.Database.OperationType.DOWNLOAD) > cmisSyncFolder.MaxDownloadRetries) {

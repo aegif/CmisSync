@@ -30,11 +30,13 @@ namespace CmisSync.Lib.Sync.SyncMachine
          * Buzy wait with sleep?
          * 
          */
-        private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null; 
+        private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null;
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder = null;
 
         private ItemsDependencies itemsDeps = null;
+
+        private ProcessorCompleteAddingChecker completeChecker = null;
 
         public SyncTripletProcessor (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session)
         {
@@ -44,12 +46,16 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         public void Start (
             BlockingCollection<SyncTriplet.SyncTriplet> full,
-            ItemsDependencies fdps
-        ) {
+            ItemsDependencies fdps,
+            ProcessorCompleteAddingChecker checker
+        )
+        {
 
             fullSyncTriplets = full;
 
             itemsDeps = fdps;
+
+            completeChecker = checker;
 
             ParallelOptions options = new ParallelOptions ();
             options.MaxDegreeOfParallelism = MaxParallelism;
@@ -57,18 +63,28 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
             // Process non-folder-deletion operations
             Parallel.ForEach (Internal.SingleItemPartitioner.Create (fullSyncTriplets.GetConsumingEnumerable ()), options,
-                              (triplet) => {
-                                  // ============== new approaches ==============
-                                  // Use folders dependencies class to record all folders' dependencies 
-                                  // one folder should be processed only after all its dependencies are processed.
-                                  // hint:
-                                  // because all folder deletions are enqueued after its conttents, 
-                                  // we can use spin() or sleep() to wait for that, just as create remote folder
-                                  bool succeed = ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, itemsDeps);
-                                  Console.WriteLine (" P [ WorkerThread: {0} ] processing triplet [ {1} ]'s result: succeed={2}",
-                                                     Thread.CurrentThread.ManagedThreadId, triplet.Name, succeed);
-                                  itemsDeps.RemoveItemDependence (triplet.Name, succeed);
-                              });
+                (triplet) => {
+                    SyncResult syncRes = ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, itemsDeps);
+                    Console.WriteLine (" P [ WorkerThread: {0} ] processing triplet [ {1} ]'s result = {2}",
+                                     Thread.CurrentThread.ManagedThreadId, triplet.Name, syncRes);
+
+                    if (syncRes == SyncResult.UNRESOLVED) {
+                        Console.WriteLine (" P [ WorkerThread: {0} ] push triplet [ {1} ] back to fullSyncTriplets queue.",
+                            Thread.CurrentThread.ManagedThreadId, triplet.Name);
+
+                        fullSyncTriplets.TryAdd (triplet);
+                    } else {
+                        itemsDeps.RemoveItemDependence (triplet.Name, syncRes == SyncResult.SUCCEED);
+                    }
+
+                    if (checker.processorCompleteAdding ()) {
+
+                        Console.WriteLine (" P [ WorkerThread: {0} ] all full-sync-triplets are processed. Set fullSyncTriplets queue CompleteAdding().",
+                            Thread.CurrentThread.ManagedThreadId);
+
+                        fullSyncTriplets.CompleteAdding ();
+                    }
+                });
         }
 
         ~SyncTripletProcessor ()

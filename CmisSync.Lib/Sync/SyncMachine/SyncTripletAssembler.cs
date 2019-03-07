@@ -36,6 +36,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
         private ConcurrentDictionary<string, SyncTriplet.SyncTriplet> remoteBuffer = new ConcurrentDictionary<String, SyncTriplet.SyncTriplet> ();
 
         private OrderedDictionary orderedRemoteBuffer = new OrderedDictionary ();
+
+        // orderedRemoteBuffer Lock
         private object orbLock = new object ();
 
         public SyncTripletAssembler (CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
@@ -57,22 +59,22 @@ namespace CmisSync.Lib.Sync.SyncMachine
         }
 
         /*
-         * There should be tow fdps(es): 
+         * There should be two idps(es): 
          *   one main for local crawler
          *   one sub for remote crawler
-         * Else for one file /xxxx/yyyy/zzz, it is first added to fdps by local crawler
+         * Else for one file /xxxx/yyyy/zzz, it is first added to idps by local crawler
          * and is soon pushed to full processor queue and been processed therefore the 
-         * fdp is deleted from fdps.  then the slow remote crawler will add it to fdps again. 
+         * idp is deleted from idps.  then the slow remote crawler will add it to idps again. 
          * 
-         * It is not desired because we use empty fdps to judge if a folder should be deleted
+         * It is not desired because we use empty idps to judge if a folder should be deleted
          * 
-         * So use local fdps for main, after procesing all local files, add remote fdps
-         * to local fdps before push remote triplet to processor queue
+         * So use local idps for main, after procesing all local files, add remote idps
+         * to local idps before push remote triplet to processor queue
          */
         public void StartForLocalCrawler (
             BlockingCollection<SyncTriplet.SyncTriplet> semi,
             BlockingCollection<SyncTriplet.SyncTriplet> full,
-            ItemsDependencies fdps
+            ItemsDependencies idps
         ) {
 
             // Foreach operation on BlockingCollectio is sequentially executed
@@ -82,17 +84,17 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.semiSyncTriplets = semi;
             this.fullSyncTriplets = full;
 
-            ItemsDependencies r_fdps = new ItemsDependencies ();
+            ItemsDependencies r_idps = new ItemsDependencies ();
 
             //this.remoteCrawlWorker = new RemoteCrawlWorker (cmisSyncFolder, session, remoteBuffer);
-            RemoteCrawlWorker orderedRemoteCrawlWorker = new RemoteCrawlWorker (cmisSyncFolder, session, orderedRemoteBuffer, orbLock, r_fdps);
+            RemoteCrawlWorker orderedRemoteCrawlWorker = new RemoteCrawlWorker (cmisSyncFolder, session, orderedRemoteBuffer, orbLock, r_idps);
 
             // Start remote crawler for assemble 
             //Task remoteCrawlTask = Task.Factory.StartNew (() => remoteCrawlWorker.Start () );
             Task remoteCrawlTask = Task.Factory.StartNew (() => orderedRemoteCrawlWorker.Start ());
 
             // Assemble semiTriplets generated from local crawler
-            foreach(SyncTriplet.SyncTriplet semiTriplet in semiSyncTriplets.GetConsumingEnumerable ()) {
+            foreach (SyncTriplet.SyncTriplet semiTriplet in semiSyncTriplets.GetConsumingEnumerable ()) {
 
                 SyncTriplet.SyncTriplet remoteTriplet = null;
 
@@ -103,37 +105,41 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 string _key = cmisSyncFolder.CmisProfile.CmisProperties.IgnoreIfSameLowercaseNames ? semiTriplet.Name.ToLowerInvariant () : semiTriplet.Name;
 
                 // if remote info is already crawled
+                bool orbContainsKey = false;
                 lock (orbLock) {
-                    if (orderedRemoteBuffer.Contains(_key)) {
+                    orbContainsKey = orderedRemoteBuffer.Contains (_key);
+                    if (orbContainsKey) {
 
                         remoteTriplet = (SyncTriplet.SyncTriplet)orderedRemoteBuffer [_key];
                         SyncTripletFactory.AssembleRemoteIntoLocal (remoteTriplet, semiTriplet);
-
-                    } else {
-
-                        // if remote is not crawled yet, lookup db for remote path and query CMIS server
-                        if (semiTriplet.DBExist) {
-                            string remotePath = CmisFileUtil.PathCombine (cmisSyncFolder.RemotePath, semiTriplet.DBStorage.DBRemotePath);
-
-                            try {
-                                ICmisObject remoteObject = session.GetObjectByPath (remotePath, false);
-
-                                if (semiTriplet.IsFolder) {
-                                    IFolder remoteFolder = (IFolder)remoteObject;
-                                    SyncTripletFactory.AssembleRemoteIntoLocal (remoteFolder, cmisSyncFolder, semiTriplet);
-                                } else {
-                                    IDocument remoteDocument = (IDocument)remoteObject;
-
-                                    SyncTripletFactory.AssembleRemoteIntoLocal (remoteDocument, remotePath, cmisSyncFolder, semiTriplet);
-                                }
-                            } catch (Exception) {
-                                Console.WriteLine (" - remote path: {0} Not found", remotePath);
-                            }
-                        } else {
-                            // TODO:
-                            // Local exist , DB not exist, Remote ???
-                        }
                     }
+                }
+
+                // if remote is not crawled yet, lookup db for remote path and query CMIS server
+                if (!orbContainsKey) {
+                    String remotePath = "";
+                    if (semiTriplet.DBExist) {
+                        remotePath = CmisFileUtil.PathCombine (cmisSyncFolder.RemotePath, semiTriplet.DBStorage.DBRemotePath);
+                    } else {
+                        // TODO:
+                        // Local exist , DB not exist, Remote ???
+                        remotePath = CmisFileUtil.PathCombine (cmisSyncFolder.RemotePath, semiTriplet.LocalStorage.RelativePath);
+                    }
+                    try {
+                        ICmisObject remoteObject = session.GetObjectByPath (remotePath, false);
+
+                        if (semiTriplet.IsFolder) {
+                            IFolder remoteFolder = (IFolder)remoteObject;
+                            SyncTripletFactory.AssembleRemoteIntoLocal (remoteFolder, cmisSyncFolder, semiTriplet);
+                        } else {
+                            IDocument remoteDocument = (IDocument)remoteObject;
+
+                            SyncTripletFactory.AssembleRemoteIntoLocal (remoteDocument, remotePath, cmisSyncFolder, semiTriplet);
+                        }
+                    } catch (Exception) {
+                        Console.WriteLine (" - remote path: {0} Not found", remotePath);
+                    }
+
                 }
 
                 if (!fullSyncTriplets.TryAdd (semiTriplet)) {
@@ -163,9 +169,9 @@ namespace CmisSync.Lib.Sync.SyncMachine
                         continue;
                     }
 
-                    // merge remote fdps for remote only folder (deletion) to processor's fdps
+                    // merge remote idps for remote only folder (deletion) to processor's idps
                     if (remoteTriplet.IsFolder) {
-                        foreach (string dep in r_fdps.GetItemDependences (remoteTriplet.Name)) fdps.AddItemDependence (remoteTriplet.Name, dep);
+                        foreach (string dep in r_idps.GetItemDependences (remoteTriplet.Name)) idps.AddItemDependence (remoteTriplet.Name, dep);
                     }
 
                     if (!fullSyncTriplets.TryAdd (remoteTriplet)) {
