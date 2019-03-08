@@ -124,7 +124,7 @@ namespace CmisSync.Auth
         /// <returns>The obfuscated string</returns>
         private static string UnixObfuscate(string value)
         {
-#if __MonoCS__
+//#if __MonoCS__
             try
             {
                 using (PasswordDeriveBytes pdb = new PasswordDeriveBytes(
@@ -148,9 +148,9 @@ namespace CmisSync.Auth
                 Console.WriteLine(e.ToString());
                 return null;
             }
-#else
-            throw new ApplicationException("Should never be reached");
-#endif
+//#else
+//            throw new ApplicationException("Should never be reached");
+//#endif
         }
 
 
@@ -161,7 +161,7 @@ namespace CmisSync.Auth
         /// <returns>The clear string</returns>
         private static string UnixDeobfuscate(string value)
         {
-#if __MonoCS__
+//#if __MonoCS__
             try
             {
                 using (PasswordDeriveBytes pdb = new PasswordDeriveBytes(
@@ -190,9 +190,9 @@ namespace CmisSync.Auth
                     throw;
                 }
             }
-#else
-            throw new ApplicationException("Should never be reached");
-#endif
+//#else
+//            throw new ApplicationException("Should never be reached");
+//#endif
         }
 
 

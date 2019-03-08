@@ -97,6 +97,19 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 // all semi-triplets assembled and pushed to process queue
                 processorCompleteAddingChecker.assemblerCompleted = true;
 
+                // a trick:
+                // It is possible that semiSyncTriplets assembler ( especially the remote-crawler in it)
+                // completes later than all full-triplets are processed but there is no remained remote-semi-triplet
+                // to be appended the full triplet processor ( usually means there is no freshly created file/folder remotely ).
+                // 
+                // In such case, the processorCompletedAddingChecker in the full-triplet-processor's multi-thread processing
+                // worker will not work because the the worker would only work when there is a NEW element ( actually they have
+                // stopped before the remote-crawler has completed). So, push a Dummy triplet to the processor to enforce it 
+                // work once again to check if the full-processor's paralle.foreach multi-thread pipeline should stop.
+                SyncTriplet.SyncTriplet dummyTriplet = new SyncTriplet.SyncTriplet (false);
+                dummyTriplet.Name = "";
+                fullSyncTriplets.TryAdd (dummyTriplet);
+
                 tripletProcessTask.Wait ();
 
                 if (cmisSyncFolder.CmisProfile.CmisProperties.ChangeLogCapability) {

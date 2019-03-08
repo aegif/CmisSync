@@ -64,17 +64,23 @@ namespace CmisSync.Lib.Sync.SyncMachine
             // Process non-folder-deletion operations
             Parallel.ForEach (Internal.SingleItemPartitioner.Create (fullSyncTriplets.GetConsumingEnumerable ()), options,
                 (triplet) => {
-                    SyncResult syncRes = ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, itemsDeps);
-                    Console.WriteLine (" P [ WorkerThread: {0} ] processing triplet [ {1} ]'s result = {2}",
-                                     Thread.CurrentThread.ManagedThreadId, triplet.Name, syncRes);
+                    if (triplet.Name != "") {
+                        SyncResult syncRes = ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, itemsDeps);
+                        Console.WriteLine (" P [ WorkerThread: {0} ] processing triplet [ {1} ]'s result = {2}",
+                                         Thread.CurrentThread.ManagedThreadId, triplet.Name, syncRes);
 
-                    if (syncRes == SyncResult.UNRESOLVED) {
-                        Console.WriteLine (" P [ WorkerThread: {0} ] push triplet [ {1} ] back to fullSyncTriplets queue.",
-                            Thread.CurrentThread.ManagedThreadId, triplet.Name);
+                        if (syncRes == SyncResult.UNRESOLVED) {
+                            Console.WriteLine (" P [ WorkerThread: {0} ] push triplet [ {1} ] back to fullSyncTriplets queue.",
+                                Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
-                        fullSyncTriplets.TryAdd (triplet);
+                            fullSyncTriplets.TryAdd (triplet);
+                        } else {
+                            Console.WriteLine (" P [WorkerThread {0} ] triplet [ {1} ] is processed successfully. ",
+                                Thread.CurrentThread.ManagedThreadId, triplet.Name);
+                            itemsDeps.RemoveItemDependence (triplet.Name, syncRes == SyncResult.SUCCEED);
+                        }
                     } else {
-                        itemsDeps.RemoveItemDependence (triplet.Name, syncRes == SyncResult.SUCCEED);
+                        Console.WriteLine (" P [ WorkerThread: {0} ] has get a dummy triplet. ", Thread.CurrentThread.ManagedThreadId);
                     }
 
                     if (checker.processorCompleteAdding ()) {

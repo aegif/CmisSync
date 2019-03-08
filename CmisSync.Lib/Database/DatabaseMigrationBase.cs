@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if __MonoCS__
+//#if __MonoCS__
 using Mono.Data.Sqlite;
-#else
-using System.Data.SQLite;
-#endif
+//#else
+//using System.Data.SQLite;
+//#endif
 
 using Newtonsoft.Json;
 using log4net;
 
 namespace CmisSync.Lib.Database
 {
-    #if __MonoCS__
+    //#if __MonoCS__
     // Mono's SQLite ADO implementation uses pure CamelCase (Sqlite vs. SQLite)
     // so we define some aliases here
     using SQLiteConnection = SqliteConnection;
     using SQLiteCommand = SqliteCommand;
     using SQLiteException = SqliteException;
     using SQLiteDataReader = SqliteDataReader;
-    #endif
+    //#endif
 
     /// <summary>
     /// Base class for classes that migrate CmisSync databases from a version to another.

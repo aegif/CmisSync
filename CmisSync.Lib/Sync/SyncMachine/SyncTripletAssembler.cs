@@ -184,6 +184,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             // full synctriplet queue for the next syncing.
             remoteBuffer.Clear ();
             orderedRemoteBuffer.Clear ();
+            Console.WriteLine (" - Sync Triplet Assembler Completed. ");
         }
 
         ~SyncTripletAssembler ()

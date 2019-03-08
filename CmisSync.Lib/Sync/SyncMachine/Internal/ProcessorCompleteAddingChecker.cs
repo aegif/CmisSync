@@ -7,7 +7,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
         public ProcessorCompleteAddingChecker (ItemsDependencies _idps)
         {
             idps = _idps;
-
+            assemblerCompleted = false;
         }
 
         public bool processorCompleteAdding()
@@ -15,7 +15,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
             return assemblerCompleted && dependeciesResolved ();
         }
 
-        public bool assemblerCompleted { get; set; } = true;
+        public bool assemblerCompleted { get; set; }
 
         private bool dependeciesResolved()
         {
