@@ -107,7 +107,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 // stopped before the remote-crawler has completed). So, push a Dummy triplet to the processor to enforce it 
                 // work once again to check if the full-processor's paralle.foreach multi-thread pipeline should stop.
                 SyncTriplet.SyncTriplet dummyTriplet = new SyncTriplet.SyncTriplet (false);
-                dummyTriplet.Name = "";
                 fullSyncTriplets.TryAdd (dummyTriplet);
 
                 tripletProcessTask.Wait ();
@@ -115,10 +114,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 if (cmisSyncFolder.CmisProfile.CmisProperties.ChangeLogCapability) {
                     try {
                         String token = CmisUtils.GetChangeLogToken (session);
-                        System.Console.WriteLine ("Get server's changelot token {0}", token);
+                        System.Console.WriteLine ("Get server's changelog token {0}", token);
                         cmisSyncFolder.Database.SetChangeLogToken (token);
                     } catch (Exception e) {
-                        System.Console.WriteLine ("Get server's changelot token error: {0}", e.Message);
+                        System.Console.WriteLine ("Get server's changelog token error: {0}", e.Message);
                     }
                 }
 
@@ -128,9 +127,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
             }
 
             Console.WriteLine ("Crawl Sync Task Completed.");
-
-            //TODO: debug
-            itemsDependencies.OutputItemsDependences ();
 
             return succeed;
         }

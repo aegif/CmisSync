@@ -29,7 +29,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         /// Gets or sets the name.
         /// </summary>
         /// <value>The name.</value>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:CmisSync.Lib.Sync.SyncTriplet.SyncTriplet"/>.

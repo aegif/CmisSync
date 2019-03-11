@@ -366,7 +366,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                         var updatedFile = allFileVersions [0];
 
                         // Update timestamp in database.
-                        DateTime serverSideModificationDate = (DateTime)updatedFile.LastModificationDate;//updatedFile.RefreshTimestamp;
+                        DateTime serverSideModificationDate = updatedFile.RefreshTimestamp;
+
                         cmisSyncFolder.Database.SetFileServerSideModificationDate (triplet, serverSideModificationDate);
 
                         // Update checksum
@@ -504,87 +505,21 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
         /// <summary>
         /// Remove folder from local filesystem and database.
         /// </summary>
-        public static bool DeleteLocalFolder (SyncTriplet.SyncTriplet triplet, bool isClean, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
-        {
-            string localFullPath = triplet.LocalStorage.FullPath;
-            // Folder has been deleted on server, delete it locally too.
-            bool containsConflict = !isClean;
-
-            try {
-                if (containsConflict) {
-
-                    // TODO: When a folder is not empty, it might contains many non-worthy files other than conflicts.
-                    // Check it. Be aware that if it contains another folder, there should be conflicts due to
-                    // inverse-lexicographical order.
-
-                    Console.WriteLine ("  %%  Can not remove non-empty local folder " + triplet.Name + "\n" +
-                                       "      check if there is remaied modified file.");
-
-
-                    // If is not empty, this folder must include conflicts.
-                    try {
-                        SolveConflict (triplet, cmisSyncFolder);
-                    } catch (Exception e) {
-                    }
-                } else {
-                    Logger.Info ("Removing remotely deleted folder: " + localFullPath);
-                    Directory.Delete (localFullPath, true);
-                }
-
-                RemoveDbRecord (triplet, cmisSyncFolder);
-
-                // if contains conflict, should be set to false
-                return containsConflict ? false : true;
-
-            } catch (Exception e) {
-                Console.WriteLine ("  %% Delete local folder: {0} failed: {1}", triplet.Name, e.Message);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Remove folder from local filesystem and database.
-        /// </summary>
         public static bool DeleteLocalFolder (SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string localFullPath = triplet.LocalStorage.FullPath;
             // Folder has been deleted on server, delete it locally too.
+
             try {
 
-                // If is not empty, there must be conflict files
-                // However, db record must be removed
-                bool containsConflict = false;
-
-                foreach (string name in Directory.EnumerateFileSystemEntries (localFullPath)) {
-                    if (name.Contains("-conflict-version"))  {
-                        containsConflict = true;
-                        break;
-                    }
-                }
-
-                if (containsConflict) {
-
-                    // TODO: When a folder is not empty, it might contains many non-worthy files other than conflicts.
-                    // Check it. Be aware that if it contains another folder, there should be conflicts due to
-                    // inverse-lexicographical order.
-                    Console.WriteLine ("  %%  Can not remove non-empty local folder " + triplet.Name + "\n" +
-                                       "      check if there is remaied modified file.");
-                    // If is not empty, this folder must include conflicts.
-                    if (containsConflict) {
-                        try {
-                            SolveConflict (triplet, cmisSyncFolder);
-                        } catch (Exception e) {
-
-                        }
-                    }
-                } else {
-                    Logger.Info ("Removing remotely deleted folder: " + localFullPath);
+                Logger.Info ("Removing remotely deleted folder: " + localFullPath);
+                if (Directory.Exists (localFullPath)) {
                     Directory.Delete (localFullPath, true);
                 }
 
                 RemoveDbRecord (triplet, cmisSyncFolder);
-                // if contains conflict, should be set to false
-                return containsConflict ? false : true;
+
+                return true;
 
             } catch (Exception e) {
                 Console.WriteLine ("  %% Delete local folder: {0} failed: {1}", triplet.Name, e.Message);

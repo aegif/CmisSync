@@ -7,6 +7,7 @@ using System.Threading;
 
 using CmisSync.Lib.Sync.SyncTriplet;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Sync.SyncMachine.ProcessWorker;
 
 
 namespace CmisSync.Lib.Sync.SyncMachine.Internal
@@ -16,7 +17,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
 
         // itemName -- <dep1, dep2, ... depN>
         private Dictionary<string, HashSet<string>> itemsDeps = null;
-        private HashSet<string> conflictOrFailed = null;
+        private HashSet<string> _failed = null;
+        private HashSet<string> _conflicted = null;
 
         // depName -- <item1, item2, ..., itemN>
         // reverse lookup table
@@ -27,7 +29,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
         public ItemsDependencies ()
         {
             itemsDeps = new Dictionary<string, HashSet<string>> ();
-            conflictOrFailed = new HashSet<string> ();
+            _failed = new HashSet<string> ();
+            _conflicted = new HashSet<string> ();
             _LUT = new Dictionary<string, HashSet<string>> ();
         }
 
@@ -47,7 +50,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
 
         public HashSet<string> GetItemDependences(string item) {
             lock(locker) {
-                if (!itemsDeps.ContainsKey (item)) return null;
+                if (!itemsDeps.ContainsKey (item)) return new HashSet<string>();
                 return itemsDeps [item];
             }
         }
@@ -101,21 +104,43 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
         /// has failed. One should set all it relating item to ConflictOrFailed.
         /// </summary>
         /// <param name="depName">Dep name.</param>
-        public void RemoveItemDependence(string depName, bool succeed) {
+        public void RemoveItemDependence(string depName, SyncResult result) {
             lock(locker) {
+                // Confirm that only the item can delete itself from idps dictionary.
+                // Else, eg:
+                //   folder1: start -> has deps, processing, failed, (long time)
+                //   folder1/f1: finished and delete folder1's dep, idps dictionary's count is 0 and full-sync-queue set to IsAddingComplete
+                //   --> after folder1's thread end, it will push folder1 back to queue because its state is unresolved. error
+                if (itemsDeps.ContainsKey (depName) && itemsDeps [depName].Count == 0) {
+                    itemsDeps.Remove (depName);
+                }
                 if (!_LUT.ContainsKey (depName)) return;
                 foreach (string item in _LUT [depName]) {
                     if (!itemsDeps.ContainsKey (item)) continue;
                     if (itemsDeps [item].Remove (depName)) {
+                        /*
                         if (itemsDeps[item].Count == 0) {
                             itemsDeps.Remove (item);
                         }
+                        */
                     } else {
-                        Console.WriteLine ("  Remove item {0}'s dependency: {1} failed", item, depName);
+                        Console.WriteLine (" I [ WorkerThread: {0} ] Remove item {1}'s dependency: {2} failed",
+                            Thread.CurrentThread.ManagedThreadId, item, depName);
                     }
-                    if (!succeed) {
-                        Console.WriteLine ("  Find conflicts in {0}'s dependencies: {1}", item, depName);
-                        conflictOrFailed.Add (item);
+
+                    if (result != SyncResult.SUCCEED) {
+                        Console.WriteLine (" I [ WorkerThread: {0} ] Item {1} not succeed. output its LUT:",
+                            Thread.CurrentThread.ManagedThreadId, depName);
+
+                        // If the item's processing failed,
+                        // all items depend on this item should
+                        // be marked as either failed or conflict
+                        if (result == SyncResult.FAILED) {
+                            _failed.Add (item);
+                        }
+                        if (result == SyncResult.CONFLICT) {
+                            _conflicted.Add (item);
+                        }
                     }
                 }
             } 
@@ -130,13 +155,24 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
         /// <param name="item">Item.</param>
         public bool HasFailedDependence(String item) { 
             lock (locker) {
-                if (!itemsDeps.ContainsKey (item)) return false;
-                foreach (string s in itemsDeps [item]) {
-                    if (conflictOrFailed.Contains (s)) return false;
-                }
-                return true;
+                return _failed.Contains (item);
             }
         }
+
+        /// <summary>
+        /// Check if there is any conflicting in the processed dependencies.
+        /// If (exists and the operation is deletion), one should do solve-conflicting
+        /// process to this object.
+        /// </summary>
+        /// <returns><c>true</c>, if conflicted dependence was hased, <c>false</c> otherwise.</returns>
+        /// <param name="item">Item.</param>
+        public bool HasConflictedDependence(String item)
+        {
+            lock (locker) {
+                return _conflicted.Contains (item);
+            }
+        }
+
 
         /// <summary>
         /// Removes the item dependence, given item Name and dependence name
@@ -152,7 +188,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
             }
         }
 
-        public void OutputItemDependences(string item) {
+        private void OutputItemDependences(string item) {
             string output = "";
             foreach (string s in itemsDeps [item]) output += s + ", ";
             Console.WriteLine (output);
@@ -164,6 +200,23 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
             foreach (string k in keys) {
                 Console.Write (" ## item {0}'s deps: ", k);
                 OutputItemDependences (k);
+            }
+        }
+
+        private void OutputItemDepLUT(string item)
+        {
+            string output = "";
+            foreach (string s in _LUT [item]) output += s + ", ";
+            Console.WriteLine (output);
+        }
+
+        public void OutputItemsDepLUT()
+        {
+            List<string> keys = _LUT.Keys.ToList<string> ();
+            keys.Sort (new ReverseLexicoGraphicalComparer<string> ());
+            foreach (string k in keys) {
+                Console.Write (" ## items depend on {0}: ", k);
+                OutputItemDepLUT(k);
             }
         }
     }

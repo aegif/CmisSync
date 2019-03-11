@@ -27,7 +27,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
          *     if set max upper bound in FullSyncTriplet
          * ,its TryAdd will not be blocked but directly return false.
          * 
-         * Buzy wait with sleep?
+         * Busy wait with sleep?: problem: one thread might set complete while another is still sleeping
          * 
          */
         private BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets = null;
@@ -37,6 +37,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
         private ItemsDependencies itemsDeps = null;
 
         private ProcessorCompleteAddingChecker completeChecker = null;
+
+        private ConcurrentDictionary<String, int> retryCounter = null;
 
         public SyncTripletProcessor (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session)
         {
@@ -57,6 +59,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
             completeChecker = checker;
 
+            retryCounter = new ConcurrentDictionary<string, int> ();
+             
             ParallelOptions options = new ParallelOptions ();
             options.MaxDegreeOfParallelism = MaxParallelism;
 
@@ -66,18 +70,23 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 (triplet) => {
                     if (triplet.Name != "") {
                         SyncResult syncRes = ProcessWorker.ProcessWorker.Process (triplet, session, cmisSyncFolder, itemsDeps);
-                        Console.WriteLine (" P [ WorkerThread: {0} ] processing triplet [ {1} ]'s result = {2}",
-                                         Thread.CurrentThread.ManagedThreadId, triplet.Name, syncRes);
+
 
                         if (syncRes == SyncResult.UNRESOLVED) {
-                            Console.WriteLine (" P [ WorkerThread: {0} ] push triplet [ {1} ] back to fullSyncTriplets queue.",
-                                Thread.CurrentThread.ManagedThreadId, triplet.Name);
+                            if (!retryCounter.ContainsKey (triplet.Name)) {
+                                Console.WriteLine (" P [ WorkerThread: {0} ] processing triplet [ {1} ]'s result = {2}",
+                                                     Thread.CurrentThread.ManagedThreadId, triplet.Name, syncRes);
+                                retryCounter [triplet.Name] = 1;
+                            } else {
+                                retryCounter [triplet.Name]++;
+                                if (retryCounter [triplet.Name] > 5) Thread.Sleep (100);
+                            }
 
                             fullSyncTriplets.TryAdd (triplet);
                         } else {
-                            Console.WriteLine (" P [WorkerThread {0} ] triplet [ {1} ] is processed successfully. ",
-                                Thread.CurrentThread.ManagedThreadId, triplet.Name);
-                            itemsDeps.RemoveItemDependence (triplet.Name, syncRes == SyncResult.SUCCEED);
+                            Console.WriteLine (" P [ WorkerThread: {0} ] processing triplet [ {1} ]'s result = {2}",
+                                             Thread.CurrentThread.ManagedThreadId, triplet.Name, syncRes);
+                            itemsDeps.RemoveItemDependence (triplet.Name, syncRes);
                         }
                     } else {
                         Console.WriteLine (" P [ WorkerThread: {0} ] has get a dummy triplet. ", Thread.CurrentThread.ManagedThreadId);
@@ -85,10 +94,14 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
                     if (checker.processorCompleteAdding ()) {
 
-                        Console.WriteLine (" P [ WorkerThread: {0} ] all full-sync-triplets are processed. Set fullSyncTriplets queue CompleteAdding().",
-                            Thread.CurrentThread.ManagedThreadId);
-
-                        fullSyncTriplets.CompleteAdding ();
+                        if (!fullSyncTriplets.IsAddingCompleted) {
+                            Console.WriteLine (" P [ WorkerThread: {0} ] all full-sync-triplets are processed. Set fullSyncTriplets queue CompleteAdding().",
+                                Thread.CurrentThread.ManagedThreadId);
+                            fullSyncTriplets.CompleteAdding ();
+                        } else {
+                            Console.WriteLine (" P [ WorkerThread: {0} ] FullSyncTriplets queue is already IsAddingCompleted.",
+                                Thread.CurrentThread.ManagedThreadId);
+                        }
                     }
                 });
         }

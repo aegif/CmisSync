@@ -1,15 +1,13 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/ProcessWorker.cs">
     <Files>
-      <File FileName="../../CmisSync.ConsoleUnderDev/CmisSyncOnceUnderDev.cs" Line="36" Column="13" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="88" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="112" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="187" Column="72" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="82" Column="28" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Internal/ProcessorCompleteAddingChecker.cs" Line="18" Column="52" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/SyncTriplet.cs" Line="31" Column="36" />
-      <File FileName="../../CmisSync.Lib/Database/Database.cs" Line="71" Column="39" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/ProcessWorker.cs" Line="74" Column="57" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="87" Column="73" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/RemoteCrawlWorker.cs" Line="174" Column="25" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs" Line="137" Column="13" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Internal/ItemsDependencies.cs" Line="136" Column="63" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="366" Column="59" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -21,8 +19,12 @@
               <Node name="Database" expanded="True" />
               <Node name="Sync" expanded="True">
                 <Node name="SyncMachine" expanded="True">
+                  <Node name="Crawler" expanded="True" />
                   <Node name="Internal" expanded="True" />
-                  <Node name="SyncTripletProcessor.cs" selected="True" />
+                  <Node name="ProcessWorker" expanded="True">
+                    <Node name="Internal" expanded="True" />
+                    <Node name="ProcessWorker.cs" selected="True" />
+                  </Node>
                 </Node>
                 <Node name="SyncTriplet" expanded="True" />
                 <Node name="SyncWorker" expanded="True" />
@@ -31,6 +33,7 @@
                 <Node name="FileUtilities" expanded="True" />
               </Node>
             </Node>
+            <Node name="DotCMIS" expanded="True" />
           </Node>
         </State>
       </Pad>
