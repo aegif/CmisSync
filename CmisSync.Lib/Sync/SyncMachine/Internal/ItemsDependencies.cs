@@ -103,7 +103,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
         /// If succeed flag is set to false, the depended item's sync
         /// has failed. One should set all it relating item to ConflictOrFailed.
         /// </summary>
-        /// <param name="depName">Dep name.</param>
+        /// <param name="depName">Dependence name.</param>
+        /// <param name="result">Result returned by sync worker</param>
         public void RemoveItemDependence(string depName, SyncResult result) {
             lock(locker) {
                 // Confirm that only the item can delete itself from idps dictionary.
@@ -129,8 +130,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
                     }
 
                     if (result != SyncResult.SUCCEED) {
-                        Console.WriteLine (" I [ WorkerThread: {0} ] Item {1} not succeed. output its LUT:",
-                            Thread.CurrentThread.ManagedThreadId, depName);
 
                         // If the item's processing failed,
                         // all items depend on this item should
