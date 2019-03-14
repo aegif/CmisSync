@@ -148,7 +148,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
                 try {
 
-                    Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog (fullSyncTriplets));
+                    Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog (fullSyncTriplets, itemsDependencies));
                     tripletAssemblerTask.Wait ();
 
                 } catch (AggregateException ae) {
@@ -241,6 +241,11 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 var changeEvents = changes.ChangeEventList./*Where (p => p != changes.ChangeEventList.FirstOrDefault ()).*/ToList ();
                 foreach (IChangeEvent changeEvent in changeEvents) {
                     Console.WriteLine (" Get change : {0}, {1} at [{2}]({3})", changeEvent.ObjectId, changeEvent.ChangeType, changeEvent.ChangeTime.ToString (), ((DateTime)changeEvent.ChangeTime).ToFileTime ());
+
+
+                    String[] tmp = cmisSyncFolder.Database.GetPathById (changeEvent.ObjectId.Split (CmisUtils.CMIS_FILE_SEPARATOR).Last ());
+                    String remotePath = tmp == null ? "NULL" : tmp [0];
+                    Console.WriteLine (" Remote path: {0}", remotePath);
                 }
                 currentChangeToken = changes.LatestChangeLogToken;
                 if (changes.HasMoreItems == true && (currentChangeToken == null || currentChangeToken.Length == 0)) {

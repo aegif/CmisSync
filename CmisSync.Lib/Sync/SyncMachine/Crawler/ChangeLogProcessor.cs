@@ -10,6 +10,7 @@ using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Sync.SyncTriplet;
 using CmisSync.Lib.Sync.SyncMachine.Crawler;
 using CmisSync.Lib.Sync.SyncMachine.Exceptions;
+using CmisSync.Lib.Sync.SyncMachine.Internal;
 using CmisSync.Lib.Utilities.FileUtilities;
 
 using log4net;
@@ -41,13 +42,17 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private CmisSyncFolder.CmisSyncFolder cmisSyncFolder;
 
+        private ItemsDependencies idps = null;
+
         private ISession session;
 
-        public ChangeLogProcessor (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session, BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets)
+        public ChangeLogProcessor (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session, 
+            BlockingCollection<SyncTriplet.SyncTriplet> fullSyncTriplets, ItemsDependencies idps)
         {
             this.cmisSyncFolder = cmisSyncFolder;
             this.session = session;
             this.fullSyncTriplets = fullSyncTriplets;
+            this.idps = idps;
         }
 
         public void Start ()
@@ -90,7 +95,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 /*
                  * Due to latest report in the master branch: single rename will not duplicate.
                  */
-                var changeEvents = changes.ChangeEventList./*Where (p => p != changes.ChangeEventList.FirstOrDefault ()).*/ToList ();
+                var changeEvents = changes.ChangeEventList.Where (p => p != changes.ChangeEventList.FirstOrDefault ()).ToList ();
 
                 /*
                  *  To avoid sequential update on a single object.
@@ -128,7 +133,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                 //database.SetChangeLogToken (currentChangeToken);
             }
-            // Repeat if there were two many changes to fit in a single response.
+            // Repeat if there were too many changes to fit in a single response.
             while (changes.HasMoreItems ?? false);
 
             // processs change logs
@@ -161,6 +166,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     }
 
                     SyncTriplet.SyncTriplet triplet = null;
+                    String parent = null;
                     if (obj is IFolder) {
 
                         triplet = SyncTripletFactory.CreateFromRemoteFolder ((IFolder)obj, cmisSyncFolder);

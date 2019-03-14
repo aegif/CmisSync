@@ -19,6 +19,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
         private Dictionary<string, HashSet<string>> itemsDeps = null;
         private HashSet<string> _failed = null;
         private HashSet<string> _conflicted = null;
+        private HashSet<String> _succeed = null;
 
         // depName -- <item1, item2, ..., itemN>
         // reverse lookup table
@@ -31,6 +32,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
             itemsDeps = new Dictionary<string, HashSet<string>> ();
             _failed = new HashSet<string> ();
             _conflicted = new HashSet<string> ();
+            _succeed = new HashSet<string> ();
             _LUT = new Dictionary<string, HashSet<string>> ();
         }
 
@@ -78,6 +80,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
                 depName.Equals (CmisUtils.CMIS_FILE_SEPARATOR.ToString ())) return;
 
             lock (locker) {
+                // if the dep is already processed successfully , do not add it
+                // to idps dictionary
+                if (_succeed.Contains (depName)) return;
+
                 // add dep to item's dependencies
                 if (itemsDeps.ContainsKey (item)) itemsDeps [item].Add (depName);
                 else itemsDeps [item] = new HashSet<string> { depName };
@@ -114,6 +120,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
                 //   --> after folder1's thread end, it will push folder1 back to queue because its state is unresolved. error
                 if (itemsDeps.ContainsKey (depName) && itemsDeps [depName].Count == 0) {
                     itemsDeps.Remove (depName);
+
+                    // if one item is removed from idps, one should mark it as succeed.
+                    // because there might be item depends on it but not processed yet.
+                    _succeed.Add (depName);
                 }
                 if (!_LUT.ContainsKey (depName)) return;
                 foreach (string item in _LUT [depName]) {

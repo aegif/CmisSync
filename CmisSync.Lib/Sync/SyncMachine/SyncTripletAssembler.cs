@@ -49,10 +49,11 @@ namespace CmisSync.Lib.Sync.SyncMachine
         }
 
         public void StartForChangeLog(
-            BlockingCollection<SyncTriplet.SyncTriplet> full 
+            BlockingCollection<SyncTriplet.SyncTriplet> full,
+            ItemsDependencies idps
         ) {
             this.fullSyncTriplets = full;
-            this.changeLogProcessor = new ChangeLogProcessor (cmisSyncFolder, session, fullSyncTriplets);
+            this.changeLogProcessor = new ChangeLogProcessor (cmisSyncFolder, session, fullSyncTriplets, idps);
 
             changeLogProcessor.Start ();
 
