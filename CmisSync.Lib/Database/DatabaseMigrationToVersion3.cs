@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//#if __MonoCS__
+#if __MonoCS__
 using Mono.Data.Sqlite;
-//#else
-//using System.Data.SQLite;
-//#endif
+#else
+using System.Data.SQLite;
+#endif
 
 using log4net;
 using CmisSync.Auth;
@@ -16,14 +16,14 @@ using CmisSync.Lib.UserNotificationListener;
 
 namespace CmisSync.Lib.Database
 {
-    //#if __MonoCS__
+#if __MonoCS__
     // Mono's SQLite ADO implementation uses pure CamelCase (Sqlite vs. SQLite)
     // so we define some aliases here
     using SQLiteConnection = SqliteConnection;
     using SQLiteCommand = SqliteCommand;
     using SQLiteException = SqliteException;
     using SQLiteDataReader = SqliteDataReader;
-    //#endif
+#endif
 
     /// <summary>
     /// Migrate from database version 0,2 to version 3.

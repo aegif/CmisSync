@@ -20,14 +20,14 @@ using CmisSync.Lib.Config;
 
 namespace CmisSync.Lib.Database
 {
-    #if __MonoCS__
+#if __MonoCS__
     // Mono's SQLite ADO implementation uses pure CamelCase (Sqlite vs. SQLite)
     // so we define some aliases here
     using SQLiteConnection = SqliteConnection;
     using SQLiteCommand = SqliteCommand;
     using SQLiteException = SqliteException;
     using SQLiteDataReader = SqliteDataReader;
-    #endif
+#endif
 
     /// <summary>
     /// Check a CmisSync database and if needed upgrade its version and schema.

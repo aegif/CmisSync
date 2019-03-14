@@ -134,7 +134,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
         public bool DoChangeLogSync() {
 
             bool succeed = true;
-            processorCompleteAddingChecker = new ProcessorCompleteAddingChecker ( itemsDependencies );
 
             lock (syncingLock) {
 
@@ -143,6 +142,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 IsWorking = true;
 
                 itemsDependencies = new ItemsDependencies ();
+                processorCompleteAddingChecker = new ProcessorCompleteAddingChecker (itemsDependencies);
+
                 fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
                 Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
@@ -162,6 +163,12 @@ namespace CmisSync.Lib.Sync.SyncMachine
                         }
                     }
                 }
+
+                // assembler completed.
+                processorCompleteAddingChecker.assemblerCompleted = true;
+
+                SyncTriplet.SyncTriplet dummyTriplet = new SyncTriplet.SyncTriplet (false);
+                fullSyncTriplets.TryAdd (dummyTriplet);
 
                 tripletProcessTask.Wait ();
 
@@ -213,6 +220,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         public void DoChangeLogTest ()
         {
+
             Config.CmisSyncConfig.Feature features = null;
             if (ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name) != null)
                 features = ConfigManager.CurrentConfig.GetFolder (cmisSyncFolder.Name).SupportedFeatures;

@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Mac Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;__COCOA__;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;__COCOA__;__MonoCS__;</DefineConstants>
     <DocumentationFile>bin\Debug\CmisSync.Lib.XML</DocumentationFile>
     <DebugType>full</DebugType>
     <PlatformTarget>anycpu</PlatformTarget>

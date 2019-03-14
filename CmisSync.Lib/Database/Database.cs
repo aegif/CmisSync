@@ -3,11 +3,11 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//#if __MonoCS__
+#if __MonoCS__
 using Mono.Data.Sqlite;
-//#else
-//using System.Data.SQLite;
-//#endif
+#else
+using System.Data.SQLite;
+#endif
 using System.Data.Common;
 using System.IO;
 using System.Security.Cryptography;
@@ -21,14 +21,14 @@ using CmisSync.Lib.Sync.SyncTriplet;
 
 namespace CmisSync.Lib.Database
 {
-//#if __MonoCS__
+#if __MonoCS__
     // Mono's SQLite ADO implementation uses pure CamelCase (Sqlite vs. SQLite)
     // so we define some aliases here
     using SQLiteConnection = SqliteConnection;
     using SQLiteCommand = SqliteCommand;
     using SQLiteException = SqliteException;
     using SQLiteDataReader = SqliteDataReader;
-//#endif
+#endif
 
     /// <summary>
     /// Database to cache remote information from the CMIS server.
@@ -639,11 +639,11 @@ namespace CmisSync.Lib.Database
 
             if (null != modifyDateObj)
             {
-                //#if __MonoCS__
+#if __MonoCS__
                 modifyDateObj = DateTime.SpecifyKind((DateTime)modifyDateObj, DateTimeKind.Utc);
-                //#else
-                //modifyDateObj = ((DateTime)modifyDateObj).ToUniversalTime();
-                //#endif
+#else
+                modifyDateObj = ((DateTime)modifyDateObj).ToUniversalTime();
+#endif
             }
             return (DateTime?)modifyDateObj;
         }
@@ -661,11 +661,11 @@ namespace CmisSync.Lib.Database
             }
 
             if (null != modifyDateObj) {
-//#if __MonoCS__
+#if __MonoCS__
                 modifyDateObj = DateTime.SpecifyKind((DateTime)modifyDateObj, DateTimeKind.Utc);
-//#else
-//                modifyDateObj = ((DateTime)modifyDateObj).ToUniversalTime ();
-//#endif
+#else
+                modifyDateObj = ((DateTime)modifyDateObj).ToUniversalTime ();
+#endif
             }
             return (DateTime?)modifyDateObj;
         }
@@ -726,11 +726,11 @@ namespace CmisSync.Lib.Database
             object obj = ExecuteSQLFunction("SELECT serverSideModificationDate FROM downloads WHERE path=@path", parameters);
             if (null != obj)
             {
-                //#if __MonoCS__
+#if __MonoCS__
                 obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
-                //#else
-                //obj = ((DateTime)obj).ToUniversalTime();
-                //#endif
+#else
+                obj = ((DateTime)obj).ToUniversalTime();
+#endif
             }
             return (DateTime?)obj;
         }
@@ -742,11 +742,11 @@ namespace CmisSync.Lib.Database
             parameters.Add ("path", remoteRelativePath);
             object obj = ExecuteSQLFunction ("SELECT serverSideModificationDate FROM downloads WHERE path=@path", parameters);
             if (null != obj) {
-                //#if __MonoCS__
+#if __MonoCS__
                 obj = DateTime.SpecifyKind((DateTime)obj, DateTimeKind.Utc);
-                //#else
-                //obj = ((DateTime)obj).ToUniversalTime ();
-                //#endif
+#else
+                obj = ((DateTime)obj).ToUniversalTime ();
+#endif
             }
             return (DateTime?)obj;
         }

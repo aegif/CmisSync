@@ -92,11 +92,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                     // ensure the folder been deleted in DB. Eg. the folder is renamed due to conflict
                     Console.WriteLine (" # [ WorkerThread: {0} ] delete local folder {1}.",
                                        System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
-                    return WorkerOperations.DeleteLocalFolder (triplet, cmisSyncFolder) ?
-                        SyncResult.SUCCEED : SyncResult.FAILED;
+                    return WorkerOperations.DeleteLocalFolder (triplet, cmisSyncFolder);
                 } else {
-                    return WorkerOperations.DeleteLocalFile (triplet, cmisSyncFolder) ?
-                        SyncResult.SUCCEED : SyncResult.FAILED;
+                    return WorkerOperations.DeleteLocalFile (triplet, cmisSyncFolder);
                 }
 
 
@@ -107,12 +105,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                 // Remote new, download
                 if (triplet.IsFolder) {
                     if (!triplet.LocalExist) {
-                        return WorkerOperations.CreateLocalFolder (triplet, session, cmisSyncFolder) ?
-                            SyncResult.SUCCEED : SyncResult.FAILED;
+                        return WorkerOperations.CreateLocalFolder (triplet, session, cmisSyncFolder);
                     }
                 } else {
-                    return WorkerOperations.DownloadFile (triplet, session, cmisSyncFolder) ?
-                        SyncResult.SUCCEED : SyncResult.FAILED;
+                    return WorkerOperations.DownloadFile (triplet, session, cmisSyncFolder);
                 }
             }
             return SyncResult.SUCCEED;
@@ -133,17 +129,14 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                                            System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                         if (triplet.IsFolder)
-                            return WorkerOperations.CreateRemoteFolder (triplet, session, cmisSyncFolder) ?
-                                SyncResult.SUCCEED : SyncResult.FAILED;
-                        else 
-                            return WorkerOperations.UploadFile (triplet, session, cmisSyncFolder) ?
-                                SyncResult.SUCCEED : SyncResult.FAILED;
+                            return WorkerOperations.CreateRemoteFolder (triplet, session, cmisSyncFolder);
+                        else
+                            return WorkerOperations.UploadFile (triplet, session, cmisSyncFolder);
 
                         // remote exist, update    
                     } else {
                         if (triplet.IsFolder) { }// do nothing 
-                        else return WorkerOperations.UpdateRemoteFile (triplet, session, cmisSyncFolder) ?
-                                SyncResult.SUCCEED : SyncResult.FAILED;
+                        else return WorkerOperations.UpdateRemoteFile (triplet, session, cmisSyncFolder);
                     }
 
                 } else {
@@ -157,13 +150,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                                            System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
 
-                        return WorkerOperations.DeleteRemoteFolder (triplet, session, cmisSyncFolder) ?
-                            SyncResult.SUCCEED : SyncResult.FAILED;
+                        return WorkerOperations.DeleteRemoteFolder (triplet, session, cmisSyncFolder);
 
                     } else {
 
-                        return WorkerOperations.DeleteRemoteFile (triplet, session, cmisSyncFolder) ?
-                            SyncResult.SUCCEED : SyncResult.FAILED;
+                        return WorkerOperations.DeleteRemoteFile (triplet, session, cmisSyncFolder);
                     }
                 }
 
@@ -181,15 +172,15 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
             // If LS=ne , DB=e, RS=ne: 
             // both removed, clear DB record only
             if (!triplet.LocalExist && !triplet.RemoteExist) {
-                return WorkerOperations.RemoveDbRecord (triplet, cmisSyncFolder) ?
-                    SyncResult.SUCCEED : SyncResult.FAILED;
+                return WorkerOperations.RemoveDbRecord (triplet, cmisSyncFolder);
             } else {
                 Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: conflict! rename local file/folder",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                 WorkerOperations.SolveConflict (triplet, cmisSyncFolder);
 
-                return SyncRemoteToLocal (triplet, session, cmisSyncFolder) == SyncResult.SUCCEED ? SyncResult.CONFLICT : SyncResult.FAILED;
+                SyncResult res = SyncRemoteToLocal (triplet, session, cmisSyncFolder);
+                return  (res != SyncResult.FAILED) ? SyncResult.CONFLICT : SyncResult.FAILED;
             }
         }
     }

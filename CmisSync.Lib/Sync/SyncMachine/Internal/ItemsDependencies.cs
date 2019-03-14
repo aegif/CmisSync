@@ -118,7 +118,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
                 //   folder1: start -> has deps, processing, failed, (long time)
                 //   folder1/f1: finished and delete folder1's dep, idps dictionary's count is 0 and full-sync-queue set to IsAddingComplete
                 //   --> after folder1's thread end, it will push folder1 back to queue because its state is unresolved. error
-                if (itemsDeps.ContainsKey (depName) && itemsDeps [depName].Count == 0) {
+                if (itemsDeps.ContainsKey (depName)) { 
+                // this is just a double check, but might cause problem in changelog processor when removing 'PossibleDeletionFolders' && itemsDeps [depName].Count == 0) {
                     itemsDeps.Remove (depName);
 
                     // if one item is removed from idps, one should mark it as succeed.

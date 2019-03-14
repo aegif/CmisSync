@@ -2,21 +2,19 @@
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="90" Column="120" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="75" Column="21" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" Line="166" Column="21" />
-      <File FileName="../../CmisSync.ConsoleUnderDev/CmisSyncOnceUnderDev.cs" Line="67" Column="34" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Internal/ItemsDependencies.cs" Line="171" Column="21" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="96" Column="9" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs" Line="85" Column="61" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SemiSyncTripletManager.cs" Line="47" Column="30" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="1" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" Line="241" Column="87" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="85" Column="13" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="131" Column="27" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="58" Column="37" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="90" Column="25" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="176" Column="17" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="CmisSync" expanded="True">
             <Node name="CmisSync.Auth" expanded="True" />
+            <Node name="CmisSync.Console" expanded="True" />
             <Node name="CmisSync.ConsoleUnderDev" expanded="True" />
             <Node name="CmisSync.Lib" expanded="True">
               <Node name="Database" expanded="True" />
@@ -36,7 +34,9 @@
                 <Node name="SyncTriplet" expanded="True" />
                 <Node name="SyncWorker" expanded="True" />
               </Node>
-              <Node name="Utilities" expanded="True" />
+              <Node name="Utilities" expanded="True">
+                <Node name="FileUtilities" expanded="True" />
+              </Node>
             </Node>
             <Node name="DotCMIS" expanded="True" />
           </Node>

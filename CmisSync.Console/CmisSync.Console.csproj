@@ -69,7 +69,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Mac Debug\</OutputPath>
-    <DefineConstants>DEBUG;__COCOA__;</DefineConstants>
+    <DefineConstants>DEBUG;__COCOA__</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -144,9 +144,12 @@
     <PostBuildEvent Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|AnyCPU'">$(SolutionDir)installer/createMacInstaller.sh 0.1</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>Mkdir "$(ProjectDir)$(OutDir)x86"
+<PreBuildEvent Condition="'$(Configuration)|$(Platform)' == 'Windows Debug|AnyCPU'">Mkdir "$(ProjectDir)$(OutDir)x86"
 Mkdir "$(ProjectDir)$(OutDir)x64"
 Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-static-binary-Win32-2010-1.0.86.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)x86\SQLite.Interop.dll"
 Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-static-binary-x64-2010-1.0.86.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)x64\SQLite.Interop.dll"</PreBuildEvent>
-  </PropertyGroup>
+    <PreBuildEvent Condition="'$(Configuration)|$(Platform)' == 'Linux Debug|AnyCPU'">Mkdir "$(ProjectDir)$(OutDir)x86"
+Mkdir "$(ProjectDir)$(OutDir)x64"
+Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-static-binary-Lin32-2010-1.0.86.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)x86\SQLite.Interop.dll"
+Copy "$(SolutionDir)..\..\extras\sqlite-netFx40-static-binary-x64-2010-1.0.86.0\SQLite.Interop.dll" "$(ProjectDir)$(OutDir)x64\SQLite.Interop.dll"</PreBuildEvent>  </PropertyGroup>
 </Project>

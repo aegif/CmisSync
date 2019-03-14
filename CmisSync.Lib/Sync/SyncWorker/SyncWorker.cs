@@ -80,7 +80,9 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
             //syncMachine.DoWatcherTest (); return;
 
-            // syncMachine.DoChangeLogTest (); return;
+            //syncMachine.DoChangeLogTest (); return;
+
+            syncMachine.DoChangeLogSync (); return;
 
             isFirstSyncing = true;
 

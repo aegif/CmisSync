@@ -21,7 +21,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
             String [] n = b.Split ('/');
             int l = Math.Min (m.Length, n.Length);
             int i = 0;
-            while (i <= l) {
+            while (i < l) {
                 if (string.Compare (m [i], n [i]) < 0) return -1;
                 if (string.Compare (m [i], n [i]) > 0) return 1;
                 i++;

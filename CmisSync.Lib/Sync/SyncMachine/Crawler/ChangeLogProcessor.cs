@@ -44,6 +44,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private ItemsDependencies idps = null;
 
+        private HashSet<string> possibleDeletionFolderBuffer = new HashSet<string> (); 
+
         private ISession session;
 
         public ChangeLogProcessor (CmisSyncFolder.CmisSyncFolder cmisSyncFolder, ISession session, 
@@ -193,28 +195,33 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                         string localpath = dbpath == null ? null : dbpath [0];
 
                         if (localpath != null) {
+
+                            // local path of folder does not contains '/' at the end of its name.
+                            String parent = CmisFileUtil.GetUpperFolderOfCmisPath (localpath);
+                            if (parent.Length > 0) {
+                                parent = parent + CmisUtils.CMIS_FILE_SEPARATOR;
+                                idps.AddItemDependence (parent, dbpath[2].Equals("Folder") ? localpath + CmisUtils.CMIS_FILE_SEPARATOR : localpath);
+                                possibleDeletionFolderBuffer.Add (parent);
+                            }
+
                             string localFullPath = Path.Combine (cmisSyncFolder.LocalPath, localpath);
                             Console.WriteLine ("  --  {1} event: {0}", action, localFullPath);
+
+
                             if (dbpath[2].Equals("Folder")) {
                                 Console.WriteLine ("  -- Delete folder work: {0}", localFullPath);
 
-                                /*
-                                 * If changelog will give out all change event in the removed folder,
-                                 * it is not necessary to traverse the local dictionary.
-                                 * It is also not necessary to check duplication in delayedFolderDeletion 
-                                 * concurrent queue in TripletProcessor.
-                                if (!FolderDeleteEventHandler (localFullPath, cmisSyncFolder)) {
-                                    throw new ChangeLogProcessorBrokenException ("Folder Deletion Failed.");
-                                }*/
-
                                 SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (localFullPath, cmisSyncFolder);
+                                possibleDeletionFolderBuffer.Remove (triplet.Name);
+
                                 if (!fullSyncTriplets.TryAdd (triplet)) {
                                     Console.WriteLine ("Add folder deletion triplet to full synctriplet queue failed! {0}", localFullPath);
                                 }
                             } else {
-                                Console.WriteLine ("  -- Delete file work: {0}", localFullPath);
-
                                 SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalDocument (localFullPath, cmisSyncFolder);
+
+                                Console.WriteLine ("  -- Delete file work: {0}, parent: {1}", localFullPath, parent);
+
                                 if (!fullSyncTriplets.TryAdd(triplet)) {
                                     Console.WriteLine ("Add file deletion triplet to full synctriplet queue failed! {0}", localFullPath);
                                 }
@@ -227,6 +234,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                         // ignore not-found , 
                     }
                 }
+            }
+
+            Console.WriteLine ("  -- All changelog processed.");
+            foreach (String pd in possibleDeletionFolderBuffer) {
+                Console.WriteLine ("  -- Remove possible deletion folder's dependecies {0}", pd);
+                idps.RemoveItemDependence (pd, ProcessWorker.SyncResult.SUCCEED);
             }
         }
 

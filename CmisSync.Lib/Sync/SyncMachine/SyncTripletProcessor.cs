@@ -88,6 +88,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                                              Thread.CurrentThread.ManagedThreadId, triplet.Name, syncRes);
                             itemsDeps.RemoveItemDependence (triplet.Name, syncRes);
                         }
+
                     } else {
                         Console.WriteLine (" P [ WorkerThread: {0} ] has get a dummy triplet. ", Thread.CurrentThread.ManagedThreadId);
                     }

@@ -42,7 +42,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
          * Download directory actually only create the folder name.
          * Contained files are enqueued
          */
-        public static bool CreateLocalFolder(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static SyncResult CreateLocalFolder(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string localFolder = OperationUtils.GetLocalFullPath (triplet, cmisSyncFolder);
 
@@ -70,17 +70,17 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 Console.WriteLine ("  %% download folder failed, {0} : {1}",  
                                    Utils.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), e.Message);
 
-                return false;
+                return SyncResult.FAILED;
             }
 
-            return true;
+            return SyncResult.SUCCEED;
         }
 
 
         /*
          * Be aware, in this method, triplet.LocalStorage might be null 
          */
-        public static bool DownloadFile (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static SyncResult DownloadFile (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string remoteRelativePath = triplet.RemoteStorage.RelativePath;
 
@@ -89,7 +89,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
             // Skip if invalid file name. See https://github.com/aegif/CmisSync/issues/196
             if (SyncFileUtil.IsInvalidFileName (CmisFileUtil.GetLeafname(remoteRelativePath))) {
                 Logger.Info ("Skipping download of file with illegal filename: " + remoteRelativePath);
-                return true;
+                return SyncResult.SUCCEED;
             }
 
             Boolean success = false;
@@ -107,7 +107,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     Logger.Info (String.Format ("Skipping download of file {0} because of too many failed ({1}) downloads", 
                                                 remoteRelativePath, 
                                                 cmisSyncFolder.Database.GetOperationRetryCounter (filePath, Database.Database.OperationType.DOWNLOAD)));
-                    return true;
+                    return SyncResult.SUCCEED;
                 }
 
                 // if .sync file exists, remove it.
@@ -138,7 +138,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                         // null contentStream sometimes happen on IBM P8 CMIS server, not sure why.
                         if (contentStream == null) {
                             Logger.Warn ("Skipping download of file with null content stream: " + remoteRelativePath);
-                            return true;
+                            return SyncResult.SUCCEED;
                         } else {
                             filehash = OperationUtils.DownloadStream (contentStream, tmpFilePath);
                             contentStream.Stream.Close ();
@@ -152,7 +152,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     }
                 }
                 if (!success) {
-                    return false;
+                    return SyncResult.FAILED;
                 }
 
                 Logger.Info (String.Format ("Downloaded remote object({0}): {1}", remoteDocument.Id, remoteRelativePath));
@@ -165,7 +165,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     // Remove temporary local document to avoid it being considered a new document.
                     Console.WriteLine ("  %% download error, " + e.Message);
                     File.Delete (tmpFilePath);
-                    return false;
+                    return SyncResult.FAILED;
                 }
 
                 Logger.Debug (String.Format ("Renaming temporary local download file {0} to {1}", tmpFilePath, filePath));
@@ -199,16 +199,16 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 //Logger.Info ("Added file to database: " + filePath);
 
                 if (!success) {
-                    return false;
+                    return SyncResult.FAILED;
                 }
             } catch (Exception e) {
                 Console.WriteLine ("  %% download error, " + e.Message);
-                return false;
+                return SyncResult.FAILED;
             }
-            return true;
+            return SyncResult.SUCCEED;
         }
 
-        public static bool CreateRemoteFolder (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static SyncResult CreateRemoteFolder (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string remoteFullPath = OperationUtils.GetRemoteFullPath (triplet, cmisSyncFolder);
             string remoteRelativePath = OperationUtils.GetRemoteRelativePath (remoteFullPath, cmisSyncFolder);
@@ -230,7 +230,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     remoteParentFolder = (IFolder)session.GetObjectByPath (remoteParentPath, false);
                 } catch (Exception e) {
                     Console.WriteLine ("  %% Can not get {1}'s parent folder {0}, abort creating", remoteParentPath, triplet.Name);
-                    return false;
+                    return SyncResult.FAILED;
                 }
 
                 IFolder folder = remoteParentFolder.CreateFolder (properties);
@@ -240,20 +240,20 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
 
             } catch (CmisNameConstraintViolationException) {
                 Logger.Warn ("Remote file conflict with local folder " + remoteLeaf);
-                return false;
+                return SyncResult.FAILED;
             } catch (Exception e) {
                 Console.WriteLine (" %%%% create remote folder " + remoteLeaf + " failed. " + e.Message);
             }
 
             Console.WriteLine ("  %%%% create remote folder: " + remoteFullPath);
-            return true;
+            return SyncResult.SUCCEED;
         }
 
 
         /*
          *  Beaware in this method, triplet.RemoteStorage may not exist.
          */
-        public static bool UploadFile (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static SyncResult UploadFile (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string remoteFullPath = OperationUtils.GetRemoteFullPath (triplet, cmisSyncFolder);
             string remoteRelativePath = OperationUtils.GetRemoteRelativePath (remoteFullPath, cmisSyncFolder);
@@ -264,11 +264,14 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
             string remoteFolderFullPath = CmisFileUtil.GetUpperFolderOfCmisPath (remoteFullPath);
             IFolder remoteFolder = null;
 
+            // The remote folder does not exist. Return CONFLICT
             try {
                 remoteFolder = (IFolder)session.GetObjectByPath (remoteFolderFullPath, false);
-            } catch (Exception e) { return false; }
+                if (null == remoteFolder) return SyncResult.CONFLICT;
+            } catch (Exception e) {
+                return SyncResult.CONFLICT;
+            }
 
-            if (null == remoteFolder) return false;
 
             try {
                 IDocument remoteDocument = null;
@@ -306,16 +309,16 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 cmisSyncFolder.Database.AddFile (
                     triplet.LocalStorage.RelativePath, remoteRelativePath, CheckSumUtil.Checksum(localFullPath),
                     remoteDocument.Id, remoteDocument.LastModificationDate, metadata, filehash);
-                return true;
+                return SyncResult.SUCCEED;
             } catch (Exception e) {
                 Console.WriteLine ("  %% Upload error, " + e.Message);
-                return false;
+                return SyncResult.FAILED;
             }
         }
 
-        public static bool UpdateRemoteFile(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) 
+        public static SyncResult UpdateRemoteFile(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) 
         {
-            if (!triplet.RemoteExist) return false;
+            if (!triplet.RemoteExist) return SyncResult.FAILED;
 
             string localFullPath = triplet.LocalStorage.FullPath;
 
@@ -331,7 +334,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     // Ignore files with null or empty content stream.
                     if ((localfile == null) && (localfile.Length == 0)) {
                         Logger.Info ("Skipping update of file with null or empty content stream: " + localFullPath);
-                        return true;
+                        return SyncResult.SUCCEED;
                     }
 
                     //IDocument remoteFile = (IDocument)session.GetObjectByPath (remoteFullPath, false);
@@ -375,24 +378,22 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
 
                         // TODO Update metadata?
                         Logger.Info ("Updated: " + triplet.LocalStorage.RelativePath);
-                        return true;
+                        return SyncResult.SUCCEED;
                     } else {
                         string message = String.Format ("File {0} is CheckOut on the server by another user: {1}", triplet.LocalStorage.RelativePath, remoteFile.CheckinComment);
 
                         // throw new IOException("File is Check Out on the server");
                         Logger.Info (message);
-                        return false;
+                        return SyncResult.FAILED;
                     }
                 }
             } catch (Exception e) {
-                return false;
+                return SyncResult.FAILED;
             }
         }
 
-        public static bool DeleteRemoteFile (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static SyncResult DeleteRemoteFile (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
-            bool success = true;
-
             string message0 = "CmisSync Warning: You have deleted file " + triplet.RemoteStorage.RelativePath +
                              "\nCmisSync will now delete it from the server. If you actually did not delete this file, please report a bug at CmisSync@aegif.jp";
             Logger.Info (message0);
@@ -418,27 +419,27 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     // effect local scanning process.
                     // 
                     // require study on processing order
-                    success &= DownloadFile (triplet, session, cmisSyncFolder);
+                    return DownloadFile (triplet, session, cmisSyncFolder);
                 } else {
                     // File has been recently removed locally, so remove it from server too.
-
                     Logger.Info ("Removing locally deleted file on server: " + triplet.RemoteStorage.FullPath);
                     /*success &=*/
                     remoteDocument.DeleteAllVersions ();
                     // Remove it from database.
                     cmisSyncFolder.Database.RemoveFile (triplet);
+                    return SyncResult.SUCCEED;
                 }
             } catch (Exception e) {
                 Console.WriteLine ("  %% delete remote file failed, " + e.Message);
+                return SyncResult.FAILED;
             }
-            return success;
         }
 
 
         /// <summary>
         /// Delete the folder from the remote server.
         /// </summary>
-        public static bool DeleteRemoteFolder (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static SyncResult DeleteRemoteFolder (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             try {
                 //IFolder folder = (IFolder)session.GetObjectByPath (triplet.RemoteStorage.FullPath, false);
@@ -453,8 +454,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
 
                     // Delete the folder from database.
                     // RemoveDbRecord (triplet, cmisSyncFolder);
-                    // return true;
-                    return false;
+                    // return SyncResult.SUCCEED;
+                    return SyncResult.FAILED;
                 }
 
                 Logger.Debug ("Removing remote folder tree: " + triplet.RemoteStorage.RelativePath);
@@ -479,33 +480,33 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 cmisSyncFolder.Database.RemoveFolder (triplet);
             } catch(Exception e) {
                 Console.WriteLine ("  %% delete remote folder failed, " + e.Message);
-                return false;
+                return SyncResult.FAILED;
             }
 
-            return true;
+            return SyncResult.SUCCEED;
         }
 
 
-        public static bool DeleteLocalFile(SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static SyncResult DeleteLocalFile(SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string localFullPath = triplet.LocalStorage.FullPath;
             try {
                 File.Delete (localFullPath); 
             } catch (Exception e) {
-                return false;
+                return SyncResult.FAILED;
             }
 
             if (!File.Exists(localFullPath)) {
                 cmisSyncFolder.Database.RemoveFile (triplet);
             }
 
-            return true;
+            return SyncResult.SUCCEED;
         }
 
         /// <summary>
         /// Remove folder from local filesystem and database.
         /// </summary>
-        public static bool DeleteLocalFolder (SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        public static SyncResult DeleteLocalFolder (SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string localFullPath = triplet.LocalStorage.FullPath;
             // Folder has been deleted on server, delete it locally too.
@@ -514,23 +515,49 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
 
                 Logger.Info ("Removing remotely deleted folder: " + localFullPath);
                 if (Directory.Exists (localFullPath)) {
-                    Directory.Delete (localFullPath, true);
+
+                    bool isEmpty = true;
+                    foreach (var f in Directory.GetFiles (localFullPath)) {
+                        if (SyncFileUtil.WorthSyncing (f, cmisSyncFolder)) {
+                            Console.WriteLine ("  %% Local folder: {0} is not empty. Containing file: {1}", triplet.Name, f);
+                            isEmpty = false;
+                            break;
+                        }
+                    }
+                    if (isEmpty) {
+                        foreach (var d in Directory.GetDirectories (localFullPath)) {
+                            if (SyncFileUtil.WorthSyncing (d, cmisSyncFolder)) {
+                                Console.WriteLine ("  %% Local folder: {0} is not empty. Containing folder: {1}", triplet.Name, d);
+                                isEmpty = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isEmpty) {
+                        Directory.Delete (localFullPath, true);
+                    } else {
+                        Console.WriteLine ("  %% Local folder: {0} is not empty. ", triplet.Name);
+                        SolveConflict (triplet, cmisSyncFolder);
+                        RemoveDbRecord (triplet, cmisSyncFolder);
+                        return SyncResult.CONFLICT;
+                    }
                 }
 
                 RemoveDbRecord (triplet, cmisSyncFolder);
 
-                return true;
+                return SyncResult.SUCCEED;
 
             } catch (Exception e) {
                 Console.WriteLine ("  %% Delete local folder: {0} failed: {1}", triplet.Name, e.Message);
-                return false;
+                return SyncResult.FAILED;
             }
         }
 
-        public static bool SolveConflict(SyncTriplet.SyncTriplet triplet,  CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
+        public static SyncResult SolveConflict(SyncTriplet.SyncTriplet triplet,  CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
 
             // case: LS=ne, RS=e, but LS!=DB, RS!=DB, conflict but download only
-            if (!triplet.LocalExist) return true;
+            if (!triplet.LocalExist) return SyncResult.SUCCEED;
 
             try {
 
@@ -549,16 +576,16 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 Console.WriteLine ("  %% rename file: " + triplet.Name + " failed. " + e.Message);
             }
    
-            return true;
+            return SyncResult.SUCCEED;
         }
 
-        public static bool RemoveDbRecord(SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
+        public static SyncResult RemoveDbRecord(SyncTriplet.SyncTriplet triplet, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
             if (triplet.IsFolder) {
                 cmisSyncFolder.Database.RemoveFolder (triplet);
             } else {
                 cmisSyncFolder.Database.RemoveFile (triplet);
             }
-            return true;
+            return SyncResult.SUCCEED;
         }
     }
 }

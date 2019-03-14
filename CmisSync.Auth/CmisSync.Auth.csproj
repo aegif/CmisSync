@@ -36,10 +36,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Mac Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;__MonoCS__;</DefineConstants>
     <DocumentationFile>bin\Debug\CmisSync.Auth.XML</DocumentationFile>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <WarningLevel>4</WarningLevel>
