@@ -452,9 +452,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                                        "      check if there is modified file in it");
 
                     // Delete the folder from database.
-                    RemoveDbRecord (triplet, cmisSyncFolder);
-
-                    return true;
+                    // RemoveDbRecord (triplet, cmisSyncFolder);
+                    // return true;
+                    return false;
                 }
 
                 Logger.Debug ("Removing remote folder tree: " + triplet.RemoteStorage.RelativePath);
