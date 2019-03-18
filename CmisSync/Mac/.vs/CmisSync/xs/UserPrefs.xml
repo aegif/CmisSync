@@ -1,13 +1,13 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" Line="241" Column="87" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/ChangeLogProcessor.cs" Line="196" Column="25" />
       <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="85" Column="13" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="131" Column="27" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="162" Column="1" />
       <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="58" Column="37" />
       <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="90" Column="25" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="176" Column="17" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="542" Column="25" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -22,12 +22,12 @@
                 <Node name="CmisSyncFolder" expanded="True" />
                 <Node name="SynchronizedFolder" expanded="True" />
                 <Node name="SyncMachine" expanded="True">
-                  <Node name="Crawler" expanded="True" />
+                  <Node name="Crawler" expanded="True">
+                    <Node name="ChangeLogProcessor.cs" selected="True" />
+                  </Node>
                   <Node name="Internal" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
-                    <Node name="Internal" expanded="True">
-                      <Node name="WorkerOperations.cs" selected="True" />
-                    </Node>
+                    <Node name="Internal" expanded="True" />
                   </Node>
                 </Node>
                 <Node name="SyncRepo" expanded="True" />

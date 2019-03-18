@@ -96,6 +96,9 @@ namespace CmisSync.Lib.Utilities.FileUtilities
 
         public static string GetUpperFolderOfCmisPath (string cmisPath)
         {
+            if (cmisPath.LastIndexOf(CmisUtils.CMIS_FILE_SEPARATOR) < 0) {
+                return "";
+            }
             return cmisPath.Substring (0, cmisPath.LastIndexOf (CmisUtils.CMIS_FILE_SEPARATOR));
         }
 
