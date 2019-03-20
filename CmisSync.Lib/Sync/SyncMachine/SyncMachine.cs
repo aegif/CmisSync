@@ -28,6 +28,23 @@ using DotCMIS.Exceptions;
 
 namespace CmisSync.Lib.Sync.SyncMachine
 {
+
+    /// <summary>
+    /// SyncMachine is operated(used) by SyncWorker to do synchronizing work. It contains:
+    ///   a semiSyncTripletManager that calls crawler to crawl semi-finished-goods of synctriplet
+    ///     and pushes them to semiSyncTriplets queue
+    ///   a semiSyncTriplets queue that accepts semi-finished-goods of synctriplet from the crawler
+    ///   a syncTripletAssembler that reads semi-finished-goods from semiSyncTriplets and fills 
+    ///     them with necessary information, then pushes them to the fullSynTriplets queue
+    ///   a fullSyncTriplets queue that accept synctriplets from the assembler
+    ///   a synTripletProcessor that processes all synctriplets from fullSyncTriplets queue
+    ///   an ItemsDependencies hashmap to record dependence among synctriplets
+    /// 
+    /// DoCrawlSync is called to do crawling synchronizing. DoChangeLogSync is called to do changelog
+    /// synchronizing. 
+    /// 
+    /// TODO: DoWatcherSync
+    /// </summary>
     public class SyncMachine : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger (typeof (SyncMachine));
@@ -97,15 +114,17 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 // all semi-triplets assembled and pushed to process queue
                 processorCompleteAddingChecker.assemblerCompleted = true;
 
-                // a trick:
-                // It is possible that semiSyncTriplets assembler ( especially the remote-crawler in it)
-                // completes later than all full-triplets are processed but there is no remained remote-semi-triplet
-                // to be appended the full triplet processor ( usually means there is no freshly created file/folder remotely ).
-                // 
-                // In such case, the processorCompletedAddingChecker in the full-triplet-processor's multi-thread processing
-                // worker will not work because the the worker would only work when there is a NEW element ( actually they have
-                // stopped before the remote-crawler has completed). So, push a Dummy triplet to the processor to enforce it 
-                // work once again to check if the full-processor's paralle.foreach multi-thread pipeline should stop.
+                /*
+                 * a trick:
+                 * It is possible that semiSyncTriplets assembler ( especially the remote-crawler in it)
+                 * completes later than all full-triplets are processed but there is no remained remote-semi-triplet
+                 * to be appended the full triplet processor ( usually means there is no freshly created file/folder remotely ).
+                 * 
+                 * In such case, the processorCompletedAddingChecker in the full-triplet-processor's multi-thread processing
+                 * worker will not work because the the worker would only work when there is a NEW element ( actually they have
+                 * stopped before the remote-crawler has completed). So, push a Dummy triplet to the processor to enforce it 
+                 * work once again to check if the full-processor's paralle.foreach multi-thread pipeline should stop.
+                 */
                 SyncTriplet.SyncTriplet dummyTriplet = new SyncTriplet.SyncTriplet (false);
                 fullSyncTriplets.TryAdd (dummyTriplet);
 

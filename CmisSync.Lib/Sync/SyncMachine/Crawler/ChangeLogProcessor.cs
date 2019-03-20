@@ -22,16 +22,11 @@ using DotCMIS.Exceptions;
 namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 {
 
-    // TODO:
-    // Change Log should consider 
-    // change event does not happend in current remote path
-    // eg : alfresco has only one changelog list.
-
-    // TODO: 2
-    // Dependencies.
-    // If delete, the changelog it self is reversed lexicographial order
-    // add dependencies one by one as dep[parent] <- obj?
-
+    /// <summary>
+    /// The changelog processor gets all changes from CMIS server after last synchroning. Then
+    /// it creates synctriplets as well as triplets' dependencies and pushes them to the full
+    /// synctriplet queue.
+    /// </summary>
     public class ChangeLogProcessor
     {
         private static readonly ILog Logger = LogManager.GetLogger (typeof (ChangeLogProcessor));
@@ -62,7 +57,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
             Console.WriteLine (" Start Changelog process :");
 
-            //changeBuffer =  new Dictionary<string, List<ChangeType?>> ();
             changeBuffer =  new Dictionary<string, List<IChangeEvent>> ();
 
             Config.CmisSyncConfig.Feature features = null;
@@ -101,12 +95,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                 /*
                  *  To avoid sequential update on a single object.
-                 *  TODO: Actually it is not necesary in current version because the changelog processor will exist
+                 *  TODO: Actually it is not necessary in current version because the changelog processor will exist
                  *  when UPDATE is detected and call the full crawler
                  */
                 foreach (IChangeEvent changeEvent in changeEvents) {
                     if (changeBuffer.ContainsKey (changeEvent.ObjectId)) {
-                        //changeBuffer [changeEvent.ObjectId].Add (changeEvent.ChangeType);
                         try {
                             long deltaTime = ((DateTime)changeEvent.ChangeTime).ToFileTime () - ((DateTime)changeBuffer [changeEvent.ObjectId].Last ().ChangeTime).ToFileTime ();
                             // FileTime's unit is 100nano second.
@@ -115,12 +108,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                             if (deltaTime > 5000000) {
                                 changeBuffer [changeEvent.ObjectId].Add (changeEvent);
                             }
-                        } catch (Exception e) {
-                            //ChangeTime is null
+                        } catch {
+                            // ChangeTime is null
                             changeBuffer [changeEvent.ObjectId].Add (changeEvent);
                         }
                     } else {
-                        //changeBuffer [changeEvent.ObjectId] = new List<ChangeType?> { changeEvent.ChangeType };
                         changeBuffer [changeEvent.ObjectId] = new List<IChangeEvent> { changeEvent };
                     }
                 }
@@ -128,12 +120,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 currentChangeToken = changes.LatestChangeLogToken;
 
                 if (changes.HasMoreItems == true && (currentChangeToken == null || currentChangeToken.Length == 0)) {
-                    // then the repository is too old to support changelog
-                    // do normal full sync
+                    // then the repository is too old to support changelog, do normal full sync
                     break;
                 }
-
-                //database.SetChangeLogToken (currentChangeToken);
             }
             // Repeat if there were too many changes to fit in a single response.
             while (changes.HasMoreItems ?? false);
@@ -160,15 +149,19 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     if (!SyncFileUtil.IsRemoteObjectInCmisSyncPath (obj, cmisSyncFolder) ||
                         !CmisFileUtil.RemoteObjectWorthSyncing (obj)) continue;
 
-                    // if this line is called, there must be a remote object, therefore the changetype must be created, updated (or security)
-                    // thus it should be buffered for parallel process
+                    /*
+                     * if this line is called, there must be a remote object, therefore the changetype must be created, updated (or security)
+                     * thus it should be buffered for parallel process
+                     */                    
                     if (action == ChangeType.Updated) {
                         // do full sync
                         throw new ChangeLogProcessorBrokenException (String.Format(" UPDATE detected, id = {0}, name = {1}", obj.Id, obj.Name));
                     }
 
+                    /*
+                     * Remote Create changes do not require the dependencies. Because creating folder locally is thread safe.
+                     */
                     SyncTriplet.SyncTriplet triplet = null;
-                    String parent = null;
                     if (obj is IFolder) {
 
                         triplet = SyncTripletFactory.CreateFromRemoteFolder ((IFolder)obj, cmisSyncFolder);
@@ -186,20 +179,34 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                 } catch (CmisObjectNotFoundException ex) { /* should be CmisObjectNotFoundExcepiton, not Exception, otherwise previous ChangeLogProcessorBroken will be caught */
 
-                    // If it is deletion, execute sync
-                    // due to all non-deletion not-found remote object will
-                    // not trigger sync logic, it is safe to directly apply
-                    // deletion syncs
+                    /*
+                     * The change type is Deletion, prepare synctriplets and their dependencies for sync.
+                     *                     
+                     * The idps method delete the idps[o] only when o is processed. But in the changelog
+                     * processing, a folder might not be processed due to no change on it while its containing
+                     * files might appear in the changelog.                     
+                     *
+                     * Therefore we use a set possibleDeletionFolderBuffer to record all parents and check if 
+                     * they've appeared in the changelog. If not, remove them from idps after all changelogs are
+                     * processed.                    
+                     */                    
                     if (action == ChangeType.Deleted) {
+
                         var dbpath = cmisSyncFolder.Database.GetPathById (remoteId);
-                        string localpath = dbpath == null ? null : dbpath [0];
+                        string localpath = (dbpath == null ? null : dbpath [0]);
 
                         if (localpath != null) {
 
-                            // local path of folder does not contains '/' at the end of its name.
+                            /*
+                             * Local path of folder does not contains '/' at the end of its name.
+                             * So if the length of parent folder is 0, it should be the root folder
+                             * of remote repository. One should not add the root folder to idps hash table.                            
+                             */
                             String parent = CmisFileUtil.GetUpperFolderOfCmisPath (localpath);
                             if (parent.Length > 0) {
                                 parent = parent + CmisUtils.CMIS_FILE_SEPARATOR;
+
+                                // parent folder's operation depends on current object
                                 idps.AddItemDependence (parent, dbpath[2].Equals("Folder") ? localpath + CmisUtils.CMIS_FILE_SEPARATOR : localpath);
                                 possibleDeletionFolderBuffer.Add (parent);
                             }
@@ -211,6 +218,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                             if (dbpath[2].Equals("Folder")) {
                                 Console.WriteLine ("  -- Delete folder work: {0}", localFullPath);
 
+                                /*
+                                 * If the folder appears in the changelog, its idps should be removed by full synctriplet processor. 
+                                 * So delete it in the possibleDeletionFolderBuffer.                                
+                                 */
                                 SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (localFullPath, cmisSyncFolder);
                                 possibleDeletionFolderBuffer.Remove (triplet.Name);
 
@@ -230,34 +241,22 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                         } else {
                             Console.WriteLine ("  -- {0} not found in DB, ignore", objId);
                         }
-                    } else {
-                        // ignore not-found , 
-                    }
+                    } 
                 }
             }
 
             Console.WriteLine ("  -- All changelog processed.");
+
+            /* 
+             * After all changes are processed, delete all folders in the possibleDeletionFolderBuffer from idps
+             * to make the full-triplet-processor consistent with crawler sync that stop blockingcollection when 
+             * the idps is empty.            
+             */            
             foreach (String pd in possibleDeletionFolderBuffer) {
                 Console.WriteLine ("  -- Remove possible deletion folder's dependecies {0}", pd);
                 idps.RemoveItemDependence (pd, ProcessWorker.SyncResult.SUCCEED);
             }
         }
-
-        /*
-        private bool FolderDeleteEventHandler(string localFullPath, CmisSyncFolder.CmisSyncFolder syncFolder) {
-
-            LocalCrawlWorker folderDeletionWorker = new LocalCrawlWorker (syncFolder, fullSyncTriplets);
-
-            try {
-                folderDeletionWorker.StartFrom (localFullPath);
-            } catch (Exception ex) {
-                Console.WriteLine ("Folder deletion failed: {0}: {1}", localFullPath, ex.Message);
-                return false;
-            }
-
-            return true; 
-        }
-        */
     }
 }
 #pragma warning restore 0414, 0219

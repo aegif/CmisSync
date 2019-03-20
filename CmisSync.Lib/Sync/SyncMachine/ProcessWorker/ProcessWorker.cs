@@ -30,6 +30,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 {
     public enum SyncResult { SUCCEED = 1, FAILED = 0, UNRESOLVED = 2, CONFLICT = 3 };
 
+    /// <summary>
+    /// Process worker is the actual class to perform synchronizing on a synctriplet. It checks the synctriplet's
+    /// dependencies syncresult (UNRESOLVED, CONFLICT) and its LS, DB, RS to decides which operation should be applied
+    /// to the triplet.
+    /// </summary>
     public static class ProcessWorker
     {
 
@@ -58,24 +63,34 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         public static SyncResult Reducer (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
                                     ItemsDependencies idps)
         {
-            //Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}'s deps state: has failed ? {2}, has conflicted ? {3}.",
-            //    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name, idps.HasFailedDependence(triplet.Name), idps.HasConflictedDependence(triplet.Name));
 
-            // If one folder's deps contain conflictions but 
-            // the folder itself is synchronized, keep it synchronized.
+            /*
+             * If there are conflictions in one folder's dependencess but
+             * the folder itself is synchronized, keep it synchronized and do
+             * not perform SolveConflict method.             
+             */            
             if (triplet.LocalEqDB && triplet.RemoteEqDB) {
+
                 Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1} is synchronized!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                 return SyncResult.SUCCEED;
+
             } else if (idps.HasConflictedDependence(triplet.Name)) {
+
                 Console.WriteLine (" # [ WorkerThread: {0} ] There is confliction in the dependencies of syncTriplet {1}!",
                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
                 return SolveConflictAndSync (triplet, session, cmisSyncFolder);
+
             } else if (triplet.LocalEqDB && !triplet.RemoteEqDB) {
+
                 return SyncRemoteToLocal (triplet, session, cmisSyncFolder);
+
             } else if (!triplet.LocalEqDB && triplet.RemoteEqDB) {
+
                 return SyncLocalToRemote (triplet, session, cmisSyncFolder);
+
             } else {
+
                 return SolveConflictAndSync (triplet, session, cmisSyncFolder);
             }
         }

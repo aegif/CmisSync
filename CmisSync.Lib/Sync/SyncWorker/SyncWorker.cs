@@ -27,6 +27,9 @@ using DotCMIS.Exceptions;
 
 namespace CmisSync.Lib.Sync.SyncWorker
 {
+    /// <summary>
+    /// Synchronizing is executed by calling SyncWorker's DoSync() method.
+    /// </summary>
     public class SyncWorker : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger (typeof (SyncWorker));

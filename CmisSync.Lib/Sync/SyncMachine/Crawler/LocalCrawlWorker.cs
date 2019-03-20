@@ -14,35 +14,35 @@ using CmisSync.Lib.Cmis;
 
 namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 {
-    /*
-     *  1. LocalCrawler will try to add local-changed triplets before local-non-changed triplets to semiSyncTriplet Queue
-     *  2. LocalCrawler has tow modes:
-     *     2.1. queue = semiSyncTriplet, it is for full crawl sync. Triplets created fron local files are sent to the Assembler
-     *          to get remote information, then to processor.
-     *     2.2. queue = fullSyncTriplet, it is for change log deletion sync. Triplets are directly sent to fullSyncTriplet with
-     *          null remote storage ( = deleted remotely ).
-     *  3. LocalCrawler 
-     *     3.1. Always add the folder triplet to the semi-production queue BEFORE their contents' triplets if it is freshly created.
-     *     3.2. BEAWARE WorkerOperion.UploadFile depends on this logic: if cmissync wants to upload a file but the folder is 
-     *          not fould, it must be being created. 
-     *     3.3. On the other hand, the folder triplets are pushed to the semi-production queue AFTER their content's triplets 
-     *          if it is not newly created.
-     *     *(3.4). (3.2) and (3.3) ensure we can use spin/sleep policy when doing creations/delections to wait the object dependencies
-     *          to be satisfied.
-     *     Deprecated: as throw-back-to-synctriplet queue is implemented and spin wait policy is removed, 
-     *                 semi-triplet processing order matters nothing now. But we keep this order because it will 
-     *                 mininize dependence resolving waiting.    
-     *  4. Object dependencies policy
-     *     4.1. If obj == new && parent == new : dep(obj) add parent. means creation of obj depends on creation of its parent
-     *     4.2. If obj == new && parnet != new : dep(parent add obj. means creation of obj does not dependes on its parents, 
-     *          but possible deletion of parent depends on obj.
-     *     4.3. If obj != new && parent != new : dep(parent) add obj. means possible deletion of parent depends on obj.
-     *     4.4. Conclusion: if parent == new , add parent to dep(obj), else add obj to dep(parent).
-     *     4.5. With this dependences construction, when creating a new object on the remote server, just check if its all deps 
-     *          are properly satisfied. If its all satisified but we can not find its parent folder, its parent folder must be
-     *          an 'Existed-but-Removed-Remotely' folder ( refer to 4.2, dep(obj) is empty because we didn't add its parent to it ).
-     *          Thus we can not upload it and we info its parent as false == there is confliction if you sync delete it.
-     */
+    /// <summary>
+    /// The local crawl worker.
+    ///  1. LocalCrawler will try to add local-changed triplets before local-non-changed triplets to semiSyncTriplet Queue
+    ///  2. LocalCrawler has tow modes:
+    ///     2.1. queue = semiSyncTriplet, it is for full crawl sync.Triplets created fron local files are sent to the Assembler
+    ///          to get remote information, then to processor.
+    ///     2.2. queue = fullSyncTriplet, it is for change log deletion sync.Triplets are directly sent to fullSyncTriplet with
+    ///          null remote storage ( = deleted remotely ).
+    ///  3. LocalCrawler
+    ///     3.1. Always add the folder triplet to the semi-production queue BEFORE their contents' triplets if it is freshly created.
+    ///     3.2. BEAWARE WorkerOperion.UploadFile depends on this logic: if cmissync wants to upload a file but the folder is 
+    ///          not fould, it must be being created.
+    ///     3.3. On the other hand, the folder triplets are pushed to the semi-production queue AFTER their content's triplets 
+    ///          if it is not newly created.
+    ///     3.4. With idps implemented, semi-finished-triplet processing order matters nothing now. But we keep this order because it will 
+    ///          mininize dependence resolving waiting.    
+    ///  4. Object dependencies policy
+    ///     4.1. If obj == new && parent == new : dep (obj) add parent.Indicating the creating of obj depends on the creating of its parent
+    ///     4.2. If obj == new && parnet != new : dep (parent add obj.Indicating the craeting of obj does not dependes on its parents,
+    ///          but the possible deletion of its parent depends on obj.
+    ///     4.3. If obj != new && parent != new : dep (parent) add obj.Indicating the possible deletion of parent depends on obj.
+    ///     4.4. Conclusion: if parent == new , add parent to dep (obj), else add obj to dep (parent). It means that if a folder is new, 
+    ///          it should be processed before all files/folders in it, otherwise the folder should be processed after all files/folders in it.
+    ///     4.5. With this dependences construction, when creating a new object on the remote server, just check if its all deps
+    ///          are properly satisfied.If its all satisified but we can not find its parent folder, its parent folder must be
+    ///          an 'Existed-but-Removed-Remotely' folder (refer to 4.2, dep(obj) is empty because we didn't add its parent to it ).
+    ///          Thus we can not upload it and we info its parent as false == there is confliction if you sync delete it.
+    ///  5. The local crawl worker will try to push local changed files/folders before not-change ones to the output queue.
+    /// </summary>
     public class LocalCrawlWorker : IDisposable
     {
 
@@ -108,6 +108,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         }
 
+        /// <summary>
+        /// Crawl all files and subfolders in a given local folder.
+        /// </summary>
+        /// <param name="folder">Folder.</param>
         private void CrawlFolder(String folder) {
 
             SyncTriplet.SyncTriplet dummyTriplet = SyncTripletFactory.CreateFromLocalFolder (folder, cmisSyncFolder);
@@ -130,6 +134,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 if (parentDBExist) itemsDeps.AddItemDependence (parentName, triplet);
                 else itemsDeps.AddItemDependence (triplet.Name, parentName);
 
+                // If a semi-finished synctriplet == local db, process it later.
                 if (triplet.LocalEqDB)
                     waitingSemi.Add (triplet);
                 else
@@ -152,17 +157,15 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 if (parentDBExist) itemsDeps.AddItemDependence (parentName, triplet);
                 else itemsDeps.AddItemDependence (triplet.Name, parentName);
 
-                // LocalCrawler always add the folder triplet to the semi - production queue BEFORE their contents' triplets if it is newly created.
-                // On the other hand, the folder triplets are pushed to the semi-production queue AFTER their content's triplets 
+                /*
+                 * LocalCrawler always add the folder triplet to the semi - production queue BEFORE their contents' triplets if it is newly created.
+                 * On the other hand, the folder triplets are pushed to the semi-production queue AFTER their content's triplets 
+                 */
                 if (!triplet.DBExist) {
-
                     outputQueue.Add (triplet);
                     CrawlFolder (folderPath);
-
                 } else {
-
                     CrawlFolder (folderPath);
-
                     if (triplet.LocalEqDB) {
                         waitingSemi.Add (triplet);
                     } else {
@@ -173,7 +176,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         }
 
-        // files first, followed by folders
+        /// <summary>
+        /// Crawls the local deleteds from DB.
+        /// Files are crawled first, followed by folders
+        /// </summary>
         private void CrawlLocalDeleteds() {
 
             // GetLocalFiles2 return [localpath, remotepath] array
@@ -208,20 +214,19 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                     // get folder's parent name
                     string parentFolderName = triplet.Name.Remove ((triplet.Name.Remove (triplet.Name.LastIndexOf ('/'))).LastIndexOf ('/') + 1);
-                    // if pareentFolder is / , it would be "" because the Name does not start with / : /a/b/c/ .Name = a/b/c/
-                    // root folder should be ignored in dependencies 
+                    /*
+                     * if pareentFolder is / , it would be "" because the Name does not start with / : /a/b/c/ .Name = a/b/c/
+                     * root folder should be ignored in dependencies
+                     */                    
                     if (parentFolderName.Length > 0) {
-
-                        // if not do so, the hashset is not thread-safety
                         itemsDeps.AddItemDependence (parentFolderName, triplet);
-
                     }
 
                     tmp.Add (triplet);
 
                 }
             }
-            // ReversedLexicographic Order
+            // ReversedLexicographic Order, it mininize dependence resolving waiting time.
             tmp.Sort (new ReverseLexicoGraphicalComparer<SyncTriplet.SyncTriplet> ());
             foreach (SyncTriplet.SyncTriplet triplet in tmp) outputQueue.Add (triplet);
 

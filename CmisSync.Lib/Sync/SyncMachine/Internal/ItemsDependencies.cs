@@ -12,6 +12,20 @@ using CmisSync.Lib.Sync.SyncMachine.ProcessWorker;
 
 namespace CmisSync.Lib.Sync.SyncMachine.Internal
 {
+
+    /// <summary>
+    /// ItemsDependencies is the object to keep synctriplets' dependencies in order. A synctriplet o1 is said to depend on
+    /// another synctriplet o2 means that the operation on o1 must be performed after the operation on o2. Eg., deleting a
+    /// remote folder F must be performed after deleting all files in it (F/f1, F/f2, for example), so F depends on F/f1, F/f2.
+    /// 
+    /// ItemsDependencies, in short, idps, contains the following objects
+    ///   - itemsDeps hashmap, maps a synctriplet to all synctriplets it depends on.
+    ///   - _LUT lookup table, the reverse map of itemsDeps.
+    ///   - _succeed, a set containing succeed synctriplets. If a synctriplet is processed successfully, it will be removed from
+    ///     idps and be pushed into _succeed set.
+    ///   -  _conflicted and _failed are sets recording dependences' status. If a synctriplet's syncresult is failed or conflicted,
+    ///      all synctriplets depend on that synctriplet  will also be marked as failed or conflicted.
+    /// </summary>
     public class ItemsDependencies
     {
 
@@ -80,8 +94,12 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
                 depName.Equals (CmisUtils.CMIS_FILE_SEPARATOR.ToString ())) return;
 
             lock (locker) {
-                // if the dep is already processed successfully , do not add it
-                // to idps dictionary
+                /*
+                 * if the dep is already processed successfully , do not add it
+                 * to idps dictionary. This is necessary in the case that when a
+                 * synctriplet o is processed but some synctriplet depend on o have
+                 * not been crawled yet.                
+                 */
                 if (_succeed.Contains (depName)) return;
 
                 // add dep to item's dependencies
@@ -113,11 +131,13 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
         /// <param name="result">Result returned by sync worker</param>
         public void RemoveItemDependence(string depName, SyncResult result) {
             lock(locker) {
-                // Confirm that only the item can delete itself from idps dictionary.
-                // Else, eg:
-                //   folder1: start -> has deps, processing, failed, (long time)
-                //   folder1/f1: finished and delete folder1's dep, idps dictionary's count is 0 and full-sync-queue set to IsAddingComplete
-                //   --> after folder1's thread end, it will push folder1 back to queue because its state is unresolved. error
+
+                /* Confirm that only the item can delete itself from idps dictionary.
+                 * Else, eg:
+                 *   folder1: start -> has deps, processing, failed, (long time)
+                 *  folder1/f1: finished and delete folder1's dep, idps dictionary's count is 0 and full-sync-queue set to IsAddingComplete
+                 *   --> after folder1's thread end, it will push folder1 back to queue because its state is unresolved. error
+                 */                
                 if (itemsDeps.ContainsKey (depName)) { 
                 // this is just a double check, but might cause problem in changelog processor when removing 'PossibleDeletionFolders' && itemsDeps [depName].Count == 0) {
                     itemsDeps.Remove (depName);
@@ -129,22 +149,18 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
                 if (!_LUT.ContainsKey (depName)) return;
                 foreach (string item in _LUT [depName]) {
                     if (!itemsDeps.ContainsKey (item)) continue;
-                    if (itemsDeps [item].Remove (depName)) {
-                        /*
-                        if (itemsDeps[item].Count == 0) {
-                            itemsDeps.Remove (item);
-                        }
-                        */
-                    } else {
+                    if (!itemsDeps [item].Remove (depName)) {
                         Console.WriteLine (" I [ WorkerThread: {0} ] Remove item {1}'s dependency: {2} failed",
                             Thread.CurrentThread.ManagedThreadId, item, depName);
                     }
 
                     if (result != SyncResult.SUCCEED) {
 
-                        // If the item's processing failed,
-                        // all items depend on this item should
-                        // be marked as either failed or conflict
+                        /* 
+                         * If the item's processing failed,
+                         * all items depend on this item should
+                         * be marked as either failed or conflict.
+                         */                        
                         if (result == SyncResult.FAILED) {
                             _failed.Add (item);
                         }

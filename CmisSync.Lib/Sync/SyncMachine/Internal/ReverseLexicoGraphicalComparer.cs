@@ -14,9 +14,11 @@ namespace CmisSync.Lib.Sync.SyncMachine.Internal
 
         private int Helper (string a, string b)
         {
-            // C# will split "/" by '/' to an array with 2 elements: "", '/', ""
-            // will split "/a/b/c/" by '/' to an array with 5 elements: "", "a", "b", "c", ""
-            // so "" does nothing to the algoritm
+            /*
+             * C# will split "/" by '/' to an array with 2 elements: "", '/', ""
+             * will split "/a/b/c/" by '/' to an array with 5 elements: "", "a", "b", "c", ""
+             * so "" does nothing to the algoritm
+             */            
             String [] m = a.Split ('/');
             String [] n = b.Split ('/');
             int l = Math.Min (m.Length, n.Length);
