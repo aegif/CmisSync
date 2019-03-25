@@ -54,6 +54,7 @@ namespace TestLibrary
     using CmisSync.Lib.Database;
     using System.Diagnostics;
     using System.Threading;
+    using DotCMIS.Exceptions;
 
     [TestFixture]
     public class ExternalTests : AbstractSyncTests
@@ -145,7 +146,7 @@ namespace TestLibrary
             Process process = Process.Start(@"C:\Users\nico\src\CmisSync\CmisSync\Windows\bin\Debug\CmisSync.exe");
             if (null == process)
                 Assert.Fail("Could not start process, maybe an existing process has been reused?");
-            
+
             //Wait for CmisSync's UI to start properly.
             Thread.Sleep(2000);
 
@@ -160,7 +161,7 @@ namespace TestLibrary
                     break;
                 }
             }*/
-            
+
             // Close as if the user had clicked "Exit".
             process.Kill(); // More violent than we would want.
             //process.Close(); // Only close the connection to the program, not the program itself.
@@ -188,7 +189,7 @@ namespace TestLibrary
             process.ErrorDataReceived += (s, e) => Console.WriteLine(e.Data);
 
             // The process should continue running perpetually.
-            Thread.Sleep(10 * 1000); // Wait for 10 seconds.
+            Thread.Sleep(30 * 1000); // Wait for 30 seconds.
             Assert.IsFalse(process.HasExited);
 
             // Exit the process to avoid any possible interference with subsequent tests.
@@ -217,53 +218,196 @@ namespace TestLibrary
         public void Real(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
+            // Clear the remote folder.
+            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
+
             // Create temporary folder for configuration and data files.
-            string tempFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            string tempFolder = Path.Combine(Path.GetTempPath(), "CmisSync_test_" + Path.GetRandomFileName());
+            Console.Write("Test folder: " + tempFolder);
             string configurationFolder = Path.Combine(tempFolder, "configuration");
+            string localDataFolder = Path.Combine(tempFolder, "data");
             Directory.CreateDirectory(tempFolder);
             Directory.CreateDirectory(configurationFolder);
+            Directory.CreateDirectory(localDataFolder);
 
             // Create XML config file.
             string customConfigPath = Path.Combine(configurationFolder, "config.xml");
             string logPath = Path.Combine(configurationFolder, "debug_log.txt");
-            string localDataPath = Path.Combine(tempFolder, "data");
             string customConfig = File.ReadAllText(@"../../config.xml");
             // Replace variables in template
-            customConfig.Replace("{LOG}", logPath);
-            customConfig.Replace("{LOCAL_FOLDER}", localDataPath);
-            customConfig.Replace("{REMOTE_FOLDER}", remoteFolderPath);
-            customConfig.Replace("{URL}", url);
-            customConfig.Replace("{USER}", user);
-            customConfig.Replace("{PASSWORD}", password);
-            customConfig.Replace("{REPOSITORY}", repositoryId);
-
+            customConfig = customConfig.Replace("{LOG}", logPath);
+            customConfig = customConfig.Replace("{LOCAL_FOLDER}", localDataFolder);
+            customConfig = customConfig.Replace("{REMOTE_FOLDER}", remoteFolderPath);
+            customConfig = customConfig.Replace("{URL}", url);
+            customConfig = customConfig.Replace("{USER}", user);
+            customConfig = customConfig.Replace("{PASSWORD}", password);
+            customConfig = customConfig.Replace("{REPOSITORY}", repositoryId);
+            // Write config file.
             File.WriteAllText(customConfigPath, customConfig);
 
-            Process process = Process.Start(CONSOLE_EXE, "-p -c " + customConfigPath);
+            // Start CmiSync.
+            string arguments = "-p -c " + customConfigPath;
+            Console.Write("Executing: " + CONSOLE_EXE + " " + arguments);
+            Process process = Process.Start(CONSOLE_EXE, arguments);
             if (null == process)
                 Assert.Fail("Could not start process, maybe an existing process has been reused?");
-
             process.OutputDataReceived += (s, e) => Console.WriteLine(e.Data);
             process.ErrorDataReceived += (s, e) => Console.WriteLine(e.Data);
 
-            //Clean(canonicalName, localPath, remoteFolderPath, url, user, password, repositoryId);
-            // TODO clean the remote folder and delete/create local folder
+            ////////////////////////////////////////////// File creation
 
             // Create random small file.
-            string filename = LocalFilesystemActivityGenerator.GetNextFileName();
-            string remoteFilePath = (remoteFolderPath + "/" + filename).Replace("//", "/");
-            LocalFilesystemActivityGenerator.CreateRandomFile(localDataPath, 3);
+            int sizeKb = 3;
+            string filename = "file.doc";
+            LocalFilesystemActivityGenerator.CreateFile(Path.Combine(localDataFolder, filename), sizeKb);
 
-            Thread.Sleep(10 * 1000); // Wait for 10 seconds so that sync gets a chance to sync things.
+            // Wait a few seconds so that sync gets a chance to sync things.
+            Thread.Sleep(20 * 1000);
 
             // Check that file is present server-side.
-            IDocument doc = (IDocument)CreateSession(url, user, password, repositoryId).GetObjectByPath(remoteFilePath, true);
+            IDocument doc = null;
+            try {
+                doc = (IDocument)CreateSession(url, user, password, repositoryId)
+                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+            }
+            catch (CmisObjectNotFoundException e) {
+                Assert.Fail("Document failed to get synced to the server.", e);
+            }
             Assert.NotNull(doc);
             Assert.AreEqual(filename, doc.ContentStreamFileName);
             Assert.AreEqual(filename, doc.Name);
+            Assert.AreEqual(sizeKb * 1024, doc.ContentStreamLength);
+            Assert.AreEqual("application/msword", doc.ContentStreamMimeType);
+            // TODO compare date Assert.AreEqual(, doc.);
+            string docId = doc.Id;
+
+            ////////////////////////////////////////////// File append
+
+            // Append to file
+            string dataToAppend = "let's add a bit more data to that file";
+            byte[] bytes = Encoding.UTF8.GetBytes(dataToAppend);
+            using (var fileStream = new FileStream(Path.Combine(localDataFolder, filename), FileMode.Append, FileAccess.Write, FileShare.None))
+            using (var bw = new BinaryWriter(fileStream))
+            {
+                bw.Write(bytes);
+            }
+
+            // Wait for 10 seconds so that sync gets a chance to sync things.
+            Thread.Sleep(10 * 1000);
+
+            try
+            {
+                doc = (IDocument)CreateSession(url, user, password, repositoryId)
+                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+            }
+            catch (CmisObjectNotFoundException e)
+            {
+                Assert.Fail("Document failed to get synced to the server.", e);
+            }
+            Assert.NotNull(doc);
+            Assert.AreEqual(filename, doc.ContentStreamFileName);
+            Assert.AreEqual(filename, doc.Name);
+            Assert.AreEqual(1024 * sizeKb + dataToAppend.Length, doc.ContentStreamLength);
+
+
+            ////////////////////////////////////////////// Folder creation
+
+            // Create local folder.
+            string foldername = "folder 1";
+            Directory.CreateDirectory(Path.Combine(localDataFolder, foldername));
+
+            // Wait for 10 seconds so that sync gets a chance to sync things.
+            Thread.Sleep(10 * 1000);
+
+            IFolder folder = null;
+            try
+            {
+                folder = (IFolder)CreateSession(url, user, password, repositoryId)
+                    .GetObjectByPath(remoteFolderPath + "/" + foldername, true);
+            }
+            catch (CmisObjectNotFoundException e)
+            {
+                Assert.Fail("Folder failed to get synced to the server.", e);
+            }
+
+
+            ////////////////////////////////////////////// File rename
+
+            // Rename the document
+            string newFilename = "moved_" + filename;
+            File.Move(Path.Combine(localDataFolder, filename), Path.Combine(localDataFolder, newFilename));
+            filename = newFilename;
+
+            // Wait for 10 seconds so that sync gets a chance to sync things.
+            Thread.Sleep(10 * 1000);
+
+            // Check that the remote document has been renamed, and still has the same object id.
+            doc = null;
+            try
+            {
+                doc = (IDocument)CreateSession(url, user, password, repositoryId)
+                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+            }
+            catch (CmisObjectNotFoundException e)
+            {
+                Assert.Fail("Document failed to get synced to the server.", e);
+            }
+            Assert.NotNull(doc);
+            Assert.AreEqual(filename, doc.ContentStreamFileName);
+            Assert.AreEqual(filename, doc.Name);
+            string newDocId = doc.Id;
+            //FIXME            Assert.AreEqual(docId, newDocId, "The remote document's id has changed when the local file was renamed: " + docId + " -> " + newDocId);
+
+            ////////////////////////////////////////////// File delete
+
+            // Delete the file.
+            File.Delete(Path.Combine(localDataFolder, filename));
+
+            // Wait for 10 seconds so that sync gets a chance to sync things.
+            Thread.Sleep(10 * 1000);
+
+            // Check that file is not present server-side.
+            doc = null;
+            try
+            {
+                doc = (IDocument)CreateSession(url, user, password, repositoryId)
+                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+
+                // Should have failed.
+                Assert.Fail("Deleted document still exists on server: " + doc);
+            }
+            catch (CmisObjectNotFoundException e)
+            {
+                // That's the correct outcome
+            }
+
+
 
             // Exit the process to avoid any possible interference with subsequent tests.
-            process.Kill();
+            process.Kill(); // TODO does not always get killed.
+        }
+
+        /// <summary>
+        /// Delete all objects contained in a remote CMIS folder.
+        /// </summary>
+        private void ClearRemoteCMISFolder(string url, string user, string password, string repositoryId, string remoteFolderPath)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+            parameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            parameters[SessionParameter.AtomPubUrl] = url;
+            parameters[SessionParameter.User] = user;
+            parameters[SessionParameter.Password] = password;
+            parameters[SessionParameter.RepositoryId] = repositoryId;
+
+            SessionFactory factory = SessionFactory.NewInstance();
+            ISession session = factory.CreateSession(parameters);
+
+            var folder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
+            foreach (var child in folder.GetChildren())
+            {
+                child.Delete(true);
+            }
         }
 
         public string CreateTemporaryDirectory()
