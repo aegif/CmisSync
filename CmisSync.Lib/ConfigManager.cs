@@ -34,7 +34,7 @@ namespace CmisSync.Lib
         {
             get
             {
-                if( config == null)
+                if (config == null)
                 {
                     lock (configlock)
                     {
