@@ -33,22 +33,29 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
     /*
      * TODO: process recoverable exceptions
      */
+    /// <summary>
+    /// Util class that provides synchronizing methods for upload, download, delete and conflict resolving.
+    /// All methods return SyncResult enum.
+    /// </summary>
     public static class WorkerOperations
     {
 
         private static readonly ILog Logger = LogManager.GetLogger (typeof (WorkerOperations));
 
-        /*
-         * Download directory actually only create the folder name.
-         * Contained files are enqueued
-         */
+        /// <summary>
+        /// Creates the local folder.
+        /// Downloading a remote directory results in creating the folder only.
+        /// </summary>
+        /// <param name="triplet">Triplet.</param>
+        /// <param name="session">Session.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
         public static SyncResult CreateLocalFolder(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
             string localFolder = OperationUtils.GetLocalFullPath (triplet, cmisSyncFolder);
 
             try {
                 // Must be CmisFileUtil.PathCombine
-                //IFolder remoteFolder = (IFolder)session.GetObjectByPath (CmisFileUtil.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), false);
+                // IFolder remoteFolder = (IFolder)session.GetObjectByPath (CmisFileUtil.PathCombine (triplet.RemoteStorage.RootPath, triplet.RemoteStorage.RelativePath), false);
                 IFolder remoteFolder = (IFolder)triplet.RemoteStorage.CmisObject;
 
                 Directory.CreateDirectory (localFolder);

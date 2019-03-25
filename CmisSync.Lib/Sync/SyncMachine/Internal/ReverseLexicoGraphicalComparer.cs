@@ -4,6 +4,15 @@ using CmisSync.Lib.Sync.SyncTriplet;
 
 namespace CmisSync.Lib.Sync.SyncMachine.Internal
 {
+    /// <summary>
+    /// Sort files/folders list in a reverse lexico graphical order. It is
+    /// friendly to dependencies resolving.
+    /// eg:
+    ///   folder1/folder2/file1
+    ///   folder1/folder2/
+    ///   folder1/file2
+    ///   folder1/
+    /// </summary>
     public class ReverseLexicoGraphicalComparer<T> : IComparer<T>
     {
 

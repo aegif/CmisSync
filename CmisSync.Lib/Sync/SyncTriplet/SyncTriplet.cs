@@ -6,7 +6,17 @@ using CmisSync.Lib.Sync.SyncTriplet.TripletItem;
 namespace CmisSync.Lib.Sync.SyncTriplet
 {
     /// <summary>
-    /// Sync triplet.
+    /// Sync triplet. A sync triplet is a (LS-DB-RS) triplet which presents a file/folder object's
+    /// synchronizing status.
+    ///   LS: local storage, presenting the file/folder on the local file system.
+    ///   DB: Database, presenting the file/folder in the CmisSync's DB.
+    ///   RS: rmote storage, presenting the file/folder on the remote server.
+    /// 
+    /// Syncmachine's processing worker will decide which action should be executed by the triplet's
+    /// status. eg: 
+    ///   If (LS==DB) and (DB==RS), the file on the local fs is identical to that on the 
+    ///   remote server therefore the triplet is synchronized. 
+    ///   If (LS!=DB) and (DB==RS), the file is modified after the last synchronizing.
     /// </summary>
     public class SyncTriplet
     {

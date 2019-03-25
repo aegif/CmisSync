@@ -11,17 +11,13 @@ using log4net;
 namespace CmisSync.Lib.Sync.SyncTriplet
 {
 
-    // The examples below are for this item:
-    //
-    // Local: C:\Users\nico\CmisSync\A Project\adir\afile.txt
-    // Remote: /sites/aproject/adir/a<file
-    //
-    // Notice how:
-    // - Slashes and antislashes can differ
-    // - File names can differ
-    // - Remote and local have different sets of fobidden characters
-    //
-    // For that reason, never convert a local path to a remote path (or vice versa) without checking the database.
+    /// <summary>
+    /// Sync triplet factory. A factory utility class for creating synctriplets SFGs for synctriplets.
+    /// 
+    /// Note: 
+    ///   An SFG is a Semi-Finished-Goods 
+    /// 
+    /// </summary>
     public static class SyncTripletFactory
     {
         /// <summary>

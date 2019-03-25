@@ -1,10 +1,6 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/Internal/ReverseLexicoGraphicalComparer.cs">
-    <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Internal/ReverseLexicoGraphicalComparer.cs" Line="21" Column="15" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Internal/ProcessorCompleteAddingChecker.cs" Line="1" Column="1" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
@@ -18,7 +14,7 @@
                 <Node name="SyncMachine" expanded="True">
                   <Node name="Crawler" expanded="True" />
                   <Node name="Internal" expanded="True">
-                    <Node name="ReverseLexicoGraphicalComparer.cs" selected="True" />
+                    <Node name="ProcessorCompleteAddingChecker.cs" selected="True" />
                   </Node>
                   <Node name="ProcessWorker" expanded="True">
                     <Node name="Internal" expanded="True" />
