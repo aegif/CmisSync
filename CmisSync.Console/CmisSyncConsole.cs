@@ -50,7 +50,7 @@ namespace CmisSync.Console
         /// <summary>
         /// Load folder configuration.
         /// </summary>
-        private void AddSynchronizedFolder(string folderName)
+        private void AddSynchronizedFolder(string folderName, bool enableWatcher)
         {
             Config config = ConfigManager.CurrentConfig;
             CmisSync.Lib.Config.SyncConfig.Folder folder = config.GetFolder(folderName);
@@ -60,7 +60,7 @@ namespace CmisSync.Console
                 return;
             }
             RepoInfo repoInfo = folder.GetRepoInfo();
-            CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, false, perpetual);
+            CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, enableWatcher, perpetual);
             repos.Add(cmisRepo);
         }
 
@@ -95,56 +95,61 @@ namespace CmisSync.Console
         /// <summary>
         /// Main method, pass folder name as argument.
         /// </summary>
-		public static int Main (string[] args)
+		public static int Main (string[] argumentsArray)
 		{
             System.Console.WriteLine("Started CmisSyncOnce");
-            Utils.ConfigureLogging();
-            Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);
 
             // Uncomment this line to disable SSL checking (for self-signed certificates)
             // ServicePointManager.CertificatePolicy = new YesCertPolicyHandler();
 
             PathRepresentationConverter.SetConverter(new WindowsPathRepresentationConverter());
 
+            var argumentsList = new List<string>(argumentsArray);
             bool perpetual = false;
 
             CmisSyncConsole instance = null;
 
             // -p means perpetual.
-            if (args.Length > 0 && "-p".Equals(args[0]))
+            if (argumentsList.Count >= 1 && "-p".Equals(argumentsList[0]))
             {
                 perpetual = true;
+                argumentsList.RemoveAt(0);
             }
 
             // Get optional config file from command line argument -c
+            if (argumentsList.Count >= 2 && "-c".Equals(argumentsList[0]))
+            {
+                System.Console.WriteLine("argument -c");
+                // Set the config file to use.
+                ConfigManager.CurrentConfigFile = argumentsList[1];
+
+                argumentsList.RemoveAt(0); // Remove -c
+                argumentsList.RemoveAt(0); // Remove the path
+            }
+            System.Console.WriteLine("config: " + ConfigManager.CurrentConfigFile);
+
+            // Now that we have the config, we can start logging (the log file location is in the config).
+            Utils.ConfigureLogging();
+            Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);
 
             instance = new CmisSyncConsole(perpetual);
 
             // Load the specified synchronized folders, or all if none is specified.
-            if (args.Length > 1 || (!perpetual && args.Length > 0 ))
+            bool enableWatcher = perpetual; // We consider that the watcher is only desirable for perpetual synchronization.
+            if (argumentsList.Count >= 1)
             {
-                int i = 0;
-
-                // Skip the -p argument if present.
-                if ("-p".Equals(args[0]))
-                {
-                    i++;
-                }
-
-                for (; i < args.Length; i++)
-                {
-                    instance.AddSynchronizedFolder(args[i]);
+                foreach(var argument in argumentsList) {
+                    instance.AddSynchronizedFolder(argument, enableWatcher);
                 }
             }
             else
             {
                 // No specific folders given, so load all folders.
 
-                Config config = ConfigManager.CurrentConfig;
-                foreach (CmisSync.Lib.Config.SyncConfig.Folder folder in config.Folders)
+                foreach (CmisSync.Lib.Config.SyncConfig.Folder folder in ConfigManager.CurrentConfig.Folders)
                 {
                     RepoInfo repoInfo = folder.GetRepoInfo();
-                    CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, false, perpetual);
+                    CmisRepo cmisRepo = new CmisRepo(repoInfo, controller, enableWatcher, perpetual);
                     instance.repos.Add(cmisRepo);
                 }
             }
@@ -152,8 +157,9 @@ namespace CmisSync.Console
             // Synchronize all
             bool success = instance.Run();
 
-            System.Console.WriteLine("Press enter to close...");
-            System.Console.ReadLine();
+            // Only for testing in an IDE, to see what happened in the console window before it gets closed by the IDE.
+            //System.Console.WriteLine("Press enter to close...");
+            //System.Console.ReadLine();
 
             // Exit code 0 if synchronization was successful or not needed,
             // 1 if synchronization failed, or could not run.
