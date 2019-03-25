@@ -174,6 +174,8 @@ namespace CmisSync.Lib.Sync
                 syncWorker.DoWork += new DoWorkEventHandler(
                     delegate(Object o, DoWorkEventArgs args)
                     {
+                        int workerDebugId = new Random().Next();
+                        Logger.Debug("syncWorker " + workerDebugId + ": starting work");
                         bool success = false;
                         try
                         {
@@ -197,6 +199,7 @@ namespace CmisSync.Lib.Sync
                         {
                             OnSyncComplete(success);
                         }
+                        Logger.Debug("syncWorker " + workerDebugId + ": work done");
                     }
                 );
             }
