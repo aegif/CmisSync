@@ -81,9 +81,13 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
         public void DoSync() {
 
-            //syncMachine.DoWatcherTest (); return;
-
-            //syncMachine.DoChangeLogSync (); return;
+            syncMachine.DoWatcherTest ();
+            /*
+            while (true) {
+                syncMachine.DoLocalWatcherSync ();
+                Thread.Sleep (5000);
+            }
+            */
 
             isFirstSyncing = true;
 

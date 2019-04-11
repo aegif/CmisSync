@@ -26,6 +26,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <ReleaseVersion></ReleaseVersion>
     <UseMSBuildEngine>false</UseMSBuildEngine>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>True</DebugSymbols>
@@ -69,7 +70,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mac Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Mac Debug\</OutputPath>
-    <DefineConstants>DEBUG;__COCOA__</DefineConstants>
+    <DefineConstants>DEBUG;__COCOA__;__MonoCS__;</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>

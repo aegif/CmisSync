@@ -148,31 +148,34 @@ namespace CmisSync.Lib.Utilities.FileUtilities
             long filesizeLimit = 256 * 1024 * 1024; //TODO: add a preference for filesize limit
             
             FileInfo fileInfo = new FileInfo (filepath);
-            
-            //Check permissions
-            if (fileInfo.Attributes.HasFlag (FileAttributes.Hidden)) {
-                Logger.InfoFormat ("Skipping {0}: hidden file", filepath);
-                return false;
-            }
-            if (fileInfo.Attributes.HasFlag (FileAttributes.System)) {
-                Logger.InfoFormat ("Skipping {0}: system file", filepath);
-                return false;
-            }
-            
-            //Check filesize
-            if (!allowBlankFiles && fileInfo.Length <= 0) {
-                Logger.InfoFormat ("Skipping {0}: blank file", filepath);
-                return false;
-            }
-            if (limitFilesize && fileInfo.Length > filesizeLimit) {
-                Logger.InfoFormat ("Skipping {0}: file too large {1}MB", filepath, fileInfo.Length / (1024f * 1024f));
-                return false;
-            }
 
-            //Ignore Symbol Link
-            if (Utils.IsSymlink(fileInfo)) {
-                Logger.InfoFormat ("Skipping {0}: symbolic link", filepath);
-                return false;
+            // Exclude files that been deleted.
+            if (fileInfo.Exists) {
+                //Check permissions
+                if (fileInfo.Attributes.HasFlag (FileAttributes.Hidden)) {
+                    Logger.InfoFormat ("Skipping {0}: hidden file", filepath);
+                    return false;
+                }
+                if (fileInfo.Attributes.HasFlag (FileAttributes.System)) {
+                    Logger.InfoFormat ("Skipping {0}: system file", filepath);
+                    return false;
+                }
+
+                //Check filesize
+                if (!allowBlankFiles && fileInfo.Length <= 0) {
+                    Logger.InfoFormat ("Skipping {0}: blank file", filepath);
+                    return false;
+                }
+                if (limitFilesize && fileInfo.Length > filesizeLimit) {
+                    Logger.InfoFormat ("Skipping {0}: file too large {1}MB", filepath, fileInfo.Length / (1024f * 1024f));
+                    return false;
+                }
+
+                //Ignore Symbol Link
+                if (Utils.IsSymlink (fileInfo)) {
+                    Logger.InfoFormat ("Skipping {0}: symbolic link", filepath);
+                    return false;
+                }
             }
 
             return true;
@@ -234,6 +237,12 @@ namespace CmisSync.Lib.Utilities.FileUtilities
                 return IsDirectoryWorthSyncing (filepath, cmisSyncFolder);
             }
             return false;
+        }
+
+        public static bool WorthSyncing (string fullPath, bool isFolder, CmisSyncFolder cmisSyncFolder)
+        {
+            if (!isFolder) return IsFileWorthSyncing (fullPath, cmisSyncFolder);
+            else return IsDirectoryWorthSyncing (fullPath, cmisSyncFolder);
         }
 
         /// <summary>

@@ -39,6 +39,8 @@ namespace CmisSync.Lib.Sync.CmisSyncFolder
 
         public long MaxDeletionRetries;
 
+        public bool IsWatcherEnabled;
+
         public CmisSyncFolder (RepoInfo repoInfo)
         {
             Name = repoInfo.Name;
@@ -49,6 +51,7 @@ namespace CmisSync.Lib.Sync.CmisSyncFolder
 
             LocalPath = repoInfo.TargetDirectory;
             BIDIRECTIONAL = true;
+            IsWatcherEnabled = true;
 
             PollInterval = repoInfo.PollInterval;
             CmisProfile = new CmisProfileRefactor (repoInfo);

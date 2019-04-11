@@ -98,7 +98,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 outputQueue.Add (semi);
             }
             // the folder is not root, push it to process queue after all containing items are pushed.
-            SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (
+            SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromLocalFolder (
                 path, this.cmisSyncFolder
             );
             outputQueue.Add (triplet);
@@ -126,7 +126,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     continue;
                 }
 
-                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalDocument (
+                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromLocalDocument (
                     filePath, this.cmisSyncFolder
                 );
 
@@ -149,7 +149,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     continue;
                 }
 
-                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (
+                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromLocalFolder (
                     folderPath, this.cmisSyncFolder
                 );
 
@@ -188,7 +188,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 if (!File.Exists(Utils.PathCombine(cmisSyncFolder.LocalPath, file[0])))
                 {
                     Console.WriteLine (" - File {0} is deleted: ", file [0]);
-                    SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromDBFile(file [0], file [1], cmisSyncFolder);
+                    SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromDBFile(file [0], file [1], cmisSyncFolder);
 
                     // get files's parent's name
                     string parentFolderName = triplet.Name.Remove (triplet.Name.LastIndexOf ('/') + 1);
@@ -210,7 +210,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                 {
 
                     Console.WriteLine (" - Folder {0} is deleted: ", folder [0]);
-                    SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromDBFolder (folder [0], folder [1], cmisSyncFolder);
+                    SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromDBFolder (folder [0], folder [1], cmisSyncFolder);
 
                     // get folder's parent name
                     string parentFolderName = triplet.Name.Remove ((triplet.Name.Remove (triplet.Name.LastIndexOf ('/'))).LastIndexOf ('/') + 1);

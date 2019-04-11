@@ -59,6 +59,51 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         }
 
+        public void StartForLocalWatcherAndLocalChange (
+            BlockingCollection<SyncTriplet.SyncTriplet> semi,
+            BlockingCollection<SyncTriplet.SyncTriplet> full
+        )
+        {
+            this.semiSyncTriplets = semi;
+            this.fullSyncTriplets = full;
+
+            // Assemble semiTriplets generated from local crawler
+            foreach (SyncTriplet.SyncTriplet semiTriplet in semiSyncTriplets.GetConsumingEnumerable ()) {
+
+                // If ignore samelowername, use lowerinvariant to lookup in already-crawled-remote-triplet dictionary.
+                // One note: IgnoreIfSameLowercaseName is applied only on remote server. it seems that if local fs is 
+                // case sensitive while remote is not, remote will regard two distinct files in local as duplicated files
+                // and rename one of them while upload.
+                string _key = cmisSyncFolder.CmisProfile.CmisProperties.IgnoreIfSameLowercaseNames ? semiTriplet.Name.ToLowerInvariant () : semiTriplet.Name;
+
+                String remotePath = "";
+                if (semiTriplet.DBExist) {
+                    remotePath = CmisFileUtil.PathCombine (cmisSyncFolder.RemotePath, semiTriplet.DBStorage.DBRemotePath);
+                } else {
+                    remotePath = CmisFileUtil.PathCombine (cmisSyncFolder.RemotePath, semiTriplet.LocalStorage.RelativePath);
+                }
+
+                try {
+                    ICmisObject remoteObject = session.GetObjectByPath (remotePath, false);
+
+                    if (semiTriplet.IsFolder) {
+                        IFolder remoteFolder = (IFolder)remoteObject;
+                        SyncTripletFactory.AssembleRemoteIntoLocal (remoteFolder, cmisSyncFolder, semiTriplet);
+                    } else {
+                        IDocument remoteDocument = (IDocument)remoteObject;
+
+                        SyncTripletFactory.AssembleRemoteIntoLocal (remoteDocument, remotePath, cmisSyncFolder, semiTriplet);
+                    }
+                } catch (Exception) {
+                    Console.WriteLine (" - remote path: {0} Not found", remotePath);
+                }
+
+                if (!fullSyncTriplets.TryAdd (semiTriplet)) {
+                    Console.WriteLine (" - assembled triplet: {0} is not appended to full sync triplet list.", semiTriplet.Name);
+                }
+            }
+        }
+
         /*
          * There should be two idps(es): 
          *   one main for local crawler

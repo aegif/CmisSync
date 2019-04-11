@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.Console", "..\..\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmisSync.ConsoleUnderDev", "..\..\CmisSync.ConsoleUnderDev\CmisSync.ConsoleUnderDev.csproj", "{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "CmisSync", "CmisSync.csproj", "{532CB65C-18E9-437C-885F-A79AF624ED83}"
+Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "CmisSync", "CmisSync.csproj", "{C3A67BCB-7D1F-4948-9A70-99424E47208D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,18 +101,18 @@ Global
 		{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}.Mac Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}.Mac Debug|x86.ActiveCfg = Debug|Any CPU
 		{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}.Mac Debug|x86.Build.0 = Debug|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Release|Any CPU.Build.0 = Release|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Debug|x86.Build.0 = Debug|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Release|x86.ActiveCfg = Release|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Release|x86.Build.0 = Release|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Mac Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Mac Debug|Any CPU.Build.0 = Release|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Mac Debug|x86.ActiveCfg = Release|Any CPU
-		{532CB65C-18E9-437C-885F-A79AF624ED83}.Mac Debug|x86.Build.0 = Release|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Debug|x86.Build.0 = Debug|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Release|x86.ActiveCfg = Release|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Release|x86.Build.0 = Release|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Mac Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Mac Debug|Any CPU.Build.0 = Release|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Mac Debug|x86.ActiveCfg = Release|Any CPU
+		{C3A67BCB-7D1F-4948-9A70-99424E47208D}.Mac Debug|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		version = 

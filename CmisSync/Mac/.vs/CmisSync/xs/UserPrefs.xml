@@ -1,6 +1,15 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Utils.cs">
+    <Files>
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="84" Column="29" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalWatcherProcessor.cs" Line="139" Column="21" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="437" Column="25" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/LocalSfpProducer.cs" Line="45" Column="9" />
+      <File FileName="../../CmisSync.Lib/Database/Database.cs" Line="978" Column="9" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/SyncTripletFactory.cs" Line="371" Column="49" />
+      <File FileName="../../CmisSync.Lib/Utils.cs" Line="545" Column="1" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
@@ -11,24 +20,29 @@
               <Node name="Database" expanded="True" />
               <Node name="Sync" expanded="True">
                 <Node name="CmisSyncFolder" expanded="True" />
+                <Node name="SynchronizedFolder" expanded="True" />
+                <Node name="SynchronizeItem" expanded="True" />
                 <Node name="SyncMachine" expanded="True">
                   <Node name="Crawler" expanded="True" />
-                  <Node name="Internal" expanded="True">
-                    <Node name="ProcessorCompleteAddingChecker.cs" selected="True" />
-                  </Node>
+                  <Node name="Internal" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
                     <Node name="Internal" expanded="True" />
                   </Node>
                 </Node>
                 <Node name="SyncRepo" expanded="True" />
-                <Node name="SyncTriplet" expanded="True" />
+                <Node name="SyncTriplet" expanded="True">
+                  <Node name="TripletItem" expanded="True" />
+                </Node>
                 <Node name="SyncWorker" expanded="True" />
               </Node>
               <Node name="Utilities" expanded="True">
                 <Node name="FileUtilities" expanded="True" />
               </Node>
+              <Node name="Utils.cs" selected="True" />
             </Node>
-            <Node name="DotCMIS" expanded="True" />
+            <Node name="DotCMIS" expanded="True">
+              <Node name="client" expanded="True" />
+            </Node>
           </Node>
         </State>
       </Pad>

@@ -39,7 +39,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
         private ItemsDependencies idps = null;
 
-        private HashSet<string> possibleDeletionFolderBuffer = new HashSet<string> (); 
+        private HashSet<string> possibleProcessedParentBuffer = new HashSet<string> (); 
 
         private ISession session;
 
@@ -186,7 +186,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                      * processing, a folder might not be processed due to no change on it while its containing
                      * files might appear in the changelog.                     
                      *
-                     * Therefore we use a set possibleDeletionFolderBuffer to record all parents and check if 
+                     * Therefore we use a set possibleProcessedParentBuffer to record all parents and check if 
                      * they've appeared in the changelog. If not, remove them from idps after all changelogs are
                      * processed.                    
                      */                    
@@ -208,7 +208,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                                 // parent folder's operation depends on current object
                                 idps.AddItemDependence (parent, dbpath[2].Equals("Folder") ? localpath + CmisUtils.CMIS_FILE_SEPARATOR : localpath);
-                                possibleDeletionFolderBuffer.Add (parent);
+                                possibleProcessedParentBuffer.Add (parent);
                             }
 
                             string localFullPath = Path.Combine (cmisSyncFolder.LocalPath, localpath);
@@ -222,14 +222,14 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                                  * If the folder appears in the changelog, its idps should be removed by full synctriplet processor. 
                                  * So delete it in the possibleDeletionFolderBuffer.                                
                                  */
-                                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalFolder (localFullPath, cmisSyncFolder);
-                                possibleDeletionFolderBuffer.Remove (triplet.Name);
+                                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromLocalFolder (localFullPath, cmisSyncFolder);
+                                possibleProcessedParentBuffer.Remove (triplet.Name);
 
                                 if (!fullSyncTriplets.TryAdd (triplet)) {
                                     Console.WriteLine ("Add folder deletion triplet to full synctriplet queue failed! {0}", localFullPath);
                                 }
                             } else {
-                                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromLocalDocument (localFullPath, cmisSyncFolder);
+                                SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromLocalDocument (localFullPath, cmisSyncFolder);
 
                                 Console.WriteLine ("  -- Delete file work: {0}, parent: {1}", localFullPath, parent);
 
@@ -252,7 +252,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
              * to make the full-triplet-processor consistent with crawler sync that stop blockingcollection when 
              * the idps is empty.            
              */            
-            foreach (String pd in possibleDeletionFolderBuffer) {
+            foreach (String pd in possibleProcessedParentBuffer) {
                 Console.WriteLine ("  -- Remove possible deletion folder's dependecies {0}", pd);
                 idps.RemoveItemDependence (pd, ProcessWorker.SyncResult.SUCCEED);
             }

@@ -12,11 +12,13 @@ namespace CmisSync.Lib.Sync.SyncTriplet
 {
 
     /// <summary>
-    /// Sync triplet factory. A factory utility class for creating synctriplets SFGs for synctriplets.
+    /// Sync triplet factory. A factory utility class for creating synctriplets SFPs for synctriplets.
     /// 
-    /// Note: 
-    ///   An SFG is a Semi-Finished-Goods 
-    /// 
+    /// <para>Note:</para>
+    /// <para>  An SFP is a Semi-Finished-Product of a synctriplet. It is common in local crawler where remote 
+    ///   storage's status is unknown. In such case, an SFP of synctriplet created by the local crawler will
+    ///   be &lt;LS, DB, ?&gt; and be pushed to semi-product queue for assembler to fill the ? with remote storage
+    ///   information.</para>
     /// </summary>
     public static class SyncTripletFactory
     {
@@ -31,14 +33,14 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         private const bool IsDocument = false;
 
         /// <summary>
-        /// Creates the SFGF rom remote document. Given remote folder where the document is.
+        /// Creates the SFP from remote document. Given remote folder where the document is.
         /// Therefore it is not necessary to check the document's folder.
         /// </summary>
-        /// <returns>The SFGF rom remote document.</returns>
+        /// <returns>The SFP from remote document.</returns>
         /// <param name="remoteFolder">Remote folder.</param>
         /// <param name="remoteDocument">Remote document.</param>
         /// <param name="cmisSyncFolder">Cmis sync folder.</param>
-        public static SyncTriplet CreateSFGFromRemoteDocument (
+        public static SyncTriplet CreateSFPFromRemoteDocument (
             IFolder remoteFolder,
             IDocument remoteDocument,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
@@ -62,14 +64,14 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         }
 
         /// <summary>
-        /// Creates the SFGF rom remote document, given document only.
+        /// Creates the SFP from remote document, given document only.
         /// Folder path should be checked among all possible paths to select the one
         /// start with CmisSyncFolder.RemotePath by SyncFileUtil.GetApplicablePath
         /// </summary>
-        /// <returns>The SFGF rom remote document.</returns>
+        /// <returns>The SFP from remote document.</returns>
         /// <param name="remoteDocument">Remote document.</param>
         /// <param name="cmisSyncFolder">Cmis sync folder.</param>
-        public static SyncTriplet CreateSFGFromRemoteDocument(
+        public static SyncTriplet CreateSFPFromRemoteDocument(
             IDocument remoteDocument,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder) 
         {
@@ -92,13 +94,19 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             return res;
         }
 
-        // Create Full Synctriplet, useful when remote has high prioirty, eg: changelog
+        /// <summary>
+        /// Create full synctriplet by remote document. It is useful when creating triplet from changelog
+        /// </summary>
+        /// <returns>The synctriplet created by remote document.</returns>
+        /// <param name="remoteFolder">Remote folder.</param>
+        /// <param name="remoteDocument">Remote document.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
         public static SyncTriplet CreateFromRemoteDocument(
             IFolder remoteFolder,
             IDocument remoteDocument,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
-            SyncTriplet res = CreateSFGFromRemoteDocument (remoteFolder, remoteDocument, cmisSyncFolder);
+            SyncTriplet res = CreateSFPFromRemoteDocument (remoteFolder, remoteDocument, cmisSyncFolder);
             // Create local storage 
             res.LocalStorage = (null == res.DBStorage.DBLocalPath) ? null : new LocalStorageItem(cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
 
@@ -109,7 +117,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             IDocument remoteDocumnt,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder) 
         {
-            SyncTriplet res = CreateSFGFromRemoteDocument (remoteDocumnt, cmisSyncFolder);
+            SyncTriplet res = CreateSFPFromRemoteDocument (remoteDocumnt, cmisSyncFolder);
             // Create local storage 
             res.LocalStorage = (null == res.DBStorage.DBLocalPath) ? null : new LocalStorageItem (cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
 
@@ -117,7 +125,13 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         }
 
 
-        public static SyncTriplet CreateSFGFromRemoteFolder (
+        /// <summary>
+        /// Creates the SFP from a remote folder.
+        /// </summary>
+        /// <returns>The SFP of a remote folder.</returns>
+        /// <param name="remoteFolder">Remote folder.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static SyncTriplet CreateSFPFromRemoteFolder (
             IFolder remoteFolder,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
@@ -144,7 +158,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
 
-            SyncTriplet res = CreateSFGFromRemoteFolder (remoteFolder, cmisSyncFolder);
+            SyncTriplet res = CreateSFPFromRemoteFolder (remoteFolder, cmisSyncFolder);
 
             res.LocalStorage = (null == res.DBStorage.DBLocalPath) ? null : new LocalStorageItem (cmisSyncFolder.LocalPath, res.DBStorage.DBLocalPath);
 
@@ -152,9 +166,14 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         }
 
 
-        // Create SFG of synctriplet from local:
-        // LS, DB, ??
-        public static SyncTriplet CreateSFGFromLocalDocument(
+        /// <summary>
+        /// Creates the SFP From the local document. Return in the form:
+        ///   &lt;LS, DB, ??&gt;
+        /// </summary>
+        /// <returns>The SFP From local document.</returns>
+        /// <param name="localFullPath">Local full path.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static SyncTriplet CreateSFPFromLocalDocument(
             String localFullPath,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
@@ -170,18 +189,32 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             return res;
         }
 
-        // Create Full synctriplet
-        // This method is almost useless.
+        /// <summary>
+        /// Create FULL synctriplet from local files using the remote path in DB.
+        /// This method is used by local watcher / local change processors that they
+        /// do not require remote storage status.
+        /// 
+        /// The sync direction is local_to_remote
+        /// </summary>
+        /// <returns>The synctriplet from local document.</returns>
+        /// <param name="localFullPath">Local full path.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
         public static SyncTriplet CreateFromLocalDocument(
             String localFullPath,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
-            SyncTriplet res = CreateSFGFromLocalDocument(localFullPath, cmisSyncFolder);
-            res.RemoteStorage = new RemoteStorageItem (cmisSyncFolder.RemotePath, res.DBStorage.DBRemotePath, null);
+            SyncTriplet res = CreateSFPFromLocalDocument(localFullPath, cmisSyncFolder);
+            res.Direction = DIRECTION.LOCAL2REMOTE;
             return res;
         }
  
-        public static SyncTriplet CreateSFGFromLocalFolder(
+        /// <summary>
+        /// Creates the SFP from local folders.
+        /// </summary>
+        /// <returns>The SFP from local folder.</returns>
+        /// <param name="localFullPath">Local full path.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static SyncTriplet CreateSFPFromLocalFolder(
             String localFullPath,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
@@ -197,18 +230,25 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             return res;
         }
 
+        /// <summary>
+        /// Create FULL synctriplet from local folders using the remote path in DB.
+        /// Same to CreateFromLocalFile, this method is used by local watcher/change processors.
+        /// 
+        /// The sync direction is local_to_remote
+        /// </summary>
+        /// <returns>The synctriplet from local folder.</returns>
+        /// <param name="localFullPath">Local full path.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
         public static SyncTriplet CreateFromLocalFolder (
             String localFullPath,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
         {
-            SyncTriplet res = CreateSFGFromLocalFolder(localFullPath, cmisSyncFolder);
-
-            res.RemoteStorage = new RemoteStorageItem (cmisSyncFolder.RemotePath, res.DBStorage.DBRemotePath, null);
-
+            SyncTriplet res = CreateSFPFromLocalFolder(localFullPath, cmisSyncFolder);
+            res.Direction = DIRECTION.LOCAL2REMOTE;
             return res;
         }
 
-        public static SyncTriplet CreateSFGFromDBFile(
+        public static SyncTriplet CreateSFPFromDBFile(
             string localRelativePath,
             string remoteRelativePath,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder
@@ -219,7 +259,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             return res;
         }
 
-        public static SyncTriplet CreateSFGFromDBFolder (
+        public static SyncTriplet CreateSFPFromDBFolder (
             string localRelativePath,
             string remoteRelativePath,
             CmisSyncFolder.CmisSyncFolder cmisSyncFolder
@@ -232,10 +272,24 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         }
 
 
+        /// <summary>
+        /// Assemble an SFP created by a remote object to an SFP created by a local object.
+        /// It will fill the local SFP's RemoteStorageItem by the one from the remote SFP.
+        /// </summary>
+        /// <param name="remoteSemi">Remote semi.</param>
+        /// <param name="localSemi">Local semi.</param>
         public static void AssembleRemoteIntoLocal(SyncTriplet remoteSemi, SyncTriplet localSemi) {
             localSemi.RemoteStorage = new RemoteStorageItem (remoteSemi.RemoteStorage);
         }
 
+        /// <summary>
+        /// Assemble an SFP created by a local object with the remote document's information.
+        /// It will fill the local SFP's RemoteStorageItem by the one created from the remote document.
+        /// </summary>
+        /// <param name="remoteDocument">Remote document.</param>
+        /// <param name="fullPath">Full path.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        /// <param name="localSemi">Local semi.</param>
         public static void AssembleRemoteIntoLocal(IDocument remoteDocument, String fullPath, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, SyncTriplet localSemi) {
             String remoteRoot = cmisSyncFolder.RemotePath;
             String remoteFull = fullPath;
@@ -244,6 +298,13 @@ namespace CmisSync.Lib.Sync.SyncTriplet
 
         }
 
+        /// <summary>
+        /// Assemble an SFP created by a local object with the remote folder's information.
+        /// It will fill the local SFP's RemoteStorageItem by the one created from the remote folder.
+        /// </summary>
+        /// <param name="remoteFolder">Remote folder.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        /// <param name="localSemi">Local semi.</param>
         public static void AssembleRemoteIntoLocal(IFolder remoteFolder, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, SyncTriplet localSemi) {
             // Create remote storage
             String remoteRoot = cmisSyncFolder.RemotePath;
@@ -253,8 +314,62 @@ namespace CmisSync.Lib.Sync.SyncTriplet
 
         }
 
+        /// <summary>
+        /// Assemble an SFP created by a local object to an SFP created by a remote object.
+        /// It will fill the remote SFP's LocalStorageItem by the one from the local SFP.
+        /// </summary>
+        /// <param name="localSemi">Local semi.</param>
+        /// <param name="remoteSemi">Remote semi.</param>
         public static void AssembleLocalIntoRemote(SyncTriplet localSemi, SyncTriplet remoteSemi) {
             remoteSemi.LocalStorage = new LocalStorageItem (localSemi.LocalStorage);
+        }
+
+        /// <summary>
+        /// Creates the synctriplet for local renamed object. The Name field of the resulting synctriplet 
+        /// will be the relative name in DB (which means, the old one). 
+        /// 
+        /// The direction is local_to_remote
+        /// 
+        /// Similar with old SynchronizedFolder/WatcherStrategy, this method can return null when
+        /// newFullPath does not exist.
+        /// </summary>
+        /// <returns>The triplet from local renamed object.</returns>
+        /// <param name="oldFullPath">Old full path.</param>
+        /// <param name="newFullPath">New full path.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static SyncTriplet CreateFromLocalRenamedObject(
+            String oldFullPath,
+            String newFullPath,
+            bool isFolder,
+            CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        {
+
+            SyncTriplet res = null;
+            String localRoot = cmisSyncFolder.LocalPath;
+            String localOldRelative = oldFullPath.Substring (localRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
+            String localNewRelative = newFullPath.Substring (localRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
+
+            try {
+                res = new SyncTriplet (isFolder, DIRECTION.LOCAL2REMOTE);
+                res.LocalStorage = new LocalStorageItem (localRoot, localNewRelative);
+                res.DBStorage = new DBStorageItem (cmisSyncFolder.Database, localOldRelative, isFolder, LocalToRemote);
+
+            } catch {
+                /*
+                Boolean isFolder = true;
+                if (cmisSyncFolder.Database.IsFile(oldFullPath)) {
+                    isFolder = false;
+                } else {
+                    isFolder = true;
+                }
+                res = new SyncTriplet (isFolder);
+                res.DBStorage = new DBStorageItem (cmisSyncFolder.Database, localOldRelative, isFolder, LocalToRemote);
+                res.LocalStorage = null;
+                */
+            }
+
+            res.Name = res.LocalStorage.FullPath;
+            return res;
         }
     }
 }

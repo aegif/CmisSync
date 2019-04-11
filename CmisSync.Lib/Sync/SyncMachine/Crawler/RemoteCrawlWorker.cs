@@ -115,7 +115,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     // process sub folders
                     if (cmisObject is DotCMIS.Client.Impl.Folder) {
                         IFolder subFolder = (IFolder)cmisObject;
-                        SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromRemoteFolder (subFolder, this.cmisSyncFolder);
+                        SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromRemoteFolder (subFolder, this.cmisSyncFolder);
 
                         lock (lockObj) {
                             if (this.cmisProperties.IgnoreIfSameLowercaseNames && orderedRemoteBuffer.Contains(triplet.Name.ToLowerInvariant ())) {
@@ -150,7 +150,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                         if (cmisObject is DotCMIS.Client.Impl.Document) {
                             IDocument document = (IDocument)cmisObject;
 
-                            SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFGFromRemoteDocument (remoteFolder, document, this.cmisSyncFolder);
+                            SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromRemoteDocument (remoteFolder, document, this.cmisSyncFolder);
 
                             lock (lockObj) {
                                 if (this.cmisProperties.IgnoreIfSameLowercaseNames && orderedRemoteBuffer.Contains (triplet.Name.ToLowerInvariant ())) {

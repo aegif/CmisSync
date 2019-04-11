@@ -137,7 +137,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                     Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote",
                                     System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
-                    // remote not exist, create or upload to remote
+                    // remote not exist, create or upload to remote, no matter if the triplet is a RENAME triplet
                     if (!triplet.RemoteExist) {
 
                         Console.WriteLine (" # [ WorkerThread: {0} ] create {1}.",
@@ -148,10 +148,22 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                         else
                             return WorkerOperations.UploadFile (triplet, session, cmisSyncFolder);
 
-                        // remote exist, update    
+                    // remote exist, update    
                     } else {
-                        if (triplet.IsFolder) { }// do nothing 
-                        else return WorkerOperations.UpdateRemoteFile (triplet, session, cmisSyncFolder);
+                        // not rename
+                        if (triplet.LocalStorage.RelativePath == triplet.DBStorage.DBLocalPath) {
+                            if (triplet.IsFolder) { }// do nothing 
+                            else return WorkerOperations.UpdateRemoteFile (triplet, session, cmisSyncFolder);
+                        } else {
+                            //TODO
+                            if (triplet.IsFolder) {
+                                //TODO
+                                // rename remote folder
+                            } else {
+                                //TODO
+                                // rename remote file
+                            }
+                        }
                     }
 
                 } else {

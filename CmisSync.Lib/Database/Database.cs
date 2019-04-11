@@ -594,6 +594,15 @@ namespace CmisSync.Lib.Database
             ExecuteSQLAction("UPDATE files SET path=@newPath, localPath=@newLocalPath WHERE path=@oldPath", parameters);
         }
 
+        public void MoveFile(SyncTriplet oldTriplet, SyncTriplet newTriplet)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("oldPath", oldTriplet.RemoteStorage.RelativePath);
+            parameters.Add ("newPath", newTriplet.RemoteStorage.RelativePath);
+            parameters.Add ("newLocalPath", newTriplet.LocalStorage.RelativePath);
+            ExecuteSQLAction ("UPDATE files SET path=@newPath, localPath=@newLocalPath WHERE path=@oldPath", parameters);
+        }
+
 
         /// <summary>
         /// Move a folder.
@@ -617,6 +626,24 @@ namespace CmisSync.Lib.Database
             ExecuteSQLAction("UPDATE files SET path=@newPath||SUBSTR(path, @substringIndex), localPath=@newLocalPath||SUBSTR(localPath, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
         }
 
+        public void MoveFolder(SyncTriplet oldTriplet, SyncTriplet newTriplet)
+        {
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("oldPath", oldTriplet.RemoteStorage.RelativePath);
+            parameters.Add ("oldPathLike", oldTriplet.RemoteStorage.RelativePath + "/%");
+            parameters.Add ("substringIndex", oldTriplet.RemoteStorage.RelativePath.Length + 1);
+            parameters.Add ("newPath", newTriplet.RemoteStorage.RelativePath);
+            parameters.Add ("newLocalPath", newTriplet.LocalStorage.RelativePath);
+
+            // Update folder itself
+            ExecuteSQLAction ("UPDATE folders SET path=@newPath, localPath=@newLocalPath WHERE path=@oldPath", parameters);
+
+            // UPdate all folders under this folder
+            ExecuteSQLAction ("UPDATE folders SET path=@newPath||SUBSTR(path, @substringIndex), localPath=@newLocalPath||SUBSTR(localPath, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
+
+            // Update all files under this folder
+            ExecuteSQLAction ("UPDATE files SET path=@newPath||SUBSTR(path, @substringIndex), localPath=@newLocalPath||SUBSTR(localPath, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
+        }
 
         /// <summary>
         /// Get the time at which the file was last modified.
@@ -1229,6 +1256,35 @@ namespace CmisSync.Lib.Database
             }
         }
 
+        public bool IsFile (string localFullPath)
+        {
+            string normalizedLocalPath = RemoveLocalPrefix (localFullPath);
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("localPath", normalizedLocalPath);
+
+            // Try to find it in files database.
+            string path = (string)ExecuteSQLFunction ("SELECT path FROM files WHERE localPath=@localPath", parameters);
+            if (string.IsNullOrEmpty (path)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        public bool IsFolder (string localFullPath) {
+            string normalizedLocalPath = RemoveLocalPrefix (localFullPath);
+            Dictionary<string, object> parameters = new Dictionary<string, object> ();
+            parameters.Add ("localPath", normalizedLocalPath);
+
+            // Try to find it in folders database.
+            String path = (string)ExecuteSQLFunction ("SELECT path FROM folders WHERE localPath=@localPath", parameters);
+            if (string.IsNullOrEmpty (path)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         /// <summary>
         /// <returns>path field in files table for <paramref name="id"/></returns>
         /// </summary>
@@ -1265,8 +1321,6 @@ namespace CmisSync.Lib.Database
 
             }).ToList();
         }
-
-        
 
         /// <summary>
         /// Check whether a file's content has changed locally since it was last synchronized.

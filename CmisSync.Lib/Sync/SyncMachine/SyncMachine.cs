@@ -61,7 +61,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
         private ProcessorCompleteAddingChecker processorCompleteAddingChecker = null;
 
-        private SemiSyncTripletManager semiSyncTripletManager;
+        private LocalSfpProducer localSfpProducer;
 
         private SyncTripletAssembler syncTripletAssembler;
 
@@ -78,8 +78,13 @@ namespace CmisSync.Lib.Sync.SyncMachine
             this.cmisSyncFolder = cmisSyncFolder;
             this.session = session;
 
+            if (cmisSyncFolder.IsWatcherEnabled) {
+                watcher = new Watcher (cmisSyncFolder.LocalPath);
+                watcher.EnableRaisingEvents = true;
+            }
+
             // semisynctriplet manager holds a concurrent semi triplet queue
-            this.semiSyncTripletManager = new SemiSyncTripletManager (cmisSyncFolder, session);
+            this.localSfpProducer = new LocalSfpProducer (cmisSyncFolder, session);
             // processor holds a concurrent triplet process queue
             this.syncTripletProcessor = new SyncTripletProcessor (cmisSyncFolder, session);
             // assembler read semi triplet from semi queue, assemble it with remote info, and push assembled triplet to process queue
@@ -103,10 +108,10 @@ namespace CmisSync.Lib.Sync.SyncMachine
                 semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
                 Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
-                Task semiManagerTask = Task.Factory.StartNew (() => this.semiSyncTripletManager.Start (semiSyncTriplets, itemsDependencies));
+                Task localSpfProduceTask = Task.Factory.StartNew (() => this.localSfpProducer.StartForLocalCrawler (semiSyncTriplets, itemsDependencies));
                 Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalCrawler (semiSyncTriplets, fullSyncTriplets, itemsDependencies));
 
-                semiManagerTask.Wait ();
+                localSpfProduceTask.Wait ();
                 semiSyncTriplets.CompleteAdding ();
 
                 // wait until assembler and processor completed
@@ -150,61 +155,162 @@ namespace CmisSync.Lib.Sync.SyncMachine
             return succeed;
         }
 
-        public bool DoChangeLogSync() {
+        /// <summary>
+        /// Dos the change log sync. 
+        /// </summary>
+        /// <returns><c>true</c>, if change log sync was done, <c>false</c> otherwise.</returns>
+        public bool DoChangeLogSync()
+        {
+            bool res = true;
+            IsWorking = true;
+            lock (syncingLock) {
+                res = DoNonLockChangeLogSync ();
+            }
+            IsWorking = false;
+            return res;
+        }
+
+        /// <summary>
+        /// Dos the local watcher sync, followed by local change sync and changelog sync
+        /// </summary>
+        /// <returns><c>true</c>, if local watcher sync was done, <c>false</c> otherwise.</returns>
+        public bool DoLocalWatcherSync()
+        {
+            bool res = true;
+            IsWorking = true;
+            lock (syncingLock) {
+                res &= DoNonLockLocalWatcherSync ();
+                // TODO 
+                // res &= DoNonLockLocalChangeSync ();
+                // res &= DoNonLockChangeLogSync ();
+            }
+            IsWorking = false;
+            return res;
+
+        }
+
+        public bool DoNonLockChangeLogSync ()
+        {
 
             bool succeed = true;
 
-            lock (syncingLock) {
+            System.Console.WriteLine ("Changelog Sync Task Start: ");
 
-                System.Console.WriteLine ("Changelog Sync Task Start: ");
+            itemsDependencies = new ItemsDependencies ();
+            processorCompleteAddingChecker = new ProcessorCompleteAddingChecker (itemsDependencies);
 
-                IsWorking = true;
+            fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
-                itemsDependencies = new ItemsDependencies ();
-                processorCompleteAddingChecker = new ProcessorCompleteAddingChecker (itemsDependencies);
+            Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
+            try {
 
-                fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+                Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog (fullSyncTriplets, itemsDependencies));
+                tripletAssemblerTask.Wait ();
 
-                Task tripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
+            } catch (AggregateException ae) {
+                foreach (var e in ae.InnerExceptions) {
+                    if (e is ChangeLogProcessorBrokenException) {
+                        Console.WriteLine ("Changelog Sync Task broke: {0}", e.Message);
+                        succeed = false;
+                    } else {
+                        succeed = false;
+                        throw;
+                    }
+                }
+            }
+
+            // assembler completed.
+            processorCompleteAddingChecker.assemblerCompleted = true;
+
+            SyncTriplet.SyncTriplet dummyTriplet = new SyncTriplet.SyncTriplet (false);
+            fullSyncTriplets.TryAdd (dummyTriplet);
+
+            tripletProcessTask.Wait ();
+
+            if (succeed) {
                 try {
-
-                    Task tripletAssemblerTask = Task.Factory.StartNew (() => syncTripletAssembler.StartForChangeLog (fullSyncTriplets, itemsDependencies));
-                    tripletAssemblerTask.Wait ();
-
-                } catch (AggregateException ae) {
-                    foreach (var e in ae.InnerExceptions) {
-                        if (e is ChangeLogProcessorBrokenException) {
-                            Console.WriteLine ("Changelog Sync Task broke: {0}", e.Message);
-                            succeed = false;
-                        } else {
-                            succeed = false;
-                            throw;
-                        }
-                    }
+                    String token = CmisUtils.GetChangeLogToken (session);
+                    Console.WriteLine ("Get server's changelog token {0}", token);
+                    cmisSyncFolder.Database.SetChangeLogToken (token);
+                } catch (Exception e) {
+                    Console.WriteLine ("Get server's changelog token error: {0}", e.Message);
                 }
-
-                // assembler completed.
-                processorCompleteAddingChecker.assemblerCompleted = true;
-
-                SyncTriplet.SyncTriplet dummyTriplet = new SyncTriplet.SyncTriplet (false);
-                fullSyncTriplets.TryAdd (dummyTriplet);
-
-                tripletProcessTask.Wait ();
-
-                if (succeed) {
-                    try {
-                        String token = CmisUtils.GetChangeLogToken (session);
-                        Console.WriteLine ("Get server's changelog token {0}", token);
-                        cmisSyncFolder.Database.SetChangeLogToken (token);
-                    } catch (Exception e) {
-                        Console.WriteLine ("Get server's changelog token error: {0}", e.Message);
-                    }
-                }
-                
-                IsWorking = false;
             }
 
             Console.WriteLine ("Changelog Sync Task Completed.");
+            return succeed;
+
+        }
+
+        /// <summary>
+        /// Do the local watcher sync.
+        /// </summary>
+        /// <returns><c>true</c>, if local watcher sync was done, <c>false</c> otherwise.</returns>
+        public bool DoNonLockLocalWatcherSync ()
+        {
+            bool succeed = false;
+
+            System.Console.WriteLine ("Local watcher sync start: ");
+
+            itemsDependencies = new ItemsDependencies ();
+            processorCompleteAddingChecker = new ProcessorCompleteAddingChecker (itemsDependencies);
+
+            fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+            semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+
+
+            Task watcherTripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
+            Task localSfpProducerTask = Task.Factory.StartNew (() => localSfpProducer.StartForLocalWatcher (watcher, semiSyncTriplets, itemsDependencies));
+            Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalWatcherAndLocalChange (semiSyncTriplets, fullSyncTriplets));
+
+            localSfpProducerTask.Wait ();
+            semiSyncTriplets.CompleteAdding ();
+            tripletAssemblerTask.Wait ();
+
+            // all semi-triplets assembled and pushed to process queue
+            processorCompleteAddingChecker.assemblerCompleted = true;
+
+            SyncTriplet.SyncTriplet dummyTriplet = new SyncTriplet.SyncTriplet (false);
+            fullSyncTriplets.TryAdd (dummyTriplet);
+
+            watcherTripletProcessTask.Wait ();
+
+            return succeed;
+        }
+
+        /// <summary>
+        /// Dos the local change sync.
+        /// </summary>
+        /// <returns><c>true</c>, if local change sync was done, <c>false</c> otherwise.</returns>
+        public bool DoNonLockLocalChangeSync()
+        {
+            bool succeed = false;
+
+            System.Console.WriteLine ("Local change crawler start: ");
+
+            itemsDependencies = new ItemsDependencies ();
+            processorCompleteAddingChecker = new ProcessorCompleteAddingChecker (itemsDependencies);
+
+            fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+            semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
+
+
+
+            Task localChangeTripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
+            Task localSfpProducerTask = Task.Factory.StartNew (() => this.localSfpProducer.StartForLocalChange (fullSyncTriplets, itemsDependencies));
+            Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalWatcherAndLocalChange (semiSyncTriplets, fullSyncTriplets));
+
+            localSfpProducerTask.Wait ();
+            semiSyncTriplets.CompleteAdding ();
+            tripletAssemblerTask.Wait ();
+
+            processorCompleteAddingChecker.assemblerCompleted = true;
+
+            SyncTriplet.SyncTriplet dummyTriplet = new SyncTriplet.SyncTriplet (false);
+            fullSyncTriplets.TryAdd (dummyTriplet);
+
+            localChangeTripletProcessTask.Wait ();
+
             return succeed;
         }
 
@@ -228,7 +334,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                     if (disposing) {
                         // this.fullSyncTriplets.Dispose ();
                         this.semiSyncTriplets.Dispose ();
-                        this.semiSyncTripletManager.Dispose ();
+                        this.localSfpProducer.Dispose ();
                         this.syncTripletAssembler.Dispose ();
                         this.syncTripletProcessor.Dispose ();
                     }
@@ -288,27 +394,59 @@ namespace CmisSync.Lib.Sync.SyncMachine
             watcher = new Watcher (cmisSyncFolder.LocalPath);
             watcher.EnableRaisingEvents = true;
 
-            watcher.ChangeEvent += (sender, e) => {
-                WatcherEvent we = watcher.GetChangeQueue ().Last ();
-                //watcher.Changed += (sender, e) => {
-                //if (!e.FullPath.StartsWith (cmisSyncFolder.LocalPath) || e.FullPath.Equals (cmisSyncFolder.LocalPath)) return;
-                //if (!SyncFileUtil.WorthSyncing (e.FullPath, cmisSyncFolder)) return;
-
-                Console.WriteLine ("%% Filesystem changed: \n" +
-                                   "   Name: {0}\n" +
-                                   "   Path: {1}\n" +
-                                   "   Type: {2}\n" +
-                                   "   Object: {3}", e.Name, e.FullPath, e.ChangeType, e.GetType().ToString());
-                Logger.Info (String.Format("FS wathcer: [0}: {1}, [{2}], len: {3}", e.Name, e.FullPath, e.ChangeType, ((Watcher)sender).GetChangeCount()));
-            };
-
             while (true) {
-                Thread.Sleep (100);
-                /*Thread.Sleep (15000);
-                Console.WriteLine ("## watcher count: {0}", watcher.GetChangeCount ()); */
-            }
+                Thread.Sleep (5000);
+                Queue<WatcherEvent> changes = watcher.GetChangeQueue ();
+                watcher.Clear ();
 
-            return;
+                foreach (WatcherEvent change in changes) {
+                    var e = change.GetFileSystemEventArgs ();
+                    if (!File.Exists (e.FullPath) && !Directory.Exists (e.FullPath)) {
+                        Console.WriteLine ("%% Local file/folder: {0} not found, might be deleted.", e.FullPath);
+                        continue;
+                    }
+
+                    if (!(e.ChangeType is WatcherChangeTypes.Deleted)) { //&& SyncFileUtil.WorthSyncing(e.FullPath, cmisSyncFolder)) {
+                        Console.WriteLine ("%% Filesystem changed: \n" +
+                          "   Name: {0}\n" +
+                          "   Path: {1}\n" +
+                          "   OldPath: {4}\n" + 
+                          "   Type: {2}\n" +
+                          "   IsMove: {3}", e.Name, e.FullPath, e.ChangeType, e is CmisSync.Lib.Watcher.MovedEventArgs,
+                          e is RenamedEventArgs ? ((RenamedEventArgs)e).OldFullPath : "");
+                        SyncTriplet.SyncTriplet triplet = null;
+                        bool isFolder = Utils.IsFolder (e.FullPath);
+                        switch (e.ChangeType) {
+                        case WatcherChangeTypes.Created:
+
+                            triplet = isFolder ?
+                                SyncTriplet.SyncTripletFactory.CreateSFPFromLocalFolder (e.FullPath, cmisSyncFolder) :
+                                SyncTriplet.SyncTripletFactory.CreateSFPFromLocalDocument (e.FullPath, cmisSyncFolder);
+                            break;
+                        case WatcherChangeTypes.Changed:
+                            triplet = isFolder ?
+                                SyncTriplet.SyncTripletFactory.CreateSFPFromLocalFolder (e.FullPath, cmisSyncFolder) :
+                                SyncTriplet.SyncTripletFactory.CreateSFPFromLocalDocument (e.FullPath, cmisSyncFolder);
+                            break;
+                        case WatcherChangeTypes.Renamed:
+                            triplet = SyncTriplet.SyncTripletFactory.CreateFromLocalRenamedObject (((RenamedEventArgs)e).OldFullPath, e.FullPath, isFolder, cmisSyncFolder);
+                            break;
+                        default:
+                            break;
+                        }
+
+                        if (triplet != null) {
+                            Console.WriteLine ("%% SyncTriplet: \n {0}", triplet.Name);
+                        } else {
+                            Console.WriteLine("%% Local file/folder: {0} not found, might be deleted.", e.FullPath);
+                        }
+                    } else {
+                        if (e.ChangeType is WatcherChangeTypes.Deleted) {
+                            Console.WriteLine ("%% File Deleted: {0}", e.FullPath);
+                        }
+                    }
+                }
+            }
         }
     }
 }

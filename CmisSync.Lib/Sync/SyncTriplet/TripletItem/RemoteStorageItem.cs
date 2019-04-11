@@ -42,7 +42,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet.TripletItem
         /// Gets or sets the last modified.
         /// </summary>
         /// <value>The last modified.</value>
-        public DateTime? LastModified { get { return CmisObject.LastModificationDate; }}
+        public DateTime? LastModified { get { return CmisObject?.LastModificationDate; }}
 
         public string FullPath {
             get {
