@@ -62,29 +62,14 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                             triplet = Utils.IsFolder (e.FullPath) ?
                                 SyncTripletFactory.CreateFromLocalFolder (e.FullPath, cmisSyncFolder) :
                                 SyncTripletFactory.CreateFromLocalDocument (e.FullPath, cmisSyncFolder);
-
-                            string localpath = triplet.LocalStorage.RelativePath;
-                            String parent = CmisFileUtil.GetUpperFolderOfCmisPath (localpath);
-
-                            if (parent.Length > 0) {
-                                parent = parent + CmisUtils.CMIS_FILE_SEPARATOR;
-
-                                // current object depends on its parent
-                                itemsDeps.AddItemDependence (
-                                    Utils.IsFolder (e.FullPath) ? localpath + CmisUtils.CMIS_FILE_SEPARATOR : localpath, 
-                                    parent);
-                                possibleProcessedParentBuffer.Add (parent);
-                            }
-
-                            if (Utils.IsFolder (e.FullPath)) {
-                                possibleProcessedParentBuffer.Remove (triplet.Name);
-                            }
                         }
 
                         break;
                     case WatcherChangeTypes.Renamed:
                         // TODO:
                         // why should I grace?
+                        // TODO 2:
+                        // idps? rename / move of folder/file should depend on its parent
                         bool isFolder = Utils.IsFolder (e.FullPath);
 
                         string oldFullPath = ((RenamedEventArgs)e).OldFullPath;
@@ -135,12 +120,33 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     }
 
                     if (triplet != null) {
-                        Console.WriteLine ("%% Change: {1}, SyncTriplet: \n {0}", triplet.Name, change.GetFileSystemEventArgs().GetType());
+
+                        // if triplet is not null, push it to output queue.
+                        string localpath = triplet.LocalStorage.RelativePath;
+
+                        // push the triplet's parent to possible_processed_parent_buffer
+                        String parent = CmisFileUtil.GetUpperFolderOfCmisPath (localpath);
+                        if (parent.Length > 0) {
+                            parent = parent + CmisUtils.CMIS_FILE_SEPARATOR;
+
+                            // current object depends on its parent
+                            itemsDeps.AddItemDependence (
+                                triplet.IsFolder ? localpath + CmisUtils.CMIS_FILE_SEPARATOR : localpath,
+                                parent);
+                            possibleProcessedParentBuffer.Add (parent);
+                        }
+
+                        if (triplet.IsFolder) {
+                            possibleProcessedParentBuffer.Remove (triplet.Name);
+                        }
+
                         if (!duplicatedTripletBuffer.Contains (triplet.Name)) {
                             outputQueue.TryAdd (triplet);
                             duplicatedTripletBuffer.Add (triplet.Name);
                             itemsDeps.OutputItemsDependences ();
                         }
+
+                        Console.WriteLine ("%% Change: {1}, SyncTriplet: \n {0}", triplet.Name, change.GetFileSystemEventArgs ().GetType ());
 
                     } else {
                         Console.WriteLine ("%% Local file/folder: {0} not found, might be deleted.", e.FullPath);

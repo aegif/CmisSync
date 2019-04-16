@@ -125,7 +125,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                         }
 
                     } else {
-                        Console.WriteLine (" P [ WorkerThread: {0} ] has get a dummy triplet. ", Thread.CurrentThread.ManagedThreadId);
+                        // Console.WriteLine (" P [ WorkerThread: {0} ] has get a dummy triplet. ", Thread.CurrentThread.ManagedThreadId);
                     }
 
                     if (checker.processorCompleteAdding ()) {
@@ -137,12 +137,12 @@ namespace CmisSync.Lib.Sync.SyncMachine
                          * loop will exist after all current threads have finished.                        
                          */                        
                         if (!fullSyncTriplets.IsAddingCompleted) {
-                            Console.WriteLine (" P [ WorkerThread: {0} ] all full-sync-triplets are processed. Set fullSyncTriplets queue CompleteAdding().",
-                                Thread.CurrentThread.ManagedThreadId);
+                            // Console.WriteLine (" P [ WorkerThread: {0} ] all full-sync-triplets are processed. Set fullSyncTriplets queue CompleteAdding().",
+                            //    Thread.CurrentThread.ManagedThreadId);
                             fullSyncTriplets.CompleteAdding ();
                         } else {
-                            Console.WriteLine (" P [ WorkerThread: {0} ] FullSyncTriplets queue is already IsAddingCompleted.",
-                                Thread.CurrentThread.ManagedThreadId);
+                            // Console.WriteLine (" P [ WorkerThread: {0} ] FullSyncTriplets queue is already IsAddingCompleted.",
+                            //    Thread.CurrentThread.ManagedThreadId);
                         }
                     }
                 });

@@ -88,11 +88,11 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
                     if (semiTriplet.IsFolder) {
                         IFolder remoteFolder = (IFolder)remoteObject;
-                        SyncTripletFactory.AssembleRemoteIntoLocal (remoteFolder, cmisSyncFolder, semiTriplet);
+                        SyncTripletFactory.AssembleRemoteIntoLocal (remoteFolder, semiTriplet, cmisSyncFolder);
                     } else {
                         IDocument remoteDocument = (IDocument)remoteObject;
 
-                        SyncTripletFactory.AssembleRemoteIntoLocal (remoteDocument, remotePath, cmisSyncFolder, semiTriplet);
+                        SyncTripletFactory.AssembleRemoteIntoLocal (remoteDocument, remotePath, semiTriplet, cmisSyncFolder);
                     }
                 } catch (Exception) {
                     Console.WriteLine (" - remote path: {0} Not found", remotePath);
@@ -176,11 +176,11 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
                         if (semiTriplet.IsFolder) {
                             IFolder remoteFolder = (IFolder)remoteObject;
-                            SyncTripletFactory.AssembleRemoteIntoLocal (remoteFolder, cmisSyncFolder, semiTriplet);
+                            SyncTripletFactory.AssembleRemoteIntoLocal (remoteFolder, semiTriplet, cmisSyncFolder);
                         } else {
                             IDocument remoteDocument = (IDocument)remoteObject;
 
-                            SyncTripletFactory.AssembleRemoteIntoLocal (remoteDocument, remotePath, cmisSyncFolder, semiTriplet);
+                            SyncTripletFactory.AssembleRemoteIntoLocal (remoteDocument, remotePath, semiTriplet, cmisSyncFolder);
                         }
                     } catch (Exception) {
                         Console.WriteLine (" - remote path: {0} Not found", remotePath);

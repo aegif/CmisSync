@@ -180,8 +180,8 @@ namespace CmisSync.Lib.Sync.SyncMachine
             IsWorking = true;
             lock (syncingLock) {
                 res &= DoNonLockLocalWatcherSync ();
+                res &= DoNonLockLocalChangeSync ();
                 // TODO 
-                // res &= DoNonLockLocalChangeSync ();
                 // res &= DoNonLockChangeLogSync ();
             }
             IsWorking = false;
@@ -293,8 +293,6 @@ namespace CmisSync.Lib.Sync.SyncMachine
 
             fullSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
             semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
-
-
 
             Task localChangeTripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
             Task localSfpProducerTask = Task.Factory.StartNew (() => this.localSfpProducer.StartForLocalChange (fullSyncTriplets, itemsDependencies));
@@ -411,9 +409,11 @@ namespace CmisSync.Lib.Sync.SyncMachine
                           "   Name: {0}\n" +
                           "   Path: {1}\n" +
                           "   OldPath: {4}\n" + 
-                          "   Type: {2}\n" +
+                          "   Change Type: {2}\n" +
+                          "   e's Type: {5}\n" +
                           "   IsMove: {3}", e.Name, e.FullPath, e.ChangeType, e is CmisSync.Lib.Watcher.MovedEventArgs,
-                          e is RenamedEventArgs ? ((RenamedEventArgs)e).OldFullPath : "");
+                          e is RenamedEventArgs ? ((RenamedEventArgs)e).OldFullPath : "",
+                          e.GetType());
                         SyncTriplet.SyncTriplet triplet = null;
                         bool isFolder = Utils.IsFolder (e.FullPath);
                         switch (e.ChangeType) {

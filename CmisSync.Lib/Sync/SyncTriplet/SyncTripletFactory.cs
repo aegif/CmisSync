@@ -283,6 +283,22 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         }
 
         /// <summary>
+        /// Assembles a remoteDocument to the SFP created by a local object.
+        /// </summary>
+        /// <param name="remoteDocument">Remote document.</param>
+        /// <param name="localSemi">Local semi.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static void AssembleRemoteIntoLocal(IDocument remoteDocument, SyncTriplet localSemi, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        {
+            String remoteRoot = cmisSyncFolder.RemotePath;
+            String remoteFull = CmisFileUtil.PathCombine (
+                SyncFileUtil.GetApplicablePath (remoteDocument, cmisSyncFolder),
+                CmisFileUtil.GetLocalFileName (remoteDocument, cmisSyncFolder.CmisProfile));
+            String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
+            localSemi.RemoteStorage = new RemoteStorageItem (remoteRoot, remoteRelative, remoteDocument);
+        }
+
+        /// <summary>
         /// Assemble an SFP created by a local object with the remote document's information.
         /// It will fill the local SFP's RemoteStorageItem by the one created from the remote document.
         /// </summary>
@@ -290,7 +306,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         /// <param name="fullPath">Full path.</param>
         /// <param name="cmisSyncFolder">Cmis sync folder.</param>
         /// <param name="localSemi">Local semi.</param>
-        public static void AssembleRemoteIntoLocal(IDocument remoteDocument, String fullPath, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, SyncTriplet localSemi) {
+        public static void AssembleRemoteIntoLocal(IDocument remoteDocument, String fullPath, SyncTriplet localSemi, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
             String remoteRoot = cmisSyncFolder.RemotePath;
             String remoteFull = fullPath;
             String remoteRelative = remoteFull.Substring (remoteRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
@@ -305,7 +321,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
         /// <param name="remoteFolder">Remote folder.</param>
         /// <param name="cmisSyncFolder">Cmis sync folder.</param>
         /// <param name="localSemi">Local semi.</param>
-        public static void AssembleRemoteIntoLocal(IFolder remoteFolder, CmisSyncFolder.CmisSyncFolder cmisSyncFolder, SyncTriplet localSemi) {
+        public static void AssembleRemoteIntoLocal(IFolder remoteFolder, SyncTriplet localSemi, CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
             // Create remote storage
             String remoteRoot = cmisSyncFolder.RemotePath;
             String remoteFull = remoteFolder.Path;
@@ -368,7 +384,10 @@ namespace CmisSync.Lib.Sync.SyncTriplet
                 */
             }
 
-            res.Name = res.LocalStorage.FullPath;
+            res.Name = isFolder ?
+                res.LocalStorage.RelativePath + Path.DirectorySeparatorChar :
+                res.LocalStorage.RelativePath;
+
             return res;
         }
     }

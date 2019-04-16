@@ -52,7 +52,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                               cmisSyncFolder.RemotePath,
                               String.Join (CmisUtils.CMIS_FILE_SEPARATOR.ToString(), 
                                            triplet.LocalStorage.RelativePath.Split (Path.DirectorySeparatorChar)));
-
         }
 
         public static string GetRemoteRelativePath (string remoteFullPath, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
@@ -127,5 +126,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
             }
             return true;
         }
+
     }
 }

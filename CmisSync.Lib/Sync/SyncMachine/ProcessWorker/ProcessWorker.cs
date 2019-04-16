@@ -158,10 +158,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
                             //TODO
                             if (triplet.IsFolder) {
                                 //TODO
-                                // rename remote folder
+                                // move remote folder
                             } else {
                                 //TODO
-                                // rename remote file
+                                return WorkerOperations.MoveRemoteFile (triplet, session, cmisSyncFolder);
                             }
                         }
                     }

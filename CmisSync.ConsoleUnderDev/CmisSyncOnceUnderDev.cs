@@ -6,6 +6,7 @@ using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
 using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync;
+using CmisSync.Lib.Utilities.PathConverter;
 using CmisSync.Lib.Sync.SyncRepo;
 using CmisSync.Lib.Sync.CmisSyncFolder;
 using CmisSync.Lib.Sync.SyncWorker;

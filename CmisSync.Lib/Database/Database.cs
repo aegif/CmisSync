@@ -594,12 +594,19 @@ namespace CmisSync.Lib.Database
             ExecuteSQLAction("UPDATE files SET path=@newPath, localPath=@newLocalPath WHERE path=@oldPath", parameters);
         }
 
-        public void MoveFile(SyncTriplet oldTriplet, SyncTriplet newTriplet)
+        /// <summary>
+        /// Moves a file by a synctriplet.
+        /// </summary>
+        /// <param name="renameTriplet">Rename triplet.</param>
+        public void MoveFile(SyncTriplet renameTriplet)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object> ();
-            parameters.Add ("oldPath", oldTriplet.RemoteStorage.RelativePath);
-            parameters.Add ("newPath", newTriplet.RemoteStorage.RelativePath);
-            parameters.Add ("newLocalPath", newTriplet.LocalStorage.RelativePath);
+            // old remote path is read from triplet.DB
+            parameters.Add ("oldPath", renameTriplet.DBStorage.DBRemotePath);
+            // new remote path is read from triplet.RS after rename api is called
+            parameters.Add ("newPath", renameTriplet.RemoteStorage.RelativePath);
+            // new local path is read from triplet.LS, the value is set when rename triplet is created.
+            parameters.Add ("newLocalPath", renameTriplet.LocalStorage.RelativePath);
             ExecuteSQLAction ("UPDATE files SET path=@newPath, localPath=@newLocalPath WHERE path=@oldPath", parameters);
         }
 
@@ -626,14 +633,22 @@ namespace CmisSync.Lib.Database
             ExecuteSQLAction("UPDATE files SET path=@newPath||SUBSTR(path, @substringIndex), localPath=@newLocalPath||SUBSTR(localPath, @substringIndex) WHERE path LIKE @oldPathLike", parameters);
         }
 
-        public void MoveFolder(SyncTriplet oldTriplet, SyncTriplet newTriplet)
+        /// <summary>
+        /// Moves the folder by a synctriplet
+        /// </summary>
+        /// <param name="moveTriplet">Move triplet.</param>
+        public void MoveFolder(SyncTriplet moveTriplet)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object> ();
-            parameters.Add ("oldPath", oldTriplet.RemoteStorage.RelativePath);
-            parameters.Add ("oldPathLike", oldTriplet.RemoteStorage.RelativePath + "/%");
-            parameters.Add ("substringIndex", oldTriplet.RemoteStorage.RelativePath.Length + 1);
-            parameters.Add ("newPath", newTriplet.RemoteStorage.RelativePath);
-            parameters.Add ("newLocalPath", newTriplet.LocalStorage.RelativePath);
+            // old remote path is read from triplet.DB
+            parameters.Add ("oldPath", moveTriplet.DBStorage.DBRemotePath);
+            parameters.Add ("oldPathLike", moveTriplet.DBStorage.DBRemotePath + "/%");
+            parameters.Add ("substringIndex", moveTriplet.DBStorage.DBRemotePath.Length + 1);
+
+            // new local path is read from triplet.LS, the value is set when rename triplet is created.
+            parameters.Add ("newLocalPath", moveTriplet.LocalStorage.RelativePath);
+            // new remote path is read from triplet.RS after rename api is called
+            parameters.Add ("newPath", moveTriplet.RemoteStorage.RelativePath);
 
             // Update folder itself
             ExecuteSQLAction ("UPDATE folders SET path=@newPath, localPath=@newLocalPath WHERE path=@oldPath", parameters);

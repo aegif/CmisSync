@@ -44,9 +44,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
             foreach (SyncTriplet.SyncTriplet triplet in localCrawlerQueue) {
                 if (!triplet.LocalEqDB) {
-                    //outputQueue.TryAdd (triplet);
+                    outputQueue.TryAdd (triplet);
                 } else {
-                    //itemsDeps.RemoveItemDependence (triplet.Name, ProcessWorker.SyncResult.SUCCEED);
+                    itemsDeps.RemoveItemDependence (triplet.Name, ProcessWorker.SyncResult.SUCCEED);
                 }
             }
         }

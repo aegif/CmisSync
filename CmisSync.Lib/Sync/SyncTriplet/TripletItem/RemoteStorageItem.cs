@@ -36,7 +36,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet.TripletItem
             this.CmisObject = storage.CmisObject;
         }
 
-        public ICmisObject CmisObject { get; }
+        public ICmisObject CmisObject { set;  get; }
 
         /// <summary>
         /// Gets or sets the last modified.

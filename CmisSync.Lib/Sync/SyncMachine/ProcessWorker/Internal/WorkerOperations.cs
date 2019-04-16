@@ -561,6 +561,163 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
             }
         }
 
+        /// <summary>
+        /// Moves the remote file. When this method is called, the structure of the triplet is:
+        ///   LS: local new item
+        ///   DB: local old item, remote old item
+        ///   RS: remote old item
+        /// </summary>
+        /// <returns>The remote file.</returns>
+        /// <param name="triplet">Triplet.</param>
+        /// <param name="session">Session.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static SyncResult MoveRemoteFile(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        {
+
+            string oldLocalPath = triplet.DBStorage.DBLocalPath;
+            string newLocalPath = triplet.LocalStorage.RelativePath;
+            string oldLocalFolder = Path.GetDirectoryName (oldLocalPath);
+            string newLocalFolder = Path.GetDirectoryName (newLocalPath);
+
+            bool rename = oldLocalFolder == newLocalFolder;
+
+            if (!triplet.RemoteExist) {
+                Console.WriteLine ("  %% Move {0} -> {1} failed: remote item not found. ", oldLocalPath, newLocalPath);
+                return SyncResult.FAILED;
+            }
+
+            try {
+                IDocument updatedDocument;
+                if (rename) {
+                    // do rename
+                    Logger.InfoFormat ("Renaming remote file: {0} -> {1}", oldLocalPath, newLocalPath);
+
+                    IDictionary<string, object> properties = new Dictionary<string, object> ();
+                    properties [PropertyIds.Name] = Path.GetFileName (newLocalPath);
+
+                    // rename remote object and refresh triplet's info
+                    updatedDocument = (IDocument)triplet.RemoteStorage.CmisObject.UpdateProperties (properties);
+
+
+                } else {
+
+                    // full path for html GET
+                    string oldRemoteFolderPath = CmisFileUtil.PathCombine (
+                        cmisSyncFolder.RemotePath,
+                        CmisFileUtil.GetUpperFolderOfCmisPath (triplet.DBStorage.DBRemotePath));
+
+                    string newRemoteFolderPath = CmisFileUtil.PathCombine (
+                        cmisSyncFolder.RemotePath,
+                        cmisSyncFolder.Database.LocalToRemote (newLocalFolder, true));
+
+                    Logger.InfoFormat ("Moving remote file {2} from : {0} -> {1}", oldRemoteFolderPath, newRemoteFolderPath, triplet.Name);
+
+                    IFolder oldRemoteFolder = (IFolder)session.GetObjectByPath (oldRemoteFolderPath, true);
+                    IFolder newRemoteFolder = (IFolder)session.GetObjectByPath (newRemoteFolderPath, true);
+
+                    // move remote object and refresh triplet's info
+                    updatedDocument = (IDocument)((IDocument)triplet.RemoteStorage.CmisObject).Move (oldRemoteFolder, newRemoteFolder);
+
+                }
+
+                // Set latest info to triplet 
+                SyncTripletFactory.AssembleRemoteIntoLocal (updatedDocument, triplet, cmisSyncFolder);
+
+                // Update the path in the database...
+                cmisSyncFolder.Database.MoveFile (triplet);
+
+                // Update timestamp in database.
+                cmisSyncFolder.Database.SetFileServerSideModificationDate (
+                    triplet,
+                    ((DateTime)updatedDocument.LastModificationDate).ToUniversalTime ());
+
+                Logger.InfoFormat ("Move remote file: {0} -> {1} succeed.", oldLocalPath, newLocalPath);
+            } catch (Exception e) {
+                Console.WriteLine ("  %% Move remote file: {0} -> {1} failed.", oldLocalPath, newLocalPath);
+                Console.WriteLine (e.Message);
+                return SyncResult.FAILED;
+            }
+
+            return SyncResult.SUCCEED;
+        }
+
+        /// <summary>
+        /// Moves the remote folder. When this method is called, the status of triplet is:
+        ///   LS: local new item
+        ///   DB: local old item, remote old item
+        ///   RS: remote old item        
+        /// 
+        /// Remember that only triplets' name contains last '/' when it is a folder, LS and
+        /// DB's relative path do not contains last DirectorySeperatarChar.
+        /// </summary>
+        /// <returns>The remote folder.</returns>
+        /// <param name="triplet">Triplet.</param>
+        /// <param name="session">Session.</param>
+        /// <param name="cmisSyncFolder">Cmis sync folder.</param>
+        public static SyncResult MoveRemoteFolder(SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder)
+        {
+
+            string oldLocalPath = triplet.DBStorage.DBLocalPath;
+            string newLocalPath = triplet.LocalStorage.RelativePath;
+
+            string oldLocalUpperFolder = Path.GetDirectoryName (oldLocalPath);
+            string newLocalUpperFolder = Path.GetDirectoryName (newLocalPath);
+
+            bool rename = oldLocalUpperFolder == newLocalUpperFolder;
+
+            if (!triplet.RemoteExist) {
+                Console.WriteLine ("  %% Move {0} -> {1} failed: remote item not found. ", oldLocalPath, newLocalPath);
+                return SyncResult.FAILED;
+            }
+
+            try {
+                IFolder updatedFolder;
+                if (rename) {
+                    // do rename
+                    Logger.InfoFormat ("Renaming remote folder: {0} -> {1}", oldLocalPath, newLocalPath);
+
+                    IDictionary<string, object> properties = new Dictionary<string, object> ();
+
+                    // Path.GetFileName will return the folder's name given path like 'd1/d2'. Becareful that there is no 
+                    // Path.DirectorySeperatarChar at the end of path.
+                    properties [PropertyIds.Name] = Path.GetFileName(newLocalPath);
+
+                    // rename remote object and refresh triplet's info
+                    updatedFolder = (IFolder)triplet.RemoteStorage.CmisObject.UpdateProperties (properties);
+
+
+                } else {
+                    // full path for html GET
+                    string oldRemoteUpperFolderPath = CmisFileUtil.PathCombine (
+                        cmisSyncFolder.RemotePath,
+                        CmisFileUtil.GetUpperFolderOfCmisPath (triplet.DBStorage.DBRemotePath));
+                    string newRemoteUpperFolderPath = CmisFileUtil.PathCombine (
+                        cmisSyncFolder.RemotePath,
+                        cmisSyncFolder.Database.LocalToRemote (newLocalUpperFolder, true));
+
+                    IFolder oldRemoteUpperFolder = (IFolder)session.GetObjectByPath (oldRemoteUpperFolderPath, true);
+                    IFolder newRemoteUpperFolder = (IFolder)session.GetObjectByPath (newRemoteUpperFolderPath, true);
+
+                    // move remote object and refresh triplet's info
+                    updatedFolder = (IFolder)((IFolder)triplet.RemoteStorage.CmisObject).Move (oldRemoteUpperFolder, newRemoteUpperFolder);
+                }
+
+                // Set latest info to triplet 
+                SyncTripletFactory.AssembleRemoteIntoLocal (updatedFolder, triplet, cmisSyncFolder);
+
+                // Update the path in the database...
+                cmisSyncFolder.Database.MoveFolder (triplet);
+
+                Logger.InfoFormat ("Move remote folder: {0} -> {1} succeed.", oldLocalPath, newLocalPath);
+            } catch (Exception e) {
+                Console.WriteLine ("  %% Move remote folder: {0} -> {1} failed.", oldLocalPath, newLocalPath);
+                Console.WriteLine (e.Message);
+                return SyncResult.FAILED;
+            }
+
+            return SyncResult.SUCCEED;
+        }
+
         public static SyncResult SolveConflict(SyncTriplet.SyncTriplet triplet,  CmisSyncFolder.CmisSyncFolder cmisSyncFolder) {
 
             // case: LS=ne, RS=e, but LS!=DB, RS!=DB, conflict but download only
