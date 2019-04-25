@@ -83,11 +83,11 @@ namespace CmisSync.Lib.Sync.SyncWorker
 
             /*
             syncMachine.DoWatcherTest ();
-            */
             while (true) {
                 syncMachine.DoLocalWatcherSync ();
                 Thread.Sleep (5000);
             }
+            */
 
             isFirstSyncing = true;
 

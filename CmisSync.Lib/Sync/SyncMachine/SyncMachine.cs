@@ -295,7 +295,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
             semiSyncTriplets = new BlockingCollection<SyncTriplet.SyncTriplet> ();
 
             Task localChangeTripletProcessTask = Task.Factory.StartNew (() => this.syncTripletProcessor.Start (fullSyncTriplets, itemsDependencies, processorCompleteAddingChecker));
-            Task localSfpProducerTask = Task.Factory.StartNew (() => this.localSfpProducer.StartForLocalChange (fullSyncTriplets, itemsDependencies));
+            Task localSfpProducerTask = Task.Factory.StartNew (() => this.localSfpProducer.StartForLocalChange (semiSyncTriplets, itemsDependencies));
             Task tripletAssemblerTask = Task.Factory.StartNew (() => this.syncTripletAssembler.StartForLocalWatcherAndLocalChange (semiSyncTriplets, fullSyncTriplets));
 
             localSfpProducerTask.Wait ();

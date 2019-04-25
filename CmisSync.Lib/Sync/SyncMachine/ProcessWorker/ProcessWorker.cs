@@ -49,6 +49,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
         public static SyncResult Process (SyncTriplet.SyncTriplet triplet, ISession session, CmisSyncFolder.CmisSyncFolder cmisSyncFolder,
                                     ItemsDependencies idps)
         {
+
             if (!idps.IsResolved (triplet.Name)) {
                 return SyncResult.UNRESOLVED;
             }
@@ -134,22 +135,28 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker
 
             if (cmisSyncFolder.BIDIRECTIONAL) {
                 if (triplet.LocalExist) {
-                    Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote",
-                                    System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                     // remote not exist, create or upload to remote, no matter if the triplet is a RENAME triplet
                     if (!triplet.RemoteExist) {
+
+                        Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: upload local to remote",
+                                        System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                         Console.WriteLine (" # [ WorkerThread: {0} ] create {1}.",
                                            System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
 
                         if (triplet.IsFolder)
+
                             return WorkerOperations.CreateRemoteFolder (triplet, session, cmisSyncFolder);
                         else
                             return WorkerOperations.UploadFile (triplet, session, cmisSyncFolder);
 
                     // remote exist, update    
                     } else {
+
+                        Console.WriteLine (" # [ WorkerThread: {0} ] SyncTriplet {1}: update remote by local",
+                                        System.Threading.Thread.CurrentThread.ManagedThreadId, triplet.Name);
+
                         // not rename
                         if (triplet.LocalStorage.RelativePath == triplet.DBStorage.DBLocalPath) {
                             if (triplet.IsFolder) { }// do nothing 

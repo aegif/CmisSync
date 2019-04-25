@@ -122,7 +122,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
             foreach( String filePath in Directory.GetFiles (folder)) {
 
                 if (!SyncFileUtil.WorthSyncing (filePath, cmisSyncFolder)) {
-                    Console.WriteLine (" - {0} is ignored: ", filePath);
+                    // TODO move to log
+                    // Console.WriteLine (" - {0} is ignored: ", filePath);
                     continue;
                 }
 
@@ -145,7 +146,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
                 //if (folderPath.Contains ("-conflict-version")) continue;
                 if (!SyncFileUtil.WorthSyncing (folderPath, cmisSyncFolder)) {
-                    Console.WriteLine (" - {0} is ignored: ", folderPath);
+                    // TODO move to log
+                    // Console.WriteLine (" - {0} is ignored: ", folderPath);
                     continue;
                 }
 

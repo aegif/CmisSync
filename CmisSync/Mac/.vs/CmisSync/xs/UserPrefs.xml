@@ -1,15 +1,17 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs">
     <Files>
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="89" Column="13" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="416" Column="37" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/ProcessWorker.cs" Line="187" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="607" Column="137" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalChangeCrawlWorker.cs" Line="31" Column="9" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalWatcherProcessor.cs" Line="141" Column="25" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="41" Column="21" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/ProcessWorker.cs" Line="171" Column="100" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="358" Column="46" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalWatcherProcessor.cs" Line="155" Column="28" />
       <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/RemoteCrawlWorker.cs" Line="153" Column="109" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/SyncTripletFactory.cs" Line="357" Column="31" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/SyncTripletFactory.cs" Line="365" Column="51" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="40" Column="36" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/Crawler/LocalCrawlWorker.cs" Line="221" Column="53" />
+      <File FileName="../../Extras/OpenDataSpaceDotCMIS/DotCMIS/binding/binding-impl.cs" Line="132" Column="1" />
+      <File FileName="../../Extras/OpenDataSpaceDotCMIS/DotCMIS/binding/http.cs" Line="259" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -18,6 +20,7 @@
             <Node name="CmisSync.Auth" expanded="True" />
             <Node name="CmisSync.ConsoleUnderDev" expanded="True" />
             <Node name="CmisSync.Lib" expanded="True">
+              <Node name="Cmis" expanded="True" />
               <Node name="Database" expanded="True" />
               <Node name="Sync" expanded="True">
                 <Node name="CmisSyncFolder" expanded="True" />
@@ -27,16 +30,16 @@
                   <Node name="Crawler" expanded="True" />
                   <Node name="Internal" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
-                    <Node name="Internal" expanded="True" />
+                    <Node name="Internal" expanded="True">
+                      <Node name="WorkerOperations.cs" selected="True" />
+                    </Node>
                   </Node>
                 </Node>
                 <Node name="SyncRepo" expanded="True" />
                 <Node name="SyncTriplet" expanded="True">
                   <Node name="TripletItem" expanded="True" />
                 </Node>
-                <Node name="SyncWorker" expanded="True">
-                  <Node name="SyncWorker.cs" selected="True" />
-                </Node>
+                <Node name="SyncWorker" expanded="True" />
               </Node>
               <Node name="Utilities" expanded="True">
                 <Node name="FileUtilities" expanded="True" />
@@ -44,7 +47,12 @@
               </Node>
             </Node>
             <Node name="DotCMIS" expanded="True">
+              <Node name="binding" expanded="True">
+                <Node name="atompub" expanded="True" />
+                <Node name="webservices" expanded="True" />
+              </Node>
               <Node name="client" expanded="True" />
+              <Node name="data" expanded="True" />
             </Node>
           </Node>
         </State>
@@ -59,7 +67,9 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="../../../../../Extras/OpenDataSpaceDotCMIS/DotCMIS/binding/http.cs" line="264" offsetX="683" offsetY="3748" expression="conn" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
   <DisabledProjects>
     <String>CmisSync.csproj</String>
   </DisabledProjects>

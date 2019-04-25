@@ -48,7 +48,13 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
 
             foreach (WatcherEvent change in changes) {
                 var e = change.GetFileSystemEventArgs ();
-                if (e.FullPath.StartsWith(cmisSyncFolder.LocalPath, StringComparison.CurrentCulture)) { 
+
+                if (e.FullPath.StartsWith(cmisSyncFolder.LocalPath, StringComparison.CurrentCulture)) {
+
+                    if (!File.Exists (e.FullPath) && !Directory.Exists (e.FullPath)) {
+                        Console.WriteLine ("%% Local file/folder: {0} not found, might be deleted.", e.FullPath);
+                        continue;
+                    }
 
                     SyncTriplet.SyncTriplet triplet = null;
 
@@ -68,8 +74,6 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     case WatcherChangeTypes.Renamed:
                         // TODO:
                         // why should I grace?
-                        // TODO 2:
-                        // idps? rename / move of folder/file should depend on its parent
                         bool isFolder = Utils.IsFolder (e.FullPath);
 
                         string oldFullPath = ((RenamedEventArgs)e).OldFullPath;
