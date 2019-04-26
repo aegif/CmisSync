@@ -180,7 +180,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             SyncTriplet res = new SyncTriplet (IsDocument);
 
             String localRoot = cmisSyncFolder.LocalPath;
-            String localRelative = localFullPath.Substring (localRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
+            String localRelative = localFullPath.Substring (localRoot.Length).TrimStart (Path.DirectorySeparatorChar);
             res.LocalStorage = new LocalStorageItem (localRoot, localRelative);
 
             res.DBStorage = new DBStorageItem (cmisSyncFolder.Database, localRelative, IsDocument, LocalToRemote);
@@ -221,7 +221,7 @@ namespace CmisSync.Lib.Sync.SyncTriplet
             SyncTriplet res = new SyncTriplet (IsFolder);
 
             String localRoot = cmisSyncFolder.LocalPath;
-            String localRelative = localFullPath.Substring (localRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
+            String localRelative = localFullPath.Substring (localRoot.Length).TrimStart (Path.DirectorySeparatorChar);
             res.LocalStorage = new LocalStorageItem (localRoot, localRelative);
 
             res.DBStorage = new DBStorageItem (cmisSyncFolder.Database, localRelative, IsFolder, LocalToRemote);
@@ -362,8 +362,8 @@ namespace CmisSync.Lib.Sync.SyncTriplet
 
             SyncTriplet res = null;
             String localRoot = cmisSyncFolder.LocalPath;
-            String localOldRelative = oldFullPath.Substring (localRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
-            String localNewRelative = newFullPath.Substring (localRoot.Length).TrimStart (CmisUtils.CMIS_FILE_SEPARATOR);
+            String localOldRelative = oldFullPath.Substring (localRoot.Length).TrimStart (Path.DirectorySeparatorChar);
+            String localNewRelative = newFullPath.Substring (localRoot.Length).TrimStart (Path.DirectorySeparatorChar);
 
             try {
                 res = new SyncTriplet (isFolder, DIRECTION.LOCAL2REMOTE);

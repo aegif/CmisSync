@@ -193,7 +193,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromDBFile(file [0], file [1], cmisSyncFolder);
 
                     // get files's parent's name
-                    string parentFolderName = triplet.Name.Remove (triplet.Name.LastIndexOf ('/') + 1);
+                    string parentFolderName = triplet.Name.Remove (
+                        triplet.Name.LastIndexOf (Path.DirectorySeparatorChar) + 1);
 
                     if (parentFolderName.Length > 0) {
 
@@ -215,7 +216,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.Crawler
                     SyncTriplet.SyncTriplet triplet = SyncTripletFactory.CreateSFPFromDBFolder (folder [0], folder [1], cmisSyncFolder);
 
                     // get folder's parent name
-                    string parentFolderName = triplet.Name.Remove ((triplet.Name.Remove (triplet.Name.LastIndexOf ('/'))).LastIndexOf ('/') + 1);
+                    string parentFolderName = triplet.Name.Remove (
+                        (triplet.Name.Remove (
+                            triplet.Name.LastIndexOf (Path.DirectorySeparatorChar))).LastIndexOf (Path.DirectorySeparatorChar) + 1);
                     /*
                      * if pareentFolder is / , it would be "" because the Name does not start with / : /a/b/c/ .Name = a/b/c/
                      * root folder should be ignored in dependencies

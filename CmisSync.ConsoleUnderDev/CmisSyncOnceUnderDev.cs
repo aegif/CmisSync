@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Net;
 
 using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
@@ -33,6 +34,16 @@ namespace CmisSync.ConsoleUnderDev
         /// <param name="args">The command-line arguments.</param>
         public static void Main(string[] args)
         {
+
+            /*
+             * https://social.msdn.microsoft.com/Forums/en-US/2ab06a91-c8fd-474c-81ea-61b78c8fbb56/httpwebrequestgetrequeststream-hangs-bug-in-systemnet-stack-?forum=ncl
+             * 
+             * The default max connection limit of a service point (which might be used by httpWebRequest) is 2.
+             * So if more than 1 file is updated to the remote ( using http PUT method ) server, httpWebRequest will hang.
+             * 
+             * TODO: set this value by 'MaxParallism' field in cmissync's config file
+             */
+            ServicePointManager.DefaultConnectionLimit = 10;
 
             Utils.ConfigureLogging();
             Logger.Info("Starting. Version: " + CmisSync.Lib.Backend.Version);

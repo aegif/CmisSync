@@ -404,7 +404,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                         continue;
                     }
 
-                    if (!(e.ChangeType is WatcherChangeTypes.Deleted)) { //&& SyncFileUtil.WorthSyncing(e.FullPath, cmisSyncFolder)) {
+                    if (!(e.ChangeType == WatcherChangeTypes.Deleted)) { //&& SyncFileUtil.WorthSyncing(e.FullPath, cmisSyncFolder)) {
                         Console.WriteLine ("%% Filesystem changed: \n" +
                           "   Name: {0}\n" +
                           "   Path: {1}\n" +
@@ -441,7 +441,7 @@ namespace CmisSync.Lib.Sync.SyncMachine
                             Console.WriteLine("%% Local file/folder: {0} not found, might be deleted.", e.FullPath);
                         }
                     } else {
-                        if (e.ChangeType is WatcherChangeTypes.Deleted) {
+                        if (e.ChangeType == WatcherChangeTypes.Deleted) {
                             Console.WriteLine ("%% File Deleted: {0}", e.FullPath);
                         }
                     }
