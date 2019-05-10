@@ -436,6 +436,9 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     cmisSyncFolder.Database.RemoveFile (triplet);
                     return SyncResult.SUCCEED;
                 }
+            } catch (CmisObjectNotFoundException e) {
+                // if the object is already removed, delete it from DB
+                cmisSyncFolder.Database.RemoveFile (triplet);
             } catch (Exception e) {
                 Console.WriteLine ("  %% delete remote file failed, " + e.Message);
                 return SyncResult.FAILED;
@@ -455,7 +458,7 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 // Companion with triplet.Delay property:
                 // All files and subfolders should be removed before
                 // it. 
-                if (folder.GetChildren().TotalNumItems > 0) {
+                if (folder.GetChildren ().TotalNumItems > 0) {
                     Console.WriteLine ("   %% unable to delete non-empty folder: " + folder.Path + "\n" +
                                        "      check if there is modified file in it");
 
@@ -485,7 +488,10 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                     + "\nIf you feel you should be able to delete it, please contact your server administrator");
                 */
                 cmisSyncFolder.Database.RemoveFolder (triplet);
-            } catch(Exception e) {
+            } catch (CmisObjectNotFoundException e) {
+                // The remote object is not found, it has been removed. Delete it from DB
+                cmisSyncFolder.Database.RemoveFolder (triplet);
+            } catch (Exception e) {
                 Console.WriteLine ("  %% delete remote folder failed, " + e.Message);
                 return SyncResult.FAILED;
             }

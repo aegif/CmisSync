@@ -1,14 +1,16 @@
 ﻿<Properties StartupConfiguration="{BC81E910-0D2D-4F4F-BE1B-BAEF53C1EC83}|Default">
   <MonoDevelop.Ide.ItemProperties.CmisSync.ConsoleUnderDev PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs">
     <Files>
       <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/SyncTripletFactory.cs" Line="309" Column="28" />
       <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/SyncTriplet.cs" Line="87" Column="33" />
       <File FileName="../../CmisSync.Lib/Sync/SyncTriplet/TripletItem/RemoteStorageItem.cs" Line="45" Column="86" />
       <File FileName="../../CmisSync.Lib/Sync/SyncMachine/LocalSfpProducer.cs" Line="1" Column="1" />
       <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletAssembler.cs" Line="95" Column="67" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="284" Column="1" />
-      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="90" Column="13" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/ProcessWorker/Internal/WorkerOperations.cs" Line="469" Column="17" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncWorker/SyncWorker.cs" Line="74" Column="1" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncMachine.cs" Line="297" Column="107" />
+      <File FileName="../../CmisSync.Lib/Sync/SyncMachine/SyncTripletProcessor.cs" Line="130" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -24,16 +26,16 @@
                   <Node name="Crawler" expanded="True" />
                   <Node name="Internal" expanded="True" />
                   <Node name="ProcessWorker" expanded="True">
-                    <Node name="Internal" expanded="True" />
+                    <Node name="Internal" expanded="True">
+                      <Node name="WorkerOperations.cs" selected="True" />
+                    </Node>
                   </Node>
                 </Node>
                 <Node name="SyncRepo" expanded="True" />
                 <Node name="SyncTriplet" expanded="True">
                   <Node name="TripletItem" expanded="True" />
                 </Node>
-                <Node name="SyncWorker" expanded="True">
-                  <Node name="SyncWorker.cs" selected="True" />
-                </Node>
+                <Node name="SyncWorker" expanded="True" />
               </Node>
               <Node name="Utilities" expanded="True">
                 <Node name="FileUtilities" expanded="True" />
