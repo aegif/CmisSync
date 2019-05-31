@@ -211,7 +211,10 @@ namespace TestLibrary
             return SessionFactory.NewInstance().CreateSession(cmisParameters);
         }
 
-        protected ISession CreateSession(string url, string user, string password, string repositoryId)
+        /**
+         * Public because used from helper
+         */
+        public ISession CreateSession(string url, string user, string password, string repositoryId)
         {
             Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
             cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;

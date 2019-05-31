@@ -1600,7 +1600,7 @@ namespace TestLibrary
             CmisRepo.SynchronizedFolder synchronizedFolder =
                     new CmisRepo.SynchronizedFolder(repoInfo, cmisRepo, activityListener);
             //  Invoke the backend synchronize for concurrent
-            cmisRepo.Initialize();
+            cmisRepo.SyncAtStartupIfConfiguredToDoSo();
 
             ISession session = CreateSession(repoInfo);
             IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);

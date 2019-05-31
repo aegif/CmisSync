@@ -95,5 +95,28 @@ namespace TestLibrary
                 Console.WriteLine("Exception on testing side, ignoring " + ex);
             }
         }
+
+        /// <summary>
+        /// Create a random text file with the given path, with the given size.
+        /// </summary>
+        public static void CreateTextFile(string filePath, int sizeInKb)
+        {
+            try
+            {
+                using (FileStream stream = File.OpenWrite(filePath))
+                {
+                    // Write random data
+                    for (int i = 0; i < sizeInKb; i++)
+                    {
+                        byte[] data = Encoding.UTF8.GetBytes("Unicode is a computing industry standard for the consistent encoding, representation, handling of text in almost all languages\n");
+                        stream.Write(data, 0, data.Length);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception on testing side, ignoring " + ex);
+            }
+        }
     }
 }

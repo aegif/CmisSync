@@ -80,16 +80,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractSyncTests.cs" />
-    <Compile Include="CmisDatabaseTest.cs" />
-    <Compile Include="CmisSyncLibUtilsTest.cs" />
-    <Compile Include="ConfigurationTest.cs" />
-    <Compile Include="ExternalTests.cs" />
-    <Compile Include="EncodingTest.cs" />
+    <Compile Include="External\CmisSyncProcess.cs" />
+    <Compile Include="External\AbstractExternalTests.cs" />
+    <Compile Include="External\BasicExternalTests.cs" />
+    <Compile Include="External\LocalFile.cs" />
+    <Compile Include="External\LongExternalTest.cs" />
+    <Compile Include="External\LocalFirstExternalTests.cs" />
+    <Compile Include="Internal\AbstractSyncTests.cs" />
+    <Compile Include="External\ProcessExtension.cs" />
+    <Compile Include="Internal\CmisDatabaseTest.cs" />
+    <Compile Include="Internal\CmisSyncLibUtilsTest.cs" />
+    <Compile Include="Internal\ConfigurationTest.cs" />
+    <Compile Include="External\RemoteFirstExternalTests.cs" />
+    <Compile Include="Internal\EncodingTest.cs" />
     <Compile Include="LocalFilesystemActivityGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SyncTests.cs" />
-    <Compile Include="WatcherTest.cs" />
+    <Compile Include="Internal\SyncTests.cs" />
+    <Compile Include="External\ThreadAccess.cs" />
+    <Compile Include="Internal\WatcherTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Auth\CmisSync.Auth.csproj">

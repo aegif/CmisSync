@@ -63,7 +63,7 @@ namespace TestLibraryRunner
 
         static void testExternal()
         {
-            new ExternalTests().StartStopConsoleNonPerpetual();
+            new LocalFirstExternalTests().LocalFileCreation();
         }
 
         static void Main(string[] args)
