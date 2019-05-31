@@ -178,6 +178,8 @@ namespace CmisSync.Lib
                 watcherDelayTimer.AutoReset = false;
                 watcherDelayTimer.Interval = delayAfterLocalChange;
             }
+
+            this.Watcher.ChangeEvent += OnFileActivity;
         }
 
 
@@ -224,12 +226,10 @@ namespace CmisSync.Lib
 
 
         /// <summary>
-        /// Initialize the watcher.
+        /// Synchronize at startup if configured to do so.
         /// </summary>
-        public void Initialize()
+        public void SyncAtStartupIfConfiguredToDoSo()
         {
-            this.Watcher.ChangeEvent += OnFileActivity;
-
             // Sync up everything that changed
             // since we've been offline
             if (RepoInfo.SyncAtStartup)

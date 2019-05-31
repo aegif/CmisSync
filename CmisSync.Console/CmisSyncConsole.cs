@@ -75,6 +75,12 @@ namespace CmisSync.Console
             {
                 // No need to do anything, as the periodicSynchronizationTimer objects in RepoBase have been configured to run synchronizations at regular intervals.
 
+                // Some repos are configured to be synchronized at startup, so sync them (done in background).
+                foreach (CmisRepo cmisRepo in repos)
+                {
+                    cmisRepo.SyncAtStartupIfConfiguredToDoSo(); // Done in background, so no success boolean returned.
+                }
+
                 // Wait until our processus gets terminated. All work is done in other threads.
                 Thread.Sleep(Timeout.Infinite);
 
