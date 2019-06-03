@@ -25,9 +25,8 @@ namespace TestLibrary
         public void LongScenario(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
+            // Prepare remote folder and CmisSync process.
             ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
-
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
             ////////////////////////////////////////////// Local file creation

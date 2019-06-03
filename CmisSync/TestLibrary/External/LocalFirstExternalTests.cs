@@ -25,7 +25,6 @@ namespace TestLibrary
         {
             // Clear the remote folder.
             ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
-
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
             new LocalFile(url, user, password, repositoryId, remoteFolderPath, sync, this);
@@ -36,27 +35,23 @@ namespace TestLibrary
         public void LocalFileAppend(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
-            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
-
+            // Prepare remote folder and CmisSync process.
+            ISession session = ClearRemoteCMISFolderAndGetSession(url, user, password, repositoryId, remoteFolderPath);
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
-            ////////////////////////////////////////////// Local file creation
+            // Local file creation
 
             // Create random small file.
             int sizeKb = 3;
             string filename = "file.doc";
             LocalFilesystemActivityGenerator.CreateFile(Path.Combine(sync.Folder(), filename), sizeKb);
 
-            // Wait a few seconds so that sync gets a chance to sync things.
-            Thread.Sleep(20 * 1000);
-
             // Check that file is present server-side.
+            Thread.Sleep(20 * 1000);
             IDocument doc = null;
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + filename, true);
             }
             catch (CmisObjectNotFoundException e)
             {
@@ -70,7 +65,7 @@ namespace TestLibrary
             // TODO compare date Assert.AreEqual(, doc.);
             string docId = doc.Id;
 
-            ////////////////////////////////////////////// Local file append
+            // Local file append
 
             // Append to file
             string dataToAppend = "let's add a bit more data to that file";
@@ -81,13 +76,11 @@ namespace TestLibrary
                 bw.Write(bytes);
             }
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
+            // Check on server
             Thread.Sleep(10 * 1000);
-
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + filename, true);
             }
             catch (CmisObjectNotFoundException e)
             {
@@ -103,23 +96,20 @@ namespace TestLibrary
         public void LocalFolderCreation(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
-            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
-
+            // Prepare remote folder and CmisSync process.
+            ISession session = ClearRemoteCMISFolderAndGetSession(url, user, password, repositoryId, remoteFolderPath);
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
             // Create local folder.
             string foldername = "folder 1";
             Directory.CreateDirectory(Path.Combine(sync.Folder(), foldername));
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
+            // Check on server
             Thread.Sleep(10 * 1000);
-
             IFolder folder = null;
             try
             {
-                folder = (IFolder)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + foldername, true);
+                folder = (IFolder)session.GetObjectByPath(remoteFolderPath + "/" + foldername, true);
             }
             catch (CmisObjectNotFoundException e)
             {
@@ -131,26 +121,24 @@ namespace TestLibrary
         public void LocalFileDeletion(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
-            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
-
+            // Prepare remote folder and CmisSync process.
+            ISession session = ClearRemoteCMISFolderAndGetSession(url, user, password, repositoryId, remoteFolderPath);
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
             // Create the file
             LocalFile localFile = new LocalFile(url, user, password, repositoryId, remoteFolderPath, sync, this);
 
+            // FIXME Check on server. Or even create the file on server.
+
             // Delete the file.
             File.Delete(Path.Combine(sync.Folder(), localFile.FullPath));
 
-            // Wait so that sync gets a chance to sync things.
-            Thread.Sleep(15 * 1000);
-
             // Check that file is not present server-side.
+            Thread.Sleep(15 * 1000);
             IDocument doc = null;
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + localFile.Filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + localFile.Filename, true);
 
                 // Should have failed.
                 Assert.Fail("Deleted document still exists on server: " + doc);
@@ -165,8 +153,8 @@ namespace TestLibrary
         public void LocalFileRename(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
-            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
+            // Prepare remote folder and CmisSync process.
+            ISession session = ClearRemoteCMISFolderAndGetSession(url, user, password, repositoryId, remoteFolderPath);
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
             ////////////////////////////////////////////// Local file creation
@@ -183,8 +171,7 @@ namespace TestLibrary
             IDocument doc = null;
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + filename, true);
             }
             catch (CmisObjectNotFoundException e)
             {
@@ -205,15 +192,12 @@ namespace TestLibrary
             File.Move(Path.Combine(sync.Folder(), filename), Path.Combine(sync.Folder(), newFilename));
             filename = newFilename;
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
-
             // Check that the remote document has been renamed, and still has the same object id.
+            Thread.Sleep(10 * 1000);
             doc = null;
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + filename, true);
             }
             catch (CmisObjectNotFoundException e)
             {
@@ -226,17 +210,14 @@ namespace TestLibrary
 
             // Current status: The following line sometimes fails, sometimes succeeds. Probably a race condition.
             Assert.AreEqual(docId, newDocId, "The remote document's id has changed when the local file was renamed: " + docId + " -> " + newDocId);
-
-            // Exit the process to avoid any possible interference with subsequent tests.
-            sync.Kill(); // TODO does not always get killed.
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
         public void LocalFileMove(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
 string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
-            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
+            // Prepare remote folder and CmisSync process.
+            ISession session = ClearRemoteCMISFolderAndGetSession(url, user, password, repositoryId, remoteFolderPath);
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
             ////////////////////////////////////////////// Local file creation
@@ -253,8 +234,7 @@ string url, string user, string password, string repositoryId)
             IDocument doc = null;
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + filename, true);
             }
             catch (CmisObjectNotFoundException e)
             {
@@ -280,28 +260,24 @@ string url, string user, string password, string repositoryId)
             IFolder folder = null;
             try
             {
-                folder = (IFolder)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + foldername, true);
+                folder = (IFolder)session.GetObjectByPath(remoteFolderPath + "/" + foldername, true);
             }
             catch (CmisObjectNotFoundException e)
             {
                 Assert.Fail("Folder failed to get synced to the server.", e);
             }
 
-            ////////////////////////////////////////////// Move local file to other folder
+            // Move local file to other folder
 
             string destinationFilename = foldername + Path.DirectorySeparatorChar + filename;
             File.Move(Path.Combine(sync.Folder(), filename), Path.Combine(sync.Folder(), destinationFilename));
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
-
             // Check that the remote document has been renamed, and still has the same object id.
+            Thread.Sleep(10 * 1000);
             doc = null;
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + foldername + "/" + filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + foldername + "/" + filename, true);
             }
             catch (CmisObjectNotFoundException e)
             {
@@ -320,8 +296,8 @@ string url, string user, string password, string repositoryId)
         public void LocalFolderMove(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
 string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
-            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
+            // Prepare remote folder and CmisSync process.
+            ISession session = ClearRemoteCMISFolderAndGetSession(url, user, password, repositoryId, remoteFolderPath);
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
             ////////////////////////////////////////////// Move local folder
@@ -338,8 +314,7 @@ string url, string user, string password, string repositoryId)
             string id = null;
             try
             {
-                IFolder folder = (IFolder)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + foldername2, true);
+                IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath + "/" + foldername2, true);
                 id = folder.Id;
             }
             catch (CmisObjectNotFoundException e)
@@ -350,14 +325,12 @@ string url, string user, string password, string repositoryId)
             // Move folder 2 into folder 1
             Directory.Move(Path.Combine(sync.Folder(), foldername2), Path.Combine(sync.Folder(), foldername1, foldername2));
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
+            // Check on server.
             Thread.Sleep(10 * 1000);
-
             string newId = null;
             try
             {
-                IFolder folder = (IFolder)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + foldername1 + "/" + foldername2, true);
+                IFolder folder = (IFolder)session.GetObjectByPath(remoteFolderPath + "/" + foldername1 + "/" + foldername2, true);
                 newId = folder.Id;
             }
             catch (CmisObjectNotFoundException e)
@@ -373,8 +346,8 @@ string url, string user, string password, string repositoryId)
         public void LocalFileCreationWithOnlyWatcher(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
 string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
-            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
+            // Prepare remote folder.
+            ISession session = ClearRemoteCMISFolderAndGetSession(url, user, password, repositoryId, remoteFolderPath);
 
             // Month-long sync interval, meaning that in fact only the watcher can trigger syncs.
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId, CmisSyncProcess.MONTH_LONG_SYNC_INTERVAL);
@@ -389,15 +362,12 @@ string url, string user, string password, string repositoryId)
             string filename = "file.doc";
             LocalFilesystemActivityGenerator.CreateFile(Path.Combine(sync.Folder(), filename), sizeKb);
 
-            // Wait a few seconds so that sync gets a chance to sync things.
-            Thread.Sleep(20 * 1000);
-
             // Check that file is present server-side.
+            Thread.Sleep(20 * 1000);
             IDocument doc = null;
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + filename, true);
             }
             catch (CmisObjectNotFoundException e)
             {
@@ -427,10 +397,8 @@ string url, string user, string password, string repositoryId)
             string foldername = "Subfolder0";
             Directory.CreateDirectory(Path.Combine(sync.Folder(), foldername));
 
-            // Wait so that sync gets a chance to sync things.
-            Thread.Sleep(2 * 10 * 1000);
-
             // Check on 2.
+            Thread.Sleep(2 * 10 * 1000);
             Assert.True(Directory.Exists(Path.Combine(sync2.Folder(), foldername)));
         }
 
@@ -438,10 +406,8 @@ string url, string user, string password, string repositoryId)
         public void Conflict(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
-            // Clear the remote folder.
-            ClearRemoteCMISFolder(url, user, password, repositoryId, remoteFolderPath);
-
-            // Create sync.
+            // Prepare remote folder and CmisSync process.
+            ISession session = ClearRemoteCMISFolderAndGetSession(url, user, password, repositoryId, remoteFolderPath);
             sync = new CmisSyncProcess(remoteFolderPath, url, user, password, repositoryId);
 
             ////////////////////////////////////////////// Initialization
@@ -455,6 +421,7 @@ string url, string user, string password, string repositoryId)
             Thread.Sleep(20 * 1000);
 
             sync.Suspend();
+
             // Wait for 10 seconds to be sure suspension happened.
             Thread.Sleep(10 * 1000);
 
@@ -470,8 +437,7 @@ string url, string user, string password, string repositoryId)
             IDocument doc = null;
             try
             {
-                doc = (IDocument)CreateSession(url, user, password, repositoryId)
-                    .GetObjectByPath(remoteFolderPath + "/" + filename, true);
+                doc = (IDocument)session.GetObjectByPath(remoteFolderPath + "/" + filename, true);
                 doc.SetContentStream(contentStream, true);
             }
             catch (CmisObjectNotFoundException e)
@@ -479,9 +445,7 @@ string url, string user, string password, string repositoryId)
                 Assert.Fail("Document failed to get synced to the server.", e);
             }
 
-            ////////////////////////////////////////////// Modify on local side
-
-            // Append to file
+            // Modify on local side, by appending to file.
             string dataToAppend = "Modified on local side";
             byte[] bytes = Encoding.UTF8.GetBytes(dataToAppend);
             using (var fileStream = new FileStream(Path.Combine(sync.Folder(), filename), FileMode.Append, FileAccess.Write, FileShare.None))
@@ -490,11 +454,8 @@ string url, string user, string password, string repositoryId)
                 bw.Write(bytes);
             }
 
-            ////////////////////////////////////////////// Conflict
-
+            // Conflict
             sync.Resume();
-
-            // Wait for 10 seconds so that sync gets a chance to sync things.
             Thread.Sleep(10 * 1000);
 
             // TODO check that conflicts happened correctly.
@@ -534,5 +495,9 @@ string url, string user, string password, string repositoryId)
             Assert.True(Directory.Exists(Path.Combine(sync.Folder(), foldername)));
             Assert.True(Directory.Exists(Path.Combine(sync2.Folder(), foldername)));
         }
+
+        // TODO
+        // sync while text file open for edition
+        // sync while .doc file open for edition by MS Word
     }
 }

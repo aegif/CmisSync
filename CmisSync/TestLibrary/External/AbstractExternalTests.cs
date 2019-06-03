@@ -159,7 +159,10 @@ namespace TestLibrary
         /// <summary>
         /// Delete all objects contained in a remote CMIS folder.
         /// </summary>
-        protected void ClearRemoteCMISFolder(string url, string user, string password, string repositoryId, string remoteFolderPath)
+        /// <returns>
+        /// The cleared folder, ready to use for testing.
+        /// </returns>
+        protected IFolder ClearRemoteCMISFolder(string url, string user, string password, string repositoryId, string remoteFolderPath)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
 
@@ -172,17 +175,50 @@ namespace TestLibrary
             SessionFactory factory = SessionFactory.NewInstance();
             ISession session = factory.CreateSession(parameters);
 
+            return ClearRemoteCMISFolderAndGetFolder(session, remoteFolderPath);
+        }
+
+        /// <summary>
+        /// Delete all objects contained in a remote CMIS folder.
+        /// </summary>
+        /// <returns>
+        /// The CMIS session, usable for testing.
+        /// </returns>
+        protected ISession ClearRemoteCMISFolderAndGetSession(string url, string user, string password, string repositoryId, string remoteFolderPath)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+            parameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            parameters[SessionParameter.AtomPubUrl] = url;
+            parameters[SessionParameter.User] = user;
+            parameters[SessionParameter.Password] = password;
+            parameters[SessionParameter.RepositoryId] = repositoryId;
+
+            SessionFactory factory = SessionFactory.NewInstance();
+            ISession session = factory.CreateSession(parameters);
+
+            ClearRemoteCMISFolderAndGetFolder(session, remoteFolderPath);
+
+            return session;
+        }
+
+        private IFolder ClearRemoteCMISFolderAndGetFolder(ISession session, string remoteFolderPath)
+        {
             var folder = (IFolder)session.GetObjectByPath(remoteFolderPath, true);
             foreach (var child in folder.GetChildren())
             {
-                if (child is IFolder) {
+                if (child is IFolder)
+                {
                     IFolder folderChild = (IFolder)child;
                     folderChild.DeleteTree(true, UnfileObject.Delete, true);
                 }
-                else {
+                else
+                {
                     child.Delete(true);
                 }
             }
+
+            return folder;
         }
 
         /*public string CreateTemporaryDirectory()
