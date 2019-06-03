@@ -440,7 +440,8 @@ namespace CmisSync.Lib.Sync.SyncMachine.ProcessWorker.Internal
                 // if the object is already removed, delete it from DB
                 cmisSyncFolder.Database.RemoveFile (triplet);
                 return SyncResult.SUCCEED;
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 Console.WriteLine ("  %% delete remote file failed, " + e.Message);
                 return SyncResult.FAILED;
             }
