@@ -8,6 +8,7 @@ using CmisSync.Lib;
 
 namespace TestLibrary
 {
+    using CmisSync.Lib.Config;
     using NUnit.Framework;
 
     /// <summary></summary>

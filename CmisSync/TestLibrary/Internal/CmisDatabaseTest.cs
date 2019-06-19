@@ -12,6 +12,7 @@ namespace TestLibrary
 {
     using NUnit.Framework;
     using CmisSync.Lib.Database;
+    using CmisSync.Lib.Config;
 
     [TestFixture]
     class CmisDatabaseTest

@@ -6,6 +6,9 @@ using System.IO;
 
 namespace TestLibrary
 {
+    /// <summary>
+    /// Generate some file system activity.
+    /// </summary>
     class LocalFilesystemActivityGenerator
     {
         public static int id = 1;
@@ -46,30 +49,66 @@ namespace TestLibrary
         {
             Random rng = new Random();
             int sizeInKb = 1 + rng.Next(maxSizeInKb);
-            CreateFile(path, sizeInKb);
+            CreateFileInFolder(path, sizeInKb);
         }
 
+        /// <summary>
+        /// Gives the name of the file that will be created next.
+        /// </summary>
         public static string GetNextFileName()
         {
             string filename = "file_" + id.ToString() + ".bin";
             return filename;
         }
 
-        public static void CreateFile(string path, int sizeInKb)
+        /// <summary>
+        /// Create a random binary file in the given folder, with the given size.
+        /// </summary>
+        public static void CreateFileInFolder(string folderPath, int sizeInKb)
         {
-            Random rng = new Random();
-            string filename = GetNextFileName();
-            ++ id;
+            ++id;
+            CreateFile(GetNextFileName(), sizeInKb);
+        }
+
+        /// <summary>
+        /// Create a random binary file with the given path, with the given size.
+        /// </summary>
+        public static void CreateFile(string filePath, int sizeInKb)
+        {
+            Random random = new Random();
             byte[] data = new byte[1024];
 
             try
             {
-                using (FileStream stream = File.OpenWrite(Path.Combine(path, filename)))
+                using (FileStream stream = File.OpenWrite(filePath))
                 {
                     // Write random data
                     for (int i = 0; i < sizeInKb; i++)
                     {
-                        rng.NextBytes(data);
+                        random.NextBytes(data);
+                        stream.Write(data, 0, data.Length);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception on testing side, ignoring " + ex);
+            }
+        }
+
+        /// <summary>
+        /// Create a random text file with the given path, with the given size.
+        /// </summary>
+        public static void CreateTextFile(string filePath, int sizeInKb)
+        {
+            try
+            {
+                using (FileStream stream = File.OpenWrite(filePath))
+                {
+                    // Write random data
+                    for (int i = 0; i < sizeInKb; i++)
+                    {
+                        byte[] data = Encoding.UTF8.GetBytes("Unicode is a computing industry standard for the consistent encoding, representation, handling of text in almost all languages\n");
                         stream.Write(data, 0, data.Length);
                     }
                 }

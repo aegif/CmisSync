@@ -1,4 +1,5 @@
 using CmisSync.Lib;
+using CmisSync.Lib.Config;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -19,12 +20,12 @@ namespace TestLibrary
             try
             {
                 //Create new config file with default values
-                Config config = new Config(configpath);
+                CmisSyncConfig config = new CmisSyncConfig(configpath);
                 //Notifications should be switched on by default
                 Assert.IsTrue(config.Notifications);
                 Assert.AreEqual(config.Folders.Count, 0);
                 config.Save();
-                config = new Config(configpath);
+                config = new CmisSyncConfig(configpath);
             }
             catch (Exception)
             {

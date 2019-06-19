@@ -1,6 +1,8 @@
 ﻿using CmisSync.Lib;
 using CmisSync.Lib.Cmis;
+using CmisSync.Lib.Config;
 using CmisSync.Lib.Sync;
+using CmisSync.Lib.Sync.SyncRepo;
 using DotCMIS;
 using DotCMIS.Client;
 using DotCMIS.Client.Impl;
@@ -211,6 +213,22 @@ namespace TestLibrary
             return SessionFactory.NewInstance().CreateSession(cmisParameters);
         }
 
+        /**
+         * Public because used from helper
+         */
+        public ISession CreateSession(string url, string user, string password, string repositoryId)
+        {
+            Dictionary<string, string> cmisParameters = new Dictionary<string, string>();
+            cmisParameters[SessionParameter.BindingType] = BindingType.AtomPub;
+            cmisParameters[SessionParameter.AtomPubUrl] = url;
+            cmisParameters[SessionParameter.User] = user;
+            cmisParameters[SessionParameter.Password] = password;
+            cmisParameters[SessionParameter.RepositoryId] = repositoryId;
+            cmisParameters[SessionParameter.ConnectTimeout] = "-1";
+
+            return SessionFactory.NewInstance().CreateSession(cmisParameters);
+        }
+
         protected IDocument CreateRemoteDocument(IFolder folder, string name, string content)
         {
             Dictionary<string, object> properties = new Dictionary<string, object>();
@@ -377,30 +395,30 @@ namespace TestLibrary
         /// <param name='pollInterval'>
         /// Sleep interval duration in miliseconds between synchronization calls.
         /// </param>
-        public static bool SyncAndWaitUntilCondition(CmisRepo.SynchronizedFolder synchronizedFolder, Func<bool> checkStop, int maxTries = 4, int pollInterval = 5000)
-        {
-            int i = 0;
-            while (i < maxTries)
-            {
-                try
-                {
-                    synchronizedFolder.Sync();
-                }
-                catch (DotCMIS.Exceptions.CmisRuntimeException e)
-                {
-                    Console.WriteLine("{0} Exception caught and swallowed, retry.", e);
-                    System.Threading.Thread.Sleep(pollInterval);
-                    continue;
-                }
-                if (checkStop())
-                    return true;
-                Console.WriteLine(String.Format("Retry Sync in {0}ms", pollInterval));
-                System.Threading.Thread.Sleep(pollInterval);
-                i++;
-            }
-            Console.WriteLine("Sync call was not successful");
-            return false;
-        }
+        //public static bool SyncAndWaitUntilCondition(CmisRepo.SynchronizedFolder synchronizedFolder, Func<bool> checkStop, int maxTries = 4, int pollInterval = 5000)
+        //{
+        //    int i = 0;
+        //    while (i < maxTries)
+        //    {
+        //        try
+        //        {
+        //            synchronizedFolder.Sync();
+        //        }
+        //        catch (DotCMIS.Exceptions.CmisRuntimeException e)
+        //        {
+        //            Console.WriteLine("{0} Exception caught and swallowed, retry.", e);
+        //            System.Threading.Thread.Sleep(pollInterval);
+        //            continue;
+        //        }
+        //        if (checkStop())
+        //            return true;
+        //        Console.WriteLine(String.Format("Retry Sync in {0}ms", pollInterval));
+        //        System.Threading.Thread.Sleep(pollInterval);
+        //        i++;
+        //    }
+        //    Console.WriteLine("Sync call was not successful");
+        //    return false;
+        //}
 
         /// <summary>
         /// Waits until a particular condition (expressed as checkStop) is true, or waiting limit is exceeded.
