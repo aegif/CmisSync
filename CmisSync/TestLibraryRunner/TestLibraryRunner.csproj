@@ -102,7 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CmisSync.Lib\CmisSync.Lib.csproj">
-      <Project>{2C914413-B31C-4362-93C7-1AE34F09112A}</Project>
+      <Project>{2c914413-b31c-4362-93c7-1ae34f09112a}</Project>
       <Name>CmisSync.Lib</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extras\log4net-1.2.11\src\log4net.vs2010.csproj">
