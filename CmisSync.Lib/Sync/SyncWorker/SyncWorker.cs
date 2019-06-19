@@ -90,17 +90,6 @@ namespace CmisSync.Lib.Sync.SyncWorker
                     Thread.Sleep (5000);
                 }
             }
-
-            isFirstSyncing = true;
-
-            if (isFirstSyncing)
-                syncMachine.DoCrawlSync ();
-            else {
-                if (!syncMachine.DoChangeLogSync ()) {
-                    Console.WriteLine ("Change Log Processor return broken: {0}, do full craw sync");
-                    syncMachine.DoCrawlSync ();
-                }
-            }
         }
 
         private void Connect ()
