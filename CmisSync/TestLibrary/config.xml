@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CmisSync xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <configSchemaVersion>1</configSchemaVersion>
+  <notifications>true</notifications>
+  <singleRepository>false</singleRepository>
+  <frozenConfiguration>false</frozenConfiguration>
+  <log4net>
+    <appender name="CmisSyncFileAppender" type="log4net.Appender.RollingFileAppender">
+      <file value="{LOG}" />
+      <appendToFile value="true" />
+      <rollingStyle value="Size" />
+      <maxSizeRollBackups value="5" />
+      <maximumFileSize value="1MB" />
+      <staticLogFileName value="true" />
+      <layout type="log4net.Layout.PatternLayout">
+        <conversionPattern value="%date [%thread] %-5level %logger [%property{NDC}] - %message%newline" />
+      </layout>
+    </appender>
+    <root>
+      <level value="DEBUG" />
+      <appender-ref ref="CmisSyncFileAppender" />
+    </root>
+  </log4net>
+  <folders>
+    <folder>
+      <name>Synchronized folder for unit tests</name>
+      <path>{LOCAL_FOLDER}</path>
+      <url>{URL}</url>
+      <repository>{REPOSITORY}</repository>
+      <remoteFolder>{REMOTE_FOLDER}</remoteFolder>
+      <user>{USER}</user>
+      <password>{PASSWORD}</password>
+      <issuspended>false</issuspended>
+      <syncatstartup>true</syncatstartup>
+      <pollinterval>{POLL_INTERVAL}</pollinterval>
+      <maxUploadRetries>2</maxUploadRetries>
+      <maxDownloadRetries>2</maxDownloadRetries>
+      <maxDeletionRetries>2</maxDeletionRetries>
+      <features xsi:nil="true" />
+    </folder>
+  </folders>
+  <user>
+    <name>nico</name>
+    <email>Unknown</email>
+  </user>
+</CmisSync>
