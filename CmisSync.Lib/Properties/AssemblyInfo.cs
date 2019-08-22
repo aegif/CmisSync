@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("CmisSync.Lib")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("E52A2D2E-DCAC-44A0-BCA5-D0D83FE5C61A")]
+[assembly: Guid("C5D13977-C12F-4D8A-BCFB-0B6A179B4058")]
 
 
 // Version information for an assembly consists of the following four values:
@@ -30,5 +30,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("2.13.1")]
+[assembly: AssemblyVersion("2.13.2")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
