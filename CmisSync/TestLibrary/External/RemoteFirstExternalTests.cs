@@ -44,8 +44,8 @@ namespace TestLibrary
                 creationContentStream.Stream = new MemoryStream(creationContent);
                 remoteBaseFolder.CreateDocument(properties, creationContentStream, null);
 
-                // Wait for 10 seconds so that sync gets a chance to sync things.
-                Thread.Sleep(10 * 1000);
+                // Wait for a few seconds so that sync gets a chance to sync things.
+                Thread.Sleep(20 * 1000);
 
                 // Check locally
                 Assert.True(File.Exists(Path.Combine(sync.Folder(), (String)properties[PropertyIds.Name])));
@@ -91,7 +91,7 @@ namespace TestLibrary
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void RemoteDocumentModification(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+        public void _CurrentlyFailing_RemoteDocumentModification(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare remote folder and CmisSync process.
@@ -113,8 +113,8 @@ namespace TestLibrary
 
             IDocument doc = remoteBaseFolder.CreateDocument(properties, creationContentStream, null);
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
+            // Wait for a few seconds so that sync gets a chance to sync things.
+            Thread.Sleep(20 * 1000);
 
             // Check locally
             Assert.True(File.Exists(Path.Combine(sync.Folder(), (String)properties[PropertyIds.Name])));
@@ -142,7 +142,7 @@ namespace TestLibrary
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void RemoteDocumentRename(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+        public void _CurrentlyFailing_RemoteDocumentRename(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare remote folder and CmisSync process.
@@ -165,8 +165,8 @@ namespace TestLibrary
 
             IDocument document = remoteBaseFolder.CreateDocument(properties, creationContentStream, null);
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
+            // Wait for a few seconds so that sync gets a chance to sync things.
+            Thread.Sleep(20 * 1000);
 
             // Check locally
             Assert.True(File.Exists(Path.Combine(sync.Folder(), (String)properties[PropertyIds.Name])));
@@ -175,8 +175,8 @@ namespace TestLibrary
             //document.Move(remoteBaseFolder, folder);
             document.Rename(newFilename);
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
+            // Wait for a few seconds so that sync gets a chance to sync things.
+            Thread.Sleep(20 * 1000);
 
             // Check locally
             Assert.False(File.Exists(Path.Combine(sync.Folder(), filename))); // Currently fails, local document is not renamed, even though document is correctly renamed on server.
@@ -199,8 +199,8 @@ namespace TestLibrary
 
             IFolder folder = remoteBaseFolder.CreateFolder(properties);
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
+            // Wait for a few seconds so that sync gets a chance to sync things.
+            Thread.Sleep(20 * 1000);
 
             // Check locally
             Assert.True(Directory.Exists(Path.Combine(sync.Folder(), (String)properties[PropertyIds.Name])));
@@ -222,8 +222,8 @@ namespace TestLibrary
 
             IFolder folder = remoteBaseFolder.CreateFolder(properties);
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
+            // Wait for a few seconds so that sync gets a chance to sync things.
+            Thread.Sleep(20 * 1000);
 
             // Check locally
             Assert.True(Directory.Exists(Path.Combine(sync.Folder(), (String)properties[PropertyIds.Name])));
@@ -239,7 +239,7 @@ namespace TestLibrary
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void RemoteDocumentMove(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+        public void _CurrentlyFailing_RemoteDocumentMove(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare remote folder and CmisSync process.
@@ -332,7 +332,7 @@ namespace TestLibrary
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void RemoteFolderCreationThenSameNameDocumentDeletion(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+        public void _CurrentlyFailing_RemoteFolderCreationThenSameNameDocumentDeletion(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare remote folder and CmisSync process.
@@ -346,8 +346,8 @@ namespace TestLibrary
             folderProperties[PropertyIds.ObjectTypeId] = "cmis:folder";
             IFolder folder = remoteBaseFolder.CreateFolder(folderProperties);
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
+            // Wait for a few seconds so that sync gets a chance to sync things.
+            Thread.Sleep(20 * 1000);
 
             // Check locally
             Assert.True(File.Exists(Path.Combine(sync.Folder(), remoteObjectName)));
@@ -367,8 +367,8 @@ namespace TestLibrary
             creationContentStream.Stream = new MemoryStream(creationContent);
             IDocument document = remoteBaseFolder.CreateDocument(properties, creationContentStream, null);
 
-            // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
+            // Wait for a few seconds so that sync gets a chance to sync things.
+            Thread.Sleep(20 * 1000);
 
             // Check locally
             Assert.True(Directory.Exists(Path.Combine(sync.Folder(), remoteObjectName)));
@@ -419,7 +419,7 @@ namespace TestLibrary
 
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void RemoteFolderRename(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+        public void _CurrentlyFailing_RemoteFolderRename(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Prepare remote folder and CmisSync process.

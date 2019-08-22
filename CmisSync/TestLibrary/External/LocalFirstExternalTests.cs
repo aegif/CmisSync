@@ -213,7 +213,7 @@ namespace TestLibrary
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void LocalFileMove(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+        public void _CurrentlyFailing_LocalFileMove(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
 string url, string user, string password, string repositoryId)
         {
             // Prepare remote folder and CmisSync process.
@@ -255,7 +255,7 @@ string url, string user, string password, string repositoryId)
             Directory.CreateDirectory(Path.Combine(sync.Folder(), foldername));
 
             // Wait for 10 seconds so that sync gets a chance to sync things.
-            Thread.Sleep(10 * 1000);
+            Thread.Sleep(20 * 1000);
 
             IFolder folder = null;
             try
@@ -273,7 +273,7 @@ string url, string user, string password, string repositoryId)
             File.Move(Path.Combine(sync.Folder(), filename), Path.Combine(sync.Folder(), destinationFilename));
 
             // Check that the remote document has been renamed, and still has the same object id.
-            Thread.Sleep(10 * 1000);
+            Thread.Sleep(20 * 1000);
             doc = null;
             try
             {
@@ -281,7 +281,7 @@ string url, string user, string password, string repositoryId)
             }
             catch (CmisObjectNotFoundException e)
             {
-                Assert.Fail("Document failed to get synced to the server.", e);
+                Assert.Fail("Document failed to get moved on server.", e);
             }
             Assert.NotNull(doc);
             Assert.AreEqual(filename, doc.ContentStreamFileName);
@@ -293,7 +293,7 @@ string url, string user, string password, string repositoryId)
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void LocalFolderMove(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+        public void _CurrentlyFailing_LocalFolderMove(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
 string url, string user, string password, string repositoryId)
         {
             // Prepare remote folder and CmisSync process.
@@ -383,7 +383,7 @@ string url, string user, string password, string repositoryId)
         }
 
         [Test, TestCaseSource("TestServers"), Category("Slow")]
-        public void TwoCmisSync(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
+        public void _CurrentlyFailing_TwoCmisSync(string ignoredCanonicalName, string ignoredLocalPath, string remoteFolderPath,
             string url, string user, string password, string repositoryId)
         {
             // Clear the remote folder.
